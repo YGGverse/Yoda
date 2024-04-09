@@ -17,10 +17,7 @@
             {
                 "button":
                 {
-                    "go":
-                    {
-                        "enabled":true
-                    }
+                    "go":true
                 }
             },
             "width":640,

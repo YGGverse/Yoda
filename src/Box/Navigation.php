@@ -35,7 +35,7 @@ class Navigation
             8
         );
 
-        if ($config->interface->window->navigation->button->go->enabled)
+        if ($config->interface->window->navigation->button->go)
         {
             $this->go = new \Yggverse\Yoda\Button\Go();
 
