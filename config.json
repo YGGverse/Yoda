@@ -17,6 +17,10 @@
             {
                 "button":
                 {
+                    "home":true,
+                    "back":true,
+                    "forward":true,
+                    "reload":true,
                     "go":true
                 }
             },
