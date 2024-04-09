@@ -16,5 +16,9 @@ class Address
         $this->entry->set_text(
             $value
         );
+
+        $this->entry->set_max_length(
+            1024
+        );
     }
 }
