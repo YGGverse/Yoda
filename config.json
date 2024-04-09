@@ -13,6 +13,16 @@
                     "close":true
                 }
             },
+            "navigation":
+            {
+                "button":
+                {
+                    "go":
+                    {
+                        "enabled":true
+                    }
+                }
+            },
             "width":640,
             "height":480
         }
