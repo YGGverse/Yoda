@@ -13,9 +13,15 @@ class Main
     public \Yggverse\Yoda\Label\Content $content;
     public \Yggverse\Yoda\Label\Tray $tray;
 
+    public \Yggverse\Yoda\Model\Memory $memory;
+
     public function __construct(
         string $name = 'boxMain'
     ) {
+        // Init memory
+        $this->memory = new \Yggverse\Yoda\Model\Memory();
+
+        // Init container
         $this->box = new \GtkBox(
             \GtkOrientation::VERTICAL
         );
@@ -72,7 +78,6 @@ class Main
             function ($entry)
             {
                 global $config;
-                global $memory;
 
                 $this->tray->label->set_text(
                     sprintf(
@@ -93,7 +98,7 @@ class Main
 
                     $name = $address->getHost();
 
-                    if (!$host = $memory->get($name))
+                    if (!$host = $this->memory->get($name))
                     {
                         $resolve = new \Yggverse\Net\Resolve(
                             $config->resolver->request->record,
@@ -110,7 +115,7 @@ class Main
                         {
                             $host = $resolved->getHost();
 
-                            $memory->set(
+                            $this->memory->set(
                                 $name,
                                 $host
                             );
