@@ -9,6 +9,9 @@ require_once __DIR__ .
 // Init config
 $config = \Yggverse\Yoda\Model\File::getConfig();
 
+// Init memory
+$memory = new \Yggverse\Yoda\Model\Memory();
+
 // Init GTK
 \Gtk::init();
 
