@@ -12,7 +12,7 @@ At this moment project under development!
 * [ ] Certificate features
 * [ ] `Gemfeed` reader
 * [ ] Search engine integrations, probably [Yo!](https://github.com/YGGverse/Yo/tree/gemini) Search by default
-* [ ] Machine translations (e.g. [Lingva API](https://github.com/thedaviddelta/lingva-translate))
+* [ ] Machine translations (e.g. [Lingva](https://github.com/thedaviddelta/lingva-translate) API)
 
 ## Components
 
