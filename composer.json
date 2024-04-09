@@ -1,0 +1,22 @@
+{
+    "name": "yggverse/yoda",
+    "description": "PHP-GTK Client for Gemini Protocol",
+    "keywords": [ "php-gtk", "gtk", "gtk3", "gemini", "gemini-protocol", "client", "browser", "altweb" ],
+    "homepage": "https://github.com/YGGverse/Yoda",
+    "type": "project",
+    "require": {
+        "yggverse/gemini": "^0.7.0",
+        "yggverse/net": "^1.7"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Yggverse\\Yoda\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "YGGverse"
+        }
+    ]
+}
