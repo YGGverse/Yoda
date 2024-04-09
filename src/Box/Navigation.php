@@ -41,24 +41,42 @@ class Navigation
             );
         }
 
-        if ($config->interface->window->navigation->button->back)
+        if ($config->interface->window->navigation->button->back || $config->interface->window->navigation->button->forward)
         {
-            $this->back = new \Yggverse\Yoda\Button\Back();
-
-            $this->box->pack_start(
-                $this->back->button,
-                false,
-                false,
-                8
+            $boxBackForward = new \GtkButtonBox(
+                \GtkOrientation::HORIZONTAL
             );
-        }
 
-        if ($config->interface->window->navigation->button->forward)
-        {
-            $this->forward = new \Yggverse\Yoda\Button\Forward();
+            $boxBackForward->set_layout(
+                \GtkButtonBoxStyle::EXPAND
+            );
+
+            if ($config->interface->window->navigation->button->back)
+            {
+                $this->back = new \Yggverse\Yoda\Button\Back();
+
+                $boxBackForward->pack_start(
+                    $this->back->button,
+                    false,
+                    true,
+                    0
+                );
+            }
+
+            if ($config->interface->window->navigation->button->forward)
+            {
+                $this->forward = new \Yggverse\Yoda\Button\Forward();
+
+                $boxBackForward->pack_end(
+                    $this->forward->button,
+                    false,
+                    true,
+                    0
+                );
+            }
 
             $this->box->pack_start(
-                $this->forward->button,
+                $boxBackForward,
                 false,
                 false,
                 8
