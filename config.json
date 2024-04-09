@@ -3,7 +3,7 @@
     "theme":"Default",
     "resolver":
     {
-        "enabled":false,
+        "enabled":true,
         "request":
         {
             "timeout":1,
