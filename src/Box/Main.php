@@ -40,7 +40,7 @@ class Main
             $this->navigation->box,
             false,
             true,
-            0
+            8
         );
 
         $this->content = new \Yggverse\Yoda\Label\Content();
