@@ -2,7 +2,7 @@
     "homepage":"gemini://yggverse.cities.yesterweb.org",
     "interface":
     {
-        "theme":"Default",
+        "theme":"default",
         "window":
         {
             "header":
