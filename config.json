@@ -1,0 +1,30 @@
+{
+    "homepage":"gemini://yggverse.cities.yesterweb.org",
+    "theme":"Default",
+    "resolver":
+    {
+        "enabled":false,
+        "request":
+        {
+            "timeout":1,
+            "host":
+            [
+                "1.1.1.1",
+                "8.8.8.8"
+            ],
+            "record":
+            [
+                "A",
+                "AAAA"
+            ]
+        },
+        "result":
+        {
+            "shuffle":false,
+            "cache":
+            {
+                "timeout":3600
+            }
+        }
+    }
+}
