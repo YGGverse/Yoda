@@ -72,36 +72,7 @@ class Main
             function ($entry)
             {
                 global $config;
-
-                $host = null;
-
-                if ($config->resolver->enabled)
-                {
-                    $resolve = new \Yggverse\Net\Resolve(
-                        $config->resolver->request->record,
-                        $config->resolver->request->host,
-                        $config->resolver->request->timeout,
-                        $config->resolver->result->shuffle
-                    );
-
-                    $address = new \Yggverse\Net\Address(
-                        $entry->get_text()
-                    );
-
-                    $resolved = $resolve->address(
-                        $address
-                    );
-
-                    if ($resolved)
-                    {
-                        $host = $resolved->getHost(); // @TODO memory cache
-                    }
-                }
-
-                $request = new \Yggverse\Gemini\Client\Request(
-                    $entry->get_text(),
-                    $host
-                );
+                global $memory;
 
                 $this->tray->label->set_text(
                     sprintf(
@@ -111,6 +82,46 @@ class Main
                 );
 
                 $start = microtime(true);
+
+                $host = null;
+
+                if ($config->resolver->enabled)
+                {
+                    $address = new \Yggverse\Net\Address(
+                        $entry->get_text()
+                    );
+
+                    $name = $address->getHost();
+
+                    if (!$host = $memory->get($name))
+                    {
+                        $resolve = new \Yggverse\Net\Resolve(
+                            $config->resolver->request->record,
+                            $config->resolver->request->host,
+                            $config->resolver->request->timeout,
+                            $config->resolver->result->shuffle
+                        );
+
+                        $resolved = $resolve->address(
+                            $address
+                        );
+
+                        if ($resolved)
+                        {
+                            $host = $resolved->getHost();
+
+                            $memory->set(
+                                $name,
+                                $host
+                            );
+                        }
+                    }
+                }
+
+                $request = new \Yggverse\Gemini\Client\Request(
+                    $entry->get_text(),
+                    $host
+                );
 
                 $raw = $request->getResponse();
 
