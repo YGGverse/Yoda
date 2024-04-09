@@ -1,6 +1,22 @@
 {
     "homepage":"gemini://yggverse.cities.yesterweb.org",
-    "theme":"Default",
+    "interface":
+    {
+        "theme":"Default",
+        "window":
+        {
+            "header":
+            {
+                "enabled":true,
+                "button":
+                {
+                    "close":true
+                }
+            },
+            "width":640,
+            "height":480
+        }
+    },
     "resolver":
     {
         "enabled":true,

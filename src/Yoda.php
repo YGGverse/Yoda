@@ -20,7 +20,7 @@ $css = new \GtkCssProvider();
 
 $css->load_from_data(
     \Yggverse\Yoda\Model\File::getTheme(
-        $config->theme
+        $config->interface->theme
     )
 );
 
@@ -35,9 +35,22 @@ $style->add_provider_for_screen(
 $window = new \GtkWindow();
 
 $window->set_size_request(
-    600,
-    480
+    $config->interface->window->width,
+    $config->interface->window->height
 );
+
+if ($config->interface->window->header->enabled)
+{
+    $header = new \GtkHeaderBar();
+
+    $header->set_show_close_button(
+        $config->interface->window->header->button->close
+    );
+
+    $window->set_titlebar(
+        $header
+    );
+}
 
 $window->set_title(
     'Yoda'
