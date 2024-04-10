@@ -61,10 +61,10 @@ $window->connect(
     }
 );
 
-$main = new \Yggverse\Yoda\Box\Main();
+$tab = new \Yggverse\Yoda\Box\Tab();
 
 $window->add(
-    $main->box
+    $tab->box
 );
 
 $window->show_all();

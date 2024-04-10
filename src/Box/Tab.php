@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Box;
 
-class Main
+class Tab
 {
     public \GtkBox $box;
 
@@ -16,7 +16,7 @@ class Main
     public \Yggverse\Yoda\Model\Memory $memory;
 
     public function __construct(
-        string $name = 'boxMain'
+        string $name = 'boxTab'
     ) {
         // Init memory
         $this->memory = new \Yggverse\Yoda\Model\Memory();
