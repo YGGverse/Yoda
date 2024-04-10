@@ -85,7 +85,9 @@ class Tab
                 $this->tray->label->set_text(
                     sprintf(
                         'Open %s...',
-                        $entry->get_text()
+                        urldecode(
+                            $entry->get_text()
+                        )
                     )
                 );
 
