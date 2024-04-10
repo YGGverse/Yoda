@@ -72,7 +72,10 @@ class Tab
             true,
             0
         );
+    }
 
+    public function activate()
+    {
         $this->navigation->address->entry->connect(
             'activate',
             function ($entry)
