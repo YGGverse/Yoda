@@ -73,6 +73,7 @@ class Tab
             0
         );
 
+        // Init listeners
         $this->navigation->address->entry->connect(
             'activate',
             function ($entry)
@@ -106,6 +107,7 @@ class Tab
         // @TODO home, back, forward buttons
     }
 
+    // Actions
     public function navigate(string $url)
     {
         global $config;
