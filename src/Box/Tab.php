@@ -113,6 +113,10 @@ class Tab
             'released',
             function ($entry)
             {
+                $this->navigation->address->entry->set_text(
+                    $this->config->homepage
+                );
+
                 $this->navigate(
                     $this->config->homepage
                 );
