@@ -109,7 +109,17 @@ class Tab
             }
         );
 
-        // @TODO home, back, forward buttons
+        $this->navigation->home->button->connect(
+            'released',
+            function ($entry)
+            {
+                $this->navigate(
+                    $this->config->homepage
+                );
+            }
+        );
+
+        // @TODO back, forward buttons
     }
 
     // Actions
