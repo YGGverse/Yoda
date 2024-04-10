@@ -61,12 +61,12 @@ $window->connect(
     }
 );
 
-$tab = new \Yggverse\Yoda\Entity\Box\Tab(
+$controller = new \Yggverse\Yoda\Controller\Tab(
     $window
 );
 
 $window->add(
-    $tab->box
+    $controller->tab->box
 );
 
 $window->show_all();
