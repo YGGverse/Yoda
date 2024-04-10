@@ -72,95 +72,109 @@ class Tab
             true,
             0
         );
-    }
 
-    public function activate()
-    {
         $this->navigation->address->entry->connect(
             'activate',
             function ($entry)
             {
-                global $config;
-
-                $this->tray->label->set_text(
-                    sprintf(
-                        'Open %s...',
-                        urldecode(
-                            $entry->get_text()
-                        )
-                    )
-                );
-
-                $start = microtime(true);
-
-                $host = null;
-
-                if ($config->resolver->enabled)
-                {
-                    $address = new \Yggverse\Net\Address(
-                        $entry->get_text()
-                    );
-
-                    $name = $address->getHost();
-
-                    if (!$host = $this->memory->get($name))
-                    {
-                        $resolve = new \Yggverse\Net\Resolve(
-                            $config->resolver->request->record,
-                            $config->resolver->request->host,
-                            $config->resolver->request->timeout,
-                            $config->resolver->result->shuffle
-                        );
-
-                        $resolved = $resolve->address(
-                            $address
-                        );
-
-                        if ($resolved)
-                        {
-                            $host = $resolved->getHost();
-
-                            $this->memory->set(
-                                $name,
-                                $host
-                            );
-                        }
-                    }
-                }
-
-                $request = new \Yggverse\Gemini\Client\Request(
-                    $entry->get_text(),
-                    $host
-                );
-
-                $raw = $request->getResponse();
-
-                $end = microtime(true);
-
-                $response = new \Yggverse\Gemini\Client\Response(
-                    $raw
-                );
-
-                $this->content->label->set_markup(
-                    $response->getBody()
-                );
-
-                $this->tray->label->set_text(
-                    sprintf(
-                        '%s | %s | %d bytes | %s seconds',
-                        date('c'),
-                        $response->getMeta() ? $response->getMeta() : $response->getCode(),
-                        number_format(
-                            mb_strlen(
-                                $raw
-                            )
-                        ),
-                        round(
-                            $end - $start, 2
-                        )
-                    )
+                $this->navigate(
+                    $entry->get_text()
                 );
             }
+        );
+
+        $this->navigation->go->button->connect(
+            'released',
+            function ($entry)
+            {
+                $this->navigate(
+                    $this->navigation->address->entry->get_text()
+                );
+            }
+        );
+    }
+
+    public function navigate(string $url)
+    {
+        global $config;
+
+        $this->tray->label->set_text(
+            sprintf(
+                'Open %s...',
+                urldecode(
+                    $url
+                )
+            )
+        );
+
+        $start = microtime(true);
+
+        $host = null;
+
+        if ($config->resolver->enabled)
+        {
+            $address = new \Yggverse\Net\Address(
+                $url
+            );
+
+            $name = $address->getHost();
+
+            if (!$host = $this->memory->get($name))
+            {
+                $resolve = new \Yggverse\Net\Resolve(
+                    $config->resolver->request->record,
+                    $config->resolver->request->host,
+                    $config->resolver->request->timeout,
+                    $config->resolver->result->shuffle
+                );
+
+                $resolved = $resolve->address(
+                    $address
+                );
+
+                if ($resolved)
+                {
+                    $host = $resolved->getHost();
+
+                    $this->memory->set(
+                        $name,
+                        $host
+                    );
+                }
+            }
+        }
+
+        $request = new \Yggverse\Gemini\Client\Request(
+            $url,
+            $host
+        );
+
+        $raw = $request->getResponse();
+
+        $end = microtime(true);
+
+        $response = new \Yggverse\Gemini\Client\Response(
+            $raw
+        );
+
+        $this->content->label->set_markup(
+            $response->getBody()
+        );
+
+        $this->tray->label->set_text(
+            sprintf(
+                '%s | %s | %d bytes | %s seconds',
+                date('c'),
+                $response->getMeta() ? $response->getMeta() : $response->getCode(),
+                number_format(
+                    mb_strlen(
+                        $raw
+                    )
+                ),
+                round(
+                    $end - $start, 2
+                )
+            )
         );
     }
 }
