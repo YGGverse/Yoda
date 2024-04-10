@@ -1,0 +1,5 @@
+# Oops!
+
+Something went wrong..
+
+=> https://github.com/YGGverse/Yoda/issues Report

@@ -73,9 +73,13 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
             );
 
             $this->tab->navigation->home->button->set_sensitive(
-                !($url == $this->config->homepage)
+                !($this->tab->navigation->address->entry->get_text() == $this->config->homepage)
             );
         }
+
+        $this->navigate(
+            $this->tab->navigation->address->entry->get_text()
+        );
 
         $this->window->add(
             $this->tab->box
@@ -84,7 +88,88 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
         $this->window->show_all();
     }
 
-    public function navigate(string $url)
+    public function navigate(string $url): void
+    {
+        switch (true)
+        {
+            case str_starts_with($url, 'gemini://'):
+
+                $this->navigateGemini(
+                    $url
+                );
+
+            break;
+
+            case str_starts_with($url, 'yoda://'):
+
+                $this->navigateYoda(
+                    $url
+                );
+
+            break;
+
+            default:
+
+                $this->navigateYoda(
+                    'yoda://oops'
+                );
+        }
+    }
+
+
+    public function navigateYoda(string $url): void
+    {
+        if ($data = \Yggverse\Yoda\Model\Page::get(str_replace('yoda://', '', $url)))
+        {
+            $response = new \Yggverse\Gemini\Client\Response(
+                $data
+            );
+
+            $this->tab->content->label->set_markup(
+                $data
+            );
+
+            $body = new \Yggverse\Gemini\Gemtext\Body(
+                $data
+            );
+
+            if ($h1 = $body->getH1())
+            {
+                $this->window->set_title(
+                    $h1[0]
+                );
+            }
+        }
+
+        else
+        {
+            $data = \Yggverse\Yoda\Model\Page::get('Oops');
+
+            $this->tab->content->label->set_markup(
+                $data
+            );
+
+            $body = new \Yggverse\Gemini\Gemtext\Body(
+                $data
+            );
+
+            if ($h1 = $body->getH1())
+            {
+                $this->window->set_title(
+                    $h1[0]
+                );
+            }
+        }
+
+        if ($this->config->interface->window->navigation->button->home && $this->config->homepage)
+        {
+            $this->tab->navigation->home->button->set_sensitive(
+                !($url == $this->config->homepage)
+            );
+        }
+    }
+
+    public function navigateGemini(string $url): void
     {
         $this->tab->tray->label->set_text(
             sprintf(
