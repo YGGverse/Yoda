@@ -15,9 +15,14 @@ class Tab
 
     public \Yggverse\Yoda\Model\Memory $memory;
 
+    public object $config;
+
     public function __construct(
         string $name = 'boxTab'
     ) {
+        // Init config
+        $this->config = \Yggverse\Yoda\Model\File::getConfig();
+
         // Init memory
         $this->memory = new \Yggverse\Yoda\Model\Memory();
 
@@ -110,8 +115,6 @@ class Tab
     // Actions
     public function navigate(string $url)
     {
-        global $config;
-
         $this->tray->label->set_text(
             sprintf(
                 'Open %s...',
@@ -125,7 +128,7 @@ class Tab
 
         $host = null;
 
-        if ($config->resolver->enabled)
+        if ($this->config->resolver->enabled)
         {
             $address = new \Yggverse\Net\Address(
                 $url
@@ -136,10 +139,10 @@ class Tab
             if (!$host = $this->memory->get($name))
             {
                 $resolve = new \Yggverse\Net\Resolve(
-                    $config->resolver->request->record,
-                    $config->resolver->request->host,
-                    $config->resolver->request->timeout,
-                    $config->resolver->result->shuffle
+                    $this->config->resolver->request->record,
+                    $this->config->resolver->request->host,
+                    $this->config->resolver->request->timeout,
+                    $this->config->resolver->result->shuffle
                 );
 
                 $resolved = $resolve->address(
