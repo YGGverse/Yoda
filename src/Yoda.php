@@ -61,7 +61,9 @@ $window->connect(
     }
 );
 
-$tab = new \Yggverse\Yoda\Box\Tab();
+$tab = new \Yggverse\Yoda\Box\Tab(
+    $window
+);
 
 $window->add(
     $tab->box

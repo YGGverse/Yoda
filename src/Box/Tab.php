@@ -8,6 +8,8 @@ class Tab
 {
     public \GtkBox $box;
 
+    public \GtkWindow $window;
+
     public \Yggverse\Yoda\Box\Menu $menu;
     public \Yggverse\Yoda\Box\Navigation $navigation;
     public \Yggverse\Yoda\Label\Content $content;
@@ -18,8 +20,12 @@ class Tab
     public object $config;
 
     public function __construct(
+        \GtkWindow $window,
         string $name = 'boxTab'
     ) {
+        // Init window
+        $this->window = $window;
+
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig();
 
@@ -194,6 +200,20 @@ class Tab
         $this->content->label->set_markup(
             $response->getBody()
         );
+
+        $body = new \Yggverse\Gemini\Gemtext\Body(
+            $response->getBody()
+        );
+
+        if ($h1 = $body->getH1())
+        {
+            $this->window->set_title(
+                sprintf(
+                    '%s - Yoda',
+                    empty($h1[0]) ? $address->getHost() : $h1[0]
+                )
+            );
+        }
 
         $this->tray->label->set_text(
             sprintf(
