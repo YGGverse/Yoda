@@ -116,7 +116,6 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
         }
     }
 
-
     private function _yoda(string $url): void
     {
         if ($data = \Yggverse\Yoda\Model\Page::get(str_replace('yoda://', '', $url)))
@@ -125,7 +124,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
                 $data
             );
 
-            $this->tab->content->label->set_markup(
+            $this->tab->content->label->set_text(
                 $data
             );
 
@@ -145,7 +144,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
         {
             $data = \Yggverse\Yoda\Model\Page::get('Oops');
 
-            $this->tab->content->label->set_markup(
+            $this->tab->content->label->set_text(
                 $data
             );
 
@@ -230,7 +229,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
             $raw
         );
 
-        $this->tab->content->label->set_markup(
+        $this->tab->content->label->set_text(
             $response->getBody()
         );
 
