@@ -56,7 +56,7 @@ class Tab
             $scroll,
             true,
             true,
-            10
+            0
         );
 
         $this->tray = new \Yggverse\Yoda\Entity\Label\Tray();
