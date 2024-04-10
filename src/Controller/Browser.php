@@ -94,7 +94,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
         {
             case str_starts_with($url, 'gemini://'):
 
-                $this->navigateGemini(
+                $this->_gemini(
                     $url
                 );
 
@@ -102,7 +102,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
 
             case str_starts_with($url, 'yoda://'):
 
-                $this->navigateYoda(
+                $this->_yoda(
                     $url
                 );
 
@@ -110,14 +110,14 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
 
             default:
 
-                $this->navigateYoda(
+                $this->_yoda(
                     'yoda://oops'
                 );
         }
     }
 
 
-    public function navigateYoda(string $url): void
+    private function _yoda(string $url): void
     {
         if ($data = \Yggverse\Yoda\Model\Page::get(str_replace('yoda://', '', $url)))
         {
@@ -169,7 +169,7 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
         }
     }
 
-    public function navigateGemini(string $url): void
+    private function _gemini(string $url): void
     {
         $this->tab->tray->label->set_text(
             sprintf(
