@@ -15,7 +15,7 @@ class Content
         );
 
         $this->label->set_use_markup(
-            true
+            false
         );
 
         $this->label->set_selectable(
