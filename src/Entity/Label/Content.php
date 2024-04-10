@@ -22,6 +22,10 @@ class Content
             true
         );
 
+        $this->label->set_line_wrap(
+            true
+        );
+
         $this->label->set_xalign(
             0
         );
