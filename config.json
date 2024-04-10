@@ -2,7 +2,7 @@
     "homepage":"yoda://welcome",
     "interface":
     {
-        "theme":"default",
+        "theme":"Default",
         "window":
         {
             "header":
