@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Controller;
 
-class Tab
+class Browser extends \Yggverse\Yoda\Abstract\Window
 {
-    public \GtkWindow $window;
-
     public \Yggverse\Yoda\Entity\Box\Tab $tab;
 
     public \Yggverse\Yoda\Model\Memory $memory;
 
-    public object $config;
-
-    public function __construct(
-        \GtkWindow $window
-    ) {
-        $this->window = $window;
-
-        $this->config = \Yggverse\Yoda\Model\File::getConfig();
+    public function __construct()
+    {
+        parent::__construct(
+            \Yggverse\Yoda\Model\File::getConfig()
+        );
 
         $this->memory = new \Yggverse\Yoda\Model\Memory();
 
@@ -72,7 +67,11 @@ class Tab
             );
         }
 
-        // @TODO back, forward buttons
+        $this->window->add(
+            $this->tab->box
+        );
+
+        $this->window->show_all();
     }
 
     public function navigate(string $url)
