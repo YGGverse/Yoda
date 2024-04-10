@@ -30,27 +30,33 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
             }
         );
 
-        $this->tab->navigation->go->button->connect(
-            'released',
-            function ($entry)
-            {
-                $this->navigate(
-                    $this->tab->navigation->address->entry->get_text()
-                );
-            }
-        );
+        if ($this->config->interface->window->navigation->button->go)
+        {
+            $this->tab->navigation->go->button->connect(
+                'released',
+                function ($entry)
+                {
+                    $this->navigate(
+                        $this->tab->navigation->address->entry->get_text()
+                    );
+                }
+            );
+        }
 
-        $this->tab->navigation->reload->button->connect(
-            'released',
-            function ($entry)
-            {
-                $this->navigate(
-                    $this->tab->navigation->address->entry->get_text()
-                );
-            }
-        );
+        if ($this->config->interface->window->navigation->button->reload)
+        {
+            $this->tab->navigation->reload->button->connect(
+                'released',
+                function ($entry)
+                {
+                    $this->navigate(
+                        $this->tab->navigation->address->entry->get_text()
+                    );
+                }
+            );
+        }
 
-        if ($this->config->homepage)
+        if ($this->config->interface->window->navigation->button->home && $this->config->homepage)
         {
             $this->tab->navigation->home->button->connect(
                 'released',
@@ -64,6 +70,10 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
                         $this->config->homepage
                     );
                 }
+            );
+
+            $this->tab->navigation->home->button->set_sensitive(
+                !($url == $this->config->homepage)
             );
         }
 
@@ -168,5 +178,12 @@ class Browser extends \Yggverse\Yoda\Abstract\Window
                 )
             )
         );
+
+        if ($this->config->interface->window->navigation->button->home && $this->config->homepage)
+        {
+            $this->tab->navigation->home->button->set_sensitive(
+                !($url == $this->config->homepage)
+            );
+        }
     }
 }
