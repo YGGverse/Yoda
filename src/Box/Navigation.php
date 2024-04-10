@@ -16,10 +16,12 @@ class Navigation
     public \Yggverse\Yoda\Button\Reload $reload;
     public \Yggverse\Yoda\Button\Go $go;
 
+    public object $config;
+
     public function __construct(
         string $name = 'boxNavigation'
     ) {
-        global $config;
+        $this->config = \Yggverse\Yoda\Model\File::getConfig();
 
         $this->box = new \GtkBox(
             \GtkOrientation::HORIZONTAL
@@ -29,7 +31,7 @@ class Navigation
             $name
         );
 
-        if ($config->interface->window->navigation->button->home && $config->homepage)
+        if ($this->config->interface->window->navigation->button->home && $this->config->homepage)
         {
             $this->home = new \Yggverse\Yoda\Button\Home();
 
@@ -41,7 +43,7 @@ class Navigation
             );
         }
 
-        if ($config->interface->window->navigation->button->back || $config->interface->window->navigation->button->forward)
+        if ($this->config->interface->window->navigation->button->back || $this->config->interface->window->navigation->button->forward)
         {
             $boxBackForward = new \GtkButtonBox(
                 \GtkOrientation::HORIZONTAL
@@ -51,7 +53,7 @@ class Navigation
                 \GtkButtonBoxStyle::EXPAND
             );
 
-            if ($config->interface->window->navigation->button->back)
+            if ($this->config->interface->window->navigation->button->back)
             {
                 $this->back = new \Yggverse\Yoda\Button\Back();
 
@@ -63,7 +65,7 @@ class Navigation
                 );
             }
 
-            if ($config->interface->window->navigation->button->forward)
+            if ($this->config->interface->window->navigation->button->forward)
             {
                 $this->forward = new \Yggverse\Yoda\Button\Forward();
 
@@ -83,7 +85,7 @@ class Navigation
             );
         }
 
-        if ($config->interface->window->navigation->button->reload)
+        if ($this->config->interface->window->navigation->button->reload)
         {
             $this->reload = new \Yggverse\Yoda\Button\Reload();
 
@@ -96,7 +98,7 @@ class Navigation
         }
 
         $this->address = new \Yggverse\Yoda\Entry\Address(
-            $config->homepage
+            $this->config->homepage
         );
 
         $this->box->pack_start(
@@ -106,7 +108,7 @@ class Navigation
             8
         );
 
-        if ($config->interface->window->navigation->button->go)
+        if ($this->config->interface->window->navigation->button->go)
         {
             $this->go = new \Yggverse\Yoda\Button\Go();
 
