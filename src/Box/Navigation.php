@@ -29,7 +29,7 @@ class Navigation
             $name
         );
 
-        if ($config->interface->window->navigation->button->home)
+        if ($config->interface->window->navigation->button->home && $config->homepage)
         {
             $this->home = new \Yggverse\Yoda\Button\Home();
 

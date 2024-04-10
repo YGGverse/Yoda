@@ -109,19 +109,22 @@ class Tab
             }
         );
 
-        $this->navigation->home->button->connect(
-            'released',
-            function ($entry)
-            {
-                $this->navigation->address->entry->set_text(
-                    $this->config->homepage
-                );
+        if ($this->config->homepage)
+        {
+            $this->navigation->home->button->connect(
+                'released',
+                function ($entry)
+                {
+                    $this->navigation->address->entry->set_text(
+                        $this->config->homepage
+                    );
 
-                $this->navigate(
-                    $this->config->homepage
-                );
-            }
-        );
+                    $this->navigate(
+                        $this->config->homepage
+                    );
+                }
+            );
+        }
 
         // @TODO back, forward buttons
     }
