@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Box;
+namespace Yggverse\Yoda\Entity\Box;
 
 class Menu
 {
     public \GtkBox $box;
 
-    public \Yggverse\Yoda\Menu\Bar\Main $main;
+    public \Yggverse\Yoda\Entity\Menu\Bar\Main $main;
 
     public function __construct(
         string $name = 'boxMenu'
@@ -21,7 +21,7 @@ class Menu
             $name
         );
 
-        $this->main = new \Yggverse\Yoda\Menu\Bar\Main();
+        $this->main = new \Yggverse\Yoda\Entity\Menu\Bar\Main();
 
         $this->box->add(
             $this->main->bar

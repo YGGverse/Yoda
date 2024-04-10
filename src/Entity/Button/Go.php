@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Button;
+namespace Yggverse\Yoda\Entity\Button;
 
-class Back
+class Go
 {
     public \GtkButton $button;
 
     public function __construct(
-        ?string $label = 'Back'
+        ?string $label = 'Go'
     ) {
         $this->button = \GtkButton::new_with_label(
             $label

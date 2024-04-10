@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entry;
+namespace Yggverse\Yoda\Entity\Entry;
 
 class Address
 {

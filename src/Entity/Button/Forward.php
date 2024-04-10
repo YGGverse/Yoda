@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Button;
+namespace Yggverse\Yoda\Entity\Button;
 
 class Forward
 {

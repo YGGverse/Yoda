@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Menu\Item;
+namespace Yggverse\Yoda\Entity\Menu\Item;
 
 class Yoda
 {
@@ -16,7 +16,7 @@ class Yoda
 
         $children = new \GtkMenu();
 
-        $quit = new \Yggverse\Yoda\Menu\Item\Quit();
+        $quit = new \Yggverse\Yoda\Entity\Menu\Item\Quit();
 
         $children->append(
             $quit->item

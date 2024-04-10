@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Menu\Item;
+namespace Yggverse\Yoda\Entity\Menu\Item;
 
 class Quit
 {

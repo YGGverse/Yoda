@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Label;
+namespace Yggverse\Yoda\Entity\Label;
 
 class Tray
 {
