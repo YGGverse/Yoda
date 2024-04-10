@@ -92,6 +92,18 @@ class Tab
                 );
             }
         );
+
+        $this->navigation->reload->button->connect(
+            'released',
+            function ($entry)
+            {
+                $this->navigate(
+                    $this->navigation->address->entry->get_text()
+                );
+            }
+        );
+
+        // @TODO home, back, forward buttons
     }
 
     public function navigate(string $url)
