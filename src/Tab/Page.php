@@ -6,7 +6,8 @@ namespace Yggverse\Yoda\Tab;
 
 class Page
 {
-    public \Yggverse\Yoda\Model\Memory $memory;
+    public \Yggverse\Yoda\Model\Memory $dns;
+    public \Yggverse\Yoda\Model\Memory $history;
 
     public \GtkBox $box,
                    $header,
@@ -34,7 +35,8 @@ class Page
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->window->tab->page;
 
         // Init memory
-        $this->memory = new \Yggverse\Yoda\Model\Memory();
+        $this->dns = new \Yggverse\Yoda\Model\Memory();
+        $this->history = new \Yggverse\Yoda\Model\Memory();
 
         // Compose header
         $this->header = new \GtkBox(
@@ -330,7 +332,7 @@ class Page
 
             $name = $address->getHost();
 
-            if (!$host = $this->memory->get($name))
+            if (!$host = $this->dns->get($name))
             {
                 $resolve = new \Yggverse\Net\Resolve(
                     $this->config->resolver->request->record,
@@ -347,7 +349,7 @@ class Page
                 {
                     $host = $resolved->getHost();
 
-                    $this->memory->set(
+                    $this->dns->set(
                         $name,
                         $host
                     );
