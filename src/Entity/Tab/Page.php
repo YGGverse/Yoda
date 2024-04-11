@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Tab;
+namespace Yggverse\Yoda\Entity\Tab;
 
 class Page
 {
+    public \Yggverse\Yoda\Entity\Window $window;
+
     public \Yggverse\Yoda\Model\Memory  $dns;
     public \Yggverse\Yoda\Model\History $history;
 
@@ -29,8 +31,11 @@ class Page
     public object $config;
 
     public function __construct(
-        ?string $url = null
+        \Yggverse\Yoda\Entity\Window $window
     ) {
+        // Init window
+        $this->window = $window;
+
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->window->tab->page;
 
@@ -68,10 +73,6 @@ class Page
         // Home button
         $this->home = \GtkButton::new_with_label(
             $this->config->header->button->home->label
-        );
-
-        $this->home->set_sensitive(
-            !($url == $this->config->header->button->home->url)
         );
 
         $this->home->connect(
@@ -165,13 +166,6 @@ class Page
 
         // Address field
         $this->address = new \GtkEntry();
-
-        if ($url)
-        {
-            $this->address->set_text(
-                $url
-            );
-        }
 
         $this->address->set_placeholder_text(
             $this->config->header->address->placeholder
