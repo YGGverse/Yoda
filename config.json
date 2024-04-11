@@ -1,56 +1,99 @@
 {
-    "homepage":"yoda://welcome",
-    "interface":
+    "window":
     {
+        "title":"Yoda",
         "theme":"Default",
-        "window":
+        "header":
         {
-            "header":
+            "enabled":true,
+            "button":
             {
-                "enabled":true,
-                "button":
-                {
-                    "close":true
-                }
-            },
-            "navigation":
-            {
-                "button":
-                {
-                    "home":true,
-                    "back":true,
-                    "forward":true,
-                    "reload":true,
-                    "go":true
-                }
-            },
-            "width":640,
-            "height":480
-        }
-    },
-    "resolver":
-    {
-        "enabled":true,
-        "request":
-        {
-            "timeout":1,
-            "host":
-            [
-                "1.1.1.1",
-                "8.8.8.8"
-            ],
-            "record":
-            [
-                "A",
-                "AAAA"
-            ]
+                "close":true
+            }
         },
-        "result":
+        "width":640,
+        "height":480,
+        "tab":
         {
-            "shuffle":false,
-            "cache":
+            "page":
             {
-                "timeout":3600
+                "resolver":
+                {
+                    "enabled":true,
+                    "request":
+                    {
+                        "timeout":1,
+                        "host":
+                        [
+                            "1.1.1.1",
+                            "8.8.8.8"
+                        ],
+                        "record":
+                        [
+                            "A",
+                            "AAAA"
+                        ]
+                    },
+                    "result":
+                    {
+                        "shuffle":false,
+                        "cache":
+                        {
+                            "timeout":3600
+                        }
+                    }
+                },
+                "header":
+                {
+                    "margin":8,
+                    "button":
+                    {
+                        "home":
+                        {
+                            "visible":true,
+                            "label":"Home",
+                            "url":"yoda://welcome"
+                        },
+                        "back":
+                        {
+                            "visible":true,
+                            "label":"Back"
+                        },
+                        "forward":
+                        {
+                            "visible":true,
+                            "label":"Forward"
+                        },
+                        "go":
+                        {
+                            "visible":true,
+                            "label":"Go"
+                        }
+                    },
+                    "address":
+                    {
+                        "placeholder":"URL or any search term...",
+                        "length":
+                        {
+                            "max":1024
+                        }
+                    }
+                },
+                "body":
+                {
+                    "margin":8
+                },
+                "footer":
+                {
+                    "margin":8,
+                    "status":
+                    {
+                        "open":
+                        {
+                            "complete":"{TIME_C} | {RESPONSE_META} | {RESPONSE_LENGTH} bytes | {RESPONSE_SECONDS} seconds"
+                        }
+                    }
+                }
             }
         }
     }
