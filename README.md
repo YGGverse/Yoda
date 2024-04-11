@@ -7,6 +7,7 @@ At this moment project under development!
 * [x] Custom DNS resolver with memory cache, oriented to alt networks like [Yggdrasil](https://github.com/yggdrasil-network/yggdrasil-go)
 * [x] Flexible settings in `config.json`, then UI
 * [x] Native GTK environment, no custom colors until you change it in `css`
+* [ ] Page tabs
 * [ ] Local pages history snaps to make it accessible even offline
 * [ ] Bookmarks
 * [ ] Certificate features
