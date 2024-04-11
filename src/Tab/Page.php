@@ -6,8 +6,8 @@ namespace Yggverse\Yoda\Tab;
 
 class Page
 {
-    public \Yggverse\Yoda\Model\Memory $dns;
-    public \Yggverse\Yoda\Model\Memory $history;
+    public \Yggverse\Yoda\Model\Memory  $dns;
+    public \Yggverse\Yoda\Model\History $history;
 
     public \GtkBox $box,
                    $header,
@@ -34,9 +34,11 @@ class Page
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->window->tab->page;
 
-        // Init memory
+        // Init DNS memory
         $this->dns = new \Yggverse\Yoda\Model\Memory();
-        $this->history = new \Yggverse\Yoda\Model\Memory();
+
+        // Init history
+        $this->history = new \Yggverse\Yoda\Model\History();
 
         // Compose header
         $this->header = new \GtkBox(
@@ -76,6 +78,8 @@ class Page
             'released',
             function ($entry)
             {
+                $this->history->reset();
+
                 $this->open(
                     $this->config->header->button->home->url
                 );
@@ -94,9 +98,39 @@ class Page
             $this->config->header->button->back->label
         );
 
+        $this->back->set_sensitive(
+            false
+        );
+
+        $this->back->connect(
+            'released',
+            function ($entry)
+            {
+                $this->open(
+                    $this->history->goBack(),
+                    false
+                );
+            }
+        );
+
         // Forward button
         $this->forward = \GtkButton::new_with_label(
             $this->config->header->button->forward->label
+        );
+
+        $this->forward->set_sensitive(
+            false
+        );
+
+        $this->forward->connect(
+            'released',
+            function ($entry)
+            {
+                $this->open(
+                    $this->history->goForward(),
+                    false
+                );
+            }
         );
 
         /// Group buttons
@@ -284,7 +318,8 @@ class Page
     }
 
     public function open(
-        string $url
+        string $url,
+        bool $history = true
     ): void
     {
         // Update address field by requested
@@ -292,9 +327,27 @@ class Page
             $url
         );
 
-        // Update home button sensitivity on match requested
+        // Update history pool
+        if ($history)
+        {
+            $this->history->add(
+                $url
+            );
+        }
+
+        // Update home button sensibility on match requested
         $this->home->set_sensitive(
             !($url == $this->config->header->button->home->url)
+        );
+
+        // Update back button sensibility
+        $this->back->set_sensitive(
+            (bool) $this->history->getBack()
+        );
+
+        // Update forward button sensibility
+        $this->forward->set_sensitive(
+            (bool) $this->history->getForward()
         );
 
         // Open current address
