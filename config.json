@@ -17,6 +17,18 @@
         {
             "page":
             {
+                "redirect":
+                {
+                    "follow":
+                    {
+                        "enabled":true,
+                        "code":
+                        [
+                            30,
+                            31
+                        ]
+                    }
+                },
                 "resolver":
                 {
                     "enabled":true,

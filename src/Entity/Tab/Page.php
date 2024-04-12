@@ -313,7 +313,8 @@ class Page
 
     public function open(
         string $url,
-        bool $history = true
+        bool $history = true,
+        int $code = 0
     ): void
     {
         // Update address field by requested
@@ -350,7 +351,8 @@ class Page
             case str_starts_with($url, 'gemini://'):
 
                 $this->_gemini(
-                    $url
+                    $url,
+                    $code
                 );
 
             break;
@@ -363,7 +365,10 @@ class Page
         }
     }
 
-    private function _gemini(string $url): void
+    private function _gemini(
+        string $url,
+        int $code = 0
+    ): void
     {
         // Track response time
         $start = microtime(true);
@@ -417,6 +422,26 @@ class Page
             $raw
         );
 
+        // Process redirect
+        if ($this->config->redirect->follow->enabled && in_array($response->getCode(), $this->config->redirect->follow->code))
+        {
+            $redirect = new \Yggverse\Net\Address(
+                $url
+            );
+
+            $redirect->setPath(
+                $response->getMeta()
+            );
+
+            $this->open(
+                $redirect->get(),
+                false,
+                $response->getCode()
+            );
+
+            return;
+        }
+
         $this->content->set_markup(
             \Yggverse\Gemini\Pango::fromGemtext(
                 $response->getBody()
@@ -445,6 +470,7 @@ class Page
                 [
                     '{NAVIGATION_ADDRESS}',
                     '{TIME_C}',
+                    '{RESPONSE_CODE}',
                     '{RESPONSE_META}',
                     '{RESPONSE_LENGTH}',
                     '{RESPONSE_SECONDS}'
@@ -456,7 +482,10 @@ class Page
                     date(
                         'c'
                     ),
-                    $response->getMeta() ? $response->getMeta() : $response->getCode(),
+                    $response->getCode(),
+                    ($code ? sprintf('%d:', $code) : '')
+                    .
+                    ($response->getMeta() ? $response->getMeta() : $response->getCode()),
                     number_format(
                         mb_strlen(
                             $raw
