@@ -1,0 +1,8 @@
+# Redirect issue
+
+You see this message because page redirect could not be processed properly
+
+## Possible reasons
+
+* Max redirects reached
+* Redirects disabled by settings

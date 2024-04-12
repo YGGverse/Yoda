@@ -367,7 +367,8 @@ class Page
 
     private function _gemini(
         string $url,
-        int $code = 0
+        int $code = 0,
+        int $redirects = 0
     ): void
     {
         // Track response time
@@ -423,23 +424,45 @@ class Page
         );
 
         // Process redirect
-        if ($this->config->redirect->follow->enabled && in_array($response->getCode(), $this->config->redirect->follow->code))
+        if (in_array($response->getCode(), $this->config->redirect->follow->code))
         {
-            $redirect = new \Yggverse\Net\Address(
-                $url
-            );
+            if ($this->config->redirect->follow->enabled)
+            {
+                if ($redirects > $this->config->redirect->follow->max)
+                {
+                    $this->_yoda(
+                        'yoda://redirect'
+                    );
 
-            $redirect->setPath(
-                $response->getMeta()
-            );
+                    return;
+                }
 
-            $this->open(
-                $redirect->get(),
-                false,
-                $response->getCode()
-            );
+                $redirect = new \Yggverse\Net\Address(
+                    $url
+                );
 
-            return;
+                $redirect->setPath(
+                    $response->getMeta()
+                );
+
+                $this->open(
+                    $redirect->get(),
+                    false,
+                    $response->getCode(),
+                    $redirects + 1
+                );
+
+                return;
+            }
+
+            else
+            {
+                $this->_yoda(
+                    'yoda://redirect'
+                );
+
+                return;
+            }
         }
 
         $this->content->set_markup(
