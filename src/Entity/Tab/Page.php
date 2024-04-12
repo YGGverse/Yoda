@@ -418,7 +418,7 @@ class Page
         );
 
         $this->content->set_markup(
-            $this->_gemtext(
+            \Yggverse\Gemini\Pango::fromGemtext(
                 $response->getBody()
             )
         );
@@ -482,7 +482,7 @@ class Page
         }
 
         $this->content->set_markup(
-            $this->_gemtext(
+            \Yggverse\Gemini\Pango::fromGemtext(
                 $data
             )
         );
@@ -500,76 +500,5 @@ class Page
 
             // @TODO update tab title
         }
-    }
-
-    private function _gemtext(
-        string $gemtext
-    ): string
-    {
-        // Format body
-        $body = new \Yggverse\Gemini\Gemtext\Body(
-            $gemtext
-        );
-
-        $lines = $body->getLines();
-
-        $escaped = [];
-
-        /// Format H1
-        foreach ($body->getH1() as $index => $h1)
-        {
-            $lines[$index] = sprintf(
-                '<span size="xx-large">%s</span>',
-                htmlentities(
-                    $h1
-                )
-            );
-
-            $escaped[] = $index;
-        }
-
-        /// Format H2
-        foreach ($body->getH2() as $index => $h2)
-        {
-            $lines[$index] = sprintf(
-                '<span size="x-large">%s</span>',
-                htmlentities(
-                    $h2
-                )
-            );
-
-            $escaped[] = $index;
-        }
-
-        /// Format H3
-        foreach ($body->getH3() as $index => $h3)
-        {
-            $lines[$index] = sprintf(
-                '<span size="large">%s</span>',
-                htmlentities(
-                    $h3
-                )
-            );
-
-            $escaped[] = $index;
-        }
-
-        /// Escape entities
-        foreach ($lines as $index => $line)
-        {
-            if (!in_array($index, $escaped))
-            {
-                $lines[$index] = htmlentities(
-                    $line
-                );
-            }
-        }
-
-        // @TODO links, code, escape entities
-
-        return implode(
-            PHP_EOL,
-            $lines
-        );
     }
 }
