@@ -440,7 +440,7 @@ class Page
             // @TODO update tab title
         }
 
-        $this->status->set_text(
+        $this->status->set_markup(
             str_replace( // Custom macros mask from config.json
                 [
                     '{NAVIGATION_ADDRESS}',
