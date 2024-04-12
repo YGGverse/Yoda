@@ -465,6 +465,16 @@ class Page
             }
         }
 
+        // Process error codes
+        if (20 != $response->getCode()) // not found
+        {
+            $this->_yoda(
+                'yoda://nothing'
+            );
+
+            return;
+        } // @TODO other codes
+
         $this->content->set_markup(
             \Yggverse\Gemini\Pango::fromGemtext(
                 $response->getBody()
