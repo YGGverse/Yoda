@@ -6,9 +6,9 @@ namespace Yggverse\Yoda\Entity\Tab;
 
 class Page
 {
-    public \Yggverse\Yoda\Entity\Window $window;
+    public \Yggverse\Yoda\Entity\App $app;
 
-    public \Yggverse\Yoda\Model\Memory  $dns;
+    public \Yggverse\Yoda\Model\Memory $dns;
     public \Yggverse\Yoda\Model\History $history;
 
     public \GtkBox $box,
@@ -31,13 +31,13 @@ class Page
     public object $config;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Window $window
+        \Yggverse\Yoda\Entity\App $app
     ) {
-        // Init window
-        $this->window = $window;
+        // Init app
+        $this->app = $app;
 
         // Init config
-        $this->config = \Yggverse\Yoda\Model\File::getConfig()->window->tab->page;
+        $this->config = \Yggverse\Yoda\Model\File::getConfig()->app->tab->page;
 
         // Init DNS memory
         $this->dns = new \Yggverse\Yoda\Model\Memory();
@@ -423,21 +423,22 @@ class Page
             )
         );
 
-        /* @TODO
         $body = new \Yggverse\Gemini\Gemtext\Body(
             $response->getBody()
         );
 
         if ($h1 = $body->getH1())
         {
-            $this->window->set_title(
+            $this->app->window->set_title(
                 sprintf(
-                    '%s - Yoda',
-                    empty($h1[0]) ? $address->getHost() : $h1[0]
+                    '%s - %s',
+                    empty($h1[0]) ? $address->getHost() : $h1[0],
+                    $this->app->config->title
                 )
             );
+
+            // @TODO update tab title
         }
-        */
 
         $this->status->set_text(
             str_replace( // Custom macros mask from config.json
@@ -487,18 +488,18 @@ class Page
         );
 
         // Parse gemtext
-        /* @TODO
         $body = new \Yggverse\Gemini\Gemtext\Body(
             $data
         );
 
         if ($h1 = $body->getH1())
         {
-            $this->window->set_title(
+            $this->app->window->set_title(
                 $h1[0]
             );
+
+            // @TODO update tab title
         }
-        */
     }
 
     private function _gemtext(

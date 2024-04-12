@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity;
 
-class Window
+class App
 {
     public \GtkWindow $window;
     public \GtkNotebook $tab;
@@ -13,7 +13,7 @@ class Window
 
     public function __construct()
     {
-        $this->config = \Yggverse\Yoda\Model\File::getConfig()->window; // @TODO
+        $this->config = \Yggverse\Yoda\Model\File::getConfig()->app; // @TODO
 
         $this->window = new \GtkWindow();
 
@@ -65,6 +65,13 @@ class Window
             $page->box,
             new \GtkLabel(
                 'New page' // @TODO
+            )
+        );
+
+        $this->tab->set_menu_label(
+            $page->box,
+            new \GtkLabel(
+                '2' // @TODO
             )
         );
 
