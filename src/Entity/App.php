@@ -83,6 +83,10 @@ class App
             'switch-page',
             function ($tabs, $child, $position)
             {
+                $this->setTitle(
+                    $tabs->get_tab_label_text($child)
+                );
+
                 if ('+' == $tabs->get_tab_label_text($child))
                 {
                     $page = $this->blankPage();
