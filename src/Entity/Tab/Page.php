@@ -350,7 +350,7 @@ class Page
         {
             case str_starts_with($url, 'gemini://'):
 
-                $this->_gemini(
+                $this->_openGemini(
                     $url,
                     $code
                 );
@@ -359,18 +359,23 @@ class Page
 
             default:
 
-                $this->_yoda(
+                $this->_openYoda(
                     $url
                 );
         }
     }
 
-    private function _gemini(
+    private function _openGemini(
         string $url,
         int $code = 0,
         int $redirects = 0
     ): void
     {
+        // Init base URL
+        $origin = new \Yggverse\Net\Address(
+            $url
+        );
+
         // Track response time
         $start = microtime(true);
 
@@ -430,7 +435,7 @@ class Page
             {
                 if ($redirects > $this->config->redirect->follow->max)
                 {
-                    $this->_yoda(
+                    $this->_openYoda(
                         'yoda://redirect'
                     );
 
@@ -457,7 +462,7 @@ class Page
 
             else
             {
-                $this->_yoda(
+                $this->_openYoda(
                     'yoda://redirect'
                 );
 
@@ -468,7 +473,7 @@ class Page
         // Process error codes
         if (20 != $response->getCode()) // not found
         {
-            $this->_yoda(
+            $this->_openYoda(
                 'yoda://nothing'
             );
 
@@ -487,16 +492,23 @@ class Page
 
         if ($h1 = $body->getH1())
         {
-            $this->app->window->set_title(
-                sprintf(
-                    '%s - %s',
-                    empty($h1[0]) ? $address->getHost() : $h1[0],
-                    $this->app->config->title
-                )
-            );
-
-            // @TODO update tab title
+            $title = $h1[0] .
+                     $this->app->config->header->title->postfix;
         }
+
+        else
+        {
+            $title = $origin->getHost() .
+                     $this->app->config->header->title->postfix;
+        }
+
+        $this->app->setTitle(
+            $title
+        );
+
+        $this->setTitle(
+            $title
+        );
 
         $this->status->set_markup(
             str_replace( // Custom macros mask from config.json
@@ -533,7 +545,7 @@ class Page
         );
     }
 
-    private function _yoda(
+    private function _openYoda(
         string $url
     ): void
     {
@@ -556,11 +568,36 @@ class Page
 
         if ($h1 = $body->getH1())
         {
-            $this->app->window->set_title(
+            $this->app->setTitle(
                 $h1[0]
             );
 
-            // @TODO update tab title
+            $this->setTitle(
+                $h1[0]
+            );
         }
+    }
+
+    public function setTitle(
+        ?string $value = null
+    ): void
+    {
+        if ($value)
+        {
+            $title = urldecode(
+                strlen($value) > $this->config->title->length->max ? substr($value, 0, $this->config->title->length->max) . '...'
+                                                                   : $value
+            );
+        }
+
+        else
+        {
+            $title = $this->config->title->default;
+        }
+
+        $this->app->tabs->set_tab_label_text(
+            $this->box,
+            $title
+        );
     }
 }

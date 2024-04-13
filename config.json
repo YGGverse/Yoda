@@ -1,11 +1,19 @@
 {
     "app":
     {
-        "title":"Yoda",
         "theme":"Default",
         "header":
         {
             "enabled":true,
+            "title":
+            {
+                "default":"Yoda",
+                "postfix":" - Yoda",
+                "length":
+                {
+                    "max":32
+                }
+            },
             "button":
             {
                 "close":true
@@ -17,6 +25,14 @@
         {
             "page":
             {
+                "title":
+                {
+                    "default":"New page",
+                    "length":
+                    {
+                        "max":32
+                    }
+                },
                 "redirect":
                 {
                     "follow":
