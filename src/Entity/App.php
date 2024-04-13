@@ -14,9 +14,11 @@ class App
 
     public function __construct()
     {
+        // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->app; // @TODO
 
-        $this->window = new \GtkWindow();
+        // Init window
+        $this->window = new \GtkWindow;
 
         $this->window->set_size_request(
             $this->config->width,
@@ -25,7 +27,7 @@ class App
 
         if ($this->config->header->enabled)
         {
-            $this->header = new \GtkHeaderBar();
+            $this->header = new \GtkHeaderBar;
 
             $this->header->set_title(
                 $this->config->header->title->default
@@ -40,6 +42,62 @@ class App
             );
         }
 
+        // Init tabs
+        $this->tabs = new \GtkNotebook;
+
+        $this->tabs->set_scrollable(
+            true
+        );
+
+        // + button
+        $blank = new \GtkLabel;
+
+        $this->tabs->append_page(
+            $blank,
+            new \GtkLabel(
+                '+'
+            )
+        );
+
+        $this->tabs->set_tab_reorderable(
+            $blank,
+            true
+        );
+
+        // Append blank page
+        $page = $this->blankPage();
+
+        $page->open(
+            $this->config->tab->page->header->button->home->url // @TODO
+        );
+
+        // Render
+        $this->window->add(
+            $this->tabs
+        );
+
+        $this->window->show_all();
+
+        // Init event listener
+        $this->tabs->connect(
+            'switch-page',
+            function ($tabs, $child, $position)
+            {
+                if ('+' == $tabs->get_tab_label_text($child))
+                {
+                    $page = $this->blankPage();
+
+                    $this->tabs->show_all();
+
+                    $this->tabs->set_current_page(
+                        $this->tabs->page_num(
+                            $page->box
+                        )
+                    );
+                }
+            }
+        );
+
         $this->window->connect(
             'destroy',
             function()
@@ -47,27 +105,9 @@ class App
                 \Gtk::main_quit();
             }
         );
-
-        $this->tabs = new \GtkNotebook();
-
-        $this->tabs->set_scrollable(
-            true
-        );
-
-        $this->window->add(
-            $this->tabs
-        );
-
-        $this->openPage(
-            $this->config->tab->page->header->button->home->url // @TODO
-        );
-
-        $this->window->show_all();
     }
 
-    public function openPage(
-        string $url
-    ): void
+    public function blankPage(): \Yggverse\Yoda\Entity\Tab\Page
     {
         $page = new \Yggverse\Yoda\Entity\Tab\Page(
             $this
@@ -85,9 +125,15 @@ class App
             true
         );
 
-        $page->open(
-            $url
+        $this->tabs->show_all();
+
+        $this->tabs->set_current_page(
+            $this->tabs->page_num(
+                $page->box
+            )
         );
+
+        return $page;
     }
 
     public function setTitle(
