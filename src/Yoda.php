@@ -9,6 +9,6 @@ require_once __DIR__ .
 // Init app
 \Gtk::init();
 
-new \Yggverse\Yoda\Entity\App();
+new \Yggverse\Yoda\Entity\App;
 
 \Gtk::main();
