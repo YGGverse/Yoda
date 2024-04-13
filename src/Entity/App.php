@@ -89,15 +89,7 @@ class App
 
                 if ('+' == $tabs->get_tab_label_text($child))
                 {
-                    $page = $this->blankPage();
-
-                    $this->tabs->show_all();
-
-                    $this->tabs->set_current_page(
-                        $this->tabs->page_num(
-                            $page->box
-                        )
-                    );
+                    $this->blankPage();
                 }
             }
         );
