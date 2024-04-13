@@ -76,7 +76,7 @@ class Page
         );
 
         $this->home->connect(
-            'released',
+            'clicked',
             function ($entry)
             {
                 $this->history->reset();
@@ -104,7 +104,7 @@ class Page
         );
 
         $this->back->connect(
-            'released',
+            'clicked',
             function ($entry)
             {
                 $this->open(
@@ -124,7 +124,7 @@ class Page
         );
 
         $this->forward->connect(
-            'released',
+            'clicked',
             function ($entry)
             {
                 $this->open(
@@ -198,7 +198,7 @@ class Page
         );
 
         $this->go->connect(
-            'released',
+            'clicked',
             function ($entry)
             {
                 $this->open(
