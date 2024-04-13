@@ -40,10 +40,10 @@ class Page
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->app->tab->page;
 
         // Init DNS memory
-        $this->dns = new \Yggverse\Yoda\Model\Memory();
+        $this->dns = new \Yggverse\Yoda\Model\Memory;
 
         // Init history
-        $this->history = new \Yggverse\Yoda\Model\History();
+        $this->history = new \Yggverse\Yoda\Model\History;
 
         // Compose header
         $this->header = new \GtkBox(
@@ -165,7 +165,7 @@ class Page
         }
 
         // Address field
-        $this->address = new \GtkEntry();
+        $this->address = new \GtkEntry;
 
         $this->address->set_placeholder_text(
             $this->config->header->address->placeholder
@@ -215,7 +215,7 @@ class Page
         }
 
         // Compose body
-        $this->content = new \GtkLabel();
+        $this->content = new \GtkLabel;
 
         $this->content->set_use_markup(
             true
@@ -238,7 +238,7 @@ class Page
         );
 
         // Init scrolled container
-        $this->container = new \GtkScrolledWindow();
+        $this->container = new \GtkScrolledWindow;
 
         $this->container->add(
             $this->content
@@ -284,7 +284,7 @@ class Page
             $this->config->footer->margin
         );
 
-        $this->status = new \GtkLabel();
+        $this->status = new \GtkLabel;
 
         $this->footer->add(
             $this->status
