@@ -563,7 +563,7 @@ class Page
         // Load local page
         if (!$data = \Yggverse\Yoda\Model\Page::get(str_replace('yoda://', '', $url)))
         {
-            $data = \Yggverse\Yoda\Model\Page::get('Oops');
+            $data = \Yggverse\Yoda\Model\Page::get('Nothing');
         }
 
         $this->content->set_markup(
