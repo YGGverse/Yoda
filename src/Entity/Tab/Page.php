@@ -317,6 +317,11 @@ class Page
         int $code = 0
     ): void
     {
+        // Filter URL
+        $url = trim(
+            $url
+        );
+
         // Update address field by requested
         $this->address->set_text(
             $url
