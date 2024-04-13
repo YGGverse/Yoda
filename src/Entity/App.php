@@ -50,18 +50,11 @@ class App
         );
 
         // + button
-        $blank = new \GtkLabel;
-
         $this->tabs->append_page(
-            $blank,
+            new \GtkLabel,
             new \GtkLabel(
                 '+'
             )
-        );
-
-        $this->tabs->set_tab_reorderable(
-            $blank,
-            true
         );
 
         // Append blank page
@@ -83,13 +76,23 @@ class App
             'switch-page',
             function ($tabs, $child, $position)
             {
+                // Update window title on tab change
                 $this->setTitle(
                     $tabs->get_tab_label_text($child)
                 );
 
+                // Add new tab event
                 if ('+' == $tabs->get_tab_label_text($child))
                 {
-                    $this->blankPage();
+                    \Gtk::timeout_add(
+                        0,
+                        function()
+                        {
+                            $this->blankPage();
+
+                            return false;
+                        }
+                    );
                 }
             }
         );
