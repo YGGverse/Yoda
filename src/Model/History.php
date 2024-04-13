@@ -37,6 +37,13 @@ class History
         return isset($this->_record[$position]) ? $this->_record[$position] : null;
     }
 
+    public function getCurrent(): ?string
+    {
+        return $this->get(
+            $this->_position
+        );
+    }
+
     public function getBack(): ?string
     {
         return $this->get(

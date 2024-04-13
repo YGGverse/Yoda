@@ -322,6 +322,12 @@ class Page
             $url
         );
 
+        // Ignore history record on same URL given
+        if ($url == $this->history->getCurrent())
+        {
+            $history = false;
+        }
+
         // Update address field by requested
         $this->address->set_text(
             $url
