@@ -46,10 +46,10 @@ class Page
         $this->history = new \Yggverse\Yoda\Model\History;
 
         // Run database cleaner
-        if ($this->config->database->history->timeout)
+        if ($this->config->history->database->timeout)
         {
             $this->app->database->cleanHistory(
-                $this->config->database->history->timeout
+                $this->config->history->database->timeout
             );
         }
 
@@ -372,7 +372,7 @@ class Page
         );
 
         // Update history in memory pool
-        if ($history && $this->config->memory->history->enabled && $url != $this->history->getCurrent())
+        if ($history && $this->config->history->memory->enabled && $url != $this->history->getCurrent())
         {
             $this->history->add(
                 $url
@@ -603,7 +603,7 @@ class Page
         );
 
         // Update history database
-        if ($history && $this->config->database->history->enabled)
+        if ($history && $this->config->history->database->enabled)
         {
             // Ignore history record on same URL stored
             if ($result = $this->app->database->getHistory('', 0, 1))

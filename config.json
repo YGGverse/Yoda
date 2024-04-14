@@ -78,16 +78,13 @@
                         }
                     }
                 },
-                "memory":
+                "history":
                 {
-                    "history":
+                    "memory":
                     {
                         "enabled":true
-                    }
-                },
-                "database":
-                {
-                    "history":
+                    },
+                    "database":
                     {
                         "enabled":true,
                         "timeout":null
