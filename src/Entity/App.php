@@ -17,6 +17,22 @@ class App
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->app; // @TODO
 
+        // Init theme
+        $css = new \GtkCssProvider();
+
+        $css->load_from_data(
+            \Yggverse\Yoda\Model\File::getTheme(
+                $this->config->theme
+            )
+        );
+
+        $style = new \GtkStyleContext();
+
+        $style->add_provider_for_screen(
+            $css,
+            600
+        );
+
         // Init window
         $this->window = new \GtkWindow;
 
