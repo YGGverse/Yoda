@@ -373,7 +373,7 @@ class Page
         }
 
         // Ignore history record on same URL stored in DB
-        if ($result = $this->app->database->getHistory(0, 1))
+        if ($result = $this->app->database->getHistory('', 0, 1))
         {
             if ($url == $result[0]->url)
             {
