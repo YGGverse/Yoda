@@ -259,6 +259,42 @@ class Page
             0
         );
 
+        $this->content->connect(
+            'activate-link',
+            function ($label, $href)
+            {
+                $address = new \Yggverse\Net\Address(
+                    $href
+                );
+
+                if ($address->isRelative())
+                {
+                    $base = new \Yggverse\Net\Address(
+                        $this->address->get_text()
+                    );
+
+                    if ($absolute = $address->getAbsolute($base))
+                    {
+                        $this->open(
+                            $absolute
+                        );
+                    }
+
+                    else
+                    {
+                        throw new Exception(); // @TODO
+                    }
+                }
+
+                else
+                {
+                    $this->open(
+                        $address->get()
+                    );
+                }
+            }
+        );
+
         // Compose footer
         $this->footer = new \GtkBox(
             \GtkOrientation::HORIZONTAL
