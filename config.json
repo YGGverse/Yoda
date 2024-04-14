@@ -78,10 +78,20 @@
                         }
                     }
                 },
-                "history":
+                "memory":
                 {
-                    "enabled":true,
-                    "timeout":null
+                    "history":
+                    {
+                        "enabled":true
+                    }
+                },
+                "database":
+                {
+                    "history":
+                    {
+                        "enabled":true,
+                        "timeout":null
+                    }
                 },
                 "header":
                 {
