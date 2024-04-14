@@ -35,7 +35,7 @@ class Database
             );
 
             $this->_database->query('
-                CREATE TABLE IF NOT EXISTS "history"
+                CREATE TABLE IF NOT EXISTS "pageHistory"
                 (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "time" INTEGER NOT NULL,
@@ -55,12 +55,12 @@ class Database
         }
     }
 
-    public function addHistory(
+    public function addPageHistory(
         string $url
     ): int
     {
         $query = $this->_database->prepare(
-            'INSERT INTO `history` (`time`, `url`) VALUES (:time, :url)'
+            'INSERT INTO `pageHistory` (`time`, `url`) VALUES (:time, :url)'
         );
 
         $query->execute(
@@ -73,14 +73,14 @@ class Database
         return (int) $this->_database->lastInsertId();
     }
 
-    public function getHistory(
+    public function getPageHistory(
         int $start = 0,
         int $limit = 1000
     ): array
     {
         $query = $this->_database->query(
             sprintf(
-                'SELECT * FROM `history` ORDER BY `id` DESC LIMIT %d,%d',
+                'SELECT * FROM `pageHistory` ORDER BY `id` DESC LIMIT %d,%d',
                 $start,
                 $limit
             )
@@ -90,13 +90,13 @@ class Database
         return $query->fetchAll();
     }
 
-    public function cleanHistory(
+    public function cleanPageHistory(
         int $timeout = 0
     ): int
     {
         $query = $this->_database->query(
             sprintf(
-                'DELETE FROM `history` WHERE `time` + %d < %d',
+                'DELETE FROM `pageHistory` WHERE `time` + %d < %d',
                 $timeout,
                 time()
             )

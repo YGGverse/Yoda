@@ -48,7 +48,7 @@ class Page
         // Run database cleaner
         if ($this->config->history->timeout)
         {
-            $this->app->database->cleanHistory(
+            $this->app->database->cleanPageHistory(
                 $this->config->history->timeout
             );
         }
@@ -373,7 +373,7 @@ class Page
         }
 
         // Ignore history record on same URL stored in DB
-        if ($result = $this->app->database->getHistory(0, 1))
+        if ($result = $this->app->database->getPageHistory(0, 1))
         {
             if ($url == $result[0]->url)
             {
@@ -396,7 +396,7 @@ class Page
             // Update history in the database
             if ($this->config->history->enabled)
             {
-                $this->app->database->addHistory(
+                $this->app->database->addPageHistory(
                     $url
                 );
             }
