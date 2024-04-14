@@ -37,9 +37,10 @@ class Database
             $this->_database->query('
                 CREATE TABLE IF NOT EXISTS "history"
                 (
-                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    "time" INTEGER NOT NULL,
-                    "url" VARCHAR(1024) NOT NULL
+                    "id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "time"  INTEGER NOT NULL,
+                    "url"   VARCHAR(1024) NOT NULL,
+                    "title" VARCHAR(255)
                 )
             ');
         }
@@ -56,17 +57,19 @@ class Database
     }
 
     public function addHistory(
-        string $url
+        string $url,
+        ?string $title = null
     ): int
     {
         $query = $this->_database->prepare(
-            'INSERT INTO `history` (`time`, `url`) VALUES (:time, :url)'
+            'INSERT INTO `history` (`time`, `url`, `title`) VALUES (:time, :url, :title)'
         );
 
         $query->execute(
             [
-                ':time' => time(),
-                ':url'  => $url
+                ':time'  => time(),
+                ':url'   => $url,
+                ':title' => $title
             ]
         );
 
@@ -81,7 +84,7 @@ class Database
     {
         $query = $this->_database->prepare(
             sprintf(
-                'SELECT * FROM `history` WHERE `url` LIKE :search ORDER BY `id` DESC LIMIT %d,%d',
+                'SELECT * FROM `history` WHERE `url` LIKE :search OR `title` LIKE :search ORDER BY `id` DESC LIMIT %d,%d',
                 $start,
                 $limit
             )

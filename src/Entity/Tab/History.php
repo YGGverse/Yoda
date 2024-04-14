@@ -161,7 +161,7 @@ class History
 
         $this->treeview->append_column(
             new \GtkTreeViewColumn(
-                'URL',
+                'Time',
                 new \GtkCellRendererText(),
                 'text',
                 0
@@ -170,15 +170,27 @@ class History
 
         $this->treeview->append_column(
             new \GtkTreeViewColumn(
-                'Time',
+                'Title',
                 new \GtkCellRendererText(),
                 'text',
                 1
             )
         );
 
+        $this->treeview->append_column(
+            new \GtkTreeViewColumn(
+                'URL',
+                new \GtkCellRendererText(),
+                'text',
+                2
+            )
+        );
+
+
+
         // Init list storage
         $this->list = new \GtkListStore(
+            \GObject::TYPE_STRING,
             \GObject::TYPE_STRING,
             \GObject::TYPE_STRING
         );
@@ -259,11 +271,12 @@ class History
         {
             $this->list->append(
                 [
-                    $record->url,
                     date(
                         $this->config->time->format,
                         $record->time
-                    )
+                    ),
+                    $record->title,
+                    $record->url
                 ]
             );
         }

@@ -46,10 +46,10 @@ class Page
         $this->history = new \Yggverse\Yoda\Model\History;
 
         // Run database cleaner
-        if ($this->config->history->timeout)
+        if ($this->config->database->history->timeout)
         {
             $this->app->database->cleanHistory(
-                $this->config->history->timeout
+                $this->config->database->history->timeout
             );
         }
 
@@ -366,42 +366,17 @@ class Page
             $url
         );
 
-        // Ignore history record on same URL given
-        if ($url == $this->history->getCurrent())
-        {
-            $history = false;
-        }
-
-        // Ignore history record on same URL stored in DB
-        if ($result = $this->app->database->getHistory('', 0, 1))
-        {
-            if ($url == $result[0]->url)
-            {
-                $history = false;
-            }
-        }
-
         // Update address field by requested
         $this->address->set_text(
             $url
         );
 
-        if ($history)
+        // Update history in memory pool
+        if ($history && $this->config->memory->history->enabled && $url != $this->history->getCurrent())
         {
-            // Update history in memory pool
             $this->history->add(
                 $url
             );
-
-            // Update history in the database
-            if ($this->config->history->enabled)
-            {
-                $this->app->database->addHistory(
-                    $url
-                );
-
-                $this->app->history->refresh();
-            }
         }
 
         // Update home button sensibility on match requested
@@ -450,7 +425,8 @@ class Page
     private function _openGemini(
         string $url,
         int $code = 0,
-        int $redirects = 0
+        int $redirects = 0,
+        bool $history = true
     ): void
     {
         // Init base URL
@@ -625,6 +601,29 @@ class Page
                 $this->config->footer->status->open->complete
             )
         );
+
+        // Update history database
+        if ($history && $this->config->database->history->enabled)
+        {
+            // Ignore history record on same URL stored
+            if ($result = $this->app->database->getHistory('', 0, 1))
+            {
+                if ($url == $result[0]->url)
+                {
+                    $history = false;
+                }
+            }
+
+            if ($history)
+            {
+                $this->app->database->addHistory(
+                    $url,
+                    $title
+                );
+
+                $this->app->history->refresh();
+            }
+        }
     }
 
     private function _openYoda(
