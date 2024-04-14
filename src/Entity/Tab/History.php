@@ -186,8 +186,6 @@ class History
             )
         );
 
-
-
         // Init list storage
         $this->list = new \GtkListStore(
             \GObject::TYPE_STRING,
@@ -197,6 +195,10 @@ class History
 
         $this->treeview->set_model(
             $this->list
+        );
+
+        $this->treeview->get_selection()->set_mode(
+            \GtkSelectionMode::MULTIPLE
         );
 
         // Compose body
