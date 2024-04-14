@@ -399,6 +399,8 @@ class Page
                 $this->app->database->addHistory(
                     $url
                 );
+
+                $this->app->history->refresh();
             }
         }
 

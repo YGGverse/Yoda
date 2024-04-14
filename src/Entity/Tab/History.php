@@ -56,18 +56,7 @@ class History
         );
 
         // Build history list from database records
-        foreach ($this->app->database->getHistory() as $record)
-        {
-            $this->list->append(
-                [
-                    $record->url,
-                    date(
-                        $this->config->time->format,
-                        $record->time
-                    )
-                ]
-            );
-        }
+        $this->refresh();
 
         // Compose page
         $this->box = new \GtkBox(
@@ -86,5 +75,23 @@ class History
             true,
             0
         );
+    }
+
+    public function refresh(): void
+    {
+        $this->list->clear();
+
+        foreach ($this->app->database->getHistory() as $record)
+        {
+            $this->list->append(
+                [
+                    $record->url,
+                    date(
+                        $this->config->time->format,
+                        $record->time
+                    )
+                ]
+            );
+        }
     }
 }

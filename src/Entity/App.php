@@ -8,6 +8,8 @@ class App
 {
     public \Yggverse\Yoda\Model\Database $database;
 
+    public \Yggverse\Yoda\Entity\Tab\History $history;
+
     public \GtkWindow $window;
     public \GtkHeaderBar $header;
     public \GtkNotebook $tabs;
@@ -81,6 +83,26 @@ class App
                 '+'
             )
         );
+
+        // History features
+        if ($this->config->tab->history->enabled)
+        {
+            $this->history = new \Yggverse\Yoda\Entity\Tab\History(
+                $this
+            );
+
+            $this->tabs->append_page(
+                $this->history->box,
+                new \GtkLabel(
+                    $this->config->tab->history->label
+                )
+            );
+
+            $this->tabs->set_tab_reorderable(
+                $this->history->box,
+                true
+            );
+        }
 
         // Append blank page
         $page = $this->blankPage();

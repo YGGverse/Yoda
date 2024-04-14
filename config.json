@@ -137,6 +137,8 @@
             },
             "history":
             {
+                "enabled":true,
+                "label":"History",
                 "time":
                 {
                     "format":"c"

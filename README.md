@@ -8,7 +8,7 @@ At this moment project under development!
 * [x] Flexible settings in `config.json`, then UI
 * [x] Native GTK environment, no custom colors until you change it by `css`
 * [x] Multi-tabs
-* [ ] Navigation history
+* [x] Navigation history
 * [ ] Bookmarks
 * [ ] Certificate features
 * [ ] Local snaps to make resources accessible even offline
