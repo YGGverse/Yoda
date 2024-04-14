@@ -368,10 +368,18 @@ class Page
 
             break;
 
-            default:
+            case str_starts_with($url, 'yoda://'):
 
                 $this->_openYoda(
                     $url
+                );
+
+            break;
+
+            default:
+
+                $this->_openYoda(
+                    'yoda://protocol'
                 );
         }
     }
