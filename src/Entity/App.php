@@ -6,6 +6,8 @@ namespace Yggverse\Yoda\Entity;
 
 class App
 {
+    public \Yggverse\Yoda\Model\Database $database;
+
     public \GtkWindow $window;
     public \GtkHeaderBar $header;
     public \GtkNotebook $tabs;
@@ -16,6 +18,13 @@ class App
     {
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->app; // @TODO
+
+        // Init database
+        $this->database = new \Yggverse\Yoda\Model\Database(
+            $this->config->database->name,
+            $this->config->database->username,
+            $this->config->database->password
+        );
 
         // Init theme
         $css = new \GtkCssProvider();

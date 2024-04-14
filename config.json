@@ -2,6 +2,12 @@
     "app":
     {
         "theme":"Default",
+        "database":
+        {
+            "name":"database.sqlite",
+            "username":null,
+            "password":null
+        },
         "header":
         {
             "enabled":true,
@@ -123,6 +129,10 @@
                         }
                     }
                 }
+            },
+            "history":
+            {
+                "enabled":true
             }
         }
     }
