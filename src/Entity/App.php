@@ -158,8 +158,8 @@ class App
         if ($value)
         {
             $title = urldecode(
-                strlen($value) > $this->config->header->title->length->max ? substr($value, 0, $this->config->header->title->length->max) . '...'
-                                                                           : $value
+                mb_strlen($value) > $this->config->header->title->length->max ? mb_substr($value, 0, $this->config->header->title->length->max) . '...'
+                                                                              : $value
             );
         }
 

@@ -640,8 +640,8 @@ class Page
         if ($value)
         {
             $title = urldecode(
-                strlen($value) > $this->config->title->length->max ? substr($value, 0, $this->config->title->length->max) . '...'
-                                                                   : $value
+                mb_strlen($value) > $this->config->title->length->max ? mb_substr($value, 0, $this->config->title->length->max) . '...'
+                                                                      : $value
             );
         }
 
