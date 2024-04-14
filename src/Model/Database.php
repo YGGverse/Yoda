@@ -6,16 +6,16 @@ namespace Yggverse\Yoda\Model;
 
 class Database
 {
-    public \PDO $database;
+    public \PDO $_database;
 
     public function __construct(
-        string $database,
+        string  $database,
         ?string $username = null,
         ?string $password = null
     ) {
         try
         {
-            $this->database = new \PDO(
+            $this->_database = new \PDO(
                 sprintf(
                     'sqlite:%s',
                     $database
@@ -24,22 +24,22 @@ class Database
                 $password
             );
 
-            $this->database->setAttribute(
+            $this->_database->setAttribute(
                 \PDO::ATTR_ERRMODE,
                 \PDO::ERRMODE_EXCEPTION
             );
 
-            $this->database->setAttribute(
+            $this->_database->setAttribute(
                 \PDO::ATTR_DEFAULT_FETCH_MODE,
                 \PDO::FETCH_OBJ
             );
 
-            $this->database->query('
+            $this->_database->query('
                 CREATE TABLE IF NOT EXISTS "history"
                 (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "time" INTEGER NOT NULL,
-                    "address" VARCHAR(1024) NOT NULL
+                    "url" VARCHAR(1024) NOT NULL
                 )
             ');
         }
@@ -53,5 +53,56 @@ class Database
                 )
             );
         }
+    }
+
+    public function addHistory(
+        string $url
+    ): int
+    {
+        $query = $this->_database->prepare(
+            'INSERT INTO `history` (`time`, `url`) VALUES (:time, :url)'
+        );
+
+        $query->execute(
+            [
+                ':time' => time(),
+                ':url'  => $url
+            ]
+        );
+
+        return (int) $this->_database->lastInsertId();
+    }
+
+    public function getHistory(
+        int $start = 0,
+        int $limit = 1000
+    ): array
+    {
+        $query = $this->_database->query(
+            sprintf(
+                'SELECT * FROM `history` ORDER BY `id` DESC LIMIT %d,%d',
+                $start,
+                $limit
+            )
+
+        );
+
+        return $query->fetchAll();
+    }
+
+    public function cleanHistory(
+        int $timeout = 0
+    ): int
+    {
+        $query = $this->_database->query(
+            sprintf(
+                'DELETE FROM `history` WHERE `time` + %d < %d',
+                $timeout,
+                time()
+            )
+
+        );
+
+        return $query->rowCount();
     }
 }

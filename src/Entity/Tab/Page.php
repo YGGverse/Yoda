@@ -45,6 +45,14 @@ class Page
         // Init history
         $this->history = new \Yggverse\Yoda\Model\History;
 
+        // Run database cleaner
+        if ($this->config->history->timeout)
+        {
+            $this->app->database->cleanHistory(
+                $this->config->history->timeout
+            );
+        }
+
         // Compose header
         $this->header = new \GtkBox(
             \GtkOrientation::HORIZONTAL
@@ -364,17 +372,34 @@ class Page
             $history = false;
         }
 
+        // Ignore history record on same URL stored in DB
+        if ($result = $this->app->database->getHistory(0, 1))
+        {
+            if ($url == $result[0]->url)
+            {
+                $history = false;
+            }
+        }
+
         // Update address field by requested
         $this->address->set_text(
             $url
         );
 
-        // Update history pool
         if ($history)
         {
+            // Update history in memory pool
             $this->history->add(
                 $url
             );
+
+            // Update history in the database
+            if ($this->config->history->enabled)
+            {
+                $this->app->database->addHistory(
+                    $url
+                );
+            }
         }
 
         // Update home button sensibility on match requested
