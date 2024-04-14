@@ -550,8 +550,9 @@ class Page
 
         if ($h1 = $body->getH1())
         {
-            $title = $h1[0] .
-                     $this->app->config->header->title->postfix;
+            $title = reset(
+                $h1
+            ) . $this->app->config->header->title->postfix;
         }
 
         else
@@ -608,7 +609,7 @@ class Page
             // Ignore history record on same URL stored
             if ($result = $this->app->database->getHistory('', 0, 1))
             {
-                if ($url == $result[0]->url)
+                if ($url == reset($result)->url)
                 {
                     $history = false;
                 }
@@ -649,12 +650,16 @@ class Page
 
         if ($h1 = $body->getH1())
         {
+            $title = reset(
+                $h1
+            );
+
             $this->app->setTitle(
-                $h1[0]
+                $title
             );
 
             $this->setTitle(
-                $h1[0]
+                $title
             );
         }
     }
