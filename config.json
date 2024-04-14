@@ -142,6 +142,36 @@
                 "time":
                 {
                     "format":"c"
+                },
+                "header":
+                {
+                    "margin":8,
+                    "button":
+                    {
+                        "open":
+                        {
+                            "visible":true,
+                            "label":"Open"
+                        },
+                        "clear":
+                        {
+                            "visible":true,
+                            "label":"Clear"
+                        },
+                        "go":
+                        {
+                            "visible":true,
+                            "label":"Go"
+                        }
+                    },
+                    "search":
+                    {
+                        "placeholder":"Search in history..."
+                    }
+                },
+                "body":
+                {
+                    "margin":8
                 }
             }
         }

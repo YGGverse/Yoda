@@ -74,17 +74,26 @@ class Database
     }
 
     public function getHistory(
+        string $search = '',
         int $start = 0,
         int $limit = 1000
     ): array
     {
-        $query = $this->_database->query(
+        $query = $this->_database->prepare(
             sprintf(
-                'SELECT * FROM `history` ORDER BY `id` DESC LIMIT %d,%d',
+                'SELECT * FROM `history` WHERE `url` LIKE :search ORDER BY `id` DESC LIMIT %d,%d',
                 $start,
                 $limit
             )
+        );
 
+        $query->execute(
+            [
+                ':search' => sprintf(
+                    '%%%s%%',
+                    $search
+                )
+            ]
         );
 
         return $query->fetchAll();
