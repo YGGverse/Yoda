@@ -14,9 +14,9 @@ class History
 
     public \GtkButton $open,
                       $clear,
-                      $go;
+                      $search;
 
-    public \GtkEntry $search;
+    public \GtkEntry $filter;
 
     public \GtkListStore $list;
     public \GtkTreeView $treeview;
@@ -110,14 +110,14 @@ class History
             );
         }
 
-        // Search field
-        $this->search = new \GtkEntry;
+        // Filter field
+        $this->filter = new \GtkEntry;
 
-        $this->search->set_placeholder_text(
-            $this->config->header->search->placeholder
+        $this->filter->set_placeholder_text(
+            $this->config->header->filter->placeholder
         );
 
-        $this->search->connect(
+        $this->filter->connect(
             'activate',
             function ($entry)
             {
@@ -128,31 +128,31 @@ class History
         );
 
         $this->header->pack_start(
-            $this->search,
+            $this->filter,
             true,
             true,
             0
         );
 
-        // Go button
-        $this->go = \GtkButton::new_with_label(
-            $this->config->header->button->go->label
+        // Search button
+        $this->search = \GtkButton::new_with_label(
+            $this->config->header->button->search->label
         );
 
-        $this->go->connect(
+        $this->search->connect(
             'clicked',
             function ()
             {
                 $this->refresh(
-                    $this->search->get_text()
+                    $this->filter->get_text()
                 );
             }
         );
 
-        if ($this->config->header->button->go->visible)
+        if ($this->config->header->button->search->visible)
         {
             $this->header->add(
-                $this->go
+                $this->search
             );
         }
 
@@ -253,7 +253,7 @@ class History
     }
 
     public function refresh(
-        string $search = ''
+        string $filter = ''
     ): void
     {
         // Reset previous state
@@ -269,7 +269,7 @@ class History
         );
 
         // Build history list from database records
-        foreach ($this->app->database->getHistory($search) as $record)
+        foreach ($this->app->database->getHistory($filter) as $record)
         {
             $this->list->append(
                 [

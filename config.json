@@ -165,13 +165,13 @@
                             "visible":true,
                             "label":"Clear"
                         },
-                        "go":
+                        "search":
                         {
                             "visible":true,
-                            "label":"Go"
+                            "label":"Search"
                         }
                     },
-                    "search":
+                    "filter":
                     {
                         "placeholder":"Search in history..."
                     }
