@@ -197,9 +197,11 @@ class History
             $this->list
         );
 
+        /* @TODO row-activated
         $this->treeview->get_selection()->set_mode(
             \GtkSelectionMode::MULTIPLE
         );
+        */
 
         // Compose body
         $this->body = new \GtkBox(
@@ -245,9 +247,20 @@ class History
         // Activate events
         $this->treeview->connect(
             'row-activated',
-            function ()
+            function ($tree)
             {
-                // @TODO
+                list($list, $row) = $tree->get_selection()
+                                         ->get_selected();
+
+                $url = $list->get_value(
+                    $row, 2
+                );
+
+                $page = $this->app->blankPage();
+
+                $page->open(
+                    $url
+                );
             }
         );
     }
