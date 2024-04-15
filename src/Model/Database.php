@@ -102,6 +102,20 @@ class Database
         return $query->fetchAll();
     }
 
+    public function deleteHistory(
+        int $id
+    ): int
+    {
+        $query = $this->_database->query(
+            sprintf(
+                'DELETE FROM `history` WHERE `id` = %d',
+                $id
+            )
+        );
+
+        return $query->rowCount();
+    }
+
     public function cleanHistory(
         int $timeout = 0
     ): int
