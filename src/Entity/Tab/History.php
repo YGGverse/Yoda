@@ -13,7 +13,7 @@ class History
                    $body;
 
     public \GtkButton $open,
-                      $clear,
+                      $delete,
                       $search;
 
     public \GtkEntry $filter;
@@ -67,16 +67,6 @@ class History
             false
         );
 
-        $this->open->connect(
-            'clicked',
-            function ()
-            {
-                // @TODO
-
-                $this->refresh();
-            }
-        );
-
         if ($this->config->header->button->open->visible)
         {
             $this->header->add(
@@ -84,29 +74,19 @@ class History
             );
         }
 
-        // Clear button
-        $this->clear = \GtkButton::new_with_label(
-            $this->config->header->button->clear->label
+        // Delete button
+        $this->delete = \GtkButton::new_with_label(
+            $this->config->header->button->delete->label
         );
 
-        $this->clear->set_sensitive(
+        $this->delete->set_sensitive(
             false
         );
 
-        $this->clear->connect(
-            'clicked',
-            function ()
-            {
-                // @TODO
-
-                $this->refresh();
-            }
-        );
-
-        if ($this->config->header->button->clear->visible)
+        if ($this->config->header->button->delete->visible)
         {
             $this->header->add(
-                $this->clear
+                $this->delete
             );
         }
 
@@ -115,16 +95,6 @@ class History
 
         $this->filter->set_placeholder_text(
             $this->config->header->filter->placeholder
-        );
-
-        $this->filter->connect(
-            'activate',
-            function ($entry)
-            {
-                $this->refresh(
-                    $entry->get_text()
-                );
-            }
         );
 
         $this->header->pack_start(
@@ -137,16 +107,6 @@ class History
         // Search button
         $this->search = \GtkButton::new_with_label(
             $this->config->header->button->search->label
-        );
-
-        $this->search->connect(
-            'clicked',
-            function ()
-            {
-                $this->refresh(
-                    $this->filter->get_text()
-                );
-            }
         );
 
         if ($this->config->header->button->search->visible)
@@ -164,7 +124,7 @@ class History
                 'Time',
                 new \GtkCellRendererText(),
                 'text',
-                0
+                1
             )
         );
 
@@ -173,7 +133,7 @@ class History
                 'Title',
                 new \GtkCellRendererText(),
                 'text',
-                1
+                2
             )
         );
 
@@ -182,12 +142,13 @@ class History
                 'URL',
                 new \GtkCellRendererText(),
                 'text',
-                2
+                3
             )
         );
 
         // Init list storage
         $this->list = new \GtkListStore(
+            \GObject::TYPE_INT,
             \GObject::TYPE_STRING,
             \GObject::TYPE_STRING,
             \GObject::TYPE_STRING
@@ -249,25 +210,98 @@ class History
             'row-activated',
             function ($tree)
             {
-                list($list, $row) = $tree->get_selection()
-                                         ->get_selected();
+                if ($url = $this->getSelectedColumn(3, $tree))
+                {
+                    $page = $this->app->blankPage();
 
-                $url = $list->get_value(
-                    $row, 2
+                    $page->open(
+                        $url
+                    );
+                }
+            }
+        );
+
+        $this->treeview->connect(
+            'cursor-changed',
+            function ($tree)
+            {
+                $url = $this->getSelectedColumn(
+                    3, $tree
                 );
 
-                $page = $this->app->blankPage();
+                $this->open->set_sensitive(
+                    (bool) $url
+                );
 
-                $page->open(
-                    $url
+                $this->delete->set_sensitive(
+                    (bool) $url
                 );
             }
         );
+
+        $this->filter->connect(
+            'activate',
+            function ($entry)
+            {
+                $this->refresh(
+                    $entry->get_text()
+                );
+            }
+        );
+
+        if ($this->config->header->button->open->visible)
+        {
+            $this->open->connect(
+                'clicked',
+                function ()
+                {
+                    if ($url = $this->getSelectedColumn(3))
+                    {
+                        $page = $this->app->blankPage();
+
+                        $page->open(
+                            $url
+                        );
+
+                        $this->refresh();
+                    }
+                }
+            );
+        }
+
+        if ($this->config->header->button->delete->visible)
+        {
+            $this->delete->connect(
+                'clicked',
+                function ()
+                {
+                    if ($id = $this->getSelectedColumn(0))
+                    {
+                        $this->app->database->deleteHistory(
+                            $id
+                        );
+
+                        $this->refresh();
+                    }
+                }
+            );
+        }
+
+        if ($this->config->header->button->search->visible)
+        {
+            $this->search->connect(
+                'clicked',
+                function ()
+                {
+                    $this->refresh(
+                        $this->filter->get_text()
+                    );
+                }
+            );
+        }
     }
 
-    public function refresh(
-        string $filter = ''
-    ): void
+    public function refresh(): void
     {
         // Reset previous state
         $this->list->clear();
@@ -277,15 +311,16 @@ class History
             false
         );
 
-        $this->clear->set_sensitive(
+        $this->delete->set_sensitive(
             false
         );
 
         // Build history list from database records
-        foreach ($this->app->database->getHistory($filter) as $record)
+        foreach ($this->app->database->getHistory($this->filter->get_text()) as $record)
         {
             $this->list->append(
                 [
+                    $record->id,
                     date(
                         $this->config->time->format,
                         $record->time
@@ -295,5 +330,34 @@ class History
                 ]
             );
         }
+
+        // Update tree
+        $this->treeview->show_all();
+    }
+
+    public function getSelectedColumn(
+        int $column,
+        \GtkTreeView $treeview = null
+    ): null|int|string
+    {
+        if (is_null($treeview))
+        {
+            $treeview = $this->treeview;
+        }
+
+        list(
+            $list,
+            $row
+        ) = $treeview->get_selection()->get_selected();
+
+        if ($list && $row)
+        {
+            if ($value = $list->get_value($row, $column))
+            {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }
