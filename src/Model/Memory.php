@@ -25,4 +25,9 @@ class Memory
 
         return null;
     }
+
+    public function flush(): void
+    {
+        $this->_memory = [];
+    }
 }
