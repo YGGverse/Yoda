@@ -6,7 +6,7 @@
     "type": "project",
     "require": {
         "yggverse/gemini": "^0.9",
-        "yggverse/net": "^1.7"
+        "yggverse/net": "dev-main"
     },
     "license": "MIT",
     "autoload": {

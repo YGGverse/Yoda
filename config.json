@@ -141,7 +141,7 @@
                     {
                         "open":
                         {
-                            "complete":"{TIME_C} | {RESPONSE_META} | {RESPONSE_LENGTH} bytes | {RESPONSE_SECONDS} seconds"
+                            "complete":"{REQUEST_BASE_URL} | {TIME_C} | {RESPONSE_META} | {RESPONSE_LENGTH} bytes | {RESPONSE_SECONDS} seconds"
                         }
                     }
                 }

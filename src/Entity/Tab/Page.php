@@ -339,6 +339,16 @@ class Page
 
         $this->status = new \GtkLabel;
 
+        $this->status->connect(
+            'activate-link',
+            function ($label, $href)
+            {
+                $this->open(
+                    $href
+                );
+            }
+        );
+
         $this->footer->add(
             $this->status
         );
@@ -591,19 +601,32 @@ class Page
         $this->status->set_markup(
             str_replace( // Custom macros mask from config.json
                 [
-                    '{NAVIGATION_ADDRESS}',
                     '{TIME_C}',
+                    '{REQUEST_BASE}',
+                    '{REQUEST_BASE_URL}',
                     '{RESPONSE_CODE}',
                     '{RESPONSE_META}',
                     '{RESPONSE_LENGTH}',
                     '{RESPONSE_SECONDS}'
                 ],
                 [
-                    urlencode(
-                        $url
-                    ),
                     date(
                         'c'
+                    ),
+                    $origin->getHost(),
+                    sprintf(
+                        '<a href="%s">%s</a>',
+                        $origin->get(
+                            true,  // scheme
+                            true,  // user
+                            true,  // pass
+                            true,  // host
+                            true,  // port
+                            false, // path
+                            false, // query
+                            false  // fragment
+                        ),
+                        $origin->getHost()
                     ),
                     $response->getCode(),
                     ($code ? sprintf('%d:', $code) : '')
