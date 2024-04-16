@@ -129,6 +129,31 @@
                             "length":
                             {
                                 "max":1024
+                            },
+                            "autocomplete":
+                            {
+                                "enabled":true,
+                                "inline":
+                                {
+                                    "completion":true,
+                                    "selection":true
+                                },
+                                "key":
+                                {
+                                    "length":1
+                                },
+                                "ignore":
+                                {
+                                    "keycode":
+                                    [
+                                        111,
+                                        116
+                                    ]
+                                },
+                                "result":
+                                {
+                                    "limit":15
+                                }
                             }
                         }
                     }

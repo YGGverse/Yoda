@@ -30,6 +30,10 @@ class Page
 
     public \GtkProgressBar $progressbar;
 
+    public \GtkEntryCompletion $completion;
+
+    public \GtkListStore $suggestion;
+
     public object $config;
 
     public function __construct(
@@ -201,6 +205,70 @@ class Page
             true,
             0
         );
+
+        // Init autocomplete
+        if ($this->config->header->entry->request->autocomplete->enabled)
+        {
+            $this->completion = new \GtkEntryCompletion();
+
+            $this->completion->set_inline_completion(
+                $this->config->header->entry->request->autocomplete->inline->completion
+            );
+
+            $this->completion->set_inline_selection(
+                $this->config->header->entry->request->autocomplete->inline->selection
+            );
+
+            $this->completion->set_minimum_key_length(
+                $this->config->header->entry->request->autocomplete->key->length
+            );
+
+            $this->completion->set_text_column(
+                0
+            );
+
+            $this->suggestion = new \GtkListStore(
+                \GObject::TYPE_STRING
+            );
+
+            $this->completion->set_model(
+                $this->suggestion
+            );
+
+            $this->request->connect(
+                'key-release-event',
+                function ($entry, $event)
+                {
+                    if (
+                        mb_strlen($entry->get_text()) >= $this->config->header->entry->request->autocomplete->key->length
+                        &&
+                        isset($event->key->keycode)
+                        &&
+                        !in_array(
+                            $event->key->keycode,
+                            $this->config->header->entry->request->autocomplete->ignore->keycode
+                        )
+                    ) {
+                        $this->suggestion->clear();
+
+                        foreach ($this->app->database->getHistory(
+                            $entry->get_text(), 0, $this->config->header->entry->request->autocomplete->result->limit
+                        ) as $suggestion)
+                        {
+                            $this->suggestion->append(
+                                [
+                                    $suggestion->url
+                                ]
+                            );
+                        }
+
+                        $this->request->set_completion(
+                            $this->completion
+                        );
+                    }
+                }
+            );
+        }
 
         // Go button
         $this->go = \GtkButton::new_with_label(
