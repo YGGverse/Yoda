@@ -121,12 +121,15 @@
                             "label":"Go"
                         }
                     },
-                    "address":
+                    "entry":
                     {
-                        "placeholder":"URL or any search term...",
-                        "length":
+                        "request":
                         {
-                            "max":1024
+                            "placeholder":"URL or any search term...",
+                            "length":
+                            {
+                                "max":1024
+                            }
                         }
                     }
                 },

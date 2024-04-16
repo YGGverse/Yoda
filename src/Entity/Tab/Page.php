@@ -21,7 +21,7 @@ class Page
                       $forward,
                       $go;
 
-    public \GtkEntry $address;
+    public \GtkEntry $request;
 
     public \GtkLabel $content,
                      $status;
@@ -174,18 +174,18 @@ class Page
             );
         }
 
-        // Address field
-        $this->address = new \GtkEntry;
+        // Request field
+        $this->request = new \GtkEntry;
 
-        $this->address->set_placeholder_text(
-            $this->config->header->address->placeholder
+        $this->request->set_placeholder_text(
+            $this->config->header->entry->request->placeholder
         );
 
-        $this->address->set_max_length(
-            $this->config->header->address->length->max
+        $this->request->set_max_length(
+            $this->config->header->entry->request->length->max
         );
 
-        $this->address->connect(
+        $this->request->connect(
             'activate',
             function ($entry)
             {
@@ -196,7 +196,7 @@ class Page
         );
 
         $this->header->pack_start(
-            $this->address,
+            $this->request,
             true,
             true,
             0
@@ -212,7 +212,7 @@ class Page
             function ($entry)
             {
                 $this->open(
-                    $this->address->get_text()
+                    $this->request->get_text()
                 );
             }
         );
@@ -280,7 +280,7 @@ class Page
                 if ($address->isRelative())
                 {
                     $base = new \Yggverse\Net\Address(
-                        $this->address->get_text()
+                        $this->request->get_text()
                     );
 
                     if ($absolute = $address->getAbsolute($base))
@@ -389,8 +389,8 @@ class Page
             $url
         );
 
-        // Update address field by requested
-        $this->address->set_text(
+        // Update request field by requested
+        $this->request->set_text(
             $url
         );
 
