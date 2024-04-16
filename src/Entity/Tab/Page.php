@@ -28,6 +28,8 @@ class Page
 
     public \GtkScrolledWindow $container;
 
+    public \GtkProgressBar $progressbar;
+
     public object $config;
 
     public function __construct(
@@ -303,6 +305,13 @@ class Page
             }
         );
 
+        // Init progressbar
+        $this->progressbar = new \GtkProgressBar();
+
+        $this->progressbar->set_opacity(
+            0
+        );
+
         // Compose footer
         $this->footer = new \GtkBox(
             \GtkOrientation::HORIZONTAL
@@ -348,6 +357,10 @@ class Page
             true,
             true,
             0
+        );
+
+        $this->box->add(
+            $this->progressbar
         );
 
         $this->box->add(
@@ -429,6 +442,12 @@ class Page
         bool $history = true
     ): void
     {
+        // Init progressbar
+        if ($this->config->progressbar->visible)
+        {
+            $this->setProgress(0);
+        }
+
         // Init base URL
         $origin = new \Yggverse\Net\Address(
             $url
@@ -684,6 +703,45 @@ class Page
         $this->app->tabs->set_tab_label_text(
             $this->box,
             $title
+        );
+    }
+
+    public function setProgress(
+        float $value
+    ): void
+    {
+        $this->progressbar->set_fraction(
+            $value
+        );
+
+        \Gtk::timeout_add(
+            10,
+            function()
+            {
+                $progress = $this->progressbar->get_fraction();
+
+                $progress = $progress + 0.02;
+
+                $this->progressbar->set_fraction(
+                    $progress
+                );
+
+                if ($progress < 1)
+                {
+                    $this->progressbar->set_opacity(
+                        1
+                    );
+                }
+
+                else
+                {
+                    $this->progressbar->set_opacity(
+                        0
+                    );
+
+                    return false;
+                }
+            }
         );
     }
 }

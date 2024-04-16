@@ -90,6 +90,10 @@
                         "timeout":null
                     }
                 },
+                "progressbar":
+                {
+                    "visible":true
+                },
                 "header":
                 {
                     "margin":8,
