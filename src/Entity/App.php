@@ -191,13 +191,19 @@ class App
     {
         if ($value)
         {
+            if ($value == 'Welcome to Yoda!')
+            {
+                $title = $value;
+            }
 
-            /* @TODO
-            $title = urldecode(
-                mb_strlen($value) > $this->config->header->title->length->max ? mb_substr($value, 0, $this->config->header->title->length->max) . '...'
-                                                                              : $value
-            );
-            */ $title = $value;
+            else
+            {
+                $title = sprintf(
+                    '%s - %s',
+                    $value,
+                    $this->config->name
+                );
+            }
         }
 
         else

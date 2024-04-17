@@ -12,13 +12,6 @@
         "header":
         {
             "enabled":true,
-            "title":
-            {
-                "length":
-                {
-                    "max":64
-                }
-            },
             "button":
             {
                 "close":true
@@ -32,11 +25,7 @@
             {
                 "title":
                 {
-                    "default":"New page",
-                    "length":
-                    {
-                        "max":32
-                    }
+                    "default":"New page"
                 },
                 "redirect":
                 {

@@ -664,10 +664,6 @@ class Page
             $title = $origin->getHost();
         }
 
-        $this->app->setTitle(
-            $title
-        );
-
         $this->setTitle(
             $title
         );
@@ -757,10 +753,6 @@ class Page
                 $h1
             );
 
-            $this->app->setTitle(
-                $title
-            );
-
             $this->setTitle(
                 $title
             );
@@ -773,12 +765,7 @@ class Page
     {
         if ($value)
         {
-            /* @TODO
-            $title = urldecode(
-                mb_strlen($value) > $this->config->title->length->max ? mb_substr($value, 0, $this->config->title->length->max) . '...'
-                                                                        : $value
-            );
-            */ $title = $value;
+            $title = $value;
         }
 
         else
@@ -788,6 +775,10 @@ class Page
 
         $this->app->tabs->set_tab_label_text(
             $this->box,
+            $title
+        );
+
+        $this->app->setTitle(
             $title
         );
     }
