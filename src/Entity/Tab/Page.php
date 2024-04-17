@@ -708,24 +708,11 @@ class Page
         // Update history database
         if ($history && $this->config->history->database->enabled)
         {
-            // Ignore history record on same URL stored
-            if ($result = $this->app->database->getHistory('', 0, 1))
-            {
-                if ($url == reset($result)->url)
-                {
-                    $history = false;
-                }
-            }
-
-            if ($history)
-            {
-                $this->app->database->addHistory(
-                    $url,
-                    $title
-                );
-
-                $this->app->history->refresh();
-            }
+            $this->app->history->add(
+                $url,
+                $title,
+                $this->config->history->database->renew
+            );
         }
     }
 
