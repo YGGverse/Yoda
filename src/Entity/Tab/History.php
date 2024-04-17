@@ -343,6 +343,32 @@ class History
         $this->treeview->show_all();
     }
 
+    public function add(
+        string  $url,
+        ?string $title = null,
+        bool    $renew = false // delete previous records with same URL
+    ): ?int
+    {
+        if ($renew)
+        {
+            foreach ($this->app->database->getHistory($url) as $record)
+            {
+                $this->app->database->deleteHistory(
+                    $record->id
+                );
+            }
+        }
+
+        $id = $this->app->database->addHistory(
+            $url,
+            $title
+        );
+
+        $this->refresh();
+
+        return $id;
+    }
+
     public function getSelectedColumn(
         int $column,
         \GtkTreeView $treeview = null

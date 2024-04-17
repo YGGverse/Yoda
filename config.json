@@ -86,7 +86,11 @@
                     },
                     "database":
                     {
-                        "enabled":true
+                        "enabled":true,
+                        "mode":
+                        {
+                            "renew":true
+                        }
                     }
                 },
                 "progressbar":

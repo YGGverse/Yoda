@@ -711,7 +711,7 @@ class Page
             $this->app->history->add(
                 $url,
                 $title,
-                $this->config->history->database->renew
+                $this->config->history->database->mode->renew
             );
         }
     }
