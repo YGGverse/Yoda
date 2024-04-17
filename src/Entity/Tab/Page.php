@@ -763,23 +763,45 @@ class Page
         ?string $value = null
     ): void
     {
-        if ($value)
+        // Build new tab label on title length reached
+        if ($value && mb_strlen($value) > $this->config->title->width->chars)
         {
-            $title = $value;
+            $label = new \GtkLabel(
+                $value ? $value : $this->config->title->default
+            );
+
+            if ($this->config->title->width->chars)
+            {
+                $label->set_width_chars(
+                    $this->config->title->width->chars
+                );
+            }
+
+            if ($this->config->title->ellipsize->mode)
+            {
+                $label->set_ellipsize(
+                    // https://docs.gtk.org/Pango/enum.EllipsizeMode.html
+                    $this->config->title->ellipsize->mode
+                );
+            }
+
+            $this->app->tabs->set_tab_label(
+                $this->box,
+                $label
+            );
         }
 
         else
         {
-            $title = $this->config->title->default;
+            $this->app->tabs->set_tab_label_text(
+                $this->box,
+                $value
+            );
         }
 
-        $this->app->tabs->set_tab_label_text(
-            $this->box,
-            $title
-        );
-
+        // Update window title
         $this->app->setTitle(
-            $title
+            $value ? $value : $this->config->title->default
         );
     }
 

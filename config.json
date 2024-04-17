@@ -25,7 +25,15 @@
             {
                 "title":
                 {
-                    "default":"New page"
+                    "default":"New page",
+                    "width":
+                    {
+                        "chars":32
+                    },
+                    "ellipsize":
+                    {
+                        "mode":3
+                    }
                 },
                 "redirect":
                 {
