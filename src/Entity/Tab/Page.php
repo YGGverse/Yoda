@@ -637,17 +637,31 @@ class Page
             $response->getBody()
         );
 
+        // Try to detect document title
         if ($h1 = $body->getH1())
         {
             $title = reset(
                 $h1
-            ) . $this->app->config->header->title->postfix;
+            );
+        }
+
+        else if ($h2 = $body->getH2())
+        {
+            $title = reset(
+                $h2
+            );
+        }
+
+        else if ($h3 = $body->getH3())
+        {
+            $title = reset(
+                $h3
+            );
         }
 
         else
         {
-            $title = $origin->getHost() .
-                     $this->app->config->header->title->postfix;
+            $title = $origin->getHost();
         }
 
         $this->app->setTitle(
@@ -759,10 +773,12 @@ class Page
     {
         if ($value)
         {
+            /* @TODO
             $title = urldecode(
                 mb_strlen($value) > $this->config->title->length->max ? mb_substr($value, 0, $this->config->title->length->max) . '...'
-                                                                      : $value
+                                                                        : $value
             );
+            */ $title = $value;
         }
 
         else

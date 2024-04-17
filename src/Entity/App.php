@@ -57,7 +57,7 @@ class App
             $this->header = new \GtkHeaderBar;
 
             $this->header->set_title(
-                $this->config->header->title->default
+                $this->config->name
             );
 
             $this->header->set_show_close_button(
@@ -121,15 +121,18 @@ class App
         // Init event listener
         $this->tabs->connect(
             'switch-page',
-            function ($tabs, $child, $position)
-            {
+            function (
+                \GtkNotebook $tabs,
+                \GtkWidget $child,
+                int $position
+            ) {
                 // Update window title on tab change
                 $this->setTitle(
-                    $tabs->get_tab_label_text($child)
+                    $tabs->get_tab_label($child)->get_text()
                 );
 
                 // Add new tab event
-                if ('+' == $tabs->get_tab_label_text($child))
+                if ('+' == $tabs->get_tab_label($child)->get_text())
                 {
                     \Gtk::timeout_add(
                         0,
@@ -188,15 +191,18 @@ class App
     {
         if ($value)
         {
+
+            /* @TODO
             $title = urldecode(
                 mb_strlen($value) > $this->config->header->title->length->max ? mb_substr($value, 0, $this->config->header->title->length->max) . '...'
                                                                               : $value
             );
+            */ $title = $value;
         }
 
         else
         {
-            $title = $this->config->header->title->default;
+            $title = $this->config->name;
         }
 
         $this->header->set_title(

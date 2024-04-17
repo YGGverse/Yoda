@@ -1,6 +1,7 @@
 {
     "app":
     {
+        "name":"Yoda",
         "theme":"Default",
         "database":
         {
@@ -13,11 +14,9 @@
             "enabled":true,
             "title":
             {
-                "default":"Yoda",
-                "postfix":" - Yoda",
                 "length":
                 {
-                    "max":32
+                    "max":64
                 }
             },
             "button":
