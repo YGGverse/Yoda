@@ -51,14 +51,6 @@ class Page
         // Init history
         $this->history = new \Yggverse\Yoda\Model\History;
 
-        // Run database cleaner
-        if ($this->config->history->database->timeout)
-        {
-            $this->app->database->cleanHistory(
-                $this->config->history->database->timeout
-            );
-        }
-
         // Compose header
         $this->header = new \GtkBox(
             \GtkOrientation::HORIZONTAL
@@ -84,71 +76,41 @@ class Page
             $this->config->header->margin
         );
 
-        // Home button
+        // Init home button
         $this->home = \GtkButton::new_with_label(
             $this->config->header->button->home->label
         );
 
-        $this->home->connect(
-            'clicked',
-            function ($entry)
-            {
-                $this->history->reset();
-
-                $this->open(
-                    $this->config->header->button->home->url
-                );
-            }
-        );
-
         if ($this->config->header->button->home->visible)
         {
+            $this->home->connect(
+                'clicked',
+                function ($entry)
+                {
+                    $this->history->reset();
+
+                    $this->open(
+                        $this->config->header->button->home->url
+                    );
+                }
+            );
+
             $this->header->add(
                 $this->home
             );
         }
 
-        // Back button
+        // Init back button
         $this->back = \GtkButton::new_with_label(
             $this->config->header->button->back->label
         );
 
-        $this->back->set_sensitive(
-            false
-        );
-
-        $this->back->connect(
-            'clicked',
-            function ($entry)
-            {
-                $this->open(
-                    $this->history->goBack(),
-                    false
-                );
-            }
-        );
-
-        // Forward button
+        // Init forward button
         $this->forward = \GtkButton::new_with_label(
             $this->config->header->button->forward->label
         );
 
-        $this->forward->set_sensitive(
-            false
-        );
-
-        $this->forward->connect(
-            'clicked',
-            function ($entry)
-            {
-                $this->open(
-                    $this->history->goForward(),
-                    false
-                );
-            }
-        );
-
-        /// Group buttons
+        // Group back/forward buttons
         if ($this->config->header->button->back->visible || $this->config->header->button->forward->visible)
         {
             $buttonGroup = new \GtkButtonBox(
@@ -161,6 +123,21 @@ class Page
 
             if ($this->config->header->button->back->visible)
             {
+                $this->back->set_sensitive(
+                    false
+                );
+
+                $this->back->connect(
+                    'clicked',
+                    function ($entry)
+                    {
+                        $this->open(
+                            $this->history->goBack(),
+                            false
+                        );
+                    }
+                );
+
                 $buttonGroup->add(
                     $this->back
                 );
@@ -168,6 +145,21 @@ class Page
 
             if ($this->config->header->button->forward->visible)
             {
+                $this->forward->set_sensitive(
+                    false
+                );
+
+                $this->forward->connect(
+                    'clicked',
+                    function ($entry)
+                    {
+                        $this->open(
+                            $this->history->goForward(),
+                            false
+                        );
+                    }
+                );
+
                 $buttonGroup->add(
                     $this->forward
                 );
@@ -189,6 +181,13 @@ class Page
             $this->config->header->entry->request->length->max
         );
 
+        $this->header->pack_start(
+            $this->request,
+            true,
+            true,
+            0
+        );
+
         $this->request->connect(
             'activate',
             function ($entry)
@@ -197,13 +196,6 @@ class Page
                     $entry->get_text()
                 );
             }
-        );
-
-        $this->header->pack_start(
-            $this->request,
-            true,
-            true,
-            0
         );
 
         // Init autocomplete
@@ -275,18 +267,18 @@ class Page
             $this->config->header->button->go->label
         );
 
-        $this->go->connect(
-            'clicked',
-            function ($entry)
-            {
-                $this->open(
-                    $this->request->get_text()
-                );
-            }
-        );
-
         if ($this->config->header->button->go->visible)
         {
+            $this->go->connect(
+                'clicked',
+                function ($entry)
+                {
+                    $this->open(
+                        $this->request->get_text()
+                    );
+                }
+            );
+
             $this->header->add(
                 $this->go
             );
