@@ -636,7 +636,7 @@ class Page
         } // @TODO other codes
 
         $this->content->set_markup(
-            \Yggverse\Gemini\Pango::fromGemtext(
+            \Yggverse\Gemini\Gtk3\Pango::fromGemtext(
                 $response->getBody()
             )
         );
@@ -748,7 +748,7 @@ class Page
         }
 
         $this->content->set_markup(
-            \Yggverse\Gemini\Pango::fromGemtext(
+            \Yggverse\Gemini\Gtk3\Pango::fromGemtext(
                 $data
             )
         );
