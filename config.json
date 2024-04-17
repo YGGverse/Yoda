@@ -86,8 +86,7 @@
                     },
                     "database":
                     {
-                        "enabled":true,
-                        "timeout":null
+                        "enabled":true
                     }
                 },
                 "progressbar":
@@ -178,6 +177,10 @@
             {
                 "enabled":true,
                 "label":"History",
+                "clean":
+                {
+                    "timeout":null
+                },
                 "time":
                 {
                     "format":"c"

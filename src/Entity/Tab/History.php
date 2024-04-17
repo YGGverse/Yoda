@@ -33,6 +33,14 @@ class History
         // Init config
         $this->config = \Yggverse\Yoda\Model\File::getConfig()->app->tab->history;
 
+        // Cleanup expired history
+        if ($this->config->clean->timeout)
+        {
+            $this->app->database->cleanHistory(
+                $this->config->clean->timeout
+            );
+        }
+
         // Compose header
         $this->header = new \GtkBox(
             \GtkOrientation::HORIZONTAL
