@@ -19,6 +19,7 @@ class Page
     public \GtkButton $home,
                       $back,
                       $forward,
+                      $base,
                       $go;
 
     public \GtkEntry $request;
@@ -167,6 +168,45 @@ class Page
 
             $this->header->add(
                 $buttonGroup
+            );
+        }
+
+        // Init base button
+        $this->base = \GtkButton::new_with_label(
+            $this->config->header->button->base->label
+        );
+
+        $this->base->set_sensitive(
+            false
+        );
+
+        if ($this->config->header->button->base->visible)
+        {
+            $this->base->connect(
+                'clicked',
+                function (\GtkButton $button)
+                {
+                    $base = new \Yggverse\Net\Address(
+                        $this->request->get_text()
+                    );
+
+                    $this->open(
+                        $base->get(
+                            true,  // scheme
+                            true,  // user
+                            true,  // pass
+                            true,  // host
+                            true,  // port
+                            false, // path
+                            false, // query
+                            false  // fragment
+                        )
+                    );
+                }
+            );
+
+            $this->header->add(
+                $this->base
             );
         }
 
@@ -449,11 +489,6 @@ class Page
             $url
         );
 
-        // Update request field by requested
-        $this->request->set_text(
-            $url
-        );
-
         // Update history in memory pool
         if ($history && $this->config->history->memory->enabled && $url != $this->history->getCurrent())
         {
@@ -463,18 +498,54 @@ class Page
         }
 
         // Update home button sensibility on match requested
-        $this->home->set_sensitive(
-            !($url == $this->config->header->button->home->url)
-        );
+        if ($this->config->header->button->home->visible)
+        {
+            $this->home->set_sensitive(
+                !($url == $this->config->header->button->home->url)
+            );
+        }
 
         // Update back button sensibility
-        $this->back->set_sensitive(
-            (bool) $this->history->getBack()
-        );
+        if ($this->config->header->button->back->visible)
+        {
+            $this->back->set_sensitive(
+                (bool) $this->history->getBack()
+            );
+        }
 
         // Update forward button sensibility
-        $this->forward->set_sensitive(
-            (bool) $this->history->getForward()
+        if ($this->config->header->button->forward->visible)
+        {
+            $this->forward->set_sensitive(
+                (bool) $this->history->getForward()
+            );
+        }
+
+        // Update base button sensibility
+        if ($this->config->header->button->base->visible)
+        {
+            // Update address
+            $base = new \Yggverse\Net\Address(
+                $this->request->get_text()
+            );
+
+            $this->base->set_sensitive(
+                !($url == $base->get(
+                    true,  // scheme
+                    true,  // user
+                    true,  // pass
+                    true,  // host
+                    true,  // port
+                    false, // path
+                    false, // query
+                    false  // fragment
+                ))
+            );
+        }
+
+        // Update request field by requested
+        $this->request->set_text(
+            $url
         );
 
         // Open current address
