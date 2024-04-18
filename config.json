@@ -33,6 +33,10 @@
                     "ellipsize":
                     {
                         "mode":3
+                    },
+                    "postfix":
+                    {
+                        "hostname":true
                     }
                 },
                 "redirect":

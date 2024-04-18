@@ -834,6 +834,23 @@ class Page
         ?string $value = null
     ): void
     {
+        // Append hostname postfix
+        if ($this->config->title->postfix->hostname && str_starts_with($this->request->get_text(), 'gemini://'))
+        {
+            $address = new \Yggverse\Net\Address(
+                $this->request->get_text()
+            );
+
+            if ($address->getHost())
+            {
+                $value = sprintf(
+                    '%s - %s',
+                    $value,
+                    $address->getHost()
+                );
+            }
+        }
+
         // Build new tab label on title length reached
         if ($value && mb_strlen($value) > $this->config->title->width->chars)
         {
