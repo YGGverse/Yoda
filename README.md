@@ -2,6 +2,11 @@
 
 At this moment project under development!
 
+## Protocols
+
+* [x] Gemini
+* [ ] Nex
+
 ## Features
 
 * [x] Custom DNS resolver with memory cache (useful for alt networks like [Yggdrasil](https://github.com/yggdrasil-network/yggdrasil-go))

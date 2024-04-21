@@ -560,6 +560,14 @@ class Page
 
             break;
 
+            case str_starts_with($url, 'nex://'):
+
+                $this->_openNex(
+                    $url
+                );
+
+            break;
+
             case str_starts_with($url, 'yoda://'):
 
                 $this->_openYoda(
@@ -773,6 +781,134 @@ class Page
                     ($code ? sprintf('%d:', $code) : '')
                     .
                     ($response->getMeta() ? $response->getMeta() : $response->getCode()),
+                    number_format(
+                        mb_strlen(
+                            $raw
+                        )
+                    ),
+                    round(
+                        $end - $start, 2
+                    )
+                ],
+                $this->config->footer->status->open->complete
+            )
+        );
+
+        // Update history database
+        if ($history && $this->config->history->database->enabled)
+        {
+            $this->app->history->add(
+                $url,
+                $title,
+                $this->config->history->database->mode->renew
+            );
+        }
+    }
+
+    private function _openNex(
+        string $url,
+        bool $history = true
+    ): void
+    {
+        // Init progressbar
+        if ($this->config->progressbar->visible)
+        {
+            $this->setProgress(0);
+        }
+
+        // Init base URL
+        $origin = new \Yggverse\Net\Address(
+            $url
+        );
+
+        // Track response time
+        $start = microtime(true);
+
+        // Init custom resolver
+        $host = null;
+
+        if ($this->config->resolver->enabled)
+        {
+            $address = new \Yggverse\Net\Address(
+                $url
+            );
+
+            $name = $address->getHost();
+
+            if (!$host = $this->dns->get($name))
+            {
+                $resolve = new \Yggverse\Net\Resolve(
+                    $this->config->resolver->request->record,
+                    $this->config->resolver->request->host,
+                    $this->config->resolver->request->timeout,
+                    $this->config->resolver->result->shuffle
+                );
+
+                $resolved = $resolve->address(
+                    $address
+                );
+
+                if ($resolved)
+                {
+                    $host = $resolved->getHost();
+
+                    $this->dns->set(
+                        $name,
+                        $host
+                    );
+                }
+            }
+        }
+
+        $request = new \Yggverse\Nex\Client\Request(
+            $url,
+            $host
+        );
+
+        $raw = $request->getResponse();
+
+        $end = microtime(true);
+
+        $this->content->set_markup(
+            $raw // @TODO
+        );
+
+        $this->setTitle(
+            $origin->getHost()
+        );
+
+        $this->status->set_markup(
+            str_replace( // Custom macros mask from config.json
+                [
+                    '{TIME_C}',
+                    '{REQUEST_BASE}',
+                    '{REQUEST_BASE_URL}',
+                    '{RESPONSE_CODE}',
+                    '{RESPONSE_META}',
+                    '{RESPONSE_LENGTH}',
+                    '{RESPONSE_SECONDS}'
+                ],
+                [
+                    date(
+                        'c'
+                    ),
+                    $origin->getHost(),
+                    sprintf(
+                        '<a href="%s">%s</a>',
+                        $origin->get(
+                            true,  // scheme
+                            true,  // user
+                            true,  // pass
+                            true,  // host
+                            true,  // port
+                            false, // path
+                            false, // query
+                            false  // fragment
+                        ),
+                        $origin->getHost()
+                    ),
+                    '-', // @TODO
+                    '-',
                     number_format(
                         mb_strlen(
                             $raw
