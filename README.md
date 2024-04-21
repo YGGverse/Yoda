@@ -5,7 +5,7 @@ At this moment project under development!
 ## Protocols
 
 * [x] Gemini
-* [ ] Nex
+* [x] Nex
 
 ## Features
 
