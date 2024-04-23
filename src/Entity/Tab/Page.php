@@ -824,53 +824,18 @@ class Page
         // Track response time
         $start = microtime(true);
 
-        // Init custom resolver
-        $host = null;
+        // @TODO custom resolver support
 
-        if ($this->config->resolver->enabled)
-        {
-            $address = new \Yggverse\Net\Address(
-                $url
-            );
+        $client = new \Yggverse\Nex\Client;
 
-            $name = $address->getHost();
-
-            if (!$host = $this->dns->get($name))
-            {
-                $resolve = new \Yggverse\Net\Resolve(
-                    $this->config->resolver->request->record,
-                    $this->config->resolver->request->host,
-                    $this->config->resolver->request->timeout,
-                    $this->config->resolver->result->shuffle
-                );
-
-                $resolved = $resolve->address(
-                    $address
-                );
-
-                if ($resolved)
-                {
-                    $host = $resolved->getHost();
-
-                    $this->dns->set(
-                        $name,
-                        $host
-                    );
-                }
-            }
-        }
-
-        $request = new \Yggverse\Nex\Client\Request(
-            $url,
-            $host
+        $response = $client->request(
+            $url
         );
-
-        $raw = $request->getResponse();
 
         $end = microtime(true);
 
         $this->content->set_markup(
-            $raw // @TODO
+            $response
         );
 
         $this->setTitle(
@@ -911,7 +876,7 @@ class Page
                     '-',
                     number_format(
                         mb_strlen(
-                            $raw
+                            $response
                         )
                     ),
                     round(
