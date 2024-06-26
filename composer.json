@@ -5,7 +5,7 @@
     "homepage": "https://github.com/YGGverse/Yoda",
     "type": "project",
     "require": {
-        "yggverse/gemini": "dev-main",
+        "yggverse/gemini": "0.10.1",
         "yggverse/nex": "dev-main",
         "yggverse/net": "dev-main"
     },
