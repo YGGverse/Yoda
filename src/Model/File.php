@@ -6,30 +6,6 @@ namespace Yggverse\Yoda\Model;
 
 class File
 {
-    public static function getConfig(): object
-    {
-        $filename = __DIR__ .
-        DIRECTORY_SEPARATOR . '..' .
-        DIRECTORY_SEPARATOR . '..' .
-        DIRECTORY_SEPARATOR . 'config.json';
-
-        if (file_exists($filename) && is_readable($filename))
-        {
-            $result = json_decode(
-                file_get_contents(
-                    $filename
-                )
-            );
-        }
-
-        if (empty($result))
-        {
-            throw new \Exception(); // @TODO
-        }
-
-        return $result;
-    }
-
     public static function getTheme(string $name): string
     {
         $filename = __DIR__ .

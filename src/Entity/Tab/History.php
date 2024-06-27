@@ -30,8 +30,8 @@ class History
         // Init app
         $this->app = $app;
 
-        // Init config
-        $this->config = \Yggverse\Yoda\Model\File::getConfig()->app->tab->history;
+        // Init config namespace
+        $this->config = $app->config->tab->history;
 
         // Cleanup expired history
         if ($this->config->clean->timeout)

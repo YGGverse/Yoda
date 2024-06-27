@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Entity;
 
 class App
 {
+    public \Yggverse\Yoda\Model\Config $config;
     public \Yggverse\Yoda\Model\Database $database;
 
     public \Yggverse\Yoda\Entity\Tab\History $history;
@@ -14,12 +15,10 @@ class App
     public \GtkHeaderBar $header;
     public \GtkNotebook $tabs;
 
-    public object $config;
-
     public function __construct()
     {
         // Init config
-        $this->config = \Yggverse\Yoda\Model\File::getConfig()->app; // @TODO
+        $this->config = new \Yggverse\Yoda\Model\Config;
 
         // Init database
         $this->database = new \Yggverse\Yoda\Model\Database(

@@ -43,8 +43,8 @@ class Page
         // Init app
         $this->app = $app;
 
-        // Init config
-        $this->config = \Yggverse\Yoda\Model\File::getConfig()->app->tab->page;
+        // Init config namespace
+        $this->config = $app->config->tab->page;
 
         // Init DNS memory
         $this->dns = new \Yggverse\Yoda\Model\Memory;
