@@ -15,10 +15,13 @@ class App
     public \GtkHeaderBar $header;
     public \GtkNotebook $tabs;
 
-    public function __construct()
-    {
+    public function __construct(
+        ?string $config = null
+    ) {
         // Init config
-        $this->config = new \Yggverse\Yoda\Model\Config;
+        $this->config = new \Yggverse\Yoda\Model\Config(
+            $config
+        );
 
         // Init database
         $this->database = new \Yggverse\Yoda\Model\Database(
