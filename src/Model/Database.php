@@ -13,47 +13,34 @@ class Database
         ?string $username = null,
         ?string $password = null
     ) {
-        try
-        {
-            $this->_database = new \PDO(
-                sprintf(
-                    'sqlite:%s',
-                    $database
-                ),
-                $username,
-                $password
-            );
+        $this->_database = new \PDO(
+            sprintf(
+                'sqlite:%s',
+                $database
+            ),
+            $username,
+            $password
+        );
 
-            $this->_database->setAttribute(
-                \PDO::ATTR_ERRMODE,
-                \PDO::ERRMODE_EXCEPTION
-            );
+        $this->_database->setAttribute(
+            \PDO::ATTR_ERRMODE,
+            \PDO::ERRMODE_EXCEPTION
+        );
 
-            $this->_database->setAttribute(
-                \PDO::ATTR_DEFAULT_FETCH_MODE,
-                \PDO::FETCH_OBJ
-            );
+        $this->_database->setAttribute(
+            \PDO::ATTR_DEFAULT_FETCH_MODE,
+            \PDO::FETCH_OBJ
+        );
 
-            $this->_database->query('
-                CREATE TABLE IF NOT EXISTS "history"
-                (
-                    "id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    "time"  INTEGER NOT NULL,
-                    "url"   VARCHAR(1024) NOT NULL,
-                    "title" VARCHAR(255)
-                )
-            ');
-        }
-
-        catch (\PDOException $exception)
-        {
-            exit(
-                print_r(
-                    $exception->getMessage(),
-                    true
-                )
-            );
-        }
+        $this->_database->query('
+            CREATE TABLE IF NOT EXISTS "history"
+            (
+                "id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "time"  INTEGER NOT NULL,
+                "url"   VARCHAR(1024) NOT NULL,
+                "title" VARCHAR(255)
+            )
+        ');
     }
 
     public function addHistory(
