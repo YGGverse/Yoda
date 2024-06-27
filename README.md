@@ -23,5 +23,6 @@ At this moment project under development!
 
 ## Components
 
-* [gemini-php](https://github.com/YGGverse/gemini-php) - Client and Parser for Gemini Protocol
-* [net-php](https://github.com/YGGverse/net-php) - DNS resolver with related network features
+* [gemini-php](https://github.com/YGGverse/gemini-php) - PHP 8 library for Gemini protocol
+* [gemtext-php](https://github.com/YGGverse/gemtext-php) - PHP 8 library for Gemtext operations
+* [net-php](https://github.com/YGGverse/net-php) - PHP 8 library for DNS resolver and address parser
