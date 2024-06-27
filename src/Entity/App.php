@@ -15,7 +15,8 @@ class App
     public \GtkHeaderBar $header;
     public \GtkNotebook $tabs;
 
-    public function __construct() {
+    public function __construct()
+    {
         // Init config
         $this->config = new \Yggverse\Yoda\Model\Config;
 
