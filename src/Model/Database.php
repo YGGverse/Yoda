@@ -6,17 +6,18 @@ namespace Yggverse\Yoda\Model;
 
 class Database
 {
-    public \PDO $_database;
+    private \PDO $_database;
 
     public function __construct(
-        string  $database,
+         string $filename,
         ?string $username = null,
         ?string $password = null
     ) {
+        // Init database
         $this->_database = new \PDO(
             sprintf(
                 'sqlite:%s',
-                $database
+                $filename
             ),
             $username,
             $password
@@ -71,7 +72,10 @@ class Database
     {
         $query = $this->_database->prepare(
             sprintf(
-                'SELECT * FROM `history` WHERE `url` LIKE :search OR `title` LIKE :search ORDER BY `id` DESC LIMIT %d,%d',
+                'SELECT * FROM `history`
+                          WHERE `url` LIKE :search OR `title` LIKE :search
+                          ORDER BY `id` DESC
+                          LIMIT %d,%d',
                 $start,
                 $limit
             )
