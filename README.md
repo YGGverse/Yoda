@@ -1,28 +1,24 @@
 # Yoda is [PHP-GTK](https://github.com/scorninpc/php-gtk3) Browser for [Gemini Protocol](https://geminiprotocol.net)
 
-At this moment project under development!
+At this moment project in development!
 
-## Protocols
+## Install
 
-* [x] Gemini
-* [x] Nex
+1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) from sources or get [Appimage](https://github.com/scorninpc/php-gtk3/releases)
+2. `apt install git composer`
+3. `git clone https://github.com/YGGverse/Yoda.git`
+4. `cd Yoda`
+5. `composer update`
 
-## Features
+## Launch
 
-* [x] Custom DNS resolver with memory cache (useful for alt networks like [Yggdrasil](https://github.com/yggdrasil-network/yggdrasil-go))
-* [x] Flexible settings in `config.json`, then UI
-* [x] Native GTK environment, no custom colors until you change it by `css`
-* [x] Multi-tabs
-* [x] Navigation history
-* [ ] Bookmarks
-* [ ] Certificate features
-* [ ] Local snaps to make resources accessible even offline
-* [ ] `Gemfeed` reader
-* [ ] Search engine integrations, probably [Yo!](https://github.com/YGGverse/Yo/tree/gemini) Search by default
-* [ ] Machine translations (e.g. [Lingva API](https://github.com/thedaviddelta/lingva-translate))
+``` bash
+/path/to/php-gtk3 src/Yoda.php
+```
 
 ## Components
 
-* [gemini-php](https://github.com/YGGverse/gemini-php) - PHP 8 library for Gemini protocol
-* [gemtext-php](https://github.com/YGGverse/gemtext-php) - PHP 8 library for Gemtext operations
-* [net-php](https://github.com/YGGverse/net-php) - PHP 8 library for DNS resolver and address parser
+* [gemini-php](https://github.com/YGGverse/gemini-php) - Gemini protocol connections
+* [gemtext-php](https://github.com/YGGverse/gemtext-php) - Gemtext operations
+* [net-php](https://github.com/YGGverse/net-php) - DNS resolver and network address features
+* [nex-php](https://github.com/YGGverse/nex-php) - NEX protocol connections

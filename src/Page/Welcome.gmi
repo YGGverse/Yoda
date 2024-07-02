@@ -1,3 +1,0 @@
-# Welcome to Yoda!
-
-=> https://github.com/YGGverse/Yoda

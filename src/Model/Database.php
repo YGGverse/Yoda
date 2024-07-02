@@ -64,8 +64,8 @@ class Database
         return (int) $this->_database->lastInsertId();
     }
 
-    public function getHistory(
-        string $search = '',
+    public function findHistory(
+        string $value = '',
         int $start = 0,
         int $limit = 1000
     ): array
@@ -73,7 +73,7 @@ class Database
         $query = $this->_database->prepare(
             sprintf(
                 'SELECT * FROM `history`
-                          WHERE `url` LIKE :search OR `title` LIKE :search
+                          WHERE `url` LIKE :value OR `title` LIKE :value
                           ORDER BY `id` DESC
                           LIMIT %d,%d',
                 $start,
@@ -83,9 +83,9 @@ class Database
 
         $query->execute(
             [
-                ':search' => sprintf(
+                ':value' => sprintf(
                     '%%%s%%',
-                    $search
+                    $value
                 )
             ]
         );
@@ -121,5 +121,36 @@ class Database
         );
 
         return $query->rowCount();
+    }
+
+    public function refreshHistory(
+        string $url,
+        ?string $title = null
+    ): void
+    {
+        // Find same records match URL
+        $query = $this->_database->prepare(
+            'SELECT * FROM `history` WHERE `url` LIKE :url'
+        );
+
+        $query->execute(
+            [
+                ':url' => $url
+            ]
+        );
+
+        // Drop previous records
+        foreach ($query->fetchAll() as $record)
+        {
+            $this->deleteHistory(
+                $record->id
+            );
+        }
+
+        // Add new record
+        $this->addHistory(
+            $url,
+            $title
+        );
     }
 }

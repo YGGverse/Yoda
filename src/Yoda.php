@@ -6,9 +6,34 @@ require_once __DIR__ .
              DIRECTORY_SEPARATOR . 'vendor' .
              DIRECTORY_SEPARATOR . 'autoload.php';
 
-// Init app
+// Init filesystem
+$filesystem = new \Yggverse\Yoda\Model\Filesystem(
+    (
+        getenv('HOME') ?? __DIR__ . DIRECTORY_SEPARATOR . '..'
+    ) . DIRECTORY_SEPARATOR . '.yoda'
+);
+
+// Init database
+$database = new \Yggverse\Yoda\Model\Database(
+    $filesystem->getAbsolute(
+        'database.sqlite'
+    )
+);
+
+// Init GTK
 \Gtk::init();
 
-new \Yggverse\Yoda\Entity\App;
+// Init window
+$window = new \Yggverse\Yoda\Entity\Window(
+    $database
+);
+
+$window->gtk->connect(
+    'destroy',
+    function()
+    {
+        \Gtk::main_quit();
+    }
+);
 
 \Gtk::main();
