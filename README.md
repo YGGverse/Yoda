@@ -4,7 +4,7 @@ At this moment project in development!
 
 ## Install
 
-1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) from sources or get [Appimage](https://github.com/scorninpc/php-gtk3/releases)
+1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [Appimage](https://github.com/scorninpc/php-gtk3/releases)
 2. `apt install git composer`
 3. `git clone https://github.com/YGGverse/Yoda.git`
 4. `cd Yoda`
