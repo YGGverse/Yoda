@@ -1,6 +1,6 @@
 # Yoda is [PHP-GTK](https://github.com/scorninpc/php-gtk3) Browser for [Gemini Protocol](https://geminiprotocol.net)
 
-At this moment project in development!
+Project in development!
 
 ## Install
 
