@@ -99,7 +99,70 @@ class Address
         {
             case 'file':
 
-                // @TODO
+                if (file_exists($address->getPath()) && is_readable($address->getPath()))
+                {
+                    switch ($address->getPath())
+                    {
+                        case is_dir($address->getPath()):
+
+                            // @TODO build fs listing
+
+                        break;
+
+                        case str_ends_with($address->getPath(), '.gmi'):
+
+                            $title = null;
+
+                            $this->content->data->setValue(
+                                file_get_contents( // @TODO format relative links
+                                    $address->getPath()
+                                ),
+                                $title
+                            );
+
+                            if ($title) // detect title by document h1
+                            {
+                                $this->title->gtk->set_text(
+                                    $title
+                                );
+                            }
+
+                            $this->statusbar->gtk->set_text(
+                                null
+                            );
+
+                        break;
+
+                        default:
+
+                            $this->title->gtk->set_text(
+                                'Oops!'
+                            );
+
+                            $this->content->data->setValue(
+                                'File extension not supported'
+                            );
+
+                            $this->statusbar->gtk->set_text(
+                                null
+                            );
+                    }
+                }
+
+                else
+                {
+                    $this->title->gtk->set_text(
+                        'Failure'
+                    );
+
+                    $this->content->data->setValue(
+                        'Could not open file'
+                    );
+
+                    $this->statusbar->gtk->set_text(
+                        'Resource not found or not readable'
+                    );
+                }
 
             break;
 
@@ -216,6 +279,10 @@ class Address
                             $response->getCode()
                         )
                     )
+                );
+
+                $this->statusbar->gtk->set_text(
+                    null
                 );
         }
 
