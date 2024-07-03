@@ -254,15 +254,22 @@ class Address
                     $this->navbar->request->gtk->set_text(
                         $address->get()
                     );
-
-                    $this->update();
                 }
 
                 // Search request
                 else
                 {
-                    // @TODO
+                    $this->navbar->request->gtk->set_text(
+                        sprintf(
+                            'gemini://tlgs.one/search?%s', // @TODO custom provider
+                            urlencode(
+                                $this->navbar->request->gtk->get_text()
+                            )
+                        )
+                    );
                 }
+
+                $this->update();
 
             return;
 
