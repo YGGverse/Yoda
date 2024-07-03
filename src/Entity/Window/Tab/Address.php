@@ -248,9 +248,13 @@ class Address
                     )
                 );
 
-                // Address correct
-                if ($address->getHost())
-                {
+                // Hostname request
+                if (filter_var(
+                        $address->getHost(),
+                        FILTER_VALIDATE_DOMAIN,
+                        FILTER_FLAG_HOSTNAME
+                    )
+                ) {
                     $this->navbar->request->gtk->set_text(
                         $address->get()
                     );
