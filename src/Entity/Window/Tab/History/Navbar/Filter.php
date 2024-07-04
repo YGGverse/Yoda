@@ -26,17 +26,4 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\History\Navbar\En
             $entry->get_text()
         );
     }
-
-    public function setValue(
-        ?string $value = null
-    ): void
-    {
-        $this->gtk->set_text(
-            trim(
-                strval(
-                    $value
-                )
-            )
-        );
-    }
 }

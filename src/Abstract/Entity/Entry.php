@@ -61,4 +61,17 @@ abstract class Entry
         \GtkEntry $entry,
         \GdkEvent $event
     ): void;
+
+    public function setValue(
+        ?string $value = null
+    ): void
+    {
+        $this->gtk->set_text(
+            trim(
+                strval(
+                    $value
+                )
+            )
+        );
+    }
 }

@@ -28,17 +28,4 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\E
             )
         );
     }
-
-    public function setValue(
-        ?string $value = null
-    ): void
-    {
-        $this->gtk->set_text(
-            trim(
-                strval(
-                    $value
-                )
-            )
-        );
-    }
 }
