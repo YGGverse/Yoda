@@ -147,6 +147,13 @@ class Content
         $this->list->clear();
     }
 
+    public function update(): void
+    {
+        $this->search(
+            $this->history->navbar->search->gtk->get_text()
+        );
+    }
+
     public function search(
         string $filter = ''
     ): void
