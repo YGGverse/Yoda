@@ -12,6 +12,7 @@ class Statusbar
 
     // Defaults
     private int $_margin = 8;
+    private string $_text = '';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Window\Tab\Address $address
@@ -46,6 +47,17 @@ class Statusbar
 
         $this->gtk->set_margin_end(
             $this->_margin
+        );
+    }
+
+    public function setText(
+        ?string $text = null
+    ): void
+    {
+        $this->gtk->set_text(
+            is_null($text) ? $this->_text : trim(
+                $text
+            )
         );
     }
 }
