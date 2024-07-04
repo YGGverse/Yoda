@@ -150,7 +150,7 @@ class Content
     public function update(): void
     {
         $this->search(
-            $this->history->navbar->search->gtk->get_text()
+            $this->history->navbar->filter->gtk->get_text()
         );
     }
 
