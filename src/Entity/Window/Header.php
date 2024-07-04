@@ -37,7 +37,9 @@ class Header
         $this->gtk->set_title(
             is_null($title) ? $this->_title : sprintf(
                 '%s - %s',
-                $title,
+                trim(
+                    $title
+                ),
                 $this->_title
             )
         );
