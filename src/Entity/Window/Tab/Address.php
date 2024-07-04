@@ -69,7 +69,7 @@ class Address
         );
 
         // Update title
-        $this->title->setText(
+        $this->title->setValue(
             $address->getHost()
         );
 
@@ -125,7 +125,7 @@ class Address
 
                             if ($title) // detect title by document h1
                             {
-                                $this->title->setText(
+                                $this->title->setValue(
                                     $title
                                 );
                             }
@@ -138,7 +138,7 @@ class Address
 
                         default:
 
-                            $this->title->setText(
+                            $this->title->setValue(
                                 'Oops!'
                             );
 
@@ -154,7 +154,7 @@ class Address
 
                 else
                 {
-                    $this->title->setText(
+                    $this->title->setValue(
                         'Failure'
                     );
 
@@ -200,7 +200,7 @@ class Address
 
                             if ($title) // detect title by document h1
                             {
-                                $this->title->setText(
+                                $this->title->setValue(
                                     $title
                                 );
                             }
@@ -221,7 +221,7 @@ class Address
 
                 else
                 {
-                    $this->title->setText(
+                    $this->title->setValue(
                         'Failure'
                     );
 
@@ -282,7 +282,7 @@ class Address
 
             default:
 
-                $this->title->setText(
+                $this->title->setValue(
                     'Oops!'
                 );
 
