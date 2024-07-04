@@ -50,4 +50,25 @@ class History
             0
         );
     }
+
+    public function search(
+        ?string $filter = null
+    ): void
+    {
+        $this->navbar->filter->setValue(
+            trim(
+                strval(
+                    $filter
+                )
+            )
+        );
+
+        $this->content->search(
+            trim(
+                strval(
+                    $filter
+                )
+            )
+        );
+    }
 }
