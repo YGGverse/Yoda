@@ -89,6 +89,9 @@ class Address
             // @TODO title
         );
 
+        // Refresh tabs
+        $this->navbar->address->tab->refresh();
+
         // Update statusbar indicator
         $this->statusbar->gtk->set_text(
             'Loading...'
