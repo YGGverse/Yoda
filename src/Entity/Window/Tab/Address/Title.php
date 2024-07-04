@@ -13,7 +13,7 @@ class Title
     // Defaults
     private int $_ellipsize = 3;
     private int $_length = 12;
-    private string $_value = 'New address';
+    private string $_text = 'New address';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Window\Tab\Address $address,
@@ -21,7 +21,7 @@ class Title
         $this->address = $address;
 
         $this->gtk = new \GtkLabel(
-            $this->_value
+            $this->_text
         );
 
         $this->gtk->set_width_chars(
@@ -30,6 +30,17 @@ class Title
 
         $this->gtk->set_ellipsize(
             $this->_ellipsize
+        );
+    }
+
+    public function setText(
+        ?string $text = null
+    ): void
+    {
+        $this->gtk->set_text(
+            is_null($text) ? $this->_text : trim(
+                $text
+            )
         );
     }
 }
