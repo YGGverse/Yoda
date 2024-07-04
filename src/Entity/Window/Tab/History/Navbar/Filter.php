@@ -13,7 +13,7 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\History\Navbar\En
     ): void
     {
         $this->navbar->history->content->search(
-            $this->navbar->filter->gtk->get_text()
+            $entry->get_text()
         );
     }
 
@@ -23,7 +23,7 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\History\Navbar\En
     ): void
     {
         $this->navbar->history->content->search(
-            $this->navbar->filter->gtk->get_text()
+            $entry->get_text()
         );
     }
 
