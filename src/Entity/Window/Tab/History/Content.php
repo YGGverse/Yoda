@@ -175,7 +175,6 @@ class Content
 
         else
         {
-            /* @TODO initiation test
             $this->history->navbar->open->gtk->set_sensitive(
                 false
             );
@@ -183,7 +182,6 @@ class Content
             $this->history->navbar->delete->gtk->set_sensitive(
                 false
             );
-            */
         }
     }
 

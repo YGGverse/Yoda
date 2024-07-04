@@ -31,11 +31,11 @@ class History
             \GtkOrientation::VERTICAL
         );
 
-        $this->content = new Content(
+        $this->navbar = new Navbar(
             $this
         );
 
-        $this->navbar = new Navbar(
+        $this->content = new Content(
             $this
         );
 
