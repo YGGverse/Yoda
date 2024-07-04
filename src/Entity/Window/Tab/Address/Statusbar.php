@@ -12,7 +12,7 @@ class Statusbar
 
     // Defaults
     private int $_margin = 8;
-    private string $_text = '';
+    private string $_value = '';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Window\Tab\Address $address
@@ -20,6 +20,14 @@ class Statusbar
         $this->address = $address;
 
         $this->gtk = new \GtkLabel;
+
+        $this->gtk->set_use_markup(
+            true
+        );
+
+        $this->gtk->set_selectable(
+            true
+        );
 
         $this->gtk->set_line_wrap(
             true
@@ -48,15 +56,19 @@ class Statusbar
         $this->gtk->set_margin_end(
             $this->_margin
         );
+
+        $this->gtk->set_markup(
+            $this->_value
+        );
     }
 
-    public function setText(
-        ?string $text = null
+    public function setValue(
+        ?string $value = null
     ): void
     {
-        $this->gtk->set_text(
-            is_null($text) ? $this->_text : trim(
-                $text
+        $this->gtk->set_markup(
+            is_null($value) ? $this->_value : trim(
+                $value
             )
         );
     }

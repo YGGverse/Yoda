@@ -93,7 +93,7 @@ class Address
         $this->navbar->address->tab->refresh();
 
         // Update statusbar indicator
-        $this->statusbar->setText(
+        $this->statusbar->setValue(
             'Loading...'
         );
 
@@ -130,7 +130,7 @@ class Address
                                 );
                             }
 
-                            $this->statusbar->setText(
+                            $this->statusbar->setValue(
                                 null
                             );
 
@@ -146,7 +146,7 @@ class Address
                                 'File extension not supported'
                             );
 
-                            $this->statusbar->setText(
+                            $this->statusbar->setValue(
                                 null
                             );
                     }
@@ -162,7 +162,7 @@ class Address
                         'Could not open file'
                     );
 
-                    $this->statusbar->setText(
+                    $this->statusbar->setValue(
                         'Resource not found or not readable'
                     );
                 }
@@ -214,7 +214,7 @@ class Address
                             );
                     }
 
-                    $this->statusbar->setText(
+                    $this->statusbar->setValue(
                         $response->getMeta()
                     );
                 }
@@ -234,7 +234,7 @@ class Address
                         )
                     );
 
-                    $this->statusbar->setText(
+                    $this->statusbar->setValue(
                         'Request failed'
                     );
                 }
@@ -295,7 +295,7 @@ class Address
                     )
                 );
 
-                $this->statusbar->setText(
+                $this->statusbar->setValue(
                     null
                 );
         }
