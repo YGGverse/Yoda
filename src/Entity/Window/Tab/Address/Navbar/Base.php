@@ -18,7 +18,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\Butt
 
         if ($address->getHost())
         {
-            $this->navbar->request->gtk->set_text(
+            $this->navbar->request->setValue(
                 $address->get( // build base
                     true,
                     true,

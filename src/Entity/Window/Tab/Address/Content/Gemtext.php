@@ -53,7 +53,7 @@ class Gemtext
                 \GtkLabel $label,
                 string $href
             ) {
-                $this->content->address->navbar->request->gtk->set_text(
+                $this->content->address->navbar->request->setValue(
                     $this->_url(
                         $href
                     )

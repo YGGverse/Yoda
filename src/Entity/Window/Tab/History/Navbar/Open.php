@@ -22,7 +22,7 @@ class Open extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\History\Navbar\Butt
             $address
         );
 
-        $address->navbar->request->gtk->set_text(
+        $address->navbar->request->setValue(
             $this->navbar->history->content->getSelectedUrl()
         );
 

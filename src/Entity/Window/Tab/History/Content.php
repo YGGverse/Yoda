@@ -92,7 +92,7 @@ class Content
                     $this->history->tab
                 );
 
-                $address->navbar->request->gtk->set_text(
+                $address->navbar->request->setValue(
                     $this->getSelectedUrl()
                 );
 

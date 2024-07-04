@@ -69,7 +69,7 @@ class Address
         );
 
         // Update title
-        $this->title->gtk->set_text(
+        $this->title->setText(
             $address->getHost()
         );
 
@@ -93,7 +93,7 @@ class Address
         $this->navbar->address->tab->refresh();
 
         // Update statusbar indicator
-        $this->statusbar->gtk->set_text(
+        $this->statusbar->setText(
             'Loading...'
         );
 
@@ -125,12 +125,12 @@ class Address
 
                             if ($title) // detect title by document h1
                             {
-                                $this->title->gtk->set_text(
+                                $this->title->setText(
                                     $title
                                 );
                             }
 
-                            $this->statusbar->gtk->set_text(
+                            $this->statusbar->setText(
                                 null
                             );
 
@@ -138,7 +138,7 @@ class Address
 
                         default:
 
-                            $this->title->gtk->set_text(
+                            $this->title->setText(
                                 'Oops!'
                             );
 
@@ -146,7 +146,7 @@ class Address
                                 'File extension not supported'
                             );
 
-                            $this->statusbar->gtk->set_text(
+                            $this->statusbar->setText(
                                 null
                             );
                     }
@@ -154,7 +154,7 @@ class Address
 
                 else
                 {
-                    $this->title->gtk->set_text(
+                    $this->title->setText(
                         'Failure'
                     );
 
@@ -162,7 +162,7 @@ class Address
                         'Could not open file'
                     );
 
-                    $this->statusbar->gtk->set_text(
+                    $this->statusbar->setText(
                         'Resource not found or not readable'
                     );
                 }
@@ -200,7 +200,7 @@ class Address
 
                             if ($title) // detect title by document h1
                             {
-                                $this->title->gtk->set_text(
+                                $this->title->setText(
                                     $title
                                 );
                             }
@@ -214,14 +214,14 @@ class Address
                             );
                     }
 
-                    $this->statusbar->gtk->set_text(
+                    $this->statusbar->setText(
                         $response->getMeta()
                     );
                 }
 
                 else
                 {
-                    $this->title->gtk->set_text(
+                    $this->title->setText(
                         'Failure'
                     );
 
@@ -234,7 +234,7 @@ class Address
                         )
                     );
 
-                    $this->statusbar->gtk->set_text(
+                    $this->statusbar->setText(
                         'Request failed'
                     );
                 }
@@ -258,7 +258,7 @@ class Address
                         FILTER_FLAG_HOSTNAME
                     )
                 ) {
-                    $this->navbar->request->gtk->set_text(
+                    $this->navbar->request->setValue(
                         $address->get()
                     );
                 }
@@ -266,7 +266,7 @@ class Address
                 // Search request
                 else
                 {
-                    $this->navbar->request->gtk->set_text(
+                    $this->navbar->request->setValue(
                         sprintf(
                             'gemini://tlgs.one/search?%s', // @TODO custom provider
                             urlencode(
@@ -282,7 +282,7 @@ class Address
 
             default:
 
-                $this->title->gtk->set_text(
+                $this->title->setText(
                     'Oops!'
                 );
 
@@ -295,7 +295,7 @@ class Address
                     )
                 );
 
-                $this->statusbar->gtk->set_text(
+                $this->statusbar->setText(
                     null
                 );
         }
