@@ -13,6 +13,9 @@ class Tab
 
     public \Yggverse\Yoda\Entity\Window $window;
 
+    // App entity operations
+    private array $_tab = [];
+
     // Defaults
     private bool $_reorderable = true;
     private bool $_scrollable  = true;
@@ -84,5 +87,23 @@ class Tab
         $this->window->header->setTitle(
             $entity->title->gtk->get_text()
         );
+
+        // Register new tab entity
+        $this->_tab[] = $entity;
+    }
+
+    public function refresh()
+    {
+        foreach ($this->_tab as $entity)
+        {
+            switch (true)
+            {
+                case $entity instanceof History:
+
+                    $entity->content->update();
+
+                break;
+            }
+        }
     }
 }
