@@ -34,7 +34,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\Butt
             $this->navbar->address->update();
         }
 
-        $this->update();
+        $this->refresh();
     }
 
     public function refresh(): void
