@@ -61,7 +61,9 @@ class Address
         );
     }
 
-    public function update(): void
+    public function update(
+        bool $history = true
+    ): void
     {
         // Parse address
         $address = new \Yggverse\Net\Address(
@@ -78,19 +80,22 @@ class Address
             $address
         );
 
-        // Remember address in the navigation memory
-        $this->navbar->history->add(
-            $address->get()
-        );
+        if ($history)
+        {
+            // Remember address in the navigation memory
+            $this->navbar->history->add(
+                $address->get()
+            );
 
-        // Refresh history in database
-        $this->navbar->address->tab->window->database->refreshHistory(
-            $address->get(),
-            // @TODO title
-        );
+            // Refresh history in database
+            $this->navbar->address->tab->window->database->refreshHistory(
+                $address->get(),
+                // @TODO title
+            );
 
-        // Refresh tabs
-        $this->navbar->address->tab->refresh();
+            // Refresh tabs
+            $this->navbar->address->tab->refresh();
+        }
 
         // Update statusbar indicator
         $this->statusbar->setValue(

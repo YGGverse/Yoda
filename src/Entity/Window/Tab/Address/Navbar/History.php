@@ -15,12 +15,12 @@ class History
     public \Yggverse\Yoda\Entity\Window\Tab\Address\Navbar\History\Back $back;
     public \Yggverse\Yoda\Entity\Window\Tab\Address\Navbar\History\Forward $forward;
 
-    private \Yggverse\Yoda\Model\History $_history;
+    public \Yggverse\Yoda\Model\History $memory;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Window\Tab\Address\Navbar $navbar
     ) {
-        $this->_history = new \Yggverse\Yoda\Model\History();
+        $this->memory = new \Yggverse\Yoda\Model\History();
 
         $this->navbar = $navbar;
 
@@ -50,27 +50,32 @@ class History
     }
 
     public function add(
-        string $url
+        string $value
     ): void
     {
-        if (empty($url))
+        if (empty($value))
         {
             throw new \Exception;
         }
 
-        if ($url != $this->_history->getCurrent())
+        if ($value != $this->memory->getCurrent())
         {
-            $this->_history->add(
-                $url
+            $this->memory->add(
+                $value
             );
         }
 
+        $this->refresh();
+    }
+
+    public function refresh(): void
+    {
         $this->back->gtk->set_sensitive(
-            (bool) $this->_history->getBack()
+            (bool) $this->memory->getBack()
         );
 
         $this->forward->gtk->set_sensitive(
-            (bool) $this->_history->getForward()
+            (bool) $this->memory->getForward()
         );
     }
 }

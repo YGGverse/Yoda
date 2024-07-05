@@ -12,6 +12,17 @@ class Back extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\Butt
         \GtkButton $entity
     ): void
     {
-        // @TODO
+        if ($this->navbar->history->memory->getBack())
+        {
+            $this->navbar->request->setValue(
+                $this->navbar->history->memory->goBack()
+            );
+
+            $this->navbar->address->update(
+                false
+            );
+        }
+
+        $this->navbar->history->refresh();
     }
 }

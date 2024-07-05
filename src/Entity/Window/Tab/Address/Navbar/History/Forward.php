@@ -12,6 +12,17 @@ class Forward extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\B
         \GtkButton $entity
     ): void
     {
-        // @TODO
+        if ($this->navbar->history->memory->getForward())
+        {
+            $this->navbar->request->setValue(
+                $this->navbar->history->memory->goForward()
+            );
+
+            $this->navbar->address->update(
+                false
+            );
+        }
+
+        $this->navbar->history->refresh();
     }
 }
