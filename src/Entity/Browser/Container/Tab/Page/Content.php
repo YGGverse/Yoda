@@ -180,7 +180,7 @@ class Content
                             $title = null;
 
                             $this->data->setGemtext(
-                                $response->getContainer(),
+                                $response->getBody(),
                                 $title
                             );
 
@@ -196,7 +196,7 @@ class Content
                         default:
 
                             $this->data->setPlain(
-                                $response->getContainer()
+                                $response->getBody()
                             );
                     }
 
