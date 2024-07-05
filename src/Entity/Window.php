@@ -20,6 +20,8 @@ class Window
     private int $_width  = 640;
     private int $_height = 480;
 
+    private bool $_maximize = true;
+
     public function __construct(
         \Yggverse\Yoda\Model\Database $database
     ) {
@@ -31,6 +33,11 @@ class Window
             $this->_width,
             $this->_height
         );
+
+        if ($this->_maximize)
+        {
+            $this->gtk->maximize();
+        }
 
         $this->header = new Header(
             $this
