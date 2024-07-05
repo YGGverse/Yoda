@@ -10,6 +10,7 @@ abstract class HeaderBar
 
     protected bool $_actions = true;
     protected string $_title = 'Yoda';
+    protected string $_subtitle = '';
 
     public function __construct()
     {
@@ -21,6 +22,10 @@ abstract class HeaderBar
 
         $this->gtk->set_title(
             $this->_title
+        );
+
+        $this->gtk->set_subtitle(
+            $this->_subtitle
         );
     }
 
