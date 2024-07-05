@@ -22,10 +22,6 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\E
     {
         $this->navbar->base->refresh();
 
-        $this->navbar->go->gtk->set_sensitive(
-            !empty(
-                $entry->get_text()
-            )
-        );
+        $this->navbar->go->refresh();
     }
 }
