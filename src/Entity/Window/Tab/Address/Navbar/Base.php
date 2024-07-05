@@ -37,19 +37,19 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\Butt
         $this->update();
     }
 
-    public function update(
-        ?\Yggverse\Net\Address $address = null
-    ): void
+    public function refresh(): void
     {
-        if (is_null($address))
-        {
-            $address = new \Yggverse\Net\Address(
-                $this->navbar->request->gtk->get_text()
-            );
-        }
+        $address = new \Yggverse\Net\Address(
+            rtrim(
+                $this->navbar->request->gtk->get_text(),
+                '/'
+            )
+        );
 
         $this->navbar->base->gtk->set_sensitive(
-            $address->getHost() && ($address->getPath() || $address->getQuery())
+            $address->getHost() && (
+                $address->getPath() || $address->getQuery()
+            )
         );
     }
 }

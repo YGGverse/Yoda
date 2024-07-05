@@ -20,7 +20,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Window\Tab\Address\Navbar\E
         \GdkEvent $event
     ): void
     {
-        $this->navbar->base->update();
+        $this->navbar->base->refresh();
 
         $this->navbar->go->gtk->set_sensitive(
             !empty(

@@ -76,9 +76,7 @@ class Address
         );
 
         // Update navbar elements
-        $this->navbar->base->update(
-            $address
-        );
+        $this->navbar->base->refresh();
 
         if ($history)
         {
