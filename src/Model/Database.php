@@ -123,7 +123,7 @@ class Database
         return $query->rowCount();
     }
 
-    public function refreshHistory(
+    public function renewHistory(
         string $url,
         ?string $title = null
     ): void

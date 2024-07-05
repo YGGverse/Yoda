@@ -23,17 +23,26 @@ $database = new \Yggverse\Yoda\Model\Database(
 // Init GTK
 \Gtk::init();
 
-// Init window
-$window = new \Yggverse\Yoda\Entity\Window(
+// Init browser
+$browser = new \Yggverse\Yoda\Entity\Browser(
     $database
 );
 
-$window->gtk->connect(
+$browser->gtk->connect(
     'destroy',
     function()
     {
         \Gtk::main_quit();
     }
 );
+
+$browser->gtk->show_all();
+
+// Init history (test)
+$history = new \Yggverse\Yoda\Entity\Browser\History(
+    $browser
+);
+
+$history->gtk->show_all();
 
 \Gtk::main();

@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+
+class Statusbar
+{
+    public \GtkLabel $gtk;
+
+    // Dependencies
+    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
+
+    // Defaults
+    private int $_margin = 8;
+    private string $_value = '';
+
+    public function __construct(
+        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page
+    ) {
+        // Init dependency
+        $this->page = $page;
+
+        // Init container
+        $this->gtk = new \GtkLabel;
+
+        $this->gtk->set_use_markup(
+            true
+        );
+
+        $this->gtk->set_selectable(
+            true
+        );
+
+        $this->gtk->set_line_wrap(
+            true
+        );
+
+        $this->gtk->set_xalign(
+            0
+        );
+
+        $this->gtk->set_yalign(
+            0
+        );
+
+        $this->gtk->set_margin_top(
+            $this->_margin
+        );
+
+        $this->gtk->set_margin_bottom(
+            $this->_margin
+        );
+
+        $this->gtk->set_margin_start(
+            $this->_margin
+        );
+
+        $this->gtk->set_margin_end(
+            $this->_margin
+        );
+
+        $this->gtk->set_markup(
+            $this->_value
+        );
+    }
+
+    public function setValue(
+        ?string $value = null
+    ): void
+    {
+        $this->gtk->set_markup(
+            is_null($value) ? $this->_value : trim(
+                $value
+            )
+        );
+    }
+
+    public function refresh()
+    {
+        // @TODO
+    }
+}
