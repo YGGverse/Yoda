@@ -28,19 +28,4 @@ class Header
             $this->_subtitle
         );
     }
-
-    public function setTitle(
-        ?string $title = null
-    ): void
-    {
-        $this->gtk->set_title(
-            is_null($title) ? $this->_title : sprintf(
-                '%s - %s',
-                trim(
-                    $title
-                ),
-                $this->_title
-            )
-        );
-    }
 }
