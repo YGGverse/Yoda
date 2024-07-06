@@ -82,7 +82,8 @@ class Data
 
     public function setGemtext(
         string $value,
-        string | null &$title = null
+        string | null &$title = null,
+        bool $preformatted = false
     ): void
     {
         $document = new Document(
@@ -109,7 +110,9 @@ class Data
 
                     else
                     {
-                        // @TODO multiline
+                        $line[] = $preformatted ? '</tt>' : '<tt>';
+
+                        $preformatted = !($preformatted); // toggle
                     }
 
                 break;
