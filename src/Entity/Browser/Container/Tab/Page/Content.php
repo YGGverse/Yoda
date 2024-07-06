@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Data;
+use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Viewport;
 
 class Content
 {
@@ -15,6 +16,7 @@ class Content
 
     // Requirements
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Data $data;
+    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Viewport $viewport;
 
     // Defaults
     private int $_margin = 8;
@@ -43,13 +45,23 @@ class Content
             true
         );
 
-        // Init label
+        // Init viewport
+        // to integrate scrolled window features for data label
+        $this->viewport = new Viewport(
+            $this
+        );
+
+        // Init data label
         $this->data = new Data(
             $this
         );
 
-        $this->gtk->add(
+        $this->viewport->gtk->add(
             $this->data->gtk
+        );
+
+        $this->gtk->add(
+            $this->viewport->gtk
         );
     }
 
