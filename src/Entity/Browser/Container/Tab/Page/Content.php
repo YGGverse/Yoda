@@ -59,7 +59,7 @@ class Content
             $this->page->navbar->request->gtk->get_text()
         );
 
-        // Update title
+        // Init new title
         $this->page->title->setValue(
             $address->getHost()
         );
@@ -71,7 +71,7 @@ class Content
                 $address->get()
             );
 
-            // Refresh history in database
+            // Update history in database
             $this->page->tab->container->browser->database->renewHistory(
                 $address->get(),
                 // @TODO title
@@ -283,6 +283,10 @@ class Content
                 );
         }
 
+        // Render content
         $this->gtk->show_all();
+
+        // Refresh page components
+        $this->page->refresh();
     }
 }
