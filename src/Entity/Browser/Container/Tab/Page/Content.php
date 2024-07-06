@@ -34,6 +34,7 @@ class Content
         $this->gtk->set_propagate_natural_height(
             true
         );
+
         $this->gtk->set_propagate_natural_width(
             true
         );
