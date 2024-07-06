@@ -90,6 +90,9 @@ class Content
             function(
                 \GtkTreeView $treeview
             ) {
+                // Focus on browser
+                // $this->container->history->browser->gtk->present();
+
                 $this->container->history->browser->container->tab->append(
                     $this->getSelectedUrl()
                 );
