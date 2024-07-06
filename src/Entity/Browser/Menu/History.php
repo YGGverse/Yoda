@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu;
+namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 class History
 {
     public \GtkMenuItem $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu $menu;
+    public \Yggverse\Yoda\Entity\Browser\Menu $menu;
 
     // Defaults
     private string $_label = 'History';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu $menu
+        \Yggverse\Yoda\Entity\Browser\Menu $menu
     ) {
         // Init dependencies
         $this->menu = $menu;
@@ -31,7 +31,7 @@ class History
             function()
             {
                 $history = new \Yggverse\Yoda\Entity\Browser\History(
-                    $this->menu->navigation->header->browser
+                    $this->menu->browser
                 );
 
                 $history->gtk->show_all();

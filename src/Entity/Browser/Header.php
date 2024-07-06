@@ -42,7 +42,7 @@ class Header
             $this->_subtitle
         );
 
-        // Init navigation element
+        // Init navigation
         $this->navigation = new Navigation(
             $this
         );

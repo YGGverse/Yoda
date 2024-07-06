@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Header\Navigation;
+namespace Yggverse\Yoda\Entity\Browser;
 
-use \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu\History;
-use \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu\Quit;
+use \Yggverse\Yoda\Entity\Browser\Menu\History;
+use \Yggverse\Yoda\Entity\Browser\Menu\Quit;
 
 class Menu
 {
     public \GtkMenu $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation $navigation;
+    public \Yggverse\Yoda\Entity\Browser $browser;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu\History $history;
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu\Quit $quit;
+    public \Yggverse\Yoda\Entity\Browser\Menu\History $history;
+    public \Yggverse\Yoda\Entity\Browser\Menu\Quit $quit;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Header\Navigation $navigation
+        \Yggverse\Yoda\Entity\Browser $browser
     ) {
         // Init dependencies
-        $this->navigation = $navigation;
+        $this->browser = $browser;
 
         // Init menu
         $this->gtk = new \GtkMenu;

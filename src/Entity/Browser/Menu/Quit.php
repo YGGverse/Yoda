@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu;
+namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 class Quit
 {
     public \GtkMenuItem $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu $menu;
+    public \Yggverse\Yoda\Entity\Browser\Menu $menu;
 
     // Defaults
     private string $_label = 'Quit';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu $menu
+        \Yggverse\Yoda\Entity\Browser\Menu $menu
     ) {
         // Init dependencies
         $this->menu = $menu;

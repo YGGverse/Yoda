@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Header;
 
-use \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu;
+use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Navigation
 {
@@ -14,7 +14,7 @@ class Navigation
     public \Yggverse\Yoda\Entity\Browser\Header $header;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation\Menu $menu;
+    public \Yggverse\Yoda\Entity\Browser\Menu $menu;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Header $header
@@ -27,7 +27,7 @@ class Navigation
 
         // Init menu
         $this->menu = new Menu(
-            $this
+            $this->header->browser
         );
 
         $this->gtk->set_popup(
