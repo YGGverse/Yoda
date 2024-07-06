@@ -35,7 +35,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Nav
                 )
             );
 
-            $this->navbar->address->update();
+            $this->navbar->page->update();
         }
 
         $this->refresh();
