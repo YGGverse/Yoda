@@ -38,11 +38,4 @@ $browser->gtk->connect(
 
 $browser->gtk->show_all();
 
-// Init history (test)
-$history = new \Yggverse\Yoda\Entity\Browser\History(
-    $browser
-);
-
-$history->gtk->show_all();
-
 \Gtk::main();
