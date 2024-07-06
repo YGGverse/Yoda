@@ -67,6 +67,9 @@ class Page
         $this->gtk->add(
             $this->statusbar->gtk
         );
+
+        // Render
+        $this->gtk->show_all();
     }
 
     public function refresh(): void
