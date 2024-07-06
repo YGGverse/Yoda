@@ -25,12 +25,12 @@ class Add
             $this->_label
         );
 
-        // Int events
+        // Init events
         $this->gtk->connect(
             'activate',
             function()
             {
-                // @TODO
+                $this->tab->menu->browser->container->tab->append();
             }
         );
     }
