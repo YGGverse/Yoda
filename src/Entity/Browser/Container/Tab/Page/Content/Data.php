@@ -14,9 +14,6 @@ class Data
     // Dependencies
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
 
-    // Defaults
-    private string $_value = '';
-
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content
     ) {
@@ -34,7 +31,17 @@ class Data
             true
         );
 
+        /*
         $this->gtk->set_line_wrap(
+            true
+        );
+
+        $this->gtk->set_line_wrap_mode(
+            @TODO #114
+        );
+        */
+
+        $this->gtk->set_track_visited_links(
             true
         );
 
@@ -44,10 +51,6 @@ class Data
 
         $this->gtk->set_yalign(
             0
-        );
-
-        $this->setPlain(
-            $this->_value
         );
 
         $this->gtk->connect(
