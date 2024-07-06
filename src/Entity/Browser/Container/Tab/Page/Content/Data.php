@@ -38,6 +38,7 @@ class Data
 
         $this->gtk->set_line_wrap_mode(
             @TODO #114
+            \GtkWrapMode::WORD
         );
         */
 
