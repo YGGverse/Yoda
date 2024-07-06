@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
+use \Yggverse\Yoda\Entity\Browser\Menu\Tab;
 use \Yggverse\Yoda\Entity\Browser\Menu\History;
 use \Yggverse\Yoda\Entity\Browser\Menu\Quit;
 
@@ -15,6 +16,7 @@ class Menu
     public \Yggverse\Yoda\Entity\Browser $browser;
 
     // Requirements
+    public \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab;
     public \Yggverse\Yoda\Entity\Browser\Menu\History $history;
     public \Yggverse\Yoda\Entity\Browser\Menu\Quit $quit;
 
@@ -27,7 +29,16 @@ class Menu
         // Init menu
         $this->gtk = new \GtkMenu;
 
-        // Init history
+        // Init tab menu item
+        $this->tab = new Tab(
+            $this
+        );
+
+        $this->gtk->append(
+            $this->tab->gtk
+        );
+
+        // Init history menu item
         $this->history = new History(
             $this
         );
@@ -36,7 +47,12 @@ class Menu
             $this->history->gtk
         );
 
-        // Init quit
+        // Add separator
+        $this->gtk->append(
+            new \GtkSeparatorMenuItem
+        );
+
+        // Init quit menu item
         $this->quit = new Quit(
             $this
         );
