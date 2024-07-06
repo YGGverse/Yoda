@@ -29,8 +29,9 @@ class Tab
         );
 
         // Init previous session @TODO
-        $this->append();
-        $this->append();
+        $this->append(
+            'gemini://yggverse.cities.yesterweb.org'
+        );
 
         // Connect events
         $this->gtk->connect(
