@@ -31,6 +31,13 @@ class Content
             $this->_margin
         );
 
+        $this->gtk->set_propagate_natural_height(
+            true
+        );
+        $this->gtk->set_propagate_natural_width(
+            true
+        );
+
         $this->gtk->set_margin_end(
             $this->_margin
         );

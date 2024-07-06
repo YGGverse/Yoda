@@ -52,11 +52,8 @@ class Page
             $this
         );
 
-        $this->gtk->pack_start(
-            $this->content->gtk,
-            true,
-            true,
-            0
+        $this->gtk->add(
+            $this->content->gtk
         );
 
         // Init statusbar
