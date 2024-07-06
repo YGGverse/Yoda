@@ -45,6 +45,9 @@ class Tab
                         $child
                     )->get_text()
                 );
+
+                // Keep current selection
+                $entity->grab_focus();
             }
         );
     }
