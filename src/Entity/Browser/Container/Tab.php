@@ -41,10 +41,13 @@ class Tab
                 \GtkWidget $child,
                 int $position
             ) {
+                $label = $entity->get_tab_label(
+                    $child
+                );
+
                 $this->container->browser->header->setTitle(
-                    $entity->get_tab_label(
-                        $child
-                    )->get_text()
+                    $label->get_text(),
+                    $label->get_subtitle() // @TODO extension not supported by GTK-PHP
                 );
 
                 // Keep current selection
@@ -92,7 +95,8 @@ class Tab
 
             // Update application title
             $this->container->browser->header->setTitle(
-                $page->title->gtk->get_text()
+                $page->title->getValue(),
+                $page->title->getSubtitle()
             );
         }
 

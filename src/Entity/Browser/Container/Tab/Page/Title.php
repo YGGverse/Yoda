@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
 
+use \Yggverse\Yoda\Gtk\Browser\Container\Tab\Page\Title\Label;
+
 class Title
 {
-    public \GtkLabel $gtk;
+    public Label $gtk;
 
     // Dependencies
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
@@ -15,6 +17,7 @@ class Title
     private int $_ellipsize = 3;
     private int $_length = 12;
     private string $_value = 'New page';
+    private string $_subtitle = '';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page,
@@ -23,7 +26,7 @@ class Title
         $this->page = $page;
 
         // Init container
-        $this->gtk = new \GtkLabel(
+        $this->gtk = new Label(
             $this->_value
         );
 
@@ -37,7 +40,8 @@ class Title
     }
 
     public function setValue(
-        ?string $value = null
+        ?string $value = null,
+        ?string $subtitle = null
     ): void
     {
         $this->gtk->set_text(
@@ -45,5 +49,30 @@ class Title
                 $value
             )
         );
+
+        $this->setSubtitle(
+            $subtitle
+        );
+    }
+
+    public function setSubtitle(
+        ?string $subtitle = null
+    ): void
+    {
+        $this->gtk->set_subtitle(
+            is_null($subtitle) ? $this->_subtitle : trim(
+                $subtitle
+            )
+        );
+    }
+
+    public function getValue(): string
+    {
+        return $this->gtk->get_text();
+    }
+
+    public function getSubtitle(): string
+    {
+        return $this->gtk->get_subtitle();
     }
 }

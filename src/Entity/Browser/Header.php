@@ -53,7 +53,8 @@ class Header
     }
 
     public function setTitle(
-        ?string $value = null
+        ?string $value = null,
+        ?string $subtitle = null
     ): void
     {
         $this->gtk->set_title(
@@ -64,6 +65,10 @@ class Header
                 ),
                 $this->_title
             )
+        );
+
+        $this->setSubtitle(
+            $subtitle
         );
     }
 

@@ -7,7 +7,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Tab;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Statusbar;
 
 class Page
 {
@@ -20,7 +19,6 @@ class Page
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title $title;
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar $navbar;
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Statusbar $statusbar;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Tab $tab
@@ -52,20 +50,8 @@ class Page
             $this
         );
 
-        $this->gtk->pack_start(
-            $this->content->gtk,
-            true,
-            true,
-            0
-        );
-
-        // Init statusbar
-        $this->statusbar = new Statusbar(
-            $this
-        );
-
         $this->gtk->add(
-            $this->statusbar->gtk
+            $this->content->gtk
         );
 
         // Render
@@ -76,7 +62,6 @@ class Page
     {
         $this->navbar->refresh();
         $this->content->refresh();
-        $this->statusbar->refresh();
     }
 
     public function update(

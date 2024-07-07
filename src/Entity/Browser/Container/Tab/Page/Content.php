@@ -37,6 +37,18 @@ class Content
             $this->_margin
         );
 
+        $this->gtk->set_margin_bottom(
+            $this->_margin
+        );
+
+        $this->gtk->set_propagate_natural_height( // instead of pack to parent
+            true
+        );
+
+        $this->gtk->set_propagate_natural_width(
+            true
+        );
+
         // Init viewport
         // to integrate scrolled window features for data label
         $this->viewport = new Viewport(
@@ -73,7 +85,8 @@ class Content
 
         // Init new title
         $this->page->title->setValue(
-            $address->getHost()
+            $address->getHost(),
+            'loading...'
         );
 
         if ($history)
@@ -89,11 +102,6 @@ class Content
                 // @TODO title
             );
         }
-
-        // Update statusbar indicator
-        $this->page->statusbar->setValue(
-            'Loading...'
-        );
 
         // Detect protocol
         switch ($address->getScheme())
@@ -124,28 +132,22 @@ class Content
                             if ($title) // detect title by document h1
                             {
                                 $this->page->title->setValue(
-                                    $title
+                                    $title,
+                                    $this->page->title->subtitle
                                 );
                             }
-
-                            $this->page->statusbar->setValue(
-                                null
-                            );
 
                         break;
 
                         default:
 
                             $this->page->title->setValue(
-                                'Oops!'
+                                'Oops!',
+                                'file extension not supported'
                             );
 
                             $this->data->setPlain(
                                 'File extension not supported'
-                            );
-
-                            $this->page->statusbar->setValue(
-                                null
                             );
                     }
                 }
@@ -153,15 +155,12 @@ class Content
                 else
                 {
                     $this->page->title->setValue(
-                        'Failure'
+                        'Failure',
+                        'resource not found or not readable'
                     );
 
                     $this->data->setPlain(
                         'Could not open file'
-                    );
-
-                    $this->page->statusbar->setValue(
-                        'Resource not found or not readable'
                     );
                 }
 
@@ -212,7 +211,7 @@ class Content
                             );
                     }
 
-                    $this->page->statusbar->setValue(
+                    $this->page->title->setSubtitle(
                         $response->getMeta()
                     );
                 }
@@ -220,20 +219,17 @@ class Content
                 else
                 {
                     $this->page->title->setValue(
-                        'Failure'
-                    );
-
-                    $this->data->setPlain(
-                        'Resource not available!'
-                    );
-
-                    $this->page->statusbar->setValue(
+                        'Failure',
                         sprintf(
-                            'code %d',
+                            'could not open resource (code %d)',
                             intval(
                                 $response->getCode()
                             )
                         )
+                    );
+
+                    $this->data->setPlain(
+                        'Requested resource not available!'
                     );
                 }
 
@@ -283,15 +279,12 @@ class Content
             default:
 
                 $this->page->title->setValue(
-                    'Oops!'
+                    'Oops!',
+                    'protocol not supported!'
                 );
 
                 $this->data->setPlain(
                     'Protocol not supported!'
-                );
-
-                $this->page->statusbar->setValue(
-                    null
                 );
         }
 
@@ -300,5 +293,11 @@ class Content
 
         // Refresh page components
         $this->page->refresh();
+
+        // Update window header
+        $this->page->tab->container->browser->header->setTitle(
+            $this->page->title->getValue(),
+            $this->page->title->getSubtitle(),
+        );
     }
 }
