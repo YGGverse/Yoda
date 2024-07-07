@@ -81,9 +81,15 @@ class Response
 
     public function show(
         ?string $placeholder = null,
-        ?bool $visible = null
+        ?bool $visible = null,
+        bool $focus = true
     ): void
     {
+        if ($focus)
+        {
+            $this->query->gtk->grab_focus();
+        }
+
         if (!is_null($placeholder))
         {
             $this->query->setPlaceholder(
