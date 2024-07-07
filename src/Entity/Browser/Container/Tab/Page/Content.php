@@ -185,7 +185,7 @@ class Content
                     $request->getResponse()
                 );
 
-                // Route status codes
+                // Route status code
                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
                 switch ($response->getCode())
                 {
@@ -211,10 +211,24 @@ class Content
 
                     case 20: // ok
 
-                        // Process content type
+                        // Detect content type
                         switch (true)
                         {
-                            case str_contains($response->getMeta(), 'text/gemini'):
+                            case str_contains(
+                                $response->getMeta(),
+                                'text/gemini'
+                            ):
+
+                            case in_array(
+                                pathinfo(
+                                    $address->getPath(),
+                                    PATHINFO_EXTENSION
+                                ),
+                                [
+                                    'gmi',
+                                    'gemini'
+                                ]
+                            ):
 
                                 $title = null;
 
