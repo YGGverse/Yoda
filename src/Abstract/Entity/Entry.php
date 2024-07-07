@@ -130,7 +130,7 @@ abstract class Entry
         return $this->gtk->get_text();
     }
 
-    public function getVisible(): ?bool
+    public function isVisible(): ?bool
     {
         return $this->gtk->get_visible();
     }
