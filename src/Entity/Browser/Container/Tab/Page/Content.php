@@ -185,14 +185,15 @@ class Content
                     $request->getResponse()
                 );
 
-                // Process codes
+                // Route status codes
+                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
                 switch ($response->getCode())
                 {
                     case 10: // response expected
 
                         $this->page->title->setValue(
                             $address->getHost(),
-                            sprintf(
+                            $response->getMeta() ? $response->getMeta() : sprintf(
                                 'response expected (code %d)',
                                 intval(
                                     $response->getCode()
@@ -200,7 +201,9 @@ class Content
                             )
                         );
 
-                        $this->page->response->show();
+                        $this->page->response->show(
+                            $response->getMeta() // pass to placeholder
+                        );
 
                     break;
 

@@ -79,13 +79,26 @@ class Response
         $this->hide();
     }
 
-    public function show(): void
+    public function show(
+        ?string $placeholder = null
+    ): void
     {
+        if ($placeholder)
+        {
+            $this->query->setPlaceholder(
+                $placeholder
+            );
+        }
+
         $this->gtk->show();
     }
 
     public function hide(): void
     {
+        $this->query->setPlaceholder(
+            null
+        );
+
         $this->gtk->hide();
     }
 
