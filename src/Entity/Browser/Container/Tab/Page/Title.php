@@ -60,8 +60,10 @@ class Title
     ): void
     {
         $this->gtk->set_subtitle(
-            is_null($subtitle) ? $this->_subtitle : trim(
-                $subtitle
+            is_null($subtitle) ? $this->_subtitle : strtolower(
+                trim(
+                    $subtitle
+                )
             )
         );
     }
