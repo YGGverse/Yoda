@@ -74,4 +74,9 @@ abstract class Entry
             )
         );
     }
+
+    public function getValue(): ?string
+    {
+        return $this->gtk->get_text();
+    }
 }
