@@ -182,55 +182,79 @@ class Content
                     $request->getResponse()
                 );
 
-                if (20 === $response->getCode())
+                // Process codes
+                switch ($response->getCode())
                 {
-                    switch (true)
-                    {
-                        case str_contains($response->getMeta(), 'text/gemini'):
+                    case 20: // ok
 
-                            $title = null;
+                        // Process content type
+                        switch (true)
+                        {
+                            case str_contains($response->getMeta(), 'text/gemini'):
 
-                            $this->data->setGemtext(
-                                $response->getBody(),
-                                $title
-                            );
+                                $title = null;
 
-                            if ($title) // detect title by document h1
-                            {
-                                $this->page->title->setValue(
+                                $this->data->setGemtext(
+                                    $response->getBody(),
                                     $title
                                 );
-                            }
 
-                        break;
+                                $this->page->title->setValue(
+                                    $title ? $title : $address->getHost(), // detect title by document h1
+                                    $response->getMeta()
+                                );
 
-                        default:
+                            break;
 
-                            $this->data->setPlain(
-                                $response->getBody()
-                            );
-                    }
+                            default:
 
-                    $this->page->title->setSubtitle(
-                        $response->getMeta()
-                    );
-                }
+                                $this->data->setPlain(
+                                    $response->getBody()
+                                );
 
-                else
-                {
-                    $this->page->title->setValue(
-                        'Failure',
-                        sprintf(
-                            'could not open resource (code %d)',
-                            intval(
-                                $response->getCode()
+                                $this->page->title->setValue(
+                                    $address->getHost()
+                                );
+                        }
+
+                    break;
+
+                    case 31: // redirect @TODO
+
+                        $this->data->setGemtext(
+                            sprintf(
+                                '=> %s',
+                                $response->getMeta()
                             )
-                        )
-                    );
+                        );
 
-                    $this->data->setPlain(
-                        'Requested resource not available!'
-                    );
+                        $this->page->title->setValue(
+                            $address->getHost(),
+                            sprintf(
+                                'redirect (code %d)',
+                                intval(
+                                    $response->getCode()
+                                )
+                            )
+                        );
+
+                    break;
+
+                    default:
+
+                        $this->page->title->setValue(
+                            'Failure',
+                            sprintf(
+                                'could not open resource (code %d)',
+                                intval(
+                                    $response->getCode()
+                                )
+                            )
+                        );
+
+                        $this->data->setPlain(
+                            'Requested resource not available!'
+                        );
                 }
 
             break;
