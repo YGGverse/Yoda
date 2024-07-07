@@ -111,7 +111,7 @@ abstract class Entry
     ): void
     {
         $this->gtk->set_visibility(
-            is_null($value) ? $this->_visibility : $value
+            is_null($value) ? $this->_visible : $value
         );
     }
 
