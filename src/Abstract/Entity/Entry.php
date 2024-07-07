@@ -11,6 +11,7 @@ abstract class Entry
     protected int $_length = 1024;
     protected string $_placeholder = '';
     protected string $_value = '';
+    protected bool $_visible = true;
 
     public function __construct()
     {
@@ -25,6 +26,10 @@ abstract class Entry
         );
 
         $this->gtk->set_text(
+            $this->_value
+        );
+
+        $this->gtk->set_visibility(
             $this->_value
         );
 
@@ -101,6 +106,15 @@ abstract class Entry
         );
     }
 
+    public function setVisible(
+        ?bool $value = null
+    ): void
+    {
+        $this->gtk->set_visibility(
+            is_null($value) ? $this->_visibility : $value
+        );
+    }
+
     public function getLength(): ?int
     {
         return $this->gtk->get_max_length();
@@ -114,5 +128,10 @@ abstract class Entry
     public function getValue(): ?string
     {
         return $this->gtk->get_text();
+    }
+
+    public function getVisible(): ?bool
+    {
+        return $this->gtk->get_visible();
     }
 }
