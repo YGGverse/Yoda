@@ -5,7 +5,6 @@ Project in development!
 ## Install
 
 1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases)
-  * _custom build required by `GtkMenuButton` dependency (issue #112 / PR #113)_
 2. `apt install git composer`
 3. `git clone https://github.com/YGGverse/Yoda.git`
 4. `cd Yoda`
