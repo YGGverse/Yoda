@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Gtk\Browser\Container\Tab\Page\Title;
 
 class Label extends \GtkLabel
 {
-    private string $_subtitle;
+    private string $_subtitle = '';
 
     public function set_subtitle(
         string $value
