@@ -16,8 +16,8 @@ class Title
     // Defaults
     private int $_ellipsize = 3;
     private int $_length = 12;
-    private string $_value = 'New page';
-    private string $_subtitle = '';
+    private ?string $_value = 'New page';
+    private ?string $_subtitle = null;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page,
