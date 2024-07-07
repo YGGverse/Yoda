@@ -132,6 +132,6 @@ abstract class Entry
 
     public function isVisible(): ?bool
     {
-        return $this->gtk->get_visible();
+        return $this->gtk->get_visibility();
     }
 }
