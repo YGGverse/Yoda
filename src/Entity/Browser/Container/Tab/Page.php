@@ -66,7 +66,7 @@ class Page
         );
 
         // Render
-        $this->gtk->show_all();
+        $this->gtk->show();
     }
 
     public function refresh(): void

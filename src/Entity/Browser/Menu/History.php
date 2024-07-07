@@ -25,6 +25,9 @@ class History
             $this->_label
         );
 
+        // Render
+        $this->gtk->show();
+
         // Int events
         $this->gtk->connect(
             'activate',
@@ -33,8 +36,6 @@ class History
                 $history = new \Yggverse\Yoda\Entity\Browser\History(
                     $this->menu->browser
                 );
-
-                $history->gtk->show_all();
             }
         );
     }

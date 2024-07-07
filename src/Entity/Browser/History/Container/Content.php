@@ -60,6 +60,9 @@ class Content
             $this->viewport->gtk
         );
 
+        // Render
+        $this->gtk->show();
+
         // Do initial search
         $this->search();
     }

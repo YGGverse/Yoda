@@ -25,6 +25,9 @@ class Add
             $this->_label
         );
 
+        // Render
+        $this->gtk->show();
+
         // Init events
         $this->gtk->connect(
             'activate',

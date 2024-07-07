@@ -38,6 +38,9 @@ class Container
             true,
             0
         );
+
+        // Render
+        $this->gtk->show();
     }
 
     public function refresh()

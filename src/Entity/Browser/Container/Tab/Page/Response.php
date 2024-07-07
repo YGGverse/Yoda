@@ -81,7 +81,7 @@ class Response
 
     public function show(): void
     {
-        $this->gtk->show_all();
+        $this->gtk->show();
     }
 
     public function hide(): void

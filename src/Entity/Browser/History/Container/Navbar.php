@@ -94,6 +94,9 @@ class Navbar
         $this->gtk->add(
             $this->search->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 
     public function refresh(): void

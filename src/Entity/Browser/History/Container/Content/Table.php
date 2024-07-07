@@ -66,7 +66,10 @@ class Table
             $this->data->gtk
         );
 
-        // Connect events
+        // Render
+        $this->gtk->show();
+
+        // Init events
         $this->gtk->connect(
             'row-activated',
             function()

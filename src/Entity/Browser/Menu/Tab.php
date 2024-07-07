@@ -56,5 +56,8 @@ class Tab
         $this->gtk->set_submenu(
             $tab
         );
+
+        // Render
+        $this->gtk->show();
     }
 }

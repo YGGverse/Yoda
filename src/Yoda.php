@@ -36,6 +36,4 @@ $browser->gtk->connect(
     }
 );
 
-$browser->gtk->show_all();
-
 \Gtk::main();

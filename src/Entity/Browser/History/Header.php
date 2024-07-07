@@ -27,5 +27,8 @@ class Header
         $this->gtk->set_subtitle(
             $this->_subtitle
         );
+
+        // Render
+        $this->gtk->show();
     }
 }

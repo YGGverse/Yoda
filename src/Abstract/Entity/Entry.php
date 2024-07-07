@@ -28,6 +28,10 @@ abstract class Entry
             $this->_value
         );
 
+        // Render
+        $this->gtk->show();
+
+        // Init events
         $this->gtk->connect(
             'activate',
             function(

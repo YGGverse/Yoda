@@ -25,6 +25,9 @@ class Quit
             $this->_label
         );
 
+        // Render
+        $this->gtk->show();
+
         // Int events
         $this->gtk->connect(
             'activate',

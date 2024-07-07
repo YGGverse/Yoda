@@ -67,6 +67,9 @@ class Content
         $this->gtk->add(
             $this->viewport->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 
     public function refresh()

@@ -54,6 +54,10 @@ class Data
             0
         );
 
+        // Render
+        $this->gtk->show();
+
+        // Init events
         $this->gtk->connect(
             'activate-link',
             function(

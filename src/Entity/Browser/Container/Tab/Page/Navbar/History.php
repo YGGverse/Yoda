@@ -50,6 +50,9 @@ class History
         $this->gtk->add(
             $this->forward->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 
     public function add(

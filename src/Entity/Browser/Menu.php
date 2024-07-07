@@ -62,6 +62,6 @@ class Menu
         );
 
         // Render
-        $this->gtk->show_all();
+        $this->gtk->show();
     }
 }

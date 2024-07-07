@@ -33,7 +33,7 @@ class Tab
             'gemini://yggverse.cities.yesterweb.org'
         );
 
-        // Connect events
+        // Init events
         $this->gtk->connect(
             'switch-page',
             function (
@@ -101,6 +101,7 @@ class Tab
             );
         }
 
-        $this->gtk->show_all();
+        // Render
+        $this->gtk->show();
     }
 }

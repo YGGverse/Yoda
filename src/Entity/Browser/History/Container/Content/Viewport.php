@@ -19,5 +19,8 @@ class Viewport
 
         // Init viewport
         $this->gtk = new \GtkViewport;
+
+        // Render
+        $this->gtk->show();
     }
 }

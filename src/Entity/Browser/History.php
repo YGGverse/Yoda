@@ -59,5 +59,8 @@ class History
         $this->gtk->add(
             $this->container->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 }

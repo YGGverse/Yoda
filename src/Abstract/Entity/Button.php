@@ -23,6 +23,10 @@ abstract class Button
             $this->_label
         );
 
+        // Render
+        $this->gtk->show();
+
+        // Init events
         $this->gtk->connect(
             'clicked',
             function(

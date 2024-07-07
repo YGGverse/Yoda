@@ -50,6 +50,9 @@ class Header
         $this->gtk->add(
             $this->navigation->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 
     public function setTitle(

@@ -33,5 +33,8 @@ class Navigation
         $this->gtk->set_popup(
             $this->menu->gtk
         );
+
+        // Render
+        $this->gtk->show();
     }
 }
