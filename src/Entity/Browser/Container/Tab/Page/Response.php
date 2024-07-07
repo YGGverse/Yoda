@@ -87,7 +87,7 @@ class Response
     {
         if ($focus)
         {
-            $this->query->gtk->grab_focus();
+            $this->query->focus();
         }
 
         if (!is_null($placeholder))
