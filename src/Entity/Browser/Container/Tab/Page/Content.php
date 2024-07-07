@@ -37,14 +37,6 @@ class Content
             $this->_margin
         );
 
-        $this->gtk->set_propagate_natural_height(
-            true
-        );
-
-        $this->gtk->set_propagate_natural_width(
-            true
-        );
-
         // Init viewport
         // to integrate scrolled window features for data label
         $this->viewport = new Viewport(
