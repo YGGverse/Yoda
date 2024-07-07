@@ -30,7 +30,11 @@ class Close
             'activate',
             function()
             {
-                // @TODO
+                $this->tab->menu->browser->container->tab->gtk->remove_page(
+                    $this->tab->menu->browser->container->tab->gtk->get_current_page()
+                );
+
+                // @TODO unset page entity
             }
         );
     }
