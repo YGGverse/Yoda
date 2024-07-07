@@ -66,12 +66,12 @@ class Title
         );
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->gtk->get_text();
     }
 
-    public function getSubtitle(): string
+    public function getSubtitle(): ?string
     {
         return $this->gtk->get_subtitle();
     }
