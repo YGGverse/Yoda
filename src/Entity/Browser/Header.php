@@ -53,16 +53,27 @@ class Header
     }
 
     public function setTitle(
-        ?string $title = null
+        ?string $value = null
     ): void
     {
         $this->gtk->set_title(
-            is_null($title) ? $this->_title : sprintf(
+            is_null($value) ? $this->_title : sprintf(
                 '%s - %s',
                 trim(
-                    $title
+                    $value
                 ),
                 $this->_title
+            )
+        );
+    }
+
+    public function setSubtitle(
+        ?string $value = null
+    ): void
+    {
+        $this->gtk->set_subtitle(
+            is_null($value) ? $this->_subtitle : trim(
+                $value
             )
         );
     }
