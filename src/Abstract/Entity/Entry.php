@@ -30,7 +30,7 @@ abstract class Entry
         );
 
         $this->gtk->set_visibility(
-            $this->_value
+            $this->_visible
         );
 
         // Render
