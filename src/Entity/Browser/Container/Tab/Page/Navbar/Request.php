@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
 
 class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Navbar\Entry
 {
-    private string $_placeholder = 'URL or search term...';
+    protected string $_placeholder = 'URL or search term...';
 
     protected function _onActivate(
         \GtkEntry $entry

@@ -8,9 +8,9 @@ abstract class Entry
 {
     public \GtkEntry $gtk;
 
-    private int $_length = 1024;
-    private string $_placeholder = '';
-    private string $_value = '';
+    protected int $_length = 1024;
+    protected string $_placeholder = '';
+    protected string $_value = '';
 
     public function __construct()
     {

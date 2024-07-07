@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
 class Filter extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Entry
 {
-    private string $_placeholder = 'Search in history...';
+    protected string $_placeholder = 'Search in history...';
 
     protected function _onActivate(
         \GtkEntry $entry
