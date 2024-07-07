@@ -66,6 +66,28 @@ abstract class Entry
         \GdkEvent $event
     ): void;
 
+    public function setLength(
+        ?int $value = null
+    ): void
+    {
+        $this->gtk->set_max_length(
+            is_null($value) ? $this->_length : $value
+        );
+    }
+
+    public function setPlaceholder(
+        ?string $value = null
+    ): void
+    {
+        $this->gtk->set_placeholder_text(
+            is_null($value) ? $this->_value : trim(
+                strval(
+                    $value
+                )
+            )
+        );
+    }
+
     public function setValue(
         ?string $value = null
     ): void
@@ -77,6 +99,16 @@ abstract class Entry
                 )
             )
         );
+    }
+
+    public function getLength(): ?int
+    {
+        return $this->gtk->get_max_length();
+    }
+
+    public function getPlaceholder(): ?string
+    {
+        return $this->gtk->get_placeholder_text();
     }
 
     public function getValue(): ?string
