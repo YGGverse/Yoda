@@ -47,7 +47,8 @@ class Tab
 
                 $this->container->browser->header->setTitle(
                     $label->get_text(),
-                    $label->get_subtitle() // @TODO extension not supported by PHP-GTK3 #117
+                    null /* @TODO extension not supported by PHP-GTK3 #117
+                    $label->get_subtitle()*/
                 );
 
                 // Keep current selection
