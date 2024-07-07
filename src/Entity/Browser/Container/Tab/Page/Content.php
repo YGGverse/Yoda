@@ -185,6 +185,22 @@ class Content
                 // Process codes
                 switch ($response->getCode())
                 {
+                    case 10: // response expected
+
+                        $this->page->title->setValue(
+                            $address->getHost(),
+                            sprintf(
+                                'response expected (code %d)',
+                                intval(
+                                    $response->getCode()
+                                )
+                            )
+                        );
+
+                        $this->page->response->show();
+
+                    break;
+
                     case 20: // ok
 
                         // Process content type

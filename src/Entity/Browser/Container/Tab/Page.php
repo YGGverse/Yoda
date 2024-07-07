@@ -7,6 +7,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Tab;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content;
+use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response;
 
 class Page
 {
@@ -19,6 +20,7 @@ class Page
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title $title;
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar $navbar;
     public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
+    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response $response;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Tab $tab
@@ -54,6 +56,15 @@ class Page
             $this->content->gtk
         );
 
+        // Init response bar
+        $this->response = new Response(
+            $this
+        );
+
+        $this->gtk->pack_end(
+            $this->response->gtk
+        );
+
         // Render
         $this->gtk->show_all();
     }
@@ -64,12 +75,24 @@ class Page
         $this->content->refresh();
     }
 
+    public function open(
+        ?string $request = null,
+        bool $history = true
+    ): void
+    {
+        $this->navbar->request->setValue(
+            $request
+        );
+
+        $this->content->update(
+            $history
+        );
+    }
+
     public function update(
         bool $history = true
     ): void
     {
-        // @TODO navbar
-
         $this->content->update(
             $history
         );
