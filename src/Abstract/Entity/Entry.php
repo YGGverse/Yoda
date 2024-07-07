@@ -67,7 +67,7 @@ abstract class Entry
     ): void
     {
         $this->gtk->set_text(
-            trim(
+            is_null($value) ? $this->_value : trim(
                 strval(
                     $value
                 )
