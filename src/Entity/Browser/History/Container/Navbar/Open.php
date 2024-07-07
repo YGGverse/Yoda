@@ -13,7 +13,7 @@ class Open extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navb
     ): void
     {
         $this->navbar->container->history->browser->container->tab->append(
-            $this->navbar->container->content->getSelectedUrl()
+            $this->navbar->container->content->table->getSelectedUrl()
         );
     }
 
@@ -21,7 +21,7 @@ class Open extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navb
     {
         $this->gtk->set_sensitive(
             boolval(
-                $this->navbar->container->content->getSelectedId()
+                $this->navbar->container->content->table->getSelectedId()
             )
         );
     }
