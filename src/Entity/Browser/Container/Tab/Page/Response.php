@@ -80,13 +80,21 @@ class Response
     }
 
     public function show(
-        ?string $placeholder = null
+        ?string $placeholder = null,
+        ?bool $visible = null
     ): void
     {
-        if ($placeholder)
+        if (!is_null($placeholder))
         {
             $this->query->setPlaceholder(
                 $placeholder
+            );
+        }
+
+        if (!is_null($visible))
+        {
+            $this->query->setVisible(
+                $visible
             );
         }
 
@@ -96,6 +104,10 @@ class Response
     public function hide(): void
     {
         $this->query->setPlaceholder(
+            null
+        );
+
+        $this->query->setVisible(
             null
         );
 

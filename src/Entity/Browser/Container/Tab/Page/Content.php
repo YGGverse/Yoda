@@ -190,6 +190,7 @@ class Content
                 switch ($response->getCode())
                 {
                     case 10: // response expected
+                    case 11: // sensitive input
 
                         $this->page->title->setValue(
                             $address->getHost(),
@@ -202,7 +203,8 @@ class Content
                         );
 
                         $this->page->response->show(
-                            $response->getMeta() // pass to placeholder
+                            $response->getMeta(), // placeholder
+                            boolval(10 === $response->getCode()) // input visibility
                         );
 
                     break;
