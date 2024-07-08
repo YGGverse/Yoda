@@ -233,7 +233,11 @@ class Content
                                 );
 
                                 $this->page->title->setValue(
-                                    $title ? $title : $address->getHost(), // detect title by document h1
+                                    $title ? sprintf(
+                                        '%s - %s',
+                                        $title,
+                                        $address->getHost()
+                                    ) : $address->getHost(), // detect title by document h1
                                     $response->getMeta()
                                 );
 
