@@ -37,6 +37,10 @@ class Tab
             'gemini://tlgs.one'
         );
 
+        $this->append(
+            'nex://nightfall.city'
+        );
+
         // Init events
         $this->gtk->connect(
             'switch-page',
