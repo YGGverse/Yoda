@@ -7,8 +7,8 @@
     "require": {
         "yggverse/gemini": "^1.0",
         "yggverse/gemtext": "^1.0",
-        "yggverse/net": "dev-main",
-        "yggverse/nex": "dev-main"
+        "yggverse/nex": "^1.1",
+        "yggverse/net": "^1.8"
     },
     "license": "MIT",
     "autoload": {
