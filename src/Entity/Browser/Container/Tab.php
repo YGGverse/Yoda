@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
+use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+
 class Tab
 {
     public \GtkNotebook $gtk;
@@ -70,7 +72,7 @@ class Tab
         bool $focus = true
     ): void
     {
-        $page = new \Yggverse\Yoda\Entity\Browser\Container\Tab\Page(
+        $page = new Page(
             $this
         );
 
