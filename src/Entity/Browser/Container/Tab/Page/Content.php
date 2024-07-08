@@ -194,12 +194,7 @@ class Content
 
                         $this->page->title->setValue(
                             $address->getHost(),
-                            $response->getMeta() ? $response->getMeta() : sprintf(
-                                'response expected (code %d)',
-                                intval(
-                                    $response->getCode()
-                                )
-                            )
+                            $response->getMeta() ? $response->getMeta() : 'response expected'
                         );
 
                         $this->page->response->show(
@@ -283,7 +278,8 @@ class Content
                         $this->page->title->setValue(
                             'Failure',
                             sprintf(
-                                'could not open resource (code %d)',
+                                '%s (code %d)',
+                                $response->getMeta() ? $response->getMeta() : 'could not open resource',
                                 intval(
                                     $response->getCode()
                                 )
