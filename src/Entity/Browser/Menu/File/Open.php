@@ -27,5 +27,14 @@ class Open
 
         // Render
         $this->gtk->show();
+
+        // Init events
+        $this->gtk->connect(
+            'activate',
+            function()
+            {
+                // @TODO
+            }
+        );
     }
 }
