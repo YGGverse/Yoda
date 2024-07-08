@@ -12,7 +12,7 @@ class Open
     public \Yggverse\Yoda\Entity\Browser\Menu\File $file;
 
     // Defaults
-    private string $_label = 'File';
+    private string $_label = 'Open';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Menu\File $file
