@@ -15,7 +15,7 @@ class Title
 
     // Defaults
     private int $_ellipsize = 3;
-    private int $_length = 12;
+    private int $_length = 16;
     private ?string $_value = 'New page';
     private ?string $_subtitle = null;
 
