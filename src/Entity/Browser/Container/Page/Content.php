@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Data;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Viewport;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Data;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Viewport;
 
 class Content
 {
     public \GtkScrolledWindow $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Data $data;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content\Viewport $viewport;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Data $data;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Viewport $viewport;
 
     // Defaults
     private int $_margin = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page
+        \Yggverse\Yoda\Entity\Browser\Container\Page $page
     ) {
         $this->page = $page;
 
@@ -92,7 +92,7 @@ class Content
             );
 
             // Update history in database
-            $this->page->tab->container->browser->database->renewHistory(
+            $this->page->container->browser->database->renewHistory(
                 $address->get(),
                 // @TODO title
             );
@@ -408,7 +408,7 @@ class Content
         $this->page->refresh();
 
         // Update window header
-        $this->page->tab->container->browser->header->setTitle(
+        $this->page->container->browser->header->setTitle(
             $this->page->title->getValue(),
             $this->page->title->getSubtitle(),
         );

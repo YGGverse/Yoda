@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response\Query;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response\Send;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Query;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Send;
 
 use \Yggverse\Net\Address;
 
@@ -14,17 +14,17 @@ class Response
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response\Query $query;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response\Send $send;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Query $query;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Send $send;
 
     // Defaults
     private int $_margin = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page
+        \Yggverse\Yoda\Entity\Browser\Container\Page $page
     ) {
         // Init dependencies
         $this->page = $page;

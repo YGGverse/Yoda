@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Gtk\Browser\Container\Tab\Page\Title\Label;
+use \Yggverse\Yoda\Gtk\Browser\Container\Page\Title\Label;
 
 class Title
 {
     public Label $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
 
     // Defaults
     private int $_ellipsize = 3;
@@ -20,7 +20,7 @@ class Title
     private ?string $_subtitle = null;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page,
+        \Yggverse\Yoda\Entity\Browser\Container\Page $page,
     ) {
         // Init dependencies
         $this->page = $page;

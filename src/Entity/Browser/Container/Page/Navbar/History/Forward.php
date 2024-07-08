@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History;
 
-class Forward extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Navbar\Button
+class Forward extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button
 {
     protected string $_label = 'Forward';
 

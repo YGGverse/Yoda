@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Gtk\Browser\Container\Tab\Page\Title;
+namespace Yggverse\Yoda\Gtk\Browser\Container\Page\Title;
 
 class Label extends \GtkLabel
 {

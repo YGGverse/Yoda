@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 use \Yggverse\Gemtext\Document;
 use \Yggverse\Net\Address;
@@ -12,10 +12,10 @@ class Data
     public \GtkLabel $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content
+        \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content
     ) {
         // Init dependency
         $this->content = $content;

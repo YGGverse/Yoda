@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Tab
 {
@@ -73,7 +73,7 @@ class Tab
     ): void
     {
         $page = new Page(
-            $this
+            $this->container
         );
 
         if ($request)

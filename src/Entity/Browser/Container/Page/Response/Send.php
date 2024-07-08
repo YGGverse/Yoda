@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 class Send extends \Yggverse\Yoda\Abstract\Entity\Button
 {
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response $response;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response $response;
 
     // Defaults
     protected string $_label = 'Send';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response $response
+        \Yggverse\Yoda\Entity\Browser\Container\Page\Response $response
     ) {
         // Use parent features
         parent::__construct();

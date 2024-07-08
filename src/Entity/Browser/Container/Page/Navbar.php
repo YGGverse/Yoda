@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Base;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Go;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Request;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Base;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Go;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Request;
 
 class Navbar
 {
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Base $base;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Go $go;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History $history;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\Request $request;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Base $base;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Go $go;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History $history;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Request $request;
 
     // Defaults
     private int $_margin = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page $page
+        \Yggverse\Yoda\Entity\Browser\Container\Page $page
     ) {
         // Init dependencies
         $this->page = $page;

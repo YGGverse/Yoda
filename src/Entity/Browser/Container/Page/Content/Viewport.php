@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 class Viewport
 {
     public \GtkViewport $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content
+        \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content
     ) {
         // Init dependencies
         $this->content = $content;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
-class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Navbar\Entry
+class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Entry
 {
     protected string $_placeholder = 'URL or search term...';
 

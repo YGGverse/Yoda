@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab;
+namespace Yggverse\Yoda\Entity\Browser\Container;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Title;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 class Page
 {
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab $tab;
+    public \Yggverse\Yoda\Entity\Browser\Container $container;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Title $title;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar $navbar;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Content $content;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Response $response;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Title $title;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response $response;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab $tab
+        \Yggverse\Yoda\Entity\Browser\Container $container
     ) {
         // Init dependencies
-        $this->tab = $tab;
+        $this->container = $container;
 
         // Init container
         $this->gtk = new \GtkBox(

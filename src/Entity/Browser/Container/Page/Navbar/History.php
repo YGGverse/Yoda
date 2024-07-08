@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar;
+namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History\Back;
-use \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History\Forward;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Back;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Forward;
 
 class History
 {
@@ -14,14 +14,14 @@ class History
     // Dependencies
     public \Yggverse\Yoda\Model\History $memory;
 
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar $navbar;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History\Back $back;
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar\History\Forward $forward;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Back $back;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Forward $forward;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Tab\Page\Navbar $navbar
+        \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar
     ) {
         $this->memory = new \Yggverse\Yoda\Model\History();
 
