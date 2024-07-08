@@ -33,6 +33,10 @@ class Tab
             'gemini://yggverse.cities.yesterweb.org'
         );
 
+        $this->append(
+            'gemini://tlgs.one'
+        );
+
         // Init events
         $this->gtk->connect(
             'switch-page',
