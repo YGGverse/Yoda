@@ -163,7 +163,66 @@ class Content
 
             case 'nex':
 
-                // @TODO
+                $client = new \Yggverse\Nex\Client;
+
+                if ($response = $client->request($address->get()))
+                {
+                    // Detect content type
+                    switch (true)
+                    {
+                        case in_array(
+                            pathinfo(
+                                strval(
+                                    $address->getPath()
+                                ),
+                                PATHINFO_EXTENSION
+                            ),
+                            [
+                                'gmi',
+                                'gemini'
+                            ]
+                        ):
+
+                            $title = null;
+
+                            $this->data->setGemtext(
+                                $response,
+                                $title
+                            );
+
+                            $this->page->title->setValue(
+                                $title ? sprintf(
+                                    '%s - %s',
+                                    $title,
+                                    $address->getHost()
+                                ) : $address->getHost()
+                            );
+
+                        break;
+
+                        default:
+
+                            $this->data->setPlain(
+                                $response
+                            );
+
+                            $this->page->title->setValue(
+                                $address->getHost()
+                            );
+                    }
+                }
+
+                else
+                {
+                    $this->page->title->setValue(
+                        'Failure',
+                        'could not open resource'
+                    );
+
+                    $this->data->setPlain(
+                        'Requested resource not available!'
+                    );
+                }
 
             break;
 
@@ -208,7 +267,9 @@ class Content
 
                             case in_array(
                                 pathinfo(
-                                    $address->getPath(),
+                                    strval(
+                                        $address->getPath()
+                                    ),
                                     PATHINFO_EXTENSION
                                 ),
                                 [
