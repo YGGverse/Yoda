@@ -84,6 +84,20 @@ class Data
         );
     }
 
+    public function setMono(
+        string $value
+    ): void
+    {
+        $this->gtk->set_markup(
+            sprintf(
+                '<tt>%s</tt>',
+                htmlspecialchars(
+                    $value
+                )
+            )
+        );
+    }
+
     public function setGemtext(
         string $value,
         string | null &$title = null,

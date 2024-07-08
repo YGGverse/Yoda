@@ -202,7 +202,7 @@ class Content
 
                         default:
 
-                            $this->data->setPlain(
+                            $this->data->setMono(
                                 $response
                             );
 
