@@ -204,7 +204,7 @@ class Content
 
                         $this->page->response->show(
                             $response->getMeta(), // placeholder
-                            boolval(10 === $response->getCode()) // input visibility
+                            boolval(11 !== $response->getCode()) // input visibility
                         );
 
                     break;
