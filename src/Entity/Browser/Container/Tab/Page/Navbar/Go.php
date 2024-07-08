@@ -19,9 +19,7 @@ class Go extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Navba
     {
         $this->gtk->set_sensitive(
             !empty(
-                trim(
-                    $this->navbar->request->gtk->get_text()
-                )
+                $this->navbar->request->getValue()
             )
         );
     }

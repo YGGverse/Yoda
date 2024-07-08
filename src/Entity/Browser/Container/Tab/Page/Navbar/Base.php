@@ -13,11 +13,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Nav
     ): void
     {
         $address = new \Yggverse\Net\Address(
-            trim(
-                strval(
-                    $this->navbar->request->gtk->get_text()
-                )
-            )
+            $this->navbar->request->getValue()
         );
 
         if ($address->getHost())
@@ -45,7 +41,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Tab\Page\Nav
     {
         $address = new \Yggverse\Net\Address(
             rtrim(
-                $this->navbar->request->gtk->get_text(),
+                $this->navbar->request->getValue(),
                 '/'
             )
         );

@@ -103,7 +103,7 @@ class Content
     public function refresh(): void
     {
         $this->search(
-            $this->container->navbar->filter->gtk->get_text()
+            $this->container->navbar->filter->getValue()
         );
     }
 }

@@ -14,7 +14,7 @@ class Search extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Na
     ): void
     {
         $this->navbar->container->content->search(
-            $this->navbar->filter->gtk->get_text()
+            $this->navbar->filter->getValue()
         );
     }
 }

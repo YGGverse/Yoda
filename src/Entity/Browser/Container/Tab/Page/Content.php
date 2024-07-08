@@ -83,7 +83,7 @@ class Content
     {
         // Parse address
         $address = new \Yggverse\Net\Address(
-            $this->page->navbar->request->gtk->get_text()
+            $this->page->navbar->request->getValue()
         );
 
         // Init new title
@@ -303,9 +303,7 @@ class Content
                 $address = new \Yggverse\Net\Address(
                     sprintf(
                         'gemini://%s',
-                        trim(
-                            $this->page->navbar->request->gtk->get_text()
-                        )
+                        $this->page->navbar->request->getValue()
                     )
                 );
 
@@ -328,7 +326,7 @@ class Content
                         sprintf(
                             'gemini://tlgs.one/search?%s', // @TODO custom provider
                             urlencode(
-                                $this->page->navbar->request->gtk->get_text()
+                                $this->page->navbar->request->getValue()
                             )
                         )
                     );

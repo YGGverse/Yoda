@@ -244,7 +244,7 @@ class Data
         {
             $address->toAbsolute(
                 new Address(
-                    $this->content->page->navbar->request->gtk->get_text()
+                    $this->content->page->navbar->request->getValue()
                 )
             );
         }
