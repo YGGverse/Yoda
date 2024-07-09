@@ -107,8 +107,15 @@ class Page
         bool $history = true
     ): void
     {
+        // Show progressbar
+        $this->progressbar->infinitive();
+
+        // Update content entity
         $this->content->update(
             $history
         );
+
+        // Hide progressbar
+        $this->progressbar->hide();
     }
 }
