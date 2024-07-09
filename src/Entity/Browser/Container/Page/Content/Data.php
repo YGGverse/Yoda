@@ -14,6 +14,9 @@ class Data
     // Dependencies
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
 
+    // Defaults
+    private int $_wrap = 140;
+
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content
     ) {
@@ -31,18 +34,9 @@ class Data
             true
         );
 
-        $this->gtk->set_line_wrap(
-            true
-        );
-
         $this->gtk->set_can_focus(
             false
         );
-
-        /* @TODO pending for PR #120
-        $this->gtk->set_line_wrap_mode(
-            \PangoWrapMode::WORD
-        );*/
 
         $this->gtk->set_track_visited_links(
             true
@@ -146,7 +140,9 @@ class Data
                             $line[] = sprintf(
                                 '<span size="xx-large">%s</span>',
                                 htmlspecialchars(
-                                    $entity->getText()
+                                    $this->_wrap(
+                                        $entity->getText()
+                                    )
                                 )
                             );
 
@@ -163,7 +159,9 @@ class Data
                             $line[] = sprintf(
                                 '<span size="x-large">%s</span>',
                                 htmlspecialchars(
-                                    $entity->getText()
+                                    $this->_wrap(
+                                        $entity->getText()
+                                    )
                                 )
                             );
 
@@ -174,7 +172,9 @@ class Data
                             $line[] = sprintf(
                                 '<span size="large">%s</span>',
                                 htmlspecialchars(
-                                    $entity->getText()
+                                    $this->_wrap(
+                                        $entity->getText()
+                                    )
                                 )
                             );
 
@@ -197,8 +197,10 @@ class Data
                             $entity->getAddress()
                         ),
                         htmlspecialchars(
-                            $entity->getAlt() ? $entity->getAlt()
-                                              : $entity->getAddress() // @TODO date
+                            $this->_wrap(
+                                $entity->getAlt() ? $entity->getAlt()
+                                                  : $entity->getAddress() // @TODO date
+                            )
                         )
                     );
 
@@ -209,7 +211,9 @@ class Data
                     $line[] = sprintf(
                         '* %s',
                         htmlspecialchars(
-                            $entity->getItem()
+                            $this->_wrap(
+                                $entity->getItem()
+                            )
                         )
                     );
 
@@ -220,7 +224,9 @@ class Data
                     $line[] = sprintf(
                         '<i>%s</i>',
                         htmlspecialchars(
-                            $entity->getText()
+                            $this->_wrap(
+                                $entity->getText()
+                            )
                         )
                     );
 
@@ -229,7 +235,9 @@ class Data
                 case $entity instanceof \Yggverse\Gemtext\Entity\Text:
 
                     $line[] = htmlspecialchars(
-                        $entity->getData()
+                        $this->_wrap(
+                            $entity->getData()
+                        )
                     );
 
                 break;
@@ -245,6 +253,18 @@ class Data
                 PHP_EOL,
                 $line
             )
+        );
+    }
+
+    private function _wrap(
+        string $value
+    ): string
+    {
+        return wordwrap(
+            $value,
+            $this->_wrap,
+            PHP_EOL,
+            false
         );
     }
 
