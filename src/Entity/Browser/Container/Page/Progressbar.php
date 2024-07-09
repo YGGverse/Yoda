@@ -24,6 +24,11 @@ class Progressbar
 
         // Init container
         $this->gtk = new \GtkProgressBar;
+
+        /* Prevent global initiation
+        $this->gtk->set_no_show_all(
+            true
+        );*/
     }
 
     public function start(): void
