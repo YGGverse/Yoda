@@ -35,6 +35,10 @@ class Data
             true
         );
 
+        $this->gtk->set_can_focus(
+            false
+        );
+
         /* @TODO pending for PR #120
         $this->gtk->set_line_wrap_mode(
             \PangoWrapMode::WORD
