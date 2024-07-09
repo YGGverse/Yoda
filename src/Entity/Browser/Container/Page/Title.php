@@ -53,9 +53,8 @@ class Title
         );
 
         $this->gtk->set_tooltip_text(
-            is_null($tooltip) ? $value : trim(
-                $tooltip
-            )
+            is_null($tooltip) ? (mb_strlen(strval($value)) > $this->_length ? $value : null)
+                              : trim($tooltip)
         );
 
         $this->setSubtitle(
