@@ -31,16 +31,14 @@ class Data
             true
         );
 
-        /*
         $this->gtk->set_line_wrap(
             true
         );
 
+        /* @TODO pending for PR #120
         $this->gtk->set_line_wrap_mode(
-            @TODO #114
-            \GtkWrapMode::WORD
-        );
-        */
+            \PangoWrapMode::WORD
+        );*/
 
         $this->gtk->set_track_visited_links(
             true
