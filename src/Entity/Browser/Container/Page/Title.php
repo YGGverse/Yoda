@@ -40,25 +40,34 @@ class Title
         );
     }
 
-    public function setValue(
+    public function set(
         ?string $value = null,
         ?string $subtitle = null,
-        ?string $tooltip = null,
+        ?string $tooltip = null
+    ): void
+    {
+        $this->setValue(
+            $value
+        );
+
+        $this->setSubtitle(
+            $subtitle
+        );
+
+        $this->setTooltip(
+            is_null($tooltip) ? (mb_strlen(strval($value)) > $this->_length ? $value : null)
+                              : $tooltip
+        );
+    }
+
+    public function setValue(
+        ?string $value = null
     ): void
     {
         $this->gtk->set_text(
             is_null($value) ? $this->_value : trim(
                 $value
             )
-        );
-
-        $this->gtk->set_tooltip_text(
-            is_null($tooltip) ? (mb_strlen(strval($value)) > $this->_length ? $value : null)
-                              : trim($tooltip)
-        );
-
-        $this->setSubtitle(
-            $subtitle
         );
     }
 
@@ -79,7 +88,7 @@ class Title
         ?string $tooltip = null
     ): void
     {
-        $this->gtk->set_subtitle(
+        $this->gtk->set_tooltip_text(
             is_null($tooltip) ? $this->_tooltip : trim(
                 $tooltip
             )

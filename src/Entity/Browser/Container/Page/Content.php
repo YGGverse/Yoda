@@ -79,7 +79,7 @@ class Content
         );
 
         // Init new title
-        $this->page->title->setValue(
+        $this->page->title->set(
             $address->getHost(),
             'loading...'
         );
@@ -126,7 +126,7 @@ class Content
 
                             if ($title) // detect title by document h1
                             {
-                                $this->page->title->setValue(
+                                $this->page->title->set(
                                     $title,
                                     $this->page->title->getSubtitle()
                                 );
@@ -136,7 +136,7 @@ class Content
 
                         default:
 
-                            $this->page->title->setValue(
+                            $this->page->title->set(
                                 'Oops!',
                                 'file extension not supported'
                             );
@@ -149,7 +149,7 @@ class Content
 
                 else
                 {
-                    $this->page->title->setValue(
+                    $this->page->title->set(
                         'Failure',
                         'resource not found or not readable'
                     );
@@ -190,7 +190,7 @@ class Content
                                 $title
                             );
 
-                            $this->page->title->setValue(
+                            $this->page->title->set(
                                 $title ? sprintf(
                                     '%s - %s',
                                     $title,
@@ -206,7 +206,7 @@ class Content
                                 $response
                             );
 
-                            $this->page->title->setValue(
+                            $this->page->title->set(
                                 $address->getHost()
                             );
                     }
@@ -214,7 +214,7 @@ class Content
 
                 else
                 {
-                    $this->page->title->setValue(
+                    $this->page->title->set(
                         'Failure',
                         'could not open resource'
                     );
@@ -243,7 +243,7 @@ class Content
                     case 10: // response expected
                     case 11: // sensitive input
 
-                        $this->page->title->setValue(
+                        $this->page->title->set(
                             $address->getHost(),
                             $response->getMeta() ? $response->getMeta() : 'response expected'
                         );
@@ -285,7 +285,7 @@ class Content
                                     $title
                                 );
 
-                                $this->page->title->setValue(
+                                $this->page->title->set(
                                     $title ? sprintf(
                                         '%s - %s',
                                         $title,
@@ -302,7 +302,7 @@ class Content
                                     $response->getBody()
                                 );
 
-                                $this->page->title->setValue(
+                                $this->page->title->set(
                                     $address->getHost()
                                 );
                         }
@@ -318,7 +318,7 @@ class Content
                             )
                         );
 
-                        $this->page->title->setValue(
+                        $this->page->title->set(
                             $address->getHost(),
                             sprintf(
                                 'redirect (code %d)',
@@ -332,7 +332,7 @@ class Content
 
                     default:
 
-                        $this->page->title->setValue(
+                        $this->page->title->set(
                             'Failure',
                             sprintf(
                                 '%s (code %d)',
@@ -391,7 +391,7 @@ class Content
 
             default:
 
-                $this->page->title->setValue(
+                $this->page->title->set(
                     'Oops!',
                     'protocol not supported!'
                 );
