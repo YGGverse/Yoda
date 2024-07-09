@@ -127,8 +127,7 @@ class Content
                             if ($title) // detect title by document h1
                             {
                                 $this->page->title->set(
-                                    $title,
-                                    $this->page->title->getSubtitle()
+                                    $title
                                 );
                             }
 
