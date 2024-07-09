@@ -128,7 +128,7 @@ class Content
                             {
                                 $this->page->title->setValue(
                                     $title,
-                                    $this->page->title->subtitle
+                                    $this->page->title->getSubtitle()
                                 );
                             }
 
