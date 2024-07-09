@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Title;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
@@ -19,6 +20,7 @@ class Page
     // Requirements
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Title $title;
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar;
+    public \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar $progressbar;
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Response $response;
 
@@ -57,6 +59,15 @@ class Page
             true,
             true,
             0
+        );
+
+        // Init progress bar
+        $this->progressbar = new Progressbar(
+            $this
+        );
+
+        $this->gtk->add(
+            $this->progressbar->gtk
         );
 
         // Init response bar

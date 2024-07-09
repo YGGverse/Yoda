@@ -73,6 +73,9 @@ class Content
         bool $history = true
     ): void
     {
+        // Show progressbar
+        $this->page->progressbar->infinitive();
+
         // Parse address
         $address = new \Yggverse\Net\Address(
             $this->page->navbar->request->getValue()
@@ -412,5 +415,8 @@ class Content
             $this->page->title->getValue(),
             $this->page->title->getSubtitle(),
         );
+
+        // Hide progressbar
+        $this->page->progressbar->hide();
     }
 }
