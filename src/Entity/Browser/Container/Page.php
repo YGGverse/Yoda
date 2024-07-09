@@ -98,7 +98,7 @@ class Page
             $request
         );
 
-        $this->content->update(
+        $this->update(
             $history
         );
     }
