@@ -36,4 +36,20 @@ $browser->gtk->connect(
     }
 );
 
+// Init theme
+$css = new \GtkCssProvider;
+
+$css->load_from_file(
+    __DIR__ .
+    DIRECTORY_SEPARATOR . 'theme' .
+    DIRECTORY_SEPARATOR . 'default.css'
+);
+
+$style = new \GtkStyleContext;
+
+$style->add_provider_for_screen(
+    $css,
+    600
+);
+
 \Gtk::main();
