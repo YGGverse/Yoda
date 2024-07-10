@@ -62,5 +62,16 @@ class Browser
 
         // Render
         $this->gtk->show();
+
+        // Init events
+        $this->gtk->connect(
+            'configure-event',
+            function(
+                \GtkWindow $window,
+                // \GdkEvent $event
+            ) {
+                // @TODO render data wordwrap by $window->get_size()
+            }
+        );
     }
 }
