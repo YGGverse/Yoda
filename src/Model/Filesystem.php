@@ -81,6 +81,112 @@ class Filesystem
         return $this->_base . $filename;
     }
 
+
+    public static function getList(
+        ?string $dirname,
+         string $sort   = 'name',
+         int    $order  = SORT_ASC,
+         int    $method = SORT_STRING | SORT_NATURAL | SORT_FLAG_CASE
+    ): ?array
+    {
+        // Convert to realpath with ending slash
+        if (!$realpath = self::_getRealpath($dirname))
+        {
+            return null;
+        }
+
+        // Make sure requested path is directory
+        if (!is_dir($realpath))
+        {
+            return null;
+        }
+
+        // Begin list builder
+        $directories = [];
+        $files = [];
+
+        foreach ((array) scandir($realpath) as $name)
+        {
+            // Skip system locations
+            if (empty($name) || $name == '.')
+            {
+                continue;
+            }
+
+            // Try to build destination path
+            if (!$path = self::_getRealpath($realpath . $name))
+            {
+                continue;
+            }
+
+            // Context
+            switch (true)
+            {
+                case is_dir($path):
+
+                    $directories[] =
+                    [
+                        'file' => false,
+                        'path' => $path,
+                        'name' => $name,
+                        'link' => urlencode(
+                            $name
+                        ),
+                        'time' => filemtime(
+                            $path
+                        )
+                    ];
+
+                break;
+
+                case is_file($path):
+
+                    $files[] =
+                    [
+                        'file' => true,
+                        'path' => $path,
+                        'name' => $name,
+                        'link' => urlencode(
+                            $name
+                        ),
+                        'time' => filemtime(
+                            $path
+                        )
+                    ];
+
+                break;
+            }
+        }
+
+        // Sort order
+        array_multisort(
+            array_column(
+                $directories,
+                $sort
+            ),
+            $order,
+            $method,
+            $directories
+        );
+
+        // Sort files by name ASC
+        array_multisort(
+            array_column(
+                $directories,
+                $sort
+            ),
+            $order,
+            $method,
+            $directories
+        );
+
+        // Merge list
+        return array_merge(
+            $directories,
+            $files
+        );
+    }
+
     private static function _fixDirectorySeparators(
         string $path,
         string $separator = DIRECTORY_SEPARATOR
@@ -94,5 +200,31 @@ class Filesystem
             $separator,
             $path
         );
+    }
+
+    // PHP::realpath extension appending slash to dir paths
+    private static function _getRealpath(
+        ?string $path
+    ): ?string
+    {
+        if (empty($path))
+        {
+            return null;
+        }
+
+        if (!$realpath = realpath($path))
+        {
+            return null;
+        }
+
+        if (is_dir($realpath))
+        {
+            $realpath = rtrim(
+                $realpath,
+                DIRECTORY_SEPARATOR
+            ) . DIRECTORY_SEPARATOR;
+        }
+
+        return $realpath;
     }
 }

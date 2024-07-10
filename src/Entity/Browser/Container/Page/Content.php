@@ -103,59 +103,91 @@ class Content
         {
             case 'file':
 
-                if (file_exists($address->getPath()) && is_readable($address->getPath()))
+                switch (true)
                 {
-                    switch ($address->getPath())
-                    {
-                        case is_dir($address->getPath()):
+                    // Try directory
+                    case (
+                        $list = \Yggverse\Yoda\Model\Filesystem::getList(
+                            $address->getPath()
+                        )
+                    ):
 
-                            // @TODO build fs listing
+                        $map = [];
 
-                        break;
+                        foreach ($list as $item)
+                        {
+                            $map[] = trim(
+                                sprintf(
+                                    '=> file://%s %s',
+                                    $item['path'],
+                                    $item['name'] . (
+                                        $item['file'] ? null : '/'
+                                    )
+                                )
+                            );
+                        }
 
-                        case str_ends_with($address->getPath(), '.gmi'):
+                        $this->data->setGemtext(
+                            implode(
+                                PHP_EOL,
+                                $map
+                            ) . PHP_EOL
+                        );
 
-                            $title = null;
+                        $this->page->title->set(
+                            basename(
+                                $address->getPath()
+                            ),
+                            'localhost'
+                        );
 
-                            $this->data->setGemtext(
-                                file_get_contents( // @TODO format relative links
+                    break;
+
+                    // Try open file by extension supported
+                    case str_ends_with(
+                        $address->getPath(),
+                        '.gmi'
+                    ):
+
+                        $title = null;
+
+                        $this->data->setGemtext(
+                            file_get_contents( // @TODO format relative links
+                                $address->getPath()
+                            ),
+                            $title
+                        );
+
+                        if ($title) // detect title by document h1
+                        {
+                            $this->page->title->set(
+                                $title,
+                                'localhost'
+                            );
+                        }
+
+                        else
+                        {
+                            $this->page->title->set(
+                                basename(
                                     $address->getPath()
                                 ),
-                                $title
+                                'localhost'
                             );
+                        }
 
-                            if ($title) // detect title by document h1
-                            {
-                                $this->page->title->set(
-                                    $title
-                                );
-                            }
+                    break;
 
-                        break;
+                    default:
 
-                        default:
+                        $this->page->title->set(
+                            'Failure',
+                            'resource not found or not readable'
+                        );
 
-                            $this->page->title->set(
-                                'Oops!',
-                                'file extension not supported'
-                            );
-
-                            $this->data->setPlain(
-                                'File extension not supported'
-                            );
-                    }
-                }
-
-                else
-                {
-                    $this->page->title->set(
-                        'Failure',
-                        'resource not found or not readable'
-                    );
-
-                    $this->data->setPlain(
-                        'Could not open file'
-                    );
+                        $this->data->setPlain(
+                            'Could not open location'
+                        );
                 }
 
             break;
