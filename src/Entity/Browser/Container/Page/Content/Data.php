@@ -60,13 +60,33 @@ class Data
                 \GtkLabel $label,
                 string $href
             ) {
+                // Format URL
+                $url = $this->_url(
+                    $href
+                );
+
+                // Update request entry
                 $this->content->page->navbar->request->setValue(
                     $this->_url(
                         $href
                     )
                 );
 
+                // Update page
                 $this->content->page->update();
+
+                // Prevent propagation for supported protocols
+                if (in_array(
+                    parse_url(
+                        $url,
+                        PHP_URL_SCHEME
+                    ),
+                    [
+                        'nex',
+                        'gemini',
+                        'file'
+                    ])
+                ) return true;
             }
         );
     }
