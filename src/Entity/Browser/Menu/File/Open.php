@@ -33,7 +33,32 @@ class Open
             'activate',
             function()
             {
-                // @TODO
+                $dialog = new \GtkFileChooserDialog(
+                    'Open file',
+                    $this->file->menu->browser->gtk,
+                    \GtkFileChooserAction::OPEN,
+                    [
+                        'Cancel',
+                        \GtkResponseType::CANCEL,
+                        'Open',
+                        \GtkResponseType::OK
+                    ]
+                );
+
+                /* @TODO keep last path
+                $dialog->set_current_folder();*/
+
+                if (\GtkResponseType::OK == $dialog->run())
+                {
+                    $this->file->menu->browser->container->tab->append(
+                        sprintf(
+                            'file://%s',
+                            $dialog->get_filename()
+                        )
+                    );
+                }
+
+                $dialog->destroy();
             }
         );
     }
