@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 use \Yggverse\Yoda\Entity\Browser\Menu\File\Open;
+use \Yggverse\Yoda\Entity\Browser\Menu\File\Save;
 
 class File
 {
@@ -30,13 +31,21 @@ class File
         // Init submenu container
         $file = new \GtkMenu;
 
-        // Init new tab menu item
+        // Init tab menu items
         $open = new Open(
             $this
         );
 
         $file->append(
             $open->gtk
+        );
+
+        $save = new Save(
+            $this
+        );
+
+        $file->append(
+            $save->gtk
         );
 
         $this->gtk->set_submenu(
