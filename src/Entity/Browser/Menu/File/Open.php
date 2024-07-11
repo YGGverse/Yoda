@@ -13,6 +13,7 @@ class Open
 
     // Defaults
     private string $_label = 'Open';
+    private bool $_multiple = true;
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Menu\File $file
@@ -48,14 +49,21 @@ class Open
                 /* @TODO keep last path
                 $dialog->set_current_folder();*/
 
+                $dialog->set_select_multiple(
+                    $this->_multiple
+                );
+
                 if (\GtkResponseType::OK == $dialog->run())
                 {
-                    $this->file->menu->browser->container->tab->append(
-                        sprintf(
-                            'file://%s',
-                            $dialog->get_filename()
-                        )
-                    );
+                    foreach ($dialog->get_filenames() as $filename)
+                    {
+                        $this->file->menu->browser->container->tab->append(
+                            sprintf(
+                                'file://%s',
+                                $filename
+                            )
+                        );
+                    }
                 }
 
                 $dialog->destroy();
