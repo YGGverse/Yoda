@@ -14,6 +14,12 @@ class Open
     // Defaults
     private string $_label = 'Open';
     private bool $_multiple = true;
+    private array $_pattern =
+    [
+        // pattern:name
+        '*'     => 'All',
+        '*.gmi' => null
+    ];
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Menu\File $file
@@ -52,6 +58,23 @@ class Open
                 $dialog->set_select_multiple(
                     $this->_multiple
                 );
+
+                foreach ($this->_pattern as $pattern => $name)
+                {
+                    $filter = new \GtkFileFilter;
+
+                    $filter->set_name(
+                        $name ? $name : $pattern
+                    );
+
+                    $filter->add_pattern(
+                        $pattern
+                    );
+
+                    $dialog->add_filter(
+                        $filter
+                    );
+                }
 
                 if (\GtkResponseType::OK == $dialog->run())
                 {
