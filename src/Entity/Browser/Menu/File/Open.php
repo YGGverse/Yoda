@@ -52,8 +52,12 @@ class Open
                     ]
                 );
 
-                /* @TODO keep last path
-                $dialog->set_current_folder();*/
+                if ($home = getenv('HOME')) // @TODO keep last path
+                {
+                    $dialog->set_current_folder(
+                        $home
+                    );
+                }
 
                 $dialog->set_select_multiple(
                     $this->_multiple
