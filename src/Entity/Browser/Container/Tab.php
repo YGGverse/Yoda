@@ -95,7 +95,9 @@ class Tab
         bool $focus = true
     ): void
     {
-        $page = new Page(
+        // Extendable classes not supported by PHP-GTK3 #117
+        // create internal pages registry
+        $this->_page[] = $page = new Page(
             $this->container
         );
 
@@ -134,10 +136,6 @@ class Tab
 
         // Render
         $this->gtk->show();
-
-        // Extendable classes not supported by PHP-GTK3 #117
-        // create internal pages registry
-        $this->_page[] = $page;
     }
 
     public function getPage(
