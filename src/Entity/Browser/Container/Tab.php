@@ -55,10 +55,13 @@ class Tab
                 int $page_num
             ) {
                 // Update header bar title
-                $this->container->browser->header->setTitle(
-                    $this->getPage($page_num)->title->getValue(),
-                    $this->getPage($page_num)->title->getSubtitle()
-                );
+                if ($page = $this->getPage($page_num))
+                {
+                    $this->container->browser->header->setTitle(
+                        $page->title->getValue(),
+                        $page->title->getSubtitle()
+                    );
+                }
 
                 // Keep current selection
                 $self->grab_focus();
