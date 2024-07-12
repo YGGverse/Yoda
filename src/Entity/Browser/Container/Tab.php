@@ -50,18 +50,40 @@ class Tab
         $this->gtk->connect(
             'switch-page',
             function (
-                \GtkNotebook $entity,
-                \GtkWidget $child,
-                int $index
+                ?\GtkNotebook $self,
+                ?\GtkWidget $child,
+                int $page_num
             ) {
                 // Update header bar title
                 $this->container->browser->header->setTitle(
-                    $this->getPage($index)->title->getValue(),
-                    $this->getPage($index)->title->getSubtitle()
+                    $this->getPage($page_num)->title->getValue(),
+                    $this->getPage($page_num)->title->getSubtitle()
                 );
 
                 // Keep current selection
-                $entity->grab_focus();
+                $self->grab_focus();
+            }
+        );
+
+        $this->gtk->connect(
+            'page-removed',
+            function (
+                ?\GtkNotebook $self,
+                ?\GtkWidget $child,
+                int $page_num
+            ) {
+                // @TODO
+            }
+        );
+
+        $this->gtk->connect(
+            'page-reordered',
+            function (
+                ?\GtkNotebook $self,
+                ?\GtkWidget $child,
+                int $page_num
+            ) {
+                // @TODO
             }
         );
     }
@@ -117,14 +139,14 @@ class Tab
     }
 
     public function getPage(
-        int $index
+        int $page_num
     ): ?\Yggverse\Yoda\Entity\Browser\Container\Page
     {
-        if (empty($this->_page[$index]))
+        if (empty($this->_page[$page_num]))
         {
             throw new \Exception;
         }
 
-        return $this->_page[$index];
+        return $this->_page[$page_num];
     }
 }
