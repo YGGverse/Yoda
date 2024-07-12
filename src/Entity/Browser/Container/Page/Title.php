@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Gtk\Browser\Container\Page\Title\Label;
-
 class Title
 {
-    public Label $gtk;
+    public \GtkLabel $gtk;
+
+    // Extras
+    public ?string $subtitle = null;
 
     // Dependencies
     public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
@@ -27,7 +28,7 @@ class Title
         $this->page = $page;
 
         // Init container
-        $this->gtk = new Label(
+        $this->gtk = new \GtkLabel(
             $this->_value
         );
 
@@ -75,11 +76,9 @@ class Title
         ?string $subtitle = null
     ): void
     {
-        $this->gtk->set_subtitle(
-            is_null($subtitle) ? $this->_subtitle : strtolower(
-                trim(
-                    $subtitle
-                )
+        $this->subtitle = is_null($subtitle) ? $this->_subtitle : strtolower(
+            trim(
+                $subtitle
             )
         );
     }
@@ -102,7 +101,7 @@ class Title
 
     public function getSubtitle(): ?string
     {
-        return $this->gtk->get_subtitle();
+        return $this->subtitle;
     }
 
     public function getTooltip(): ?string

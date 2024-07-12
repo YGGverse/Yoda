@@ -17,6 +17,9 @@ class Tab
     private bool $_reorderable = true;
     private bool $_scrollable  = true;
 
+    // Extras
+    private array $_page = [];
+
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Container $container
     ) {
@@ -49,16 +52,12 @@ class Tab
             function (
                 \GtkNotebook $entity,
                 \GtkWidget $child,
-                int $position
+                int $index
             ) {
-                $label = $entity->get_tab_label(
-                    $child
-                );
-
+                // Update header bar title
                 $this->container->browser->header->setTitle(
-                    $label->get_text(),
-                    null /* @TODO extension not supported by PHP-GTK3 #117
-                    $label->get_subtitle()*/
+                    $this->getPage($index)->title->getValue(),
+                    $this->getPage($index)->title->getSubtitle()
                 );
 
                 // Keep current selection
@@ -111,5 +110,21 @@ class Tab
 
         // Render
         $this->gtk->show();
+
+        // Extendable classes not supported by PHP-GTK3 #117
+        // create internal pages registry
+        $this->_page[] = $page;
+    }
+
+    public function getPage(
+        int $index
+    ): ?\Yggverse\Yoda\Entity\Browser\Container\Page
+    {
+        if (empty($this->_page[$index]))
+        {
+            throw new \Exception;
+        }
+
+        return $this->_page[$index];
     }
 }
