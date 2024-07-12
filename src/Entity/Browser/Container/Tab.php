@@ -85,7 +85,9 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                // @TODO
+                $this->reorderPage(
+                    $page_num
+                );
             }
         );
     }
@@ -168,5 +170,18 @@ class Tab
         );
 
         // Reorder @TODO
+    }
+
+    public function reorderPage(
+        int $page_num
+    ): void
+    {
+        /* @TODO
+        $this->_page = array_splice(
+            $this->_page,
+            $page_num,
+            0,
+            // @TODO get $page
+        ); */
     }
 }
