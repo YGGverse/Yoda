@@ -75,8 +75,8 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->closePage(
-                    $page_num
+                $this->reorderPage(
+                    null // all
                 );
             }
         );
@@ -88,7 +88,9 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->reorderPage();
+                $this->reorderPage(
+                    null // all
+                );
             }
         );
     }
@@ -168,30 +170,17 @@ class Tab
     }
 
     public function closePage(
-        int $page_num
+        ?int $page_num = null
     ): void
     {
-        // Validate page index exists
-        if (empty($this->_page[$page_num]))
+        if ($page = $this->getPage($page_num))
         {
-            throw new \Exception;
+            $this->gtk->remove_page(
+                $this->gtk->page_num(
+                    $page->gtk
+                )
+            );
         }
-
-        // Remove GTK node
-        $this->gtk->remove_page(
-            $page_num
-        );
-/*
-        // Free memory
-        $this->_page[$page_num] = null;
-
-        // Cleanup internal record
-        unset(
-            $this->_page[$page_num]
-        );
-*/
-        // Reorder
-        $this->reorderPage();
     }
 
     public function reorderPage(

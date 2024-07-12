@@ -34,10 +34,8 @@ class Close
             function()
             {
                 $this->tab->menu->browser->container->tab->closePage(
-                    $this->tab->menu->browser->container->tab->gtk->get_current_page()
+                    null // active
                 );
-
-                // @TODO unset page entity
             }
         );
     }
