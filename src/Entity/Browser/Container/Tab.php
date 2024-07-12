@@ -218,7 +218,7 @@ class Tab
                 }
 
                 // Update position
-                $_page[] = $this->_page[$page_num];
+                $_page[$page_num] = $page;
             }
 
             // Reorder
