@@ -11,6 +11,9 @@ class Data
 {
     public \GtkLabel $gtk;
 
+    // Extras
+    public ?string $raw = null;
+
     // Dependencies
     public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
 
@@ -98,6 +101,8 @@ class Data
         $this->gtk->set_text(
             $value
         );
+
+        $this->raw = $value;
     }
 
     public function setMono(
@@ -112,6 +117,8 @@ class Data
                 )
             )
         );
+
+        $this->raw = $value;
     }
 
     public function setGemtext(
@@ -274,6 +281,8 @@ class Data
                 $line
             )
         );
+
+        $this->raw = $value;
     }
 
     private function _wrap(
