@@ -12,7 +12,7 @@ class Open extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navb
         \GtkButton $entity
     ): void
     {
-        $this->navbar->container->history->browser->container->tab->append(
+        $this->navbar->container->history->browser->container->tab->appendPage(
             $this->navbar->container->content->table->getSelectedUrl()
         );
     }

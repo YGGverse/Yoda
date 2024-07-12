@@ -77,7 +77,7 @@ class Table
                 // Focus on browser
                 // $this->content->container->history->browser->gtk->present();
 
-                $this->content->container->history->browser->container->tab->append(
+                $this->content->container->history->browser->container->tab->appendPage(
                     $this->getSelectedUrl()
                 );
             }

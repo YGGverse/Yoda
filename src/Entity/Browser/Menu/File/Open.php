@@ -84,7 +84,7 @@ class Open
                 {
                     foreach ($dialog->get_filenames() as $filename)
                     {
-                        $this->file->menu->browser->container->tab->append(
+                        $this->file->menu->browser->container->tab->appendPage(
                             sprintf(
                                 'file://%s',
                                 $filename

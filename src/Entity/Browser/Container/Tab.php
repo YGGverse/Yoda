@@ -34,15 +34,15 @@ class Tab
         );
 
         // Init previous session @TODO
-        $this->append(
+        $this->appendPage(
             'gemini://yggverse.cities.yesterweb.org'
         );
 
-        $this->append(
+        $this->appendPage(
             'gemini://tlgs.one'
         );
 
-        $this->append(
+        $this->appendPage(
             'nex://nightfall.city'
         );
 
@@ -90,7 +90,7 @@ class Tab
         );
     }
 
-    public function append(
+    public function appendPage(
         ?string $request = null,
         bool $focus = true
     ): void
