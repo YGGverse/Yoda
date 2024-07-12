@@ -85,9 +85,7 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->reorderPage(
-                    $page_num
-                );
+                $this->reorderPage();
             }
         );
     }
@@ -180,7 +178,7 @@ class Tab
         $this->gtk->remove_page(
             $page_num
         );
-
+/*
         // Free memory
         $this->_page[$page_num] = null;
 
@@ -188,20 +186,45 @@ class Tab
         unset(
             $this->_page[$page_num]
         );
-
-        // Reorder @TODO
+*/
+        // Reorder
+        $this->reorderPage();
     }
 
     public function reorderPage(
-        int $page_num
+        ?int $page_num = null
     ): void
     {
-        /* @TODO
-        $this->_page = array_splice(
-            $this->_page,
-            $page_num,
-            0,
-            // @TODO get $page
-        ); */
+        // Reorder all pages
+        if (is_null($page_num))
+        {
+            // Init new index
+            $_page = [];
+
+            foreach ($this->_page as $page)
+            {
+                // Get current entity $page_num
+                $page_num = $this->gtk->page_num(
+                    $page->gtk
+                );
+
+                // Skip deleted
+                if ($page_num === -1)
+                {
+                    continue;
+                }
+
+                // Update position
+                $_page[] = $this->_page[$page_num];
+            }
+
+            // Reorder
+            $this->_page = $_page;
+        }
+
+        // Reorder by $page_num
+        else throw new \Exception(
+            'Reorder by $page_num value not implemented'
+        );
     }
 }
