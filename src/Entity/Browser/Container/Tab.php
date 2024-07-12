@@ -103,13 +103,6 @@ class Tab
             $this->container
         );
 
-        if ($request)
-        {
-            $page->open(
-                $request
-            );
-        }
-
         $this->gtk->append_page(
             $page->gtk,
             $page->title->gtk
@@ -119,6 +112,13 @@ class Tab
             $page->gtk,
             $this->_reorderable
         );
+
+        if ($request)
+        {
+            $page->open(
+                $request
+            );
+        }
 
         if ($focus)
         {
