@@ -72,7 +72,9 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                // @TODO
+                $this->deletePage(
+                    $page_num
+                );
             }
         );
 
@@ -148,5 +150,25 @@ class Tab
         }
 
         return $this->_page[$page_num];
+    }
+
+    public function deletePage(
+        int $page_num
+    ): void
+    {
+        if (empty($this->_page[$page_num]))
+        {
+            throw new \Exception;
+        }
+
+        // Free memory
+        $this->_page[$page_num] = null;
+
+        // Remove internal record
+        unset(
+            $this->_page[$page_num]
+        );
+
+        // Reorder @TODO
     }
 }
