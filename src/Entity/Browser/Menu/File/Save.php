@@ -58,10 +58,13 @@ class Save
 
                 if (\GtkResponseType::APPLY == $dialog->run())
                 {
-                    file_put_contents(
-                        $dialog->get_filename(),
-                        '' // @TODO get active tab content
-                    );
+                    if ($page = $this->file->menu->browser->container->tab->getPage())
+                    {
+                        file_put_contents(
+                            $dialog->get_filename(),
+                            $page->content->data->raw
+                        );
+                    }
                 }
 
                 $dialog->destroy();
