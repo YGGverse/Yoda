@@ -72,7 +72,7 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->deletePage(
+                $this->closePage(
                     $page_num
                 );
             }
@@ -152,7 +152,7 @@ class Tab
         return $this->_page[$page_num];
     }
 
-    public function deletePage(
+    public function closePage(
         int $page_num
     ): void
     {
@@ -161,10 +161,15 @@ class Tab
             throw new \Exception;
         }
 
+        // Remove GTK node
+        $this->gtk->remove_page(
+            $page_num
+        );
+
         // Free memory
         $this->_page[$page_num] = null;
 
-        // Remove internal record
+        // Cleanup internal record
         unset(
             $this->_page[$page_num]
         );

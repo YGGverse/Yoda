@@ -33,7 +33,7 @@ class Close
             'activate',
             function()
             {
-                $this->tab->menu->browser->container->tab->gtk->remove_page(
+                $this->tab->menu->browser->container->tab->closePage(
                     $this->tab->menu->browser->container->tab->gtk->get_current_page()
                 );
 
