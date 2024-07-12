@@ -141,14 +141,28 @@ class Tab
     }
 
     public function getPage(
-        int $page_num
+        ?int $page_num = null
     ): ?\Yggverse\Yoda\Entity\Browser\Container\Page
     {
+        // Get current page number on $page_num is null
+        if (is_null($page_num))
+        {
+            $page_num = $this->gtk->get_current_page();
+
+            // Return null if the notebook has no pages
+            if ($page_num === -1)
+            {
+                return null;
+            }
+        }
+
+        // Validate page index exists
         if (empty($this->_page[$page_num]))
         {
             throw new \Exception;
         }
 
+        // Return page entity
         return $this->_page[$page_num];
     }
 
@@ -156,6 +170,7 @@ class Tab
         int $page_num
     ): void
     {
+        // Validate page index exists
         if (empty($this->_page[$page_num]))
         {
             throw new \Exception;
