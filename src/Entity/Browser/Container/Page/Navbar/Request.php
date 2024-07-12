@@ -12,7 +12,9 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         \GtkEntry $entry
     ): void
     {
-        $this->navbar->page->content->update();
+        $this->navbar->page->open(
+            $entry->get_text()
+        );
     }
 
     protected function _onKeyRelease(

@@ -78,11 +78,9 @@ class Tab
 
         if ($request)
         {
-            $page->navbar->request->setValue(
+            $page->open(
                 $request
             );
-
-            $page->content->update();
         }
 
         $this->gtk->append_page(
