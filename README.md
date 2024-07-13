@@ -8,9 +8,10 @@ Project in development!
 
 Run `INSTALL.sh` script from terminal to build app for your system using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3).
 
-This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only, trough `apt`.
+This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only, by `apt`.
 
-To uninstall, just remove `build` folder generated.
+* To launch, open Yoda in application menu
+* To uninstall, just remove `build` folder generated in `Yoda` directory. Optionally, remove profile data `~/.yoda`
 
 ### Manual
 
@@ -20,7 +21,7 @@ To uninstall, just remove `build` folder generated.
 4. `cd Yoda`
 5. `composer update`
 
-## Launch
+#### Launch
 
 ``` bash
 /path/to/php-gtk3 src/Yoda.php
