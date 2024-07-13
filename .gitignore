@@ -1,3 +1,4 @@
 /.yoda/
+/build/
 /vendor/
 /composer.lock

@@ -4,6 +4,12 @@ Project in development!
 
 ## Install
 
+## Auto
+
+Run `INSTALL.sh` to build application for your system, using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3) sources. This tool make completely local installation at `build` folder and does not change system PHP version, it also does not require the root access but optional system dependencies installation only.
+
+## Manual
+
 1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases)
 2. `apt install git composer`
 3. `git clone https://github.com/YGGverse/Yoda.git`
