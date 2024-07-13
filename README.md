@@ -11,7 +11,7 @@ Run `INSTALL.sh` script from terminal to build app for your system using latest 
 This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only, by `apt`.
 
 * To launch, open Yoda in application menu
-* To uninstall, just remove `build` folder generated in `Yoda` directory. Optionally, remove profile data `~/.yoda`
+* To uninstall, just remove `build` folder generated in Yoda directory, remove profile data `~/.yoda`
 
 ### Manual
 
