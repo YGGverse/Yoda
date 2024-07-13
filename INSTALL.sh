@@ -192,6 +192,9 @@ if [[ $BUILD_PHP_GTK == "y" ]]; then
     make install
 fi
 
+# Init desktop location
+mkdir -p $DIR_DESKTOP_TARGET
+
 # Create launcher
 cat > "$DIR_DESKTOP_TARGET/yoda.sh" <<EOL
 #!/bin/bash
@@ -201,8 +204,6 @@ EOL
 chmod +x "$DIR_DESKTOP_TARGET/yoda.sh"
 
 # Create desktop menu
-mkdir -p $DIR_DESKTOP_TARGET
-
 cat > "$DIR_DESKTOP_TARGET/yoda.desktop" <<EOL
 [Desktop Entry]
     Name=Yoda
