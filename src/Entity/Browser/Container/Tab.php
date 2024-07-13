@@ -131,12 +131,6 @@ class Tab
                     $page->gtk
                 )
             );
-
-            // Update application title
-            $this->container->browser->header->setTitle(
-                $page->title->getValue(),
-                $page->title->getSubtitle()
-            );
         }
 
         // Render
