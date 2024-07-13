@@ -4,9 +4,13 @@ Project in development!
 
 ## Install
 
-## Auto
+## Builder
 
-Run `INSTALL.sh` to build application for your system, using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3) sources. This tool make completely local installation at `build` folder and does not change system PHP version, it also does not require the root access but optional system dependencies installation only.
+Run `INSTALL.sh` script from terminal to build app for your system using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3) sources.
+
+This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only (trough `apt`).
+
+To uninstall, just remove `build` folder generated.
 
 ## Manual
 
