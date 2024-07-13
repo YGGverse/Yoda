@@ -6,9 +6,9 @@ Project in development!
 
 ## Builder
 
-Run `INSTALL.sh` script from terminal to build app for your system using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3) sources.
+Run `INSTALL.sh` script from terminal to build app for your system using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3)
 
-This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only (trough `apt`).
+This tool does not change system PHP version, not requires root permissions but optional system dependencies installation only (trough `apt`)
 
 To uninstall, just remove `build` folder generated.
 
