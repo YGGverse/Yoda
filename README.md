@@ -4,7 +4,7 @@ Project in development!
 
 ## Install
 
-## Builder
+### Builder
 
 Run `INSTALL.sh` script from terminal to build app for your system using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3).
 
@@ -12,7 +12,7 @@ This tool does not change system PHP version, not requires root permissions but 
 
 To uninstall, just remove `build` folder generated.
 
-## Manual
+### Manual
 
 1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases)
 2. `apt install git composer`
