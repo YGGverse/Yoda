@@ -66,9 +66,13 @@ if [[ $INSTALL_SYSTEM_DEPENDENCIES == "y" ]]; then
                         libwnck-dev
 fi
 
-# Install composer dependencies
+# Build App
 cd $DIR_APP
 
+## Update application sources
+git pull
+
+## Update composer dependencies
 composer update
 
 ## Check composer dependencies received to continue
