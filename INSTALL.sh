@@ -60,6 +60,11 @@ cd $DIR_APP
 
 composer update
 
+## Check composer dependencies received to continue
+if [ ! -d "$DIR_APP/vendor" ]; then
+    echo "Could not get composer dependencies" && exit
+fi
+
 # Build PHP-SRC
 
 ## Get latest sources
