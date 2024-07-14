@@ -176,7 +176,7 @@ sed -i "/INI_DIR     =   /c\
          INI_DIR     =   /dev/null" $DIR_PHP_GTK_SOURCE/Makefile
 
 ## Force build for new installation
-if [ ! -d $DIR_PHP_CPP_TARGET ]; then BUILD_PHP_GTK="y"
+if [ ! -f "$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
 else # or ask for re-build
     until [[ $BUILD_PHP_GTK =~ (y|n) ]]; do
         read -rp "Rebuild latest PHP-GTK? [y/n]: " -e BUILD_PHP_GTK
