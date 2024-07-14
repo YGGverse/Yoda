@@ -25,34 +25,45 @@ until [[ $INSTALL_SYSTEM_DEPENDENCIES =~ (y|n) ]]; do
     read -rp "Install system dependencies? [y/n]: " -e INSTALL_SYSTEM_DEPENDENCIES
 done
 
-## @TODO check for package manager support
+## Dependencies installation requested
 if [[ $INSTALL_SYSTEM_DEPENDENCIES == "y" ]]; then
-    sudo apt install libpq-dev\
-                     bison\
-                     libreadline-dev\
-                     git\
-                     composer\
-                     build-essential\
-                     autoconf\
-                     automake\
-                     libtool\
-                     re2c\
-                     libxml2-dev\
-                     libcurl4-openssl-dev\
-                     libssl-dev\
-                     libbz2-dev\
-                     libjpeg-dev\
-                     libpng-dev\
-                     libxpm-dev\
-                     libfreetype6-dev\
-                     libzip-dev\
-                     libsqlite3-dev\
-                     libonig-dev\
-                     libxslt1-dev\
-                     libgtk-3-dev\
-                     libgladeui-dev\
-                     libgtksourceview-3.0-dev\
-                     libwnck-dev
+
+    ### Detect package manager
+    if [[ ! -z $(which apt) ]]; then
+        CMD_INSTALL="apt install"
+    elif [[ ! -z $(which yum) ]]; then
+        CMD_INSTALL="yum install"
+    else
+        echo "Package manager not supported!" && exit
+    fi
+
+    ### Install dependencies
+    sudo $CMD_INSTALL   libpq-dev\
+                        bison\
+                        libreadline-dev\
+                        git\
+                        composer\
+                        build-essential\
+                        autoconf\
+                        automake\
+                        libtool\
+                        re2c\
+                        libxml2-dev\
+                        libcurl4-openssl-dev\
+                        libssl-dev\
+                        libbz2-dev\
+                        libjpeg-dev\
+                        libpng-dev\
+                        libxpm-dev\
+                        libfreetype6-dev\
+                        libzip-dev\
+                        libsqlite3-dev\
+                        libonig-dev\
+                        libxslt1-dev\
+                        libgtk-3-dev\
+                        libgladeui-dev\
+                        libgtksourceview-3.0-dev\
+                        libwnck-dev
 fi
 
 # Install composer dependencies
