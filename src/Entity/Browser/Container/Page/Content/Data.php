@@ -160,112 +160,172 @@ class Data
 
                 case $entity instanceof \Yggverse\Gemtext\Entity\Header:
 
-                    switch ($entity->getLevel())
+                    if ($preformatted)
                     {
-                        case 1: // #
+                        $line[] = htmlspecialchars(
+                            $this->_wrap(
+                                $entity->toString()
+                            )
+                        );
+                    }
 
-                            $line[] = sprintf(
-                                '<span size="xx-large">%s</span>',
-                                htmlspecialchars(
-                                    $this->_wrap(
-                                        $entity->getText()
+                    else
+                    {
+                        switch ($entity->getLevel())
+                        {
+                            case 1: // #
+
+                                $line[] = sprintf(
+                                    '<span size="xx-large">%s</span>',
+                                    htmlspecialchars(
+                                        $this->_wrap(
+                                            $entity->getText()
+                                        )
                                     )
-                                )
-                            );
+                                );
 
-                            // Find and return document title by first # tag
-                            if (empty($title))
-                            {
-                                $title = $entity->getText();
-                            }
+                                // Find and return document title by first # tag
+                                if (empty($title))
+                                {
+                                    $title = $entity->getText();
+                                }
 
-                        break;
+                            break;
 
-                        case 2: // ##
+                            case 2: // ##
 
-                            $line[] = sprintf(
-                                '<span size="x-large">%s</span>',
-                                htmlspecialchars(
-                                    $this->_wrap(
-                                        $entity->getText()
+                                $line[] = sprintf(
+                                    '<span size="x-large">%s</span>',
+                                    htmlspecialchars(
+                                        $this->_wrap(
+                                            $entity->getText()
+                                        )
                                     )
-                                )
-                            );
+                                );
 
-                        break;
+                            break;
 
-                        case 3: // ###
+                            case 3: // ###
 
-                            $line[] = sprintf(
-                                '<span size="large">%s</span>',
-                                htmlspecialchars(
-                                    $this->_wrap(
-                                        $entity->getText()
+                                $line[] = sprintf(
+                                    '<span size="large">%s</span>',
+                                    htmlspecialchars(
+                                        $this->_wrap(
+                                            $entity->getText()
+                                        )
                                     )
-                                )
-                            );
+                                );
 
-                        break;
-                        default:
+                            break;
+                            default:
 
-                            throw new \Exception;
+                                throw new \Exception;
+                        }
                     }
 
                 break;
 
                 case $entity instanceof \Yggverse\Gemtext\Entity\Link:
 
-                    $line[] = sprintf(
-                        '<a href="%s" title="%s">%s</a>',
-                        $this->_url(
-                            $entity->getAddress()
-                        ),
-                        htmlspecialchars(
-                            $entity->getAddress()
-                        ),
-                        htmlspecialchars(
+                    if ($preformatted)
+                    {
+                        $line[] = htmlspecialchars(
                             $this->_wrap(
-                                $entity->getAlt() ? $entity->getAlt()
-                                                  : $entity->getAddress() // @TODO date
+                                $entity->toString()
                             )
-                        )
-                    );
+                        );
+                    }
+
+                    else
+                    {
+                        $line[] = sprintf(
+                            '<a href="%s" title="%s">%s</a>',
+                            $this->_url(
+                                $entity->getAddress()
+                            ),
+                            htmlspecialchars(
+                                $entity->getAddress()
+                            ),
+                            htmlspecialchars(
+                                $this->_wrap(
+                                    $entity->getAlt() ? $entity->getAlt()
+                                                      : $entity->getAddress() // @TODO date
+                                )
+                            )
+                        );
+                    }
 
                 break;
 
                 case $entity instanceof \Yggverse\Gemtext\Entity\Listing:
 
-                    $line[] = sprintf(
-                        '* %s',
-                        htmlspecialchars(
+                    if ($preformatted)
+                    {
+                        $line[] = htmlspecialchars(
                             $this->_wrap(
-                                $entity->getItem()
+                                $entity->toString()
                             )
-                        )
-                    );
+                        );
+                    }
+
+                    else
+                    {
+                        $line[] = sprintf(
+                            '* %s',
+                            htmlspecialchars(
+                                $this->_wrap(
+                                    $entity->getItem()
+                                )
+                            )
+                        );
+                    }
 
                 break;
 
                 case $entity instanceof \Yggverse\Gemtext\Entity\Quote:
 
-                    $line[] = sprintf(
-                        '<i>%s</i>',
-                        htmlspecialchars(
+                    if ($preformatted)
+                    {
+                        $line[] = htmlspecialchars(
                             $this->_wrap(
-                                $entity->getText()
+                                $entity->toString()
                             )
-                        )
-                    );
+                        );
+                    }
+
+                    else
+                    {
+                        $line[] = sprintf(
+                            '<i>%s</i>',
+                            htmlspecialchars(
+                                $this->_wrap(
+                                    $entity->getText()
+                                )
+                            )
+                        );
+                    }
 
                 break;
 
                 case $entity instanceof \Yggverse\Gemtext\Entity\Text:
 
-                    $line[] = htmlspecialchars(
-                        $this->_wrap(
-                            $entity->getData()
-                        )
-                    );
+                    if ($preformatted)
+                    {
+                        $line[] = htmlspecialchars(
+                            $this->_wrap(
+                                $entity->toString()
+                            )
+                        );
+                    }
+
+                    else
+                    {
+                        $line[] = htmlspecialchars(
+                            $this->_wrap(
+                                $entity->getData()
+                            )
+                        );
+                    }
 
                 break;
 
