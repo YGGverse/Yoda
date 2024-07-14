@@ -34,7 +34,7 @@ class Database
         );
 
         $this->_database->query('
-            CREATE TABLE IF NOT EXISTS "history"
+            CREATE TABLE IF NOT EXISTS "browser_page_history"
             (
                 "id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "time"  INTEGER NOT NULL,
@@ -44,13 +44,13 @@ class Database
         ');
     }
 
-    public function addHistory(
+    public function addBrowserPageHistory(
         string $url,
         ?string $title = null
     ): int
     {
         $query = $this->_database->prepare(
-            'INSERT INTO `history` (`time`, `url`, `title`) VALUES (:time, :url, :title)'
+            'INSERT INTO `browser_page_history` (`time`, `url`, `title`) VALUES (:time, :url, :title)'
         );
 
         $query->execute(
@@ -64,7 +64,7 @@ class Database
         return (int) $this->_database->lastInsertId();
     }
 
-    public function findHistory(
+    public function findBrowserPageHistory(
         string $value = '',
         int $start = 0,
         int $limit = 1000
@@ -72,7 +72,7 @@ class Database
     {
         $query = $this->_database->prepare(
             sprintf(
-                'SELECT * FROM `history`
+                'SELECT * FROM `browser_page_history`
                           WHERE `url` LIKE :value OR `title` LIKE :value
                           ORDER BY `id` DESC
                           LIMIT %d,%d',
@@ -93,13 +93,13 @@ class Database
         return $query->fetchAll();
     }
 
-    public function deleteHistory(
+    public function deleteBrowserPageHistory(
         int $id
     ): int
     {
         $query = $this->_database->query(
             sprintf(
-                'DELETE FROM `history` WHERE `id` = %d',
+                'DELETE FROM `browser_page_history` WHERE `id` = %d',
                 $id
             )
         );
@@ -107,13 +107,13 @@ class Database
         return $query->rowCount();
     }
 
-    public function cleanHistory(
+    public function cleanBrowserPageHistory(
         int $timeout = 0
     ): int
     {
         $query = $this->_database->query(
             sprintf(
-                'DELETE FROM `history` WHERE `time` + %d < %d',
+                'DELETE FROM `browser_page_history` WHERE `time` + %d < %d',
                 $timeout,
                 time()
             )
@@ -123,14 +123,14 @@ class Database
         return $query->rowCount();
     }
 
-    public function renewHistory(
+    public function renewBrowserPageHistory(
         string $url,
         ?string $title = null
     ): void
     {
         // Find same records match URL
         $query = $this->_database->prepare(
-            'SELECT * FROM `history` WHERE `url` LIKE :url'
+            'SELECT * FROM `browser_page_history` WHERE `url` LIKE :url'
         );
 
         $query->execute(
@@ -142,13 +142,13 @@ class Database
         // Drop previous records
         foreach ($query->fetchAll() as $record)
         {
-            $this->deleteHistory(
+            $this->deleteBrowserPageHistory(
                 $record->id
             );
         }
 
         // Add new record
-        $this->addHistory(
+        $this->addBrowserPageHistory(
             $url,
             $title
         );
