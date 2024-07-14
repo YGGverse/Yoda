@@ -227,4 +227,8 @@ fi
 
 # Dump result
 echo "Build completed!"
-echo "run $DIR_DESKTOP_TARGET/yoda.sh"
+
+if [[ $SETUP_DESKTOP_MENU == "y" ]]; then
+    echo "run Yoda from application menu or"
+fi
+    echo "start Yoda with launcher: \"$DIR_DESKTOP_TARGET/yoda.sh\""
