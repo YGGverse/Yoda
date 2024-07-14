@@ -8,7 +8,7 @@ Project in development!
 
 Run `INSTALL.sh` in terminal to autobuild Yoda for Linux systems, using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3)
 
-This tool does not change global PHP version, not requires root permissions, but optionally install system dependencies, through `apt`
+This tool does not change global PHP version, not requires root permissions, but optionally install system dependencies, through `apt` or `yum`
 
 * To **start**, open Yoda in application menu or use `yoda.sh` launcher created
 * To **update**, run `INSTALL.sh` again
