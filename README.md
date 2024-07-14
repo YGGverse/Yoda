@@ -12,7 +12,7 @@ This tool does not change global PHP version, not requires root permissions, but
 
 #### After build
 
-* To **start**, open Yoda in application menu or use `yoda.sh` launcher generated
+* To **launch**, open Yoda in application menu or use `yoda.sh` launcher generated
 * To **update**, run `INSTALL.sh` again
 * To **uninstall**, just remove `build` folder with profile data in `~/.yoda`
 
