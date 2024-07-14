@@ -3,7 +3,7 @@
 # Init environment
 PHP_VERSION="8.3.9"
 
-DIR_APP=$(dirname $(realpath -s "$0"))
+DIR_APP="$(dirname $(realpath -s "$0"))"
 
 DIR_BUILD="$DIR_APP/build/$(uname)"
 
@@ -67,7 +67,7 @@ if [[ $INSTALL_SYSTEM_DEPENDENCIES == "y" ]]; then
 fi
 
 # Build App
-cd $DIR_APP
+cd "$DIR_APP"
 
 ## Update application sources
 git pull
@@ -83,8 +83,8 @@ fi
 # Build PHP-SRC
 
 ## Get latest sources
-if [ ! -d $DIR_PHP_SRC_SOURCE ]; then
-    git clone -b PHP-$PHP_VERSION https://github.com/php/php-src.git $DIR_PHP_SRC_SOURCE
+if [ ! -d "$DIR_PHP_SRC_SOURCE" ]; then
+    git clone -b "PHP-$PHP_VERSION" "https://github.com/php/php-src.git" "$DIR_PHP_SRC_SOURCE"
 fi
 
 ## Check sources directory received to continue
@@ -93,7 +93,7 @@ if [ ! -d "$DIR_PHP_SRC_SOURCE" ]; then
 fi
 
 ## Navigate to PHP-SRC location
-cd $DIR_PHP_SRC_SOURCE
+cd "$DIR_PHP_SRC_SOURCE"
 
 ## Switch to version branch
 git checkout "PHP-$PHP_VERSION"
@@ -107,7 +107,7 @@ if [ ! -f "$DIR_PHP_SRC_SOURCE/configure" ]; then
 fi
 
 ## Force build for new installation
-if [ ! -d $DIR_PHP_SRC_TARGET ]; then BUILD_PHP_SRC="y"
+if [ ! -d "$DIR_PHP_SRC_TARGET" ]; then BUILD_PHP_SRC="y"
 else # or ask for re-build
     until [[ $BUILD_PHP_SRC =~ (y|n) ]]; do
         read -rp "Rebuild latest PHP-SRC? [y/n]: " -e BUILD_PHP_SRC
@@ -116,7 +116,7 @@ fi
 
 ## Install PHP-SRC
 if [[ $BUILD_PHP_SRC == "y" ]]; then
-    ./configure --prefix=$DIR_PHP_SRC_TARGET\
+    ./configure --prefix="$DIR_PHP_SRC_TARGET"\
                 --with-openssl\
                 --with-gettext\
                 --with-pdo-mysql\
@@ -137,8 +137,8 @@ fi
 # Build PHP-CPP
 
 ## Get latest sources
-if [ ! -d $DIR_PHP_CPP_SOURCE ]; then
-    git clone https://github.com/fast-debug/php-cpp.git $DIR_PHP_CPP_SOURCE
+if [ ! -d "$DIR_PHP_CPP_SOURCE" ]; then
+    git clone "https://github.com/fast-debug/php-cpp.git" "$DIR_PHP_CPP_SOURCE"
 fi
 
 ## Check sources directory received to continue
@@ -147,20 +147,20 @@ if [ ! -d "$DIR_PHP_CPP_SOURCE" ]; then
 fi
 
 ## Navigate to PHP-CPP location
-cd $DIR_PHP_CPP_SOURCE
+cd "$DIR_PHP_CPP_SOURCE"
 
 ## Get repository updates
 git pull
 
 ## Replace installation paths in PHP-CPP Makefile
 sed -i "/PHP_CONFIG			=	/c\
-         PHP_CONFIG			=	$DIR_PHP_SRC_TARGET/bin/php-config" $DIR_PHP_CPP_SOURCE/Makefile
+         PHP_CONFIG			=	\"$DIR_PHP_SRC_TARGET/bin/php-config\"" "$DIR_PHP_CPP_SOURCE/Makefile"
 
 sed -i "/INSTALL_PREFIX		=	/c\
-         INSTALL_PREFIX		=	$DIR_PHP_CPP_TARGET" $DIR_PHP_CPP_SOURCE/Makefile
+         INSTALL_PREFIX		=	\"$DIR_PHP_CPP_TARGET\"" "$DIR_PHP_CPP_SOURCE/Makefile"
 
 ## Force build for new installation
-if [ ! -d $DIR_PHP_CPP_TARGET ]; then BUILD_PHP_CPP="y"
+if [ ! -d "$DIR_PHP_CPP_TARGET" ]; then BUILD_PHP_CPP="y"
 else # or ask for re-build
     until [[ $BUILD_PHP_CPP =~ (y|n) ]]; do
         read -rp "Rebuild latest PHP-CPP? [y/n]: " -e BUILD_PHP_CPP
@@ -179,8 +179,8 @@ fi
 # Build PHP-GTK
 
 ## Get latest sources
-if [ ! -d $DIR_PHP_GTK_SOURCE ]; then
-    git clone https://github.com/scorninpc/php-gtk3.git $DIR_PHP_GTK_SOURCE
+if [ ! -d "$DIR_PHP_GTK_SOURCE" ]; then
+    git clone "https://github.com/scorninpc/php-gtk3.git" "$DIR_PHP_GTK_SOURCE"
 fi
 
 ## Check sources directory received to continue
@@ -189,20 +189,20 @@ if [ ! -d "$DIR_PHP_GTK_SOURCE" ]; then
 fi
 
 ## Navigate to PHP-GTK location
-cd $DIR_PHP_GTK_SOURCE
+cd "$DIR_PHP_GTK_SOURCE"
 
 ## Get repository updates
 git pull
 
 ## Replace installation paths in PHP-CPP Makefile
 sed -i "/EXTENSION_DIR       =   /c\
-         EXTENSION_DIR       =   $($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)" $DIR_PHP_GTK_SOURCE/Makefile
+         EXTENSION_DIR       =   \"$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)\"" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 sed -i "/INI_DIR     =   /c\
-         INI_DIR     =   /dev/null" $DIR_PHP_GTK_SOURCE/Makefile
+         INI_DIR     =   \"/dev/null\"" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Force build for new installation
-if [ ! -f "$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
+if [ ! -f "$("$DIR_PHP_SRC_TARGET/bin/php-config" --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
 else # or ask for re-build
     until [[ $BUILD_PHP_GTK =~ (y|n) ]]; do
         read -rp "Rebuild latest PHP-GTK? [y/n]: " -e BUILD_PHP_GTK
@@ -219,12 +219,12 @@ if [[ $BUILD_PHP_GTK == "y" ]]; then
 fi
 
 # Init desktop location
-mkdir -p $DIR_DESKTOP_TARGET
+mkdir -p "$DIR_DESKTOP_TARGET"
 
 # Create launcher
 cat > "$DIR_DESKTOP_TARGET/yoda.sh" <<EOL
 #!/bin/bash
-$DIR_PHP_SRC_TARGET/bin/php -dextension=php-gtk3.so $DIR_APP/src/Yoda.php \$@
+"$DIR_PHP_SRC_TARGET/bin/php" -dextension="php-gtk3.so" "$DIR_APP/src/Yoda.php" \$@
 EOL
 
 chmod +x "$DIR_DESKTOP_TARGET/yoda.sh"
@@ -235,7 +235,7 @@ cat > "$DIR_DESKTOP_TARGET/yoda.desktop" <<EOL
     Name=Yoda
     Comment=PHP-GTK Browser for Gemini Protocol
     Type=Application
-    Exec=$DIR_DESKTOP_TARGET/yoda.sh
+    Exec="$DIR_DESKTOP_TARGET/yoda.sh"
 EOL
 
 chmod +x "$DIR_DESKTOP_TARGET/yoda.desktop"
@@ -247,8 +247,8 @@ done
 
 ### Activate menu
 if [[ $SETUP_DESKTOP_MENU == "y" ]]; then
-    desktop-file-install --dir=$HOME/.local/share/applications $DIR_DESKTOP_TARGET/yoda.desktop
-    update-desktop-database $HOME/.local/share/applications
+    desktop-file-install --dir="$HOME/.local/share/applications" "$DIR_DESKTOP_TARGET/yoda.desktop"
+    update-desktop-database "$HOME/.local/share/applications"
 fi
 
 # Dump result
@@ -257,4 +257,6 @@ echo "Build completed!"
 if [[ $SETUP_DESKTOP_MENU == "y" ]]; then
     echo "run Yoda from application menu or"
 fi
-    echo "start with launcher: \"$DIR_DESKTOP_TARGET/yoda.sh\""
+
+echo "start with launcher:"
+echo "$DIR_DESKTOP_TARGET/yoda.sh"
