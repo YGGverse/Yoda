@@ -10,6 +10,8 @@ Run `INSTALL.sh` in terminal to autobuild Yoda for Linux systems, using latest [
 
 This tool does not change global PHP version, not requires root permissions, but optionally install system dependencies, through `apt` or `yum`
 
+#### After build
+
 * To **start**, open Yoda in application menu or use `yoda.sh` launcher created
 * To **update**, run `INSTALL.sh` again
 * To **uninstall**, just remove `build` folder with profile data in `~/.yoda`
