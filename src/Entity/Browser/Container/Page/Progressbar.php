@@ -67,6 +67,9 @@ class Progressbar
         // Activate iterator
         $this->_active = true;
 
+        // Reset initial progress
+        $this->gtk->set_fraction(0);
+
         // Begin iterator
         \Gtk::timeout_add(
             $timeout,
