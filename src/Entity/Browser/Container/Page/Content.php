@@ -92,7 +92,7 @@ class Content
             );
 
             // Update history in database
-            $this->page->container->browser->database->renewBrowserPageHistory(
+            $this->page->container->browser->database->renewHistory(
                 $address->get(),
                 // @TODO title
             );

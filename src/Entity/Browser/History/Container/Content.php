@@ -74,7 +74,7 @@ class Content
     {
         $this->table->data->clear();
 
-        if ($records = $this->container->history->browser->database->findBrowserPageHistory($filter))
+        if ($records = $this->container->history->browser->database->findHistory($filter))
         {
             foreach ($records as $record)
             {
