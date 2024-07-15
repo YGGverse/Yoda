@@ -132,6 +132,9 @@ class Page
         // Show progressbar
         $this->progressbar->infinitive();
 
+        // Hide response form
+        $this->response->hide();
+
         // Update content by multi-protocol responser
         $response = new \Yggverse\Yoda\Model\Response(
             $this->navbar->request->getValue(),
@@ -152,6 +155,23 @@ class Page
                     $this->open(
                         $location
                     );
+
+                    // Hide progressbar
+                    $this->progressbar->hide();
+
+                    return false; // stop
+                }
+
+                // Response form requested
+                if ($request = $response->getRequest())
+                {
+                    $this->response->show(
+                        $request['placeholder'],
+                        $request['visible']
+                    );
+
+                    // Hide progressbar
+                    $this->progressbar->hide();
 
                     return false; // stop
                 }
@@ -198,17 +218,6 @@ class Page
                             _('MIME type not supported')
                         );
                 }
-
-                // Response form requested
-                if ($request = $response->getRequest())
-                {
-                    $this->response->show(
-                        $request['placeholder'],
-                        $request['visible']
-                    );
-                }
-
-                else $this->response->hide();
 
                 // Stop event loop on request completed
                 if ($response->isCompleted())

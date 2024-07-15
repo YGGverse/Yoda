@@ -149,6 +149,8 @@ class Response
                     case 10: // response expected
                     case 11: // sensitive input
 
+                        $this->_mime = self::MIME_TEXT_GEMINI;
+
                         $this->_request =
                         [
                             'placeholder' => $response->getMeta(),
