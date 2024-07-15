@@ -223,6 +223,16 @@ class Page
                 // Stop event loop on request expired
                 if (time() > $expire)
                 {
+                    // Update title
+                    $this->title->set(
+                        _('Timeout')
+                    );
+
+                    // Update content
+                    $this->content->setGemtext(
+                        _('Response time reached')
+                    );
+
                     // Hide progressbar
                     $this->progressbar->hide();
 
