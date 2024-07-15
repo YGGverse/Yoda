@@ -105,7 +105,8 @@ class Page
 
     public function update(
         bool $history = true,
-        int  $refresh = 100
+         int $refresh = 100,
+         int $timeout = 5
     ): void
     {
         // Update history
@@ -133,13 +134,17 @@ class Page
 
         // Update content by multi-protocol responser
         $response = new \Yggverse\Yoda\Model\Response(
-            $this->navbar->request->getValue()
+            $this->navbar->request->getValue(),
+            $timeout
         );
+
+        // Calculate expiration time
+        $expire = time() + $timeout;
 
         // Listen response
         \Gtk::timeout_add(
             $refresh,
-            function() use ($response)
+            function() use ($response, $expire)
             {
                 // Redirect requested
                 if ($location = $response->getRedirect())
@@ -205,8 +210,18 @@ class Page
 
                 else $this->response->hide();
 
-                // Stop event loop on request expired or completed
-                if ($response->isExpired() || $response->isCompleted())
+                // Stop event loop on request completed
+                if ($response->isCompleted())
+                {
+                    // Hide progressbar
+                    $this->progressbar->hide();
+
+                    // Stop
+                    return false;
+                }
+
+                // Stop event loop on request expired
+                if (time() > $expire)
                 {
                     // Hide progressbar
                     $this->progressbar->hide();

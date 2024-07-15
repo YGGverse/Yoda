@@ -15,7 +15,6 @@ class Response
 
     // Async status
     private bool $_completed = false;
-    private bool $_expired = false;
 
     // Response
     private ?string $_title = null;
@@ -291,11 +290,6 @@ class Response
     public function isCompleted(): bool
     {
         return $this->_completed;
-    }
-
-    public function isExpired(): bool
-    {
-        return $this->_expired;
     }
 
     public function getTitle(): ?string
