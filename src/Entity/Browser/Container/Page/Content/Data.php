@@ -98,17 +98,6 @@ class Data
         string $value
     ): void
     {
-        $this->gtk->set_text(
-            $value
-        );
-
-        $this->raw = $value;
-    }
-
-    public function setMono(
-        string $value
-    ): void
-    {
         $this->gtk->set_markup(
             sprintf(
                 '<tt>%s</tt>',
