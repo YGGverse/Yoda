@@ -138,7 +138,9 @@ class Response
                 );
 
                 $response = new \Yggverse\Gemini\Client\Response(
-                    $request->getResponse()
+                    $request->getResponse(
+                        $timeout
+                    )
                 );
 
                 // Route status code
@@ -233,7 +235,8 @@ class Response
                 $this->_data = (
                     new \Yggverse\Nex\Client
                 )->request(
-                    $this->_address->get()
+                    $this->_address->get(),
+                    $timeout
                 );
 
                 $this->_mime = self::MIME_TEXT_PLAIN; // @TODO
