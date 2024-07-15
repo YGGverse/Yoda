@@ -104,18 +104,117 @@ class Page
     }
 
     public function update(
-        bool $history = true
+        bool $history = true,
+        int  $refresh = 100
     ): void
     {
+        // Update history
+        if ($history)
+        {
+            // Save request in memory
+            $this->navbar->history->add(
+                $this->navbar->request->getValue()
+            );
+
+            // Save request in database
+            $this->container->browser->database->renewHistory(
+                $this->navbar->request->getValue(),
+                // @TODO title
+            );
+        }
+
+        // Update title
+        $this->title->set(
+            _('Loading...')
+        );
+
         // Show progressbar
         $this->progressbar->infinitive();
 
-        // Update content entity
-        $this->content->update(
-            $history
+        // Update content by multi-protocol responser
+        $response = new \Yggverse\Yoda\Model\Response(
+            $this->navbar->request->getValue()
         );
 
-        // Hide progressbar
-        $this->progressbar->hide();
+        // Listen response
+        \Gtk::timeout_add(
+            $refresh,
+            function() use ($response)
+            {
+                // Redirect requested
+                if ($location = $response->getRedirect())
+                {
+                    $this->open(
+                        $location
+                    );
+
+                    return false; // stop
+                }
+
+                // Update title
+                $this->title->set(
+                    $response->getTitle(),
+                    $response->getSubtitle(),
+                    $response->getTooltip()
+                );
+
+                // Update content
+                switch ($response->getMime())
+                {
+                    case 'text/gemini':
+
+                        $title = null;
+
+                        $this->content->setGemtext(
+                            (string) $response->getData(),
+                            $title
+                        );
+
+                        if ($title)
+                        {
+                            $this->title->setValue(
+                                $title
+                            );
+                        }
+
+                    break;
+
+                    case 'text/plain':
+
+                        $this->content->setPlain(
+                            (string) $response->getData()
+                        );
+
+                    break;
+
+                    default:
+
+                        throw new \Exception(
+                            _('MIME type not supported')
+                        );
+                }
+
+                // Response form requested
+                if ($request = $response->getRequest())
+                {
+                    $this->response->show(
+                        $request['placeholder'],
+                        $request['visible']
+                    );
+                }
+
+                else $this->response->hide();
+
+                // Stop event loop on request expired or completed
+                if ($response->isExpired() || $response->isCompleted())
+                {
+                    // Hide progressbar
+                    $this->progressbar->hide();
+
+                    // Stop
+                    return false;
+                }
+            }
+        );
     }
 }
