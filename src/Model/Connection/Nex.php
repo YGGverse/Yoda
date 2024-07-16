@@ -20,7 +20,7 @@ class Nex
     }
 
     // @TODO
-    public function sync(
+    public function request(
         Address $address,
         int $timeout = 5
     ): void

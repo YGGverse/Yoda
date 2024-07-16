@@ -20,7 +20,7 @@ class Gemini
         $this->_connection = $connection;
     }
 
-    public function sync(
+    public function request(
         Address $address,
         int $timeout = 5
     ): void

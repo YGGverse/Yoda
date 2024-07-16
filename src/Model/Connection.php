@@ -27,7 +27,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
         {
             case 'file':
 
-                (new File($this))->sync(
+                (new File($this))->request(
                     $address
                 );
 
@@ -35,7 +35,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
             case 'gemini':
 
-                (new Gemini($this))->sync(
+                (new Gemini($this))->request(
                     $address,
                     $timeout
                 );
@@ -44,7 +44,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
             case 'nex':
 
-                (new Nex($this))->sync(
+                (new Nex($this))->request(
                     $address,
                     $timeout
                 );

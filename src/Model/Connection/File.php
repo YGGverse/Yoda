@@ -19,7 +19,7 @@ class File
         $this->_connection = $connection;
     }
 
-    public function sync(
+    public function request(
         Address $address
     ): void
     {
