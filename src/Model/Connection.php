@@ -100,6 +100,10 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
                     _('Protocol not supported')
                 );
 
+                $this->setMime(
+                    $this::MIME_TEXT_GEMINI
+                );
+
                 $this->setCompleted(
                     true
                 );
