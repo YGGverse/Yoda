@@ -11,10 +11,10 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     private Pool $_pool;
 
     public function __construct(
-        Pool $pool
+        ?Pool $pool = null
     ) {
         // Use shared memory pool for async operations
-        $this->_pool = $pool;
+        $this->_pool = $pool ? $pool : new Pool;
 
         // Set defaults
         $this->_pool->set(

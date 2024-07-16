@@ -13,7 +13,7 @@ use \Yggverse\Yoda\Interface\Model\Pool;
 interface Connection
 {
     public function __construct(
-        Pool $pool
+        ?Pool $pool = null
     );
 
     public function request(
