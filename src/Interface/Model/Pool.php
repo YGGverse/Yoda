@@ -8,7 +8,7 @@ namespace Yggverse\Yoda\Interface\Model;
  * Shared memory API for async operations
  *
  */
-interface Buffer
+interface Pool
 {
     public function get(
         string $key

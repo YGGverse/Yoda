@@ -4,54 +4,54 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Model;
 
-use \Yggverse\Yoda\Model\Buffer;
+use \Yggverse\Yoda\Model\Pool;
 
 abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 {
-    private Buffer $_buffer;
+    private Pool $_pool;
 
     public function __construct(
-        Buffer $buffer
+        Pool $pool
     ) {
-        // Use shared memory for async operations
-        $this->_buffer = $buffer;
+        // Use shared memory pool for async operations
+        $this->_pool = $pool;
 
         // Set defaults
-        $this->_buffer->set(
+        $this->_pool->set(
             'completed',
             false
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'title',
             null
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'subtitle',
             null
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'tooltip',
             null
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'mime',
             null
         );
-        $this->_buffer->set(
+        $this->_pool->set(
             'data',
             null
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'redirect',
             null
         );
 
-        $this->_buffer->set(
+        $this->_pool->set(
             'request',
             null
         );
@@ -59,7 +59,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function isCompleted(): bool
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'completed'
         );
     }
@@ -68,7 +68,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         bool $completed
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'completed',
             $completed
         );
@@ -76,7 +76,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getTitle(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'title'
         );
     }
@@ -85,7 +85,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $title = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'title',
             $title
         );
@@ -93,7 +93,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getSubtitle(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'subtitle'
         );
     }
@@ -102,7 +102,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $subtitle = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'subtitle',
             $subtitle
         );
@@ -110,7 +110,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getTooltip(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'tooltip'
         );
     }
@@ -119,7 +119,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $tooltip = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'tooltip',
             $tooltip
         );
@@ -127,7 +127,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getMime(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'mime'
         );
     }
@@ -136,7 +136,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $mime = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'mime',
             $mime
         );
@@ -144,7 +144,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getData(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'data'
         );
     }
@@ -153,7 +153,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $data = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'data',
             $data
         );
@@ -161,7 +161,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getRedirect(): ?string
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'redirect'
         );
     }
@@ -170,7 +170,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         ?string $redirect = null
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'redirect',
             $redirect
         );
@@ -178,7 +178,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getRequest(): ?array
     {
-        return $this->_buffer->get(
+        return $this->_pool->get(
             'request'
         );
     }
@@ -188,7 +188,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         bool $visible = true
     ): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'request',
             [
                 'placeholder' => $placeholder,
@@ -199,7 +199,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function unsetRequest(): void
     {
-        $this->_buffer->set(
+        $this->_pool->set(
             'request',
             null
         );
@@ -208,7 +208,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     public function getLength(): ?int
     {
         return mb_strlen(
-            $this->_buffer->get(
+            $this->_pool->get(
                 'data'
             )
         );

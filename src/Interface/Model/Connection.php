@@ -10,6 +10,10 @@ namespace Yggverse\Yoda\Interface\Model;
  */
 interface Connection
 {
+    public function __construct(
+        \Yggverse\Yoda\Interface\Model\Pool $pool
+    );
+
     public function request(
         string $request,
         int $timeout = 5
