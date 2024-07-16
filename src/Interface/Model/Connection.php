@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Interface\Model;
 
 /*
- * Single API for multiple protocols
+ * Single async API for multiple protocols
  *
  */
 interface Connection
