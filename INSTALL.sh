@@ -125,6 +125,7 @@ if [[ $BUILD_PHP_SRC == "y" ]]; then
                 --enable-static\
                 --enable-sockets\
                 --enable-mbstring\
+                --enable-shmop\
                 --enable-pcntl
 
     make clean
