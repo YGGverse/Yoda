@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Interface\Model;
 
+use \Yggverse\Yoda\Interface\Model\Pool;
+
 /*
  * Single async API for multiple protocols
  *
@@ -11,7 +13,7 @@ namespace Yggverse\Yoda\Interface\Model;
 interface Connection
 {
     public function __construct(
-        \Yggverse\Yoda\Interface\Model\Pool $pool
+        Pool $pool
     );
 
     public function request(
