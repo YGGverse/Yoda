@@ -92,8 +92,16 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
             default:
 
-                throw new \Exception(
+                $this->setTitle(
+                    _('Oops!')
+                );
+
+                $this->setData(
                     _('Protocol not supported')
+                );
+
+                $this->setCompleted(
+                    true
                 );
         }
     }
