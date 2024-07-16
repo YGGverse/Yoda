@@ -10,6 +10,8 @@ use \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
+use \Yggverse\Yoda\Model\Connection;
+
 class Page
 {
     public \GtkBox $gtk;
@@ -136,7 +138,7 @@ class Page
         $this->response->hide();
 
         // Update content using multi-protocol driver
-        $connection = new \Yggverse\Yoda\Model\Connection;
+        $connection = new Connection;
 
         // Async request
         $connection->request(
