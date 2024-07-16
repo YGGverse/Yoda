@@ -181,52 +181,52 @@ class Page
                     return false; // stop
                 }
 
-                // Update title
-                $this->title->set(
-                    $connection->getTitle(),
-                    $connection->getSubtitle(),
-                    $connection->getTooltip()
-                );
-
-                // Update content
-                switch ($connection->getMime())
-                {
-                    case 'text/gemini':
-
-                        $title = null;
-
-                        $this->content->setGemtext(
-                            (string) $connection->getData(),
-                            $title
-                        );
-
-                        if ($title)
-                        {
-                            $this->title->setValue(
-                                $title
-                            );
-                        }
-
-                    break;
-
-                    case 'text/plain':
-
-                        $this->content->setPlain(
-                            (string) $connection->getData()
-                        );
-
-                    break;
-
-                    default:
-
-                        throw new \Exception(
-                            _('MIME type not supported')
-                        );
-                }
-
                 // Stop event loop on request completed
                 if ($connection->isCompleted())
                 {
+                    // Update title
+                    $this->title->set(
+                        $connection->getTitle(),
+                        $connection->getSubtitle(),
+                        $connection->getTooltip()
+                    );
+
+                    // Update content
+                    switch ($connection->getMime())
+                    {
+                        case 'text/gemini':
+
+                            $title = null;
+
+                            $this->content->setGemtext(
+                                (string) $connection->getData(),
+                                $title
+                            );
+
+                            if ($title)
+                            {
+                                $this->title->setValue(
+                                    $title
+                                );
+                            }
+
+                        break;
+
+                        case 'text/plain':
+
+                            $this->content->setPlain(
+                                (string) $connection->getData()
+                            );
+
+                        break;
+
+                        default:
+
+                            throw new \Exception(
+                                _('MIME type not supported')
+                            );
+                    }
+
                     // Hide progressbar
                     $this->progressbar->hide();
 
