@@ -135,8 +135,11 @@ class Page
         // Hide response form
         $this->response->hide();
 
-        // Update content by multi-protocol responser
-        $response = new \Yggverse\Yoda\Model\Response(
+        // Update content using multi-protocol driver
+        $connection = new \Yggverse\Yoda\Model\Connection;
+
+        // Async request
+        $connection->request(
             $this->navbar->request->getValue(),
             $timeout
         );
@@ -147,10 +150,10 @@ class Page
         // Listen response
         \Gtk::timeout_add(
             $refresh,
-            function() use ($response, $expire)
+            function() use ($connection, $expire)
             {
                 // Redirect requested
-                if ($location = $response->getRedirect())
+                if ($location = $connection->getRedirect())
                 {
                     $this->open(
                         $location
@@ -163,7 +166,7 @@ class Page
                 }
 
                 // Response form requested
-                if ($request = $response->getRequest())
+                if ($request = $connection->getRequest())
                 {
                     $this->response->show(
                         $request['placeholder'],
@@ -178,20 +181,20 @@ class Page
 
                 // Update title
                 $this->title->set(
-                    $response->getTitle(),
-                    $response->getSubtitle(),
-                    $response->getTooltip()
+                    $connection->getTitle(),
+                    $connection->getSubtitle(),
+                    $connection->getTooltip()
                 );
 
                 // Update content
-                switch ($response->getMime())
+                switch ($connection->getMime())
                 {
                     case 'text/gemini':
 
                         $title = null;
 
                         $this->content->setGemtext(
-                            (string) $response->getData(),
+                            (string) $connection->getData(),
                             $title
                         );
 
@@ -207,7 +210,7 @@ class Page
                     case 'text/plain':
 
                         $this->content->setPlain(
-                            (string) $response->getData()
+                            (string) $connection->getData()
                         );
 
                     break;
@@ -220,7 +223,7 @@ class Page
                 }
 
                 // Stop event loop on request completed
-                if ($response->isCompleted())
+                if ($connection->isCompleted())
                 {
                     // Hide progressbar
                     $this->progressbar->hide();
