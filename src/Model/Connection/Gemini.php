@@ -47,10 +47,8 @@ class Gemini
                 );
 
                 $this->_connection->setRequest(
-                    [
-                        'placeholder' => $response->getMeta(),
-                        'visible'     => 11 !== $response->getCode()
-                    ]
+                    $response->getMeta(),
+                    11 !== $response->getCode()
                 );
 
             break;

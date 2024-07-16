@@ -7,16 +7,16 @@ namespace Yggverse\Yoda\Abstract\Model;
 abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 {
     // Status
-    protected bool $_completed = false;
+    private bool $_completed = false;
 
     // Response
-    protected ?string $_title = null;
-    protected ?string $_subtitle = null;
-    protected ?string $_tooltip = null;
-    protected ?string $_mime = null;
-    protected ?string $_data = null;
-    protected ?string $_redirect = null;
-    protected ?array  $_request = null;
+    private ?string $_title = null;
+    private ?string $_subtitle = null;
+    private ?string $_tooltip = null;
+    private ?string $_mime = null;
+    private ?string $_data = null;
+    private ?string $_redirect = null;
+    private ?array  $_request = null;
 
     public function isCompleted(): bool
     {
@@ -108,10 +108,19 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     }
 
     public function setRequest(
-        ?array $request = null
+        ?string $placeholder,
+        bool $visible = true
     ): void
     {
-        $this->_request = $request; // @TODO
+        $this->_request = [
+            'placeholder' => $placeholder,
+            'visible'     => $visible
+        ];
+    }
+
+    public function unsetRequest(): void
+    {
+        $this->_request = null;
     }
 
     public function getLength(): ?int

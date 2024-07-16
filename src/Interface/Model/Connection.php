@@ -63,8 +63,11 @@ interface Connection
     public function getRequest(): ?array;
 
     public function setRequest(
-        ?array $request = null
+        ?string $placeholder,
+        bool $visible = true
     ): void;
+
+    public function unsetRequest(): void;
 
     public function getLength(): ?int;
 }
