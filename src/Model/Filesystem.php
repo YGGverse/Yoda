@@ -187,6 +187,55 @@ class Filesystem
         );
     }
 
+    public static function getMimeByPath(
+        ?string $path = null
+    ): ?string
+    {
+        if ($path)
+        {
+            switch (
+                pathinfo(
+                    $path,
+                    PATHINFO_EXTENSION
+                )
+            ) {
+                case 'gmi':
+                case 'gemini':
+
+                    return 'text/gemini';
+
+                case 'txt':
+
+                    return 'text/plain';
+            }
+        }
+
+        return null;
+    }
+
+    public static function getMimeByData(
+        ?string $data = null
+    ): ?string
+    {
+        if ($data)
+        {
+            $mime = (
+                new \Finfo(
+                    FILEINFO_MIME_TYPE
+                )
+            )->buffer(
+                $data
+            );
+
+            if ($mime)
+            {
+                return $mime;
+            }
+        }
+
+        return null;
+    }
+
     private static function _fixDirectorySeparators(
         string $path,
         string $separator = DIRECTORY_SEPARATOR
