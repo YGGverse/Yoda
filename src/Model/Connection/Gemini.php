@@ -76,7 +76,7 @@ class Gemini
                         $response->getData()
                     ): break;
 
-                    default: $mime = null;
+                    default: $mime = Filesystem::MIME_TEXT_GEMINI;
                 }
 
                 $this->_connection->setMime(
