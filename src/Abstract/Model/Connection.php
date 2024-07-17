@@ -18,49 +18,43 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
         // Set defaults
         $this->_pool->set(
-            'completed',
-            false
+            'completed'
         );
 
         $this->_pool->set(
-            'title',
-            null
+            'title'
         );
 
         $this->_pool->set(
-            'subtitle',
-            null
+            'subtitle'
         );
 
         $this->_pool->set(
-            'tooltip',
-            null
+            'tooltip'
         );
 
         $this->_pool->set(
-            'mime',
-            null
+            'mime'
         );
         $this->_pool->set(
-            'data',
-            null
+            'data'
         );
 
         $this->_pool->set(
-            'redirect',
-            null
+            'redirect'
         );
 
         $this->_pool->set(
-            'request',
-            null
+            'request'
         );
     }
 
     public function isCompleted(): bool
     {
-        return $this->_pool->get(
-            'completed'
+        return boolval(
+            $this->_pool->get(
+                'completed'
+            )
         );
     }
 
@@ -70,7 +64,9 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     {
         $this->_pool->set(
             'completed',
-            $completed
+            strval(
+                $completed
+            )
         );
     }
 
@@ -178,9 +174,14 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
     public function getRequest(): ?array
     {
-        return $this->_pool->get(
-            'request'
-        );
+        if ($request = $this->_pool->get('request'))
+        {
+            return unserialize(
+                $request
+            );
+        }
+
+        return null;
     }
 
     public function setRequest(
@@ -190,27 +191,31 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     {
         $this->_pool->set(
             'request',
-            [
-                'placeholder' => $placeholder,
-                'visible'     => $visible
-            ]
+            serialize(
+                [
+                    'placeholder' => $placeholder,
+                    'visible'     => $visible
+                ]
+            )
         );
     }
 
     public function unsetRequest(): void
     {
         $this->_pool->set(
-            'request',
-            null
+            'request'
         );
     }
 
     public function getLength(): ?int
     {
-        return mb_strlen(
-            $this->_pool->get(
-                'data'
-            )
-        );
+        if ($data = $this->_pool->get('data'))
+        {
+            return mb_strlen(
+                $data
+            );
+        }
+
+        return null;
     }
 }
