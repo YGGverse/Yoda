@@ -227,6 +227,19 @@ class Page
 
                         break;
 
+                        /* @TODO
+                        case 'image/gif':
+                        case 'image/jpeg':
+                        case 'image/png':
+                        case 'image/webp':
+
+                            $this->content->setImage(
+                                (string) $connection->getData()
+                            );
+
+                        break;
+                        */
+
                         default:
 
                             throw new \Exception(
