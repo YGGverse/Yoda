@@ -9,6 +9,7 @@ use \Yggverse\Gemini\Client\Response;
 use \Yggverse\Net\Address;
 
 use \Yggverse\Yoda\Model\Connection;
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Gemini
 {
@@ -55,43 +56,32 @@ class Gemini
 
             case 20: // ok
 
+                // Update content data
                 $this->_connection->setData(
                     $response->getBody()
                 );
 
+                // Detect MIME type
                 switch (true)
                 {
-                    case str_contains(
-                        $response->getMeta(),
-                        $this->_connection::MIME_TEXT_GEMINI
-                    ):
+                    case $mime = self::getMimeByMeta(
+                        $response->getMeta()
+                    ): break;
 
-                        $this->_connection->setMime(
-                            $this->_connection::MIME_TEXT_GEMINI
-                        );
+                    case $mime = Filesystem::getMimeByPath(
+                        $address->getPath()
+                    ): break;
 
-                    break;
+                    case $mime = Filesystem::getMimeByData(
+                        $response->getData()
+                    ): break;
 
-                    case str_contains(
-                        $response->getMeta(),
-                        $this->_connection::MIME_TEXT_PLAIN
-                    ):
-
-                        $this->_connection->setMime(
-                            $this->_connection::MIME_TEXT_PLAIN
-                        );
-
-                    break;
-
-                    default:
-
-                        throw new \Exception(
-                            sprintf(
-                                _('MIME type not implemented for %s'),
-                                $response->getMeta()
-                            )
-                        );
+                    default: $mime = null;
                 }
+
+                $this->_connection->setMime(
+                    $mime
+                );
 
             break;
 
@@ -107,10 +97,6 @@ class Gemini
                         '=> %s',
                         $response->getMeta()
                     )
-                );
-
-                $this->_connection->setMime(
-                    $this->_connection::MIME_TEXT_GEMINI
                 );
 
             break;
@@ -138,5 +124,26 @@ class Gemini
         $this->_connection->setCompleted(
             true
         );
+    }
+
+    public static function getMimeByMeta(
+        ?string $meta = null
+    ): ?string
+    {
+        if ($meta)
+        {
+            preg_match(
+                '/(?<mime>([\w]+\/[\w]+))/m',
+                $meta,
+                $match
+            );
+
+            if (isset($match['mime']))
+            {
+                return $match['mime'];
+            }
+        }
+
+        return null;
     }
 }
