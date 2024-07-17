@@ -39,7 +39,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
         $this->_pool->init(
             'mime',
-            255
+            32
         );
         $this->_pool->init(
             'data',
