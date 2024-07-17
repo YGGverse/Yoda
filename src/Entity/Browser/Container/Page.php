@@ -242,7 +242,11 @@ class Page
 
                         default:
 
-                            throw new \Exception(
+                            $this->title->setValue(
+                                _('Oops!')
+                            );
+
+                            $this->content->setPlain(
                                 _('MIME type not supported')
                             );
                     }
