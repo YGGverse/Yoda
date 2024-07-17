@@ -20,7 +20,7 @@ interface Pool
 
     public function set(
         string $key,
-        string $value,
+        string $value = '',
         string $flags = 'c',
         int $offset = 0,
         int $mode = 0644,
