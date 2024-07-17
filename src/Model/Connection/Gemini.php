@@ -63,7 +63,7 @@ class Gemini
                 {
                     case str_contains(
                         $response->getMeta(),
-                        self::MIME_TEXT_GEMINI
+                        $this->_connection::MIME_TEXT_GEMINI
                     ):
 
                         $this->_connection->setMime(
@@ -74,7 +74,7 @@ class Gemini
 
                     case str_contains(
                         $response->getMeta(),
-                        self::MIME_TEXT_PLAIN
+                        $this->_connection::MIME_TEXT_PLAIN
                     ):
 
                         $this->_connection->setMime(
