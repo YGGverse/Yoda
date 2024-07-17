@@ -18,34 +18,42 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
         // Set defaults
         $this->_pool->init(
-            'completed'
+            'completed',
+            1
         );
 
         $this->_pool->init(
-            'title'
+            'title',
+            255
         );
 
         $this->_pool->init(
-            'subtitle'
+            'subtitle',
+            255
         );
 
         $this->_pool->init(
-            'tooltip'
+            'tooltip',
+            255
         );
 
         $this->_pool->init(
-            'mime'
+            'mime',
+            255
         );
         $this->_pool->init(
-            'data'
-        );
-
-        $this->_pool->init(
-            'redirect'
+            'data',
+            // 1 Mb default
         );
 
         $this->_pool->init(
-            'request'
+            'redirect',
+            1024
+        );
+
+        $this->_pool->init(
+            'request',
+            // 1 Mb default
         );
     }
 
