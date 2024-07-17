@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Interface\Model;
 
-use \Yggverse\Yoda\Interface\Model\Pool;
+use \Yggverse\Yoda\Model\Pool;
 
 /*
  * Single async API for multiple protocols
