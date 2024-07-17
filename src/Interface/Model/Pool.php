@@ -10,12 +10,22 @@ namespace Yggverse\Yoda\Interface\Model;
  */
 interface Pool
 {
+    public function __construct(
+        ?string $namespace = null
+    );
+
     public function get(
         string $key
-    ): mixed;
+    ): ?string;
 
     public function set(
         string $key,
-        mixed $value
-    ): void;
+        string $value,
+        string $flags = 'c',
+        int $offset = 0,
+        int $mode = 0644,
+        ?string $encoding = null
+    ): int;
+
+    public function reset(): void;
 }
