@@ -46,5 +46,5 @@ interface Pool
         ?string $value = null
     ): void;
 
-    public function reset(): void;
+    public function clean(): void;
 }
