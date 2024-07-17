@@ -44,7 +44,7 @@ class Gemini
             case 11: // sensitive input
 
                 $this->_connection->setMime(
-                    $this->_connection::MIME_TEXT_GEMINI
+                    Filesystem::MIME_TEXT_GEMINI
                 );
 
                 $this->_connection->setRequest(
@@ -117,7 +117,7 @@ class Gemini
                 );
 
                 $this->_connection->setMime(
-                    $this->_connection::MIME_TEXT_GEMINI
+                    Filesystem::MIME_TEXT_GEMINI
                 );
         }
 

@@ -6,6 +6,9 @@ namespace Yggverse\Yoda\Model;
 
 class Filesystem
 {
+    public const MIME_TEXT_GEMINI = 'text/gemini';
+    public const MIME_TEXT_PLAIN  = 'text/plain';
+
     private string $_base;
 
     public function __construct(

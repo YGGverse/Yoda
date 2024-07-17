@@ -9,6 +9,7 @@ use \Yggverse\Net\Address;
 use \Yggverse\Yoda\Model\Connection\File;
 use \Yggverse\Yoda\Model\Connection\Gemini;
 use \Yggverse\Yoda\Model\Connection\Nex;
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 {
@@ -115,7 +116,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
                 );
 
                 $this->setMime(
-                    $this::MIME_TEXT_GEMINI
+                    Filesystem::MIME_TEXT_GEMINI
                 );
 
                 $this->setCompleted(

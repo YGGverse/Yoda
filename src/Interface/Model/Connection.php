@@ -21,9 +21,6 @@ interface Connection
         int $timeout = 5
     ): void;
 
-    public const MIME_TEXT_GEMINI = 'text/gemini';
-    public const MIME_TEXT_PLAIN  = 'text/plain';
-
     public function isCompleted(): bool;
 
     public function setCompleted(

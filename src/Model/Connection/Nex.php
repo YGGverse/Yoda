@@ -8,6 +8,7 @@ use \Yggverse\Net\Address;
 use \Yggverse\Nex\Client;
 
 use \Yggverse\Yoda\Model\Connection;
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Nex
 {
@@ -43,7 +44,7 @@ class Nex
             );
 
             $this->_connection->setMime(
-                $this->_connection::MIME_TEXT_PLAIN
+                Filesystem::MIME_TEXT_PLAIN
             );
         }
 
@@ -58,7 +59,7 @@ class Nex
             );
 
             $this->_connection->setMime(
-                $this->_connection::MIME_TEXT_GEMINI
+                Filesystem::MIME_TEXT_GEMINI
             );
         }
 

@@ -61,7 +61,7 @@ class File
                 }
 
                 $this->_connection->setMime(
-                    $this->_connection::MIME_TEXT_GEMINI
+                    Filesystem::MIME_TEXT_GEMINI
                 );
 
                 $this->_connection->setData(
@@ -94,7 +94,7 @@ class File
                     )
                 );
 
-                if ($this->_connection::MIME_TEXT_PLAIN == $this->_connection->getMime())
+                if (Filesystem::MIME_TEXT_PLAIN == $this->_connection->getMime())
                 {
                     $extension = pathinfo(
                         strval(
@@ -106,7 +106,7 @@ class File
                     if (in_array($extension, ['gmi', 'gemini']))
                     {
                         $this->_connection->setMime(
-                            $this->_connection::MIME_TEXT_GEMINI
+                            Filesystem::MIME_TEXT_GEMINI
                         );
                     }
                 }
