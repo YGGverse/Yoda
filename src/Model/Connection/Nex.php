@@ -43,8 +43,22 @@ class Nex
                 $response
             );
 
+            // Detect MIME type
+            switch (true)
+            {
+                case $mime = Filesystem::getMimeByPath(
+                    $address->getPath()
+                ): break;
+
+                case $mime = Filesystem::getMimeByData(
+                    $response
+                ): break;
+
+                default: $mime = Filesystem::MIME_TEXT_PLAIN;
+            }
+
             $this->_connection->setMime(
-                Filesystem::MIME_TEXT_PLAIN
+                $mime
             );
         }
 

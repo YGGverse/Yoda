@@ -86,30 +86,23 @@ class File
                     )
                 );
 
-                $this->_connection->setMime(
-                    strval(
-                        mime_content_type(
-                            $address->getPath()
-                        )
-                    )
-                );
-
-                if (Filesystem::MIME_TEXT_PLAIN == $this->_connection->getMime())
+                // Detect MIME type
+                switch (true)
                 {
-                    $extension = pathinfo(
-                        strval(
-                            $address->getPath()
-                        ),
-                        PATHINFO_EXTENSION
-                    );
+                    case $mime = Filesystem::getMimeByPath(
+                        $address->getPath()
+                    ): break;
 
-                    if (in_array($extension, ['gmi', 'gemini']))
-                    {
-                        $this->_connection->setMime(
-                            Filesystem::MIME_TEXT_GEMINI
-                        );
-                    }
+                    case $mime = mime_content_type(
+                        $address->getPath()
+                    ): break;
+
+                    default: $mime = Filesystem::MIME_TEXT_GEMINI;
                 }
+
+                $this->_connection->setMime(
+                    $mime
+                );
 
             break;
 
