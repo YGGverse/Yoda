@@ -33,21 +33,35 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
             break;
 
-            case 'gemini':
+            case 'gemini': // async
 
-                (new Gemini($this))->request(
-                    $address,
-                    $timeout
-                );
+                $pid = pcntl_fork();
+
+                if ($pid === 0)
+                {
+                    (new Gemini($this))->request(
+                        $address,
+                        $timeout
+                    );
+
+                    exit;
+                }
 
             break;
 
-            case 'nex':
+            case 'nex': // async
 
-                (new Nex($this))->request(
-                    $address,
-                    $timeout
-                );
+                $pid = pcntl_fork();
+
+                if ($pid === 0)
+                {
+                    (new Nex($this))->request(
+                        $address,
+                        $timeout
+                    );
+
+                    exit;
+                }
 
             break;
 
