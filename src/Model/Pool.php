@@ -18,12 +18,39 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
         );
     }
 
-    public function get(
+    public function init(
+        string $key,
+        int $size = 0xfffff,
+        string $flags = 'c',
+        int $mode = 0644,
+    ): ?\Shmop
+    {
+        if (isset($this->_data[$key]))
+        {
+            throw new \Exception;
+        }
+
+        return $this->_data[$key] = shmop_open(
+            crc32(
+                $this->_namespace . $key
+            ),
+            $flags,
+            $mode,
+            $size
+        );
+    }
+
+    public function read(
         string $key,
         int $start = 0,
         int $count = 0
     ): ?string
     {
+        if (!isset($this->_data[$key]))
+        {
+            throw new \Exception;
+        }
+
         if (empty($this->_data[$key]))
         {
             return null;
@@ -38,46 +65,75 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
         );
     }
 
-    public function set(
+    public function write(
         string $key,
-        ?string $value = null,
-        string $flags = 'c',
-        int $offset = 0,
-        int $mode = 0644,
-        ?string $encoding = null
+        string $value,
+        int $offset = 0
     ): int
     {
-        if (empty($value))
+        if (!isset($this->_data[$key]))
         {
-            // @TODO delete from memory
-
-            $this->_data[$key] = null;
-
-            return 0;
+            throw new \Exception;
         }
 
-        if ($this->_data[$key] = shmop_open(crc32($this->_namespace . $key), $flags, $mode, mb_strlen($value, $encoding)))
+        return shmop_write(
+            $this->_data[$key],
+            $value,
+            $offset
+        );
+    }
+
+    public function delete(
+        string $key
+    ): bool
+    {
+        if (!isset($this->_data[$key]))
         {
-            return shmop_write(
-                $this->_data[$key],
-                $value,
-                $offset
-            );
+            throw new \Exception;
         }
 
-        throw new \Exception;
+        $result = shmop_delete(
+            $this->_data[$key]
+        );
+
+        $this->_data[$key] = null;
+
+        return $result;
+    }
+
+    public function get(
+        string $key
+    ): string
+    {
+        return trim(
+            strval(
+                $this->read(
+                    $key
+                )
+            )
+        );
+    }
+
+    public function set(
+        string $key,
+        ?string $value = null
+    ): void
+    {
+        $this->write(
+            $key,
+            strval(
+                $value
+            )
+        );
     }
 
     public function reset(): void
     {
-        foreach ($this->_data as $data)
+        foreach ($this->_data as $key => $shmop)
         {
-            if ($data)
-            {
-                shmop_delete(
-                    $data
-                );
-            }
+            $this->delete(
+                $key
+            );
         }
 
         $this->_data = [];

@@ -17,34 +17,34 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         $this->_pool = $pool ? $pool : new Pool;
 
         // Set defaults
-        $this->_pool->set(
+        $this->_pool->init(
             'completed'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'title'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'subtitle'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'tooltip'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'mime'
         );
-        $this->_pool->set(
+        $this->_pool->init(
             'data'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'redirect'
         );
 
-        $this->_pool->set(
+        $this->_pool->init(
             'request'
         );
     }
