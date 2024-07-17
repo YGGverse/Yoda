@@ -157,12 +157,16 @@ class Page
                 // Redirect requested
                 if ($location = $connection->getRedirect())
                 {
+                    // Follow
                     $this->open(
                         $location
                     );
 
                     // Hide progressbar
                     $this->progressbar->hide();
+
+                    // Free shared memory pool
+                    $connection->close();
 
                     return false; // stop
                 }
@@ -177,6 +181,9 @@ class Page
 
                     // Hide progressbar
                     $this->progressbar->hide();
+
+                    // Free shared memory pool
+                    $connection->close();
 
                     return false; // stop
                 }
@@ -230,6 +237,9 @@ class Page
                     // Hide progressbar
                     $this->progressbar->hide();
 
+                    // Free shared memory pool
+                    $connection->close();
+
                     // Stop
                     return false;
                 }
@@ -249,6 +259,9 @@ class Page
 
                     // Hide progressbar
                     $this->progressbar->hide();
+
+                    // Free shared memory pool
+                    $connection->close();
 
                     // Stop
                     return false;

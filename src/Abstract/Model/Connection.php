@@ -218,4 +218,9 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 
         return null;
     }
+
+    public function close(): void
+    {
+        $this->_pool->reset(); // @TODO
+    }
 }

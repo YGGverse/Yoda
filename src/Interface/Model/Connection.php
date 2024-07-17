@@ -76,4 +76,6 @@ interface Connection
     public function unsetRequest(): void;
 
     public function getLength(): ?int;
+
+    public function close(): void;
 }
