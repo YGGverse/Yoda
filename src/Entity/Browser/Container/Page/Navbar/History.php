@@ -4,26 +4,28 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Back;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Forward;
+
+use \Yggverse\Yoda\Model\History as Memory;
 
 class History
 {
     public \GtkButtonBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Model\History $memory;
-
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar;
+    public Navbar $navbar;
+    public Memory $memory;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Back $back;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Forward $forward;
+    public Back $back;
+    public Forward $forward;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar
+        Navbar $navbar
     ) {
-        $this->memory = new \Yggverse\Yoda\Model\History();
+        $this->memory = new Memory();
 
         $this->navbar = $navbar;
 
