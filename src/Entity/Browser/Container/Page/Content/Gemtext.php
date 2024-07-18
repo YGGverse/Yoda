@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
+
 use \Yggverse\Gemtext\Document;
 use \Yggverse\Net\Address;
 
-class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
+class Gemtext extends Markup
 {
     public function setSource(
         string $value,

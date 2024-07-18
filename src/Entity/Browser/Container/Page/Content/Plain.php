@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
-class Plain extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
+use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
+
+class Plain extends Markup
 {
     public function setSource(
         string $value
