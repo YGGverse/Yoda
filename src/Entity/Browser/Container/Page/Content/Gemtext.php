@@ -15,8 +15,6 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
         bool $preformatted = false
     ): void
     {
-        $this->_source = $value;
-
         $document = new Document(
             $value
         );

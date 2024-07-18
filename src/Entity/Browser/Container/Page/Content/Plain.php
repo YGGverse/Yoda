@@ -10,8 +10,6 @@ class Plain extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Conten
         string $value
     ): void
     {
-        $this->_source = $value;
-
         $this->gtk->set_markup(
             sprintf(
                 '<tt>%s</tt>',
