@@ -41,6 +41,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
             'mime',
             32
         );
+
         $this->_pool->init(
             'data',
             // 1 Mb default
@@ -227,8 +228,13 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         return null;
     }
 
+    public function reset(): void
+    {
+        $this->_pool->reset();
+    }
+
     public function close(): void
     {
-        $this->_pool->clean();
+        $this->_pool->close();
     }
 }

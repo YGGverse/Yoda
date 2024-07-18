@@ -127,7 +127,18 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
         );
     }
 
-    public function clean(): void
+    public function reset(): void
+    {
+        foreach ($this->_data as $key => $shmop)
+        {
+            $this->set(
+                $key,
+                null
+            );
+        }
+    }
+
+    public function close(): void
     {
         foreach ($this->_data as $key => $shmop)
         {

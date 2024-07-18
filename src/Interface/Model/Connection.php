@@ -74,5 +74,7 @@ interface Connection
 
     public function getLength(): ?int;
 
+    public function reset(): void;
+
     public function close(): void;
 }
