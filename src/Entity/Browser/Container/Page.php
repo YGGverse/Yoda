@@ -11,6 +11,7 @@ use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 use \Yggverse\Yoda\Model\Connection;
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Page
 {
@@ -201,7 +202,7 @@ class Page
                     // Update content
                     switch ($connection->getMime())
                     {
-                        case 'text/gemini':
+                        case Filesystem::MIME_TEXT_GEMINI:
 
                             $title = null;
 
@@ -219,7 +220,7 @@ class Page
 
                         break;
 
-                        case 'text/plain':
+                        case Filesystem::MIME_TEXT_PLAIN:
 
                             $this->content->setPlain(
                                 (string) $connection->getData()
