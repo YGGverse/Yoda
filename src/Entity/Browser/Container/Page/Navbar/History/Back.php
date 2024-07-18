@@ -25,7 +25,7 @@ class Back extends Button
             );
         }
 
-        $this->navbar->history->refresh();
+        $this->navbar->refresh();
     }
 
     public function refresh(): void
