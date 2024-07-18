@@ -27,7 +27,7 @@ class Image
         string $data
     ): void
     {
-        $this->gtk->new_from_resource(
+        $this->gtk->set_from_resource(
             $data
         );
     }
