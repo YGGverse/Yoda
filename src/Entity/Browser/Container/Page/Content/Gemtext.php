@@ -236,7 +236,8 @@ class Gemtext extends Markup
     protected function _onActivateLink(
         \GtkLabel $label,
         string $href
-    ) {
+    ): bool
+    {
         // Format URL
         $url = $this->_url(
             $href
@@ -253,7 +254,7 @@ class Gemtext extends Markup
         $this->content->page->update();
 
         // Prevent propagation for supported protocols
-        if (in_array(
+        return in_array(
             parse_url(
                 $url,
                 PHP_URL_SCHEME
@@ -262,8 +263,8 @@ class Gemtext extends Markup
                 'nex',
                 'gemini',
                 'file'
-            ])
-        ) return true;
+            ]
+        );
     }
 
     private function _wrap(

@@ -58,7 +58,7 @@ abstract class Markup
                 \GtkLabel $label,
                 string $href
             ) {
-                $this->_onActivateLink(
+                return $this->_onActivateLink(
                     $label,
                     $href
                 );
@@ -69,7 +69,7 @@ abstract class Markup
     abstract protected function _onActivateLink(
         \GtkLabel $label,
         string $href
-    );
+    ): bool;
 
     abstract public function set(
         string $value
