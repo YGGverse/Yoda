@@ -177,6 +177,14 @@ class Page
                 // Response form requested
                 if ($request = $connection->getRequest())
                 {
+                    // Update title
+                    $this->title->set(
+                        _('Pending...'),
+                        $request['placeholder'] ? $request['placeholder']
+                                                : _('Response expected')
+                    );
+
+                    // Show response form
                     $this->response->show(
                         $request['placeholder'],
                         $request['visible']
