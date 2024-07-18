@@ -184,6 +184,15 @@ class Page
                         $connection->getTooltip()
                     );
 
+                    // Refresh header by new title if current page is active
+                    if ($this == $this->container->tab->getPage())
+                    {
+                        $this->container->browser->header->setTitle(
+                            $this->title->getValue(),
+                            $this->title->getSubtitle()
+                        );
+                    }
+
                     // Show response form
                     $this->response->show(
                         $request['placeholder'],
@@ -209,6 +218,15 @@ class Page
                         $connection->getTooltip()
                     );
 
+                    // Refresh header by new title if current page is active
+                    if ($this == $this->container->tab->getPage())
+                    {
+                        $this->container->browser->header->setTitle(
+                            $this->title->getValue(),
+                            $this->title->getSubtitle()
+                        );
+                    }
+
                     // Update content
                     $this->content->set(
                         $connection->getMime(),
@@ -232,6 +250,14 @@ class Page
                     $this->title->set(
                         _('Timeout')
                     );
+
+                    // Refresh header by new title if current page is active
+                    if ($this == $this->container->tab->getPage())
+                    {
+                        $this->container->browser->header->setTitle(
+                            $this->title->getValue()
+                        );
+                    }
 
                     // Update content
                     $this->content->set(

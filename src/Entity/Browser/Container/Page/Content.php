@@ -81,11 +81,22 @@ class Content
                     $title
                 );
 
-                if ($title) // use gemtext title on available
+                // Update title by gemtext H1 tag (on available)
+                if ($title)
                 {
+                    // Set new title
                     $this->page->title->setValue(
                         $title
                     );
+
+                    // Refresh header by new title if current page is active
+                    if ($this->page == $this->page->container->tab->getPage())
+                    {
+                        $this->page->container->browser->header->setTitle(
+                            $this->page->title->getValue(),
+                            $this->page->title->getSubtitle()
+                        );
+                    }
                 }
 
             break;
