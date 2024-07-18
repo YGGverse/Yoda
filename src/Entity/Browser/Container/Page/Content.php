@@ -70,13 +70,23 @@ class Content
         {
             case Filesystem::MIME_TEXT_GEMINI:
 
+                $title = null;
+
                 $document = new Gemtext(
                     $this
                 );
 
                 $document->set(
-                    $data
+                    $data,
+                    $title
                 );
+
+                if ($title) // use gemtext title on available
+                {
+                    $this->page->title->setValue(
+                        $title
+                    );
+                }
 
             break;
 
