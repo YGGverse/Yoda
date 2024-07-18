@@ -113,14 +113,20 @@ class Content
 
             break;
 
-            /* @TODO
-            case 'image/gif':
-            case 'image/jpeg':
-            case 'image/png':
-            case 'image/webp':
+            case Filesystem::MIME_IMAGE_GIF:
+            case Filesystem::MIME_IMAGE_JPEG:
+            case Filesystem::MIME_IMAGE_PNG:
+            case Filesystem::MIME_IMAGE_WEBP:
+
+                $document = new Image(
+                    $this
+                );
+
+                $document->set(
+                    $data
+                );
 
             break;
-            */
 
             default:
 
