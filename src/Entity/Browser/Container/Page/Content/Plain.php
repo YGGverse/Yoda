@@ -21,4 +21,9 @@ class Plain extends Markup
             )
         );
     }
+
+    protected function _onActivateLink(
+        \GtkLabel $label,
+        string $href
+    ) {}
 }
