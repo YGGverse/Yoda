@@ -6,6 +6,11 @@ namespace Yggverse\Yoda\Model;
 
 class Filesystem
 {
+    public const MIME_IMAGE_GIF   = 'image/gif';
+    public const MIME_IMAGE_JPEG  = 'image/jpeg';
+    public const MIME_IMAGE_PNG   = 'image/png';
+    public const MIME_IMAGE_WEBP  = 'image/webp';
+
     public const MIME_TEXT_GEMINI = 'text/gemini';
     public const MIME_TEXT_PLAIN  = 'text/plain';
 
