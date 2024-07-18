@@ -77,7 +77,7 @@ class Content
                     $this
                 );
 
-                $document->setSource(
+                $document->set(
                     $data
                 );
 
@@ -89,7 +89,7 @@ class Content
                     $this
                 );
 
-                $document->setSource(
+                $document->set(
                     $data
                 );
 
@@ -110,7 +110,7 @@ class Content
                     $this
                 );
 
-                $document->setSource(
+                $document->set(
                     _('MIME type not supported')
                 );
         }

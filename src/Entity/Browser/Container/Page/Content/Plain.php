@@ -8,7 +8,7 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
 
 class Plain extends Markup
 {
-    public function setSource(
+    public function set(
         string $value
     ): void
     {

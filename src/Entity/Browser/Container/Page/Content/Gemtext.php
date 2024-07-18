@@ -11,7 +11,7 @@ use \Yggverse\Net\Address;
 
 class Gemtext extends Markup
 {
-    public function setSource(
+    public function set(
         string $value,
         string | null &$title = null,
         bool $preformatted = false

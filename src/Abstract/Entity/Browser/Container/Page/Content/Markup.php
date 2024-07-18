@@ -71,7 +71,7 @@ abstract class Markup
         string $href
     );
 
-    abstract public function setSource(
+    abstract public function set(
         string $value
     ): void;
 }
