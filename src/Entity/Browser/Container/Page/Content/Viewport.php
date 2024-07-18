@@ -48,6 +48,6 @@ class Viewport
         );
 
         // Render
-        $this->gtk->show();
+        $this->gtk->show_all();
     }
 }
