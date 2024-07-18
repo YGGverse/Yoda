@@ -36,6 +36,8 @@ class Gemini
             )
         );
 
+        // @TODO reset title, mime, data
+
         // Route status code
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
         switch ($response->getCode())
@@ -70,11 +72,6 @@ class Gemini
 
             case 20: // ok
 
-                // Update content data
-                $this->_connection->setData(
-                    $response->getBody()
-                );
-
                 // Detect MIME type
                 switch (true)
                 {
@@ -93,8 +90,29 @@ class Gemini
                     default: $mime = Filesystem::MIME_TEXT_GEMINI;
                 }
 
+                // Set MIME
                 $this->_connection->setMime(
                     $mime
+                );
+
+                // Set title
+                $this->_connection->setTitle(
+                    $address->getHost()
+                );
+
+                // Set subtitle
+                $this->_connection->setSubtitle(
+                    $response->getMeta()
+                );
+
+                // Set tooltip
+                $this->_connection->setTooltip(
+                    $address->get()
+                );
+
+                // Update content data
+                $this->_connection->setData(
+                    $response->getBody()
                 );
 
             break;
@@ -106,11 +124,26 @@ class Gemini
                     _('Redirect...')
                 );
 
+                $this->_connection->setSubtitle(
+                    $response->getMeta()
+                );
+
+                $this->_connection->setTooltip(
+                    sprintf(
+                        _('Redirect to %s'),
+                        $response->getMeta()
+                    )
+                );
+
                 $this->_connection->setData(
                     sprintf(
                         '=> %s',
                         $response->getMeta()
                     )
+                );
+
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
                 );
 
             break;
@@ -119,6 +152,24 @@ class Gemini
 
                 $this->_connection->setTitle(
                     _('Oops!')
+                );
+
+                $this->_connection->setSubtitle(
+                    sprintf(
+                        'Could not open request (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setTooltip(
+                    sprintf(
+                        'Could not open request (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
                 );
 
                 $this->_connection->setData(

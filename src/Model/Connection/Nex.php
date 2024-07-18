@@ -33,16 +33,6 @@ class Nex
 
         if ($response)
         {
-            $this->_connection->setTitle(
-                strval(
-                    $address->getHost()
-                )
-            );
-
-            $this->_connection->setData(
-                $response
-            );
-
             // Detect MIME type
             switch (true)
             {
@@ -57,23 +47,54 @@ class Nex
                 default: $mime = Filesystem::MIME_TEXT_PLAIN;
             }
 
+            // Set MIME
             $this->_connection->setMime(
                 $mime
+            );
+
+            // Set title
+            $this->_connection->setTitle(
+                $address->getHost()
+            );
+
+            // Set subtitle
+            $this->_connection->setSubtitle(
+                $mime
+            );
+
+            // Set tooltip
+            $this->_connection->setTooltip(
+                $address->get()
+            );
+
+            $this->_connection->setData(
+                $response
             );
         }
 
         else
         {
+            $this->_connection->setMime(
+                Filesystem::MIME_TEXT_PLAIN
+            );
+
             $this->_connection->setTitle(
                 _('Oops!')
             );
 
-            $this->_connection->setData(
-                _('Could not open request')
+            $this->_connection->setSubtitle(
+                sprintf(
+                    _('Could not open request - %s'),
+                    $address->get()
+                )
             );
 
-            $this->_connection->setMime(
-                Filesystem::MIME_TEXT_GEMINI
+            $this->_connection->setTooltip(
+                $address->get()
+            );
+
+            $this->_connection->setData(
+                _('Could not open request')
             );
         }
 

@@ -23,20 +23,6 @@ class File
         Address $address
     ): void
     {
-        $this->_connection->setTitle(
-            basename(
-                $address->getPath()
-            )
-        );
-
-        $this->_connection->setSubtitle(
-            $address->getPath()
-        );
-
-        $this->_connection->setTooltip(
-            $address->getPath()
-        );
-
         switch (true)
         {
             case ( // is directory
@@ -44,6 +30,29 @@ class File
                     $address->getPath()
                 )
             ):
+                // Set MIME
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
+                );
+
+                // Set title
+                $this->_connection->setTitle(
+                    basename(
+                        $address->getPath()
+                    )
+                );
+
+                // Set subtitle
+                $this->_connection->setSubtitle(
+                    $address->getPath()
+                );
+
+                // Set tooltip
+                $this->_connection->setTooltip(
+                    $address->getPath()
+                );
+
+                // Set data
                 $tree = [];
 
                 foreach ($list as $item)
@@ -60,10 +69,6 @@ class File
                     );
                 }
 
-                $this->_connection->setMime(
-                    Filesystem::MIME_TEXT_GEMINI
-                );
-
                 $this->_connection->setData(
                     implode(
                         PHP_EOL,
@@ -78,14 +83,6 @@ class File
             ) && is_readable(
                 $address->getPath()
             ):
-                $this->_connection->setData(
-                    strval(
-                        file_get_contents(
-                            $address->getPath()
-                        )
-                    )
-                );
-
                 // Detect MIME type
                 switch (true)
                 {
@@ -100,18 +97,62 @@ class File
                     default: $mime = Filesystem::MIME_TEXT_GEMINI;
                 }
 
+                // Set MIME
                 $this->_connection->setMime(
                     $mime
+                );
+
+                // Set title
+                $this->_connection->setTitle(
+                    basename(
+                        $address->getPath()
+                    )
+                );
+
+                // Set subtitle
+                $this->_connection->setSubtitle(
+                    $mime
+                );
+
+                // Set tooltip
+                $this->_connection->setTooltip(
+                    $address->getPath()
+                );
+
+                // Set data
+                $this->_connection->setData(
+                    strval(
+                        file_get_contents(
+                            $address->getPath()
+                        )
+                    )
                 );
 
             break;
 
             default:
 
+                // Set MIME
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
+                );
+
+                // Set title
                 $this->_connection->setTitle(
                     _('Failure')
                 );
 
+                // Set subtitle
+                $this->_connection->setSubtitle(
+                    $address->getPath()
+                );
+
+                // Set tooltip
+                $this->_connection->setTooltip(
+                    $address->getPath()
+                );
+
+                // Set data
                 $this->_connection->setData(
                     _('Could not open location')
                 );
