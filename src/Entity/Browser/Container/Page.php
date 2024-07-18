@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
+use \Yggverse\Yoda\Entity\Browser\Container;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Title;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar;
@@ -17,17 +19,17 @@ class Page
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container $container;
+    public Container $container;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Title $title;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar $navbar;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar $progressbar;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content $content;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response $response;
+    public Title $title;
+    public Navbar $navbar;
+    public Progressbar $progressbar;
+    public Content $content;
+    public Response $response;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container $container
+        Container $container
     ) {
         // Init dependencies
         $this->container = $container;
