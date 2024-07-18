@@ -57,9 +57,6 @@ class Content
         $this->gtk->add(
             $this->viewport->gtk
         );
-
-        // Render
-        $this->gtk->show();
     }
 
     public function set(
@@ -115,11 +112,11 @@ class Content
                 );
         }
 
-        $this->viewport->gtk->add(
-            $document->gtk
+        $this->viewport->set(
+            $document
         );
 
-        //$this->gtk->show_all();
+        $this->gtk->show();
     }
 
     public function getSource(): ?string
