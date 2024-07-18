@@ -62,7 +62,7 @@ class Save
                     {
                         file_put_contents(
                             $dialog->get_filename(),
-                            $page->content->data->raw
+                            $page->content->getSource()
                         );
                     }
                 }

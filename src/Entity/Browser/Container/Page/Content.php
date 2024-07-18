@@ -4,29 +4,37 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Data;
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
+
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Gemtext;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Image;
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Plain;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Viewport;
+
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Content
 {
     public \GtkScrolledWindow $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
+    public Page $page;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Data $data;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Viewport $viewport;
+    public Viewport $viewport;
 
     // Defaults
     private int $_margin = 8;
 
+    // Extras
+    private ?string $_source = null;
+
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Page $page
+        Page $page
     ) {
         $this->page = $page;
 
-        // Init container
+        // Init scrolled window container
         $this->gtk = new \GtkScrolledWindow;
 
         $this->gtk->set_margin_start(
@@ -41,19 +49,9 @@ class Content
             $this->_margin
         );
 
-        // Init viewport
-        // to integrate scrolled window features for data label
+        // Init scrolled window viewport
         $this->viewport = new Viewport(
             $this
-        );
-
-        // Init data label
-        $this->data = new Data(
-            $this
-        );
-
-        $this->viewport->gtk->add(
-            $this->data->gtk
         );
 
         $this->gtk->add(
@@ -64,28 +62,73 @@ class Content
         $this->gtk->show();
     }
 
+    public function set(
+        ?string $data,
+        ?string $mime
+    ): void
+    {
+        $this->_source = $data;
+
+        switch ($mime)
+        {
+            case Filesystem::MIME_TEXT_GEMINI:
+
+                $document = new Gemtext(
+                    $this
+                );
+
+                $document->setSource(
+                    $data
+                );
+
+            break;
+
+            case Filesystem::MIME_TEXT_PLAIN:
+
+                $document = new Plain(
+                    $this
+                );
+
+                $document->setSource(
+                    $data
+                );
+
+            break;
+
+            /* @TODO
+            case 'image/gif':
+            case 'image/jpeg':
+            case 'image/png':
+            case 'image/webp':
+
+            break;
+            */
+
+            default:
+
+                $document = new Plain(
+                    $this
+                );
+
+                $document->setSource(
+                    _('MIME type not supported')
+                );
+        }
+
+        $this->viewport->gtk->add(
+            $document->gtk
+        );
+
+        //$this->gtk->show_all();
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->_source;
+    }
+
     public function refresh()
     {
         // @TODO
-    }
-
-    public function setGemtext(
-        ?string $data = null,
-        ?string &$title = null
-    ): void
-    {
-        $this->data->setGemtext(
-            $data,
-            $title
-        );
-    }
-
-    public function setPlain(
-        ?string $data = null
-    ): void
-    {
-        $this->data->setPlain(
-            $data
-        );
     }
 }

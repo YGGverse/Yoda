@@ -11,7 +11,6 @@ use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 use \Yggverse\Yoda\Model\Connection;
-use \Yggverse\Yoda\Model\Filesystem;
 
 class Page
 {
@@ -200,57 +199,10 @@ class Page
                     );
 
                     // Update content
-                    switch ($connection->getMime())
-                    {
-                        case Filesystem::MIME_TEXT_GEMINI:
-
-                            $title = null;
-
-                            $this->content->setGemtext(
-                                (string) $connection->getData(),
-                                $title
-                            );
-
-                            if ($title)
-                            {
-                                $this->title->setValue(
-                                    $title
-                                );
-                            }
-
-                        break;
-
-                        case Filesystem::MIME_TEXT_PLAIN:
-
-                            $this->content->setPlain(
-                                (string) $connection->getData()
-                            );
-
-                        break;
-
-                        /* @TODO
-                        case 'image/gif':
-                        case 'image/jpeg':
-                        case 'image/png':
-                        case 'image/webp':
-
-                            $this->content->setImage(
-                                (string) $connection->getData()
-                            );
-
-                        break;
-                        */
-
-                        default:
-
-                            $this->title->setValue(
-                                _('Oops!')
-                            );
-
-                            $this->content->setPlain(
-                                _('MIME type not supported')
-                            );
-                    }
+                    $this->content->set(
+                        $connection->getData(),
+                        $connection->getMime()
+                    );
 
                     // Hide progressbar
                     $this->progressbar->hide();
@@ -271,7 +223,7 @@ class Page
                     );
 
                     // Update content
-                    $this->content->setGemtext(
+                    $this->content->set(
                         _('Response time reached')
                     );
 
