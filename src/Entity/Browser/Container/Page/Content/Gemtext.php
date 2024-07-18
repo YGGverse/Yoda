@@ -129,7 +129,7 @@ class Gemtext extends Markup
                     else
                     {
                         $line[] = sprintf(
-                            '<a href="%s" title="%s">%s</a>',
+                            '<a href="%s" title="%s"><span underline="none">%s</span></a>',
                             $this->_url(
                                 $entity->getAddress()
                             ),
