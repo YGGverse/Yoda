@@ -179,9 +179,9 @@ class Page
                 {
                     // Update title
                     $this->title->set(
-                        _('Pending...'),
-                        $request['placeholder'] ? $request['placeholder']
-                                                : _('Response expected')
+                        $connection->getTitle(),
+                        $connection->getSubtitle(),
+                        $connection->getTooltip()
                     );
 
                     // Show response form

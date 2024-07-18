@@ -43,6 +43,20 @@ class Gemini
             case 10: // response expected
             case 11: // sensitive input
 
+                $this->_connection->setTitle(
+                    _('Pending...')
+                );
+
+                $this->_connection->setSubtitle(
+                    $response->getMeta() ? $response->getMeta()
+                                         : _('Response expected')
+                );
+
+                $this->_connection->setTooltip(
+                    $response->getMeta() ? $response->getMeta()
+                                         : _('Response expected')
+                );
+
                 $this->_connection->setMime(
                     Filesystem::MIME_TEXT_GEMINI
                 );
@@ -89,7 +103,7 @@ class Gemini
                      // show link, no follow
 
                 $this->_connection->setTitle(
-                    _('Redirect!')
+                    _('Redirect...')
                 );
 
                 $this->_connection->setData(
