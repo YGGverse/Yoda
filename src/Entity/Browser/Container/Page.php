@@ -134,6 +134,9 @@ class Page
             _('Loading...')
         );
 
+        // Refresh navbar
+        $this->navbar->refresh();
+
         // Show progressbar
         $this->progressbar->infinitive();
 
