@@ -63,8 +63,8 @@ class Content
     }
 
     public function set(
-        ?string $data,
-        ?string $mime
+        ?string $mime,
+        ?string $data
     ): void
     {
         $this->_source = $data;

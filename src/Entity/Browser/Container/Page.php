@@ -13,6 +13,7 @@ use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 use \Yggverse\Yoda\Model\Connection;
+use \Yggverse\Yoda\Model\Filesystem;
 
 class Page
 {
@@ -202,8 +203,8 @@ class Page
 
                     // Update content
                     $this->content->set(
-                        $connection->getData(),
-                        $connection->getMime()
+                        $connection->getMime(),
+                        $connection->getData()
                     );
 
                     // Hide progressbar
@@ -226,6 +227,7 @@ class Page
 
                     // Update content
                     $this->content->set(
+                        Filesystem::MIME_TEXT_PLAIN,
                         _('Response time reached')
                     );
 
