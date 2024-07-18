@@ -27,8 +27,21 @@ class Image
         string $data
     ): void
     {
-        $this->gtk->set_from_resource(
+        $tmp = tmpfile();
+
+        fwrite(
+            $tmp,
             $data
+        );
+
+        $this->gtk->set_from_file(
+            stream_get_meta_data(
+                $tmp
+            )['uri']
+        );
+
+        fclose(
+            $tmp
         );
     }
 }
