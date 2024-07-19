@@ -89,6 +89,11 @@ class Content
                         $title
                     );
 
+                    // Update tooltip
+                    $this->page->title->setTooltip(
+                        $title
+                    );
+
                     // Refresh header by new title if current page is active
                     if ($this->page === $this->page->container->tab->get())
                     {
