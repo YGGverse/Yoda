@@ -49,9 +49,9 @@ apt install libpq-dev\
             libwnck-dev
 ```
 
-#### PHP
+#### [PHP](https://github.com/php/php-src)
 
-Make sure [PHP](https://github.com/php/php-src) version is 8.1 or above and configured with following components:
+Make sure version 8.1 or above installed and configured with following minimals:
 
 ```
 ./configure --with-openssl\
@@ -63,15 +63,14 @@ Make sure [PHP](https://github.com/php/php-src) version is 8.1 or above and conf
             --enable-pcntl
 ```
 
-#### PHP-CPP
+#### [PHP-CPP](https://github.com/fast-debug/PHP-CPP)
 
-PHP-GTK3 require [PHP-CPP](https://github.com/fast-debug/PHP-CPP) extension to interact native GTK3 libraries.
+PHP-CPP required to interact native GTK3 libraries.
 Use official [documentation](https://www.php-cpp.com/documentation/install) for details.
 
-#### PHP-GTK
+#### [PHP-GTK](https://github.com/scorninpc/php-gtk3)
 
-Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get binaries.
-Follow official installation [guide](https://github.com/scorninpc/php-gtk3#acknowledgements) for details.
+Follow [installation guide](https://github.com/scorninpc/php-gtk3#acknowledgements) or use [binaries](https://github.com/scorninpc/php-gtk3/releases).
 
 #### Yoda
 
