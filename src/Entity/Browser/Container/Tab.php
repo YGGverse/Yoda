@@ -37,7 +37,13 @@ class Tab
         foreach ($this->container->browser->database->getSession() as $session)
         {
             $this->appendPage(
-                $session->request
+                $session->request,
+                boolval( // open
+                    parse_url(
+                        $session->request,
+                        PHP_URL_SCHEME
+                    )
+                )
             );
         }
 
@@ -105,6 +111,7 @@ class Tab
 
     public function appendPage(
         ?string $request = null,
+        bool $open = true,
         bool $focus = true
     ): void
     {
@@ -124,9 +131,16 @@ class Tab
             $this->_reorderable
         );
 
-        if ($request)
+        if ($open)
         {
             $page->open(
+                $request
+            );
+        }
+
+        else
+        {
+            $page->init(
                 $request
             );
         }

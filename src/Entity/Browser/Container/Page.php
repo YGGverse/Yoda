@@ -94,6 +94,15 @@ class Page
         $this->content->refresh();
     }
 
+    public function init(
+        ?string $request = null
+    ): void
+    {
+        $this->navbar->request->setValue(
+            $request
+        );
+    }
+
     public function open(
         ?string $request = null,
         bool $history = true
