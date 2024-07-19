@@ -252,13 +252,20 @@ class Tab
 
     public function updateSession(): void
     {
-        $this->container->browser->database->cleanSession();
+        $pid = pcntl_fork();
 
-        foreach ($this->_page as $page)
+        if ($pid === 0)
         {
-            $this->container->browser->database->addSession(
-                $page->navbar->request->getValue()
-            );
+            $this->container->browser->database->cleanSession();
+
+            foreach ($this->_page as $page)
+            {
+                $this->container->browser->database->addSession(
+                    $page->navbar->request->getValue()
+                );
+            }
+
+            exit;
         }
     }
 }
