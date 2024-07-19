@@ -65,13 +65,13 @@ Make sure PHP version is 8.1 or above and includes following components:
 
 #### PHP-CPP
 
-[PHP-GTK](#PHP-GTK) require [PHP-CPP](https://github.com/fast-debug/PHP-CPP) extension to interact native GTK3 libraries.
+PHP-GTK require [PHP-CPP](https://github.com/fast-debug/PHP-CPP) extension to interact native GTK3 libraries.
 
 Use official [documentation](https://www.php-cpp.com/documentation) for details.
 
 #### PHP-GTK
 
-Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases).
+Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get binaries.
 
 Follow official [guide](https://github.com/scorninpc/php-gtk3#acknowledgements) for details.
 
