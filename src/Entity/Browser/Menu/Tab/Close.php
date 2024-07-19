@@ -33,9 +33,7 @@ class Close
             'activate',
             function()
             {
-                $this->tab->menu->browser->container->tab->closePage(
-                    null // active
-                );
+                $this->tab->menu->browser->container->tab->close();
             }
         );
     }

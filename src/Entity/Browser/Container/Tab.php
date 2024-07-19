@@ -76,9 +76,7 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->reorderPage(
-                    null // all
-                );
+                $this->reorder();
             }
         );
 
@@ -89,9 +87,7 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->reorderPage(
-                    null // all
-                );
+                $this->reorder();
             }
         );
 
@@ -102,9 +98,21 @@ class Tab
                 ?\GtkWidget $child,
                 int $page_num
             ) {
-                $this->reorderPage(
-                    null // all
-                );
+                $this->reorder();
+            }
+        );
+
+        $this->gtk->connect(
+            'button-press-event',
+            function (
+                ?\GtkNotebook $self,
+                ?\GdkEvent $event
+            ) {
+                // Close tab on double click
+                if ($event->type == 5) // @TODO PHP-GTK3 Gdk.EventType.DOUBLE_BUTTON_PRESS
+                {
+                    $this->close();
+                }
             }
         );
     }
@@ -185,7 +193,7 @@ class Tab
         return $this->_page[$page_num];
     }
 
-    public function closePage(
+    public function close(
         ?int $page_num = null
     ): void
     {
@@ -196,58 +204,50 @@ class Tab
                     $page->gtk
                 )
             );
+
+            $this->reorder();
         }
     }
 
-    public function reorderPage(
-        ?int $page_num = null,
+    public function reorder(
         bool $session = true
     ): void
     {
-        // Reorder all pages
-        if (is_null($page_num))
+        // Init new index
+        $_page = [];
+
+        foreach ($this->_page as $page)
         {
-            // Init new index
-            $_page = [];
-
-            foreach ($this->_page as $page)
-            {
-                // Get current entity $page_num
-                $page_num = $this->gtk->page_num(
-                    $page->gtk
-                );
-
-                // Skip deleted
-                if ($page_num === -1)
-                {
-                    // Prevent session update
-                    $session = false;
-
-                    continue;
-                }
-
-                // Update position
-                $_page[$page_num] = $page;
-            }
-
-            // Reorder entities
-            $this->_page = $_page;
-
-            ksort(
-                $this->_page
+            // Get current entity $page_num
+            $page_num = $this->gtk->page_num(
+                $page->gtk
             );
 
-            // Update session
-            if ($session)
+            // Skip deleted
+            if ($page_num === -1)
             {
-                $this->updateSession();
+                // Prevent session update
+                $session = false;
+
+                continue;
             }
+
+            // Update position
+            $_page[$page_num] = $page;
         }
 
-        // Reorder by $page_num
-        else throw new \Exception(
-            'Reorder by $page_num value not implemented'
+        // Reorder entities
+        $this->_page = $_page;
+
+        ksort(
+            $this->_page
         );
+
+        // Update session
+        if ($session)
+        {
+            $this->updateSession();
+        }
     }
 
     public function updateSession(): void
