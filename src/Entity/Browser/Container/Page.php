@@ -244,11 +244,18 @@ class Page
                             $this->navbar->request->getValue()
                         );
 
-                        // Save request in database
-                        $this->container->browser->database->renewHistory(
-                            $this->navbar->request->getValue(),
-                            $this->title->getValue()
-                        );
+                        // Save request in database (on background)
+                        $pid = pcntl_fork();
+
+                        if ($pid === 0)
+                        {
+                            $this->container->browser->database->renewHistory(
+                                $this->navbar->request->getValue(),
+                                $this->title->getValue()
+                            );
+
+                            exit;
+                        }
                     }
 
                     // Stop
