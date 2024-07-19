@@ -26,4 +26,9 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Na
             $entry->get_text()
         );
     }
+
+    protected function _onChanged(
+        \GtkEntry $entry
+    ): void
+    {}
 }
