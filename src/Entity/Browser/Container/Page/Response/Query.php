@@ -36,6 +36,11 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
         $this->response->refresh();
     }
 
+    protected function _onChanged(
+        \GtkEntry $entry
+    ): void
+    {}
+
     public function refresh(): void
     {
         // @TODO

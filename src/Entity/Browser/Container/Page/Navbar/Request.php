@@ -29,19 +29,10 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         $this->navbar->page->container->tab->updateSession();
     }
 
-    // Update setter with session update feature
-    public function setValue(
-        ?string $value = null
+    protected function _onChanged(
+        \GtkEntry $entry
     ): void
     {
-        $this->gtk->set_text(
-            is_null($value) ? $this->_value : trim(
-                strval(
-                    $value
-                )
-            )
-        );
-
         // Update session on tab initiated only
         if (isset($this->navbar->page->container->tab))
         {

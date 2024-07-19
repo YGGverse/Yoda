@@ -66,6 +66,17 @@ abstract class Entry
                 );
             }
         );
+
+        $this->gtk->connect(
+            'changed',
+            function (
+                \GtkEntry $entry
+            ) {
+                $this->_onChanged(
+                    $entry
+                );
+            }
+        );
     }
 
     abstract protected function _onActivate(
@@ -75,6 +86,10 @@ abstract class Entry
     abstract protected function _onKeyRelease(
         \GtkEntry $entry,
         \GdkEvent $event
+    ): void;
+
+    abstract protected function _onChanged(
+        \GtkEntry $entry
     ): void;
 
     public function setLength(
