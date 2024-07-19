@@ -33,18 +33,13 @@ class Tab
             $this->_scrollable
         );
 
-        // Init previous session @TODO
-        $this->appendPage(
-            'gemini://yggverse.cities.yesterweb.org'
-        );
-
-        $this->appendPage(
-            'gemini://tlgs.one'
-        );
-
-        $this->appendPage(
-            'nex://nightfall.city'
-        );
+        // Restore previous session
+        foreach ($this->container->browser->database->getSession() as $session)
+        {
+            $this->appendPage(
+                $session->request
+            );
+        }
 
         // Init events
         $this->gtk->connect(
