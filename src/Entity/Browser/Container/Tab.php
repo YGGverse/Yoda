@@ -64,6 +64,19 @@ class Tab
         );
 
         $this->gtk->connect(
+            'page-added',
+            function (
+                ?\GtkNotebook $self,
+                ?\GtkWidget $child,
+                int $page_num
+            ) {
+                $this->reorderPage(
+                    null // all
+                );
+            }
+        );
+
+        $this->gtk->connect(
             'page-removed',
             function (
                 ?\GtkNotebook $self,
@@ -173,7 +186,8 @@ class Tab
     }
 
     public function reorderPage(
-        ?int $page_num = null
+        ?int $page_num = null,
+        bool $session = true
     ): void
     {
         // Reorder all pages
@@ -192,6 +206,9 @@ class Tab
                 // Skip deleted
                 if ($page_num === -1)
                 {
+                    // Prevent session update
+                    $session = false;
+
                     continue;
                 }
 
@@ -199,8 +216,23 @@ class Tab
                 $_page[$page_num] = $page;
             }
 
-            // Reorder
+            // Reorder entities
             $this->_page = $_page;
+
+            // Update session
+            if ($session)
+            {
+                $this->container->browser->database->cleanSession();
+
+                ksort($_page);
+
+                foreach ($_page as $page)
+                {
+                    $this->container->browser->database->addSession(
+                        $page->navbar->request->getValue()
+                    );
+                }
+            }
         }
 
         // Reorder by $page_num
