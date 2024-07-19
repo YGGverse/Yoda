@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
+
 class Title
 {
     public \GtkLabel $gtk;
@@ -12,7 +14,7 @@ class Title
     public ?string $subtitle = null;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
+    public Page $page;
 
     // Defaults
     private int $_ellipsize = 3;
@@ -22,7 +24,7 @@ class Title
     private ?string $_tooltip = null;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Page $page,
+        Page $page,
     ) {
         // Init dependencies
         $this->page = $page;
