@@ -103,19 +103,7 @@ class Tab
             }
         );
 
-        $this->gtk->connect(
-            'button-press-event',
-            function (
-                ?\GtkNotebook $self,
-                ?\GdkEvent $event
-            ) {
-                // Close tab on double click
-                if ($event->type == 5) // @TODO PHP-GTK3 Gdk.EventType.DOUBLE_BUTTON_PRESS
-                {
-                    $this->close();
-                }
-            }
-        );
+
     }
 
     public function append(
@@ -130,9 +118,32 @@ class Tab
             $this->container
         );
 
+        // Create event box to listen for double click on title label
+        $label = new \GtkEventBox;
+
+        $label->add(
+            $page->title->gtk
+        );
+
+        $label->show_all();
+
+        $label->connect(
+            'button-press-event',
+            function (
+                ?\GtkEventBox $self,
+                ?\GdkEvent $event
+            ) {
+                // Close tab on double click
+                if ($event->type == 5) // @TODO PHP-GTK3 Gdk.EventType.DOUBLE_BUTTON_PRESS
+                {
+                    $this->close();
+                }
+            }
+        );
+
         $this->gtk->append_page(
             $page->gtk,
-            $page->title->gtk
+            $label
         );
 
         $this->gtk->set_tab_reorderable(
