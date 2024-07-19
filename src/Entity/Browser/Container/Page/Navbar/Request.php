@@ -36,7 +36,15 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         // Update session on tab initiated only
         if (isset($this->navbar->page->container->tab))
         {
-            $this->navbar->page->container->tab->updateSession();
+            \Gtk::timeout_add(
+                1000, // wait for one second to apply changes
+                function()
+                {
+                    $this->navbar->page->container->tab->updateSession();
+
+                    return false; // stop
+                }
+            );
         }
     }
 }
