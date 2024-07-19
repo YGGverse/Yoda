@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
+use \Yggverse\Yoda\Entity\Browser\Container;
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Tab
@@ -11,7 +12,7 @@ class Tab
     public \GtkNotebook $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container $container;
+    public Container $container;
 
     // Defaults
     private bool $_reorderable = true;
@@ -21,7 +22,7 @@ class Tab
     private array $_page = [];
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container $container
+        Container $container
     ) {
         // Init dependency
         $this->container = $container;
