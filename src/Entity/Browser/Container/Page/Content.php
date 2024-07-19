@@ -90,7 +90,7 @@ class Content
                     );
 
                     // Refresh header by new title if current page is active
-                    if ($this->page === $this->page->container->tab->getPage())
+                    if ($this->page === $this->page->container->tab->get())
                     {
                         $this->page->container->browser->header->setTitle(
                             $this->page->title->getValue(),

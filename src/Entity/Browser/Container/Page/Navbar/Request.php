@@ -16,7 +16,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
             $entry->get_text()
         );
 
-        $this->navbar->page->container->tab->updateSession();
+        $this->navbar->page->container->tab->update();
     }
 
     protected function _onKeyRelease(
@@ -26,7 +26,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
     {
         $this->navbar->refresh();
 
-        $this->navbar->page->container->tab->updateSession();
+        $this->navbar->page->container->tab->update();
     }
 
     protected function _onChanged(
@@ -40,7 +40,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
                 1000, // wait for one second to apply changes
                 function()
                 {
-                    $this->navbar->page->container->tab->updateSession();
+                    $this->navbar->page->container->tab->update();
 
                     return false; // stop
                 }

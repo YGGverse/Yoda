@@ -36,7 +36,7 @@ class Tab
         // Restore previous session
         foreach ($this->container->browser->database->getSession() as $session)
         {
-            $this->appendPage(
+            $this->append(
                 $session->request,
                 boolval( // open
                     parse_url(
@@ -56,7 +56,7 @@ class Tab
                 int $page_num
             ) {
                 // Update header bar title
-                if ($page = $this->getPage($page_num))
+                if ($page = $this->get($page_num))
                 {
                     $this->container->browser->header->setTitle(
                         $page->title->getValue(),
@@ -117,7 +117,7 @@ class Tab
         );
     }
 
-    public function appendPage(
+    public function append(
         ?string $request = null,
         bool $open = true,
         bool $focus = true
@@ -167,9 +167,9 @@ class Tab
         $this->gtk->show();
     }
 
-    public function getPage(
+    public function get(
         ?int $page_num = null
-    ): ?\Yggverse\Yoda\Entity\Browser\Container\Page
+    ): ?Page
     {
         // Get current page number on $page_num is null
         if (is_null($page_num))
@@ -197,7 +197,7 @@ class Tab
         ?int $page_num = null
     ): void
     {
-        if ($page = $this->getPage($page_num))
+        if ($page = $this->get($page_num))
         {
             $this->gtk->remove_page(
                 $this->gtk->page_num(
@@ -246,11 +246,11 @@ class Tab
         // Update session
         if ($session)
         {
-            $this->updateSession();
+            $this->update();
         }
     }
 
-    public function updateSession(): void
+    public function update(): void
     {
         $pid = pcntl_fork();
 

@@ -33,7 +33,7 @@ class Add
             'activate',
             function()
             {
-                $this->tab->menu->browser->container->tab->appendPage(
+                $this->tab->menu->browser->container->tab->append(
                     null,
                     false
                 );

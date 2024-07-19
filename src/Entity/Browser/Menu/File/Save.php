@@ -58,7 +58,7 @@ class Save
 
                 if (\GtkResponseType::APPLY == $dialog->run())
                 {
-                    if ($page = $this->file->menu->browser->container->tab->getPage())
+                    if ($page = $this->file->menu->browser->container->tab->get())
                     {
                         file_put_contents(
                             $dialog->get_filename(),

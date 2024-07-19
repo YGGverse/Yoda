@@ -197,7 +197,7 @@ class Page
                     );
 
                     // Refresh header by new title if current page is active
-                    if ($this === $this->container->tab->getPage())
+                    if ($this === $this->container->tab->get())
                     {
                         $this->container->browser->header->setTitle(
                             $this->title->getValue(),
@@ -231,7 +231,7 @@ class Page
                     );
 
                     // Refresh header by new title if current page is active
-                    if ($this === $this->container->tab->getPage())
+                    if ($this === $this->container->tab->get())
                     {
                         $this->container->browser->header->setTitle(
                             $this->title->getValue(),
@@ -264,7 +264,7 @@ class Page
                     );
 
                     // Refresh header by new title if current page is active
-                    if ($this === $this->container->tab->getPage())
+                    if ($this === $this->container->tab->get())
                     {
                         $this->container->browser->header->setTitle(
                             $this->title->getValue()
