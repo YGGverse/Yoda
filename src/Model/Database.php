@@ -88,7 +88,9 @@ class Database
             ]
         );
 
-        return $this->_database->lastInsertId();
+        return intval(
+            $this->_database->lastInsertId()
+        );
     }
 
     public function findHistory(
@@ -198,7 +200,9 @@ class Database
             ]
         );
 
-        return $this->_database->lastInsertId();
+        return intval(
+            $this->_database->lastInsertId()
+        );
     }
 
     public function getSession(): ?object
