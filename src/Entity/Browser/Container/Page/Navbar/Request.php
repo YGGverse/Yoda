@@ -16,7 +16,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
             $entry->get_text()
         );
 
-        $this->navbar->page->container->tab->updateSession(); // @TODO async page update
+        $this->navbar->page->container->tab->updateSession();
     }
 
     protected function _onKeyRelease(
@@ -27,5 +27,25 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         $this->navbar->refresh();
 
         $this->navbar->page->container->tab->updateSession();
+    }
+
+    // Update setter with session update feature
+    public function setValue(
+        ?string $value = null
+    ): void
+    {
+        $this->gtk->set_text(
+            is_null($value) ? $this->_value : trim(
+                strval(
+                    $value
+                )
+            )
+        );
+
+        // Update session on tab initiated only
+        if (isset($this->navbar->page->container->tab))
+        {
+            $this->navbar->page->container->tab->updateSession();
+        }
     }
 }
