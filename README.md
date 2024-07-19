@@ -4,7 +4,7 @@ Project in development!
 
 ## Install
 
-### Builder
+### Auto
 
 Run `INSTALL.sh` in terminal to autobuild Yoda for Linux systems, using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3)
 
@@ -77,9 +77,9 @@ Follow official [installation guide](https://github.com/scorninpc/php-gtk3#ackno
 
 #### Yoda
 
-1. `git clone https://github.com/YGGverse/Yoda.git`
-2. `cd Yoda`
-3. `composer update`
+* `git clone https://github.com/YGGverse/Yoda.git`
+* `cd Yoda`
+* `composer update`
 
 #### Launch
 
