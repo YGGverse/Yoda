@@ -13,8 +13,8 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
     public function __construct(
         ?string $namespace = null
     ) {
-        $this->_namespace = __FILE__ . (
-            $namespace ? $namespace : uniqid()
+        $this->_namespace = $namespace ? $namespace : uniqid(
+            __FILE__
         );
     }
 
