@@ -123,21 +123,6 @@ class Page
          int $timeout = 5
     ): void
     {
-        // Update history
-        if ($history)
-        {
-            // Save request in memory
-            $this->navbar->history->add(
-                $this->navbar->request->getValue()
-            );
-
-            // Save request in database
-            $this->container->browser->database->renewHistory(
-                $this->navbar->request->getValue(),
-                // @TODO title
-            );
-        }
-
         // Update title
         $this->title->set(
             _('Loading...')
@@ -167,7 +152,7 @@ class Page
         // Listen response
         \Gtk::timeout_add(
             $refresh,
-            function() use ($connection, $expire)
+            function() use ($connection, $expire, $history)
             {
                 // Redirect requested
                 if ($location = $connection->getRedirect())
@@ -250,6 +235,21 @@ class Page
 
                     // Free shared memory pool
                     $connection->close();
+
+                    // Update history
+                    if ($history)
+                    {
+                        // Save request in memory
+                        $this->navbar->history->add(
+                            $this->navbar->request->getValue()
+                        );
+
+                        // Save request in database
+                        $this->container->browser->database->renewHistory(
+                            $this->navbar->request->getValue(),
+                            $this->title->getValue()
+                        );
+                    }
 
                     // Stop
                     return false;
