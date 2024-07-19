@@ -15,6 +15,8 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         $this->navbar->page->open(
             $entry->get_text()
         );
+
+        $this->navbar->page->container->tab->updateSession(); // @TODO async page update
     }
 
     protected function _onKeyRelease(
@@ -23,5 +25,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
     ): void
     {
         $this->navbar->refresh();
+
+        $this->navbar->page->container->tab->updateSession();
     }
 }

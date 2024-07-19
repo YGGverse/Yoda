@@ -219,19 +219,14 @@ class Tab
             // Reorder entities
             $this->_page = $_page;
 
+            ksort(
+                $this->_page
+            );
+
             // Update session
             if ($session)
             {
-                $this->container->browser->database->cleanSession();
-
-                ksort($_page);
-
-                foreach ($_page as $page)
-                {
-                    $this->container->browser->database->addSession(
-                        $page->navbar->request->getValue()
-                    );
-                }
+                $this->updateSession();
             }
         }
 
@@ -239,5 +234,17 @@ class Tab
         else throw new \Exception(
             'Reorder by $page_num value not implemented'
         );
+    }
+
+    public function updateSession(): void
+    {
+        $this->container->browser->database->cleanSession();
+
+        foreach ($this->_page as $page)
+        {
+            $this->container->browser->database->addSession(
+                $page->navbar->request->getValue()
+            );
+        }
     }
 }
