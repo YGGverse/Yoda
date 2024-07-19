@@ -51,7 +51,7 @@ apt install libpq-dev\
 
 #### PHP
 
-Make sure PHP version is 8.1 or above and includes following components:
+Make sure [PHP](https://github.com/php/php-src) version is 8.1 or above and configured with following components:
 
 ```
 ./configure --with-openssl\
