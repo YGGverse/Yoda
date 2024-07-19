@@ -18,11 +18,68 @@ This tool does not change global PHP version, not requires root permissions, but
 
 ### Manual
 
-1. Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases)
-2. `apt install git composer`
-3. `git clone https://github.com/YGGverse/Yoda.git`
-4. `cd Yoda`
-5. `composer update`
+#### Environment
+
+``` bash
+apt install libpq-dev\
+            bison\
+            libreadline-dev\
+            git\
+            composer\
+            build-essential\
+            autoconf\
+            automake\
+            libtool\
+            re2c\
+            libxml2-dev\
+            libcurl4-openssl-dev\
+            libssl-dev\
+            libbz2-dev\
+            libjpeg-dev\
+            libpng-dev\
+            libxpm-dev\
+            libfreetype6-dev\
+            libzip-dev\
+            libsqlite3-dev\
+            libonig-dev\
+            libxslt1-dev\
+            libgtk-3-dev\
+            libgladeui-dev\
+            libgtksourceview-3.0-dev\
+            libwnck-dev
+```
+
+#### PHP
+
+Make sure PHP version is 8.1 or above and includes following components:
+
+```
+./configure --with-openssl\
+            --with-gettext\
+            --with-pdo-mysql\
+            --enable-sockets\
+            --enable-mbstring\
+            --enable-shmop\
+            --enable-pcntl
+```
+
+#### PHP-CPP
+
+[PHP-GTK](#PHP-GTK) require [PHP-CPP](https://github.com/fast-debug/PHP-CPP) extension to interact native GTK3 libraries.
+
+Use official [documentation](https://www.php-cpp.com/documentation) for details.
+
+#### PHP-GTK
+
+Build latest [PHP-GTK3](https://github.com/scorninpc/php-gtk3) or get [binaries](https://github.com/scorninpc/php-gtk3/releases).
+
+Follow official [guide](https://github.com/scorninpc/php-gtk3#acknowledgements) for details.
+
+#### Yoda
+
+1. `git clone https://github.com/YGGverse/Yoda.git`
+2. `cd Yoda`
+3. `composer update`
 
 #### Launch
 
