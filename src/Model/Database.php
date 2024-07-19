@@ -205,7 +205,7 @@ class Database
         );
     }
 
-    public function getSession(): ?object
+    public function getSession(): ?array
     {
         $query = $this->_database->query(
             'SELECT * FROM `session`'
