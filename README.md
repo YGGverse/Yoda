@@ -51,7 +51,7 @@ apt install libpq-dev\
 
 #### [PHP](https://github.com/php/php-src)
 
-Make sure version 8.1 or above installed and configured with following minimals:
+Make sure version 8.1 or above installed and configured with following extensions:
 
 ```
 ./configure --with-openssl\
@@ -66,7 +66,7 @@ Make sure version 8.1 or above installed and configured with following minimals:
 #### [PHP-CPP](https://github.com/fast-debug/PHP-CPP)
 
 PHP-CPP required to interact native GTK3 libraries.
-Use official [documentation](https://www.php-cpp.com/documentation/install) for details.
+Use official [documentation](https://www.php-cpp.com/documentation) for details.
 
 #### [PHP-GTK](https://github.com/scorninpc/php-gtk3)
 
