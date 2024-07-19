@@ -8,12 +8,19 @@ class Database
 {
     private \PDO $_database;
 
+    private bool $_exists;
+
     public function __construct(
          string $filename,
         ?string $username = null,
         ?string $password = null
     ) {
-        // Init database
+        // Status
+        $this->_exists = file_exists(
+            $filename
+        );
+
+        // Init database connection
         $this->_database = new \PDO(
             sprintf(
                 'sqlite:%s',
@@ -33,17 +40,37 @@ class Database
             \PDO::FETCH_OBJ
         );
 
+        // Init tables
         $this->_database->query('
-            CREATE TABLE IF NOT EXISTS "history"
+            CREATE TABLE IF NOT EXISTS `history`
             (
-                "id"    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                "time"  INTEGER NOT NULL,
-                "url"   VARCHAR(1024) NOT NULL,
-                "title" VARCHAR(255)
+                `id`    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`  INTEGER NOT NULL,
+                `url`   VARCHAR(1024) NOT NULL,
+                `title` VARCHAR(255)
             )
         ');
+
+        $this->_database->query('
+            CREATE TABLE IF NOT EXISTS `session`
+            (
+                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`    INTEGER NOT NULL,
+                `request` VARCHAR(1024)
+            );
+        ');
+
+        // Initial setup
+        if (!$this->_exists)
+        {
+            // Init welcome page
+            $this->addSession(
+                'gemini://yggverse.cities.yesterweb.org' // @TODO config
+            );
+        }
     }
 
+    // History
     public function addHistory(
         string $url,
         ?string $title = null
@@ -61,7 +88,7 @@ class Database
             ]
         );
 
-        return (int) $this->_database->lastInsertId();
+        return $this->_database->lastInsertId();
     }
 
     public function findHistory(
@@ -152,5 +179,48 @@ class Database
             $url,
             $title
         );
+    }
+
+    // Session
+    public function addSession(
+        ?string $request = null,
+        ?int $time = null
+    ): int
+    {
+        $query = $this->_database->prepare(
+            'INSERT INTO `session` (`time`, `request`) VALUES (:time, :request)'
+        );
+
+        $query->execute(
+            [
+                ':time'    => $time ? $time : time(),
+                ':request' => $request
+            ]
+        );
+
+        return $this->_database->lastInsertId();
+    }
+
+    public function getSession(): ?object
+    {
+        $query = $this->_database->query(
+            'SELECT * FROM `session`'
+        );
+
+        if ($session = $query->fetchAll())
+        {
+            return $session;
+        }
+
+        return null;
+    }
+
+    public function cleanSession(): int
+    {
+        $query = $this->_database->query(
+            'DELETE FROM `session`'
+        );
+
+        return $query->rowCount();
     }
 }
