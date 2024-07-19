@@ -205,7 +205,7 @@ class Database
         );
     }
 
-    public function getSession(): ?array
+    public function getSession(): array
     {
         $query = $this->_database->query(
             'SELECT * FROM `session`'
@@ -216,7 +216,7 @@ class Database
             return $session;
         }
 
-        return null;
+        return [];
     }
 
     public function cleanSession(): int
