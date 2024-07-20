@@ -15,6 +15,7 @@ class Add
 
     // Defaults
     private string $_label = 'Add';
+    private string $_tooltip = 'Append new tab';
 
     public function __construct(
         Tab $tab
@@ -25,6 +26,10 @@ class Add
         // Init menu item
         $this->gtk = \GtkMenuItem::new_with_label(
             $this->_label
+        );
+
+        $this->gtk->set_tooltip_text(
+            $this->_tooltip
         );
 
         // Render
