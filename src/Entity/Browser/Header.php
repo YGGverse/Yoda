@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
-use \Yggverse\Yoda\Entity\Browser\Header\Navigation;
-use \Yggverse\Yoda\Entity\Browser\Header\Tab;
+use \Yggverse\Yoda\Entity\Browser;
+use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 
 class Header
 {
     public \GtkHeaderBar $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser $browser;
+    public Browser $browser;
 
     // Requirements
-    public Navigation $navigation;
-    public Tab $tab;
+    public Tray $tray;
 
     // Defaults
     protected bool $_actions = true;
@@ -24,7 +23,7 @@ class Header
     protected string $_subtitle = '';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser $browser
+        Browser $browser
     ) {
         // Init dependencies
         $this->browser = $browser;
@@ -44,22 +43,13 @@ class Header
             $this->_subtitle
         );
 
-        // Init navigation
-        $this->navigation = new Navigation(
+        // Init tray area
+        $this->tray = new Tray(
             $this
         );
 
         $this->gtk->add(
-            $this->navigation->gtk
-        );
-
-        // Init new tab button
-        $this->tab = new Tab(
-            $this
-        );
-
-        $this->gtk->add(
-            $this->tab->gtk
+            $this->tray->gtk
         );
 
         // Render

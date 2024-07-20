@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Header;
+namespace Yggverse\Yoda\Entity\Browser\Header\Tray;
 
-use \Yggverse\Yoda\Entity\Browser\Header;
+use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 
 class Tab
 {
     public \GtkButton $gtk;
 
     // Dependencies
-    public Header $header;
+    public Tray $tray;
 
     // Defaults
     protected string $_label = '+';
     private string $_tooltip = 'New tab';
 
     public function __construct(
-        Header $header
+        Tray $tray
     ) {
         // Init dependency
-        $this->header = $header;
+        $this->tray = $tray;
 
         // Init GTK
         $this->gtk = new \GtkButton;
@@ -43,7 +43,7 @@ class Tab
             function(
                 \GtkButton $entity
             ) {
-                $this->header->browser->container->tab->append(
+                $this->tray->header->browser->container->tab->append(
                     null,
                     false
                 );

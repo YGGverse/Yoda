@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yggverse\Yoda\Entity\Browser\Header;
+namespace Yggverse\Yoda\Entity\Browser\Header\Tray;
 
-use \Yggverse\Yoda\Entity\Browser\Header;
+use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Navigation
@@ -12,7 +12,7 @@ class Navigation
     public \GtkMenuButton $gtk;
 
     // Dependencies
-    public Header $header;
+    public Tray $tray;
 
     // Requirements
     public Menu $menu;
@@ -21,10 +21,10 @@ class Navigation
     private string $_tooltip = 'Navigation';
 
     public function __construct(
-        Header $header
+        Tray $tray
     ) {
         // Init dependencies
-        $this->header = $header;
+        $this->tray = $tray;
 
         // Init navigation container
         $this->gtk = new \GtkMenuButton;
@@ -35,7 +35,7 @@ class Navigation
 
         // Init menu
         $this->menu = new Menu(
-            $this->header->browser
+            $this->tray->header->browser
         );
 
         $this->gtk->set_popup(
