@@ -59,7 +59,7 @@ class Nex
 
             // Set subtitle
             $this->_connection->setSubtitle(
-                $mime
+                $address->getHost()
             );
 
             // Set tooltip
@@ -83,10 +83,7 @@ class Nex
             );
 
             $this->_connection->setSubtitle(
-                sprintf(
-                    _('Could not open request - %s'),
-                    $address->get()
-                )
+                $address->getHost()
             );
 
             $this->_connection->setTooltip(

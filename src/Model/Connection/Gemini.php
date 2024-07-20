@@ -50,8 +50,7 @@ class Gemini
                 );
 
                 $this->_connection->setSubtitle(
-                    $response->getMeta() ? $response->getMeta()
-                                         : _('Response expected')
+                    $address->getHost()
                 );
 
                 $this->_connection->setTooltip(
@@ -102,7 +101,7 @@ class Gemini
 
                 // Set subtitle
                 $this->_connection->setSubtitle(
-                    $response->getMeta()
+                    $address->getHost()
                 );
 
                 // Set tooltip
@@ -125,7 +124,7 @@ class Gemini
                 );
 
                 $this->_connection->setSubtitle(
-                    $response->getMeta()
+                    $address->getHost()
                 );
 
                 $this->_connection->setTooltip(
@@ -155,12 +154,7 @@ class Gemini
                 );
 
                 $this->_connection->setSubtitle(
-                    sprintf(
-                        'Could not open request (code: %d)',
-                        intval(
-                            $response->getCode()
-                        )
-                    )
+                    $address->getHost()
                 );
 
                 $this->_connection->setTooltip(
