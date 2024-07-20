@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser;
 
 use \Yggverse\Yoda\Entity\Browser\Header\Navigation;
+use \Yggverse\Yoda\Entity\Browser\Header\Tab;
 
 class Header
 {
@@ -14,7 +15,8 @@ class Header
     public \Yggverse\Yoda\Entity\Browser $browser;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Header\Navigation $navigation;
+    public Navigation $navigation;
+    public Tab $tab;
 
     // Defaults
     protected bool $_actions = true;
@@ -49,6 +51,15 @@ class Header
 
         $this->gtk->add(
             $this->navigation->gtk
+        );
+
+        // Init new tab button
+        $this->tab = new Tab(
+            $this
+        );
+
+        $this->gtk->add(
+            $this->tab->gtk
         );
 
         // Render
