@@ -21,32 +21,32 @@ This tool does not change global PHP version, not requires root permissions, but
 #### Environment
 
 ``` bash
-apt install libpq-dev\
-            bison\
-            libreadline-dev\
-            git\
-            composer\
-            build-essential\
-            autoconf\
+apt install autoconf\
             automake\
-            libtool\
-            re2c\
-            libxml2-dev\
-            libcurl4-openssl-dev\
-            libssl-dev\
+            bison\
+            build-essential\
+            composer\
+            git\
             libbz2-dev\
-            libjpeg-dev\
-            libpng-dev\
-            libxpm-dev\
+            libcurl4-openssl-dev\
             libfreetype6-dev\
-            libzip-dev\
-            libsqlite3-dev\
-            libonig-dev\
-            libxslt1-dev\
-            libgtk-3-dev\
             libgladeui-dev\
+            libgtk-3-dev\
             libgtksourceview-3.0-dev\
-            libwnck-dev
+            libjpeg-dev\
+            libonig-dev\
+            libpng-dev\
+            libpq-dev\
+            libreadline-dev\
+            libsqlite3-dev\
+            libssl-dev\
+            libtool\
+            libwnck-dev\
+            libxml2-dev\
+            libxpm-dev\
+            libxslt1-dev\
+            libzip-dev\
+            re2c
 ```
 
 #### [PHP](https://github.com/php/php-src)
