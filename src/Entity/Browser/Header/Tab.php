@@ -15,6 +15,7 @@ class Tab
 
     // Defaults
     protected string $_label = '+';
+    private string $_tooltip = 'New tab';
 
     public function __construct(
         Header $header
@@ -27,6 +28,10 @@ class Tab
 
         $this->gtk->set_label(
             $this->_label
+        );
+
+        $this->gtk->set_tooltip_text(
+            $this->_tooltip
         );
 
         // Render

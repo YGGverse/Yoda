@@ -15,7 +15,7 @@ class Add
 
     // Defaults
     private string $_label = 'Add';
-    private string $_tooltip = 'Append new tab';
+    private string $_tooltip = 'New tab';
 
     public function __construct(
         Tab $tab
