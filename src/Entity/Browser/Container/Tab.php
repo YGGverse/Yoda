@@ -102,8 +102,6 @@ class Tab
                 $this->reorder();
             }
         );
-
-
     }
 
     public function append(
