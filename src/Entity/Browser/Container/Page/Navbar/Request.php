@@ -8,6 +8,8 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
 {
     protected string $_placeholder = 'URL or search term...';
 
+    private ?int $_changed = null;
+
     protected function _onActivate(
         \GtkEntry $entry
     ): void
@@ -36,8 +38,15 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
         // Update session on tab initiated only
         if (isset($this->navbar->page->container->tab))
         {
-            \Gtk::timeout_add(
-                1000, // wait for one second to apply changes
+            // Reset previous event
+            if ($this->_changed)
+            {
+                // @TODO source_remove #125
+            }
+
+            // Wait for one second to apply act
+            $this->_changed = \Gtk::timeout_add(
+                1000,
                 function()
                 {
                     $this->navbar->page->container->tab->update();
