@@ -13,6 +13,7 @@ class Close
 
     // Defaults
     private string $_label = 'Close';
+    private string $_tooltip = 'Close active tab (double click on tab)';
 
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab
@@ -23,6 +24,10 @@ class Close
         // Init menu item
         $this->gtk = \GtkMenuItem::new_with_label(
             $this->_label
+        );
+
+        $this->gtk->set_tooltip_text(
+            $this->_tooltip
         );
 
         // Render
