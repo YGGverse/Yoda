@@ -95,12 +95,29 @@ class Page
     }
 
     public function init(
-        ?string $request = null
+        ?string $request = null,
+        bool $focus = false
     ): void
     {
-        $this->navbar->request->setValue(
-            $request
-        );
+        if ($request)
+        {
+            $this->navbar->request->setValue(
+                $request
+            );
+        }
+
+        if ($focus)
+        {
+            \Gtk::timeout_add(
+                100,
+                function()
+                {
+                    $this->navbar->request->focus();
+
+                    return false;
+                }
+            );
+        }
     }
 
     public function open(

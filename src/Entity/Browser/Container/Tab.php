@@ -159,7 +159,10 @@ class Tab
         else
         {
             $page->init(
-                $request
+                $request,
+                empty(
+                    $request
+                )
             );
         }
 
