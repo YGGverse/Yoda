@@ -25,11 +25,11 @@ class Close
 
         // Init menu item
         $this->gtk = \GtkMenuItem::new_with_label(
-            $this->_label
+            _($this->_label)
         );
 
         $this->gtk->set_tooltip_text(
-            $this->_tooltip
+            _($this->_tooltip)
         );
 
         // Render

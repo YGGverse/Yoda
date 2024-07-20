@@ -19,9 +19,9 @@ class Title
     // Defaults
     private int $_ellipsize = 3;
     private int $_length = 16;
-    private ?string $_value = 'New page';
-    private ?string $_subtitle = null;
-    private ?string $_tooltip = null;
+    private string $_value = 'New page';
+    private string $_subtitle = '';
+    private string $_tooltip = '';
 
     public function __construct(
         Page $page,
@@ -68,7 +68,7 @@ class Title
     ): void
     {
         $this->gtk->set_text(
-            is_null($value) ? $this->_value : trim(
+            is_null($value) ? _($this->_value) : trim(
                 $value
             )
         );
@@ -78,7 +78,7 @@ class Title
         ?string $subtitle = null
     ): void
     {
-        $this->subtitle = is_null($subtitle) ? $this->_subtitle : strtolower(
+        $this->subtitle = is_null($subtitle) ? _($this->_subtitle) : strtolower(
             trim(
                 $subtitle
             )
@@ -90,7 +90,7 @@ class Title
     ): void
     {
         $this->gtk->set_tooltip_text(
-            is_null($tooltip) ? $this->_tooltip : trim(
+            is_null($tooltip) ? _($this->_tooltip) : trim(
                 $tooltip
             )
         );

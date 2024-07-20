@@ -27,11 +27,11 @@ class Tab
         $this->gtk = new \GtkButton;
 
         $this->gtk->set_label(
-            $this->_label
+            _($this->_label)
         );
 
         $this->gtk->set_tooltip_text(
-            $this->_tooltip
+            _($this->_tooltip)
         );
 
         // Render

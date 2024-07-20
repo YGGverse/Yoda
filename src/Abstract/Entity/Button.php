@@ -20,7 +20,7 @@ abstract class Button
         );
 
         $this->gtk->set_label(
-            $this->_label
+            _($this->_label)
         );
 
         // Render

@@ -19,7 +19,7 @@ abstract class Entry
         $this->gtk = new \GtkEntry;
 
         $this->gtk->set_placeholder_text(
-            $this->_placeholder
+            _($this->_placeholder)
         );
 
         $this->gtk->set_max_length(
@@ -27,7 +27,7 @@ abstract class Entry
         );
 
         $this->gtk->set_text(
-            $this->_value
+            _($this->_value)
         );
 
         $this->gtk->set_visibility(

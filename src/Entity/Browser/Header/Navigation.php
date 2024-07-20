@@ -30,7 +30,7 @@ class Navigation
         $this->gtk = new \GtkMenuButton;
 
         $this->gtk->set_tooltip_text(
-            $this->_tooltip
+            _($this->_tooltip)
         );
 
         // Init menu
