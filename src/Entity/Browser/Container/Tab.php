@@ -134,7 +134,7 @@ class Tab
                 ?\GdkEvent $event
             ) {
                 // Close tab on double click
-                if ($event->type == 5) // @TODO PHP-GTK3 Gdk.EventType.DOUBLE_BUTTON_PRESS
+                if ($event->type == \Gdk::DOUBLE_BUTTON_PRESS)
                 {
                     $this->close();
                 }
