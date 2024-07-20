@@ -22,7 +22,8 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
     }
 
     protected function _onActivate(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void
     {
         $this->response->send();
@@ -42,7 +43,8 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
     {}
 
     protected function _onFocusOut(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void
     {}
 

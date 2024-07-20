@@ -11,7 +11,8 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
     private ?int $_changed = null;
 
     protected function _onActivate(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void
     {
         $this->navbar->page->open(
@@ -58,7 +59,8 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
     }
 
     protected function _onFocusOut(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void
     {}
 }

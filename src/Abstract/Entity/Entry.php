@@ -40,10 +40,12 @@ abstract class Entry
         $this->gtk->connect(
             'activate',
             function(
-                \GtkEntry $entry
+                \GtkEntry $entry,
+                \GdkEvent $event
             ) {
                 $this->_onActivate(
-                    $entry
+                    $entry,
+                    $event
                 );
             }
         );
@@ -75,17 +77,20 @@ abstract class Entry
         $this->gtk->connect(
             'focus-out-event',
             function (
-                \GtkEntry $entry
+                \GtkEntry $entry,
+                \GdkEvent $event
             ) {
                 $this->_onFocusOut(
-                    $entry
+                    $entry,
+                    $event
                 );
             }
         );
     }
 
     abstract protected function _onActivate(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void;
 
     abstract protected function _onKeyRelease(
@@ -98,7 +103,8 @@ abstract class Entry
     ): void;
 
     abstract protected function _onFocusOut(
-        \GtkEntry $entry
+        \GtkEntry $entry,
+        \GdkEvent $event
     ): void;
 
     public function setLength(
