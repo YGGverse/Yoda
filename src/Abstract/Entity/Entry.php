@@ -12,7 +12,6 @@ abstract class Entry
     protected string $_placeholder = '';
     protected string $_value = '';
     protected bool $_visible = true;
-    protected bool $_focus = false;
 
     public function __construct()
     {
@@ -33,11 +32,6 @@ abstract class Entry
         $this->gtk->set_visibility(
             $this->_visible
         );
-
-        if ($this->_focus)
-        {
-            $this->gtk->grab_focus();
-        }
 
         // Render
         $this->gtk->show();
