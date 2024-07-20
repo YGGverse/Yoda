@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\Tab;
 
+use \Yggverse\Yoda\Entity\Browser\Menu\Tab;
+
 class Add
 {
     public \GtkMenuItem $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab;
+    public Tab $tab;
 
     // Defaults
     private string $_label = 'Add';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab
+        Tab $tab
     ) {
         // Init dependencies
         $this->tab = $tab;

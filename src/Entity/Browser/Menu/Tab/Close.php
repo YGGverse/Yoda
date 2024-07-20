@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\Tab;
 
+use \Yggverse\Yoda\Entity\Browser\Menu\Tab;
+
 class Close
 {
     public \GtkMenuItem $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab;
+    public Tab $tab;
 
     // Defaults
     private string $_label = 'Close';
     private string $_tooltip = 'Close active tab (double click on tab)';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab
+        Tab $tab
     ) {
         // Init dependencies
         $this->tab = $tab;
