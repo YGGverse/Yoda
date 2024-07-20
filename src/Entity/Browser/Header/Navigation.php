@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Header;
 
+use \Yggverse\Yoda\Entity\Browser\Header;
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Navigation
@@ -11,16 +12,16 @@ class Navigation
     public \GtkMenuButton $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Header $header;
+    public Header $header;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Menu $menu;
+    public Menu $menu;
 
     // Defaults
     private string $_tooltip = 'Navigation';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Header $header
+        Header $header
     ) {
         // Init dependencies
         $this->header = $header;
