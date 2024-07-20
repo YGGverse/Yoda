@@ -16,6 +16,9 @@ class Navigation
     // Requirements
     public \Yggverse\Yoda\Entity\Browser\Menu $menu;
 
+    // Defaults
+    private string $_tooltip = 'Navigation';
+
     public function __construct(
         \Yggverse\Yoda\Entity\Browser\Header $header
     ) {
@@ -24,6 +27,10 @@ class Navigation
 
         // Init navigation container
         $this->gtk = new \GtkMenuButton;
+
+        $this->gtk->set_tooltip_text(
+            $this->_tooltip
+        );
 
         // Init menu
         $this->menu = new Menu(
