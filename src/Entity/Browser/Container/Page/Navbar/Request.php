@@ -11,8 +11,7 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
     private ?int $_changed = null;
 
     protected function _onActivate(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        \GtkEntry $entry
     ): void
     {
         $this->navbar->page->open(

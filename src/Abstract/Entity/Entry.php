@@ -40,12 +40,10 @@ abstract class Entry
         $this->gtk->connect(
             'activate',
             function(
-                \GtkEntry $entry,
-                \GdkEvent $event
+                \GtkEntry $entry
             ) {
                 $this->_onActivate(
-                    $entry,
-                    $event
+                    $entry
                 );
             }
         );
@@ -89,8 +87,7 @@ abstract class Entry
     }
 
     abstract protected function _onActivate(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        \GtkEntry $entry
     ): void;
 
     abstract protected function _onKeyRelease(

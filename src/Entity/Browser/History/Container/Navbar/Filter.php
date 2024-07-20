@@ -9,8 +9,7 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Na
     protected string $_placeholder = 'Search in history...';
 
     protected function _onActivate(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        \GtkEntry $entry
     ): void
     {
         $this->navbar->container->content->search(
