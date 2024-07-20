@@ -71,6 +71,17 @@ abstract class Entry
                 );
             }
         );
+
+        $this->gtk->connect(
+            'focus-out-event',
+            function (
+                \GtkEntry $entry
+            ) {
+                $this->_onFocusOut(
+                    $entry
+                );
+            }
+        );
     }
 
     abstract protected function _onActivate(
@@ -83,6 +94,10 @@ abstract class Entry
     ): void;
 
     abstract protected function _onChanged(
+        \GtkEntry $entry
+    ): void;
+
+    abstract protected function _onFocusOut(
         \GtkEntry $entry
     ): void;
 

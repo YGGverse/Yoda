@@ -56,4 +56,9 @@ class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navb
             );
         }
     }
+
+    protected function _onFocusOut(
+        \GtkEntry $entry
+    ): void
+    {}
 }

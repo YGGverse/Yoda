@@ -31,4 +31,9 @@ class Filter extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Na
         \GtkEntry $entry
     ): void
     {}
+
+    protected function _onFocusOut(
+        \GtkEntry $entry
+    ): void
+    {}
 }

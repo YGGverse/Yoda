@@ -41,6 +41,11 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
     ): void
     {}
 
+    protected function _onFocusOut(
+        \GtkEntry $entry
+    ): void
+    {}
+
     public function refresh(): void
     {
         // @TODO
