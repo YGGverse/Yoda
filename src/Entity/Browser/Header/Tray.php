@@ -37,6 +37,14 @@ class Tray
             \GtkOrientation::HORIZONTAL
         );
 
+        $this->gtk->set_margin_start(
+            $this->_margin / 2
+        );
+
+        $this->gtk->set_margin_end(
+            $this->_margin / 2
+        );
+
         $this->gtk->set_spacing(
             $this->_margin
         );
