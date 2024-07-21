@@ -17,9 +17,9 @@ class Header
     public Header\Tray $tray;
 
     // Defaults
-    protected bool $_actions = true;
-    protected string $_title = 'Yoda';
-    protected string $_subtitle = '';
+    public const ACTIONS = true;
+    public const TITLE = 'Yoda';
+    public const SUBTITLE = '';
 
     public function __construct(
         Browser $browser
@@ -31,15 +31,15 @@ class Header
         $this->gtk = new \GtkHeaderBar;
 
         $this->gtk->set_show_close_button(
-            $this->_actions
+            $this::ACTIONS
         );
 
         $this->gtk->set_title(
-            $this->_title
+            $this::TITLE
         );
 
         $this->gtk->set_subtitle(
-            $this->_subtitle
+            $this::SUBTITLE
         );
 
         // Init tray area
@@ -56,17 +56,17 @@ class Header
     }
 
     public function setTitle(
-        ?string $value = null,
+        ?string $title = null,
         ?string $subtitle = null
     ): void
     {
         $this->gtk->set_title(
-            is_null($value) ? $this->_title : sprintf(
+            is_null($title) ? $this::TITLE : sprintf(
                 '%s - %s',
                 trim(
-                    $value
+                    $title
                 ),
-                $this->_title
+                $this::TITLE
             )
         );
 
@@ -76,12 +76,12 @@ class Header
     }
 
     public function setSubtitle(
-        ?string $value = null
+        ?string $subtitle = null
     ): void
     {
         $this->gtk->set_subtitle(
-            is_null($value) ? $this->_subtitle : trim(
-                $value
+            is_null($subtitle) ? $this::SUBTITLE : trim(
+                $subtitle
             )
         );
     }

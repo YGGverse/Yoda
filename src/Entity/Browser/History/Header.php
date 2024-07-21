@@ -8,27 +8,26 @@ class Header
 {
     public \GtkHeaderBar $gtk;
 
-    protected bool $_actions = true;
-    protected string $_title = 'History - Yoda';
-    protected string $_subtitle = '';
+    public const ACTIONS = true;
+    public const TITLE = 'History - Yoda';
+    public const SUBTITLE = '';
 
     public function __construct()
     {
         $this->gtk = new \GtkHeaderBar;
 
         $this->gtk->set_show_close_button(
-            $this->_actions
+            $this::ACTIONS
         );
 
         $this->gtk->set_title(
-            $this->_title
+            _($this::TITLE)
         );
 
         $this->gtk->set_subtitle(
-            $this->_subtitle
+            _($this::SUBTITLE)
         );
 
-        // Render
         $this->gtk->show();
     }
 }

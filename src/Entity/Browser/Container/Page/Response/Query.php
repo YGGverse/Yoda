@@ -11,7 +11,7 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
     public Response $response;
 
     // Defaults
-    protected string $_placeholder = 'Enter response...';
+    public const PLACEHOLDER = 'Enter your response...';
 
     public function __construct(
         Response $response

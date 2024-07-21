@@ -18,10 +18,8 @@ class Tray
     public Tray\Tab $tab;
 
     // Defaults
-    protected bool $_actions = true;
-    protected string $_title = 'Yoda';
-    protected string $_subtitle = '';
-    protected int $_margin = 8;
+    public const MARGIN = 4;
+    public const SPACING = 8;
 
     public function __construct(
         Header $header
@@ -35,15 +33,15 @@ class Tray
         );
 
         $this->gtk->set_margin_start(
-            $this->_margin / 2
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin / 2
+            $this::MARGIN
         );
 
         $this->gtk->set_spacing(
-            $this->_margin
+            $this::SPACING
         );
 
         // Init navigation

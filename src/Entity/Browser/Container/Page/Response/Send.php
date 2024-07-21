@@ -12,7 +12,7 @@ class Send extends \Yggverse\Yoda\Abstract\Entity\Button
     public Response $response;
 
     // Defaults
-    protected string $_label = 'Send';
+    public const LABEL = 'Send';
 
     public function __construct(
         Response $response
