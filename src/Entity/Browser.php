@@ -7,24 +7,26 @@ namespace Yggverse\Yoda\Entity;
 use \Yggverse\Yoda\Entity\Browser\Header;
 use \Yggverse\Yoda\Entity\Browser\Container;
 
+use \Yggverse\Yoda\Model\Database;
+
 class Browser
 {
     public \GtkWindow $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Model\Database $database;
+    public Database $database;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Header $header;
-    public \Yggverse\Yoda\Entity\Browser\Container $container;
+    public Header $header;
+    public Container $container;
 
     // Defaults
-    private int $_width  = 640;
-    private int $_height = 480;
-    private bool $_maximize = true;
+    public const WIDTH = 640;
+    public const HEIGHT = 640;
+    public const MAXIMIZE = true;
 
     public function __construct(
-        \Yggverse\Yoda\Model\Database $database
+        Database $database
     ) {
         // Init dependencies
         $this->database = $database;
@@ -33,11 +35,11 @@ class Browser
         $this->gtk = new \GtkWindow;
 
         $this->gtk->set_size_request(
-            $this->_width,
-            $this->_height
+            $this::WIDTH,
+            $this::HEIGHT
         );
 
-        if ($this->_maximize)
+        if ($this::MAXIMIZE)
         {
             $this->gtk->maximize();
         }

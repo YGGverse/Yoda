@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Content;
 
+use \Yggverse\Yoda\Entity\Browser\History\Container\Content;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table\Data;
 
 class Table
@@ -11,18 +13,18 @@ class Table
     public \GtkTreeView $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content $content;
+    public Content $content;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table\Data $data;
+    public Data $data;
 
     // Defaults
-    private string $_time   = 'Time';
-    private string $_title  = 'Title';
-    private string $_url    = 'URL';
+    public const TIME = 'Time';
+    public const TITLE = 'Title';
+    public const URL = 'URL';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\History\Container\Content $content
+        Content $content
     ) {
         // Init dependencies
         $this->content = $content;
@@ -32,7 +34,7 @@ class Table
 
         $this->gtk->append_column(
             new \GtkTreeViewColumn(
-                $this->_time,
+                $this::TIME,
                 new \GtkCellRendererText(),
                 'text',
                 1
@@ -41,7 +43,7 @@ class Table
 
         $this->gtk->append_column(
             new \GtkTreeViewColumn(
-                $this->_url,
+                $this::URL,
                 new \GtkCellRendererText(),
                 'text',
                 2
@@ -50,7 +52,7 @@ class Table
 
         $this->gtk->append_column(
             new \GtkTreeViewColumn(
-                $this->_title,
+                $this::TITLE,
                 new \GtkCellRendererText(),
                 'text',
                 3

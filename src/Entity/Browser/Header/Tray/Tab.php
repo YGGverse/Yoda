@@ -14,8 +14,8 @@ class Tab
     public Tray $tray;
 
     // Defaults
-    protected string $_label = '+';
-    private string $_tooltip = 'New tab';
+    public const LABEL = '+';
+    public const TOOLTIP = 'New tab';
 
     public function __construct(
         Tray $tray
@@ -27,11 +27,11 @@ class Tab
         $this->gtk = new \GtkButton;
 
         $this->gtk->set_label(
-            _($this->_label)
+            _($this::LABEL)
         );
 
         $this->gtk->set_tooltip_text(
-            _($this->_tooltip)
+            _($this::TOOLTIP)
         );
 
         // Render

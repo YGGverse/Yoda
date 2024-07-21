@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container;
 
+use \Yggverse\Yoda\Entity\Browser\History\Container;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Delete;
 use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Filter;
 use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Open;
@@ -14,19 +16,20 @@ class Navbar
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\History\Container $container;
+    public Container $container;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Delete $delete;
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Filter $filter;
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Open $open;
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Search $search;
+    public Delete $delete;
+    public Filter $filter;
+    public Open $open;
+    public Search $search;
 
     // Defaults
-    private int $_margin = 8;
+    public const MARGIN = 8;
+    public const SPACING = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\History\Container $container
+        Container $container
     ) {
         // Init dependency
         $this->container = $container;
@@ -37,23 +40,23 @@ class Navbar
         );
 
         $this->gtk->set_margin_top(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_bottom(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_start(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_spacing(
-            $this->_margin
+            $this::SPACING
         );
 
         // Init open button

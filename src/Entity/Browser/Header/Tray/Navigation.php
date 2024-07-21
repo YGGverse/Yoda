@@ -18,7 +18,7 @@ class Navigation
     public Menu $menu;
 
     // Defaults
-    private string $_tooltip = 'Navigation';
+    public const TOOLTIP = 'Navigation';
 
     public function __construct(
         Tray $tray
@@ -30,7 +30,7 @@ class Navigation
         $this->gtk = new \GtkMenuButton;
 
         $this->gtk->set_tooltip_text(
-            _($this->_tooltip)
+            _($this::TOOLTIP)
         );
 
         // Init menu

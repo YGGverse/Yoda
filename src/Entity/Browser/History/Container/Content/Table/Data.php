@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
 
+use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
+
 class Data
 {
     public \GtkListStore $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table $table;
+    public Table $table;
 
     // Defaults
-    private string $_time = 'c';
+    public const TIME = 'c';
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table $table
+        Table $table
     ) {
         // Init dependencies
         $this->table = $table;
@@ -41,7 +43,7 @@ class Data
             [
                 $id,
                 date(
-                    $this->_time,
+                    $this::TIME,
                     $time
                 ),
                 $url,

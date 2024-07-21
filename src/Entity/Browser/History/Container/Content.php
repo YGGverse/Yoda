@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container;
 
+use \Yggverse\Yoda\Entity\Browser\History\Container;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Viewport;
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
 
@@ -12,17 +14,17 @@ class Content
     public \GtkScrolledWindow $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\History\Container $container;
+    public Container $container;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content\Viewport $viewport;
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table $table;
+    public Viewport $viewport;
+    public Table $table;
 
     // Defaults
-    private int $_margin = 8;
+    public const MARGIN = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\History\Container $container
+        Container $container
     ) {
         // Init dependency
         $this->container = $container;
@@ -31,15 +33,15 @@ class Content
         $this->gtk = new \GtkScrolledWindow;
 
         $this->gtk->set_margin_start(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_bottom(
-            $this->_margin
+            $this::MARGIN
         );
 
         // Init history records table

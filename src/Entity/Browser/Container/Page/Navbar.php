@@ -25,7 +25,7 @@ class Navbar
     public Request $request;
 
     // Defaults
-    private int $_margin = 8;
+    public const MARGIN = 8;
 
     public function __construct(
         Page $page
@@ -39,23 +39,23 @@ class Navbar
         );
 
         $this->gtk->set_margin_top(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_bottom(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_start(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_spacing(
-            $this->_margin
+            $this::MARGIN
         );
 
         // Append base button

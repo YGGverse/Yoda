@@ -7,24 +7,26 @@ namespace Yggverse\Yoda\Entity\Browser;
 use \Yggverse\Yoda\Entity\Browser\History\Header;
 use \Yggverse\Yoda\Entity\Browser\History\Container;
 
+use \Yggverse\Yoda\Entity\Browser;
+
 class History
 {
     public \GtkWindow $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser $browser;
+    public Browser $browser;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\History\Header $header;
-    public \Yggverse\Yoda\Entity\Browser\History\Container $container;
+    public Header $header;
+    public Container $container;
 
     // Defaults
-    private int $_width  = 640;
-    private int $_height = 480;
-    private bool $_maximize = false;
+    public const WIDTH = 640;
+    public const HEIGHT = 640;
+    public const MAXIMIZE = false;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser $browser
+        Browser $browser
     ) {
         // Init dependencies
         $this->browser = $browser;
@@ -33,11 +35,11 @@ class History
         $this->gtk = new \GtkWindow;
 
         $this->gtk->set_size_request(
-            $this->_width,
-            $this->_height
+            $this::WIDTH,
+            $this::HEIGHT
         );
 
-        if ($this->_maximize)
+        if ($this::MAXIMIZE)
         {
             $this->gtk->maximize();
         }

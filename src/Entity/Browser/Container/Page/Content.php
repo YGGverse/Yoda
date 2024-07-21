@@ -24,7 +24,7 @@ class Content
     public Viewport $viewport;
 
     // Defaults
-    private int $_margin = 8;
+    public const MARGIN = 8;
 
     // Extras
     private ?string $_source = null;
@@ -38,15 +38,15 @@ class Content
         $this->gtk = new \GtkScrolledWindow;
 
         $this->gtk->set_margin_start(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_bottom(
-            $this->_margin
+            $this::MARGIN
         );
 
         // Init scrolled window viewport

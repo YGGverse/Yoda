@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Query;
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Send;
 
@@ -14,17 +16,18 @@ class Response
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
+    public Page $page;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Query $query;
-    public \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Send $send;
+    public Query $query;
+    public Send $send;
 
     // Defaults
-    private int $_margin = 8;
+    public const MARGIN = 8;
+    public const SPACING = 8;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Page $page
+        Page $page
     ) {
         // Init dependencies
         $this->page = $page;
@@ -35,23 +38,23 @@ class Response
         );
 
         $this->gtk->set_margin_top(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_bottom(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_start(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_margin_end(
-            $this->_margin
+            $this::MARGIN
         );
 
         $this->gtk->set_spacing(
-            $this->_margin
+            $this::SPACING
         );
 
         // Init query field

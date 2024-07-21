@@ -4,32 +4,33 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\File;
 
+use \Yggverse\Yoda\Entity\Browser\Menu\File;
+
 class Open
 {
     public \GtkMenuItem $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Menu\File $file;
+    public File $file;
 
     // Defaults
-    private string $_label = 'Open';
-    private bool $_multiple = true;
-    private array $_pattern =
-    [
+    public const LABEL = 'Open';
+    public const MULTIPLE = true;
+    public const PATTERN = [
         // pattern:name
         '*'     => 'All',
         '*.gmi' => null
     ];
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Menu\File $file
+        File $file
     ) {
         // Init dependencies
         $this->file = $file;
 
         // Init menu item
         $this->gtk = \GtkMenuItem::new_with_label(
-            $this->_label
+            $this::LABEL
         );
 
         // Render
@@ -60,10 +61,10 @@ class Open
                 }
 
                 $dialog->set_select_multiple(
-                    $this->_multiple
+                    $this::MULTIPLE
                 );
 
-                foreach ($this->_pattern as $pattern => $name)
+                foreach ($this::PATTERN as $pattern => $name)
                 {
                     $filter = new \GtkFileFilter;
 

@@ -14,8 +14,8 @@ class Close
     public Tab $tab;
 
     // Defaults
-    private string $_label = 'Close';
-    private string $_tooltip = 'Close active tab (double click on tab)';
+    public const LABEL = 'Close';
+    public const TOOLTIP = 'Close active tab (double click on tab)';
 
     public function __construct(
         Tab $tab
@@ -25,11 +25,11 @@ class Close
 
         // Init menu item
         $this->gtk = \GtkMenuItem::new_with_label(
-            _($this->_label)
+            _($this::LABEL)
         );
 
         $this->gtk->set_tooltip_text(
-            _($this->_tooltip)
+            _($this::TOOLTIP)
         );
 
         // Render
