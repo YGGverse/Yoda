@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page as Page;
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Navbar
 {
