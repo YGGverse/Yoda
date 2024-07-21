@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page;
-
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Base;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Go;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\Request;
+use \Yggverse\Yoda\Entity\Browser\Container\Page as Page;
 
 class Navbar
 {
@@ -19,10 +14,10 @@ class Navbar
     public Page $page;
 
     // Requirements
-    public Base $base;
-    public Go $go;
-    public History $history;
-    public Request $request;
+    public Navbar\Base $base;
+    public Navbar\Go $go;
+    public Navbar\History $history;
+    public Navbar\Request $request;
 
     // Defaults
     public const MARGIN = 8;
@@ -59,7 +54,7 @@ class Navbar
         );
 
         // Append base button
-        $this->base = new Base(
+        $this->base = new Navbar\Base(
             $this
         );
 
@@ -68,7 +63,7 @@ class Navbar
         );
 
         // Append history buttons group
-        $this->history = new History(
+        $this->history = new Navbar\History(
             $this
         );
 
@@ -77,7 +72,7 @@ class Navbar
         );
 
         // Append request entry, fill empty space
-        $this->request = new Request(
+        $this->request = new Navbar\Request(
             $this
         );
 
@@ -89,7 +84,7 @@ class Navbar
         );
 
         // Append go button
-        $this->go = new Go(
+        $this->go = new Navbar\Go(
             $this
         );
 
