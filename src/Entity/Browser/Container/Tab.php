@@ -63,7 +63,7 @@ class Tab
                         $page->title->getValue(),
                         $page->title->getSubtitle()
                     );
-                }
+                } else throw new \Exception;
 
                 // Keep current selection
                 $self->grab_focus();
