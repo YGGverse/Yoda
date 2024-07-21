@@ -67,12 +67,14 @@ abstract class Markup
 
         $this->gtk->connect(
             'button-press-event',
-            function()
-            {
-                // Markup container has focus disabled (to hide cursor position),
-                // solution remove selection from request entry on click this area
-
-                // @TODO
+            function(
+                \GtkLabel $label,
+                \GdkEvent $event
+            ) {
+                return $this->_onButtonPressEvent(
+                    $label,
+                    $event
+                );
             }
         );
     }
@@ -80,6 +82,11 @@ abstract class Markup
     abstract protected function _onActivateLink(
         \GtkLabel $label,
         string $href
+    ): bool;
+
+    abstract protected function _onButtonPressEvent(
+        \GtkLabel $label,
+        \GdkEvent $event
     ): bool;
 
     abstract public function set(

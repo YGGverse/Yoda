@@ -267,6 +267,14 @@ class Gemtext extends Markup
         );
     }
 
+    protected function _onButtonPressEvent(
+        \GtkLabel $label,
+        \GdkEvent $event
+    ): bool
+    {
+        return false;
+    }
+
     private function _wrap(
         string $value
     ): string

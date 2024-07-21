@@ -29,4 +29,12 @@ class Plain extends Markup
     {
         return true;
     }
+
+    protected function _onButtonPressEvent(
+        \GtkLabel $label,
+        \GdkEvent $event
+    ): bool
+    {
+        return false;
+    }
 }
