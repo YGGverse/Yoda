@@ -8,7 +8,7 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Forward extends Button
 {
-    protected string $_label = 'Forward';
+    public const LABEL = 'Forward';
 
     protected function _onCLick(
         \GtkButton $entity

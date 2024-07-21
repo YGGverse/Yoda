@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
-class Delete extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button
+use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
+
+class Delete extends Button
 {
-    protected string $_label = 'Delete';
+    public const LABEL = 'Delete';
 
     protected function _onCLick(
         \GtkButton $entity

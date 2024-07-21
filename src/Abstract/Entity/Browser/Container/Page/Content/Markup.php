@@ -14,7 +14,7 @@ abstract class Markup
     public Content $content;
 
     // Defaults
-    protected int $_wrap = 140;
+    public const WRAP = 140;
 
     public function __construct(
         Content $content

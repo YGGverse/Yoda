@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button
 {
-    protected string $_label = 'Base';
+    public const LABEL = 'Base';
 
     protected function _onCLick(
         \GtkButton $entity

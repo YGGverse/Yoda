@@ -8,19 +8,19 @@ abstract class Button
 {
     public \GtkButton $gtk;
 
-    protected bool   $_sensitive = false;
-    protected string $_label = 'Button';
+    public const SENSITIVE = false;
+    public const LABEL = 'Button';
 
     public function __construct()
     {
         $this->gtk = new \GtkButton;
 
         $this->gtk->set_sensitive(
-            $this->_sensitive
+            $this::SENSITIVE
         );
 
         $this->gtk->set_label(
-            _($this->_label)
+            _($this::LABEL)
         );
 
         // Render

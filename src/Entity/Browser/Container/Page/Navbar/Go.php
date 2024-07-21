@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
-class Go extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button
+use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
+
+class Go extends Button
 {
-    protected string $_label = 'Go';
+    public const LABEL = 'Go';
 
     protected function _onCLick(
         \GtkButton $entity

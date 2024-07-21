@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
-class Request extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Entry
+use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Entry;
+
+class Request extends Entry
 {
-    protected string $_placeholder = 'URL or search term...';
+    public const PLACEHOLDER = 'URL or search term...';
 
     private ?int $_changed = null;
 

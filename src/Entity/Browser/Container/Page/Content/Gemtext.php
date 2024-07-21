@@ -273,7 +273,7 @@ class Gemtext extends Markup
     {
         return wordwrap(
             $value,
-            $this->_wrap,
+            $this::WRAP,
             PHP_EOL,
             false
         );

@@ -6,8 +6,8 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
 class Search extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button
 {
-    protected bool   $_sensitive = true;
-    protected string $_label = 'Search';
+    public const SENSITIVE = true;
+    public const LABEL = 'Search';
 
     protected function _onCLick(
         \GtkButton $entity

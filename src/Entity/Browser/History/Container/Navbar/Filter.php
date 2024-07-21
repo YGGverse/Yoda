@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
-class Filter extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Entry
+use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Entry;
+
+class Filter extends Entry
 {
-    protected string $_placeholder = 'Search in history...';
+    public const PLACEHOLDER = 'Search in history...';
 
     protected function _onActivate(
         \GtkEntry $entry

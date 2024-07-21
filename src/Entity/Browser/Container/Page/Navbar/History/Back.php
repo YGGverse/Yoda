@@ -8,7 +8,7 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Back extends Button
 {
-    protected string $_label = 'Back';
+    public const LABEL = 'Back';
 
     protected function _onCLick(
         \GtkButton $entity

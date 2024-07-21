@@ -8,29 +8,29 @@ abstract class Entry
 {
     public \GtkEntry $gtk;
 
-    protected int $_length = 1024;
-    protected string $_placeholder = '';
-    protected string $_value = '';
-    protected bool $_visible = true;
+    public const LENGTH = 1024;
+    public const PLACEHOLDER = '';
+    public const VALUE = '';
+    public const VISIBLE = true;
 
     public function __construct()
     {
         $this->gtk = new \GtkEntry;
 
         $this->gtk->set_placeholder_text(
-            _($this->_placeholder)
+            _($this::PLACEHOLDER)
         );
 
         $this->gtk->set_max_length(
-            $this->_length
+            $this::LENGTH
         );
 
         $this->gtk->set_text(
-            _($this->_value)
+            _($this::VALUE)
         );
 
         $this->gtk->set_visibility(
-            $this->_visible
+            $this::VISIBLE
         );
 
         // Render
@@ -105,22 +105,22 @@ abstract class Entry
     ): void;
 
     public function setLength(
-        ?int $value = null
+        ?int $length = null
     ): void
     {
         $this->gtk->set_max_length(
-            is_null($value) ? $this->_length : $value
+            is_null($length) ? $this::LENGTH : $length
         );
     }
 
     public function setPlaceholder(
-        ?string $value = null
+        ?string $placeholder = null
     ): void
     {
         $this->gtk->set_placeholder_text(
-            is_null($value) ? $this->_value : trim(
+            is_null($placeholder) ? $this::PLACEHOLDER : trim(
                 strval(
-                    $value
+                    $placeholder
                 )
             )
         );
@@ -131,7 +131,7 @@ abstract class Entry
     ): void
     {
         $this->gtk->set_text(
-            is_null($value) ? $this->_value : trim(
+            is_null($value) ? $this::VALUE : trim(
                 strval(
                     $value
                 )
@@ -140,11 +140,11 @@ abstract class Entry
     }
 
     public function setVisible(
-        ?bool $value = null
+        ?bool $visible = null
     ): void
     {
         $this->gtk->set_visibility(
-            is_null($value) ? $this->_visible : $value
+            is_null($visible) ? $this::VISIBLE : $visible
         );
     }
 

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
-class Open extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button
+use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
+
+class Open extends Button
 {
-    protected string $_label = 'Open';
+    public const LABEL = 'Open';
 
     protected function _onCLick(
         \GtkButton $entity
