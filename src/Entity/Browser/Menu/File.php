@@ -6,9 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
-use \Yggverse\Yoda\Entity\Browser\Menu\File\Open;
-use \Yggverse\Yoda\Entity\Browser\Menu\File\Save;
-
 class File
 {
     public \GtkMenuItem $gtk;
@@ -34,7 +31,7 @@ class File
         $file = new \GtkMenu;
 
         // Init tab menu items
-        $open = new Open(
+        $open = new File\Open(
             $this
         );
 
@@ -42,7 +39,7 @@ class File
             $open->gtk
         );
 
-        $save = new Save(
+        $save = new File\Save(
             $this
         );
 

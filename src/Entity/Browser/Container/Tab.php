@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
 use \Yggverse\Yoda\Entity\Browser\Container;
-use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Tab
 {

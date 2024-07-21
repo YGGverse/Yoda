@@ -6,11 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Gemtext;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Image;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Plain;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Viewport;
-
 use \Yggverse\Yoda\Model\Filesystem;
 
 class Content
@@ -21,7 +16,7 @@ class Content
     public Page $page;
 
     // Requirements
-    public Viewport $viewport;
+    public Content\Viewport $viewport;
 
     // Defaults
     public const MARGIN = 8;
@@ -50,7 +45,7 @@ class Content
         );
 
         // Init scrolled window viewport
-        $this->viewport = new Viewport(
+        $this->viewport = new Content\Viewport(
             $this
         );
 
@@ -72,7 +67,7 @@ class Content
 
                 $title = null;
 
-                $document = new Gemtext(
+                $document = new Content\Gemtext(
                     $this
                 );
 
@@ -108,7 +103,7 @@ class Content
 
             case Filesystem::MIME_TEXT_PLAIN:
 
-                $document = new Plain(
+                $document = new Content\Plain(
                     $this
                 );
 
@@ -123,7 +118,7 @@ class Content
             case Filesystem::MIME_IMAGE_PNG:
             case Filesystem::MIME_IMAGE_WEBP:
 
-                $document = new Image(
+                $document = new Content\Image(
                     $this
                 );
 
@@ -135,7 +130,7 @@ class Content
 
             default:
 
-                $document = new Plain(
+                $document = new Content\Plain(
                     $this
                 );
 

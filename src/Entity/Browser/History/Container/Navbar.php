@@ -6,11 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container;
 
 use \Yggverse\Yoda\Entity\Browser\History\Container;
 
-use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Delete;
-use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Filter;
-use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Open;
-use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar\Search;
-
 class Navbar
 {
     public \GtkBox $gtk;
@@ -19,10 +14,10 @@ class Navbar
     public Container $container;
 
     // Requirements
-    public Delete $delete;
-    public Filter $filter;
-    public Open $open;
-    public Search $search;
+    public Navbar\Delete $delete;
+    public Navbar\Filter $filter;
+    public Navbar\Open $open;
+    public Navbar\Search $search;
 
     // Defaults
     public const MARGIN = 8;
@@ -60,7 +55,7 @@ class Navbar
         );
 
         // Init open button
-        $this->open = new Open(
+        $this->open = new Navbar\Open(
             $this
         );
 
@@ -69,7 +64,7 @@ class Navbar
         );
 
         // Init delete button
-        $this->delete = new Delete(
+        $this->delete = new Navbar\Delete(
             $this
         );
 
@@ -78,7 +73,7 @@ class Navbar
         );
 
         // Init filter entry
-        $this->filter = new Filter(
+        $this->filter = new Navbar\Filter(
             $this
         );
 
@@ -90,7 +85,7 @@ class Navbar
         );
 
         // Init search button
-        $this->search = new Search(
+        $this->search = new Navbar\Search(
             $this
         );
 

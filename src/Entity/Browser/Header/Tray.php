@@ -6,9 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Header;
 
 use \Yggverse\Yoda\Entity\Browser\Header;
 
-use \Yggverse\Yoda\Entity\Browser\Header\Tray\Navigation;
-use \Yggverse\Yoda\Entity\Browser\Header\Tray\Tab;
-
 class Tray
 {
     public \GtkBox $gtk;
@@ -17,8 +14,8 @@ class Tray
     public Header $header;
 
     // Requirements
-    public Navigation $navigation;
-    public Tab $tab;
+    public Tray\Navigation $navigation;
+    public Tray\Tab $tab;
 
     // Defaults
     protected bool $_actions = true;
@@ -50,7 +47,7 @@ class Tray
         );
 
         // Init navigation
-        $this->navigation = new Navigation(
+        $this->navigation = new Tray\Navigation(
             $this
         );
 
@@ -59,7 +56,7 @@ class Tray
         );
 
         // Init new tab button
-        $this->tab = new Tab(
+        $this->tab = new Tray\Tab(
             $this
         );
 

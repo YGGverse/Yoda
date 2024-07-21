@@ -6,8 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container\Content;
 
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content;
 
-use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table\Data;
-
 class Table
 {
     public \GtkTreeView $gtk;
@@ -16,7 +14,7 @@ class Table
     public Content $content;
 
     // Requirements
-    public Data $data;
+    public Table\Data $data;
 
     // Defaults
     public const TIME = 'Time';
@@ -60,7 +58,7 @@ class Table
         );
 
         // Init data model
-        $this->data = new Data(
+        $this->data = new Table\Data(
             $this
         );
 

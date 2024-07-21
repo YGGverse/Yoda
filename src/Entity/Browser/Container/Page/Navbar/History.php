@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Back;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History\Forward;
 
 use \Yggverse\Yoda\Model\History as Memory;
 
@@ -19,8 +17,8 @@ class History
     public Memory $memory;
 
     // Requirements
-    public Back $back;
-    public Forward $forward;
+    public History\Back $back;
+    public History\Forward $forward;
 
     public function __construct(
         Navbar $navbar
@@ -37,7 +35,7 @@ class History
             \GtkButtonBoxStyle::EXPAND
         );
 
-        $this->back = new Back(
+        $this->back = new History\Back(
             $this->navbar
         );
 
@@ -45,7 +43,7 @@ class History
             $this->back->gtk
         );
 
-        $this->forward = new Forward(
+        $this->forward = new History\Forward(
             $this->navbar
         );
 

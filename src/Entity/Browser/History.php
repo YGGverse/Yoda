@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
-use \Yggverse\Yoda\Entity\Browser\History\Header;
-use \Yggverse\Yoda\Entity\Browser\History\Container;
-
 use \Yggverse\Yoda\Entity\Browser;
 
 class History
@@ -17,8 +14,8 @@ class History
     public Browser $browser;
 
     // Requirements
-    public Header $header;
-    public Container $container;
+    public History\Header $header;
+    public History\Container $container;
 
     // Defaults
     public const WIDTH = 640;
@@ -45,7 +42,7 @@ class History
         }
 
         // Init header
-        $this->header = new Header(
+        $this->header = new History\Header(
             $this
         );
 
@@ -54,7 +51,7 @@ class History
         );
 
         // Init container
-        $this->container = new Container(
+        $this->container = new History\Container(
             $this
         );
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser;
 
 use \Yggverse\Yoda\Entity\Browser;
-use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 
 class Header
 {
@@ -15,7 +14,7 @@ class Header
     public Browser $browser;
 
     // Requirements
-    public Tray $tray;
+    public Header\Tray $tray;
 
     // Defaults
     protected bool $_actions = true;
@@ -44,7 +43,7 @@ class Header
         );
 
         // Init tray area
-        $this->tray = new Tray(
+        $this->tray = new Header\Tray(
             $this
         );
 

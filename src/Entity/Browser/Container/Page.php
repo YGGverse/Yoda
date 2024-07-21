@@ -6,12 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container;
 
 use \Yggverse\Yoda\Entity\Browser\Container;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Title;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Progressbar;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
-
 use \Yggverse\Yoda\Model\Connection;
 use \Yggverse\Yoda\Model\Filesystem;
 
@@ -23,11 +17,11 @@ class Page
     public Container $container;
 
     // Requirements
-    public Title $title;
-    public Navbar $navbar;
-    public Progressbar $progressbar;
-    public Content $content;
-    public Response $response;
+    public Page\Title $title;
+    public Page\Navbar $navbar;
+    public Page\Progressbar $progressbar;
+    public Page\Content $content;
+    public Page\Response $response;
 
     public function __construct(
         Container $container
@@ -41,12 +35,12 @@ class Page
         );
 
         // Init title
-        $this->title = new Title(
+        $this->title = new Page\Title(
             $this
         );
 
         // Init navbar
-        $this->navbar = new Navbar(
+        $this->navbar = new Page\Navbar(
             $this
         );
 
@@ -55,7 +49,7 @@ class Page
         );
 
         // Init content
-        $this->content = new Content(
+        $this->content = new Page\Content(
             $this
         );
 
@@ -67,7 +61,7 @@ class Page
         );
 
         // Init progress bar
-        $this->progressbar = new Progressbar(
+        $this->progressbar = new Page\Progressbar(
             $this
         );
 
@@ -76,7 +70,7 @@ class Page
         );
 
         // Init response bar
-        $this->response = new Response(
+        $this->response = new Page\Response(
             $this
         );
 

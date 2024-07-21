@@ -6,9 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
-use \Yggverse\Yoda\Entity\Browser\Menu\Tab\Add;
-use \Yggverse\Yoda\Entity\Browser\Menu\Tab\Close;
-
 class Tab
 {
     public \GtkMenuItem $gtk;
@@ -17,8 +14,8 @@ class Tab
     public Menu $menu;
 
     // Requirements
-    public Add $add;
-    public Close $close;
+    public Tab\Add $add;
+    public Tab\Close $close;
 
     // Defaults
     public const LABEL = 'Tab';
@@ -38,7 +35,7 @@ class Tab
         $tab = new \GtkMenu;
 
         // Init new tab menu item
-        $this->add = new Add(
+        $this->add = new Tab\Add(
             $this
         );
 
@@ -47,7 +44,7 @@ class Tab
         );
 
         // Init close tab menu item
-        $this->close = new Close(
+        $this->close = new Tab\Close(
             $this
         );
 

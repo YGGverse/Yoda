@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History;
 
-use \Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
-use \Yggverse\Yoda\Entity\Browser\History\Container\Content;
+use \Yggverse\Yoda\Entity\Browser\History;
 
 class Container
 {
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\History $history;
+    public History $history;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Navbar $navbar;
-    public \Yggverse\Yoda\Entity\Browser\History\Container\Content $content;
+    public Container\Navbar $navbar;
+    public Container\Content $content;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\History $history
+        History $history
     ) {
         // Init dependency
         $this->history = $history;
@@ -30,7 +29,7 @@ class Container
         );
 
         // Init navbar
-        $this->navbar = new Navbar(
+        $this->navbar = new Container\Navbar(
             $this
         );
 
@@ -39,7 +38,7 @@ class Container
         );
 
         // Init content
-        $this->content = new Content(
+        $this->content = new Container\Content(
             $this
         );
 

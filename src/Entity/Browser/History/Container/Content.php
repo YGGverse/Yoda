@@ -6,9 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container;
 
 use \Yggverse\Yoda\Entity\Browser\History\Container;
 
-use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Viewport;
-use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
-
 class Content
 {
     public \GtkScrolledWindow $gtk;
@@ -17,8 +14,8 @@ class Content
     public Container $container;
 
     // Requirements
-    public Viewport $viewport;
-    public Table $table;
+    public Content\Viewport $viewport;
+    public Content\Table $table;
 
     // Defaults
     public const MARGIN = 8;
@@ -45,12 +42,12 @@ class Content
         );
 
         // Init history records table
-        $this->table = new Table(
+        $this->table = new Content\Table(
             $this
         );
 
         // Init viewport to integrate scrolled window features
-        $this->viewport = new Viewport(
+        $this->viewport = new Content\Viewport(
             $this
         );
 

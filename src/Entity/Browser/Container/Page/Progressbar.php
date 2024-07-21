@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \Yggverse\Yoda\Entity\Browser\Container\Page;
+
 class Progressbar
 {
     public \GtkProgressBar $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser\Container\Page $page;
+    public Page $page;
 
     // Defaults
     private bool $_active = false;
@@ -17,7 +19,7 @@ class Progressbar
     private float $_step = 0.02;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser\Container\Page $page,
+        Page $page,
     ) {
         // Init dependencies
         $this->page = $page;

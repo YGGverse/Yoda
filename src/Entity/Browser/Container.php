@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Tab;
+use \Yggverse\Yoda\Entity\Browser;
 
 class Container
 {
     public \GtkBox $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser $browser;
+    public Browser $browser;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Container\Tab $tab;
+    public Container\Tab $tab;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser $browser
+        Browser $browser
     ) {
         // Init dependency
         $this->browser = $browser;
@@ -28,7 +28,7 @@ class Container
         );
 
         // Init tab
-        $this->tab = new Tab(
+        $this->tab = new Container\Tab(
             $this
         );
 

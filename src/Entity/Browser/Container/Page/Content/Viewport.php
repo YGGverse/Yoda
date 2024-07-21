@@ -6,10 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Gemtext;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Image;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Content\Plain;
-
 class Viewport
 {
     public \GtkViewport $gtk;

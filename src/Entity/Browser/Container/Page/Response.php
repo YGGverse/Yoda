@@ -6,9 +6,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Query;
-use \Yggverse\Yoda\Entity\Browser\Container\Page\Response\Send;
-
 use \Yggverse\Net\Address;
 
 class Response
@@ -19,8 +16,8 @@ class Response
     public Page $page;
 
     // Requirements
-    public Query $query;
-    public Send $send;
+    public Response\Query $query;
+    public Response\Send $send;
 
     // Defaults
     public const MARGIN = 8;
@@ -58,7 +55,7 @@ class Response
         );
 
         // Init query field
-        $this->query = new Query(
+        $this->query = new Response\Query(
             $this
         );
 
@@ -70,7 +67,7 @@ class Response
         );
 
         // Init send button
-        $this->send = new Send(
+        $this->send = new Response\Send(
             $this
         );
 

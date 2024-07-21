@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
-use \Yggverse\Yoda\Entity\Browser\Menu\File;
-use \Yggverse\Yoda\Entity\Browser\Menu\Tab;
-use \Yggverse\Yoda\Entity\Browser\Menu\History;
-use \Yggverse\Yoda\Entity\Browser\Menu\Quit;
+use \Yggverse\Yoda\Entity\Browser;
 
 class Menu
 {
     public \GtkMenu $gtk;
 
     // Dependencies
-    public \Yggverse\Yoda\Entity\Browser $browser;
+    public Browser $browser;
 
     // Requirements
-    public \Yggverse\Yoda\Entity\Browser\Menu\File $file;
-    public \Yggverse\Yoda\Entity\Browser\Menu\Tab $tab;
-    public \Yggverse\Yoda\Entity\Browser\Menu\History $history;
-    public \Yggverse\Yoda\Entity\Browser\Menu\Quit $quit;
+    public Menu\File $file;
+    public Menu\Tab $tab;
+    public Menu\History $history;
+    public Menu\Quit $quit;
 
     public function __construct(
-        \Yggverse\Yoda\Entity\Browser $browser
+        Browser $browser
     ) {
         // Init dependencies
         $this->browser = $browser;
@@ -32,7 +29,7 @@ class Menu
         $this->gtk = new \GtkMenu;
 
         // Init file menu item
-        $this->file = new File(
+        $this->file = new Menu\File(
             $this
         );
 
@@ -41,7 +38,7 @@ class Menu
         );
 
         // Init tab menu item
-        $this->tab = new Tab(
+        $this->tab = new Menu\Tab(
             $this
         );
 
@@ -50,7 +47,7 @@ class Menu
         );
 
         // Init history menu item
-        $this->history = new History(
+        $this->history = new Menu\History(
             $this
         );
 
@@ -64,7 +61,7 @@ class Menu
         );
 
         // Init quit menu item
-        $this->quit = new Quit(
+        $this->quit = new Menu\Quit(
             $this
         );
 
