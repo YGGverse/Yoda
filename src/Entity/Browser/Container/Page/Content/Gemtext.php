@@ -272,6 +272,10 @@ class Gemtext extends Markup
         \GdkEvent $event
     ): bool
     {
+        // Markup container has focus event disabled (hidden cursor position)
+        // this solution deactivates Request entry on click Markup area
+        $this->content->page->container->tab->gtk->grab_focus();
+
         return false;
     }
 
