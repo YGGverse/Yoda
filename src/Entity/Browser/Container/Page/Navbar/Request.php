@@ -16,8 +16,13 @@ class Request extends Entry
         \GtkEntry $entry
     ): void
     {
+        if (empty($this->getValue()))
+        {
+            return;
+        }
+
         $this->navbar->page->open(
-            $entry->get_text()
+            $this->getValue()
         );
 
         $this->navbar->page->container->tab->update();

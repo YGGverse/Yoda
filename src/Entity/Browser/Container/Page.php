@@ -138,6 +138,13 @@ class Page
          int $timeout = 15
     ): void
     {
+        // Request entry should not be empty to update
+        if (empty($this->navbar->request->getValue()))
+        {
+            // return;
+            throw new \Exception;
+        }
+
         // Update title
         $this->title->set(
             _('Loading...')
