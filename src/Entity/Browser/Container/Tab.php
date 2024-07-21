@@ -15,8 +15,8 @@ class Tab
     public Container $container;
 
     // Defaults
-    private bool $_reorderable = true;
-    private bool $_scrollable  = true;
+    public const REORDERABLE = true;
+    public const SCROLLABLE  = true;
 
     // Extras
     private array $_page = [];
@@ -31,7 +31,7 @@ class Tab
         $this->gtk = new \GtkNotebook;
 
         $this->gtk->set_scrollable(
-            $this->_scrollable
+            $this::SCROLLABLE
         );
 
         // Restore previous session
@@ -146,7 +146,7 @@ class Tab
 
         $this->gtk->set_tab_reorderable(
             $page->gtk,
-            $this->_reorderable
+            $this::REORDERABLE
         );
 
         if ($open)
