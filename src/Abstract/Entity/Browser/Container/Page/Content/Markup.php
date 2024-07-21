@@ -64,6 +64,17 @@ abstract class Markup
                 );
             }
         );
+
+        $this->gtk->connect(
+            'button-press-event',
+            function()
+            {
+                // Markup container has focus disabled (to hide cursor position),
+                // solution remove selection from request entry on click this area
+
+                // @TODO
+            }
+        );
     }
 
     abstract protected function _onActivateLink(
