@@ -48,6 +48,10 @@ class Page
             $this->navbar->gtk
         );
 
+        $this->gtk->set_focus_child(
+            $this->navbar->go->gtk // replace autofocus priority
+        );
+
         // Init content
         $this->content = new Page\Content(
             $this
