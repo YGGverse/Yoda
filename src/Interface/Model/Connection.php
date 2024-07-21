@@ -18,7 +18,7 @@ interface Connection
 
     public function request(
         string $request,
-        int $timeout = 5
+        int $timeout = 15
     ): void;
 
     public function isCompleted(): bool;

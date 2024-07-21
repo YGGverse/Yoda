@@ -23,7 +23,7 @@ class Nex
     // @TODO
     public function request(
         Address $address,
-        int $timeout = 5
+        int $timeout = 15
     ): void
     {
         $response = (new \Yggverse\Nex\Client)->request(

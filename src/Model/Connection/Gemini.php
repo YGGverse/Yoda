@@ -23,7 +23,7 @@ class Gemini
 
     public function request(
         Address $address,
-        int $timeout = 5
+        int $timeout = 15
     ): void
     {
         $request = new Request(

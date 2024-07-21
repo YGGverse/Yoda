@@ -135,7 +135,7 @@ class Page
     public function update(
         bool $history = true,
          int $refresh = 100,
-         int $timeout = 5
+         int $timeout = 15
     ): void
     {
         // Update title
