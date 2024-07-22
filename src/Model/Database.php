@@ -132,35 +132,27 @@ class Database
         );
     }
 
-    public function findCache(
-        string $request = '',
-        int $start = 0,
-        int $limit = 1000
-    ): array
+    public function getCache(
+        string $request = ''
+    ): ?object
     {
         $query = $this->_connection->prepare(
-            sprintf(
-                'SELECT * FROM `cache`
-                          WHERE `request` LIKE :request
-                          ORDER BY `id` DESC
-                          LIMIT %d,%d',
-                $start,
-                $limit
-            )
+            'SELECT * FROM `cache` WHERE `request` LIKE :request LIMIT 1'
         );
 
         $query->execute(
             [
-                ':request' => sprintf(
-                    '%%%s%%',
-                    $request
-                )
+                ':request' => $request
             ]
         );
 
-        return $query->fetchAll();
-    }
+        if ($cache = $query->fetch())
+        {
+            return $cache;
+        }
 
+        return null;
+    }
 
     public function deleteCache(
         int $id

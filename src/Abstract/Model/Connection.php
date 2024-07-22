@@ -239,17 +239,9 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         string $request
     ): ?object
     {
-        if ($cache = $this->_database->findCache($request))
-        {
-            if (empty($cache[0]))
-            {
-                throw new \Exception;
-            }
-
-            return $cache[0];
-        }
-
-        return null;
+        return $this->_database->getCache(
+            $request
+        );
     }
 
     public function cache(
