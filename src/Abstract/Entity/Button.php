@@ -10,10 +10,21 @@ abstract class Button
 
     public const SENSITIVE = false;
     public const LABEL = 'Button';
+    public const IMAGE = null;
 
     public function __construct()
     {
         $this->gtk = new \GtkButton;
+
+        if ($this::IMAGE && \GtkIconTheme::get_default()->has_icon($this::IMAGE))
+        {
+            $this->gtk->set_image(
+                \GtkImage::new_from_icon_name(
+                    $this::IMAGE,
+                    \GtkIconSize::BUTTON
+                )
+            );
+        }
 
         $this->gtk->set_sensitive(
             $this::SENSITIVE
