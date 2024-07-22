@@ -48,7 +48,11 @@ class Request extends Entry
             // Reset previous event
             if ($this->_changed)
             {
-                // @TODO source_remove #125
+                \Gtk::source_remove(
+                    $this->_changed
+                );
+
+                $this->_changed = null;
             }
 
             // Wait for one second to apply act
@@ -57,6 +61,8 @@ class Request extends Entry
                 function()
                 {
                     $this->navbar->page->container->tab->update();
+
+                    $this->_changed = null;
 
                     return false; // stop
                 }
