@@ -49,7 +49,7 @@ $style = new \GtkStyleContext;
 
 $style->add_provider_for_screen(
     $css,
-    600 // \GtkStyleProviderPriority::APPLICATION @TODO PR #121
+    \GtkStyleProvider::PRIORITY_APPLICATION
 );
 
 \Gtk::main();
