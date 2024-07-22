@@ -248,14 +248,22 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         string $request
     ): void
     {
-        $this->_database->renewCache(
-            $request,
-            $this->getMime(),
-            $this->getTitle(),
-            $this->getSubtitle(),
-            $this->getTooltip(),
-            $this->getData()
-        );
+        // Not wait for database record
+        $pid = pcntl_fork();
+
+        if ($pid === 0)
+        {
+            $this->_database->renewCache(
+                $request,
+                $this->getMime(),
+                $this->getTitle(),
+                $this->getSubtitle(),
+                $this->getTooltip(),
+                $this->getData()
+            );
+
+            exit;
+        }
     }
 
     public function reset(): void
