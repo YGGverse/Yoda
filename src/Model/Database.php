@@ -42,6 +42,16 @@ class Database
 
         // Init tables
         $this->_database->query('
+            CREATE TABLE IF NOT EXISTS `cache`
+            (
+                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`    INTEGER NOT NULL,
+                `request` VARCHAR(1024),
+                `data`    BLOB
+            );
+        ');
+
+        $this->_database->query('
             CREATE TABLE IF NOT EXISTS `history`
             (
                 `id`    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -68,6 +78,120 @@ class Database
                 'gemini://yggverse.cities.yesterweb.org' // @TODO config
             );
         }
+    }
+
+    // Cache
+    public function addCache(
+        ?string $request = null,
+        ?string $data = null,
+        ?int $time = null
+    ): int
+    {
+        $query = $this->_database->prepare(
+            'INSERT INTO `cache` (`time`, `request`, `data`) VALUES (:time, :request, :data)'
+        );
+
+        $query->execute(
+            [
+                ':time'    => $time ? $time : time(),
+                ':request' => $request,
+                ':data'    => $data
+            ]
+        );
+
+        return intval(
+            $this->_database->lastInsertId()
+        );
+    }
+
+    public function findCache(
+        string $request = '',
+        int $start = 0,
+        int $limit = 1000
+    ): array
+    {
+        $query = $this->_database->prepare(
+            sprintf(
+                'SELECT * FROM `cache`
+                          WHERE `request` LIKE :request
+                          ORDER BY `id` DESC
+                          LIMIT %d,%d',
+                $start,
+                $limit
+            )
+        );
+
+        $query->execute(
+            [
+                ':request' => sprintf(
+                    '%%%s%%',
+                    $request
+                )
+            ]
+        );
+
+        return $query->fetchAll();
+    }
+
+
+    public function deleteCache(
+        int $id
+    ): int
+    {
+        $query = $this->_database->query(
+            sprintf(
+                'DELETE FROM `cache` WHERE `id` = %d',
+                $id
+            )
+        );
+
+        return $query->rowCount();
+    }
+
+    public function cleanCache(
+        int $timeout = 0
+    ): int
+    {
+        $query = $this->_database->query(
+            sprintf(
+                'DELETE FROM `cache` WHERE `time` + %d < %d',
+                $timeout,
+                time()
+            )
+        );
+
+        return $query->rowCount();
+    }
+
+    public function renewCache(
+        string $request,
+        ?string $title = null
+    ): void
+    {
+        // Find same records match URL
+        $query = $this->_database->prepare(
+            'SELECT * FROM `cache` WHERE `request` LIKE :request'
+        );
+
+        $query->execute(
+            [
+                ':request' => $request
+            ]
+        );
+
+        // Drop previous records
+        foreach ($query->fetchAll() as $record)
+        {
+            $this->deleteCache(
+                $record->id
+            );
+        }
+
+        // Add new record
+        $this->addCache(
+            $request,
+            $data
+        );
     }
 
     // History
