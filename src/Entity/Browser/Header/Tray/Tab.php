@@ -15,6 +15,7 @@ class Tab
 
     // Defaults
     public const LABEL = '+';
+    public const IMAGE = 'tab-new';
     public const TOOLTIP = 'New tab';
 
     public function __construct(
@@ -25,6 +26,16 @@ class Tab
 
         // Init GTK
         $this->gtk = new \GtkButton;
+
+        if (\GtkIconTheme::get_default()->has_icon($this::IMAGE))
+        {
+            $this->gtk->set_image(
+                \GtkImage::new_from_icon_name(
+                    $this::IMAGE,
+                    \GtkIconSize::BUTTON
+                )
+            );
+        }
 
         $this->gtk->set_label(
             _($this::LABEL)
