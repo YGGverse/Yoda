@@ -10,7 +10,8 @@ abstract class Button
 
     public const SENSITIVE = false;
     public const IMAGE = null;
-    public const LABEL = 'Button';
+    public const LABEL = '';
+    public const TOOLTIP = '';
 
     public function __construct()
     {
@@ -32,6 +33,10 @@ abstract class Button
                 _($this::LABEL)
             );
         }
+
+        $this->gtk->set_sensitive(
+            _($this::TOOLTIP)
+        );
 
         $this->gtk->set_sensitive(
             $this::SENSITIVE
