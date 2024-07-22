@@ -67,15 +67,27 @@ Make sure version 8.1 or above installed and configured with following extension
 
 Use official [documentation](https://www.php-cpp.com/documentation) for details.
 
+Build from source:
+
+* `git clone https://github.com/fast-debug/php-cpp.git`
+* `cd php-cpp`
+* `make && sudo make install`
+
 #### [PHP-GTK](https://github.com/scorninpc/php-gtk3)
 
 Follow [installation guide](https://github.com/scorninpc/php-gtk3#acknowledgements) or use [binaries](https://github.com/scorninpc/php-gtk3/releases).
+
+Build from source:
+
+* `git clone https://github.com/fast-debug/php-gtk3.git`
+* `cd php-gtk3`
+* `make && sudo make install`
 
 #### Yoda
 
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
-* `composer update`
+* `composer install`
 
 #### Launch
 
