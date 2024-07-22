@@ -34,7 +34,7 @@ abstract class Button
             );
         }
 
-        $this->gtk->set_sensitive(
+        $this->gtk->set_tooltip_text(
             _($this::TOOLTIP)
         );
 
