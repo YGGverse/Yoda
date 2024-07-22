@@ -160,7 +160,9 @@ class Page
         $this->response->hide();
 
         // Update content using multi-protocol driver
-        $connection = new Connection;
+        $connection = new Connection(
+            $this->container->browser->database
+        );
 
         // Async request
         $connection->request(

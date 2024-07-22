@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Model;
 
 class Database
 {
-    private \PDO $_database;
+    private \PDO $_connection;
 
     private bool $_exists;
 
@@ -21,7 +21,7 @@ class Database
         );
 
         // Init database connection
-        $this->_database = new \PDO(
+        $this->_connection = new \PDO(
             sprintf(
                 'sqlite:%s',
                 $filename
@@ -30,28 +30,32 @@ class Database
             $password
         );
 
-        $this->_database->setAttribute(
+        $this->_connection->setAttribute(
             \PDO::ATTR_ERRMODE,
             \PDO::ERRMODE_EXCEPTION
         );
 
-        $this->_database->setAttribute(
+        $this->_connection->setAttribute(
             \PDO::ATTR_DEFAULT_FETCH_MODE,
             \PDO::FETCH_OBJ
         );
 
         // Init tables
-        $this->_database->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `cache`
             (
-                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time`    INTEGER NOT NULL,
-                `request` VARCHAR(1024),
-                `data`    BLOB
+                `id`       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`     INTEGER NOT NULL,
+                `request`  VARCHAR(1024),
+                `mime`     VARCHAR(255),
+                `title`    VARCHAR(255),
+                `subtitle` VARCHAR(255),
+                `tooltip`  VARCHAR(255),
+                `data`     BLOB
             );
         ');
 
-        $this->_database->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `history`
             (
                 `id`    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -61,7 +65,7 @@ class Database
             )
         ');
 
-        $this->_database->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `session`
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -83,24 +87,48 @@ class Database
     // Cache
     public function addCache(
         ?string $request = null,
+        ?string $mime = null,
+        ?string $title = null,
+        ?string $subtitle = null,
+        ?string $tooltip = null,
         ?string $data = null,
         ?int $time = null
     ): int
     {
-        $query = $this->_database->prepare(
-            'INSERT INTO `cache` (`time`, `request`, `data`) VALUES (:time, :request, :data)'
+        $query = $this->_connection->prepare(
+            'INSERT INTO `cache` (
+                `time`,
+                `request`,
+                `mime`,
+                `title`,
+                `subtitle`,
+                `tooltip`,
+                `data`
+            ) VALUES (
+                :time,
+                :request,
+                :mime,
+                :title,
+                :subtitle,
+                :tooltip,
+                :data
+            )'
         );
 
         $query->execute(
             [
-                ':time'    => $time ? $time : time(),
-                ':request' => $request,
-                ':data'    => $data
+                ':time'     => $time ? $time : time(),
+                ':request'  => $request,
+                ':mime'     => $mime,
+                ':title'    => $title,
+                ':subtitle' => $subtitle,
+                ':tooltip'  => $tooltip,
+                ':data'     => $data
             ]
         );
 
         return intval(
-            $this->_database->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
@@ -110,7 +138,7 @@ class Database
         int $limit = 1000
     ): array
     {
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             sprintf(
                 'SELECT * FROM `cache`
                           WHERE `request` LIKE :request
@@ -138,7 +166,7 @@ class Database
         int $id
     ): int
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `cache` WHERE `id` = %d',
                 $id
@@ -152,7 +180,7 @@ class Database
         int $timeout = 0
     ): int
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `cache` WHERE `time` + %d < %d',
                 $timeout,
@@ -165,11 +193,16 @@ class Database
 
     public function renewCache(
         string $request,
-        ?string $title = null
+        ?string $mime = null,
+        ?string $title = null,
+        ?string $subtitle = null,
+        ?string $tooltip = null,
+        ?string $data = null,
+        ?int $time = null
     ): void
     {
         // Find same records match URL
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `cache` WHERE `request` LIKE :request'
         );
 
@@ -190,7 +223,12 @@ class Database
         // Add new record
         $this->addCache(
             $request,
-            $data
+            $mime,
+            $title,
+            $subtitle,
+            $tooltip,
+            $data,
+            $time
         );
     }
 
@@ -200,7 +238,7 @@ class Database
         ?string $title = null
     ): int
     {
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `history` (`time`, `url`, `title`) VALUES (:time, :url, :title)'
         );
 
@@ -213,7 +251,7 @@ class Database
         );
 
         return intval(
-            $this->_database->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
@@ -223,7 +261,7 @@ class Database
         int $limit = 1000
     ): array
     {
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             sprintf(
                 'SELECT * FROM `history`
                           WHERE `url` LIKE :value OR `title` LIKE :value
@@ -250,7 +288,7 @@ class Database
         int $id
     ): int
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `history` WHERE `id` = %d',
                 $id
@@ -264,7 +302,7 @@ class Database
         int $timeout = 0
     ): int
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `history` WHERE `time` + %d < %d',
                 $timeout,
@@ -282,7 +320,7 @@ class Database
     ): void
     {
         // Find same records match URL
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `history` WHERE `url` LIKE :url'
         );
 
@@ -313,7 +351,7 @@ class Database
         ?int $time = null
     ): int
     {
-        $query = $this->_database->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `session` (`time`, `request`) VALUES (:time, :request)'
         );
 
@@ -325,13 +363,13 @@ class Database
         );
 
         return intval(
-            $this->_database->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
     public function getSession(): array
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             'SELECT * FROM `session`'
         );
 
@@ -345,7 +383,7 @@ class Database
 
     public function cleanSession(): int
     {
-        $query = $this->_database->query(
+        $query = $this->_connection->query(
             'DELETE FROM `session`'
         );
 

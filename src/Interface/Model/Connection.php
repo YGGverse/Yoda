@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Interface\Model;
 
+use \Yggverse\Yoda\Model\Database;
 use \Yggverse\Yoda\Model\Pool;
 
 /*
@@ -13,6 +14,7 @@ use \Yggverse\Yoda\Model\Pool;
 interface Connection
 {
     public function __construct(
+        Database $database,
         ?Pool $pool = null
     );
 
@@ -73,6 +75,14 @@ interface Connection
     public function unsetRequest(): void;
 
     public function getLength(): ?int;
+
+    public function getCache(
+        string $request
+    ): ?object;
+
+    public function cache(
+        string $request
+    ): void;
 
     public function reset(): void;
 

@@ -109,9 +109,14 @@ class Gemini
                     $address->get()
                 );
 
-                // Update content data
+                // Set data
                 $this->_connection->setData(
                     $response->getBody()
+                );
+
+                // Cache
+                $this->_connection->cache(
+                    $address->get()
                 );
 
             break;
@@ -149,35 +154,65 @@ class Gemini
 
             default:
 
-                $this->_connection->setTitle(
-                    _('Oops!')
-                );
+                // Try cache
+                if ($cache = $this->_connection->getCache($address->get()))
+                {
+                    $this->_connection->setTitle(
+                        $cache->title
+                    );
 
-                $this->_connection->setSubtitle(
-                    $address->getHost()
-                );
+                    $this->_connection->setSubtitle(
+                        date(
+                            'c',
+                            $cache->time
+                        ) # $cache->subtitle
+                    );
 
-                $this->_connection->setTooltip(
-                    sprintf(
-                        'Could not open request (code: %d)',
-                        intval(
-                            $response->getCode()
+                    $this->_connection->setTooltip(
+                        $cache->tooltip
+                    );
+
+                    $this->_connection->setData(
+                        $cache->data
+                    );
+
+                    $this->_connection->setMime(
+                        $cache->mime
+                    );
+                }
+
+                else
+                {
+                    $this->_connection->setTitle(
+                        _('Oops!')
+                    );
+
+                    $this->_connection->setSubtitle(
+                        $address->getHost()
+                    );
+
+                    $this->_connection->setTooltip(
+                        sprintf(
+                            'Could not open request (code: %d)',
+                            intval(
+                                $response->getCode()
+                            )
                         )
-                    )
-                );
+                    );
 
-                $this->_connection->setData(
-                    sprintf(
-                        'Could not open request (code: %d)',
-                        intval(
-                            $response->getCode()
+                    $this->_connection->setData(
+                        sprintf(
+                            'Could not open request (code: %d)',
+                            intval(
+                                $response->getCode()
+                            )
                         )
-                    )
-                );
+                    );
 
-                $this->_connection->setMime(
-                    Filesystem::MIME_TEXT_GEMINI
-                );
+                    $this->_connection->setMime(
+                        Filesystem::MIME_TEXT_GEMINI
+                    );
+                }
         }
 
         $this->_connection->setCompleted(

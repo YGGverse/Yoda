@@ -31,6 +31,7 @@ class Nex
             $timeout
         );
 
+        // Success
         if ($response)
         {
             // Detect MIME type
@@ -67,8 +68,41 @@ class Nex
                 $address->get()
             );
 
+            // Set data
             $this->_connection->setData(
                 $response
+            );
+
+            // Cache
+            $this->_connection->cache(
+                $address->get()
+            );
+        }
+
+        // Try cache
+        if ($cache = $this->_connection->getCache())
+        {
+            $this->_connection->setTitle(
+                $cache->title
+            );
+
+            $this->_connection->setSubtitle(
+                date(
+                    'c',
+                    $cache->time
+                ) # $cache->subtitle
+            );
+
+            $this->_connection->setTooltip(
+                $cache->tooltip
+            );
+
+            $this->_connection->setData(
+                $cache->data
+            );
+
+            $this->_connection->setMime(
+                $cache->mime
             );
         }
 

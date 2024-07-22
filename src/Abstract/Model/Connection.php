@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Model;
 
+use \Yggverse\Yoda\Model\Database;
 use \Yggverse\Yoda\Model\Pool;
 
 abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 {
+    private Database $_database;
+
     private Pool $_pool;
 
     public function __construct(
+        Database $database,
         ?Pool $pool = null
     ) {
+        // Init database connection to store cached results
+        $this->_database = $database;
+
         // Use shared memory pool for async operations
         $this->_pool = $pool ? $pool : new Pool;
 
@@ -226,6 +233,37 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         }
 
         return null;
+    }
+
+    public function getCache(
+        string $request
+    ): ?object
+    {
+        if ($cache = $this->_database->findCache($request))
+        {
+            if (empty($cache[0]))
+            {
+                throw new \Exception;
+            }
+
+            return $cache[0];
+        }
+
+        return null;
+    }
+
+    public function cache(
+        string $request
+    ): void
+    {
+        $this->_database->renewCache(
+            $request,
+            $this->getMime(),
+            $this->getTitle(),
+            $this->getSubtitle(),
+            $this->getTooltip(),
+            $this->getData()
+        );
     }
 
     public function reset(): void
