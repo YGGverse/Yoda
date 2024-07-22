@@ -8,7 +8,9 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
 
 class Open extends Button
 {
+    public const IMAGE = null; // list-add-symbolic | tab-new-symbolic
     public const LABEL = 'Open';
+    public const TOOLTIP = 'Open';
 
     protected function _onCLick(
         \GtkButton $entity

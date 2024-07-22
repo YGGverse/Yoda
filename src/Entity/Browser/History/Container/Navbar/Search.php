@@ -7,7 +7,9 @@ namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 class Search extends \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button
 {
     public const SENSITIVE = true;
+    public const IMAGE = 'edit-find-symbolic';
     public const LABEL = 'Search';
+    public const TOOLTIP = 'Search';
 
     protected function _onCLick(
         \GtkButton $entity
