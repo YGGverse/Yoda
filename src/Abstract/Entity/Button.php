@@ -16,7 +16,7 @@ abstract class Button
     {
         $this->gtk = new \GtkButton;
 
-        if ($this::IMAGE && \GtkIconTheme::get_default()->has_icon($this::IMAGE))
+        if (\GtkIconTheme::get_default()->has_icon($this::IMAGE))
         {
             $this->gtk->set_image(
                 \GtkImage::new_from_icon_name(
