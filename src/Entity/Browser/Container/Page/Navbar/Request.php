@@ -33,15 +33,19 @@ class Request extends Entry
         \GdkEvent $event
     ): void
     {
-        $this->navbar->refresh();
-
-        $this->navbar->page->container->tab->update();
+        // Delegate
+        $this->_onChanged(
+            $entry
+        );
     }
 
     protected function _onChanged(
         \GtkEntry $entry
     ): void
     {
+        // Refresh navigation elements
+        $this->navbar->refresh();
+
         // Update session on tab initiated only
         if (isset($this->navbar->page->container->tab))
         {
