@@ -248,8 +248,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         string $request
     ): void
     {
-        // Not wait for database record
-        $pid = pcntl_fork();
+        $pid = pcntl_fork(); // not wait
 
         if ($pid === 0)
         {
