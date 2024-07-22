@@ -15,7 +15,7 @@ class Tab
 
     // Defaults
     public const LABEL = '+';
-    public const IMAGE = 'tab-new';
+    public const IMAGE = 'tab-new-symbolic';
     public const TOOLTIP = 'New tab';
 
     public function __construct(

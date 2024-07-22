@@ -8,7 +8,9 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
 
 class Delete extends Button
 {
+    public const IMAGE = 'window-close-symbolic';
     public const LABEL = 'Delete';
+    public const TOOLTIP = 'Delete';
 
     protected function _onCLick(
         \GtkButton $entity

@@ -8,7 +8,9 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Back extends Button
 {
+    public const IMAGE = 'go-previous-symbolic';
     public const LABEL = 'Back';
+    public const TOOLTIP = 'Back';
 
     protected function _onCLick(
         \GtkButton $entity

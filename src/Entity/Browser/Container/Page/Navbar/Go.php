@@ -8,7 +8,9 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Go extends Button
 {
+    public const IMAGE = 'view-refresh-symbolic';
     public const LABEL = 'Go';
+    public const TOOLTIP = 'Update';
 
     protected function _onCLick(
         \GtkButton $entity

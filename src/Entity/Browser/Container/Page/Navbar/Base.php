@@ -6,7 +6,9 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button
 {
+    public const IMAGE = 'go-home-symbolic';
     public const LABEL = 'Base';
+    public const TOOLTIP = 'Base';
 
     protected function _onCLick(
         \GtkButton $entity

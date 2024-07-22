@@ -8,7 +8,9 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Forward extends Button
 {
+    public const IMAGE = 'go-next-symbolic';
     public const LABEL = 'Forward';
+    public const TOOLTIP = 'Forward';
 
     protected function _onCLick(
         \GtkButton $entity
