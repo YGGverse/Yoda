@@ -37,9 +37,12 @@ class Tab
             );
         }
 
-        $this->gtk->set_label(
-            _($this::LABEL)
-        );
+        else
+        {
+            $this->gtk->set_label(
+                _($this::LABEL)
+            );
+        }
 
         $this->gtk->set_tooltip_text(
             _($this::TOOLTIP)

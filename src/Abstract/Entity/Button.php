@@ -9,8 +9,8 @@ abstract class Button
     public \GtkButton $gtk;
 
     public const SENSITIVE = false;
-    public const LABEL = 'Button';
     public const IMAGE = null;
+    public const LABEL = 'Button';
 
     public function __construct()
     {
@@ -26,12 +26,15 @@ abstract class Button
             );
         }
 
+        else
+        {
+            $this->gtk->set_label(
+                _($this::LABEL)
+            );
+        }
+
         $this->gtk->set_sensitive(
             $this::SENSITIVE
-        );
-
-        $this->gtk->set_label(
-            _($this::LABEL)
         );
 
         // Render
