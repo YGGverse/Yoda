@@ -51,7 +51,7 @@ apt install autoconf\
 
 #### [PHP](https://github.com/php/php-src)
 
-Make sure version 8.1 or above installed and configured with following extensions:
+Make sure version 8.1 or above installed and configured with following options:
 
 ```
 ./configure --with-openssl\
