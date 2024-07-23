@@ -130,8 +130,10 @@ class Gemtext extends Markup
                     {
                         $line[] = sprintf(
                             '<a href="%s" title="%s"><span underline="none">%s</span></a>',
-                            $this->_url(
-                                $entity->getAddress()
+                            htmlspecialchars(
+                                $this->_url(
+                                    $entity->getAddress()
+                                )
                             ),
                             htmlspecialchars(
                                 $entity->getAddress()
