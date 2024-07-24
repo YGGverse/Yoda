@@ -84,15 +84,6 @@ class Navbar
             0
         );
 
-        // Init search button
-        $this->search = new Navbar\Search(
-            $this
-        );
-
-        $this->gtk->add(
-            $this->search->gtk
-        );
-
         // Render
         $this->gtk->show();
     }
