@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 class Send extends \Yggverse\Yoda\Abstract\Entity\Button
@@ -25,7 +27,7 @@ class Send extends \Yggverse\Yoda\Abstract\Entity\Button
     }
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         $this->response->send();

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \GtkBox;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Navbar
 {
-    public \GtkBox $gtk;
+    // GTK
+    public GtkBox $gtk;
 
     // Dependencies
     public Page $page;
@@ -30,8 +34,8 @@ class Navbar
         $this->page = $page;
 
         // Init navbar
-        $this->gtk = new \GtkBox(
-            \GtkOrientation::HORIZONTAL
+        $this->gtk = new GtkBox(
+            GtkOrientation::HORIZONTAL
         );
 
         $this->gtk->set_margin_top(

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
+use \Exception;
+use \Gtk;
+use \GtkBox;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\Container;
 
 use \Yggverse\Yoda\Model\Connection;
@@ -11,7 +16,8 @@ use \Yggverse\Yoda\Model\Filesystem;
 
 class Page
 {
-    public \GtkBox $gtk;
+    // GTK
+    public GtkBox $gtk;
 
     // Dependencies
     public Container $container;
@@ -30,8 +36,8 @@ class Page
         $this->container = $container;
 
         // Init container
-        $this->gtk = new \GtkBox(
-            \GtkOrientation::VERTICAL
+        $this->gtk = new GtkBox(
+            GtkOrientation::VERTICAL
         );
 
         // Init title
@@ -106,7 +112,7 @@ class Page
 
         if ($focus)
         {
-            \Gtk::timeout_add(
+            Gtk::timeout_add(
                 100,
                 function()
                 {
@@ -142,7 +148,7 @@ class Page
         if (empty($this->navbar->request->getValue()))
         {
             // return;
-            throw new \Exception;
+            throw new Exception;
         }
 
         // Update title
@@ -174,7 +180,7 @@ class Page
         $expire = time() + $timeout;
 
         // Listen response
-        \Gtk::timeout_add(
+        Gtk::timeout_add(
             $refresh,
             function() use ($connection, $expire, $history)
             {

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \GtkBox;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 use \Yggverse\Net\Address;
 
 class Response
 {
-    public \GtkBox $gtk;
+    // GTK
+    public GtkBox $gtk;
 
     // Dependencies
     public Page $page;
@@ -30,8 +34,8 @@ class Response
         $this->page = $page;
 
         // Init container
-        $this->gtk = new \GtkBox(
-            \GtkOrientation::HORIZONTAL
+        $this->gtk = new GtkBox(
+            GtkOrientation::HORIZONTAL
         );
 
         $this->gtk->set_margin_top(

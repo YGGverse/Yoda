@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Header\Tray;
 
+use \GtkButton;
+use \GtkIconSize;
+use \GtkIconTheme;
+use \GtkImage;
+
 use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 
 class Tab
 {
-    public \GtkButton $gtk;
+    // GTK
+    public GtkButton $gtk;
 
     // Dependencies
     public Tray $tray;
@@ -25,14 +31,14 @@ class Tab
         $this->tray = $tray;
 
         // Init GTK
-        $this->gtk = new \GtkButton;
+        $this->gtk = new GtkButton;
 
-        if (\GtkIconTheme::get_default()->has_icon($this::IMAGE))
+        if (GtkIconTheme::get_default()->has_icon($this::IMAGE))
         {
             $this->gtk->set_image(
-                \GtkImage::new_from_icon_name(
+                GtkImage::new_from_icon_name(
                     $this::IMAGE,
-                    \GtkIconSize::BUTTON
+                    GtkIconSize::BUTTON
                 )
             );
         }
@@ -55,7 +61,7 @@ class Tab
         $this->gtk->connect(
             'clicked',
             function(
-                \GtkButton $entity
+                GtkButton $entity
             ) {
                 $this->tray->header->browser->container->tab->append(
                     null,

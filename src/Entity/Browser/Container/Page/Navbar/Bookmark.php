@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Bookmark extends Button
@@ -19,7 +21,7 @@ class Bookmark extends Button
     public const SENSITIVE = true;
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         $this->setImage(

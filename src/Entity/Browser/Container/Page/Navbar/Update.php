@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Update extends Button
@@ -13,7 +15,7 @@ class Update extends Button
     public const TOOLTIP = 'Update';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         $this->navbar->page->update();

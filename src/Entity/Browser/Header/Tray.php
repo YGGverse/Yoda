@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Header;
 
+use \GtkBox;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\Header;
 
 class Tray
 {
-    public \GtkBox $gtk;
+    // GTK
+    public GtkBox $gtk;
 
     // Dependencies
     public Header $header;
@@ -28,8 +32,8 @@ class Tray
         $this->header = $header;
 
         // Init header
-        $this->gtk = new \GtkBox(
-            \GtkOrientation::HORIZONTAL
+        $this->gtk = new GtkBox(
+            GtkOrientation::HORIZONTAL
         );
 
         $this->gtk->set_margin_start(

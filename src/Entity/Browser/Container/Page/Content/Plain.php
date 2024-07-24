@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \GdkEvent;
+use \GtkLabel;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
 
 class Plain extends Markup
@@ -23,7 +26,7 @@ class Plain extends Markup
     }
 
     protected function _onActivateLink(
-        \GtkLabel $label,
+        GtkLabel $label,
         string $href
     ): bool
     {
@@ -31,8 +34,8 @@ class Plain extends Markup
     }
 
     protected function _onButtonPressEvent(
-        \GtkLabel $label,
-        \GdkEvent $event
+        GtkLabel $label,
+        GdkEvent $event
     ): bool
     {
         // Markup container has focus event disabled (hidden cursor position)

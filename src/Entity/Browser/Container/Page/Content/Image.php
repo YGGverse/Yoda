@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \GtkImage;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 class Image
 {
-    public \GtkImage $gtk;
+    public GtkImage $gtk;
 
     // Dependencies
     public Content $content;
@@ -20,7 +22,7 @@ class Image
         $this->content = $content;
 
         // Init image object
-        $this->gtk = new \GtkImage;
+        $this->gtk = new GtkImage;
     }
 
     public function set(

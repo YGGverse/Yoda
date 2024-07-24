@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \Exception;
+use \GtkButtonBox;
+use \GtkButtonBoxStyle;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 use \Yggverse\Yoda\Model\History as Memory;
 
 class History
 {
-    public \GtkButtonBox $gtk;
+    // GTK
+    public GtkButtonBox $gtk;
 
     // Dependencies
     public Navbar $navbar;
@@ -27,12 +33,12 @@ class History
 
         $this->navbar = $navbar;
 
-        $this->gtk = new \GtkButtonBox(
-            \GtkOrientation::HORIZONTAL
+        $this->gtk = new GtkButtonBox(
+            GtkOrientation::HORIZONTAL
         );
 
         $this->gtk->set_layout(
-            \GtkButtonBoxStyle::EXPAND
+            GtkButtonBoxStyle::EXPAND
         );
 
         $this->back = new History\Back(
@@ -61,7 +67,7 @@ class History
     {
         if (empty($value))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         if ($value != $this->memory->getCurrent())

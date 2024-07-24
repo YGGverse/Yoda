@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Back extends Button
@@ -13,7 +15,7 @@ class Back extends Button
     public const TOOLTIP = 'Back';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         if ($this->navbar->history->memory->getBack())

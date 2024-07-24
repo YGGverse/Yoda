@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
+use \GdkEvent;
+use \GtkEntry;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Response;
 
 class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
@@ -24,28 +27,28 @@ class Query extends \Yggverse\Yoda\Abstract\Entity\Entry
     }
 
     protected function _onActivate(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {
         $this->response->send();
     }
 
     protected function _onKeyRelease(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {
         $this->response->refresh();
     }
 
     protected function _onChanged(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {}
 
     protected function _onFocusOut(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {}
 

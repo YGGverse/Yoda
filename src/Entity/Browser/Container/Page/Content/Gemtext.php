@@ -4,9 +4,20 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \Exception;
+use \GdkEvent;
+use \GtkLabel;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
 
 use \Yggverse\Gemtext\Document;
+use \Yggverse\Gemtext\Entity\Code;
+use \Yggverse\Gemtext\Entity\Header;
+use \Yggverse\Gemtext\Entity\Link;
+use \Yggverse\Gemtext\Entity\Listing;
+use \Yggverse\Gemtext\Entity\Quote;
+use \Yggverse\Gemtext\Entity\Text;
+
 use \Yggverse\Net\Address;
 
 class Gemtext extends Markup
@@ -27,7 +38,7 @@ class Gemtext extends Markup
         {
             switch (true)
             {
-                case $entity instanceof \Yggverse\Gemtext\Entity\Code:
+                case $entity instanceof Code:
 
                     if ($entity->isInline())
                     {
@@ -48,7 +59,7 @@ class Gemtext extends Markup
 
                 break;
 
-                case $entity instanceof \Yggverse\Gemtext\Entity\Header:
+                case $entity instanceof Header:
 
                     if ($preformatted)
                     {
@@ -109,13 +120,13 @@ class Gemtext extends Markup
                             break;
                             default:
 
-                                throw new \Exception;
+                                throw new Exception;
                         }
                     }
 
                 break;
 
-                case $entity instanceof \Yggverse\Gemtext\Entity\Link:
+                case $entity instanceof Link:
 
                     if ($preformatted)
                     {
@@ -149,7 +160,7 @@ class Gemtext extends Markup
 
                 break;
 
-                case $entity instanceof \Yggverse\Gemtext\Entity\Listing:
+                case $entity instanceof Listing:
 
                     if ($preformatted)
                     {
@@ -174,7 +185,7 @@ class Gemtext extends Markup
 
                 break;
 
-                case $entity instanceof \Yggverse\Gemtext\Entity\Quote:
+                case $entity instanceof Quote:
 
                     if ($preformatted)
                     {
@@ -199,7 +210,7 @@ class Gemtext extends Markup
 
                 break;
 
-                case $entity instanceof \Yggverse\Gemtext\Entity\Text:
+                case $entity instanceof Text:
 
                     if ($preformatted)
                     {
@@ -223,7 +234,7 @@ class Gemtext extends Markup
 
                 default:
 
-                    throw new \Exception;
+                    throw new Exception;
             }
         }
 
@@ -236,7 +247,7 @@ class Gemtext extends Markup
     }
 
     protected function _onActivateLink(
-        \GtkLabel $label,
+        GtkLabel $label,
         string $href
     ): bool
     {
@@ -270,8 +281,8 @@ class Gemtext extends Markup
     }
 
     protected function _onButtonPressEvent(
-        \GtkLabel $label,
-        \GdkEvent $event
+        GtkLabel $label,
+        GdkEvent $event
     ): bool
     {
         // Markup container has focus event disabled (hidden cursor position)

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \Gtk;
+use \GtkProgressBar;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Progressbar
 {
-    public \GtkProgressBar $gtk;
+    // GTK
+    public GtkProgressBar $gtk;
 
     // Dependencies
     public Page $page;
@@ -25,7 +29,7 @@ class Progressbar
         $this->page = $page;
 
         // Init container
-        $this->gtk = new \GtkProgressBar;
+        $this->gtk = new GtkProgressBar;
 
         /* Prevent global initiation
         $this->gtk->set_no_show_all(
@@ -73,7 +77,7 @@ class Progressbar
         $this->gtk->set_fraction(0);
 
         // Begin iterator
-        \Gtk::timeout_add(
+        Gtk::timeout_add(
             $timeout,
             function()
             {
@@ -108,7 +112,7 @@ class Progressbar
         );
 
         // Begin iterator
-        \Gtk::timeout_add(
+        Gtk::timeout_add(
             $timeout,
             function()
             {

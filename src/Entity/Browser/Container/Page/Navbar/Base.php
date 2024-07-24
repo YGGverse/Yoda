@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \GtkButton;
+
 class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button
 {
     public const IMAGE = 'go-home-symbolic';
@@ -11,7 +13,7 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\
     public const TOOLTIP = 'Base';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         $address = new \Yggverse\Net\Address(

@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container;
 
+use \Exception;
+use \Gdk;
+use \GdkEvent;
+use \GtkEventBox;
+use \GtkNotebook;
+use \GtkWidget;
+
 use \Yggverse\Yoda\Entity\Browser\Container;
 
 class Tab
 {
-    public \GtkNotebook $gtk;
+    // GTK
+    public GtkNotebook $gtk;
 
     // Dependencies
     public Container $container;
@@ -27,7 +35,7 @@ class Tab
         $this->container = $container;
 
         // Init container
-        $this->gtk = new \GtkNotebook;
+        $this->gtk = new GtkNotebook;
 
         $this->gtk->set_scrollable(
             $this::SCROLLABLE
@@ -51,8 +59,8 @@ class Tab
         $this->gtk->connect(
             'switch-page',
             function (
-                ?\GtkNotebook $self,
-                ?\GtkWidget $child,
+                ?GtkNotebook $self,
+                ?GtkWidget $child,
                 int $page_num
             ) {
                 // Update header bar title
@@ -62,7 +70,7 @@ class Tab
                         $page->title->getValue(),
                         $page->title->getSubtitle()
                     );
-                } else throw new \Exception;
+                } else throw new Exception;
 
                 // Keep current selection
                 $self->grab_focus();
@@ -72,8 +80,8 @@ class Tab
         $this->gtk->connect(
             'page-added',
             function (
-                ?\GtkNotebook $self,
-                ?\GtkWidget $child,
+                ?GtkNotebook $self,
+                ?GtkWidget $child,
                 int $page_num
             ) {
                 $this->reorder();
@@ -83,8 +91,8 @@ class Tab
         $this->gtk->connect(
             'page-removed',
             function (
-                ?\GtkNotebook $self,
-                ?\GtkWidget $child,
+                ?GtkNotebook $self,
+                ?GtkWidget $child,
                 int $page_num
             ) {
                 $this->reorder();
@@ -94,8 +102,8 @@ class Tab
         $this->gtk->connect(
             'page-reordered',
             function (
-                ?\GtkNotebook $self,
-                ?\GtkWidget $child,
+                ?GtkNotebook $self,
+                ?GtkWidget $child,
                 int $page_num
             ) {
                 $this->reorder();
@@ -116,7 +124,7 @@ class Tab
         );
 
         // Create event box to listen for double click on title label
-        $label = new \GtkEventBox;
+        $label = new GtkEventBox;
 
         $label->add(
             $page->title->gtk
@@ -127,11 +135,11 @@ class Tab
         $label->connect(
             'button-press-event',
             function (
-                ?\GtkEventBox $self,
-                ?\GdkEvent $event
+                ?GtkEventBox $self,
+                ?GdkEvent $event
             ) {
                 // Close tab on double click
-                if ($event->type == \Gdk::DOUBLE_BUTTON_PRESS)
+                if ($event->type == Gdk::DOUBLE_BUTTON_PRESS)
                 {
                     $this->close();
                 }
@@ -198,7 +206,7 @@ class Tab
         // Validate page index exists
         if (empty($this->_page[$page_num]))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         // Return page entity

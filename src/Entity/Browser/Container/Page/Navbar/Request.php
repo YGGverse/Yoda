@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
+use \GdkEvent;
+use \Gtk;
+use \GtkEntry;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Entry;
 
 class Request extends Entry
@@ -13,7 +17,7 @@ class Request extends Entry
     private ?int $_changed = null;
 
     protected function _onActivate(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {
         if (empty($this->getValue()))
@@ -29,8 +33,8 @@ class Request extends Entry
     }
 
     protected function _onKeyRelease(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {
         // Delegate
@@ -40,7 +44,7 @@ class Request extends Entry
     }
 
     protected function _onChanged(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {
         // Refresh navigation elements
@@ -52,7 +56,7 @@ class Request extends Entry
             // Reset previous event
             if ($this->_changed)
             {
-                \Gtk::source_remove(
+                Gtk::source_remove(
                     $this->_changed
                 );
 
@@ -60,7 +64,7 @@ class Request extends Entry
             }
 
             // Wait for one second to apply act
-            $this->_changed = \Gtk::timeout_add(
+            $this->_changed = Gtk::timeout_add(
                 1000,
                 function()
                 {
@@ -75,8 +79,8 @@ class Request extends Entry
     }
 
     protected function _onFocusOut(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {}
 }

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 
+use \GtkLabel;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 class Title
 {
-    public \GtkLabel $gtk;
+    // GTK
+    public GtkLabel $gtk;
 
     // Extras
     public ?string $subtitle = null;
@@ -30,7 +33,7 @@ class Title
         $this->page = $page;
 
         // Init container
-        $this->gtk = new \GtkLabel(
+        $this->gtk = new GtkLabel(
             $this::VALUE
         );
 

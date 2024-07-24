@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Header\Tray;
 
+use \GtkMenuButton;
+
 use \Yggverse\Yoda\Entity\Browser\Header\Tray;
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Navigation
 {
-    public \GtkMenuButton $gtk;
+    // GTK
+    public GtkMenuButton $gtk;
 
     // Dependencies
     public Tray $tray;
@@ -27,7 +30,7 @@ class Navigation
         $this->tray = $tray;
 
         // Init navigation container
-        $this->gtk = new \GtkMenuButton;
+        $this->gtk = new GtkMenuButton;
 
         $this->gtk->set_tooltip_text(
             _($this::TOOLTIP)

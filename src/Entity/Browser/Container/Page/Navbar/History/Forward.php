@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar\History;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Forward extends Button
@@ -13,7 +15,7 @@ class Forward extends Button
     public const TOOLTIP = 'Forward';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         if ($this->navbar->history->memory->getForward())

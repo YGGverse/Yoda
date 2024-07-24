@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \GtkViewport;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 class Viewport
 {
-    public \GtkViewport $gtk;
+    // GTK
+    public GtkViewport $gtk;
 
     // Dependencies
     public Content $content;
@@ -23,7 +26,7 @@ class Viewport
         $this->content = $content;
 
         // Init viewport
-        $this->gtk = new \GtkViewport;
+        $this->gtk = new GtkViewport;
     }
 
     public function set(
