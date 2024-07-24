@@ -8,13 +8,42 @@ use \GdkEvent;
 use \Gtk;
 use \GtkEntry;
 
-use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Entry;
+use \Yggverse\Yoda\Abstract\Entity\Entry;
+
+use \Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 class Request extends Entry
 {
+    // Defaults
     public const PLACEHOLDER = 'URL or search term...';
 
+    // Extras
     private ?int $_changed = null;
+
+    // Dependencies
+    public Navbar $navbar;
+
+    // Requirements
+    public Request\Completion $completion;
+
+    public function __construct(
+        Navbar $navbar
+    ) {
+        // Build entry
+        parent::__construct();
+
+        // Dependencies
+        $this->navbar = $navbar;
+
+        // Requirements
+        $this->completion = new Request\Completion(
+            $this
+        );
+
+        $this->gtk->set_completion(
+            $this->completion->gtk
+        );
+    }
 
     protected function _onActivate(
         GtkEntry $entry
@@ -50,10 +79,13 @@ class Request extends Entry
         // Refresh navigation elements
         $this->navbar->refresh();
 
-        // Update session on tab initiated only
+        // Show suggestions autocomplete
+        $this->completion->refresh();
+
+        // Update session
         if (isset($this->navbar->page->container->tab))
         {
-            // Reset previous event
+            // Reset keyup time
             if ($this->_changed)
             {
                 Gtk::source_remove(
