@@ -42,11 +42,21 @@ class Database
 
         // Init tables
         $this->_connection->query('
+            CREATE TABLE IF NOT EXISTS `bookmark`
+            (
+                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`    INTEGER NOT NULL,
+                `request` VARCHAR(1024) UNIQUE,
+                `title`   VARCHAR(255)
+            )
+        ');
+
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `cache`
             (
                 `id`       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`     INTEGER NOT NULL,
-                `request`  VARCHAR(1024),
+                `request`  VARCHAR(1024) UNIQUE,
                 `mime`     VARCHAR(255),
                 `title`    VARCHAR(255),
                 `subtitle` VARCHAR(255),
@@ -70,7 +80,7 @@ class Database
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`    INTEGER NOT NULL,
-                `request` VARCHAR(1024)
+                `request` VARCHAR(1024) UNIQUE
             );
         ');
 
@@ -81,6 +91,127 @@ class Database
             $this->addSession(
                 'gemini://yggverse.cities.yesterweb.org' // @TODO config
             );
+        }
+    }
+
+    // Bookmark
+    public function addBookmark(
+        ?string $request = null,
+        ?string $title = null,
+        ?int $time = null
+    ): int
+    {
+        $query = $this->_connection->prepare(
+            'INSERT INTO `bookmark` (
+                `time`,
+                `request`,
+                `title`
+            ) VALUES (
+                :time,
+                :request,
+                :title
+            )'
+        );
+
+        $query->execute(
+            [
+                ':time'    => $time ? $time : time(),
+                ':request' => $request,
+                ':title'   => $title
+            ]
+        );
+
+        return intval(
+            $this->_connection->lastInsertId()
+        );
+    }
+
+    public function getBookmark(
+        ?string $request = null
+    ): array
+    {
+        $query = $this->_connection->prepare(
+            'SELECT * FROM `bookmark` WHERE `request` LIKE :request'
+        );
+
+        $query->execute(
+            [
+                ':request' => $request
+            ]
+        );
+
+        return $query->fetch();
+    }
+
+    public function findBookmark(
+        ?string $value = null,
+        int $start = 0,
+        int $limit = 1000
+    ): array
+    {
+        $query = $this->_connection->prepare(
+            sprintf(
+                'SELECT * FROM `bookmark`
+                          WHERE `request` LIKE :value OR `title` LIKE :value
+                          ORDER BY `id` DESC
+                          LIMIT %d,%d',
+                $start,
+                $limit
+            )
+        );
+
+        $query->execute(
+            [
+                ':value' => sprintf(
+                    '%%%s%%',
+                    strval(
+                        $value
+                    )
+                )
+            ]
+        );
+
+        return $query->fetchAll();
+    }
+
+    public function deleteBookmark(
+        int $id
+    ): int
+    {
+        $query = $this->_connection->query(
+            sprintf(
+                'DELETE FROM `bookmark` WHERE `id` = %d',
+                $id
+            )
+        );
+
+        return $query->rowCount();
+    }
+
+    public function toggleBookmark(
+        ?string $request = null,
+        ?string $title = null,
+        ?int $time = null
+    ): bool
+    {
+        if ($record = $this->getBookmark($request))
+        {
+            $this->deleteBookmark(
+                $record->id
+            );
+
+            return false;
+        }
+
+        else
+        {
+            $this->addBookmark(
+                $request,
+                $title,
+                $time
+            );
+
+            return true;
         }
     }
 
@@ -137,7 +268,7 @@ class Database
     ): ?object
     {
         $query = $this->_connection->prepare(
-            'SELECT * FROM `cache` WHERE `request` LIKE :request LIMIT 1'
+            'SELECT * FROM `cache` WHERE `request` LIKE :request'
         );
 
         $query->execute(
