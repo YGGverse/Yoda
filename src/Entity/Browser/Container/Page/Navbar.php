@@ -109,7 +109,8 @@ class Navbar
     public function refresh()
     {
         $this->base->refresh();
-        $this->update->refresh();
+        $this->bookmark->refresh();
         $this->history->refresh();
+        $this->update->refresh();
     }
 }
