@@ -65,15 +65,39 @@ abstract class Button
         int $size = \GtkIconSize::BUTTON
     ): void
     {
-        if (\GtkIconTheme::get_default()->has_icon($image))
+        switch (true)
         {
-            $this->gtk->set_image(
-                \GtkImage::new_from_icon_name(
-                    $image,
-                    $size
-                )
-            );
+            case file_exists(
+                $image
+            ) && is_readable(
+                $image
+            ):
 
-        } else throw new \Exception;
+                $this->gtk->set_image(
+                    \GtkImage::new_from_file(
+                        $image,
+                        $size
+                    )
+                );
+
+            break;
+
+            case \GtkIconTheme::get_default()->has_icon(
+                $image
+            ):
+
+                $this->gtk->set_image(
+                    \GtkImage::new_from_icon_name(
+                        $image,
+                        $size
+                    )
+                );
+
+            break;
+
+            default:
+
+                throw new \Exception;
+        }
     }
 }
