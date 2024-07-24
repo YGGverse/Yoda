@@ -80,7 +80,7 @@ class Nex
         }
 
         // Try cache
-        if ($cache = $this->_connection->getCache())
+        if ($cache = $this->_connection->getCache($address->get()))
         {
             $this->_connection->setTitle(
                 $cache->title
