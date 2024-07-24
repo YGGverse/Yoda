@@ -43,10 +43,6 @@ class Content
             $this::MARGIN
         );
 
-        $this->gtk->set_margin_bottom(
-            $this::MARGIN
-        );
-
         // Init scrolled window viewport
         $this->viewport = new Content\Viewport(
             $this

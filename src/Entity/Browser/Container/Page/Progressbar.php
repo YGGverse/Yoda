@@ -32,6 +32,10 @@ class Progressbar
         // Init container
         $this->gtk = new GtkProgressBar;
 
+        $this->gtk->set_margin_top(
+            $this::MARGIN / 4
+        );
+
         $this->gtk->set_margin_start(
             $this::MARGIN
         );
@@ -41,7 +45,7 @@ class Progressbar
         );
 
         $this->gtk->set_margin_bottom(
-            $this::MARGIN
+            $this::MARGIN / 4
         );
 
         $this->gtk->show(); // fixed block height, show always
