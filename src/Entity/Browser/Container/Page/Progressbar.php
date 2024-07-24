@@ -31,10 +31,9 @@ class Progressbar
         // Init container
         $this->gtk = new GtkProgressBar;
 
-        /* Prevent global initiation
-        $this->gtk->set_no_show_all(
-            true
-        );*/
+        $this->gtk->show(); // fixed block height, show always
+
+        $this->gtk->set_opacity(0); // init transparently
     }
 
     public function start(): void
@@ -49,14 +48,14 @@ class Progressbar
 
     public function show(): void
     {
-        $this->gtk->show(); // | set_opacity(1)
+        $this->gtk->set_opacity(1); // fixed block height, do not show()
     }
 
     public function hide(): void
     {
         $this->stop(); // make sure iterator get stopped
 
-        $this->gtk->hide();  // | set_opacity(0)
+        $this->gtk->set_opacity(0); // fixed block height, do not hide()
     }
 
     public function infinitive(
@@ -67,7 +66,7 @@ class Progressbar
         // Init visible
         if ($show)
         {
-            $this->gtk->show();
+            $this->show();
         }
 
         // Activate iterator
@@ -100,7 +99,7 @@ class Progressbar
         // Init visible
         if ($show)
         {
-            $this->gtk->show();
+            $this->show();
         }
 
         // Activate iterator
