@@ -195,7 +195,7 @@ cd "$DIR_PHP_GTK_SOURCE"
 ## Get repository updates
 git pull
 
-## Replace installation paths in PHP-CPP Makefile
+## Replace installation paths in PHP-GTK Makefile
 sed -i "/EXTENSION_DIR       =   /c\
          EXTENSION_DIR       =   \"$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)\"" "$DIR_PHP_GTK_SOURCE/Makefile"
 
