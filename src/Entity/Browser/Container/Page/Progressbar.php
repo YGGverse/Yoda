@@ -20,7 +20,8 @@ class Progressbar
     // Defaults
     private bool $_active = false;
 
-    private float $_step = 0.02;
+    public const MARGIN = 8;
+    public const STEP = 0.02;
 
     public function __construct(
         Page $page,
@@ -30,6 +31,18 @@ class Progressbar
 
         // Init container
         $this->gtk = new GtkProgressBar;
+
+        $this->gtk->set_margin_start(
+            $this::MARGIN
+        );
+
+        $this->gtk->set_margin_end(
+            $this::MARGIN
+        );
+
+        $this->gtk->set_margin_bottom(
+            $this::MARGIN
+        );
 
         $this->gtk->show(); // fixed block height, show always
 
@@ -119,7 +132,7 @@ class Progressbar
                 {
                     // Update fraction step
                     $this->gtk->set_fraction(
-                        $fraction = $this->gtk->get_fraction() + $this->_step
+                        $fraction = $this->gtk->get_fraction() + $this::STEP
                     );
 
                     // Deactivate loop on progress complete
