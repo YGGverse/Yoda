@@ -6,7 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Navbar;
 
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
-class Go extends Button
+class Update extends Button
 {
     public const IMAGE = 'view-refresh-symbolic';
     public const LABEL = 'Go';

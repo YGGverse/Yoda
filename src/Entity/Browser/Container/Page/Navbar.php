@@ -15,9 +15,9 @@ class Navbar
 
     // Requirements
     public Navbar\Base $base;
-    public Navbar\Go $go;
     public Navbar\History $history;
     public Navbar\Request $request;
+    public Navbar\Update $update;
 
     // Defaults
     public const MARGIN = 8;
@@ -71,6 +71,15 @@ class Navbar
             $this->history->gtk
         );
 
+        // Append update button
+        $this->update = new Navbar\Update(
+            $this
+        );
+
+        $this->gtk->add(
+            $this->update->gtk
+        );
+
         // Append request entry, fill empty space
         $this->request = new Navbar\Request(
             $this
@@ -83,15 +92,6 @@ class Navbar
             0
         );
 
-        // Append go button
-        $this->go = new Navbar\Go(
-            $this
-        );
-
-        $this->gtk->add(
-            $this->go->gtk
-        );
-
         // Render
         $this->gtk->show();
     }
@@ -99,7 +99,7 @@ class Navbar
     public function refresh()
     {
         $this->base->refresh();
-        $this->go->refresh();
+        $this->update->refresh();
         $this->history->refresh();
     }
 }

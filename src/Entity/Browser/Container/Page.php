@@ -49,7 +49,7 @@ class Page
         );
 
         $this->gtk->set_focus_child(
-            $this->navbar->go->gtk // replace autofocus priority
+            $this->navbar->update->gtk // replace autofocus priority
         );
 
         // Init content
