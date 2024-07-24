@@ -128,7 +128,7 @@ class Database
 
     public function getBookmark(
         ?string $request = null
-    ): array
+    ): ?object
     {
         $query = $this->_connection->prepare(
             'SELECT * FROM `bookmark` WHERE `request` LIKE :request'
@@ -140,7 +140,12 @@ class Database
             ]
         );
 
-        return $query->fetch();
+        if ($record = $query->fetch())
+        {
+            return $record;
+        }
+
+        return null;
     }
 
     public function findBookmark(
