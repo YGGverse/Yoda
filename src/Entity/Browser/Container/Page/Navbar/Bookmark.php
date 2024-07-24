@@ -24,7 +24,8 @@ class Bookmark extends Button
     {
         $this->setImage(
             $this->navbar->page->container->browser->database->toggleBookmark(
-                $this->navbar->request->getValue()
+                $this->navbar->request->getValue(),
+                $this->navbar->page->title->getValue()
             ) ? self::_IMAGE_STARRED_YES : self::_IMAGE_STARRED_NON
         );
     }
