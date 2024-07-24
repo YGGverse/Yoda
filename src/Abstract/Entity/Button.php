@@ -15,9 +15,17 @@ abstract class Button
 
     public function __construct()
     {
+        // Init button
         $this->gtk = new \GtkButton;
 
-        if (!$this->setImage($this::IMAGE))
+        if ($this::IMAGE)
+        {
+            $this->setImage(
+                $this::IMAGE
+            );
+        }
+
+        else
         {
             $this->gtk->set_label(
                 _($this::LABEL)
@@ -55,7 +63,7 @@ abstract class Button
     public function setImage(
         ?string $image = null,
         int $size = \GtkIconSize::BUTTON
-    ): bool
+    ): void
     {
         if (\GtkIconTheme::get_default()->has_icon($image))
         {
@@ -66,9 +74,6 @@ abstract class Button
                 )
             );
 
-            return true;
-        }
-
-        return false;
+        } else throw new \Exception;
     }
 }
