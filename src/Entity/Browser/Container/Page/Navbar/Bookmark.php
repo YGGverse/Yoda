@@ -8,9 +8,11 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\Button;
 
 class Bookmark extends Button
 {
+    // Extras
     private const _IMAGE_STARRED_YES = 'starred-symbolic';
     private const _IMAGE_STARRED_NON = 'non-starred-symbolic';
 
+    // Defaults
     public const IMAGE = self::_IMAGE_STARRED_NON;
     public const LABEL = 'Bookmark';
     public const TOOLTIP = 'Toggle bookmark';
