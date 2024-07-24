@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Model;
 
+use \Exception;
+use \Shmop;
+
 class Pool implements \Yggverse\Yoda\Interface\Model\Pool
 {
     private string $_namespace;
@@ -23,11 +26,11 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
         int $size = 0xfffff,
         string $flags = 'c',
         int $mode = 0644,
-    ): ?\Shmop
+    ): ?Shmop
     {
         if (isset($this->_data[$key]))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         return $this->_data[$key] = shmop_open(
@@ -48,7 +51,7 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
     {
         if (!isset($this->_data[$key]))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         if (empty($this->_data[$key]))
@@ -73,7 +76,7 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
     {
         if (!isset($this->_data[$key]))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         return shmop_write(
@@ -89,7 +92,7 @@ class Pool implements \Yggverse\Yoda\Interface\Model\Pool
     {
         if (!isset($this->_data[$key]))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         $result = shmop_delete(

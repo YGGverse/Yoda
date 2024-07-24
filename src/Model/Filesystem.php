@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Model;
 
+use \Exception;
+use \Finfo;
+
 class Filesystem
 {
     public const MIME_IMAGE_GIF   = 'image/gif';
@@ -27,13 +30,13 @@ class Filesystem
         // Require path
         if (empty($dirname))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         // Require absolute path
         if (!str_starts_with($dirname, DIRECTORY_SEPARATOR))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         // Init destination
@@ -64,7 +67,7 @@ class Filesystem
         // Require filename
         if (empty($filename))
         {
-            throw new \Exception;
+            throw new Exception;
         }
 
         // Unify separators
@@ -78,7 +81,7 @@ class Filesystem
             // Check absolute filename path started with filesystem base
             if (!str_starts_with($filepath, $this->_base))
             {
-                throw new \Exception;
+                throw new Exception;
             }
 
             // Return as is
@@ -228,7 +231,7 @@ class Filesystem
         if ($data)
         {
             $mime = (
-                new \Finfo(
+                new Finfo(
                     FILEINFO_MIME_TYPE
                 )
             )->buffer(

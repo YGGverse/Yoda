@@ -26,7 +26,7 @@ class Nex
         int $timeout = 15
     ): void
     {
-        $response = (new \Yggverse\Nex\Client)->request(
+        $response = (new Client)->request(
             $address->get(),
             $timeout
         );

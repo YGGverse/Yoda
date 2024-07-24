@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Model;
 
+use \PDO;
+
 class Database
 {
-    private \PDO $_connection;
+    private PDO $_connection;
 
     private bool $_exists;
 
@@ -21,7 +23,7 @@ class Database
         );
 
         // Init database connection
-        $this->_connection = new \PDO(
+        $this->_connection = new PDO(
             sprintf(
                 'sqlite:%s',
                 $filename
@@ -31,13 +33,13 @@ class Database
         );
 
         $this->_connection->setAttribute(
-            \PDO::ATTR_ERRMODE,
-            \PDO::ERRMODE_EXCEPTION
+            PDO::ATTR_ERRMODE,
+            PDO::ERRMODE_EXCEPTION
         );
 
         $this->_connection->setAttribute(
-            \PDO::ATTR_DEFAULT_FETCH_MODE,
-            \PDO::FETCH_OBJ
+            PDO::ATTR_DEFAULT_FETCH_MODE,
+            PDO::FETCH_OBJ
         );
 
         // Init tables

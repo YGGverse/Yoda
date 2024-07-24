@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Entity;
 
+use \GdkEvent;
+use \GtkEntry;
+
 abstract class Entry
 {
-    public \GtkEntry $gtk;
+    public GtkEntry $gtk;
 
     public const LENGTH = 1024;
     public const PLACEHOLDER = '';
@@ -15,7 +18,7 @@ abstract class Entry
 
     public function __construct()
     {
-        $this->gtk = new \GtkEntry;
+        $this->gtk = new GtkEntry;
 
         $this->gtk->set_placeholder_text(
             _($this::PLACEHOLDER)
@@ -40,7 +43,7 @@ abstract class Entry
         $this->gtk->connect(
             'activate',
             function(
-                \GtkEntry $entry
+                GtkEntry $entry
             ) {
                 $this->_onActivate(
                     $entry
@@ -51,8 +54,8 @@ abstract class Entry
         $this->gtk->connect(
             'key-release-event',
             function (
-                \GtkEntry $entry,
-                \GdkEvent $event
+                GtkEntry $entry,
+                GdkEvent $event
             ) {
                 $this->_onKeyRelease(
                     $entry,
@@ -64,7 +67,7 @@ abstract class Entry
         $this->gtk->connect(
             'changed',
             function (
-                \GtkEntry $entry
+                GtkEntry $entry
             ) {
                 $this->_onChanged(
                     $entry
@@ -75,8 +78,8 @@ abstract class Entry
         $this->gtk->connect(
             'focus-out-event',
             function (
-                \GtkEntry $entry,
-                \GdkEvent $event
+                GtkEntry $entry,
+                GdkEvent $event
             ) {
                 $this->_onFocusOut(
                     $entry,
@@ -87,21 +90,21 @@ abstract class Entry
     }
 
     abstract protected function _onActivate(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void;
 
     abstract protected function _onKeyRelease(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void;
 
     abstract protected function _onChanged(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void;
 
     abstract protected function _onFocusOut(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void;
 
     public function setLength(

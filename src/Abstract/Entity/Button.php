@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Entity;
 
+use \Exception;
+
+use \GtkButton;
+use \GtkIconSize;
+use \GtkIconTheme;
+use \GtkImage;
+
 abstract class Button
 {
-    public \GtkButton $gtk;
+    public GtkButton $gtk;
 
     public const SENSITIVE = false;
     public const IMAGE = null;
@@ -16,7 +23,7 @@ abstract class Button
     public function __construct()
     {
         // Init button
-        $this->gtk = new \GtkButton;
+        $this->gtk = new GtkButton;
 
         if ($this::IMAGE)
         {
@@ -47,7 +54,7 @@ abstract class Button
         $this->gtk->connect(
             'clicked',
             function(
-                \GtkButton $entity
+                GtkButton $entity
             ) {
                 $this->_onClick(
                     $entity
@@ -57,12 +64,12 @@ abstract class Button
     }
 
     abstract protected function _onClick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void;
 
     public function setImage(
         ?string $image = null,
-        int $size = \GtkIconSize::BUTTON
+        int $size = GtkIconSize::BUTTON
     ): void
     {
         switch (true)
@@ -74,7 +81,7 @@ abstract class Button
             ):
 
                 $this->gtk->set_image(
-                    \GtkImage::new_from_file(
+                    GtkImage::new_from_file(
                         $image,
                         $size
                     )
@@ -82,12 +89,12 @@ abstract class Button
 
             break;
 
-            case \GtkIconTheme::get_default()->has_icon(
+            case GtkIconTheme::get_default()->has_icon(
                 $image
             ):
 
                 $this->gtk->set_image(
-                    \GtkImage::new_from_icon_name(
+                    GtkImage::new_from_icon_name(
                         $image,
                         $size
                     )
@@ -97,7 +104,7 @@ abstract class Button
 
             default:
 
-                throw new \Exception;
+                throw new Exception;
         }
     }
 }

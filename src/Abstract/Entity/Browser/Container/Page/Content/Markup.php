@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content;
 
+use \GdkEvent;
+use \GtkLabel;
+
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 abstract class Markup
 {
-    public \GtkLabel $gtk;
+    public GtkLabel $gtk;
 
     // Dependencies
     public Content $content;
@@ -23,7 +26,7 @@ abstract class Markup
         $this->content = $content;
 
         // Init markup label
-        $this->gtk = new \GtkLabel;
+        $this->gtk = new GtkLabel;
 
         $this->gtk->set_use_markup(
             true
@@ -55,7 +58,7 @@ abstract class Markup
         $this->gtk->connect(
             'activate-link',
             function(
-                \GtkLabel $label,
+                GtkLabel $label,
                 string $href
             ) {
                 return $this->_onActivateLink(
@@ -68,8 +71,8 @@ abstract class Markup
         $this->gtk->connect(
             'button-press-event',
             function(
-                \GtkLabel $label,
-                \GdkEvent $event
+                GtkLabel $label,
+                GdkEvent $event
             ) {
                 return $this->_onButtonPressEvent(
                     $label,
@@ -80,13 +83,13 @@ abstract class Markup
     }
 
     abstract protected function _onActivateLink(
-        \GtkLabel $label,
+        GtkLabel $label,
         string $href
     ): bool;
 
     abstract protected function _onButtonPressEvent(
-        \GtkLabel $label,
-        \GdkEvent $event
+        GtkLabel $label,
+        GdkEvent $event
     ): bool;
 
     abstract public function set(
