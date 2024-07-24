@@ -15,6 +15,7 @@ class Navbar
 
     // Requirements
     public Navbar\Base $base;
+    public Navbar\Bookmark $bookmark;
     public Navbar\History $history;
     public Navbar\Request $request;
     public Navbar\Update $update;
@@ -90,6 +91,15 @@ class Navbar
             true,
             true,
             0
+        );
+
+        // Append bookmark button
+        $this->bookmark = new Navbar\Bookmark(
+            $this
+        );
+
+        $this->gtk->add(
+            $this->bookmark->gtk
         );
 
         // Render

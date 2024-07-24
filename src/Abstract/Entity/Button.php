@@ -17,17 +17,7 @@ abstract class Button
     {
         $this->gtk = new \GtkButton;
 
-        if (\GtkIconTheme::get_default()->has_icon($this::IMAGE))
-        {
-            $this->gtk->set_image(
-                \GtkImage::new_from_icon_name(
-                    $this::IMAGE,
-                    \GtkIconSize::BUTTON
-                )
-            );
-        }
-
-        else
+        if (!$this->setImage($this::IMAGE))
         {
             $this->gtk->set_label(
                 _($this::LABEL)
@@ -61,4 +51,24 @@ abstract class Button
     abstract protected function _onClick(
         \GtkButton $entity
     ): void;
+
+    public function setImage(
+        ?string $image = null,
+        int $size = \GtkIconSize::BUTTON
+    ): bool
+    {
+        if (\GtkIconTheme::get_default()->has_icon($image))
+        {
+            $this->gtk->set_image(
+                \GtkImage::new_from_icon_name(
+                    $image,
+                    $size
+                )
+            );
+
+            return true;
+        }
+
+        return false;
+    }
 }
