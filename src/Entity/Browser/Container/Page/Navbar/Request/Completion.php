@@ -62,10 +62,20 @@ class Completion
 
     public function refresh(
         int $limit = 5,
-        int $offset = 0
+        int $offset = 0,
+        array $suggestions = []
     ): void
     {
         $this->suggestion->clear();
+
+        foreach ($this->request->navbar->page->container->browser->database->findBookmark(
+            $this->request->getValue(),
+            $offset,
+            $limit
+        ) as $history)
+        {
+            $suggestions[] = $history->request;
+        }
 
         foreach ($this->request->navbar->page->container->browser->database->findHistory(
             $this->request->getValue(),
@@ -73,8 +83,15 @@ class Completion
             $limit
         ) as $history)
         {
+            $suggestions[] = $history->url;
+        }
+
+        foreach (array_values(array_unique($suggestions)) as $index => $suggestion)
+        {
+            if ($index > $limit) break;
+
             $this->suggestion->append(
-                $history->url
+                $suggestion
             );
         }
     }
