@@ -19,6 +19,7 @@ class Menu
     // Requirements
     public Menu\File $file;
     public Menu\Tab $tab;
+    public Menu\Bookmark $bookmark;
     public Menu\History $history;
     public Menu\Quit $quit;
 
@@ -47,6 +48,15 @@ class Menu
 
         $this->gtk->append(
             $this->tab->gtk
+        );
+
+        // Init bookmark menu item
+        $this->bookmark = new Menu\Bookmark(
+            $this
+        );
+
+        $this->gtk->append(
+            $this->bookmark->gtk
         );
 
         // Init history menu item

@@ -8,9 +8,9 @@ use \GtkMenuItem;
 
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
-use \Yggverse\Yoda\Entity\Browser\History as Window;
+use \Yggverse\Yoda\Entity\Browser\Bookmark as Window;
 
-class History
+class Bookmark
 {
     // GTK
     public GtkMenuItem $gtk;
@@ -19,7 +19,7 @@ class History
     public Menu $menu;
 
     // Defaults
-    public const LABEL = 'History';
+    public const LABEL = 'Bookmarks';
 
     public function __construct(
         Menu $menu
