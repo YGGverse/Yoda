@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
+use \GtkWindow;
+
 use \Yggverse\Yoda\Entity\Browser;
 
 class History
 {
+    // GTK
     public \GtkWindow $gtk;
 
     // Dependencies
@@ -29,7 +32,7 @@ class History
         $this->browser = $browser;
 
         // Init window
-        $this->gtk = new \GtkWindow;
+        $this->gtk = new GtkWindow;
 
         $this->gtk->set_size_request(
             $this::WIDTH,

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu;
 
+use \GtkMenu;
+use \GtkMenuItem;
+
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Tab
 {
-    public \GtkMenuItem $gtk;
+    // GTK
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public Menu $menu;
@@ -27,12 +31,12 @@ class Tab
         $this->menu = $menu;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             $this::LABEL
         );
 
         // Init submenu container
-        $tab = new \GtkMenu;
+        $tab = new GtkMenu;
 
         // Init new tab menu item
         $this->add = new Tab\Add(

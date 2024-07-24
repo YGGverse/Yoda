@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History;
 
+use \GtkHeaderBar;
+
 class Header
 {
-    public \GtkHeaderBar $gtk;
+    public GtkHeaderBar $gtk;
 
     public const ACTIONS = true;
     public const TITLE = 'History - Yoda';
@@ -14,7 +16,7 @@ class Header
 
     public function __construct()
     {
-        $this->gtk = new \GtkHeaderBar;
+        $this->gtk = new GtkHeaderBar;
 
         $this->gtk->set_show_close_button(
             $this::ACTIONS

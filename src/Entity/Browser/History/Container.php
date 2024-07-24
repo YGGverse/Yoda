@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History;
 
+use \GtkBox;
+use \GtkOrientation;
+
 use \Yggverse\Yoda\Entity\Browser\History;
 
 class Container
 {
-    public \GtkBox $gtk;
+    // GTK
+    public GtkBox $gtk;
 
     // Dependencies
     public History $history;
@@ -24,8 +28,8 @@ class Container
         $this->history = $history;
 
         // Init container
-        $this->gtk = new \GtkBox(
-            \GtkOrientation::VERTICAL
+        $this->gtk = new GtkBox(
+            GtkOrientation::VERTICAL
         );
 
         // Init navbar

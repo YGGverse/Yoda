@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
 
 class Delete extends Button
@@ -13,7 +15,7 @@ class Delete extends Button
     public const TOOLTIP = 'Delete';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         if ($id = $this->navbar->container->content->table->getSelectedId())

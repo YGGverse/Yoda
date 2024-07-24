@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
+use \GtkMenu;
+use \GtkSeparatorMenuItem;
+
 use \Yggverse\Yoda\Entity\Browser;
 
 class Menu
 {
-    public \GtkMenu $gtk;
+    public GtkMenu $gtk;
 
     // Dependencies
     public Browser $browser;
@@ -26,7 +29,7 @@ class Menu
         $this->browser = $browser;
 
         // Init menu
-        $this->gtk = new \GtkMenu;
+        $this->gtk = new GtkMenu;
 
         // Init file menu item
         $this->file = new Menu\File(
@@ -57,7 +60,7 @@ class Menu
 
         // Add separator
         $this->gtk->append(
-            new \GtkSeparatorMenuItem
+            new GtkSeparatorMenuItem
         );
 
         // Init quit menu item

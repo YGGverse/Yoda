@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Content;
 
+use \GtkCellRendererText;
+use \GtkTreeView;
+use \GtkTreeViewColumn;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content;
 
 class Table
 {
-    public \GtkTreeView $gtk;
+    public GtkTreeView $gtk;
 
     // Dependencies
     public Content $content;
@@ -28,30 +32,30 @@ class Table
         $this->content = $content;
 
         // Init tree view
-        $this->gtk = new \GtkTreeView;
+        $this->gtk = new GtkTreeView;
 
         $this->gtk->append_column(
-            new \GtkTreeViewColumn(
+            new GtkTreeViewColumn(
                 $this::TIME,
-                new \GtkCellRendererText(),
+                new GtkCellRendererText(),
                 'text',
                 1
             )
         );
 
         $this->gtk->append_column(
-            new \GtkTreeViewColumn(
+            new GtkTreeViewColumn(
                 $this::URL,
-                new \GtkCellRendererText(),
+                new GtkCellRendererText(),
                 'text',
                 2
             )
         );
 
         $this->gtk->append_column(
-            new \GtkTreeViewColumn(
+            new GtkTreeViewColumn(
                 $this::TITLE,
-                new \GtkCellRendererText(),
+                new GtkCellRendererText(),
                 'text',
                 3
             )

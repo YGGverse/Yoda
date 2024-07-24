@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container;
 
+use \GtkScrolledWindow;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container;
 
 class Content
 {
-    public \GtkScrolledWindow $gtk;
+    // GTK
+    public GtkScrolledWindow $gtk;
 
     // Dependencies
     public Container $container;
@@ -27,7 +30,7 @@ class Content
         $this->container = $container;
 
         // Init container
-        $this->gtk = new \GtkScrolledWindow;
+        $this->gtk = new GtkScrolledWindow;
 
         $this->gtk->set_margin_start(
             $this::MARGIN

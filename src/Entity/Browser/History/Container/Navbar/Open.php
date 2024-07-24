@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
+use \GtkButton;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Button;
 
 class Open extends Button
@@ -13,7 +15,7 @@ class Open extends Button
     public const TOOLTIP = 'Open';
 
     protected function _onCLick(
-        \GtkButton $entity
+        GtkButton $entity
     ): void
     {
         $this->navbar->container->history->browser->container->tab->append(

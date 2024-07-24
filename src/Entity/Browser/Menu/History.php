@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu;
 
+use \GtkMenuItem;
+
 use \Yggverse\Yoda\Entity\Browser\Menu;
+
+use \Yggverse\Yoda\Entity\Browser\History as Window;
 
 class History
 {
-    public \GtkMenuItem $gtk;
+    // GTK
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public Menu $menu;
@@ -23,7 +28,7 @@ class History
         $this->menu = $menu;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             $this::LABEL
         );
 
@@ -35,7 +40,7 @@ class History
             'activate',
             function()
             {
-                $history = new \Yggverse\Yoda\Entity\Browser\History(
+                $history = new Window(
                     $this->menu->browser
                 );
             }

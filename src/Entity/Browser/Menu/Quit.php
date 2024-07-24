@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu;
 
+use \Gtk;
+use \GtkMenuItem;
+
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
 class Quit
 {
-    public \GtkMenuItem $gtk;
+    // GTK
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public Menu $menu;
@@ -23,7 +27,7 @@ class Quit
         $this->menu = $menu;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             $this::LABEL
         );
 
@@ -35,7 +39,7 @@ class Quit
             'activate',
             function()
             {
-                \Gtk::main_quit();
+                Gtk::main_quit();
             }
         );
     }

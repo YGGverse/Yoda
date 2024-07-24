@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\File;
 
+use \GtkFileChooserAction;
+use \GtkFileChooserDialog;
+use \GtkFileFilter;
+use \GtkMenuItem;
+use \GtkResponseType;
+
 use \Yggverse\Yoda\Entity\Browser\Menu\File;
 
 class Open
 {
-    public \GtkMenuItem $gtk;
+    // GTK
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public File $file;
@@ -29,7 +36,7 @@ class Open
         $this->file = $file;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             $this::LABEL
         );
 
@@ -41,15 +48,15 @@ class Open
             'activate',
             function()
             {
-                $dialog = new \GtkFileChooserDialog(
+                $dialog = new GtkFileChooserDialog(
                     'Open file',
                     $this->file->menu->browser->gtk,
-                    \GtkFileChooserAction::OPEN,
+                    GtkFileChooserAction::OPEN,
                     [
                         'Cancel',
-                        \GtkResponseType::CANCEL,
+                        GtkResponseType::CANCEL,
                         'Open',
-                        \GtkResponseType::OK
+                        GtkResponseType::OK
                     ]
                 );
 
@@ -66,7 +73,7 @@ class Open
 
                 foreach ($this::PATTERN as $pattern => $name)
                 {
-                    $filter = new \GtkFileFilter;
+                    $filter = new GtkFileFilter;
 
                     $filter->set_name(
                         $name ? $name : $pattern
@@ -81,7 +88,7 @@ class Open
                     );
                 }
 
-                if (\GtkResponseType::OK == $dialog->run())
+                if (GtkResponseType::OK == $dialog->run())
                 {
                     foreach ($dialog->get_filenames() as $filename)
                     {

@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\File;
 
+use \GtkMenuItem;
+use \GtkFileChooserDialog;
+use \GtkFileChooserAction;
+use \GtkResponseType;
+
 use \Yggverse\Yoda\Entity\Browser\Menu\File;
 
 class Save
 {
-    public \GtkMenuItem $gtk;
+    // GTK
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public File $file;
@@ -23,7 +29,7 @@ class Save
         $this->file = $file;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             $this::LABEL
         );
 
@@ -35,15 +41,15 @@ class Save
             'activate',
             function()
             {
-                $dialog = new \GtkFileChooserDialog(
+                $dialog = new GtkFileChooserDialog(
                     'Save to file',
                     $this->file->menu->browser->gtk,
-                    \GtkFileChooserAction::SAVE,
+                    GtkFileChooserAction::SAVE,
                     [
                         'Cancel',
-                        \GtkResponseType::CANCEL,
+                        GtkResponseType::CANCEL,
                         'Save',
-                        \GtkResponseType::APPLY
+                        GtkResponseType::APPLY
                     ]
                 );
 
@@ -58,7 +64,7 @@ class Save
                     true
                 );
 
-                if (\GtkResponseType::APPLY == $dialog->run())
+                if (GtkResponseType::APPLY == $dialog->run())
                 {
                     if ($page = $this->file->menu->browser->container->tab->get())
                     {

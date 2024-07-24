@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity;
 
+use \GtkWindow;
+
 use \Yggverse\Yoda\Entity\Browser\Header;
 use \Yggverse\Yoda\Entity\Browser\Container;
 
@@ -11,7 +13,8 @@ use \Yggverse\Yoda\Model\Database;
 
 class Browser
 {
-    public \GtkWindow $gtk;
+    // GTK
+    public GtkWindow $gtk;
 
     // Dependencies
     public Database $database;
@@ -32,7 +35,7 @@ class Browser
         $this->database = $database;
 
         // Init window
-        $this->gtk = new \GtkWindow;
+        $this->gtk = new GtkWindow;
 
         $this->gtk->set_size_request(
             $this::WIDTH,
@@ -69,8 +72,8 @@ class Browser
         $this->gtk->connect(
             'configure-event',
             function(
-                \GtkWindow $window,
-                // \GdkEvent $event
+                GtkWindow $window,
+                // GdkEvent $event
             ) {
                 // @TODO render data wordwrap by $window->get_size()
             }

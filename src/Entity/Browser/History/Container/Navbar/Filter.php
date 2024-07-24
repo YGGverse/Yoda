@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Navbar;
 
+use \GdkEvent;
+use \GtkEntry;
+
 use \Yggverse\Yoda\Abstract\Entity\Browser\History\Container\Navbar\Entry;
 
 class Filter extends Entry
@@ -11,7 +14,7 @@ class Filter extends Entry
     public const PLACEHOLDER = 'Search in history...';
 
     protected function _onActivate(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {
         $this->navbar->container->content->search(
@@ -20,8 +23,8 @@ class Filter extends Entry
     }
 
     protected function _onKeyRelease(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {
         $this->navbar->container->content->search(
@@ -30,13 +33,13 @@ class Filter extends Entry
     }
 
     protected function _onChanged(
-        \GtkEntry $entry
+        GtkEntry $entry
     ): void
     {}
 
     protected function _onFocusOut(
-        \GtkEntry $entry,
-        \GdkEvent $event
+        GtkEntry $entry,
+        GdkEvent $event
     ): void
     {}
 }

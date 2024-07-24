@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser;
 
+use \GtkHeaderBar;
+
 use \Yggverse\Yoda\Entity\Browser;
 
 class Header
 {
-    public \GtkHeaderBar $gtk;
+    // GTK
+    public GtkHeaderBar $gtk;
 
     // Dependencies
     public Browser $browser;
@@ -28,7 +31,7 @@ class Header
         $this->browser = $browser;
 
         // Init header
-        $this->gtk = new \GtkHeaderBar;
+        $this->gtk = new GtkHeaderBar;
 
         $this->gtk->set_show_close_button(
             $this::ACTIONS

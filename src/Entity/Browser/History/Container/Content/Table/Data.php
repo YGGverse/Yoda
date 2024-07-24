@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
 
+use \GObject;
+use \GtkListStore;
+
 use \Yggverse\Yoda\Entity\Browser\History\Container\Content\Table;
 
 class Data
 {
-    public \GtkListStore $gtk;
+    public GtkListStore $gtk;
 
     // Dependencies
     public Table $table;
@@ -23,11 +26,11 @@ class Data
         $this->table = $table;
 
         // Init tree view
-        $this->gtk = new \GtkListStore(
-            \GObject::TYPE_INT,
-            \GObject::TYPE_STRING,
-            \GObject::TYPE_STRING,
-            \GObject::TYPE_STRING
+        $this->gtk = new GtkListStore(
+            GObject::TYPE_INT,
+            GObject::TYPE_STRING,
+            GObject::TYPE_STRING,
+            GObject::TYPE_STRING
         );
     }
 
