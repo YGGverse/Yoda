@@ -160,6 +160,9 @@ sed -i "/PHP_CONFIG			=	/c\
 sed -i "/INSTALL_PREFIX		=	/c\
          INSTALL_PREFIX		=	\"$DIR_PHP_CPP_TARGET\"" "$DIR_PHP_CPP_SOURCE/Makefile"
 
+## Disable ldconfig
+sed -i "s/ldconfig;/@echo \"ldconfig disabled by local configuration\";/g" "$DIR_PHP_CPP_SOURCE/Makefile"
+
 ## Force build for new installation
 if [ ! -d "$DIR_PHP_CPP_TARGET" ]; then BUILD_PHP_CPP="y"
 else # or ask for re-build
@@ -195,12 +198,13 @@ cd "$DIR_PHP_GTK_SOURCE"
 ## Get repository updates
 git pull
 
-## Replace installation paths in PHP-GTK Makefile
+## Replace installation paths
 sed -i "/EXTENSION_DIR       =   /c\
          EXTENSION_DIR       =   \"$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)\"" "$DIR_PHP_GTK_SOURCE/Makefile"
 
+## Disable INI
 sed -i "/INI_DIR     =   /c\
-         INI_DIR     =   \"/dev/null\"" "$DIR_PHP_GTK_SOURCE/Makefile"
+         INI_DIR     =   /dev/null" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Force build for new installation
 if [ ! -f "$("$DIR_PHP_SRC_TARGET/bin/php-config" --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
