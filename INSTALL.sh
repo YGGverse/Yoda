@@ -129,9 +129,7 @@ if [[ $BUILD_PHP_SRC == "y" ]]; then
                 --enable-pcntl
 
     make clean
-
     make -j $(nproc)
-
     make install
 fi
 
@@ -154,14 +152,18 @@ cd "$DIR_PHP_CPP_SOURCE"
 git pull
 
 ## Replace installation paths in PHP-CPP Makefile
-sed -i "/PHP_CONFIG			=	/c\
-         PHP_CONFIG			=	\"$DIR_PHP_SRC_TARGET/bin/php-config\"" "$DIR_PHP_CPP_SOURCE/Makefile"
+sed -i "/\
+PHP_CONFIG			=	/c\
+PHP_CONFIG			=	\"$DIR_PHP_SRC_TARGET/bin/php-config\"" "$DIR_PHP_CPP_SOURCE/Makefile"
 
-sed -i "/INSTALL_PREFIX		=	/c\
-         INSTALL_PREFIX		=	\"$DIR_PHP_CPP_TARGET\"" "$DIR_PHP_CPP_SOURCE/Makefile"
+sed -i "/\
+INSTALL_PREFIX		=	/c\
+INSTALL_PREFIX		=	\"$DIR_PHP_CPP_TARGET\"" "$DIR_PHP_CPP_SOURCE/Makefile"
 
 ## Disable ldconfig
-sed -i "s/ldconfig;/@echo \"ldconfig disabled by local configuration\";/g" "$DIR_PHP_CPP_SOURCE/Makefile"
+sed -i "s/\
+ldconfig;/\
+@echo \"ldconfig disabled by local configuration\";/g" "$DIR_PHP_CPP_SOURCE/Makefile"
 
 ## Force build for new installation
 if [ ! -d "$DIR_PHP_CPP_TARGET" ]; then BUILD_PHP_CPP="y"
@@ -174,9 +176,7 @@ fi
 ## Install PHP-CPP
 if [[ $BUILD_PHP_CPP == "y" ]]; then
     make clean
-
     make -j $(nproc)
-
     make install
 fi
 
@@ -199,15 +199,19 @@ cd "$DIR_PHP_GTK_SOURCE"
 git pull
 
 ## Replace installation paths
-sed -i "/EXTENSION_DIR       =   /c\
-         EXTENSION_DIR       =   \"$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)\"" "$DIR_PHP_GTK_SOURCE/Makefile"
+sed -i "/\
+EXTENSION_DIR       =   /c\
+EXTENSION_DIR       =   \"$($DIR_PHP_SRC_TARGET/bin/php-config --extension-dir)\"" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Disable INI
-sed -i "/INI_DIR     =   /c\
-         INI_DIR     =   /dev/null" "$DIR_PHP_GTK_SOURCE/Makefile"
+sed -i "/\
+INI_DIR     =   /c\
+INI_DIR     =   /dev/null" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Use local builds
-sed -i "s|LINKER_DEPENDENCIES =   -lphpcpp|LINKER_DEPENDENCIES =   -Wl,-rpath=\"$DIR_PHP_CPP_TARGET/lib\" -lphpcpp|g" "$DIR_PHP_GTK_SOURCE/Makefile"
+sed -i "s|\
+LINKER_DEPENDENCIES =   -lphpcpp|\
+LINKER_DEPENDENCIES =   -Wl,-rpath=\"$DIR_PHP_CPP_TARGET/lib\" -lphpcpp|g" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Force build for new installation
 if [ ! -f "$("$DIR_PHP_SRC_TARGET/bin/php-config" --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
@@ -220,9 +224,7 @@ fi
 ## Install PHP-GTK
 if [[ $BUILD_PHP_GTK == "y" ]]; then
     make clean
-
     make -j $(nproc)
-
     make install
 fi
 
