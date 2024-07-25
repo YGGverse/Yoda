@@ -207,7 +207,7 @@ sed -i "/INI_DIR     =   /c\
          INI_DIR     =   /dev/null" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Use local builds
-sed -i "s|-lphpcpp|-Wl,-rpath=\"$DIR_PHP_CPP_TARGET/lib\" -lphpcpp|g" "$DIR_PHP_GTK_SOURCE/Makefile"
+sed -i "s|LINKER_DEPENDENCIES =   -lphpcpp|LINKER_DEPENDENCIES =   -Wl,-rpath=\"$DIR_PHP_CPP_TARGET/lib\" -lphpcpp|g" "$DIR_PHP_GTK_SOURCE/Makefile"
 
 ## Force build for new installation
 if [ ! -f "$("$DIR_PHP_SRC_TARGET/bin/php-config" --extension-dir)/php-gtk3.so" ]; then BUILD_PHP_GTK="y"
