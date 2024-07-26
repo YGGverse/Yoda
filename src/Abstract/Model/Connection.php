@@ -244,27 +244,6 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         );
     }
 
-    public function cache(
-        string $request
-    ): void
-    {
-        $pid = pcntl_fork(); // not wait
-
-        if ($pid === 0)
-        {
-            $this->_database->renewCache(
-                $request,
-                $this->getMime(),
-                $this->getTitle(),
-                $this->getSubtitle(),
-                $this->getTooltip(),
-                $this->getData()
-            );
-
-            exit;
-        }
-    }
-
     public function reset(): void
     {
         $this->_pool->reset();

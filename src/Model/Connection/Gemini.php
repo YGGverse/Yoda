@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Model\Connection;
 
-use \Yggverse\Gemini\Client\Request;
-use \Yggverse\Gemini\Client\Response;
-use \Yggverse\Net\Address;
-
 use \Yggverse\Yoda\Model\Connection;
 use \Yggverse\Yoda\Model\Filesystem;
+
+use \Yggverse\Gemini\Client\Request;
+use \Yggverse\Gemini\Client\Response;
+
+use \Yggverse\Net\Address;
 
 class Gemini
 {
@@ -112,11 +113,6 @@ class Gemini
                 // Set data
                 $this->_connection->setData(
                     $response->getBody()
-                );
-
-                // Cache
-                $this->_connection->cache(
-                    $address->get()
                 );
 
             break;

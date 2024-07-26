@@ -80,10 +80,6 @@ interface Connection
         string $request
     ): ?object;
 
-    public function cache(
-        string $request
-    ): void;
-
     public function reset(): void;
 
     public function close(): void;

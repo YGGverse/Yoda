@@ -29,6 +29,8 @@ class Page
     public Page\Content $content;
     public Page\Response $response;
 
+    public ?Connection $connection = null;
+
     public function __construct(
         Container $container
     ) {
@@ -165,13 +167,20 @@ class Page
         // Hide response form
         $this->response->hide();
 
+        // Drop previous connection
+        if ($this->connection)
+        {
+            // Free memory
+            $this->connection->close();
+        }
+
         // Update content using multi-protocol driver
-        $connection = new Connection(
+        $this->connection = new Connection(
             $this->container->browser->database
         );
 
         // Async request
-        $connection->request(
+        $this->connection->request(
             $this->navbar->request->getValue(),
             $timeout
         );
@@ -182,10 +191,10 @@ class Page
         // Listen response
         Gtk::timeout_add(
             $refresh,
-            function() use ($connection, $expire, $history)
+            function() use ($expire, $history)
             {
                 // Redirect requested
-                if ($location = $connection->getRedirect())
+                if ($location = $this->connection->getRedirect())
                 {
                     // Follow
                     $this->open(
@@ -195,20 +204,17 @@ class Page
                     // Hide progressbar
                     $this->progressbar->hide();
 
-                    // Free shared memory pool
-                    $connection->close();
-
                     return false; // stop
                 }
 
                 // Response form requested
-                if ($request = $connection->getRequest())
+                if ($request = $this->connection->getRequest())
                 {
                     // Update title
                     $this->title->set(
-                        $connection->getTitle(),
-                        $connection->getSubtitle(),
-                        $connection->getTooltip()
+                        $this->connection->getTitle(),
+                        $this->connection->getSubtitle(),
+                        $this->connection->getTooltip()
                     );
 
                     // Refresh header by new title if current page is active
@@ -229,20 +235,17 @@ class Page
                     // Hide progressbar
                     $this->progressbar->hide();
 
-                    // Free shared memory pool
-                    $connection->close();
-
                     return false; // stop
                 }
 
                 // Stop event loop on request completed
-                if ($connection->isCompleted())
+                if ($this->connection->isCompleted())
                 {
                     // Update title
                     $this->title->set(
-                        $connection->getTitle(),
-                        $connection->getSubtitle(),
-                        $connection->getTooltip()
+                        $this->connection->getTitle(),
+                        $this->connection->getSubtitle(),
+                        $this->connection->getTooltip()
                     );
 
                     // Refresh header by new title if current page is active
@@ -256,15 +259,12 @@ class Page
 
                     // Update content
                     $this->content->set(
-                        $connection->getMime(),
-                        $connection->getData()
+                        $this->connection->getMime(),
+                        $this->connection->getData()
                     );
 
                     // Hide progressbar
                     $this->progressbar->hide();
-
-                    // Free shared memory pool
-                    $connection->close();
 
                     // Update history
                     if ($history)
@@ -316,9 +316,6 @@ class Page
 
                     // Hide progressbar
                     $this->progressbar->hide();
-
-                    // Free shared memory pool
-                    $connection->close();
 
                     // Stop
                     return false;

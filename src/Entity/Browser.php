@@ -84,18 +84,33 @@ class Browser
             'destroy',
             function()
             {
-                // Save session
+                // Save session data
                 $pid = pcntl_fork();
 
                 if ($pid === 0)
                 {
+                    // Reset previous records
                     $this->database->cleanSession();
 
                     foreach ($this->container->tab->pages as $page)
                     {
+                        // Save page session data
                         $this->database->addSession(
                             $page->navbar->request->getValue()
                         );
+
+                        // Cache connection pool data
+                        if ($page->connection)
+                        {
+                            $this->database->renewCache(
+                                $page->navbar->request->getValue(),
+                                $page->connection->getMime(),
+                                $page->connection->getTitle(),
+                                $page->connection->getSubtitle(),
+                                $page->connection->getTooltip(),
+                                $page->connection->getData()
+                            );
+                        }
                     }
 
                     exit;

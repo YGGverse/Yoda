@@ -72,11 +72,6 @@ class Nex
             $this->_connection->setData(
                 $response
             );
-
-            // Cache
-            $this->_connection->cache(
-                $address->get()
-            );
         }
 
         // Try cache
