@@ -280,18 +280,6 @@ class Gemtext extends Markup
         );
     }
 
-    protected function _onButtonPressEvent(
-        GtkLabel $label,
-        GdkEvent $event
-    ): bool
-    {
-        // Markup container has focus event disabled (hidden cursor position)
-        // this solution deactivates Request entry on click Markup area
-        $this->content->page->container->tab->gtk->grab_focus();
-
-        return false;
-    }
-
     private function _wrap(
         string $value
     ): string

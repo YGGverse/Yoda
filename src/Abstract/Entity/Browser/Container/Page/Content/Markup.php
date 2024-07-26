@@ -36,10 +36,6 @@ abstract class Markup
             true
         );
 
-        $this->gtk->set_can_focus(
-            false
-        );
-
         $this->gtk->set_track_visited_links(
             true
         );
@@ -82,15 +78,21 @@ abstract class Markup
         );
     }
 
-    abstract protected function _onActivateLink(
+    protected function _onActivateLink(
         GtkLabel $label,
         string $href
-    ): bool;
+    ): bool
+    {
+        return false;
+    }
 
-    abstract protected function _onButtonPressEvent(
+    protected function _onButtonPressEvent(
         GtkLabel $label,
         GdkEvent $event
-    ): bool;
+    ): bool
+    {
+        return false;
+    }
 
     abstract public function set(
         string $value

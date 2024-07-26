@@ -24,24 +24,4 @@ class Plain extends Markup
             )
         );
     }
-
-    protected function _onActivateLink(
-        GtkLabel $label,
-        string $href
-    ): bool
-    {
-        return true;
-    }
-
-    protected function _onButtonPressEvent(
-        GtkLabel $label,
-        GdkEvent $event
-    ): bool
-    {
-        // Markup container has focus event disabled (hidden cursor position)
-        // this solution deactivates Request entry on click Markup area
-        $this->content->page->container->tab->gtk->grab_focus();
-
-        return false;
-    }
 }
