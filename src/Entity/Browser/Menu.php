@@ -17,11 +17,12 @@ class Menu
     public Browser $browser;
 
     // Requirements
-    public Menu\File $file;
-    public Menu\Tab $tab;
     public Menu\Bookmark $bookmark;
+    public Menu\Debug $debug;
+    public Menu\File $file;
     public Menu\History $history;
     public Menu\Quit $quit;
+    public Menu\Tab $tab;
 
     public function __construct(
         Browser $browser
@@ -71,6 +72,15 @@ class Menu
         // Add separator
         $this->gtk->append(
             new GtkSeparatorMenuItem
+        );
+
+        // Init debug menu item
+        $this->debug = new Menu\Debug(
+            $this
+        );
+
+        $this->gtk->append(
+            $this->debug->gtk
         );
 
         // Init quit menu item

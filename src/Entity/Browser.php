@@ -28,6 +28,7 @@ class Browser
     public const WIDTH = 640;
     public const HEIGHT = 640;
     public const MAXIMIZE = true;
+    public const DEBUG = false;
 
     public function __construct(
         Database $database
@@ -37,6 +38,10 @@ class Browser
 
         // Init window
         $this->gtk = new GtkWindow;
+
+        $this->gtk->set_interactive_debugging(
+            $this::DEBUG
+        );
 
         $this->gtk->set_size_request(
             $this::WIDTH,
