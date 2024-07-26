@@ -89,9 +89,14 @@ class Database
         // Initial setup
         if (!$this->_exists)
         {
-            // Init welcome page
+            // Add gemini protocol homepage
             $this->addSession(
-                'gemini://yggverse.cities.yesterweb.org' // @TODO config
+                'gemini://geminiprotocol.net/'
+            );
+
+            // Add yggverse homepage
+            $this->addSession(
+                'gemini://yggverse.cities.yesterweb.org/'
             );
         }
     }
