@@ -82,7 +82,7 @@ class Database
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`    INTEGER NOT NULL,
-                `request` VARCHAR(1024) UNIQUE
+                `request` VARCHAR(1024)
             );
         ');
 
