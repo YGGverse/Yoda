@@ -26,7 +26,7 @@ class Tab
     public const SCROLLABLE  = true;
 
     // Extras
-    private array $_page = [];
+    public array $pages = [];
 
     public function __construct(
         Container $container
@@ -119,7 +119,7 @@ class Tab
     {
         // Extendable classes not supported by PHP-GTK3 #117
         // create internal pages registry
-        $this->_page[] = $page = new Page(
+        $this->pages[] = $page = new Page(
             $this->container
         );
 
@@ -204,13 +204,13 @@ class Tab
         }
 
         // Validate page index exists
-        if (empty($this->_page[$page_num]))
+        if (empty($this->pages[$page_num]))
         {
             throw new Exception;
         }
 
         // Return page entity
-        return $this->_page[$page_num];
+        return $this->pages[$page_num];
     }
 
     public function close(
@@ -229,14 +229,12 @@ class Tab
         }
     }
 
-    public function reorder(
-        bool $session = true
-    ): void
+    public function reorder(): void
     {
         // Init new index
-        $_page = [];
+        $pages = [];
 
-        foreach ($this->_page as $page)
+        foreach ($this->pages as $page)
         {
             // Get current entity $page_num
             $page_num = $this->gtk->page_num(
@@ -253,39 +251,14 @@ class Tab
             }
 
             // Update position
-            $_page[$page_num] = $page;
+            $pages[$page_num] = $page;
         }
 
         // Reorder entities
-        $this->_page = $_page;
+        $this->pages = $pages;
 
         ksort(
-            $this->_page
+            $this->pages
         );
-
-        // Update session
-        if ($session)
-        {
-            $this->update();
-        }
-    }
-
-    public function update(): void
-    {
-        $pid = pcntl_fork();
-
-        if ($pid === 0)
-        {
-            $this->container->browser->database->cleanSession();
-
-            foreach ($this->_page as $page)
-            {
-                $this->container->browser->database->addSession(
-                    $page->navbar->request->getValue()
-                );
-            }
-
-            exit;
-        }
     }
 }

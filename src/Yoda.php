@@ -24,16 +24,8 @@ $database = new \Yggverse\Yoda\Model\Database(
 \Gtk::init();
 
 // Init browser
-$browser = new \Yggverse\Yoda\Entity\Browser(
+new \Yggverse\Yoda\Entity\Browser(
     $database
-);
-
-$browser->gtk->connect(
-    'destroy',
-    function()
-    {
-        \Gtk::main_quit();
-    }
 );
 
 // Init theme

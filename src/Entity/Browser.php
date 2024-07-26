@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity;
 
+use \Gtk;
 use \GtkWindow;
 
 use \Yggverse\Yoda\Entity\Browser\Header;
@@ -76,6 +77,32 @@ class Browser
                 // GdkEvent $event
             ) {
                 // @TODO render data wordwrap by $window->get_size()
+            }
+        );
+
+        $this->gtk->connect(
+            'destroy',
+            function()
+            {
+                // Save session
+                $pid = pcntl_fork();
+
+                if ($pid === 0)
+                {
+                    $this->database->cleanSession();
+
+                    foreach ($this->container->tab->pages as $page)
+                    {
+                        $this->database->addSession(
+                            $page->navbar->request->getValue()
+                        );
+                    }
+
+                    exit;
+                }
+
+                // Exit application
+                Gtk::main_quit();
             }
         );
     }
