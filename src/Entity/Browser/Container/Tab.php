@@ -58,9 +58,9 @@ class Tab
         // Init events
         $this->gtk->connect(
             'switch-page',
-            function (
-                ?GtkNotebook $self,
-                ?GtkWidget $child,
+            function(
+                GtkNotebook $self,
+                GtkWidget $child,
                 int $page_num
             ) {
                 // Update header bar title
@@ -80,9 +80,9 @@ class Tab
 
         $this->gtk->connect(
             'page-added',
-            function (
-                ?GtkNotebook $self,
-                ?GtkWidget $child,
+            function(
+                GtkNotebook $self,
+                GtkWidget $child,
                 int $page_num
             ) {
                 $this->reorder();
@@ -91,9 +91,9 @@ class Tab
 
         $this->gtk->connect(
             'page-removed',
-            function (
-                ?GtkNotebook $self,
-                ?GtkWidget $child,
+            function(
+                GtkNotebook $self,
+                GtkWidget $child,
                 int $page_num
             ) {
                 // Free memory pool
@@ -113,9 +113,9 @@ class Tab
 
         $this->gtk->connect(
             'page-reordered',
-            function (
-                ?GtkNotebook $self,
-                ?GtkWidget $child,
+            function(
+                GtkNotebook $self,
+                GtkWidget $child,
                 int $page_num
             ) {
                 $this->reorder();
@@ -146,9 +146,9 @@ class Tab
 
         $label->connect(
             'button-press-event',
-            function (
-                ?GtkEventBox $self,
-                ?GdkEvent $event
+            function(
+                GtkEventBox $self,
+                GdkEvent $event
             ) {
                 // Close tab on double click
                 if ($event->type == Gdk::DOUBLE_BUTTON_PRESS)
