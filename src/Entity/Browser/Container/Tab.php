@@ -70,6 +70,7 @@ class Tab
                         $page->title->getValue(),
                         $page->title->getSubtitle()
                     );
+
                 } else throw new Exception;
 
                 // Keep current selection
@@ -95,6 +96,17 @@ class Tab
                 ?GtkWidget $child,
                 int $page_num
             ) {
+                // Free memory pool
+                if ($page = $this->get($page_num))
+                {
+                    if ($page->connection)
+                    {
+                        $page->connection->close();
+                    }
+
+                } else throw new Exception;
+
+                // Reorder pages
                 $this->reorder();
             }
         );
