@@ -23,16 +23,19 @@ class Base extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Navbar\
         if ($address->getHost())
         {
             $this->navbar->request->setValue(
-                $address->get( // build base
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    false,
-                    false,
-                    false
-                )
+                rtrim(
+                    $address->get(
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false
+                    ),
+                    '/'
+                ) . '/'
             );
 
             $this->navbar->page->update();
