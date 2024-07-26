@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Interface\Model;
 
+use \Shmop;
+
 /*
  * Shared memory API for async operations
  *
@@ -19,7 +21,7 @@ interface Pool
         int $size = 0xfffff,
         string $flags = 'c',
         int $mode = 0644,
-    ): ?\Shmop;
+    ): ?Shmop;
 
     public function read(
         string $key,
