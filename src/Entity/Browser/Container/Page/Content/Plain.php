@@ -31,5 +31,6 @@ class Plain extends Markup
     ): bool
     {
         // @TODO
+        return false;
     }
 }

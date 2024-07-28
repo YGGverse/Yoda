@@ -254,6 +254,7 @@ class Gemtext extends Markup
     ): bool
     {
         // @TODO
+        return false;
     }
 
     protected function _onActivateLink(
