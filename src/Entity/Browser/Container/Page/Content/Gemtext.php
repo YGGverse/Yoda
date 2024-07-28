@@ -248,6 +248,14 @@ class Gemtext extends Markup
         );
     }
 
+    protected function _onConfigure(
+        GtkLabel $label,
+        GdkEvent $event
+    ): bool
+    {
+        // @TODO
+    }
+
     protected function _onActivateLink(
         GtkLabel $label,
         string $href

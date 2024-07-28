@@ -76,6 +76,19 @@ abstract class Markup
                 );
             }
         );
+
+        $this->gtk->connect(
+            'configure-event',
+            function(
+                GtkWindow $window,
+                GdkEvent $event
+            ) {
+                return $this->_onConfigure(
+                    $label,
+                    $event
+                );
+            }
+        );
     }
 
     protected function _onActivateLink(
@@ -93,6 +106,11 @@ abstract class Markup
     {
         return false;
     }
+
+    abstract protected function _onConfigure(
+        GtkLabel $label,
+        GdkEvent $event
+    ): bool;
 
     abstract public function set(
         string $value

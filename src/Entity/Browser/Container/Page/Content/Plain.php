@@ -24,4 +24,12 @@ class Plain extends Markup
             )
         );
     }
+
+    protected function _onConfigure(
+        GtkLabel $label,
+        GdkEvent $event
+    ): bool
+    {
+        // @TODO
+    }
 }

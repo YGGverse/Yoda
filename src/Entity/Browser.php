@@ -76,16 +76,6 @@ class Browser
 
         // Init events
         $this->gtk->connect(
-            'configure-event',
-            function(
-                GtkWindow $window,
-                // GdkEvent $event
-            ) {
-                // @TODO render data wordwrap by $window->get_size()
-            }
-        );
-
-        $this->gtk->connect(
             'destroy',
             function()
             {
