@@ -70,7 +70,7 @@ abstract class Markup
                 GtkLabel $label,
                 GdkEvent $event
             ) {
-                return $this->_onButtonPressEvent(
+                return $this->_onButtonPress(
                     $label,
                     $event
                 );
@@ -99,7 +99,7 @@ abstract class Markup
         return false;
     }
 
-    protected function _onButtonPressEvent(
+    protected function _onButtonPress(
         GtkLabel $label,
         GdkEvent $event
     ): bool

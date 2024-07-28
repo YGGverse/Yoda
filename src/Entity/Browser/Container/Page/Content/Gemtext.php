@@ -290,7 +290,7 @@ class Gemtext extends Markup
         );
     }
 
-    protected function _onButtonPressEvent(
+    protected function _onButtonPress(
         GtkLabel $label,
         GdkEvent $event
     ): bool
