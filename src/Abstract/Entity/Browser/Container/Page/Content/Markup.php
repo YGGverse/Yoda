@@ -16,11 +16,12 @@ abstract class Markup
     // Dependencies
     public Content $content;
 
-    // Extras
-    protected ?string $_source = null;
-
     // Defaults
     public const WRAP = 140;
+
+    // Extras
+    protected int $_wrap = self::WRAP;
+    protected ?string $_source = null;
 
     public function __construct(
         Content $content

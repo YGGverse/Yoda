@@ -315,15 +315,20 @@ class Gemtext extends Markup
     }
 
     private function _wrap(
-        string $value
+        string $source
     ): string
     {
-        return wordwrap(
-            $value,
-            $this::WRAP,
-            PHP_EOL,
-            false
-        );
+        if ($wrap = $this->_wrap ? $this->_wrap : $this::WRAP)
+        {
+            return wordwrap(
+                $source,
+                $wrap,
+                PHP_EOL,
+                false
+            );
+        }
+
+        throw new Exception;
     }
 
     private function _url(
