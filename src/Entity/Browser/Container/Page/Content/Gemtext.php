@@ -20,7 +20,8 @@ use \Yggverse\Gemtext\Entity\Listing;
 use \Yggverse\Gemtext\Entity\Quote;
 use \Yggverse\Gemtext\Entity\Text;
 
-use \Yggverse\Net\Address;
+use \Yggverse\Gemtext\Parser\Link as LinkParser;
+
 
 class Gemtext extends Markup
 {
@@ -287,18 +288,36 @@ class Gemtext extends Markup
         GdkEvent $event
     ): bool
     {
-        // Open link in new tab on middle button click
+        // Open link in the new tab on middle button click
         if ($event->button->button == Gdk::BUTTON_MIDDLE)
         {
+            // Detect cursor position
             $result = $label->get_layout()->xy_to_index(
                 $event->button->x * Pango::SCALE,
                 $event->button->y * Pango::SCALE
             );
 
+            // Position detected
             if ($result)
             {
-                // @TODO
-                return true;
+                // Get entire line from source
+                if ($line = $this->_line($result['index_']))
+                {
+                    // Parse gemtext href
+                    if ($href = LinkParser::getAddress($line))
+                    {
+                        // Format URL
+                        if ($url = $this->_url($href))
+                        {
+                            // Open
+                            $this->content->page->container->tab->append(
+                                $url
+                            );
+
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
@@ -312,42 +331,5 @@ class Gemtext extends Markup
     {
         // @TODO
         return false;
-    }
-
-    private function _wrap(
-        string $source
-    ): string
-    {
-        if ($wrap = $this->_wrap ? $this->_wrap : $this::WRAP)
-        {
-            return wordwrap(
-                $source,
-                $wrap,
-                PHP_EOL,
-                false
-            );
-        }
-
-        throw new Exception;
-    }
-
-    private function _url(
-        string $link
-    ): ?string
-    {
-        $address = new Address(
-            $link
-        );
-
-        if ($address->isRelative())
-        {
-            $address->toAbsolute(
-                new Address(
-                    $this->content->page->navbar->request->getValue()
-                )
-            );
-        }
-
-        return $address->get();
     }
 }

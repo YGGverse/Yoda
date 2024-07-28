@@ -9,6 +9,8 @@ use \GtkLabel;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
+use \Yggverse\Net\Address;
+
 abstract class Markup
 {
     public GtkLabel $gtk;
@@ -121,4 +123,80 @@ abstract class Markup
     abstract public function set(
         string $value
     ): void;
+
+    // Tools
+    protected function _line(
+        int $offset
+    ): ?string
+    {
+        if (is_null($this->_source))
+        {
+            return null;
+        }
+
+        $start = strrpos(
+            substr(
+                $this->_source,
+                0,
+                $offset
+            ),
+            PHP_EOL
+        ) + 1;
+
+        $end = strpos(
+            $this->_source,
+            PHP_EOL,
+            $offset
+        );
+
+        if ($end === false)
+        {
+            $end = strlen(
+                $this->_source
+            );
+        }
+
+        return substr(
+            $this->_source,
+            $start,
+            $end - $start
+        );
+    }
+
+    protected function _wrap(
+        string $source
+    ): string
+    {
+        if ($wrap = $this->_wrap ? $this->_wrap : $this::WRAP)
+        {
+            return wordwrap(
+                $source,
+                $wrap,
+                PHP_EOL,
+                false
+            );
+        }
+
+        throw new Exception;
+    }
+
+    protected function _url(
+        string $link
+    ): ?string
+    {
+        $address = new Address(
+            $link
+        );
+
+        if ($address->isRelative())
+        {
+            $address->toAbsolute(
+                new Address(
+                    $this->content->page->navbar->request->getValue()
+                )
+            );
+        }
+
+        return $address->get();
+    }
 }
