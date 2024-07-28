@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Menu;
 
 use \GtkMenu;
 use \GtkMenuItem;
+use \GtkSeparatorMenuItem;
 
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
@@ -20,6 +21,7 @@ class Tab
     // Requirements
     public Tab\Add $add;
     public Tab\Close $close;
+    public Tab\Clean $clean;
 
     // Defaults
     public const LABEL = 'Tab';
@@ -54,6 +56,24 @@ class Tab
 
         $tab->append(
             $this->close->gtk
+        );
+
+        $this->gtk->set_submenu(
+            $tab
+        );
+
+        // Add separator
+        $tab->append(
+            new GtkSeparatorMenuItem
+        );
+
+        // Init close all tabs menu item
+        $this->clean = new Tab\Clean(
+            $this
+        );
+
+        $tab->append(
+            $this->clean->gtk
         );
 
         $this->gtk->set_submenu(
