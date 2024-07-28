@@ -29,6 +29,10 @@ class Open
         '*.gmi' => null
     ];
 
+    public const DIALOG_TITLE = 'Open file';
+    public const DIALOG_BUTTON_CANCEL = 'Cancel';
+    public const DIALOG_BUTTON_OPEN = 'Open';
+
     public function __construct(
         File $file
     ) {
@@ -49,13 +53,13 @@ class Open
             function()
             {
                 $dialog = new GtkFileChooserDialog(
-                    'Open file',
+                    _($this::DIALOG_TITLE),
                     $this->file->menu->browser->gtk,
                     GtkFileChooserAction::OPEN,
                     [
-                        'Cancel',
+                        _($this::DIALOG_BUTTON_CANCEL),
                         GtkResponseType::CANCEL,
-                        'Open',
+                        _($this::DIALOG_BUTTON_OPEN),
                         GtkResponseType::OK
                     ]
                 );

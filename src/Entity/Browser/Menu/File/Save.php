@@ -22,6 +22,10 @@ class Save
     // Defaults
     public const LABEL = 'Save As..';
 
+    public const DIALOG_TITLE = 'Save to file';
+    public const DIALOG_BUTTON_CANCEL = 'Cancel';
+    public const DIALOG_BUTTON_SAVE = 'Save';
+
     public function __construct(
         File $file
     ) {
@@ -42,13 +46,13 @@ class Save
             function()
             {
                 $dialog = new GtkFileChooserDialog(
-                    'Save to file',
+                    _($this::DIALOG_TITLE),
                     $this->file->menu->browser->gtk,
                     GtkFileChooserAction::SAVE,
                     [
-                        'Cancel',
+                        _($this::DIALOG_BUTTON_CANCEL),
                         GtkResponseType::CANCEL,
-                        'Save',
+                        _($this::DIALOG_BUTTON_SAVE),
                         GtkResponseType::APPLY
                     ]
                 );
