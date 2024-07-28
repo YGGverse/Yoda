@@ -12,14 +12,14 @@ use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
 class Plain extends Markup
 {
     public function set(
-        string $value
+        string $source
     ): void
     {
         $this->gtk->set_markup(
             sprintf(
                 '<tt>%s</tt>',
                 htmlspecialchars(
-                    $value
+                    $this->_source = $source
                 )
             )
         );

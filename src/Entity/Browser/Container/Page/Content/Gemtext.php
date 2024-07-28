@@ -25,13 +25,13 @@ use \Yggverse\Net\Address;
 class Gemtext extends Markup
 {
     public function set(
-        string $value,
+        string $source,
         string | null &$title = null,
         bool $preformatted = false
     ): void
     {
         $document = new Document(
-            $value
+            $this->_source = $source
         );
 
         $line = [];
@@ -248,15 +248,6 @@ class Gemtext extends Markup
         );
     }
 
-    protected function _onSizeAllocate(
-        GtkLabel $label,
-        GdkEvent $event
-    ): bool
-    {
-        // @TODO
-        return false;
-    }
-
     protected function _onActivateLink(
         GtkLabel $label,
         string $href
@@ -311,6 +302,15 @@ class Gemtext extends Markup
             }
         }
 
+        return false;
+    }
+
+    protected function _onSizeAllocate(
+        GtkLabel $label,
+        GdkEvent $event
+    ): bool
+    {
+        // @TODO
         return false;
     }
 
