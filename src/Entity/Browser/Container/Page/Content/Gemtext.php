@@ -301,6 +301,8 @@ class Gemtext extends Markup
             if ($result)
             {
                 // Get entire line from source
+
+                /* @TODO incorrect offset index_
                 if ($line = $this->_line($result['index_']))
                 {
                     // Parse gemtext href
@@ -319,7 +321,7 @@ class Gemtext extends Markup
                             return true;
                         }
                     }
-                }
+                } */
             }
         }
 
