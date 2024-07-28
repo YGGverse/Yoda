@@ -107,11 +107,13 @@ abstract class Markup
         return false;
     }
 
+    // Require custom wordwrap implementation on widget resize
     abstract protected function _onSizeAllocate(
         GtkLabel $label,
         GdkEvent $event
     ): bool;
 
+    // Require custom layout implementation
     abstract public function set(
         string $value
     ): void;
