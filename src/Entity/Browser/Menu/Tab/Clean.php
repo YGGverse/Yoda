@@ -62,12 +62,7 @@ class Clean
 
                 if (GtkResponseType::OK == $dialog->run())
                 {
-                    foreach ($this->tab->menu->browser->container->tab->pages as $page_num => $page)
-                    {
-                        $this->tab->menu->browser->container->tab->close(
-                            $page_num
-                        );
-                    }
+                    $this->tab->menu->browser->container->tab->clean();
                 }
 
                 $dialog->destroy();

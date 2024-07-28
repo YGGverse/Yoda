@@ -241,6 +241,14 @@ class Tab
         }
     }
 
+    public function clean(): void
+    {
+        while ($this->pages)
+        {
+            $this->close();
+        }
+    }
+
     public function reorder(): void
     {
         // Init new index
