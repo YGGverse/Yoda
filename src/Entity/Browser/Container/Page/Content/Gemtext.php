@@ -311,7 +311,9 @@ class Gemtext extends Markup
                         {
                             // Open
                             $this->content->page->container->tab->append(
-                                $url
+                                $url,
+                                true,
+                                false
                             );
 
                             return true;
