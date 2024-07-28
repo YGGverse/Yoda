@@ -248,7 +248,7 @@ class Gemtext extends Markup
         );
     }
 
-    protected function _onConfigure(
+    protected function _onSizeAllocate(
         GtkLabel $label,
         GdkEvent $event
     ): bool

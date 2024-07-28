@@ -78,12 +78,12 @@ abstract class Markup
         );
 
         $this->gtk->connect(
-            'configure-event',
+            'size-allocate',
             function(
-                GtkWindow $window,
+                GtkLabel $label,
                 GdkEvent $event
             ) {
-                return $this->_onConfigure(
+                return $this->_onSizeAllocate(
                     $label,
                     $event
                 );
@@ -107,7 +107,7 @@ abstract class Markup
         return false;
     }
 
-    abstract protected function _onConfigure(
+    abstract protected function _onSizeAllocate(
         GtkLabel $label,
         GdkEvent $event
     ): bool;
