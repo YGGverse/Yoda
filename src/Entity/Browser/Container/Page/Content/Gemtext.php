@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 
 use \Exception;
+use \Gdk;
 use \GdkEvent;
 use \GtkLabel;
+use \Pango;
 
 use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
 
@@ -278,6 +280,29 @@ class Gemtext extends Markup
                 'file'
             ]
         );
+    }
+
+    protected function _onButtonPressEvent(
+        GtkLabel $label,
+        GdkEvent $event
+    ): bool
+    {
+        // Open link in new tab on middle button click
+        if ($event->button->button == Gdk::BUTTON_MIDDLE)
+        {
+            $result = $label->get_layout()->xy_to_index(
+                $event->button->x * Pango::SCALE,
+                $event->button->y * Pango::SCALE
+            );
+
+            if ($result)
+            {
+                // @TODO
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function _wrap(
