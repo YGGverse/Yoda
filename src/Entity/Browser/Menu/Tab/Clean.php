@@ -53,11 +53,11 @@ class Clean
                     GtkDialogFlags::MODAL,
                     GtkMessageType::WARNING,
                     GtkButtonsType::OK_CANCEL,
-                    $this::DIALOG_MESSAGE_FORMAT
+                    _($this::DIALOG_MESSAGE_FORMAT)
                 );
 
                 $dialog->format_secondary_text(
-                    $this::DIALOG_FORMAT_SECONDARY_TEXT
+                    _($this::DIALOG_FORMAT_SECONDARY_TEXT)
                 );
 
                 if (GtkResponseType::OK == $dialog->run())
