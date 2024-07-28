@@ -14,7 +14,7 @@ class Close
     public Tab $tab;
 
     // Defaults
-    public const LABEL = 'Close';
+    public const LABEL = 'Close active';
     public const TOOLTIP = 'Close active tab (double click on tab)';
 
     public function __construct(
