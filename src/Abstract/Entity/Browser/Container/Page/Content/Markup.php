@@ -16,6 +16,9 @@ abstract class Markup
     // Dependencies
     public Content $content;
 
+    // Extras
+    protected ?string $_source = null;
+
     // Defaults
     public const WRAP = 140;
 
