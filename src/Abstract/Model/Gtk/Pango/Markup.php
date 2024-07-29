@@ -151,7 +151,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
             $markup,
             mb_strlen(
                 $markup,
-                'UTF-8'
+                self::ENCODING
             )
         );
 
