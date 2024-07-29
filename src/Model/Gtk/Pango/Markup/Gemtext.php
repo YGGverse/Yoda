@@ -113,7 +113,7 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
                     else
                     {
-                        $line[] = self::h3(
+                        $line[] = self::link(
                             self::_url(
                                 $entity->getAddress(),
                                 $request
