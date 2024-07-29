@@ -165,7 +165,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
     protected static function _wrap(
         string $string,
-        int $width = self::WRAP_WIDTH,
+        int $width,
         int $line = 1
     ): string
     {
