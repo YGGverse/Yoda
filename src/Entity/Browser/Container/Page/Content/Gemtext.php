@@ -10,15 +10,7 @@ use \GdkEvent;
 use \GtkLabel;
 use \Pango;
 
-use \Yggverse\Yoda\Model\Gtk\Pango\Markup;
-
-use \Yggverse\Gemtext\Document;
-use \Yggverse\Gemtext\Entity\Code;
-use \Yggverse\Gemtext\Entity\Header;
-use \Yggverse\Gemtext\Entity\Link;
-use \Yggverse\Gemtext\Entity\Listing;
-use \Yggverse\Gemtext\Entity\Quote;
-use \Yggverse\Gemtext\Entity\Text;
+use \Yggverse\Yoda\Model\Gtk\Pango\Markup\Gemtext as Markup;
 
 # use \Yggverse\Gemtext\Parser\Link as LinkParser;
 
@@ -26,177 +18,15 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
 {
     public function set(
         string $source,
-        string | null &$title = null,
-        bool $preformatted = false
+        string | null &$title = null
     ): void
     {
-        $document = new Document(
-            $this->_source = $source
-        );
-
-        $line = [];
-
-        foreach ($document->getEntities() as $entity)
-        {
-            switch (true)
-            {
-                case $entity instanceof Code:
-
-                    if ($entity->isInline())
-                    {
-                        $line[] = Markup::code(
-                            $entity->getAlt()
-                        );
-                    }
-
-                    else
-                    {
-                        $line[] = $preformatted ? Markup::tag(Markup::TAG_CODE, true)
-                                                : Markup::tag(Markup::TAG_CODE, false);
-
-                        $preformatted = !($preformatted); // toggle
-                    }
-
-                break;
-
-                case $entity instanceof Header:
-
-                    if ($preformatted)
-                    {
-                        $line[] = Markup::pre(
-                            $entity->toString()
-                        );
-                    }
-
-                    else
-                    {
-                        switch ($entity->getLevel())
-                        {
-                            case 1: // #
-
-                                $line[] = Markup::h1(
-                                    $entity->getText()
-                                );
-
-                                // Find and return document title by first # tag
-                                if (empty($title))
-                                {
-                                    $title = $entity->getText();
-                                }
-
-                            break;
-
-                            case 2: // ##
-
-                                $line[] = Markup::h2(
-                                    $entity->getText()
-                                );
-
-                            break;
-
-                            case 3: // ###
-
-                                $line[] = Markup::h3(
-                                    $entity->getText()
-                                );
-
-                            break;
-                            default:
-
-                                throw new Exception;
-                        }
-                    }
-
-                break;
-
-                case $entity instanceof Link:
-
-                    if ($preformatted)
-                    {
-                        $line[] = Markup::pre(
-                            $entity->toString()
-                        );
-                    }
-
-                    else
-                    {
-                        $line[] = Markup::h3(
-                            $this->_url(
-                                $entity->getAddress()
-                            ),
-                            $entity->getAddress(),
-                            $entity->getAlt() ? $entity->getAlt()
-                                              : $entity->getAddress() // @TODO date
-                        );
-                    }
-
-                break;
-
-                case $entity instanceof Listing:
-
-                    if ($preformatted)
-                    {
-                        $line[] = Markup::pre(
-                            $entity->toString()
-                        );
-                    }
-
-                    else
-                    {
-                        $line[] = Markup::list(
-                            $entity->getItem()
-                        );
-                    }
-
-                break;
-
-                case $entity instanceof Quote:
-
-                    if ($preformatted)
-                    {
-                        $line[] = Markup::pre(
-                            $entity->toString()
-                        );
-                    }
-
-                    else
-                    {
-                        $line[] = Markup::quote(
-                            $entity->getText()
-                        );
-                    }
-
-                break;
-
-                case $entity instanceof Text:
-
-                    if ($preformatted)
-                    {
-                        $line[] = Markup::pre(
-                            $entity->toString()
-                        );
-                    }
-
-                    else
-                    {
-                        $line[] = Markup::text(
-                            $entity->getData(),
-                            $this->content->page->gtk->get_allocated_width()
-                        );
-                    }
-
-                break;
-
-                default:
-
-                    throw new Exception;
-            }
-        }
-
         $this->gtk->set_markup(
-            implode(
-                PHP_EOL,
-                $line
+            Markup::format(
+                $this->_source = $source,
+                $this->content->page->navbar->request->getValue(),
+                $this->content->page->gtk->get_allocated_width(),
+                $title
             )
         );
     }
