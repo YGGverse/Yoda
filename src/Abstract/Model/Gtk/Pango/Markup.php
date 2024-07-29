@@ -166,11 +166,11 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     protected static function _wrap(
         string $string,
         int $width,
-        int $line = 1
+        int $line = 1,
+        array $words = [],
+        array $lines = []
     ): string
     {
-        $words = [];
-
         foreach (explode(' ', $string) as $word)
         {
             if (isset($words[$line]) && self::_width(implode(' ', $words[$line])) > $width)
@@ -180,8 +180,6 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
             $words[$line][] = $word;
         }
-
-        $lines = [];
 
         foreach ($words as $values)
         {
