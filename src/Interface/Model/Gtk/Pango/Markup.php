@@ -56,8 +56,4 @@ interface Markup
         string $const,
         bool $close
     ): string;
-
-    public static function width(
-        string $markup
-    ): ?int;
 }

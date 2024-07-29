@@ -139,7 +139,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         throw new Exception;
     }
 
-    public static function width(
+    protected static function _width(
         string $markup
     ): ?int
     {
@@ -173,7 +173,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
         foreach (explode(' ', $string) as $word)
         {
-            if (isset($words[$line]) && Markup::width(implode(' ', $words[$line])) > $width)
+            if (isset($words[$line]) && self::_width(implode(' ', $words[$line])) > $width)
             {
                 $line++;
             }
