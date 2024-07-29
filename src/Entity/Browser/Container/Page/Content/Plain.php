@@ -7,30 +7,18 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \GdkEvent;
 use \GtkLabel;
 
-use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
+use \Yggverse\Yoda\Model\Gtk\Pango\Markup;
 
-class Plain extends Markup
+class Plain extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
 {
     public function set(
         string $source
     ): void
     {
         $this->gtk->set_markup(
-            sprintf(
-                '<tt>%s</tt>',
-                htmlspecialchars(
-                    $this->_source = $source
-                )
+            Markup::code( // @TODO
+                $this->_source = $source
             )
         );
-    }
-
-    protected function _onSizeAllocate(
-        GtkLabel $label,
-        GdkEvent $event
-    ): bool
-    {
-        // @TODO
-        return false;
     }
 }

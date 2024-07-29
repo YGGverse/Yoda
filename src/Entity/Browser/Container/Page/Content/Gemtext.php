@@ -10,7 +10,7 @@ use \GdkEvent;
 use \GtkLabel;
 use \Pango;
 
-use \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup;
+use \Yggverse\Yoda\Model\Gtk\Pango\Markup;
 
 use \Yggverse\Gemtext\Document;
 use \Yggverse\Gemtext\Entity\Code;
@@ -20,10 +20,9 @@ use \Yggverse\Gemtext\Entity\Listing;
 use \Yggverse\Gemtext\Entity\Quote;
 use \Yggverse\Gemtext\Entity\Text;
 
-use \Yggverse\Gemtext\Parser\Link as LinkParser;
+# use \Yggverse\Gemtext\Parser\Link as LinkParser;
 
-
-class Gemtext extends Markup
+class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
 {
     public function set(
         string $source,
@@ -45,17 +44,15 @@ class Gemtext extends Markup
 
                     if ($entity->isInline())
                     {
-                        $line[] = sprintf(
-                            '<tt>%s</tt>',
-                            htmlspecialchars(
-                                $entity->getAlt()
-                            )
+                        $line[] = Markup::code(
+                            $entity->getAlt()
                         );
                     }
 
                     else
                     {
-                        $line[] = $preformatted ? '</tt>' : '<tt>';
+                        $line[] = $preformatted ? Markup::tag(Markup::TAG_CODE, true)
+                                                : Markup::tag(Markup::TAG_CODE, false);
 
                         $preformatted = !($preformatted); // toggle
                     }
@@ -66,10 +63,8 @@ class Gemtext extends Markup
 
                     if ($preformatted)
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->toString()
-                            )
+                        $line[] = Markup::pre(
+                            $entity->toString()
                         );
                     }
 
@@ -79,13 +74,8 @@ class Gemtext extends Markup
                         {
                             case 1: // #
 
-                                $line[] = sprintf(
-                                    '<span size="xx-large">%s</span>',
-                                    htmlspecialchars(
-                                        $this->_wrap(
-                                            $entity->getText()
-                                        )
-                                    )
+                                $line[] = Markup::h1(
+                                    $entity->getText()
                                 );
 
                                 // Find and return document title by first # tag
@@ -98,26 +88,16 @@ class Gemtext extends Markup
 
                             case 2: // ##
 
-                                $line[] = sprintf(
-                                    '<span size="x-large">%s</span>',
-                                    htmlspecialchars(
-                                        $this->_wrap(
-                                            $entity->getText()
-                                        )
-                                    )
+                                $line[] = Markup::h2(
+                                    $entity->getText()
                                 );
 
                             break;
 
                             case 3: // ###
 
-                                $line[] = sprintf(
-                                    '<span size="large">%s</span>',
-                                    htmlspecialchars(
-                                        $this->_wrap(
-                                            $entity->getText()
-                                        )
-                                    )
+                                $line[] = Markup::h3(
+                                    $entity->getText()
                                 );
 
                             break;
@@ -133,31 +113,20 @@ class Gemtext extends Markup
 
                     if ($preformatted)
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->toString()
-                            )
+                        $line[] = Markup::pre(
+                            $entity->toString()
                         );
                     }
 
                     else
                     {
-                        $line[] = sprintf(
-                            '<a href="%s" title="%s"><span underline="none">%s</span></a>',
-                            htmlspecialchars(
-                                $this->_url(
-                                    $entity->getAddress()
-                                )
-                            ),
-                            htmlspecialchars(
+                        $line[] = Markup::h3(
+                            $this->_url(
                                 $entity->getAddress()
                             ),
-                            htmlspecialchars(
-                                $this->_wrap(
-                                    $entity->getAlt() ? $entity->getAlt()
-                                                      : $entity->getAddress() // @TODO date
-                                )
-                            )
+                            $entity->getAddress(),
+                            $entity->getAlt() ? $entity->getAlt()
+                                              : $entity->getAddress() // @TODO date
                         );
                     }
 
@@ -167,22 +136,15 @@ class Gemtext extends Markup
 
                     if ($preformatted)
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->toString()
-                            )
+                        $line[] = Markup::pre(
+                            $entity->toString()
                         );
                     }
 
                     else
                     {
-                        $line[] = sprintf(
-                            '* %s',
-                            htmlspecialchars(
-                                $this->_wrap(
-                                    $entity->getItem()
-                                )
-                            )
+                        $line[] = Markup::list(
+                            $entity->getItem()
                         );
                     }
 
@@ -192,22 +154,15 @@ class Gemtext extends Markup
 
                     if ($preformatted)
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->toString()
-                            )
+                        $line[] = Markup::pre(
+                            $entity->toString()
                         );
                     }
 
                     else
                     {
-                        $line[] = sprintf(
-                            '<i>%s</i>',
-                            htmlspecialchars(
-                                $this->_wrap(
-                                    $entity->getText()
-                                )
-                            )
+                        $line[] = Markup::quote(
+                            $entity->getText()
                         );
                     }
 
@@ -217,19 +172,15 @@ class Gemtext extends Markup
 
                     if ($preformatted)
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->toString()
-                            )
+                        $line[] = Markup::pre(
+                            $entity->toString()
                         );
                     }
 
                     else
                     {
-                        $line[] = htmlspecialchars(
-                            $this->_wrap(
-                                $entity->getData()
-                            )
+                        $line[] = Markup::text(
+                            $entity->getData()
                         );
                     }
 
@@ -325,15 +276,6 @@ class Gemtext extends Markup
             }
         }
 
-        return false;
-    }
-
-    protected function _onSizeAllocate(
-        GtkLabel $label,
-        GdkEvent $event
-    ): bool
-    {
-        // @TODO
         return false;
     }
 }
