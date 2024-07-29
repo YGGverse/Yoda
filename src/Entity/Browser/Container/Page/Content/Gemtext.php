@@ -36,16 +36,9 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
         string $href
     ): bool
     {
-        // Format URL
-        $url = $this->_url(
-            $href
-        );
-
         // Update request entry
         $this->content->page->navbar->request->setValue(
-            $this->_url(
-                $href
-            )
+            $href
         );
 
         // Update page
@@ -54,7 +47,7 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
         // Prevent propagation for supported protocols
         return in_array(
             parse_url(
-                $url,
+                $href,
                 PHP_URL_SCHEME
             ),
             [
@@ -90,18 +83,14 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
                     // Parse gemtext href
                     if ($href = LinkParser::getAddress($line))
                     {
-                        // Format URL
-                        if ($url = $this->_url($href))
-                        {
-                            // Open
-                            $this->content->page->container->tab->append(
-                                $url,
-                                true,
-                                false
-                            );
+                        // Open
+                        $this->content->page->container->tab->append(
+                            $href,
+                            true,
+                            false
+                        );
 
-                            return true;
-                        }
+                        return true;
                     }
                 } */
             }
