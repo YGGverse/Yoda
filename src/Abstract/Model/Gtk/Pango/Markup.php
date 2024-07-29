@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Model\Gtk\Pango;
 
+use \PangoLayout;
+use \GtkDrawingArea;
+
 class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 {
     public static function code(
@@ -99,11 +102,15 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     }
 
     public static function text(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
         return htmlspecialchars(
-            $value
+            self::_wrap(
+                $value,
+                $width
+            )
         );
     }
 
@@ -130,5 +137,63 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         }
 
         throw new Exception;
+    }
+
+    public static function width(
+        string $markup
+    ): ?int
+    {
+        $layout = new PangoLayout(
+            (new GtkDrawingArea)->create_pango_context()
+        );
+
+        $layout->set_markup(
+            $markup,
+            mb_strlen(
+                $markup,
+                'UTF-8'
+            )
+        );
+
+        if ($size = $layout->get_pixel_size())
+        {
+            return $size['width'];
+        }
+
+        return null;
+    }
+
+    protected static function _wrap(
+        string $string,
+        int $width = self::WRAP_WIDTH,
+        int $line = 1
+    ): string
+    {
+        $words = [];
+
+        foreach (explode(' ', $string) as $word)
+        {
+            if (isset($words[$line]) && Markup::width(implode(' ', $words[$line])) > $width)
+            {
+                $line++;
+            }
+
+            $words[$line][] = $word;
+        }
+
+        $lines = [];
+
+        foreach ($words as $values)
+        {
+            $lines[] = implode(
+                ' ',
+                $values
+            );
+        }
+
+        return implode(
+            PHP_EOL,
+            $lines
+        );
     }
 }

@@ -180,7 +180,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
                     else
                     {
                         $line[] = Markup::text(
-                            $entity->getData()
+                            $entity->getData(),
+                            $this->content->page->gtk->get_allocated_width()
                         );
                     }
 

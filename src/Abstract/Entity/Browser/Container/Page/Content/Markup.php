@@ -18,11 +18,7 @@ abstract class Markup
     // Dependencies
     public Content $content;
 
-    // Defaults
-    public const WRAP = 140;
-
     // Extras
-    protected int $_wrap = self::WRAP;
     protected ?string $_source = null;
 
     public function __construct(
@@ -113,11 +109,18 @@ abstract class Markup
         return false;
     }
 
-    // Require custom wordwrap implementation on widget resize
-    abstract protected function _onSizeAllocate(
+    // Custom wordwrap on widget resize
+    protected function _onSizeAllocate(
         GtkLabel $label,
         GdkEvent $event
-    ): bool;
+    ): bool
+    {
+        $this->set( // @TODO Gtk::timeout_add
+            $this->_source
+        );
+
+        return false;
+    }
 
     // Require custom layout implementation
     abstract public function set(
@@ -125,61 +128,6 @@ abstract class Markup
     ): void;
 
     // Tools
-    protected function _line(
-        int $offset
-    ): ?string
-    {
-        if (is_null($this->_source))
-        {
-            return null;
-        }
-
-        $start = strrpos(
-            substr(
-                $this->_source,
-                0,
-                $offset
-            ),
-            PHP_EOL
-        ) + 1;
-
-        $end = strpos(
-            $this->_source,
-            PHP_EOL,
-            $offset
-        );
-
-        if ($end === false)
-        {
-            $end = strlen(
-                $this->_source
-            );
-        }
-
-        return substr(
-            $this->_source,
-            $start,
-            $end - $start
-        );
-    }
-
-    protected function _wrap(
-        string $source
-    ): string
-    {
-        if ($wrap = $this->_wrap ? $this->_wrap : $this::WRAP)
-        {
-            return wordwrap(
-                $source,
-                $wrap,
-                PHP_EOL,
-                false
-            );
-        }
-
-        throw new Exception;
-    }
-
     protected function _url(
         string $link
     ): ?string

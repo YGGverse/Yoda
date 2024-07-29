@@ -12,6 +12,8 @@ interface Markup
 {
     public const TAG_CODE = 'tt';
 
+    public const WRAP_WIDTH = 140;
+
     public static function code(
         string $value
     ): string;
@@ -54,4 +56,8 @@ interface Markup
         string $const,
         bool $close
     ): string;
+
+    public static function width(
+        string $markup
+    ): ?int;
 }
