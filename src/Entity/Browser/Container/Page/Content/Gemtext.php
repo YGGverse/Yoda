@@ -25,7 +25,7 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Cont
             Markup::format(
                 $this->_source = $source,
                 $this->content->page->navbar->request->getValue(),
-                $this->content->page->gtk->get_allocated_width(),
+                $this->content->page->content->gtk->get_allocated_width(),
                 $title
             )
         );
