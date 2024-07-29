@@ -148,11 +148,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         );
 
         $layout->set_markup(
-            $markup,
-            mb_strlen(
-                $markup,
-                self::ENCODING
-            )
+            $markup, -1
         );
 
         if ($size = $layout->get_pixel_size())
