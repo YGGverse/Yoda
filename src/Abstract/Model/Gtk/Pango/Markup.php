@@ -143,7 +143,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         string $markup
     ): ?int
     {
-        $layout = new PangoLayout(
+        $layout = new PangoLayout( // @TODO cleanup
             (new GtkDrawingArea)->create_pango_context()
         );
 
