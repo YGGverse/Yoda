@@ -169,9 +169,16 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     {
         foreach (explode(' ', $string) as $word)
         {
-            if (isset($words[$line]) && self::_width(implode(' ', $words[$line])) > $width)
+            if (isset($words[$line]))
             {
-                $line++;
+                $try = implode(
+                    ' ' , $words[$line]
+                ) . ' ' . $word;
+
+                if (self::_width($try) > $width)
+                {
+                    $line++;
+                }
             }
 
             $words[$line][] = $word;
