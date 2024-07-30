@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Abstract\Model\Gtk\Pango;
 
-use \PangoLayout;
-use \GtkDrawingArea;
+use \GtkLabel;
 
 class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 {
@@ -143,16 +142,20 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         string $markup
     ): ?int
     {
-        $layout = new PangoLayout( // @TODO cleanup
-            (new GtkDrawingArea)->create_pango_context()
+        $label = new GtkLabel;
+
+        $label->set_use_markup(
+            true
         );
 
-        $layout->set_markup(
+        $label->set_markup(
             $markup, -1
         );
 
-        if ($size = $layout->get_pixel_size())
+        if ($size = $label->get_layout()->get_pixel_size())
         {
+            $label->destroy();
+
             return $size['width'];
         }
 
