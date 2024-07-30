@@ -149,7 +149,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         );
 
         $label->set_markup(
-            $markup, -1
+            $markup
         );
 
         if ($size = $label->get_layout()->get_pixel_size())
