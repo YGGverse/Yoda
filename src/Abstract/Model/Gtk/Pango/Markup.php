@@ -105,7 +105,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         int $width = self::WRAP_WIDTH
     ): string
     {
-        return self::_wrap(
+        return self::_wrap( // @TODO slow
             htmlspecialchars(
                 $value
             ),
