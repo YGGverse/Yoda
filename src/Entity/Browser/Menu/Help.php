@@ -20,7 +20,7 @@ class Help
     // Requirements
     public Help\About $about;
     public Help\Debug $debug;
-    public Help\Gemlog $gemlog;
+    public Help\Homepage $homepage;
     public Help\Issue $issue;
 
     // Defaults
@@ -49,13 +49,13 @@ class Help
             $this->about->gtk
         );
 
-        // Init gemlog menu item
-        $this->gemlog = new Help\Gemlog(
+        // Init homepage menu item
+        $this->homepage = new Help\Homepage(
             $this
         );
 
         $help->append(
-            $this->gemlog->gtk
+            $this->homepage->gtk
         );
 
         // Init issue menu item

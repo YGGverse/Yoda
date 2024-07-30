@@ -9,7 +9,7 @@ use \GtkMenuItem;
 
 use \Yggverse\Yoda\Entity\Browser\Menu\Help;
 
-class Gemlog
+class Homepage
 {
     // GTK
     public GtkMenuItem $gtk;
@@ -18,7 +18,7 @@ class Gemlog
     public Help $help;
 
     // Defaults
-    public const LABEL = 'Gemlog';
+    public const LABEL = 'Home page';
     public const URL = 'gemini://yggverse.cities.yesterweb.org';
 
     public function __construct(
