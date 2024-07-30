@@ -174,11 +174,11 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         {
             if (isset($words[$line]))
             {
-                $try = implode(
+                $markup = implode(
                     ' ' , $words[$line]
                 ) . ' ' . $word;
 
-                if (self::_width($try) > $width)
+                if (self::_width($markup) > $width)
                 {
                     $line++;
                 }
