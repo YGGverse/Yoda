@@ -20,6 +20,7 @@ class Menu
     public Menu\Bookmark $bookmark;
     public Menu\Debug $debug;
     public Menu\File $file;
+    public Menu\Help $help;
     public Menu\History $history;
     public Menu\Quit $quit;
     public Menu\Tab $tab;
@@ -69,11 +70,6 @@ class Menu
             $this->history->gtk
         );
 
-        // Add separator
-        $this->gtk->append(
-            new GtkSeparatorMenuItem
-        );
-
         // Init debug menu item
         $this->debug = new Menu\Debug(
             $this
@@ -81,6 +77,20 @@ class Menu
 
         $this->gtk->append(
             $this->debug->gtk
+        );
+
+        // Init help menu item
+        $this->help = new Menu\Help(
+            $this
+        );
+
+        $this->gtk->append(
+            $this->help->gtk
+        );
+
+        // Add separator
+        $this->gtk->append(
+            new GtkSeparatorMenuItem
         );
 
         // Init quit menu item
