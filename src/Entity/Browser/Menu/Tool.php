@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu;
 
+use \GtkMenu;
 use \GtkMenuItem;
 
 use \Yggverse\Yoda\Entity\Browser\Menu;
 
-class Debug
+class Tool
 {
     // GTK
     public GtkMenuItem $gtk;
@@ -16,8 +17,11 @@ class Debug
     // Dependencies
     public Menu $menu;
 
+    // Requirements
+    public Tool\Debug $debug;
+
     // Defaults
-    public const LABEL = 'Debug';
+    public const LABEL = 'Tool';
 
     public function __construct(
         Menu $menu
@@ -30,18 +34,23 @@ class Debug
             $this::LABEL
         );
 
+        // Init submenu container
+        $tool = new GtkMenu;
+
+        // Init debug menu item
+        $this->debug = new Tool\Debug(
+            $this
+        );
+
+        $tool->append(
+            $this->debug->gtk
+        );
+
+        $this->gtk->set_submenu(
+            $tool
+        );
+
         // Render
         $this->gtk->show();
-
-        // Int events
-        $this->gtk->connect(
-            'activate',
-            function()
-            {
-                $this->menu->browser->gtk->set_interactive_debugging(
-                    true
-                );
-            }
-        );
     }
 }

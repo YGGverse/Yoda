@@ -19,6 +19,7 @@ class Help
 
     // Requirements
     public Help\About $about;
+    public Help\Debug $debug;
     public Help\Gemlog $gemlog;
     public Help\Issue $issue;
 
@@ -37,14 +38,14 @@ class Help
         );
 
         // Init submenu container
-        $tab = new GtkMenu;
+        $help = new GtkMenu;
 
         // Init about menu item
         $this->about = new Help\About(
             $this
         );
 
-        $tab->append(
+        $help->append(
             $this->about->gtk
         );
 
@@ -53,7 +54,7 @@ class Help
             $this
         );
 
-        $tab->append(
+        $help->append(
             $this->gemlog->gtk
         );
 
@@ -62,12 +63,13 @@ class Help
             $this
         );
 
-        $tab->append(
+        $help->append(
             $this->issue->gtk
         );
 
+        // Set submenu
         $this->gtk->set_submenu(
-            $tab
+            $help
         );
 
         // Render

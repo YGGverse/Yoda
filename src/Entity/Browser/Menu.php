@@ -18,12 +18,12 @@ class Menu
 
     // Requirements
     public Menu\Bookmark $bookmark;
-    public Menu\Debug $debug;
     public Menu\File $file;
     public Menu\Help $help;
     public Menu\History $history;
     public Menu\Quit $quit;
     public Menu\Tab $tab;
+    public Menu\Tool $tool;
 
     public function __construct(
         Browser $browser
@@ -70,13 +70,13 @@ class Menu
             $this->history->gtk
         );
 
-        // Init debug menu item
-        $this->debug = new Menu\Debug(
+        // Init tool menu item
+        $this->tool = new Menu\Tool(
             $this
         );
 
         $this->gtk->append(
-            $this->debug->gtk
+            $this->tool->gtk
         );
 
         // Init help menu item
