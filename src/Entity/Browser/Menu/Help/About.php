@@ -173,7 +173,7 @@ class About
                 // Tune up the label
                 if ($label = $dialog->get_message_area()->get_children())
                 {
-                    if (!isset($label[1]))
+                    if (empty($label[1]))
                     {
                         throw new Exception;
                     }
