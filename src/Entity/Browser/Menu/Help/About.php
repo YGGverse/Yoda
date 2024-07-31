@@ -31,21 +31,25 @@ class About
 
     public const DIALOG_MESSAGE_FORMAT = 'About';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME = '<a href="https://github.com/YGGverse/Yoda"><span underline="none">Yoda</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">Yoda</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_INFO = 'Browser for Gemini protocol';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META = '<span size="small">%s</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_HREF = 'https://github.com/YGGverse/Yoda';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="https://github.com/php/php-src"><span underline="none">PHP</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">PHP</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO = 'Hypertext Preprocessor';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META = '<span size="small">version: %d.%d.%d</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_HREF = 'https://github.com/php/php-src';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME = '<a href="https://github.com/scorninpc/php-gtk3"><span underline="none">PHP-GTK</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME = '<a href="%s" title="%s"><span underline="none">PHP-GTK</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_INFO = 'Bind of GTK 3 to create desktop applications with PHP';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META = '<span size="small">version: %s</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF = 'https://github.com/scorninpc/php-gtk3';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="https://gtk.org"><span underline="none">GTK</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="%s" title="%s"><span underline="none">GTK</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO = 'Free and open-source cross-platform widget toolkit';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version: %d.%d.%d</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF = 'https://gtk.org';
 
     public const PHP_VERSION_GTK_EXTENSION = 'php-gtk3';
 
@@ -101,7 +105,11 @@ class About
                         PHP_EOL,
                         [
                             // App
-                            _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME),
+                            sprintf(
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_HREF),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_HREF)
+                            ),
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META),
@@ -112,7 +120,11 @@ class About
                             ),
                             null,
                             // PHP
-                            _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME),
+                            sprintf(
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_HREF),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_HREF)
+                            ),
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META),
@@ -122,7 +134,11 @@ class About
                             ),
                             null,
                             // PHP-GTK
-                            _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME),
+                            sprintf(
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF)
+                            ),
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META),
@@ -132,7 +148,11 @@ class About
                             ),
                             null,
                             // GTK
-                            _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME),
+                            sprintf(
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF),
+                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF)
+                            ),
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META),
