@@ -113,9 +113,10 @@ abstract class Markup
         GdkEvent $event
     ): bool
     {
-        $this->set( // @TODO Gtk::timeout_add
+        /* @TODO Gtk::timeout_add
+        $this->set(
             $this->_source
-        );
+        ); */
 
         return false;
     }
