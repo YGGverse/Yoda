@@ -77,7 +77,8 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     }
 
     public static function list(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
         return sprintf(
