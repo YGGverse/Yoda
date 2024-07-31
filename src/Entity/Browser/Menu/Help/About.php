@@ -133,7 +133,7 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META),
                                 implode(
-                                    PHP_EOL,
+                                    ' / ',
                                     $composer
                                 )
                             ),
@@ -148,7 +148,7 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META),
                                 implode(
-                                    PHP_EOL,
+                                    ' / ',
                                     $phpinfo
                                 )
                             ),
