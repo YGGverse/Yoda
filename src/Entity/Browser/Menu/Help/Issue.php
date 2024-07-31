@@ -40,11 +40,10 @@ class Issue
             'activate',
             function()
             {
-                /* @TODO pending for PR #153
                 Gtk::show_uri_on_window(
                     $this->help->menu->browser->gtk,
                     $this::URL
-                ); */
+                );
             }
         );
     }

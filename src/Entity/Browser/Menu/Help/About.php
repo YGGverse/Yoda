@@ -137,10 +137,10 @@ class About
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META),
-                                0,
-                                0,
-                                0
-                            ) // @TODO pending for PR #153
+                                Gtk::MAJOR_VERSION,
+                                Gtk::MICRO_VERSION,
+                                Gtk::MINOR_VERSION
+                            )
                         ]
                     )
                 );
