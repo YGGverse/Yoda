@@ -99,7 +99,7 @@ class About
                 {
                     $phpinfo[] = sprintf(
                         '%s: %s',
-                        mb_strtolower(
+                        strtolower(
                             $extension
                         ),
                         strval(
