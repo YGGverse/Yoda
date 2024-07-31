@@ -1,7 +1,7 @@
 {
     "name": "yggverse/yoda",
     "description": "PHP-GTK Client for Gemini Protocol",
-    "keywords": [ "php-gtk", "gtk", "gtk3", "gemini", "gemini-protocol", "client", "browser", "altweb" ],
+    "keywords": [ "php-gtk", "gtk", "gtk3", "gemini", "gemini-protocol", "nex-protocol", "client", "browser", "altweb" ],
     "homepage": "https://github.com/YGGverse/Yoda",
     "type": "project",
     "require": {
