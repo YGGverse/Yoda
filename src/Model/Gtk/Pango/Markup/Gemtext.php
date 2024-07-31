@@ -138,7 +138,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                     else
                     {
                         $line[] = self::list(
-                            $entity->getItem()
+                            $entity->getItem(),
+                            $width
                         );
                     }
 

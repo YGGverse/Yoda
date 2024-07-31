@@ -82,8 +82,11 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     {
         return sprintf(
             '* %s', // @TODO
-            htmlspecialchars(
-                $value
+            self::_wrap(
+                htmlspecialchars(
+                    $value
+                ),
+                $width
             )
         );
     }
@@ -105,7 +108,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         int $width = self::WRAP_WIDTH
     ): string
     {
-        return self::_wrap( // @TODO slow
+        return self::_wrap(
             htmlspecialchars(
                 $value
             ),
@@ -138,6 +141,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         throw new Exception;
     }
 
+    // @TODO optimization wanted, wordwrap / set_line_wrap not solution
     protected static function _wrap(
         string $string,
         int $width,
