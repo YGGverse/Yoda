@@ -11,7 +11,6 @@ use \Exception;
 use \Gtk;
 use \GtkButtonsType;
 use \GtkDialogFlags;
-use \GtkJustification;
 use \GtkMenuItem;
 use \GtkMessageDialog;
 use \GtkMessageType;
@@ -159,10 +158,6 @@ class About
 
                     $label[1]->set_track_visited_links(
                         false
-                    );
-
-                    $label[1]->set_justify(
-                        GtkJustification::CENTER
                     );
                 }
 
