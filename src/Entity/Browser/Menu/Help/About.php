@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yggverse\Yoda\Entity\Browser\Menu\Help;
 
+use \Composer\InstalledVersions;
+
+use \Exception;
+
 use \Gtk;
 use \GtkButtonsType;
 use \GtkDialogFlags;
@@ -14,8 +18,6 @@ use \GtkMessageType;
 use \GtkResponseType;
 
 use \Yggverse\Yoda\Entity\Browser\Menu\Help;
-
-use \Composer\InstalledVersions;
 
 class About
 {
