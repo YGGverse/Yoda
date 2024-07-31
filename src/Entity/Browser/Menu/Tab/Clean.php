@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Entity\Browser\Menu\Tab;
 
 use \GtkButtonsType;
 use \GtkDialogFlags;
+use \GtkMenuItem;
 use \GtkMessageDialog;
 use \GtkMessageType;
 use \GtkResponseType;
@@ -14,7 +15,7 @@ use \Yggverse\Yoda\Entity\Browser\Menu\Tab;
 
 class Clean
 {
-    public \GtkMenuItem $gtk;
+    public GtkMenuItem $gtk;
 
     // Dependencies
     public Tab $tab;
@@ -32,7 +33,7 @@ class Clean
         $this->tab = $tab;
 
         // Init menu item
-        $this->gtk = \GtkMenuItem::new_with_label(
+        $this->gtk = GtkMenuItem::new_with_label(
             _($this::LABEL)
         );
 
