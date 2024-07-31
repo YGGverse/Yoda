@@ -43,7 +43,7 @@ class Issue
                 /* @TODO pending for PR #153
                 Gtk::show_uri_on_window(
                     $this->help->menu->browser->gtk,
-                    self::URL
+                    $this::URL
                 ); */
             }
         );
