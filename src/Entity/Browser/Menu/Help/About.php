@@ -92,6 +92,10 @@ class About
                     );
                 }
 
+                sort(
+                    $composer
+                );
+
                 // Get phpinfo
                 $phpinfo = [];
 
@@ -109,6 +113,10 @@ class About
                         )
                     );
                 }
+
+                sort(
+                    $phpinfo
+                );
 
                 // Build dialog template
                 $dialog->format_secondary_markup(
