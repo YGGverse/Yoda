@@ -58,6 +58,7 @@ if [[ $INSTALL_SYSTEM_DEPENDENCIES == "y" ]]; then
                         libsqlite3-dev\
                         libssl-dev\
                         libtool\
+                        libwebp-dev\
                         libwnck-dev\
                         libxml2-dev\
                         libxpm-dev\
@@ -117,16 +118,24 @@ fi
 ## Install PHP-SRC
 if [[ $BUILD_PHP_SRC == "y" ]]; then
     ./configure --prefix="$DIR_PHP_SRC_TARGET"\
-                --with-openssl\
-                --with-gettext\
-                --with-pdo-mysql\
                 --disable-cgi\
+                --disable-dom\
+                --disable-phar\
+                --disable-session\
                 --disable-shared\
-                --enable-static\
-                --enable-sockets\
+                --disable-simplexml\
+                --disable-xml\
+                --disable-xmlreader\
+                --disable-xmlwriter\
                 --enable-mbstring\
+                --enable-pcntl\
                 --enable-shmop\
-                --enable-pcntl
+                --enable-sockets\
+                --enable-static\
+                --with-gettext\
+                --with-openssl\
+                --with-pdo-sqlite\
+                --without-libxml
 
     make clean
     make -j $(nproc)

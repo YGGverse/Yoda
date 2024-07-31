@@ -45,6 +45,7 @@ apt install autoconf\
             libsqlite3-dev\
             libssl-dev\
             libtool\
+            libwebp-dev\
             libwnck-dev\
             libxml2-dev\
             libxpm-dev\
@@ -58,13 +59,14 @@ apt install autoconf\
 Make sure version 8.1 or above installed and configured with following options:
 
 ```
-./configure --with-openssl\
-            --with-gettext\
-            --with-pdo-mysql\
-            --enable-sockets\
-            --enable-mbstring\
+./configure --enable-mbstring\
+            --enable-pcntl\
             --enable-shmop\
-            --enable-pcntl
+            --enable-sockets\
+            --enable-static\
+            --with-gettext\
+            --with-openssl\
+            --with-pdo-sqlite
 ```
 
 #### [PHP-CPP](https://github.com/fast-debug/PHP-CPP)
