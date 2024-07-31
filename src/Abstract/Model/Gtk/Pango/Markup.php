@@ -141,6 +141,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     protected static function _wrap(
         string $string,
         int $width,
+        string $break = PHP_EOL,
         int $line = 1,
         array $words = [],
         array $lines = []
@@ -182,7 +183,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         $label->destroy();
 
         return implode(
-            PHP_EOL,
+            $break,
             $lines
         );
     }
