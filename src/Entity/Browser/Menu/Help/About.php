@@ -83,7 +83,7 @@ class About
                 foreach (InstalledVersions::getInstalledPackages() as $package)
                 {
                     $composer[] = sprintf(
-                        '%s %s',
+                        '%s: %s',
                         basename(
                             $package
                         ),
@@ -106,7 +106,7 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META),
                                 implode(
-                                    ' / ',
+                                    PHP_EOL,
                                     $composer
                                 )
                             ),
