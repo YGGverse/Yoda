@@ -138,30 +138,6 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         throw new Exception;
     }
 
-    protected static function _width(
-        string $markup
-    ): ?int
-    {
-        $label = new GtkLabel;
-
-        $label->set_use_markup(
-            true
-        );
-
-        $label->set_markup(
-            $markup
-        );
-
-        if ($size = $label->get_layout()->get_pixel_size())
-        {
-            $label->destroy();
-
-            return $size['width'];
-        }
-
-        return null;
-    }
-
     protected static function _wrap(
         string $string,
         int $width,
@@ -170,15 +146,23 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         array $lines = []
     ): string
     {
+        $label = new GtkLabel;
+
+        $label->set_use_markup(
+            true
+        );
+
         foreach (explode(' ', $string) as $word)
         {
             if (isset($words[$line]))
             {
-                $markup = implode(
-                    ' ' , $words[$line]
-                ) . ' ' . $word;
+                $label->set_markup(
+                    implode(
+                        ' ' , $words[$line]
+                    ) . ' ' . $word
+                );
 
-                if (self::_width($markup) > $width)
+                if ($label->get_layout()->get_pixel_size()['width'] > $width)
                 {
                     $line++;
                 }
@@ -194,6 +178,8 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
                 $values
             );
         }
+
+        $label->destroy();
 
         return implode(
             PHP_EOL,
