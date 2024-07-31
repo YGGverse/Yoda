@@ -18,7 +18,7 @@ class Issue
     public Help $help;
 
     // Defaults
-    public const LABEL = 'Report issue';
+    public const LABEL = 'Issue report';
     public const URL = 'https://github.com/YGGverse/Yoda/issues';
 
     public function __construct(
