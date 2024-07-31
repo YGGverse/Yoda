@@ -9,7 +9,7 @@ use \GtkMenuItem;
 
 use \Yggverse\Yoda\Entity\Browser\Menu\Help;
 
-class Homepage
+class Home
 {
     // GTK
     public GtkMenuItem $gtk;

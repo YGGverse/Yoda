@@ -20,7 +20,7 @@ class Help
     // Requirements
     public Help\About $about;
     public Help\Debug $debug;
-    public Help\Homepage $homepage;
+    public Help\Home $home;
     public Help\Issue $issue;
 
     // Defaults
@@ -49,13 +49,13 @@ class Help
             $this->about->gtk
         );
 
-        // Init homepage menu item
-        $this->homepage = new Help\Homepage(
+        // Init home menu item
+        $this->home = new Help\Home(
             $this
         );
 
         $help->append(
-            $this->homepage->gtk
+            $this->home->gtk
         );
 
         // Init issue menu item
