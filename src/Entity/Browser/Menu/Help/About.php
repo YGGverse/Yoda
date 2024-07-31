@@ -43,7 +43,7 @@ class About
 
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="%s" title="%s"><span underline="none">GTK</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO = 'Free and open-source cross-platform widget toolkit';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version: %d.%d.%d</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version %d.%d.%d</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF = 'https://gtk.org';
 
     public function __construct(
@@ -80,7 +80,7 @@ class About
                 foreach (InstalledVersions::getInstalledPackages() as $package)
                 {
                     $composer[] = sprintf(
-                        '%s: %s',
+                        '%s-%s',
                         basename(
                             $package
                         ),
@@ -102,7 +102,7 @@ class About
                 foreach (get_loaded_extensions() as $extension)
                 {
                     $phpinfo[] = sprintf(
-                        '%s: %s',
+                        '%s-%s',
                         strtolower(
                             $extension
                         ),
@@ -133,7 +133,7 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META),
                                 implode(
-                                    ' / ',
+                                    ' ',
                                     $composer
                                 )
                             ),
@@ -148,7 +148,7 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META),
                                 implode(
-                                    ' / ',
+                                    ' ',
                                     $phpinfo
                                 )
                             ),
