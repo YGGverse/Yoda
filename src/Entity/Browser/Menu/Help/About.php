@@ -140,9 +140,11 @@ class About
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META),
-                                phpversion(
-                                    basename(
-                                        $this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF
+                                strval(
+                                    phpversion(
+                                        basename(
+                                            $this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF
+                                        )
                                     )
                                 )
                             ),
