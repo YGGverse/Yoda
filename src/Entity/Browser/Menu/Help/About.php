@@ -37,14 +37,9 @@ class About
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_HREF = 'https://github.com/YGGverse/Yoda';
 
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">PHP</span></a>';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO = 'Hypertext Preprocessor';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META = '<span size="small">version: %d.%d.%d</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO = 'The Hypertext Preprocessor';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META = '<span size="small">%s</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_HREF = 'https://github.com/php/php-src';
-
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME = '<a href="%s" title="%s"><span underline="none">PHP-GTK</span></a>';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_INFO = 'Bind of GTK 3 to create desktop applications with PHP';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META = '<span size="small">version: %s</span>';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF = 'https://github.com/scorninpc/php-gtk3';
 
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="%s" title="%s"><span underline="none">GTK</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO = 'Free and open-source cross-platform widget toolkit';
@@ -97,6 +92,24 @@ class About
                     );
                 }
 
+                // Get phpinfo
+                $phpinfo = [];
+
+                foreach (get_loaded_extensions() as $extension)
+                {
+                    $phpinfo[] = sprintf(
+                        '%s: %s',
+                        mb_strtolower(
+                            $extension
+                        ),
+                        strval(
+                            phpversion(
+                                $extension
+                            )
+                        )
+                    );
+                }
+
                 // Build dialog template
                 $dialog->format_secondary_markup(
                     implode(
@@ -126,26 +139,9 @@ class About
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META),
-                                PHP_MAJOR_VERSION,
-                                PHP_MINOR_VERSION,
-                                PHP_RELEASE_VERSION
-                            ),
-                            null,
-                            // PHP-GTK
-                            sprintf(
-                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_NAME),
-                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF),
-                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF)
-                            ),
-                            _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_INFO),
-                            sprintf(
-                                _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META),
-                                strval(
-                                    phpversion(
-                                        basename(
-                                            $this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF
-                                        )
-                                    )
+                                implode(
+                                    PHP_EOL,
+                                    $phpinfo
                                 )
                             ),
                             null,
