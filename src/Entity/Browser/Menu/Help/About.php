@@ -86,8 +86,10 @@ class About
                         basename(
                             $package
                         ),
-                        InstalledVersions::getVersion(
-                            $package
+                        strval(
+                            InstalledVersions::getVersion(
+                                $package
+                            )
                         )
                     );
                 }
