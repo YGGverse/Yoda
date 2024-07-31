@@ -120,10 +120,12 @@ if [[ $BUILD_PHP_SRC == "y" ]]; then
     ./configure --prefix="$DIR_PHP_SRC_TARGET"\
                 --disable-cgi\
                 --disable-dom\
+                --disable-filter\
                 --disable-phar\
                 --disable-session\
                 --disable-shared\
                 --disable-simplexml\
+                --disable-tokenizer\
                 --disable-xml\
                 --disable-xmlreader\
                 --disable-xmlwriter\
@@ -135,6 +137,7 @@ if [[ $BUILD_PHP_SRC == "y" ]]; then
                 --with-gettext\
                 --with-openssl\
                 --with-pdo-sqlite\
+                --without-iconv\
                 --without-libxml
 
     make clean
