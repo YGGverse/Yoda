@@ -15,6 +15,8 @@ use \GtkResponseType;
 
 use \Yggverse\Yoda\Entity\Browser\Menu\Help;
 
+use \Composer\InstalledVersions;
+
 class About
 {
     // GTK
@@ -30,7 +32,7 @@ class About
 
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME = '<a href="https://github.com/YGGverse/Yoda"><span underline="none">Yoda</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_INFO = 'Browser for Gemini protocol';
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META = '<span size="small">version: %s</span>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META = '<span size="small">%s</span>';
 
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="https://github.com/php/php-src"><span underline="none">PHP</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO = 'Hypertext Preprocessor';
@@ -44,7 +46,6 @@ class About
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO = 'Free and open-source cross-platform widget toolkit';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version: %d.%d.%d</span>';
 
-    public const APP_SRC_VERSION = 'dev'; // @TODO
     public const PHP_VERSION_GTK_EXTENSION = 'php-gtk3';
 
     public function __construct(
@@ -66,6 +67,7 @@ class About
             'activate',
             function()
             {
+                // Init application info dialog
                 $dialog = new GtkMessageDialog(
                     $this->help->menu->browser->gtk,
                     GtkDialogFlags::MODAL,
@@ -74,6 +76,23 @@ class About
                     _($this::DIALOG_MESSAGE_FORMAT)
                 );
 
+                // Get composer versions installed
+                $composer = [];
+
+                foreach (InstalledVersions::getInstalledPackages() as $package)
+                {
+                    $composer[] = sprintf(
+                        '%s %s',
+                        basename(
+                            $package
+                        ),
+                        InstalledVersions::getVersion(
+                            $package
+                        )
+                    );
+                }
+
+                // Build dialog template
                 $dialog->format_secondary_markup(
                     implode(
                         PHP_EOL,
@@ -83,7 +102,10 @@ class About
                             _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_INFO),
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META),
-                                $this::APP_SRC_VERSION
+                                implode(
+                                    ' / ',
+                                    $composer
+                                )
                             ),
                             null,
                             // PHP
