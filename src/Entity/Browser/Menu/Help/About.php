@@ -51,8 +51,6 @@ class About
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version: %d.%d.%d</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF = 'https://gtk.org';
 
-    public const PHP_VERSION_GTK_EXTENSION = 'php-gtk3';
-
     public function __construct(
         Help $help
     ) {
@@ -143,7 +141,9 @@ class About
                             sprintf(
                                 _($this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_META),
                                 phpversion(
-                                    $this::PHP_VERSION_GTK_EXTENSION
+                                    basename(
+                                        $this::DIALOG_FORMAT_SECONDARY_MARKUP_PHP_GTK_HREF
+                                    )
                                 )
                             ),
                             null,
