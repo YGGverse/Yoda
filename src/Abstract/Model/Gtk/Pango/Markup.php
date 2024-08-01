@@ -13,7 +13,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return sprintf(
-            self::TAG_CODE,
+            self::CODE,
             self::_escape(
                 $value
             )
@@ -26,7 +26,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_H1,
+            self::H1,
             $value,
             $width
         );
@@ -38,7 +38,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_H2,
+            self::H2,
             $value,
             $width
         );
@@ -50,7 +50,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_H3,
+            self::H3,
             $value,
             $width
         );
@@ -63,7 +63,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return sprintf(
-            self::TAG_LINK,
+            self::LINK,
             self::_escape(
                 $href
             ),
@@ -82,7 +82,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_LIST,
+            self::LIST,
             sprintf(
                 '* %s',
                 $value
@@ -97,7 +97,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_QUOTE,
+            self::QUOTE,
             $value,
             $width
         );
@@ -109,7 +109,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            self::TAG_TEXT,
+            self::TEXT,
             $value,
             $width
         );
@@ -137,7 +137,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
     // @TODO optimization wanted, wordwrap / set_line_wrap not solution
     protected static function _wrap(
-        string $tag, // const
+        string $format, // const
         string $value, // unescaped
         int $width = self::WRAP_WIDTH,
         string $break = self::WRAP_BREAK,
@@ -158,7 +158,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
             {
                 $label->set_markup(
                     sprintf(
-                        $tag,
+                        $format,
                         self::_escape(
                             implode(
                                 ' ' , $words[$line]
@@ -187,7 +187,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         $label->destroy();
 
         return sprintf(
-            $tag,
+            $format,
             self::_escape(
                 implode(
                     $break,

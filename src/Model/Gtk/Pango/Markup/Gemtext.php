@@ -44,8 +44,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
                     else
                     {
-                        $line[] = $preformatted ? self::TAG_CODE_CLOSE
-                                                : self::TAG_CODE_OPEN;
+                        $line[] = $preformatted ? self::CODE_CLOSE
+                                                : self::CODE_BEGIN;
 
                         $preformatted = !($preformatted); // toggle
                     }

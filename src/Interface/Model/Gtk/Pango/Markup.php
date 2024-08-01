@@ -10,17 +10,17 @@ namespace Yggverse\Yoda\Interface\Model\Gtk\Pango;
  */
 interface Markup
 {
-    public const TAG_CODE  = '<tt>%s</tt>';
-    public const TAG_CODE_CLOSE  = '</tt>';
-    public const TAG_CODE_OPEN  = '<tt>';
+    public const CODE  = '<tt>%s</tt>';
+    public const H1 = '<span size="xx-large">%s</span>';
+    public const H2 = '<span size="x-large">%s</span>';
+    public const H3 = '<span size="large">%s</span>';
+    public const LINK = '<a href="%s" title="%s"><span underline="none">%s</span></a>';
+    public const LIST = '<span>%s</span>';
+    public const QUOTE = '<i>%s</i>';
+    public const TEXT = '<span>%s</span>';
 
-    public const TAG_H1 = '<span size="xx-large">%s</span>';
-    public const TAG_H2 = '<span size="x-large">%s</span>';
-    public const TAG_H3 = '<span size="large">%s</span>';
-    public const TAG_LINK = '<a href="%s" title="%s"><span underline="none">%s</span></a>';
-    public const TAG_LIST = '<span>%s</span>';
-    public const TAG_QUOTE = '<i>%s</i>';
-    public const TAG_TEXT = '<span>%s</span>';
+    public const CODE_BEGIN  = '<tt>';
+    public const CODE_CLOSE  = '</tt>';
 
     public const LINK_PREFIX_INTERNAL = ''; // | ⇒
     public const LINK_PREFIX_EXTERNAL = '⇗';
