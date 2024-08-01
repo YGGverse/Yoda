@@ -116,7 +116,7 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
                     else
                     {
-                        $prefix = self::LINK_PREFIX_DEFAULT;
+                        $prefix = self::LINK_PREFIX_EXTERNAL;
 
                         $line[] = self::link(
                             self::_url(
@@ -208,34 +208,26 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
     private static function _url(
         string $link,
         string $base,
-        string &$prefix = self::LINK_PREFIX_DEFAULT
+        string &$prefix = self::LINK_PREFIX_EXTERNAL
     ): ?string
     {
         $address = new Address(
             $link
         );
 
+        $request = new Address(
+            $base
+        );
+
         if ($address->isRelative())
         {
             $address->toAbsolute(
-                new Address(
-                    $base
-                )
+                $request
             );
         }
 
-        switch ($address->getScheme())
-        {
-            case 'gemini':
-
-                $prefix = self::LINK_PREFIX_GEMINI;
-
-            break;
-
-            default:
-
-                $prefix = self::LINK_PREFIX_DEFAULT;
-        }
+        $prefix = $address->getScheme() == $request->getScheme() ? self::LINK_PREFIX_INTERNAL
+                                                                 : self::LINK_PREFIX_EXTERNAL;
 
         return $address->get();
     }
