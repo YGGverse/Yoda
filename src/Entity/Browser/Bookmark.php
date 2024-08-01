@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yggverse\Yoda\Entity\Browser;
 
 use \GtkWindow;
+use \GtkWindowType;
 
 use \Yggverse\Yoda\Entity\Browser;
 
@@ -32,7 +33,9 @@ class Bookmark
         $this->browser = $browser;
 
         // Init window
-        $this->gtk = new GtkWindow;
+        $this->gtk = new GtkWindow(
+            GtkWindowType::TOPLEVEL // GtkWindowType::POPUP
+        );
 
         $this->gtk->set_size_request(
             $this::WIDTH,

@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Entity;
 
 use \Gtk;
 use \GtkWindow;
+use \GtkWindowType;
 
 use \Yggverse\Yoda\Entity\Browser\Header;
 use \Yggverse\Yoda\Entity\Browser\Container;
@@ -37,7 +38,9 @@ class Browser
         $this->database = $database;
 
         // Init window
-        $this->gtk = new GtkWindow;
+        $this->gtk = new GtkWindow(
+            GtkWindowType::TOPLEVEL
+        );
 
         $this->gtk->set_interactive_debugging(
             $this::DEBUG
