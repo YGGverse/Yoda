@@ -125,11 +125,15 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                                 $prefix
                             ),
                             $entity->getAddress(),
-                            sprintf(
-                                '%s %s',
-                                $prefix,
-                                $entity->getAlt() ? $entity->getAlt()
-                                                  : $entity->getAddress() // @TODO date
+                            trim(
+                                implode(
+                                    ' ',
+                                    [
+                                        $prefix,
+                                        $entity->getDate(),
+                                        $entity->getAlt() ? $entity->getAlt() : $entity->getAddress()
+                                    ]
+                                )
                             )
                         );
                     }
