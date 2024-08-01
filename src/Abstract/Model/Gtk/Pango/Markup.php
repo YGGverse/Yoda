@@ -63,7 +63,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return sprintf(
-            '<a href="%s" title="%s"><span underline="none">%s</span></a>',
+            self::TAG_LINK,
             self::_escape(
                 $href
             ),
