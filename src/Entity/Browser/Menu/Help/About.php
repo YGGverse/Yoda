@@ -173,6 +173,13 @@ class About
                 // Tune up the label
                 if ($label = $dialog->get_message_area()->get_children())
                 {
+                    if (empty($label[0]))
+                    {
+                        throw new Exception;
+                    }
+
+                    $label[0]->grab_focus();
+
                     if (empty($label[1]))
                     {
                         throw new Exception;
