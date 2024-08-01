@@ -116,14 +116,21 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
                     else
                     {
+                        $prefix = self::LINK_PREFIX_DEFAULT;
+
                         $line[] = self::link(
                             self::_url(
                                 $entity->getAddress(),
-                                $request
+                                $request,
+                                $prefix
                             ),
                             $entity->getAddress(),
-                            $entity->getAlt() ? $entity->getAlt()
-                                              : $entity->getAddress() // @TODO date
+                            sprintf(
+                                '%s %s',
+                                $prefix,
+                                $entity->getAlt() ? $entity->getAlt()
+                                                  : $entity->getAddress() // @TODO date
+                            )
                         );
                     }
 
@@ -200,7 +207,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
     private static function _url(
         string $link,
-        string $base
+        string $base,
+        string &$prefix = self::LINK_PREFIX_DEFAULT
     ): ?string
     {
         $address = new Address(
@@ -214,6 +222,19 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                     $base
                 )
             );
+        }
+
+        switch ($address->getScheme())
+        {
+            case 'gemini':
+
+                $prefix = self::LINK_PREFIX_GEMINI;
+
+            break;
+
+            default:
+
+                $prefix = self::LINK_PREFIX_DEFAULT;
         }
 
         return $address->get();
