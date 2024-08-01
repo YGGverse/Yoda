@@ -16,9 +16,6 @@ abstract class Markup
     // Dependencies
     public Content $content;
 
-    // Extras
-    protected ?string $_source = null;
-
     public function __construct(
         Content $content
     ) {
@@ -113,9 +110,9 @@ abstract class Markup
         GdkEvent $event
     ): bool
     {
-        /* @TODO Gtk::timeout_add
+        /* @TODO unstable solution
         $this->set(
-            $this->_source
+            // source
         ); */
 
         return false;

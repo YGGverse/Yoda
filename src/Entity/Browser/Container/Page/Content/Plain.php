@@ -14,7 +14,7 @@ class Plain extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Conten
     {
         $this->gtk->set_markup(
             Markup::format(
-                $this->_source = $source
+                $source
             )
         );
     }

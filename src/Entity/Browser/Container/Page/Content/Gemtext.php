@@ -18,17 +18,17 @@ use \Yggverse\Yoda\Model\Gtk\Pango\Markup\Gemtext as Markup;
 class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
 {
     public function set(
-        string $value
+        string $source
     ): void
     {
         Gtk::timeout_add( // await for renderer dimensions init
-            1, function(?string $title = null) use ($value)
+            1, function(?string $title = null) use ($source)
             {
                 if ($this->content->page->content->gtk->get_allocated_width() > Markup::WRAP_WIDTH)
                 {
                     $this->gtk->set_markup(
                         Markup::format(
-                            $this->_source = $value,
+                            $source,
                             $this->content->page->navbar->request->getValue(),
                             $this->content->page->content->gtk->get_allocated_width(),
                             $title
