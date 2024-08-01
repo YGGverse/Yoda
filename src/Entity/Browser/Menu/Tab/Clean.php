@@ -25,6 +25,7 @@ class Clean
     public const TOOLTIP = 'Close all tabs';
     public const DIALOG_MESSAGE_FORMAT = 'Clean session';
     public const DIALOG_FORMAT_SECONDARY_TEXT = 'Close all tabs and start new session?';
+    public const DIALOG_DEFAULT_RESPONSE = GtkResponseType::CANCEL;
 
     public function __construct(
         Tab $tab
@@ -57,12 +58,12 @@ class Clean
                     _($this::DIALOG_MESSAGE_FORMAT)
                 );
 
-                $dialog->set_default_response(
-                    GtkResponseType::CANCEL
-                );
-
                 $dialog->format_secondary_text(
                     _($this::DIALOG_FORMAT_SECONDARY_TEXT)
+                );
+
+                $dialog->set_default_response(
+                    $this::DIALOG_DEFAULT_RESPONSE
                 );
 
                 if (GtkResponseType::OK == $dialog->run())
