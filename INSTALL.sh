@@ -120,7 +120,6 @@ if [[ $BUILD_PHP_SRC == "y" ]]; then
     ./configure --prefix="$DIR_PHP_SRC_TARGET"\
                 --disable-cgi\
                 --disable-dom\
-                --disable-filter\
                 --disable-phar\
                 --disable-session\
                 --disable-shared\
