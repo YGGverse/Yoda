@@ -13,46 +13,46 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return sprintf(
-            '<tt>%s</tt>',
-            htmlspecialchars(
+            self::TAG_CODE,
+            self::_escape(
                 $value
             )
         );
     }
 
     public static function h1(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
-        return sprintf(
-            '<span size="xx-large">%s</span>',
-            htmlspecialchars(
-                $value
-            )
+        return self::_wrap(
+            self::TAG_H1,
+            $value,
+            $width
         );
     }
 
     public static function h2(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
-        return sprintf(
-            '<span size="x-large">%s</span>',
-            htmlspecialchars(
-                $value
-            )
+        return self::_wrap(
+            self::TAG_H2,
+            $value,
+            $width
         );
     }
 
     public static function h3(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
-        return sprintf(
-            '<span size="large">%s</span>',
-            htmlspecialchars(
-                $value
-            )
+        return self::_wrap(
+            self::TAG_H3,
+            $value,
+            $width
         );
     }
 
@@ -64,13 +64,13 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     {
         return sprintf(
             '<a href="%s" title="%s"><span underline="none">%s</span></a>',
-            htmlspecialchars(
+            self::_escape(
                 $href
             ),
-            htmlspecialchars(
+            self::_escape(
                 $title
             ),
-            htmlspecialchars(
+            self::_escape(
                 $value
             )
         );
@@ -81,18 +81,13 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         int $width = self::WRAP_WIDTH
     ): string
     {
-        return sprintf(
-            '<span>%s</span>', // @TODO
-            self::_wrap(
-                htmlspecialchars(
-                    sprintf(
-                        '* %s',
-                        $value
-                    )
-                ),
-                self::TAG_LIST,
-                $width
-            )
+        return self::_wrap(
+            self::TAG_LIST,
+            sprintf(
+                '* %s',
+                $value
+            ),
+            $width
         );
     }
 
@@ -101,15 +96,10 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         int $width = self::WRAP_WIDTH
     ): string
     {
-        return sprintf(
-            '<i>%s</i>',
-            self::_wrap(
-                htmlspecialchars(
-                    $value
-                ),
-                self::TAG_QUOTE,
-                $width
-            )
+        return self::_wrap(
+            self::TAG_QUOTE,
+            $value,
+            $width
         );
     }
 
@@ -119,10 +109,8 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return self::_wrap(
-            htmlspecialchars(
-                $value
-            ),
             self::TAG_TEXT,
+            $value,
             $width
         );
     }
@@ -131,37 +119,28 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         string $value
     ): string
     {
+        return self::_escape(
+            $value
+        );
+    }
+
+    protected static function _escape(
+        string $value
+    ): string
+    {
+        // @TODO PR #135
+        // https://docs.gtk.org/glib/func.markup_escape_text.html
         return htmlspecialchars(
             $value
         );
     }
 
-    public static function tag(
-        string $const,
-        bool $close
-    ): string
-    {
-        if (in_array($const, [
-            self::TAG_CODE,
-            self::TAG_LIST,
-            self::TAG_QUOTE,
-            self::TAG_TEXT
-        ])) {
-            return sprintf(
-                $close ? '</%s>' : '<%s>',
-                $const
-            );
-        }
-
-        throw new Exception;
-    }
-
     // @TODO optimization wanted, wordwrap / set_line_wrap not solution
     protected static function _wrap(
-        string $string,
         string $tag,
-        int $width,
-        string $break = PHP_EOL,
+        string $value,
+        int $width = self::WRAP_WIDTH,
+        string $break = self::WRAP_BREAK,
         int $line = 1,
         array $words = [],
         array $lines = []
@@ -173,26 +152,19 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
             true
         );
 
-        foreach (explode(' ', $string) as $word)
+        foreach (explode(' ', $value) as $word)
         {
             if (isset($words[$line]))
             {
                 $label->set_markup(
                     sprintf(
-                        '%s%s%s',
-                        self::tag(
-                            $tag,
-                            false
-                        ),
-                        implode(
-                            ' ' , $words[$line]
-                        ) . ' ' . $word,
-                        self::tag(
-                            $tag,
-                            true
+                        $tag,
+                        self::_escape(
+                            implode(
+                                ' ' , $words[$line]
+                            ) . ' ' . $word
                         )
                     )
-
                 );
 
                 if ($label->get_layout()->get_pixel_size()['width'] > $width)
@@ -214,9 +186,14 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
         $label->destroy();
 
-        return implode(
-            $break,
-            $lines
+        return sprintf(
+            $tag,
+            self::_escape(
+                implode(
+                    $break,
+                    $lines
+                )
+            )
         );
     }
 }

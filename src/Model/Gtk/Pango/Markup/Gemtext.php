@@ -44,8 +44,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
 
                     else
                     {
-                        $line[] = $preformatted ? self::tag(self::TAG_CODE, true)
-                                                : self::tag(self::TAG_CODE, false);
+                        $line[] = $preformatted ? self::TAG_CODE_CLOSE
+                                                : self::TAG_CODE_OPEN;
 
                         $preformatted = !($preformatted); // toggle
                     }
@@ -68,7 +68,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                             case 1: // #
 
                                 $line[] = self::h1(
-                                    $entity->getText()
+                                    $entity->getText(),
+                                    $width
                                 );
 
                                 // Find title by first # tag
@@ -82,7 +83,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                             case 2: // ##
 
                                 $line[] = self::h2(
-                                    $entity->getText()
+                                    $entity->getText(),
+                                    $width
                                 );
 
                             break;
@@ -90,7 +92,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                             case 3: // ###
 
                                 $line[] = self::h3(
-                                    $entity->getText()
+                                    $entity->getText(),
+                                    $width
                                 );
 
                             break;

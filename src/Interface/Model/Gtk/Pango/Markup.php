@@ -10,11 +10,19 @@ namespace Yggverse\Yoda\Interface\Model\Gtk\Pango;
  */
 interface Markup
 {
-    public const ENCODING = 'UTF-8';
-    public const TAG_CODE = 'tt';
-    public const TAG_QUOTE = 'i';
-    public const TAG_TEXT = 'span';
-    public const TAG_LIST = 'span';
+    public const TAG_CODE  = '<tt>%s</tt>';
+    public const TAG_CODE_CLOSE  = '</tt>';
+    public const TAG_CODE_OPEN  = '<tt>';
+
+    public const TAG_H1 = '<span size="xx-large">%s</span>';
+    public const TAG_H2 = '<span size="x-large">%s</span>';
+    public const TAG_H3 = '<span size="large">%s</span>';
+    public const TAG_LINK = '<a href="%s" title="%s"><span underline="none">%s</span></a>';
+    public const TAG_LIST = '<span>%s</span>';
+    public const TAG_QUOTE = '<i>%s</i>';
+    public const TAG_TEXT = '<span>%s</span>';
+
+    public const WRAP_BREAK = PHP_EOL;
     public const WRAP_WIDTH = 320;
 
     public static function code(
@@ -53,10 +61,5 @@ interface Markup
 
     public static function pre(
         string $value
-    ): string;
-
-    public static function tag(
-        string $const,
-        bool $close
     ): string;
 }
