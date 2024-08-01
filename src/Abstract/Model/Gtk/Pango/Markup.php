@@ -82,24 +82,33 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     ): string
     {
         return sprintf(
-            '* %s', // @TODO
+            '<span>%s</span>', // @TODO
             self::_wrap(
                 htmlspecialchars(
-                    $value
+                    sprintf(
+                        '* %s',
+                        $value
+                    )
                 ),
+                self::TAG_LIST,
                 $width
             )
         );
     }
 
     public static function quote(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string
     {
         return sprintf(
             '<i>%s</i>',
-            htmlspecialchars(
-                $value
+            self::_wrap(
+                htmlspecialchars(
+                    $value
+                ),
+                self::TAG_QUOTE,
+                $width
             )
         );
     }
@@ -113,6 +122,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
             htmlspecialchars(
                 $value
             ),
+            self::TAG_TEXT,
             $width
         );
     }
@@ -131,8 +141,12 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
         bool $close
     ): string
     {
-        if (in_array($const, [self::TAG_CODE]))
-        {
+        if (in_array($const, [
+            self::TAG_CODE,
+            self::TAG_LIST,
+            self::TAG_QUOTE,
+            self::TAG_TEXT
+        ])) {
             return sprintf(
                 $close ? '</%s>' : '<%s>',
                 $const
@@ -145,6 +159,7 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
     // @TODO optimization wanted, wordwrap / set_line_wrap not solution
     protected static function _wrap(
         string $string,
+        string $tag,
         int $width,
         string $break = PHP_EOL,
         int $line = 1,
@@ -163,9 +178,21 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
             if (isset($words[$line]))
             {
                 $label->set_markup(
-                    implode(
-                        ' ' , $words[$line]
-                    ) . ' ' . $word
+                    sprintf(
+                        '%s%s%s',
+                        self::tag(
+                            $tag,
+                            false
+                        ),
+                        implode(
+                            ' ' , $words[$line]
+                        ) . ' ' . $word,
+                        self::tag(
+                            $tag,
+                            true
+                        )
+                    )
+
                 );
 
                 if ($label->get_layout()->get_pixel_size()['width'] > $width)

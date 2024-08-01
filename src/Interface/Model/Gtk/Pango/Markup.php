@@ -12,6 +12,9 @@ interface Markup
 {
     public const ENCODING = 'UTF-8';
     public const TAG_CODE = 'tt';
+    public const TAG_QUOTE = 'i';
+    public const TAG_TEXT = 'span';
+    public const TAG_LIST = 'span';
     public const WRAP_WIDTH = 320;
 
     public static function code(

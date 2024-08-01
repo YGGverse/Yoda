@@ -157,7 +157,8 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
                     else
                     {
                         $line[] = self::quote(
-                            $entity->getText()
+                            $entity->getText(),
+                            $width
                         );
                     }
 
