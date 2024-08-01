@@ -57,6 +57,10 @@ class Clean
                     _($this::DIALOG_MESSAGE_FORMAT)
                 );
 
+                $dialog->set_default_response(
+                    GtkResponseType::CANCEL
+                );
+
                 $dialog->format_secondary_text(
                     _($this::DIALOG_FORMAT_SECONDARY_TEXT)
                 );
