@@ -12,7 +12,7 @@ interface Markup
 {
     public const ENCODING = 'UTF-8';
     public const TAG_CODE = 'tt';
-    public const WRAP_WIDTH = 640;
+    public const WRAP_WIDTH = 320;
 
     public static function code(
         string $value
