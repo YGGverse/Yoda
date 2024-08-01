@@ -37,7 +37,7 @@ abstract class Markup
         );
 
         $this->gtk->set_track_visited_links(
-            true
+            false // @TODO unexpected behavior
         );
 
         $this->gtk->set_xalign(
