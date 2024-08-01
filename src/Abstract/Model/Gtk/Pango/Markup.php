@@ -137,8 +137,8 @@ class Markup implements \Yggverse\Yoda\Interface\Model\Gtk\Pango\Markup
 
     // @TODO optimization wanted, wordwrap / set_line_wrap not solution
     protected static function _wrap(
-        string $tag,
-        string $value,
+        string $tag, // const
+        string $value, // unescaped
         int $width = self::WRAP_WIDTH,
         string $break = self::WRAP_BREAK,
         int $line = 1,
