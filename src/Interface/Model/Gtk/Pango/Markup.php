@@ -22,7 +22,7 @@ interface Markup
     public const TAG_QUOTE = '<i>%s</i>';
     public const TAG_TEXT = '<span>%s</span>';
 
-    public const LINK_PREFIX_INTERNAL = '⇒';
+    public const LINK_PREFIX_INTERNAL = ''; // | ⇒
     public const LINK_PREFIX_EXTERNAL = '⇗';
 
     public const WRAP_BREAK = PHP_EOL;
