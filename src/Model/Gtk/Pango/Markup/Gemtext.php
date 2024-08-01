@@ -20,14 +20,13 @@ class Gemtext extends \Yggverse\Yoda\Abstract\Model\Gtk\Pango\Markup
         string $request,
         int $width = self::WRAP_WIDTH,
         ?string &$title = null,
-        bool $preformatted = false
+        bool $preformatted = false,
+        array $line = []
     ): string
     {
         $document = new Document(
             $gemtext
         );
-
-        $line = [];
 
         foreach ($document->getEntities() as $entity)
         {
