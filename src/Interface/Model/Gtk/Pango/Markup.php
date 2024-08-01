@@ -23,7 +23,7 @@ interface Markup
     public const TAG_TEXT = '<span>%s</span>';
 
     public const WRAP_BREAK = PHP_EOL;
-    public const WRAP_WIDTH = 320;
+    public const WRAP_WIDTH = 320; // px
 
     public static function code(
         string $value
