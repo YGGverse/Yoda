@@ -30,15 +30,18 @@ interface Markup
     ): string;
 
     public static function h1(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function h2(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function h3(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function link(
@@ -48,15 +51,18 @@ interface Markup
     ): string;
 
     public static function list(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function quote(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function text(
-        string $value
+        string $value,
+        int $width = self::WRAP_WIDTH
     ): string;
 
     public static function pre(
