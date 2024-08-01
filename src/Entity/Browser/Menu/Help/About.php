@@ -31,17 +31,17 @@ class About
 
     public const DIALOG_MESSAGE_FORMAT = 'About';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">Yoda</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">⇗ Yoda</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_INFO = 'Browser for Gemini protocol';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_META = '<span size="small">%s</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_APP_SRC_HREF = 'https://github.com/YGGverse/Yoda';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">PHP</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_NAME = '<a href="%s" title="%s"><span underline="none">⇗ PHP</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_INFO = 'The Hypertext Preprocessor';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_META = '<span size="small">%s</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_PHP_SRC_HREF = 'https://php.net';
 
-    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="%s" title="%s"><span underline="none">GTK</span></a>';
+    public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_NAME = '<a href="%s" title="%s"><span underline="none">⇗ GTK</span></a>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_INFO = 'Free and open-source cross-platform widget toolkit';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_META = '<span size="small">version %d.%d.%d</span>';
     public const DIALOG_FORMAT_SECONDARY_MARKUP_LIB_GTK_HREF = 'https://gtk.org';
