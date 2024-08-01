@@ -7,6 +7,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Content;
 use \Exception;
 use \Gdk;
 use \GdkEvent;
+use \Gtk;
 use \GtkLabel;
 use \Pango;
 
@@ -17,17 +18,49 @@ use \Yggverse\Yoda\Model\Gtk\Pango\Markup\Gemtext as Markup;
 class Gemtext extends \Yggverse\Yoda\Abstract\Entity\Browser\Container\Page\Content\Markup
 {
     public function set(
-        string $source,
-        string | null &$title = null
+        string $value
     ): void
     {
-        $this->gtk->set_markup(
-            Markup::format(
-                $this->_source = $source,
-                $this->content->page->navbar->request->getValue(),
-                $this->content->page->content->gtk->get_allocated_width(),
-                $title
-            )
+        Gtk::timeout_add( // await for renderer dimensions init
+            1, function(?string $title = null) use ($value)
+            {
+                if ($this->content->page->content->gtk->get_allocated_width() > Markup::WRAP_WIDTH)
+                {
+                    $this->gtk->set_markup(
+                        Markup::format(
+                            $this->_source = $value,
+                            $this->content->page->navbar->request->getValue(),
+                            $this->content->page->content->gtk->get_allocated_width(),
+                            $title
+                        )
+                    );
+
+                    // Update title by gemtext H1 tag (on available)
+                    if ($title)
+                    {
+                        // Set new title
+                        $this->content->page->title->setValue(
+                            $title
+                        );
+
+                        // Update tooltip
+                        $this->content->page->title->setTooltip(
+                            $title
+                        );
+
+                        // Refresh header by new title if current page is active
+                        if ($this->content->page === $this->content->page->container->tab->get())
+                        {
+                            $this->content->page->container->browser->header->setTitle(
+                                $this->content->page->title->getValue(),
+                                $this->content->page->title->getSubtitle()
+                            );
+                        }
+                    };
+
+                    return false; // stop
+                }
+            }
         );
     }
 

@@ -53,7 +53,7 @@ class Content
         );
     }
 
-    public function set( // @TODO make async
+    public function set(
         ?string $mime,
         ?string $data
     ): void
@@ -64,39 +64,13 @@ class Content
         {
             case Filesystem::MIME_TEXT_GEMINI:
 
-                $title = null;
-
                 $document = new Content\Gemtext(
                     $this
                 );
 
                 $document->set(
-                    $data,
-                    $title
+                    $data
                 );
-
-                // Update title by gemtext H1 tag (on available)
-                if ($title)
-                {
-                    // Set new title
-                    $this->page->title->setValue(
-                        $title
-                    );
-
-                    // Update tooltip
-                    $this->page->title->setTooltip(
-                        $title
-                    );
-
-                    // Refresh header by new title if current page is active
-                    if ($this->page === $this->page->container->tab->get())
-                    {
-                        $this->page->container->browser->header->setTitle(
-                            $this->page->title->getValue(),
-                            $this->page->title->getSubtitle()
-                        );
-                    }
-                }
 
             break;
 
