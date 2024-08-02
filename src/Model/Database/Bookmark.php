@@ -8,16 +8,16 @@ use \Pdo;
 
 class Bookmark
 {
-    public Pdo $connection;
+    protected Pdo $_connection;
 
     public function __construct(
         Pdo $connection
     ) {
         // Init parent connection
-        $this->connection = $connection;
+        $this->_connection = $connection;
 
         // Init database structure
-        $this->connection->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `bookmark`
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -34,7 +34,7 @@ class Bookmark
         ?int $time = null
     ): int
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `bookmark` (
                 `time`,
                 `request`,
@@ -55,7 +55,7 @@ class Bookmark
         );
 
         return intval(
-            $this->connection->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
@@ -63,7 +63,7 @@ class Bookmark
         ?string $request = null
     ): ?object
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `bookmark` WHERE `request` LIKE :request'
         );
 
@@ -87,7 +87,7 @@ class Bookmark
         int $limit = 1000
     ): array
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             sprintf(
                 'SELECT * FROM `bookmark`
                           WHERE `request` LIKE :value OR `title` LIKE :value
@@ -116,7 +116,7 @@ class Bookmark
         int $id
     ): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `bookmark` WHERE `id` = %d',
                 $id

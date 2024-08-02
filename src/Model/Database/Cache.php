@@ -8,16 +8,16 @@ use \Pdo;
 
 class Cache
 {
-    public Pdo $connection;
+    protected Pdo $_connection;
 
     public function __construct(
         Pdo $connection
     ) {
         // Init parent connection
-        $this->connection = $connection;
+        $this->_connection = $connection;
 
         // Init database structure
-        $this->connection->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `cache`
             (
                 `id`       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -42,7 +42,7 @@ class Cache
         ?int $time = null
     ): int
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `cache` (
                 `time`,
                 `request`,
@@ -75,7 +75,7 @@ class Cache
         );
 
         return intval(
-            $this->connection->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
@@ -83,7 +83,7 @@ class Cache
         string $request = ''
     ): ?object
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `cache` WHERE `request` LIKE :request'
         );
 
@@ -105,7 +105,7 @@ class Cache
         int $id
     ): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `cache` WHERE `id` = %d',
                 $id
@@ -119,7 +119,7 @@ class Cache
         int $timeout = 0
     ): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `cache` WHERE `time` + %d < %d',
                 $timeout,
@@ -141,7 +141,7 @@ class Cache
     ): void
     {
         // Find same records match URL
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `cache` WHERE `request` LIKE :request'
         );
 

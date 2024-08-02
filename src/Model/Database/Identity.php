@@ -8,16 +8,16 @@ use \Pdo;
 
 class Identity
 {
-    public Pdo $connection;
+    protected Pdo $_connection;
 
     public function __construct(
         Pdo $connection
     ) {
         // Init parent connection
-        $this->connection = $connection;
+        $this->_connection = $connection;
 
         // Init database structure
-        $this->connection->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `identity`
             (
                 `id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

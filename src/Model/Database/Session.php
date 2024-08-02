@@ -8,16 +8,16 @@ use \Pdo;
 
 class Session
 {
-    public Pdo $connection;
+    protected Pdo $_connection;
 
     public function __construct(
         Pdo $connection
     ) {
         // Init parent connection
-        $this->connection = $connection;
+        $this->_connection = $connection;
 
         // Init database structure
-        $this->connection->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `session`
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -32,7 +32,7 @@ class Session
         ?int $time = null
     ): int
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `session` (`time`, `request`) VALUES (:time, :request)'
         );
 
@@ -44,13 +44,13 @@ class Session
         );
 
         return intval(
-            $this->connection->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
     public function get(): array
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             'SELECT * FROM `session`'
         );
 
@@ -64,7 +64,7 @@ class Session
 
     public function clean(): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             'DELETE FROM `session`'
         );
 

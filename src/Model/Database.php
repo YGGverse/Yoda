@@ -8,10 +8,8 @@ use \Pdo;
 
 class Database
 {
-    // Dependencies
-    public Pdo $connection;
+    protected Pdo $_connection;
 
-    // Requirements
     public Database\Auth $auth;
     public Database\Bookmark $bookmark;
     public Database\Cache $cache;
@@ -30,7 +28,7 @@ class Database
         );
 
         // Init dependencies
-        $this->connection = new Pdo(
+        $this->_connection = new Pdo(
             sprintf(
                 'sqlite:%s',
                 $filename
@@ -39,39 +37,39 @@ class Database
             $password
         );
 
-        $this->connection->setAttribute(
+        $this->_connection->setAttribute(
             Pdo::ATTR_ERRMODE,
             Pdo::ERRMODE_EXCEPTION
         );
 
-        $this->connection->setAttribute(
+        $this->_connection->setAttribute(
             Pdo::ATTR_DEFAULT_FETCH_MODE,
             Pdo::FETCH_OBJ
         );
 
         // Init requirements
         $this->auth = new Database\Auth(
-            $this->connection
+            $this->_connection
         );
 
         $this->bookmark = new Database\Bookmark(
-            $this->connection
+            $this->_connection
         );
 
         $this->cache = new Database\Cache(
-            $this->connection
+            $this->_connection
         );
 
         $this->history = new Database\History(
-            $this->connection
+            $this->_connection
         );
 
         $this->identity = new Database\Identity(
-            $this->connection
+            $this->_connection
         );
 
         $this->session = new Database\Session(
-            $this->connection
+            $this->_connection
         );
 
         // Init data

@@ -8,16 +8,16 @@ use \Pdo;
 
 class History
 {
-    public Pdo $connection;
+    protected Pdo $_connection;
 
     public function __construct(
         Pdo $connection
     ) {
         // Init parent connection
-        $this->connection = $connection;
+        $this->_connection = $connection;
 
         // Init database structure
-        $this->connection->query('
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `history`
             (
                 `id`    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -33,7 +33,7 @@ class History
         ?string $title = null
     ): int
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'INSERT INTO `history` (`time`, `url`, `title`) VALUES (:time, :url, :title)'
         );
 
@@ -46,7 +46,7 @@ class History
         );
 
         return intval(
-            $this->connection->lastInsertId()
+            $this->_connection->lastInsertId()
         );
     }
 
@@ -56,7 +56,7 @@ class History
         int $limit = 1000
     ): array
     {
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             sprintf(
                 'SELECT * FROM `history`
                           WHERE `url` LIKE :value OR `title` LIKE :value
@@ -83,7 +83,7 @@ class History
         int $id
     ): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `history` WHERE `id` = %d',
                 $id
@@ -97,7 +97,7 @@ class History
         int $timeout = 0
     ): int
     {
-        $query = $this->connection->query(
+        $query = $this->_connection->query(
             sprintf(
                 'DELETE FROM `history` WHERE `time` + %d < %d',
                 $timeout,
@@ -115,7 +115,7 @@ class History
     ): void
     {
         // Find same records match URL
-        $query = $this->connection->prepare(
+        $query = $this->_connection->prepare(
             'SELECT * FROM `history` WHERE `url` LIKE :url'
         );
 
