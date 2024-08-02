@@ -63,6 +63,11 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
             'request',
             // 1 Mb default
         );
+
+        $this->_pool->init(
+            'auth',
+            1
+        );
     }
 
     public function isCompleted(): bool
@@ -220,6 +225,27 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
     {
         $this->_pool->set(
             'request'
+        );
+    }
+
+    public function getAuth(): bool
+    {
+        return boolval(
+            $this->_pool->get(
+                'auth'
+            )
+        );
+    }
+
+    public function setAuth(
+        bool $auth
+    ): void
+    {
+        $this->_pool->set(
+            'auth',
+            strval(
+                $auth
+            )
         );
     }
 

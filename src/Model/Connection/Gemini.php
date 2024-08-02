@@ -148,6 +148,120 @@ class Gemini
 
             break;
 
+            case 60: // authorization certificate required
+
+                $this->_connection->setAuth(
+                    true
+                );
+
+                $this->_connection->setTitle(
+                    _('Authorization')
+                );
+
+                $this->_connection->setSubtitle(
+                    $address->getHost()
+                );
+
+                $this->_connection->setTooltip(
+                    sprintf(
+                        'Authorization required (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setData(
+                    sprintf(
+                        'Authorization required (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
+                );
+
+            break;
+
+            case 61: // certificate not authorized
+
+                $this->_connection->setAuth(
+                    true
+                );
+
+                $this->_connection->setTitle(
+                    _('Oops!')
+                );
+
+                $this->_connection->setSubtitle(
+                    $address->getHost()
+                );
+
+                $this->_connection->setTooltip(
+                    sprintf(
+                        'Authorization certificate not authorized (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setData(
+                    sprintf(
+                        'Authorization certificate not authorized (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
+                );
+
+            break;
+
+            case 62: // certificate not valid
+
+                $this->_connection->setAuth(
+                    true
+                );
+
+                $this->_connection->setTitle(
+                    _('Oops!')
+                );
+
+                $this->_connection->setSubtitle(
+                    $address->getHost()
+                );
+
+                $this->_connection->setTooltip(
+                    sprintf(
+                        'Authorization certificate not valid (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setData(
+                    sprintf(
+                        'Authorization certificate not valid (code: %d)',
+                        intval(
+                            $response->getCode()
+                        )
+                    )
+                );
+
+                $this->_connection->setMime(
+                    Filesystem::MIME_TEXT_GEMINI
+                );
+
+            break;
+
             default:
 
                 // Try cache

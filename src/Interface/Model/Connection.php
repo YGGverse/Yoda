@@ -74,6 +74,12 @@ interface Connection
 
     public function unsetRequest(): void;
 
+    public function getAuth(): bool;
+
+    public function setAuth(
+        bool $auth
+    ): void;
+
     public function getLength(): ?int;
 
     public function getCache(
