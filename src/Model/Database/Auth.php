@@ -22,7 +22,6 @@ class Auth
             (
                 `id`       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`     INTEGER NOT NULL,
-                `active`   INTEGER NOT NULL,
                 `identity` INTEGER NOT NULL,
                 `request`  VARCHAR(1024) NOT NULL
             )
