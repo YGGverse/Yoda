@@ -68,7 +68,7 @@ class Completion
     {
         $this->suggestion->clear();
 
-        foreach ($this->request->navbar->page->container->browser->database->findBookmark(
+        foreach ($this->request->navbar->page->container->browser->database->bookmark->find(
             $this->request->getValue(),
             $offset,
             $limit
@@ -77,7 +77,7 @@ class Completion
             $suggestions[] = $history->request;
         }
 
-        foreach ($this->request->navbar->page->container->browser->database->findHistory(
+        foreach ($this->request->navbar->page->container->browser->database->history->find(
             $this->request->getValue(),
             $offset,
             $limit

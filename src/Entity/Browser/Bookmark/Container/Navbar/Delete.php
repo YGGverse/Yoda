@@ -20,7 +20,7 @@ class Delete extends Button
     {
         if ($id = $this->navbar->container->content->table->getSelectedId())
         {
-            $this->navbar->container->bookmark->browser->database->deleteBookmark(
+            $this->navbar->container->bookmark->browser->database->bookmark->delete(
                 $id
             );
         }

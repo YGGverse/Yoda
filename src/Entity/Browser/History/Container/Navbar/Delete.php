@@ -20,7 +20,7 @@ class Delete extends Button
     {
         if ($id = $this->navbar->container->content->table->getSelectedId())
         {
-            $this->navbar->container->history->browser->database->deleteHistory(
+            $this->navbar->container->history->browser->database->history->delete(
                 $id
             );
         }

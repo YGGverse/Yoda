@@ -279,7 +279,7 @@ class Page
 
                         if ($pid === 0)
                         {
-                            $this->container->browser->database->renewHistory(
+                            $this->container->browser->database->history->renew(
                                 $this->navbar->request->getValue(),
                                 $this->title->getValue()
                             );

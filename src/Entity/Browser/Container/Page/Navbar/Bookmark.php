@@ -25,7 +25,7 @@ class Bookmark extends Button
     ): void
     {
         $this->setImage(
-            $this->navbar->page->container->browser->database->toggleBookmark(
+            $this->navbar->page->container->browser->database->bookmark->toggle(
                 $this->navbar->request->getValue(),
                 $this->navbar->page->title->getValue()
             ) ? self::_IMAGE_STARRED_YES : self::_IMAGE_STARRED_NON
@@ -35,7 +35,7 @@ class Bookmark extends Button
     public function refresh(): void
     {
         $this->setImage(
-            $this->navbar->page->container->browser->database->getBookmark(
+            $this->navbar->page->container->browser->database->bookmark->get(
                 $this->navbar->request->getValue()
             ) ? self::_IMAGE_STARRED_YES : self::_IMAGE_STARRED_NON
         );

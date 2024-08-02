@@ -42,7 +42,7 @@ class Tab
         );
 
         // Restore previous session
-        foreach ($this->container->browser->database->getSession() as $session)
+        foreach ($this->container->browser->database->session->get() as $session)
         {
             $this->append(
                 $session->request,

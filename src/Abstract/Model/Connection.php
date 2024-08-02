@@ -239,7 +239,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         string $request
     ): ?object
     {
-        return $this->_database->getCache(
+        return $this->_database->cache->get(
             $request
         );
     }

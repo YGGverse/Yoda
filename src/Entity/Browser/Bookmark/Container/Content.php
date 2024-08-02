@@ -76,7 +76,7 @@ class Content
     {
         $this->table->data->clear();
 
-        if ($records = $this->container->bookmark->browser->database->findBookmark($filter))
+        if ($records = $this->container->bookmark->browser->database->bookmark->find($filter))
         {
             foreach ($records as $record)
             {
