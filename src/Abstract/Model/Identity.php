@@ -74,4 +74,30 @@ abstract class Identity implements \Yggverse\Yoda\Interface\Model\Identity
 
         throw new Exception;
     }
+
+    // Read certificate
+    public static function read(
+        OpenSSLCertificate|string $crt
+    ): OpenSSLCertificate
+    {
+        if ($result = openssl_x509_read($crt))
+        {
+            return $result;
+        }
+
+        throw new Exception;
+    }
+
+    // Dump certificate
+    public static function parse(
+        OpenSSLCertificate|string $crt
+    ): array
+    {
+        if ($result = openssl_x509_parse($crt))
+        {
+            return $result;
+        }
+
+        throw new Exception;
+    }
 }

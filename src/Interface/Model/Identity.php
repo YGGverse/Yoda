@@ -37,4 +37,14 @@ interface Identity
         OpenSSLCertificate|string|null $crt = null, // self-signed
         int $days = self::CSR_SIGN_DAYS
     ):  OpenSSLCertificate;
+
+    // Read certificate
+    public static function read(
+        OpenSSLCertificate|string $crt
+    ): OpenSSLCertificate;
+
+    // Dump certificate
+    public static function parse(
+        OpenSSLCertificate|string $crt
+    ): array;
 }
