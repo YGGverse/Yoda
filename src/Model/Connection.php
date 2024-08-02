@@ -6,11 +6,6 @@ namespace Yggverse\Yoda\Model;
 
 use \Yggverse\Net\Address;
 
-use \Yggverse\Yoda\Model\Connection\File;
-use \Yggverse\Yoda\Model\Connection\Gemini;
-use \Yggverse\Yoda\Model\Connection\Nex;
-use \Yggverse\Yoda\Model\Filesystem;
-
 class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 {
     public function request(
@@ -28,7 +23,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
         {
             case 'file':
 
-                (new File($this))->request(
+                (new Connection\File($this))->request(
                     $address
                 );
 
@@ -40,7 +35,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
                 if ($pid === 0)
                 {
-                    (new Gemini($this))->request(
+                    (new Connection\Gemini($this))->request(
                         $address,
                         $timeout
                     );
@@ -56,7 +51,7 @@ class Connection extends \Yggverse\Yoda\Abstract\Model\Connection
 
                 if ($pid === 0)
                 {
-                    (new Nex($this))->request(
+                    (new Connection\Nex($this))->request(
                         $address,
                         $timeout
                     );
