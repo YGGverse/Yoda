@@ -14,7 +14,11 @@ use \OpenSSLCertificateSigningRequest;
  */
 interface Identity
 {
-    public const CSR_SIGN_DAYS = 365;
+    /*
+     * Industry standards recommend limiting the validity period of public SSL/TLS certificates to 397 days.
+     * This is a guideline default value provided by the CA/B Forum to improve security and manage risk.
+     */
+    public const CSR_SIGN_DAYS = 397;
 
     public const PRIVATE_KEY_BITS = 2048;
     public const PRIVATE_KEY_TYPE = OPENSSL_KEYTYPE_RSA;
