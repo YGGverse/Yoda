@@ -44,6 +44,17 @@ class Database
 
         // Init tables
         $this->_connection->query('
+            CREATE TABLE IF NOT EXISTS `auth`
+            (
+                `id`       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`     INTEGER NOT NULL,
+                `active`   INTEGER NOT NULL,
+                `identity` INTEGER NOT NULL,
+                `request`  VARCHAR(1024) NOT NULL
+            )
+        ');
+
+        $this->_connection->query('
             CREATE TABLE IF NOT EXISTS `bookmark`
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -74,6 +85,18 @@ class Database
                 `time`  INTEGER NOT NULL,
                 `url`   VARCHAR(1024) NOT NULL,
                 `title` VARCHAR(255)
+            )
+        ');
+
+        $this->_connection->query('
+            CREATE TABLE IF NOT EXISTS `identity`
+            (
+                `id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`   INTEGER NOT NULL,
+                `active` INTEGER NOT NULL,
+                `name`   VARCHAR(255),
+                `crt`    TEXT NOT NULL,
+                `key`    TEXT NOT NULL
             )
         ');
 
