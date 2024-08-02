@@ -30,10 +30,10 @@ class Identity
     }
 
     public function add(
-        ?string $crt,
-        ?string $key,
+        string $crt,
+        string $key,
         ?string $name = null,
-           ?int $time = null
+        ?int $time = null
     ): int
     {
         $query = $this->_connection->prepare(
