@@ -10,8 +10,8 @@ use \OpenSSLCertificate;
 
 class Gemini extends \Yggverse\Yoda\Abstract\Model\Identity
 {
-    // Update defaults
-    public const CSR_SIGN_DAYS = 365 * 1965; // @TODO
+    // Init defaults
+    public const CSR_SIGN_DATE = '99991231235959Z';
 
     // Init identity variables
     protected OpenSSLAsymmetricKey $_key;
@@ -32,7 +32,11 @@ class Gemini extends \Yggverse\Yoda\Abstract\Model\Identity
             ),
             $this->_key,
             null,
-            self::CSR_SIGN_DAYS
+            intval( // use max possible certificate age for user identities
+                floor(
+                    (strtotime(self::CSR_SIGN_DATE) - time()) / (60 * 60 * 24)
+                )
+            )
         );
     }
 
