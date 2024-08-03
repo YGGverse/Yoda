@@ -128,15 +128,15 @@ class Auth
         string $request
     ): int
     {
-        $records = 0;
+        $affected = 0;
 
         foreach ($this->like($request) as $record)
         {
-            $records += $this->delete(
+            $affected += $this->delete(
                 $record->id
             );
         }
 
-        return $records;
+        return $affected;
     }
 }
