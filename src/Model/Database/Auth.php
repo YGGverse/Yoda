@@ -100,8 +100,8 @@ class Auth
 
     public function match(
         string $request = '',
-        int $start = 0,
-        int $limit = 1000
+        int $limit = 1000,
+        int $start = 0
     ): array
     {
         $query = $this->_connection->prepare(
