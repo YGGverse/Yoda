@@ -38,8 +38,27 @@ class Gemini
         // Apply identity if available
         if ($identity = $this->matchIdentity($address->get()))
         {
-            $options['ssl']['local_cert'] = $identity->crt;
-            $options['ssl']['local_pk'] = $identity->key;
+            $crt = tmpfile();
+
+            fwrite(
+                $crt,
+                $identity->crt
+            );
+
+            $options['ssl']['local_cert'] = stream_get_meta_data(
+                $crt
+            )['uri'];
+
+            $key = tmpfile();
+
+            fwrite(
+                $key,
+                $identity->key
+            );
+
+            $options['ssl']['local_pk'] = stream_get_meta_data(
+                $key
+            )['uri'];
         }
 
         // Update connection
