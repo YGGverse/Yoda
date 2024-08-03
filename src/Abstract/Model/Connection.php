@@ -9,7 +9,7 @@ use \Yggverse\Yoda\Model\Pool;
 
 abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
 {
-    private Database $_database;
+    public Database $database;
 
     private Pool $_pool;
 
@@ -17,8 +17,8 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         Database $database,
         ?Pool $pool = null
     ) {
-        // Init database connection to store cached results
-        $this->_database = $database;
+        // Init database connection
+        $this->database = $database;
 
         // Use shared memory pool for async operations
         $this->_pool = $pool ? $pool : new Pool;
@@ -259,15 +259,6 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         }
 
         return null;
-    }
-
-    public function getCache(
-        string $request
-    ): ?object
-    {
-        return $this->_database->cache->get(
-            $request
-        );
     }
 
     public function reset(): void

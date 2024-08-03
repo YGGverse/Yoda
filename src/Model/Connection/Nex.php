@@ -75,7 +75,7 @@ class Nex
         }
 
         // Try cache
-        else if ($cache = $this->_connection->getCache($address->get()))
+        else if ($cache = $this->_connection->database->cache->get($address->get()))
         {
             $this->_connection->setTitle(
                 $cache->title

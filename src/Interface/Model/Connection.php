@@ -82,10 +82,6 @@ interface Connection
 
     public function getLength(): ?int;
 
-    public function getCache(
-        string $request
-    ): ?object;
-
     public function reset(): void;
 
     public function close(): void;
