@@ -25,9 +25,6 @@ class Auth
     // Dependencies
     public Page $page;
 
-    // Requirements
-    public GtkEntry $name;
-
     // Defaults
     public const DIALOG_DEFAULT_RESPONSE = GtkResponseType::CANCEL;
     public const DIALOG_FORMAT_SECONDARY_TEXT = 'Select identity';
@@ -43,34 +40,35 @@ class Auth
     public const DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER = 'Local name (optional)';
 
     // Extras
-    private array $_options = [];
+    private array $_options = []; // GtkRadioButton
+    private GtkEntry $_name;
 
     public function __construct(
-        Page $page,
+        Page $page
     ) {
         // Init dependencies
         $this->page = $page;
 
-        // Init requirements
-        $this->name = new GtkEntry;
+        // Init extras
+        $this->_name = new GtkEntry;
 
-        $this->name->set_alignment(
+        $this->_name->set_alignment(
             $this::DIALOG_CONTENT_OPTION_NAME_ALIGNMENT
         );
 
-        $this->name->set_placeholder_text(
+        $this->_name->set_placeholder_text(
             _($this::DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER)
         );
 
-        $this->name->set_margin_start(
+        $this->_name->set_margin_start(
             $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
         );
 
-        $this->name->set_margin_end(
+        $this->_name->set_margin_end(
             $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
         );
 
-        $this->name->set_margin_bottom(
+        $this->_name->set_margin_bottom(
             $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
         );
     }
@@ -150,7 +148,7 @@ class Auth
             if (!$id)
             {
                 $content->add(
-                    $this->name,
+                    $this->_name,
                     true,
                     true,
                     0
@@ -194,7 +192,7 @@ class Auth
                                 $this->page->container->browser->database->identity->add(
                                     $identity->crt(),
                                     $identity->key(),
-                                    $this->name->get_text() ? $this->name->get_text() : null
+                                    $this->_name->get_text() ? $this->_name->get_text() : null
                                 ),
                                 $this->page->navbar->request->getValue()
                             );
@@ -253,7 +251,7 @@ class Auth
                     if (!$id)
                     {
                         // Update sensibility
-                        $this->name->set_sensitive(
+                        $this->_name->set_sensitive(
                             $option->get_active()
                         );
 
