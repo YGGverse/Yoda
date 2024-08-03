@@ -74,7 +74,7 @@ interface Connection
 
     public function unsetRequest(): void;
 
-    public function getAuth(): bool;
+    public function isAuth(): bool;
 
     public function setAuth(
         bool $auth

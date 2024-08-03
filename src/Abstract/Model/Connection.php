@@ -228,7 +228,7 @@ abstract class Connection implements \Yggverse\Yoda\Interface\Model\Connection
         );
     }
 
-    public function getAuth(): bool
+    public function isAuth(): bool
     {
         return boolval(
             $this->_pool->get(
