@@ -193,7 +193,7 @@ class Page
             $refresh,
             function() use ($expire, $history)
             {
-                // Redirect requested
+                // Force redirect by application router (not status code)
                 if ($location = $this->connection->getRedirect())
                 {
                     // Follow
@@ -207,40 +207,40 @@ class Page
                     return false; // stop
                 }
 
-                // Response form requested
-                if ($request = $this->connection->getRequest())
-                {
-                    // Update title
-                    $this->title->set(
-                        $this->connection->getTitle(),
-                        $this->connection->getSubtitle(),
-                        $this->connection->getTooltip()
-                    );
-
-                    // Refresh header by new title if current page is active
-                    if ($this === $this->container->tab->get())
-                    {
-                        $this->container->browser->header->setTitle(
-                            $this->title->getValue(),
-                            $this->title->getSubtitle()
-                        );
-                    }
-
-                    // Show response form
-                    $this->response->show(
-                        $request['placeholder'],
-                        $request['visible']
-                    );
-
-                    // Hide progressbar
-                    $this->progressbar->hide();
-
-                    return false; // stop
-                }
-
-                // Stop event loop on request completed
+                // Request completed
                 if ($this->connection->isCompleted())
                 {
+                    // Response form requested
+                    if ($request = $this->connection->getRequest())
+                    {
+                        // Update title
+                        $this->title->set(
+                            $this->connection->getTitle(),
+                            $this->connection->getSubtitle(),
+                            $this->connection->getTooltip()
+                        );
+
+                        // Refresh header by new title if current page is active
+                        if ($this === $this->container->tab->get())
+                        {
+                            $this->container->browser->header->setTitle(
+                                $this->title->getValue(),
+                                $this->title->getSubtitle()
+                            );
+                        }
+
+                        // Show response form
+                        $this->response->show(
+                            $request['placeholder'],
+                            $request['visible']
+                        );
+
+                        // Hide progressbar
+                        $this->progressbar->hide();
+
+                        return false; // stop at this point, do not update page data
+                    }
+
                     // Update title
                     $this->title->set(
                         $this->connection->getTitle(),
