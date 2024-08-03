@@ -79,8 +79,11 @@ class Auth
         );
 
         // Search database for auth records
-        foreach ($this->page->container->browser->database->auth->find(
-            $this->page->navbar->request->getValue()
+        foreach ($this->page->container->browser->database->auth->like(
+            sprintf(
+                '%s%%',
+                $this->page->navbar->request->getValue()
+            )
         ) as $auth)
         {
             // Get related identity records
