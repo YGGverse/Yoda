@@ -126,4 +126,30 @@ class Auth
 
         return $query->fetchAll();
     }
+
+    public function like(
+        string $request  = '',
+        int $start = 0,
+        int $limit = 1000
+    ): array
+    {
+        $query = $this->_connection->prepare(
+            sprintf(
+                'SELECT * FROM `auth`
+                          WHERE `request` LIKE :request
+                          ORDER BY `request` ASC
+                          LIMIT %d,%d',
+                $start,
+                $limit
+            )
+        );
+
+        $query->execute(
+            [
+                ':request' => $request
+            ]
+        );
+
+        return $query->fetchAll();
+    }
 }
