@@ -36,7 +36,7 @@ class Gemini
         $options = $request->getOptions();
 
         // Apply identity if available
-        if ($identity = $this->matchIdentity($address->get()))
+        if ($identity = $this->matchIdentity($address))
         {
             $crt = tmpfile();
 
@@ -373,18 +373,46 @@ class Gemini
      *
      */
     public function matchIdentity(
-        string $request,
+        Address $address,
         array $identities = []
     ): ?object
     {
-        foreach ($this->_connection->database->auth->like(sprintf('%s%%', $request)) as $auth)
-        {
-            $identities[$auth->identity] = $auth->request;
+        foreach (
+            // Select host records
+            $this->_connection->database->auth->like(
+                sprintf(
+                    '%s%%',
+                    $address->get(
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false
+                    )
+                )
+            ) as $auth
+        ) {
+            // Parse result address
+            $request = new Address(
+                $auth->request
+            );
+
+            // Filter results match current path prefix
+            if (str_starts_with($address->getPath(), $request->getPath()))
+            {
+                $identities[
+                    $auth->identity
+                ] = $auth->request;
+            }
         }
 
+        // Results found
         if ($identities)
         {
-            uasort(
+            uasort( // max-level
                 $identities,
                 function ($a, $b)
                 {
