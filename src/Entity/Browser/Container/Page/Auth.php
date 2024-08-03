@@ -28,12 +28,12 @@ class Auth
     public Page $page;
 
     // Defaults
-    public const DIALOG_DEFAULT_RESPONSE = GtkResponseType::CANCEL;
-    public const DIALOG_FORMAT_SECONDARY_TEXT = 'Select identity';
-    public const DIALOG_MESSAGE_FORMAT = 'Authorization';
-    public const DIALOG_CONTENT_OPTION_LABEL_CREATE = 'Create new for this resource';
-    public const DIALOG_CONTENT_OPTION_MARGIN = 8;
-    public const DIALOG_CONTENT_SPACING = 1;
+    public const DEFAULT_RESPONSE = GtkResponseType::CANCEL;
+    public const FORMAT_SECONDARY_TEXT = 'Select identity';
+    public const MESSAGE_FORMAT = 'Authorization';
+
+    public const MARGIN = 8;
+    public const SPACING = 1;
 
     // Extras
     private array $_options = []; // GtkRadioButton
@@ -53,22 +53,22 @@ class Auth
             GtkDialogFlags::MODAL,
             GtkMessageType::INFO,
             GtkButtonsType::OK_CANCEL,
-            _($this::DIALOG_MESSAGE_FORMAT)
+            _($this::MESSAGE_FORMAT)
         );
 
         $this->gtk->format_secondary_text(
-            _($this::DIALOG_FORMAT_SECONDARY_TEXT)
+            _($this::FORMAT_SECONDARY_TEXT)
         );
 
         $this->gtk->set_default_response(
-            $this::DIALOG_DEFAULT_RESPONSE
+            $this::DEFAULT_RESPONSE
         );
 
         // Init content
         $content = $this->gtk->get_content_area();
 
         $content->set_spacing(
-            $this::DIALOG_CONTENT_SPACING
+            $this::SPACING
         );
 
         // Init new certificate option
@@ -81,7 +81,7 @@ class Auth
         );
 
         $this->_options[0]->setLabel(
-            0, _($this::DIALOG_CONTENT_OPTION_LABEL_CREATE)
+            0, null
         );
 
         // Search database for auth records
@@ -145,7 +145,7 @@ class Auth
 
                 // Set margin
                 $option->gtk->set_margin_bottom(
-                    self::DIALOG_CONTENT_OPTION_MARGIN
+                    self::MARGIN
                 );
             }
         }

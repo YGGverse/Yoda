@@ -25,6 +25,7 @@ class Identity
     public const MARGIN = 12;
     public const LABEL_DEFAULT = '#%d (%s)';
     public const LABEL_NO_NAME = '#%d (no name)';
+    public const LABEL_CRT_NEW = 'Create new for this resource';
 
     public function __construct(
         Auth $auth
@@ -73,16 +74,26 @@ class Identity
         ?string $label = null
     ): void
     {
-        $this->gtk->set_label(
-            $label ? sprintf(
-                $this::LABEL_DEFAULT,
-                $id,
-                $label
-            ) : sprintf(
-                $this::LABEL_NO_NAME,
-                $id
-            )
-        );
+        if ($id)
+        {
+            $this->gtk->set_label(
+                $label ? sprintf(
+                    $this::LABEL_DEFAULT,
+                    $id,
+                    $label
+                ) : sprintf(
+                    $this::LABEL_NO_NAME,
+                    $id
+                )
+            );
+        }
+
+        else
+        {
+            $this->gtk->set_label(
+                $this::LABEL_CRT_NEW
+            );
+        }
     }
 
     public function setName(
