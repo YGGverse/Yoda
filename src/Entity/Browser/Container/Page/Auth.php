@@ -134,6 +134,15 @@ class Auth
         // Build options list
         foreach ($this->_options as $id => $option)
         {
+            // Detect active identity
+            $option->gtk->set_active(
+                boolval(
+                    $this->page->container->browser->database->auth->match(
+                        $this->page->navbar->request->getValue(), 1 // one
+                    )
+                )
+            );
+
             // Append option
             $content->add(
                 $option->gtk
