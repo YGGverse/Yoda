@@ -6,6 +6,8 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page\Auth\Option\Identity;
 
 use \GtkEntry;
 
+use Yggverse\Yoda\Entity\Browser\Container\Page\Auth\Option\Identity;
+
 class Name
 {
     // GTK
@@ -28,26 +30,31 @@ class Name
         // Init GTK
         $this->gtk = new GtkEntry;
 
-        $this->_name->set_alignment(
+        $this->gtk->set_alignment(
             $this::ALIGNMENT
         );
 
-        $this->_name->set_placeholder_text(
+        $this->gtk->set_placeholder_text(
             _($this::PLACEHOLDER)
         );
 
-        $this->_name->set_margin_start(
+        $this->gtk->set_margin_start(
             $this::MARGIN
         );
 
-        $this->_name->set_margin_end(
+        $this->gtk->set_margin_end(
             $this::MARGIN
         );
 
-        $this->_name->set_margin_bottom(
+        $this->gtk->set_margin_bottom(
             $this::MARGIN
         );
 
         $this->gtk->show();
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->gtk->get_text();
     }
 }

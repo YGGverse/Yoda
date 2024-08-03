@@ -92,6 +92,10 @@ class Auth
             Auth\Option\Identity::ID_CRT_NEW
         );
 
+        $this->_options[
+            Auth\Option\Identity::ID_CRT_NEW
+        ]->useName();
+
         // Search database for auth records
         foreach ($this->page->container->browser->database->auth->like(
             sprintf(
@@ -140,7 +144,7 @@ class Auth
             {
                 // Append name entry after new identity option
                 $content->add(
-                    $option->name,
+                    $option->name->gtk,
                     true,
                     true,
                     0
@@ -203,7 +207,7 @@ class Auth
                                     $this->page->container->browser->database->identity->add(
                                         $identity->crt(),
                                         $identity->key(),
-                                        $this->_name->get_text() ? $this->_name->get_text() : null
+                                        $option->name->getValue()
                                     ),
                                     $this->page->navbar->request->getValue()
                                 );

@@ -98,12 +98,10 @@ class Identity
         }
     }
 
-    public function setName(
-        string $label
+    public function useName(
+        bool $value = true
     ): void
     {
-        $this->name = new Identity\Name(
-            $this
-        );
+        $this->name = $value ? new Identity\Name($this) : null;
     }
 }
