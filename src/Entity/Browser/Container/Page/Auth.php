@@ -30,7 +30,7 @@ class Auth
     // Defaults
     public const DEFAULT_RESPONSE = GtkResponseType::CANCEL;
     public const FORMAT_SECONDARY_TEXT = 'Select identity';
-    public const MESSAGE_FORMAT = 'Authorization';
+    public const MESSAGE_FORMAT = 'Auth';
 
     public const MARGIN = 8;
     public const SPACING = 1;
@@ -71,6 +71,13 @@ class Auth
             $this::SPACING
         );
 
+        // Add separator
+        $content->add(
+            new GtkSeparator(
+                GtkOrientation::VERTICAL
+            )
+        );
+
         // Init new certificate option
         $this->_options[
             Auth\Option\Identity::ID_CRT_NEW
@@ -96,7 +103,7 @@ class Auth
             Auth\Option\Identity::ID_CRT_NEW
         ]->useName();
 
-        // Search database for auth records
+        // Build records from database
         foreach ($this->page->container->browser->database->auth->like(
             sprintf(
                 '%s%%',
@@ -107,28 +114,48 @@ class Auth
             // Get related identity records
             if ($identity = $this->page->container->browser->database->identity->get($auth->identity))
             {
-                $this->_options[$identity->id] = new Auth\Option\Identity(
+                $this->_options[
+                    $identity->id
+                ] = new Auth\Option\Identity(
                     $this
                 );
 
-                $this->_options[$identity->id]->setGroup(
+                $this->_options[
+                    $identity->id
+                ]->setGroup(
                     $this->_options[
                         Auth\Option\Identity::ID_CRT_NEW
                     ]
                 );
 
-                $this->_options[$identity->id]->setLabel(
+                $this->_options[
+                    $identity->id
+                ]->setLabel(
                     $identity->id,
                     $identity->name
                 );
             }
         }
 
-        // Append separator
-        $content->add(
-            new GtkSeparator(
-                GtkOrientation::VERTICAL
-            )
+        // Append logout option
+        $this->_options[
+            Auth\Option\Identity::ID_LOG_OUT
+        ] = new Auth\Option\Identity(
+            $this
+        );
+
+        $this->_options[
+            Auth\Option\Identity::ID_LOG_OUT
+        ]->setGroup(
+            $this->_options[
+                Auth\Option\Identity::ID_CRT_NEW
+            ]
+        );
+
+        $this->_options[
+            Auth\Option\Identity::ID_LOG_OUT
+        ]->setLabel(
+            Auth\Option\Identity::ID_LOG_OUT
         );
 
         // Build options list
@@ -173,7 +200,7 @@ class Auth
             }
         }
 
-        // Append empty line separator
+        // Add final separator
         $content->add(
             new GtkLabel
         );
@@ -189,56 +216,71 @@ class Auth
             {
                 if ($option->gtk->get_active())
                 {
-                    // Logout previous identities for this request
-                    $this->page->container->browser->database->auth->logout(
-                        $this->page->navbar->request->getValue()
-                    );
-
-                    // Activate existing identity
-                    if ($id)
+                    // Route ID
+                    switch ($id)
                     {
-                        // Add new auth record
-                        $this->page->container->browser->database->auth->add(
-                            $id,
-                            $this->page->navbar->request->getValue()
-                        );
-                    }
+                        case Auth\Option\Identity::ID_LOG_OUT:
 
-                    // Generate new identity
-                    else
-                    {
-                        // Detect driver
-                        switch (true)
-                        {
-                            case mb_strtolower(
-                                parse_url(
+                            // Logout previous session
+                            $this->page->container->browser->database->auth->logout(
+                                $this->page->navbar->request->getValue()
+                            );
+
+                        break;
+
+                        case Auth\Option\Identity::ID_CRT_NEW:
+
+                            // Logout previous session
+                            $this->page->container->browser->database->auth->logout(
+                                $this->page->navbar->request->getValue()
+                            );
+
+                            // Detect identity driver
+                            switch (true)
+                            {
+                                case parse_url(
                                     $this->page->navbar->request->getValue(),
                                     PHP_URL_SCHEME
-                                )
-                            ) == 'gemini':
+                                ) == 'gemini':
 
-                                // Init identity model
-                                $identity = new Gemini;
+                                    // Init identity model
+                                    $identity = new Gemini;
 
-                                // Add new auth record
-                                $this->page->container->browser->database->auth->add(
-                                    $this->page->container->browser->database->identity->add(
-                                        $identity->crt(),
-                                        $identity->key(),
-                                        $option->name ? $option->name->getValue() : null
-                                    ),
-                                    $this->page->navbar->request->getValue()
-                                );
+                                    // Add new auth record
+                                    $this->page->container->browser->database->auth->add(
+                                        $this->page->container->browser->database->identity->add(
+                                            $identity->crt(),
+                                            $identity->key(),
+                                            $option->name ? $option->name->getValue() : null
+                                        ),
+                                        $this->page->navbar->request->getValue()
+                                    );
 
-                            break;
+                                break;
 
-                            default:
+                                default:
 
-                                throw new Exception;
-                        }
+                                    throw new Exception;
+                            }
+
+                        break;
+
+                        default:
+
+                            // Logout previous session
+                            $this->page->container->browser->database->auth->logout(
+                                $this->page->navbar->request->getValue()
+                            );
+
+                            // Add new auth record
+                            $this->page->container->browser->database->auth->add(
+                                $id,
+                                $this->page->navbar->request->getValue()
+                            );
                     }
-                }
 
+                    break;
+                }
             }
 
             $this->destroy();
