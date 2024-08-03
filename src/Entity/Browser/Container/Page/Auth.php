@@ -219,13 +219,13 @@ class Auth
 
             }
 
-            $this->gtk->destroy();
+            $this->destroy();
 
             return true;
         }
 
         // Dialog canceled
-        $this->gtk->destroy();
+        $this->destroy();
 
         return false;
     }
@@ -246,5 +246,14 @@ class Auth
                 break;
             }
         }
+    }
+
+    public function destroy(): void
+    {
+        // Free memory
+        $this->_options = [];
+
+        // Destroy GTK object
+        $this->gtk->destroy();
     }
 }
