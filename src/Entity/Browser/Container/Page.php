@@ -23,6 +23,7 @@ class Page
     public Container $container;
 
     // Requirements
+    public Page\Auth $auth;
     public Page\Title $title;
     public Page\Navbar $navbar;
     public Page\Progressbar $progressbar;
@@ -40,6 +41,11 @@ class Page
         // Init container
         $this->gtk = new GtkBox(
             GtkOrientation::VERTICAL
+        );
+
+        // Init auth
+        $this->auth = new Page\Auth(
+            $this
         );
 
         // Init title
@@ -210,6 +216,49 @@ class Page
                 // Request completed
                 if ($this->connection->isCompleted())
                 {
+                    // Response form requested
+                    if ($this->connection->isAuth())
+                    {
+                        // Update title
+                        $this->title->set(
+                            $this->connection->getTitle(),
+                            $this->connection->getSubtitle(),
+                            $this->connection->getTooltip()
+                        );
+
+                        // Refresh header by new title if current page is active
+                        if ($this === $this->container->tab->get())
+                        {
+                            $this->container->browser->header->setTitle(
+                                $this->title->getValue(),
+                                $this->title->getSubtitle()
+                            );
+                        }
+
+                        // Hide progressbar
+                        $this->progressbar->hide();
+
+                        // Show auth dialog
+                        if ($this->auth->dialog())
+                        {
+                            // Update page
+                            $this->update(
+                                false
+                            );
+                        }
+
+                        else
+                        {
+                            // Update content
+                            $this->content->set(
+                                $this->connection->getMime(),
+                                $this->connection->getData()
+                            );
+                        }
+
+                        return false; // stop
+                    }
+
                     // Response form requested
                     if ($request = $this->connection->getRequest())
                     {
