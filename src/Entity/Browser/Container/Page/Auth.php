@@ -190,48 +190,52 @@ class Auth
         // Listen for user chose
         if (GtkResponseType::OK == $this->gtk->run())
         {
-            // Get active option
+            // Find active option
             foreach ($this->_options as $id => $option)
             {
-                // Auth
-                if ($id)
+                if ($option->get_active())
                 {
-                    // @TODO activate existing record
-                }
-
-                // Generate new identity
-                else
-                {
-                    // Detect driver
-                    switch (true)
+                    // Auth
+                    if ($id)
                     {
-                        case mb_strtolower(
-                            parse_url(
-                                $this->page->navbar->request->getValue(),
-                                PHP_URL_SCHEME
-                            )
-                        ) == 'gemini':
+                        // @TODO activate existing record
+                    }
 
-                            // Init identity model
-                            $identity = new Gemini;
+                    // Generate new identity
+                    else
+                    {
+                        // Detect driver
+                        switch (true)
+                        {
+                            case mb_strtolower(
+                                parse_url(
+                                    $this->page->navbar->request->getValue(),
+                                    PHP_URL_SCHEME
+                                )
+                            ) == 'gemini':
 
-                            // Add new auth record
-                            $this->page->container->browser->database->auth->add(
-                                $this->page->container->browser->database->identity->add(
-                                    $identity->crt(),
-                                    $identity->key(),
-                                    $this->_name->get_text() ? $this->_name->get_text() : null
-                                ),
-                                $this->page->navbar->request->getValue()
-                            );
+                                // Init identity model
+                                $identity = new Gemini;
 
-                        break;
+                                // Add new auth record
+                                $this->page->container->browser->database->auth->add(
+                                    $this->page->container->browser->database->identity->add(
+                                        $identity->crt(),
+                                        $identity->key(),
+                                        $this->_name->get_text() ? $this->_name->get_text() : null
+                                    ),
+                                    $this->page->navbar->request->getValue()
+                                );
 
-                        default:
+                            break;
 
-                            throw new Exception;
+                            default:
+
+                                throw new Exception;
+                        }
                     }
                 }
+
             }
 
             $this->gtk->destroy();
