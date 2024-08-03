@@ -7,6 +7,7 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 use \Exception;
 use \GtkButtonsType;
 use \GtkDialogFlags;
+use \GtkEntry;
 use \GtkMessageDialog;
 use \GtkMessageType;
 use \GtkRadioButton;
@@ -24,14 +25,22 @@ class Auth
     // Dependencies
     public Page $page;
 
+    // Requirements
+    public GtkEntry $name;
+
     // Defaults
     public const DIALOG_DEFAULT_RESPONSE = GtkResponseType::CANCEL;
     public const DIALOG_FORMAT_SECONDARY_TEXT = 'Select identity';
     public const DIALOG_MESSAGE_FORMAT = 'Authorization';
     public const DIALOG_CONTENT_OPTION_LABEL_CREATE = 'Create new for this resource';
-    public const DIALOG_CONTENT_OPTION_LABEL_RECORD = '#%d (no name)';
+    public const DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME = '#%d (%s)';
+    public const DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME_DEFAULT = '#%d (no name)';
     public const DIALOG_CONTENT_OPTION_MARGIN = 8;
     public const DIALOG_CONTENT_SPACING = 1;
+
+    public const DIALOG_CONTENT_OPTION_NAME_ALIGNMENT = 0.5;
+    public const DIALOG_CONTENT_OPTION_NAME_MARGIN = 12;
+    public const DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER = 'Local name (optional)';
 
     // Extras
     private array $_options = [];
@@ -41,6 +50,29 @@ class Auth
     ) {
         // Init dependencies
         $this->page = $page;
+
+        // Init requirements
+        $this->name = new GtkEntry;
+
+        $this->name->set_alignment(
+            $this::DIALOG_CONTENT_OPTION_NAME_ALIGNMENT
+        );
+
+        $this->name->set_placeholder_text(
+            _($this::DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER)
+        );
+
+        $this->name->set_margin_start(
+            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
+        );
+
+        $this->name->set_margin_end(
+            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
+        );
+
+        $this->name->set_margin_bottom(
+            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
+        );
     }
 
     public function dialog(): bool
@@ -90,8 +122,12 @@ class Auth
             if ($identity = $this->page->container->browser->database->identity->get($auth->identity))
             {
                 $this->_options[$identity->id] = $this->_option(
-                    $identity->name ? $identity->name : sprintf(
-                        _($this::DIALOG_CONTENT_OPTION_LABEL_RECORD),
+                    $identity->name ? sprintf(
+                        _($this::DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME),
+                        $identity->id,
+                        $identity->name
+                    ) : sprintf(
+                        _($this::DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME_DEFAULT),
                         $identity->id
                     )
                 );
@@ -103,11 +139,23 @@ class Auth
         }
 
         // Build options list
-        foreach ($this->_options as $option)
+        foreach ($this->_options as $id => $option)
         {
+            // Append option
             $content->add(
                 $option
             );
+
+            // Append name entry after new identity option
+            if (!$id)
+            {
+                $content->add(
+                    $this->name,
+                    true,
+                    true,
+                    0
+                );
+            }
         }
 
         // Render
@@ -145,7 +193,8 @@ class Auth
                             $this->page->container->browser->database->auth->add(
                                 $this->page->container->browser->database->identity->add(
                                     $identity->crt(),
-                                    $identity->key()
+                                    $identity->key(),
+                                    $this->name->get_text()
                                 ),
                                 $this->page->navbar->request->getValue()
                             );
@@ -191,6 +240,31 @@ class Auth
 
         $option->set_margin_bottom(
             $margin
+        );
+
+        $option->connect(
+            'toggled',
+            function (
+                GtkRadioButton $self
+            ) {
+                // Detect active option
+                foreach ($this->_options as $id => $option)
+                {
+                    // Is new
+                    if (!$id)
+                    {
+                        if ($option->get_active())
+                        {
+                            $this->name->show();
+                        }
+
+                        else
+                        {
+                            $this->name->hide();
+                        }
+                    }
+                }
+            }
         );
 
         return $option;
