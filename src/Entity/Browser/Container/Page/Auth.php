@@ -207,7 +207,7 @@ class Auth
                                     $this->page->container->browser->database->identity->add(
                                         $identity->crt(),
                                         $identity->key(),
-                                        $option->name->getValue()
+                                        $option->name ? $option->name->getValue() : null
                                     ),
                                     $this->page->navbar->request->getValue()
                                 );
