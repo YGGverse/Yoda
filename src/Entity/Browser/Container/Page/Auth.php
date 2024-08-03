@@ -119,7 +119,7 @@ class Auth
                 // Auth
                 if ($id)
                 {
-                    // @TODO
+                    // @TODO activate existing record
                 }
 
                 // Generate new identity
@@ -135,10 +135,10 @@ class Auth
                             )
                         ) == 'gemini':
 
-                            // Init identity
+                            // Init identity model
                             $identity = new Gemini;
 
-                            // Init auth record
+                            // Add new auth record
                             $this->page->container->browser->database->auth->add(
                                 $this->page->container->browser->database->identity->add(
                                     $identity->crt(),
