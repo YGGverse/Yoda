@@ -97,7 +97,7 @@ class Auth
         ]->useName();
 
         // Search database for auth records
-        foreach ($this->page->container->browser->database->auth->match(
+        foreach ($this->page->container->browser->database->auth->like(
             sprintf(
                 '%s%%',
                 $this->page->navbar->request->getValue()
@@ -137,7 +137,7 @@ class Auth
             // Detect active identity
             $option->gtk->set_active(
                 boolval(
-                    $this->page->container->browser->database->auth->match(
+                    $this->page->container->browser->database->auth->like(
                         $this->page->navbar->request->getValue(), 1 // one
                     )
                 )

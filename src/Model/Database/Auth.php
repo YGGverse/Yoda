@@ -98,7 +98,7 @@ class Auth
         return null;
     }
 
-    public function match(
+    public function like(
         string $request = '',
         int $limit = 1000,
         int $start = 0
@@ -130,7 +130,7 @@ class Auth
     {
         $records = 0;
 
-        foreach ($this->match($request) as $record)
+        foreach ($this->like($request) as $record)
         {
             $records += $this->delete(
                 $record->id
