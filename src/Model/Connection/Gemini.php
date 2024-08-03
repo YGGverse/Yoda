@@ -27,10 +27,27 @@ class Gemini
         int $timeout = 15
     ): void
     {
+        // Init request
         $request = new Request(
             $address->get()
         );
 
+        // Get connection settings
+        $options = $request->getOptions();
+
+        // Apply identity if available
+        if ($identity = $this->matchIdentity($address->get()))
+        {
+            $options['ssl']['local_cert'] = $identity->crt;
+            $options['ssl']['local_pk'] = $identity->key;
+        }
+
+        // Update connection
+        $request->setOptions(
+            $options
+        );
+
+        // Parse response
         $response = new Response(
             $request->getResponse(
                 $timeout
@@ -265,7 +282,7 @@ class Gemini
             default:
 
                 // Try cache
-                if ($cache = $this->_connection->getCache($address->get()))
+                if ($cache = $this->_connection->database->cache->get($address->get()))
                 {
                     $this->_connection->setTitle(
                         $cache->title
@@ -328,6 +345,44 @@ class Gemini
         $this->_connection->setCompleted(
             true
         );
+    }
+
+    /**
+     * Return identity match request | NULL
+     *
+     * https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
+     *
+     */
+    public function matchIdentity(
+        string $request,
+        array $identities = []
+    ): ?object
+    {
+        foreach ($this->_connection->database->auth->like(sprintf('%s%%', $request)) as $auth)
+        {
+            $identities[$auth->identity] = $auth->request;
+        }
+
+        if ($identities)
+        {
+            uasort(
+                $identities,
+                function ($a, $b)
+                {
+                    return mb_strlen($b) <=> mb_strlen($a);
+                }
+            );
+
+            return $this->_connection->database->identity->get(
+                intval(
+                    array_key_first(
+                        $identities
+                    )
+                )
+            );
+        }
+
+        return null;
     }
 
     public static function getMimeByMeta(
