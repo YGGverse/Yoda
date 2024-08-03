@@ -72,16 +72,24 @@ class Auth
         );
 
         // Init new certificate option
-        $this->_options[0] = new Auth\Option\Identity(
+        $this->_options[
+            Auth\Option\Identity::ID_CRT_NEW
+        ] = new Auth\Option\Identity(
             $this
         );
 
-        $this->_options[0]->setGroup(
-            $this->_options[0]
+        $this->_options[
+            Auth\Option\Identity::ID_CRT_NEW
+        ]->setGroup(
+            $this->_options[
+                Auth\Option\Identity::ID_CRT_NEW
+            ]
         );
 
-        $this->_options[0]->setLabel(
-            0, null
+        $this->_options[
+            Auth\Option\Identity::ID_CRT_NEW
+        ]->setLabel(
+            Auth\Option\Identity::ID_CRT_NEW
         );
 
         // Search database for auth records
@@ -100,7 +108,9 @@ class Auth
                 );
 
                 $this->_options[$identity->id]->setGroup(
-                    $this->_options[0]
+                    $this->_options[
+                        Auth\Option\Identity::ID_CRT_NEW
+                    ]
                 );
 
                 $this->_options[$identity->id]->setLabel(

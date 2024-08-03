@@ -27,6 +27,8 @@ class Identity
     public const LABEL_NO_NAME = '#%d (no name)';
     public const LABEL_CRT_NEW = 'Create new for this resource';
 
+    public const ID_CRT_NEW = 0; // free < 0 > reserved by DB
+
     public function __construct(
         Auth $auth
     ) {
