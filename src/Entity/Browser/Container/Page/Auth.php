@@ -244,24 +244,20 @@ class Auth
 
         $option->connect(
             'toggled',
-            function (
-                GtkRadioButton $self
-            ) {
+            function(): void
+            {
                 // Detect active option
                 foreach ($this->_options as $id => $option)
                 {
                     // Is new
                     if (!$id)
                     {
-                        if ($option->get_active())
-                        {
-                            $this->name->show();
-                        }
+                        // Update sensibility
+                        $this->name->set_sensitive(
+                            $option->get_active()
+                        );
 
-                        else
-                        {
-                            $this->name->hide();
-                        }
+                        break;
                     }
                 }
             }
