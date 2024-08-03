@@ -7,7 +7,6 @@ namespace Yggverse\Yoda\Entity\Browser\Container\Page;
 use \Exception;
 use \GtkButtonsType;
 use \GtkDialogFlags;
-use \GtkEntry;
 use \GtkLabel;
 use \GtkMessageDialog;
 use \GtkMessageType;
@@ -33,47 +32,17 @@ class Auth
     public const DIALOG_FORMAT_SECONDARY_TEXT = 'Select identity';
     public const DIALOG_MESSAGE_FORMAT = 'Authorization';
     public const DIALOG_CONTENT_OPTION_LABEL_CREATE = 'Create new for this resource';
-    public const DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME = '#%d (%s)';
-    public const DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME_DEFAULT = '#%d (no name)';
     public const DIALOG_CONTENT_OPTION_MARGIN = 8;
     public const DIALOG_CONTENT_SPACING = 1;
 
-    public const DIALOG_CONTENT_OPTION_NAME_ALIGNMENT = 0.5;
-    public const DIALOG_CONTENT_OPTION_NAME_MARGIN = 12;
-    public const DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER = 'Local name (optional)';
-
     // Extras
     private array $_options = []; // GtkRadioButton
-    private GtkEntry $_name;
 
     public function __construct(
         Page $page
     ) {
         // Init dependencies
         $this->page = $page;
-
-        // Init extras
-        $this->_name = new GtkEntry;
-
-        $this->_name->set_alignment(
-            $this::DIALOG_CONTENT_OPTION_NAME_ALIGNMENT
-        );
-
-        $this->_name->set_placeholder_text(
-            _($this::DIALOG_CONTENT_OPTION_NAME_PLACEHOLDER)
-        );
-
-        $this->_name->set_margin_start(
-            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
-        );
-
-        $this->_name->set_margin_end(
-            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
-        );
-
-        $this->_name->set_margin_bottom(
-            $this::DIALOG_CONTENT_OPTION_NAME_MARGIN
-        );
     }
 
     public function dialog(): bool
@@ -103,12 +72,16 @@ class Auth
         );
 
         // Init new certificate option
-        $this->_options[0] = $this->_option(
-            _($this::DIALOG_CONTENT_OPTION_LABEL_CREATE)
+        $this->_options[0] = new Auth\Option\Identity(
+            $this
         );
 
-        $this->_options[0]->join_group(
+        $this->_options[0]->setGroup(
             $this->_options[0]
+        );
+
+        $this->_options[0]->setLabel(
+            0, _($this::DIALOG_CONTENT_OPTION_LABEL_CREATE)
         );
 
         // Search database for auth records
@@ -122,19 +95,17 @@ class Auth
             // Get related identity records
             if ($identity = $this->page->container->browser->database->identity->get($auth->identity))
             {
-                $this->_options[$identity->id] = $this->_option(
-                    $identity->name ? sprintf(
-                        _($this::DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME),
-                        $identity->id,
-                        $identity->name
-                    ) : sprintf(
-                        _($this::DIALOG_CONTENT_OPTION_LABEL_IDENTITY_NAME_DEFAULT),
-                        $identity->id
-                    )
+                $this->_options[$identity->id] = new Auth\Option\Identity(
+                    $this
                 );
 
-                $this->_options[$identity->id]->join_group(
+                $this->_options[$identity->id]->setGroup(
                     $this->_options[0]
+                );
+
+                $this->_options[$identity->id]->setLabel(
+                    $identity->id,
+                    $identity->name
                 );
             }
         }
@@ -151,15 +122,15 @@ class Auth
         {
             // Append option
             $content->add(
-                $option
+                $option->gtk
             );
 
-            // Is new
-            if (!$id)
+            // Is new and option has name entity
+            if (!$id && !is_null($option->name))
             {
                 // Append name entry after new identity option
                 $content->add(
-                    $this->_name,
+                    $option->name,
                     true,
                     true,
                     0
@@ -173,7 +144,7 @@ class Auth
                 );
 
                 // Set margin
-                $option->set_margin_bottom(
+                $option->gtk->set_margin_bottom(
                     self::DIALOG_CONTENT_OPTION_MARGIN
                 );
             }
@@ -193,7 +164,7 @@ class Auth
             // Find active option
             foreach ($this->_options as $id => $option)
             {
-                if ($option->get_active())
+                if ($option->gtk->get_active())
                 {
                     // Auth
                     if ($id)
@@ -249,50 +220,21 @@ class Auth
         return false;
     }
 
-    private function _option(
-        string $label,
-        int $margin = self::DIALOG_CONTENT_OPTION_MARGIN
-    ): GtkRadioButton
+    public function refresh(): void
     {
-        $option = new GtkRadioButton;
-
-        $option->set_label(
-            $label
-        );
-
-        $option->set_margin_top(
-            $margin
-        );
-
-        $option->set_margin_start(
-            $margin
-        );
-
-        $option->set_margin_end(
-            $margin
-        );
-
-        $option->connect(
-            'toggled',
-            function(): void
+        // Detect active option
+        foreach ($this->_options as $id => $option)
+        {
+            // Is new and option has name entity
+            if (!$id && !is_null($option->name))
             {
-                // Detect active option
-                foreach ($this->_options as $id => $option)
-                {
-                    // Is new
-                    if (!$id)
-                    {
-                        // Update sensibility
-                        $this->_name->set_sensitive(
-                            $option->get_active()
-                        );
+                // Update sensibility
+                $option->name->gtk->set_sensitive(
+                    $option->gtk->get_active()
+                );
 
-                        break;
-                    }
-                }
+                break;
             }
-        );
-
-        return $option;
+        }
     }
 }
