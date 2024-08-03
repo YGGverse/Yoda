@@ -97,7 +97,7 @@ class Auth
         ]->useName();
 
         // Search database for auth records
-        foreach ($this->page->container->browser->database->auth->like(
+        foreach ($this->page->container->browser->database->auth->match(
             sprintf(
                 '%s%%',
                 $this->page->navbar->request->getValue()
@@ -201,6 +201,11 @@ class Auth
 
                                 // Init identity model
                                 $identity = new Gemini;
+
+                                // Logout previous set
+                                $this->page->container->browser->database->auth->logout(
+                                    $this->page->navbar->request->getValue()
+                                );
 
                                 // Add new auth record
                                 $this->page->container->browser->database->auth->add(

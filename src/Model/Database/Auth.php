@@ -98,37 +98,8 @@ class Auth
         return null;
     }
 
-    public function find(
-        string $request  = '',
-        int $start = 0,
-        int $limit = 1000
-    ): array
-    {
-        $query = $this->_connection->prepare(
-            sprintf(
-                'SELECT * FROM `auth`
-                          WHERE `request` LIKE :request
-                          ORDER BY `request` ASC
-                          LIMIT %d,%d',
-                $start,
-                $limit
-            )
-        );
-
-        $query->execute(
-            [
-                ':request' => sprintf(
-                    '%%%s%%',
-                    $request
-                )
-            ]
-        );
-
-        return $query->fetchAll();
-    }
-
-    public function like(
-        string $request  = '',
+    public function match(
+        string $request = '',
         int $start = 0,
         int $limit = 1000
     ): array
@@ -151,5 +122,21 @@ class Auth
         );
 
         return $query->fetchAll();
+    }
+
+    public function logout(
+        string $request
+    ): int
+    {
+        $records = 0;
+
+        foreach ($this->match($request) as $record)
+        {
+            $records += $this->delete(
+                $record->id
+            );
+        }
+
+        return $records;
     }
 }
