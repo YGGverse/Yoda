@@ -194,7 +194,7 @@ class Auth
                                 $this->page->container->browser->database->identity->add(
                                     $identity->crt(),
                                     $identity->key(),
-                                    $this->name->get_text()
+                                    $this->name->get_text() ? $this->name->get_text() : null
                                 ),
                                 $this->page->navbar->request->getValue()
                             );
