@@ -8,10 +8,13 @@ use \Exception;
 use \GtkButtonsType;
 use \GtkDialogFlags;
 use \GtkEntry;
+use \GtkLabel;
 use \GtkMessageDialog;
 use \GtkMessageType;
+use \GtkOrientation;
 use \GtkRadioButton;
 use \GtkResponseType;
+use \GtkSeparator;
 
 use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
@@ -136,6 +139,13 @@ class Auth
             }
         }
 
+        // Append separator
+        $content->add(
+            new GtkSeparator(
+                GtkOrientation::VERTICAL
+            )
+        );
+
         // Build options list
         foreach ($this->_options as $id => $option)
         {
@@ -144,17 +154,35 @@ class Auth
                 $option
             );
 
-            // Append name entry after new identity option
+            // Is new
             if (!$id)
             {
+                // Append name entry after new identity option
                 $content->add(
                     $this->_name,
                     true,
                     true,
                     0
                 );
+
+                // Append separator
+                $content->add(
+                    new GtkSeparator(
+                        GtkOrientation::VERTICAL
+                    )
+                );
+
+                // Set margin
+                $option->set_margin_bottom(
+                    self::DIALOG_CONTENT_OPTION_MARGIN
+                );
             }
         }
+
+        // Append empty line separator
+        $content->add(
+            new GtkLabel
+        );
 
         // Render
         $this->gtk->show_all();
@@ -228,15 +256,15 @@ class Auth
             $label
         );
 
+        $option->set_margin_top(
+            $margin
+        );
+
         $option->set_margin_start(
             $margin
         );
 
         $option->set_margin_end(
-            $margin
-        );
-
-        $option->set_margin_bottom(
             $margin
         );
 
