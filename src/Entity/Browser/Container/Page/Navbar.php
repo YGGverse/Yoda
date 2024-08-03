@@ -18,6 +18,7 @@ class Navbar
     public Page $page;
 
     // Requirements
+    public Navbar\Auth $auth;
     public Navbar\Base $base;
     public Navbar\Bookmark $bookmark;
     public Navbar\History $history;
@@ -106,12 +107,22 @@ class Navbar
             $this->bookmark->gtk
         );
 
+        // Append auth button
+        $this->auth = new Navbar\Auth(
+            $this
+        );
+
+        $this->gtk->add(
+            $this->auth->gtk
+        );
+
         // Render
         $this->gtk->show();
     }
 
     public function refresh()
     {
+        $this->auth->refresh();
         $this->base->refresh();
         $this->bookmark->refresh();
         $this->history->refresh();
