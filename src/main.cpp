@@ -4,7 +4,7 @@ void activate(
     GtkApplication *application
 ) {
     // Init default component
-    new YodaBrowser(
+    new Yoda::Browser(
         application
     );
 }

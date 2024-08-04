@@ -3,19 +3,22 @@
 
 #include "../main.h"
 
-class YodaBrowser
+namespace Yoda
 {
-    public:
+    class Browser
+    {
+        public:
 
-        GtkWidget *gtk;
+            GtkWidget *gtk;
 
-        const guint WIDTH = 640;
-        const guint HEIGHT = 480;
-        const gchar* TITLE = "Yoda";
+            const guint WIDTH = 640;
+            const guint HEIGHT = 480;
+            const gchar* TITLE = "Yoda";
 
-        YodaBrowser(
-            GtkApplication *application
-        );
+            Browser(
+                GtkApplication *application
+            );
+    };
 };
 
 #endif
