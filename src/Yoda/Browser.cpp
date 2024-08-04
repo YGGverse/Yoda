@@ -4,7 +4,9 @@ YodaBrowser::YodaBrowser(
     GtkApplication *application
 ) {
     this->gtk = gtk_application_window_new(
-        application
+        GTK_APPLICATION(
+            application
+        )
     );
 
     gtk_window_set_title(
