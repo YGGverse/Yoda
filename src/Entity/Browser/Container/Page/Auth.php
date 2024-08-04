@@ -357,9 +357,11 @@ class Auth
 
                     // Update sensibility
                     $option->gtk->set_sensitive(
-                        count(
-                            $this->_options
-                        ) > 2
+                        boolval(
+                            count(
+                                $this->_options
+                            ) > 2
+                        )
                     );
 
                 break;
