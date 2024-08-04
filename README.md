@@ -1,4 +1,4 @@
-# Yoda is GTK Browser for [Gemini protocol](https://geminiprotocol.net)
+# Yoda - GTK Browser for [Gemini protocol](https://geminiprotocol.net)
 
 > [!IMPORTANT]
 > This is experimental branch, checkout [master](https://github.com/YGGverse/Yoda/tree/master) for C++ implementation
