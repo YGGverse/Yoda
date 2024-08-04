@@ -8,6 +8,10 @@ use \Exception;
 use \OpenSSLAsymmetricKey;
 use \OpenSSLCertificate;
 
+use \Yggverse\Net\Address;
+
+use \Yggverse\Yoda\Model\Database;
+
 class Gemini extends \Yggverse\Yoda\Abstract\Model\Identity
 {
     // Init defaults
@@ -78,5 +82,72 @@ class Gemini extends \Yggverse\Yoda\Abstract\Model\Identity
         }
 
         throw new Exception;
+    }
+
+    /**
+     * Return identity match Address | NULL
+     *
+     * https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
+     *
+     */
+    public static function match(
+        Address $address,
+        Database $database,
+        array $identities = []
+    ): ?object
+    {
+        foreach (
+            // Select host records
+            $database->auth->like(
+                sprintf(
+                    '%s%%',
+                    $address->get(
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false
+                    )
+                )
+            ) as $auth
+        ) {
+            // Parse result address
+            $request = new Address(
+                $auth->request
+            );
+
+            // Filter results match current path prefix
+            if (str_starts_with($address->getPath(), $request->getPath()))
+            {
+                $identities[
+                    $auth->identity
+                ] = $auth->request;
+            }
+        }
+
+        // Results found
+        if ($identities)
+        {
+            uasort( // max-level
+                $identities,
+                function ($a, $b)
+                {
+                    return mb_strlen($b) <=> mb_strlen($a);
+                }
+            );
+
+            return $database->identity->get(
+                intval(
+                    array_key_first(
+                        $identities
+                    )
+                )
+            );
+        }
+
+        return null;
     }
 }

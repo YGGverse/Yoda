@@ -47,7 +47,7 @@ class Name
         );
 
         $this->gtk->set_margin_bottom(
-            $this::MARGIN
+            $this::MARGIN * 2
         );
 
         $this->gtk->show();

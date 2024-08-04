@@ -6,6 +6,7 @@ namespace Yggverse\Yoda\Model\Connection;
 
 use \Yggverse\Yoda\Model\Connection;
 use \Yggverse\Yoda\Model\Filesystem;
+use \Yggverse\Yoda\Model\Identity\Gemini as Identity;
 
 use \Yggverse\Gemini\Client\Request;
 use \Yggverse\Gemini\Client\Response;
@@ -36,7 +37,7 @@ class Gemini
         $options = $request->getOptions();
 
         // Apply identity if available
-        if ($identity = $this->matchIdentity($address))
+        if ($identity = Identity::match($address, $this->_connection->database))
         {
             $crt = tmpfile();
 
@@ -364,72 +365,6 @@ class Gemini
         $this->_connection->setCompleted(
             true
         );
-    }
-
-    /**
-     * Return identity match request | NULL
-     *
-     * https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
-     *
-     */
-    public function matchIdentity(
-        Address $address,
-        array $identities = []
-    ): ?object
-    {
-        foreach (
-            // Select host records
-            $this->_connection->database->auth->like(
-                sprintf(
-                    '%s%%',
-                    $address->get(
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        false,
-                        false,
-                        false
-                    )
-                )
-            ) as $auth
-        ) {
-            // Parse result address
-            $request = new Address(
-                $auth->request
-            );
-
-            // Filter results match current path prefix
-            if (str_starts_with($address->getPath(), $request->getPath()))
-            {
-                $identities[
-                    $auth->identity
-                ] = $auth->request;
-            }
-        }
-
-        // Results found
-        if ($identities)
-        {
-            uasort( // max-level
-                $identities,
-                function ($a, $b)
-                {
-                    return mb_strlen($b) <=> mb_strlen($a);
-                }
-            );
-
-            return $this->_connection->database->identity->get(
-                intval(
-                    array_key_first(
-                        $identities
-                    )
-                )
-            );
-        }
-
-        return null;
     }
 
     public static function getMimeByMeta(

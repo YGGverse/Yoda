@@ -19,6 +19,8 @@ use \Yggverse\Yoda\Entity\Browser\Container\Page;
 
 use \Yggverse\Yoda\Model\Identity\Gemini;
 
+use \Yggverse\Net\Address;
+
 class Auth
 {
     // GTK
@@ -161,49 +163,85 @@ class Auth
         // Build options list
         foreach ($this->_options as $id => $option)
         {
-            // Detect active identity
-            $option->gtk->set_active(
-                boolval(
-                    $this->page->container->browser->database->auth->like(
-                        $this->page->navbar->request->getValue(), 1 // one
-                    )
-                )
-            );
-
-            // Append option
-            $content->add(
-                $option->gtk
-            );
-
-            // Is new and option has name entity
-            if (!$id && !is_null($option->name))
+            // Detect option type
+            switch ($id)
             {
-                // Append name entry after new identity option
-                $content->add(
-                    $option->name->gtk,
-                    true,
-                    true,
-                    0
-                );
+                // Is new cert option
+                case Auth\Option\Identity::ID_CRT_NEW:
 
-                // Append separator
-                $content->add(
-                    new GtkSeparator(
-                        GtkOrientation::VERTICAL
-                    )
-                );
+                    // Set extra margin
+                    $option->gtk->set_margin_bottom(
+                        $option::MARGIN
+                    );
 
-                // Set margin
-                $option->gtk->set_margin_bottom(
-                    self::MARGIN
-                );
+                    // Append option
+                    $content->add(
+                        $option->gtk
+                    );
+
+                    // Append name entry after new identity option
+                    $content->add(
+                        $option->name->gtk,
+                        true,
+                        true,
+                        0
+                    );
+
+                    // Append separator
+                    $content->add(
+                        new GtkSeparator(
+                            GtkOrientation::VERTICAL
+                        )
+                    );
+
+                break;
+
+                // Is logout option
+                case Auth\Option\Identity::ID_LOG_OUT:
+
+                    // Set extra margin
+                    $option->gtk->set_margin_bottom(
+                        $option::MARGIN
+                    );
+
+                    // Append option
+                    $content->add(
+                        $option->gtk
+                    );
+
+                break;
+
+                // Is DB
+                default:
+
+                    // Append option
+                    $content->add(
+                        $option->gtk
+                    );
+
+                    // Detect active option match identity driver conditions
+                    switch (true)
+                    {
+                        case parse_url(
+                            $this->page->navbar->request->getValue(),
+                            PHP_URL_SCHEME
+                        ) == 'gemini':
+
+                            $option->gtk->set_active(
+                                boolval(
+                                    Gemini::match(
+                                        new Address(
+                                            $this->page->navbar->request->getValue()
+                                        ),
+                                        $this->page->container->browser->database
+                                    )
+                                )
+                            );
+
+                        break;
+                    }
             }
         }
-
-        // Add final separator
-        $content->add(
-            new GtkLabel
-        );
 
         // Render
         $this->gtk->show_all();
@@ -216,7 +254,7 @@ class Auth
             {
                 if ($option->gtk->get_active())
                 {
-                    // Route ID
+                    // Detect option type
                     switch ($id)
                     {
                         case Auth\Option\Identity::ID_LOG_OUT:
@@ -299,13 +337,19 @@ class Auth
         // Detect active option
         foreach ($this->_options as $id => $option)
         {
-            // Is new and option has name entity
-            if (!$id && !is_null($option->name))
+            // Detect option type
+            switch ($id)
             {
-                // Update sensibility
-                $option->name->gtk->set_sensitive(
-                    $option->gtk->get_active()
-                );
+                case Auth\Option\Identity::ID_CRT_NEW:
+
+                    // Is name entity defined
+                    if (!is_null($option->name))
+                    {
+                        // Update sensibility
+                        $option->name->gtk->set_sensitive(
+                            $option->gtk->get_active()
+                        );
+                    }
 
                 break;
             }
