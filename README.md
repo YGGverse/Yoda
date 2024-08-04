@@ -1,7 +1,7 @@
-# Yoda - GTK Browser for [Gemini protocol](https://geminiprotocol.net)
+# Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
 > [!IMPORTANT]
-> This is experimental branch, checkout [master](https://github.com/YGGverse/Yoda/tree/master) for C++ implementation
+> This is experimental PHP-GTK3 branch, checkout [master](https://github.com/YGGverse/Yoda/tree/master) for GTK 4 / C++ implementation
 >
 
 ## Install
