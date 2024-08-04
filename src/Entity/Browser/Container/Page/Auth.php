@@ -257,15 +257,6 @@ class Auth
                     // Detect option type
                     switch ($id)
                     {
-                        case Auth\Option\Identity::ID_LOG_OUT:
-
-                            // Logout previous session
-                            $this->page->container->browser->database->auth->logout(
-                                $this->page->navbar->request->getValue()
-                            );
-
-                        break;
-
                         case Auth\Option\Identity::ID_CRT_NEW:
 
                             // Logout previous session
@@ -300,6 +291,15 @@ class Auth
 
                                     throw new Exception;
                             }
+
+                        break;
+
+                        case Auth\Option\Identity::ID_LOG_OUT:
+
+                            // Logout previous session
+                            $this->page->container->browser->database->auth->logout(
+                                $this->page->navbar->request->getValue()
+                            );
 
                         break;
 
@@ -350,6 +350,17 @@ class Auth
                             $option->gtk->get_active()
                         );
                     }
+
+                break;
+
+                case Auth\Option\Identity::ID_LOG_OUT:
+
+                    // Update sensibility
+                    $option->gtk->set_sensitive(
+                        count(
+                            $this->_options
+                        ) > 2
+                    );
 
                 break;
             }
