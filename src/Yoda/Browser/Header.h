@@ -1,7 +1,8 @@
 #ifndef YODA_BROWSER_HEADER_H
 #define YODA_BROWSER_HEADER_H
 
-#include "../../main.h"
+// Dependencies
+#include "../Browser.h"
 
 namespace YodaBrowser
 {

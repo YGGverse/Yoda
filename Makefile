@@ -5,7 +5,9 @@ LDFLAGS = `pkg-config --libs gtk4`
 
 # Define target executable and source files
 TARGET = bin/Yoda
-SRCS =  src/main.cpp $(wildcard src/**/*.cpp)
+SRCS =  src/*.cpp\
+		src/Yoda/*.cpp\
+		src/Yoda/Browser/*.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
