@@ -3,6 +3,8 @@
 
 #include "../main.h"
 
+#include "Browser/Header.h"
+
 namespace Yoda
 {
     class Browser
@@ -13,7 +15,6 @@ namespace Yoda
 
             const guint WIDTH = 640;
             const guint HEIGHT = 480;
-            const gchar* TITLE = "Yoda";
 
             Browser(
                 GtkApplication *application

@@ -1,8 +1,7 @@
 #include "Header.h"
 
-YodaBrowser::Header::Header(
-    Yoda::Browser *browser
-) {
+YodaBrowser::Header::Header()
+{
     // Init GTK
     this->gtk = gtk_header_bar_new();
 

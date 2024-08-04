@@ -9,13 +9,6 @@ Yoda::Browser::Browser(
         )
     );
 
-    gtk_window_set_title(
-        GTK_WINDOW(
-            this->gtk
-        ),
-        Browser::TITLE
-    );
-
     gtk_window_set_default_size(
         GTK_WINDOW(
             this->gtk
@@ -24,15 +17,11 @@ Yoda::Browser::Browser(
         Browser::HEIGHT
     );
 
-    GtkWidget *label = gtk_label_new(
-        "Hello, World!"
-    );
-
-    gtk_window_set_child(
+    gtk_window_set_titlebar(
         GTK_WINDOW(
             this->gtk
         ),
-        label
+        (new YodaBrowser::Header())->gtk
     );
 
     gtk_widget_show(
@@ -40,6 +29,4 @@ Yoda::Browser::Browser(
             this->gtk
         )
     );
-
-    // @TODO signals
 }
