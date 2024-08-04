@@ -1,4 +1,4 @@
-# Yoda is C++ Browser for [Gemini protocol](https://geminiprotocol.net)
+# Yoda - GTK Browser for [Gemini protocol](https://geminiprotocol.net)
 
 > [!IMPORTANT]
 > Project in development!
