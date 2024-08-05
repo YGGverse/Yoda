@@ -12,6 +12,7 @@ SRCS =  src/main.cpp\
 		src/app/browser/container/tab.cpp\
 		src/app/browser/header.cpp\
 		src/app/browser/header/bar.cpp\
+		src/app/browser/header/bar/title.cpp\
 		src/app/browser/menu.cpp
 
 OBJS = $(SRCS:.cpp=.o)

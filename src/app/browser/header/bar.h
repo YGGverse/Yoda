@@ -6,6 +6,7 @@
 
 // Requirements
 #include "../menu.h"
+#include "bar/title.h"
 
 namespace app
 {
@@ -17,6 +18,11 @@ namespace app
 
         namespace header
         {
+            namespace bar
+            {
+                class Title;
+            };
+
             class Bar
             {
                 public:
@@ -32,6 +38,7 @@ namespace app
 
                     // Requirements
                     Menu *menu;
+                    bar::Title *title;
 
                     Bar(
                         Header *header

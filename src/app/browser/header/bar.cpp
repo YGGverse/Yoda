@@ -33,6 +33,20 @@ namespace app
                     )
                 );
 
+                // Init title
+                this->title = new bar::Title(
+                    this
+                );
+
+                gtk_box_append(
+                    GTK_BOX(
+                        this->gtk
+                    ),
+                    GTK_WIDGET(
+                        this->title->gtk
+                    )
+                );
+
                 // Render
                 gtk_widget_show(
                     GTK_WIDGET(
