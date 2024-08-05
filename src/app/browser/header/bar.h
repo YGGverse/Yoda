@@ -12,7 +12,7 @@ namespace app
 
         namespace header
         {
-            class Title
+            class Bar
             {
                 public:
 
@@ -25,7 +25,7 @@ namespace app
                     // Dependencies
                     Header *header;
 
-                    Title(
+                    Bar(
                         Header *header
                     );
             };

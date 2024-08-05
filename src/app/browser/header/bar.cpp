@@ -1,4 +1,4 @@
-#include "title.h"
+#include "bar.h"
 
 namespace app
 {
@@ -7,13 +7,13 @@ namespace app
         namespace header
         {
             // Construct
-            Title::Title(
+            Bar::Bar(
                 Header *header
             ) {
                 // Init GTK
                 this->gtk = gtk_box_new(
                     GTK_ORIENTATION_HORIZONTAL,
-                    Title::SPACING
+                    Bar::SPACING
                 );
 
                 gtk_widget_show(
