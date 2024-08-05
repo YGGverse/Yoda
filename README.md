@@ -8,7 +8,9 @@ GTK 4 / C++ implementation branch
 
 ## Dependencies
 
-* `sudo apt install git libgtk-4-dev`
+``` bash
+sudo apt install git libgtk-4-dev
+```
 
 ## Install
 
