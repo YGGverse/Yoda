@@ -19,6 +19,20 @@ namespace app
                     this->gtk
                 )
             );
+
+            // Init tab
+            this->tab = new container::Tab(
+                this
+            );
+
+            gtk_box_append(
+                GTK_BOX(
+                    this->gtk
+                ),
+                GTK_WIDGET(
+                    this->tab
+                )
+            );
         }
     }
 }
