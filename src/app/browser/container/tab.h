@@ -17,6 +17,7 @@ namespace app
 
                     GtkWidget *gtk;
 
+                    const gboolean REORDERABLE = true;
                     const gboolean SCROLLABLE = true;
 
                     Tab(
