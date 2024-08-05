@@ -4,11 +4,16 @@
 // Dependencies
 #include "../header.h"
 
+// Requirements
+#include "../menu.h"
+
 namespace app
 {
     namespace browser
     {
         class Header;
+
+        class Menu;
 
         namespace header
         {
@@ -24,6 +29,9 @@ namespace app
 
                     // Dependencies
                     Header *header;
+
+                    // Requirements
+                    Menu *menu;
 
                     Bar(
                         Header *header
