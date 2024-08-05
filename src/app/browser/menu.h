@@ -1,7 +1,7 @@
 #ifndef APP_BROWSER_MENU_H
 #define APP_BROWSER_MENU_H
 
-#include "../menu.h"
+#include "../browser.h"
 
 namespace app
 {
