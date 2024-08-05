@@ -4,34 +4,28 @@
 // Dependencies
 #include "../bar.h"
 
-namespace app
+namespace app::browser::header
 {
-    namespace browser
+    class Bar;
+
+    namespace bar
     {
-        namespace header
+        class Title
         {
-            class Bar;
+            public:
 
-            namespace bar
-            {
-                class Title
-                {
-                    public:
+                // GTK
+                GtkWidget *gtk;
 
-                        // GTK
-                        GtkWidget *gtk;
+                // Defaults
+                const char* LABEL = "Yoda";
 
-                        // Defaults
-                        const char* LABEL = "Yoda";
+                // Dependencies
+                Bar *bar;
 
-                        // Dependencies
-                        Bar *bar;
-
-                        Title(
-                            Bar *bar
-                        );
-                };
-            };
+                Title(
+                    Bar *bar
+                );
         };
     };
 };
