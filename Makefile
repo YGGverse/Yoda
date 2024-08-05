@@ -8,6 +8,7 @@ TARGET = bin/Yoda
 SRCS =  src/main.cpp\
 		src/app/browser.cpp\
 		src/app/browser/container.cpp\
+		src/app/browser/container/page.cpp\
 		src/app/browser/container/tab.cpp\
 		src/app/browser/header.cpp
 
