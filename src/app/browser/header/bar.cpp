@@ -20,8 +20,8 @@ namespace app
                 );
 
                 // Init menu
-                this->menu = new Menu(
-                    this->header->browser
+                this->menu = new bar::Menu(
+                    this
                 );
 
                 gtk_box_append(

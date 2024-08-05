@@ -5,45 +5,42 @@
 #include "../header.h"
 
 // Requirements
-#include "../menu.h"
+#include "bar/menu.h"
 #include "bar/title.h"
 
-namespace app
+namespace app::browser
 {
-    namespace browser
+    class Header;
+
+    namespace header
     {
-        class Header;
-
-        class Menu;
-
-        namespace header
+        namespace bar
         {
-            namespace bar
-            {
-                class Title;
-            };
+            class Menu;
 
-            class Bar
-            {
-                public:
+            class Title;
+        };
 
-                    // GTK
-                    GtkWidget *gtk;
+        class Bar
+        {
+            public:
 
-                    // Defaults
-                    const gint SPACING = 0;
+                // GTK
+                GtkWidget *gtk;
 
-                    // Dependencies
-                    Header *header;
+                // Defaults
+                const gint SPACING = 0;
 
-                    // Requirements
-                    Menu *menu;
-                    bar::Title *title;
+                // Dependencies
+                Header *header;
 
-                    Bar(
-                        Header *header
-                    );
-            };
+                // Requirements
+                bar::Menu *menu;
+                bar::Title *title;
+
+                Bar(
+                    Header *header
+                );
         };
     };
 };
