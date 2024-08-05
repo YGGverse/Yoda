@@ -6,10 +6,13 @@ namespace app
     Browser::Browser(
         GtkApplication *application
     ) {
+        // Init dependencies
+        this->application = application;
+
         // Init GTK
         this->gtk = gtk_application_window_new(
             GTK_APPLICATION(
-                application
+                this->application
             )
         );
 

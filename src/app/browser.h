@@ -21,12 +21,15 @@ namespace app
             // GTK
             GtkWidget *gtk;
 
-            // Defaults
-            const guint WIDTH = 640;
-            const guint HEIGHT = 480;
+            // Dependencies
+            GtkApplication *application;
 
             // Requirements
             browser::Header *header;
+
+            // Defaults
+            const guint WIDTH = 640;
+            const guint HEIGHT = 480;
 
             Browser(
                 GtkApplication *application
