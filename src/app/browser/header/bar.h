@@ -37,7 +37,7 @@ namespace app
                         Header *header
                     );
             };
-        }
+        };
     };
 };
 
