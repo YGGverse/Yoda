@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_HEADER_TITLE_H
-#define APP_BROWSER_HEADER_TITLE_H
+#ifndef APP_BROWSER_HEADER_BAR_H
+#define APP_BROWSER_HEADER_BAR_H
 
 // Dependencies
 #include "../header.h"
