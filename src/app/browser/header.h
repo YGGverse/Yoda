@@ -5,7 +5,7 @@
 #include "../browser.h"
 
 // Requirements
-#include "menu.h"
+#include "header/bar.h"
 
 namespace app
 {
@@ -13,7 +13,10 @@ namespace app
 
     namespace browser
     {
-        class Menu;
+        namespace header
+        {
+            class Bar;
+        }
 
         class Header
         {
@@ -29,7 +32,7 @@ namespace app
                 Browser *browser;
 
                 // Requirements
-                Menu *menu;
+                header::Bar *bar;
 
                 Header(
                     Browser *browser

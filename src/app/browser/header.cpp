@@ -26,7 +26,7 @@ namespace app
                 GTK_HEADER_BAR(
                     this->gtk
                 ),
-                (new Menu(this->browser))->gtk // @TODO
+                (new header::Bar(this))->gtk // @TODO
             );
 
             // Render
