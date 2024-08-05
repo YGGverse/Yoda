@@ -1,7 +1,7 @@
 #include <iostream>
 #include <gtk/gtk.h>
 
-#include "Yoda/Browser.h"
+#include "app/browser.h"
 
 void static activate(
     GtkApplication *application
