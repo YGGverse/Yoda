@@ -21,7 +21,9 @@ int main(
 
     // Connect the "activate" signal to the callback function
     g_signal_connect(
-        application,
+        G_APPLICATION(
+            application
+        ),
         "activate",
         G_CALLBACK(
             activate
