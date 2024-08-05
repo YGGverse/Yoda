@@ -1,4 +1,4 @@
-# Yoda - GTK Browser for [Gemini protocol](https://geminiprotocol.net)
+# Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
 GTK 4 / C++ implementation branch
 
