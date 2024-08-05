@@ -22,6 +22,16 @@ namespace app
                     Page(
                         Container *container
                     );
+
+                    void init(
+                        char *request,
+                        bool focus
+                    );
+
+                    void open(
+                        char *request,
+                        bool history
+                    );
             };
         };
     };
