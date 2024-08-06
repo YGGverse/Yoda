@@ -5,7 +5,7 @@
 #include "../menu.h"
 
 // Requirements
-// ..
+#include "main/quit.h"
 
 namespace app::browser::header::bar
 {
@@ -13,8 +13,17 @@ namespace app::browser::header::bar
 
     namespace menu
     {
+        namespace main
+        {
+            class Quit;
+        };
+
         class Main
         {
+            private:
+
+                GMenu* _model;
+
             public:
 
                 // GTK
@@ -24,7 +33,7 @@ namespace app::browser::header::bar
                 Menu *menu;
 
                 // Requirements
-                // ..
+                main::Quit *quit;
 
                 // Constructor
                 Main(
