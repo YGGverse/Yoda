@@ -33,7 +33,9 @@ namespace app
             GTK_WINDOW(
                 this->gtk
             ),
-            this->header->gtk
+            GTK_WIDGET(
+                this->header->gtk
+            )
         );
 
         // Render
