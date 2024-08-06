@@ -17,7 +17,7 @@ namespace app::browser::header::bar::menu::main
 
         g_action_map_add_action(
             G_ACTION_MAP(
-                this->main->menu->bar->header->browser->application
+                this->main->menu->bar->header->browser->app
             ),
             G_ACTION(
                 this->action
@@ -46,7 +46,7 @@ namespace app::browser::header::bar::menu::main
 
         gtk_application_set_accels_for_action(
             GTK_APPLICATION(
-                this->main->menu->bar->header->browser->application
+                this->main->menu->bar->header->browser->app
             ),
             action,
             accels
@@ -68,7 +68,7 @@ namespace app::browser::header::bar::menu::main
                 Quit::_activate
             ),
             G_APPLICATION(
-                this->main->menu->bar->header->browser->application
+                this->main->menu->bar->header->browser->app
             )
         );
     }

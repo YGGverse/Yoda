@@ -7,12 +7,12 @@ namespace app
         GtkApplication *application
     ) {
         // Init dependencies
-        this->application = application;
+        this->app = application;
 
         // Init GTK
         this->gtk = gtk_application_window_new(
             GTK_APPLICATION(
-                this->application
+                this->app
             )
         );
 
@@ -46,7 +46,7 @@ namespace app
         // Connect signals
         g_signal_connect(
             G_APPLICATION(
-                this->application
+                this->app
             ),
             "shutdown",
             G_CALLBACK(

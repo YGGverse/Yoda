@@ -22,7 +22,7 @@ namespace app
             GtkWidget *gtk;
 
             // Dependencies
-            GtkApplication *application;
+            GtkApplication *app;
 
             // Requirements
             browser::Header *header;
