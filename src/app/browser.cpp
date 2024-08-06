@@ -24,7 +24,7 @@ namespace app
             Browser::HEIGHT
         );
 
-        // Init requirements
+        // Init components
         this->header = new browser::Header(
             this
         );
@@ -42,5 +42,25 @@ namespace app
                 this->gtk
             )
         );
+
+        // Connect signals
+        g_signal_connect(
+            G_APPLICATION(
+                this->application
+            ),
+            "shutdown",
+            G_CALLBACK(
+                _shutdown
+            ),
+            NULL
+        );
+    }
+
+    // Events
+    void Browser::_shutdown(
+        GtkApplication *application
+    ) {
+        // @TODO save session, clean cache, etc
+        g_print("Shutdown..\n");
     }
 }

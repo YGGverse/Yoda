@@ -31,7 +31,15 @@ namespace app
             const guint WIDTH = 640;
             const guint HEIGHT = 480;
 
+            // Constructor
             Browser(
+                GtkApplication *application
+            );
+
+        private:
+
+            // Events
+            static void _shutdown(
                 GtkApplication *application
             );
     };
