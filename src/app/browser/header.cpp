@@ -29,6 +29,18 @@ namespace app
                 (new header::Bar(this))->gtk // @TODO
             );
 
+            // Init new tab button
+            this->tab = new header::Tab(
+                this
+            );
+
+            gtk_header_bar_pack_start(
+                GTK_HEADER_BAR(
+                    this->gtk
+                ),
+                this->tab->gtk
+            );
+
             // Render
             gtk_widget_show(
                 GTK_WIDGET(

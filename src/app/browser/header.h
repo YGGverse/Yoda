@@ -6,6 +6,7 @@
 
 // Requirements
 #include "header/bar.h"
+#include "header/tab.h"
 
 namespace app
 {
@@ -16,6 +17,7 @@ namespace app
         namespace header
         {
             class Bar;
+            class Tab;
         }
 
         class Header
@@ -33,6 +35,7 @@ namespace app
 
                 // Requirements
                 header::Bar *bar;
+                header::Tab *tab;
 
                 Header(
                     Browser *browser
