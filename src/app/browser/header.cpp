@@ -22,7 +22,7 @@ namespace app
             );
 
             // Init title widget
-            gtk_header_bar_set_title_widget(
+            gtk_header_bar_pack_start(
                 GTK_HEADER_BAR(
                     this->gtk
                 ),

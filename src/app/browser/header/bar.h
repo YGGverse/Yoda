@@ -6,7 +6,6 @@
 
 // Requirements
 #include "bar/menu.h"
-#include "bar/title.h"
 
 namespace app::browser
 {
@@ -17,8 +16,6 @@ namespace app::browser
         namespace bar
         {
             class Menu;
-
-            class Title;
         };
 
         class Bar
@@ -36,7 +33,6 @@ namespace app::browser
 
                 // Requirements
                 bar::Menu *menu;
-                bar::Title *title;
 
                 Bar(
                     Header *header
