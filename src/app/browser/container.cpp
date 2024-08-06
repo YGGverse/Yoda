@@ -28,6 +28,13 @@ namespace app
                 )
             );
 
+            // @TODO append testing tab
+            this->tab->append(
+                NULL,
+                false,
+                true
+            );
+
             // Render
             gtk_widget_show(
                 GTK_WIDGET(
