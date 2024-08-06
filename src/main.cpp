@@ -19,7 +19,7 @@ int main(
         G_APPLICATION_DEFAULT_FLAGS
     );
 
-    // Connect the "activate" signal to the callback function
+    // Connect events
     g_signal_connect(
         G_APPLICATION(
             application
@@ -42,7 +42,9 @@ int main(
 
     // Clean up
     g_object_unref(
-        application
+        G_APPLICATION(
+            application
+        )
     );
 
     // Result
