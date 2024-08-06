@@ -1,13 +1,13 @@
 #include "menu.h"
 
-namespace app::browser::header::bar
+namespace app::browser::header
 {
     // Construct
     Menu::Menu(
-        Bar *bar
+        Header *header
     ) {
         // Init dependencies
-        this->bar = bar;
+        this->header = header;
 
         // Init GTK
         this->gtk = gtk_menu_button_new();

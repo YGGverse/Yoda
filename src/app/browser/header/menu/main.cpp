@@ -1,6 +1,6 @@
 #include "main.h"
 
-namespace app::browser::header::bar::menu
+namespace app::browser::header::menu
 {
     // Construct
     Main::Main(

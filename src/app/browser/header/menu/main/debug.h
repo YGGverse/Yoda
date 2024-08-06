@@ -1,15 +1,15 @@
-#ifndef APP_BROWSER_HEADER_BAR_MENU_QUIT_H
-#define APP_BROWSER_HEADER_BAR_MENU_QUIT_H
+#ifndef APP_BROWSER_HEADER_MENU_MAIN_DEBUG_H
+#define APP_BROWSER_HEADER_MENU_MAIN_DEBUG_H
 
 #include "../main.h"
 
-namespace app::browser::header::bar::menu
+namespace app::browser::header::menu
 {
     class Main;
 
     namespace main
     {
-        class Quit
+        class Debug
         {
             public:
 
@@ -22,16 +22,16 @@ namespace app::browser::header::bar::menu
                 Main *main;
 
                 // Defaults
-                const gchar *LABEL = "Quit";
+                const gchar *LABEL = "Debug";
 
-                const gchar *ACCEL_1 = "<Control>q";
-                const gchar *ACCEL_2 = "<Control>Q";
+                const gchar *ACCEL_1 = "<Control><Shift>i";
+                const gchar *ACCEL_2 = "<Control><Shift>I";
 
                 const gchar *ACTION_NS = "app.%s";
-                const gchar *ACTION_ID = "browser.header.bar.menu.main.quit.activate";
+                const gchar *ACTION_ID = "browser.header.menu.main.debug.activate";
 
                 // Construct
-                Quit(
+                Debug(
                     Main *main
                 );
 

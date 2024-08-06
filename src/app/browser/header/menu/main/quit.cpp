@@ -1,9 +1,9 @@
-#include "debug.h"
+#include "quit.h"
 
-namespace app::browser::header::bar::menu::main
+namespace app::browser::header::menu::main
 {
     // Construct
-    Debug::Debug(
+    Quit::Quit(
         Main *main
     ) {
         // Init dependencies
@@ -11,13 +11,13 @@ namespace app::browser::header::bar::menu::main
 
         // Init action object
         this->action = g_simple_action_new(
-            Debug::ACTION_ID,
+            Quit::ACTION_ID,
             NULL
         );
 
         g_action_map_add_action(
             G_ACTION_MAP(
-                this->main->menu->bar->header->browser->app
+                this->main->menu->header->browser->app
             ),
             G_ACTION(
                 this->action
@@ -32,21 +32,21 @@ namespace app::browser::header::bar::menu::main
             sizeof(
                 action
             ),
-            Debug::ACTION_NS,
-            Debug::ACTION_ID
+            Quit::ACTION_NS,
+            Quit::ACTION_ID
         );
 
         // Init keyboard accelerators
         // https://docs.gtk.org/gtk4/func.accelerator_parse.html
         const gchar *accels[] = {
-            Debug::ACCEL_1,  // First accelerator
-            Debug::ACCEL_2,  // Second accelerator
+            Quit::ACCEL_1,  // First accelerator
+            Quit::ACCEL_2,  // Second accelerator
             NULL
         };
 
         gtk_application_set_accels_for_action(
             GTK_APPLICATION(
-                this->main->menu->bar->header->browser->app
+                this->main->menu->header->browser->app
             ),
             action,
             accels
@@ -54,7 +54,7 @@ namespace app::browser::header::bar::menu::main
 
         // Init menu item object
         this->item = g_menu_item_new(
-            Debug::LABEL,
+            Quit::LABEL,
             action
         );
 
@@ -65,20 +65,24 @@ namespace app::browser::header::bar::menu::main
             ),
             "activate",
             G_CALLBACK(
-                Debug::_activate
+                Quit::_activate
             ),
-            NULL
+            G_APPLICATION(
+                this->main->menu->header->browser->app
+            )
         );
     }
 
     // Events
-    void Debug::_activate(
+    void Quit::_activate(
         GSimpleAction* action,
         GVariant* parameter,
         gpointer user_data
     ) {
-        gtk_window_set_interactive_debugging(
-            true
+        g_application_quit(
+            G_APPLICATION(
+                user_data
+            )
         );
     }
 }

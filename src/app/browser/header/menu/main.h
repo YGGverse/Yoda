@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_HEADER_BAR_MENU_MAIN_H
-#define APP_BROWSER_HEADER_BAR_MENU_MAIN_H
+#ifndef APP_BROWSER_HEADER_MENU_MAIN_H
+#define APP_BROWSER_HEADER_MENU_MAIN_H
 
 // Dependencies
 #include "../menu.h"
@@ -8,7 +8,7 @@
 #include "main/debug.h"
 #include "main/quit.h"
 
-namespace app::browser::header::bar
+namespace app::browser::header
 {
     class Menu;
 

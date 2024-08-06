@@ -21,15 +21,19 @@ namespace app
                 Header::SHOW_TITLE_BUTTONS
             );
 
-            // Init title widget
+            // Init menu element
+            this->menu = new header::Menu(
+                this
+            );
+
             gtk_header_bar_pack_start(
                 GTK_HEADER_BAR(
                     this->gtk
                 ),
-                (new header::Bar(this))->gtk // @TODO
+                this->menu->gtk
             );
 
-            // Init new tab button
+            // Init new tab element
             this->tab = new header::Tab(
                 this
             );

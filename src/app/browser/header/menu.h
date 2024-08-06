@@ -1,22 +1,22 @@
-#ifndef APP_BROWSER_HEADER_BAR_MENU_H
-#define APP_BROWSER_HEADER_BAR_MENU_H
+#ifndef APP_BROWSER_HEADER_MENU_H
+#define APP_BROWSER_HEADER_MENU_H
 
 // Dependencies
-#include "../bar.h"
+#include "../header.h"
 
 // Requirements
 #include "menu/main.h"
 
-namespace app::browser::header
+namespace app::browser
 {
-    class Bar;
+    class Header;
 
-    namespace bar
+    namespace header
     {
         namespace menu
         {
             class Main;
-        };
+        }
 
         class Menu
         {
@@ -26,14 +26,14 @@ namespace app::browser::header
                 GtkWidget *gtk;
 
                 // Dependencies
-                Bar *bar;
+                Header *header;
 
                 // Requirements
                 menu::Main *main;
 
                 // Constructor
                 Menu(
-                    Bar *bar
+                    Header *header
                 );
         };
     };
