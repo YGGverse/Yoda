@@ -10,7 +10,22 @@ namespace app::browser::header::menu
         this->menu = menu;
 
         // Init model
-        this->_model = g_menu_new();
+        this->model = g_menu_new();
+
+        // Init tab submenu
+        this->tab = new main::Tab(
+            this
+        );
+
+        g_menu_append_submenu(
+            G_MENU(
+                this->model
+            ),
+            this->tab->LABEL,
+            G_MENU_MODEL(
+                this->tab->model
+            )
+        );
 
         // Init debug menu
         this->debug = new main::Debug(
@@ -19,7 +34,7 @@ namespace app::browser::header::menu
 
         g_menu_append_item(
             G_MENU(
-                this->_model
+                this->model
             ),
             G_MENU_ITEM(
                 this->debug->item
@@ -33,7 +48,7 @@ namespace app::browser::header::menu
 
         g_menu_append_item(
             G_MENU(
-                this->_model
+                this->model
             ),
             G_MENU_ITEM(
                 this->quit->item
@@ -43,7 +58,7 @@ namespace app::browser::header::menu
         // Create a new GtkPopoverMenu from the GMenuModel
         this->gtk = gtk_popover_menu_new_from_model(
             G_MENU_MODEL(
-                this->_model
+                this->model
             )
         );
     }

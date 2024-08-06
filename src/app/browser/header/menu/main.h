@@ -5,6 +5,7 @@
 #include "../menu.h"
 
 // Requirements
+#include "main/tab.h"
 #include "main/debug.h"
 #include "main/quit.h"
 
@@ -16,25 +17,26 @@ namespace app::browser::header
     {
         namespace main
         {
+            class Tab;
             class Debug;
             class Quit;
         };
 
         class Main
         {
-            private:
-
-                GMenu* _model;
-
             public:
 
                 // GTK
                 GtkWidget *gtk;
 
+                // Gio
+                GMenu* model;
+
                 // Dependencies
                 Menu *menu;
 
                 // Requirements
+                main::Tab *tab;
                 main::Debug *debug;
                 main::Quit *quit;
 
