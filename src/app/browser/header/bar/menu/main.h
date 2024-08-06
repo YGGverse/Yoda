@@ -5,6 +5,7 @@
 #include "../menu.h"
 
 // Requirements
+#include "main/debug.h"
 #include "main/quit.h"
 
 namespace app::browser::header::bar
@@ -15,6 +16,7 @@ namespace app::browser::header::bar
     {
         namespace main
         {
+            class Debug;
             class Quit;
         };
 
@@ -33,6 +35,7 @@ namespace app::browser::header::bar
                 Menu *menu;
 
                 // Requirements
+                main::Debug *debug;
                 main::Quit *quit;
 
                 // Constructor
