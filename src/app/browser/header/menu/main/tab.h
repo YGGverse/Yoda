@@ -1,7 +1,11 @@
 #ifndef APP_BROWSER_HEADER_MENU_MAIN_TAB_H
 #define APP_BROWSER_HEADER_MENU_MAIN_TAB_H
 
+// Dependencies
 #include "../main.h"
+
+// Requirements
+#include "tab/append.h"
 
 namespace app::browser::header::menu
 {
@@ -9,6 +13,11 @@ namespace app::browser::header::menu
 
     namespace main
     {
+        namespace tab
+        {
+            class Append;
+        }
+
         class Tab
         {
             public:
@@ -23,6 +32,9 @@ namespace app::browser::header::menu
 
                 // Dependencies
                 Main *main;
+
+                // Requirements
+                tab::Append *append;
 
                 // Defaults
                 const gchar *LABEL = "Tab";
