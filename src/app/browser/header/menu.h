@@ -31,6 +31,9 @@ namespace app::browser
                 // Requirements
                 menu::Main *main;
 
+                // Defaults
+                const gchar *TOOLTIP = "Menu";
+
                 // Constructor
                 Menu(
                     Header *header

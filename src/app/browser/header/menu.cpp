@@ -12,6 +12,13 @@ namespace app::browser::header
         // Init GTK
         this->gtk = gtk_menu_button_new();
 
+        gtk_widget_set_tooltip_text(
+            GTK_WIDGET(
+                this->gtk
+            ),
+            Menu::TOOLTIP
+        );
+
         // Init requirements
         this->main = new menu::Main(
             this
