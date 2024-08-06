@@ -21,7 +21,8 @@ namespace app::browser
                 Header *header;
 
                 // Defaults
-                const gchar *LABEL = "New tab";
+                const gchar *ICON = "tab-new-symbolic";
+                const gchar *TOOLTIP = "New tab";
 
                 // Constructor
                 Tab(
