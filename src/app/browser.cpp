@@ -24,7 +24,7 @@ namespace app
             Browser::HEIGHT
         );
 
-        // Init components
+        // Init header
         this->header = new browser::Header(
             this
         );
@@ -35,6 +35,20 @@ namespace app
             ),
             GTK_WIDGET(
                 this->header->gtk
+            )
+        );
+
+        // Init container
+        this->container = new browser::Container(
+            this
+        );
+
+        gtk_window_set_child(
+            GTK_WINDOW(
+                this->gtk
+            ),
+            GTK_WIDGET(
+                this->container->gtk
             )
         );
 

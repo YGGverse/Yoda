@@ -6,12 +6,14 @@
 
 // Requirements
 #include "browser/header.h"
+#include "browser/container.h"
 
 namespace app
 {
     namespace browser
     {
         class Header;
+        class Container;
     }
 
     class Browser
@@ -26,6 +28,7 @@ namespace app
 
             // Requirements
             browser::Header *header;
+            browser::Container *container;
 
             // Defaults
             const guint WIDTH = 640;

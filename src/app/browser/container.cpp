@@ -14,13 +14,7 @@ namespace app
                 Container::SPACING
             );
 
-            gtk_widget_show(
-                GTK_WIDGET(
-                    this->gtk
-                )
-            );
-
-            // Init tab
+            // Init tabs component
             this->tab = new container::Tab(
                 this
             );
@@ -30,7 +24,14 @@ namespace app
                     this->gtk
                 ),
                 GTK_WIDGET(
-                    this->tab
+                    this->tab->gtk
+                )
+            );
+
+            // Render
+            gtk_widget_show(
+                GTK_WIDGET(
+                    this->gtk
                 )
             );
         }
