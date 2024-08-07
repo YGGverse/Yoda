@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef APP_BROWSER_CONTAINER_PAGE_H
 #define APP_BROWSER_CONTAINER_PAGE_H
 

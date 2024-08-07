@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef APP_BROWSER_HEADER_MENU_MAIN_QUIT_H
 #define APP_BROWSER_HEADER_MENU_MAIN_QUIT_H
 
