@@ -6,29 +6,18 @@ GTK 4 / C++ implementation branch
 > Project in development!
 >
 
-## Install
+## Build
 
-### Source
+### Linux
 
-#### Linux
-
-##### Dependencies
-
-``` bash
-sudo apt install git libgtk-4-dev
-```
-
-##### Build
-
+* `sudo apt install git libgtk-4-dev`
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
 * `git checkout master`
 * `make`
 
-###### Update
+#### Update
 
-* `cd Yoda`
-* `git checkout master`
 * `git pull`
 * `make clean`
 * `make`
