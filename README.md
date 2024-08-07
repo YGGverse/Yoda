@@ -10,7 +10,10 @@ GTK 4 / C++ implementation branch
 
 ### Linux
 
-* `sudo apt install git libgtk-4-dev`
+``` bash
+sudo apt install git libgtk-4-dev
+```
+
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
 * `git checkout master`
