@@ -12,12 +12,24 @@ Browser::Browser()
         WIDTH,
         HEIGHT
     );
+
+    set_titlebar(
+        * new Header()
+    );
 }
 
 Browser::Header::Header()
 {
     set_show_title_buttons(
         SHOW_TITLE_BUTTONS
+    );
+
+    pack_start(
+        * new Menu()
+    );
+
+    pack_start(
+        * new Tab()
     );
 }
 
