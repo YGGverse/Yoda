@@ -18,7 +18,7 @@ namespace app
 
             Browser();
 
-            class Header : Gtk::HeaderBar
+            class Header : public Gtk::HeaderBar
             {
                 public:
 
@@ -45,7 +45,7 @@ namespace app
                     };
             };
 
-            class Container : Gtk::Notebook
+            class Container : public Gtk::Notebook
             {
                 public:
 
