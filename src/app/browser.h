@@ -28,7 +28,12 @@ namespace app
 
         class Container : Gtk::Notebook
         {
+            public:
 
+                const bool SCROLLABLE = true;
+                const bool REORDERABLE = true;
+
+                Container();
         };
     };
 }

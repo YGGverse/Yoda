@@ -20,3 +20,10 @@ Browser::Header::Header()
         SHOW_TITLE_BUTTONS
     );
 }
+
+Browser::Container::Container()
+{
+    set_scrollable(
+        SCROLLABLE
+    );
+}
