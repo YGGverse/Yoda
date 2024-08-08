@@ -39,6 +39,7 @@ namespace app
                     {
                         public:
 
+                            const Glib::ustring ICON = "tab-new-symbolic";
                             const Glib::ustring TOOLTIP = "New tab";
 
                             Tab();
