@@ -1,14 +1,14 @@
 #ifndef APP_BROWSER_H
 #define APP_BROWSER_H
 
-#include <gtkmm/window.h>
+#include <gtkmm/applicationwindow.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/menubutton.h>
 #include <gtkmm/notebook.h>
 
 namespace app
 {
-    class Browser : public Gtk::Window
+    class Browser : public Gtk::ApplicationWindow
     {
         public:
 
