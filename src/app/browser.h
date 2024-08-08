@@ -28,16 +28,20 @@ namespace app
 
                     class Menu : public Gtk::MenuButton
                     {
-                        const Glib::ustring TOOLTIP = "Menu";
+                        public:
 
-                        Menu();
+                            const Glib::ustring TOOLTIP = "Menu";
+
+                            Menu();
                     };
 
                     class Tab : public Gtk::MenuButton
                     {
-                        const Glib::ustring TOOLTIP = "New tab";
+                        public:
 
-                        Tab();
+                            const Glib::ustring TOOLTIP = "New tab";
+
+                            Tab();
                     };
             };
 
