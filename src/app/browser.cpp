@@ -21,6 +21,20 @@ Browser::Header::Header()
     );
 }
 
+Browser::Header::Menu::Menu()
+{
+    set_tooltip_text(
+        TOOLTIP
+    );
+}
+
+Browser::Header::Tab::Tab()
+{
+    set_tooltip_text(
+        TOOLTIP
+    );
+}
+
 Browser::Container::Container()
 {
     set_scrollable(

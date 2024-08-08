@@ -3,6 +3,7 @@
 
 #include <gtkmm/window.h>
 #include <gtkmm/headerbar.h>
+#include <gtkmm/menubutton.h>
 #include <gtkmm/notebook.h>
 
 namespace app
@@ -17,24 +18,38 @@ namespace app
 
             Browser();
 
-        class Header : Gtk::HeaderBar
-        {
-            public:
+            class Header : Gtk::HeaderBar
+            {
+                public:
 
-                const bool SHOW_TITLE_BUTTONS = true;
+                    const bool SHOW_TITLE_BUTTONS = true;
 
-                Header();
-        };
+                    Header();
 
-        class Container : Gtk::Notebook
-        {
-            public:
+                    class Menu : public Gtk::MenuButton
+                    {
+                        const Glib::ustring TOOLTIP = "Menu";
 
-                const bool SCROLLABLE = true;
-                const bool REORDERABLE = true;
+                        Menu();
+                    };
 
-                Container();
-        };
+                    class Tab : public Gtk::MenuButton
+                    {
+                        const Glib::ustring TOOLTIP = "New tab";
+
+                        Tab();
+                    };
+            };
+
+            class Container : Gtk::Notebook
+            {
+                public:
+
+                    const bool SCROLLABLE = true;
+                    const bool REORDERABLE = true;
+
+                    Container();
+            };
     };
 }
 
