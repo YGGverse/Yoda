@@ -1,52 +1,15 @@
 #include "main.h"
 
-void activate(
-    GtkApplication *application
-) {
-    // Init default component
-    new app::Browser(
-        application
-    );
-}
-
 int main(
     int argc,
-    char *argv[]
+    char* argv[]
 ) {
-    // Create a new application
-    GtkApplication *application = gtk_application_new(
-        NULL,
-        G_APPLICATION_DEFAULT_FLAGS
+    auto app = Gtk::Application::create(
+        "Yoda"
     );
 
-    // Connect events
-    g_signal_connect(
-        G_APPLICATION(
-            application
-        ),
-        "activate",
-        G_CALLBACK(
-            activate
-        ),
-        NULL
-    );
-
-    // Run the application
-    int status = g_application_run(
-        G_APPLICATION(
-            application
-        ),
+    return app->make_window_and_run<app::Browser>(
         argc,
         argv
     );
-
-    // Clean up
-    g_object_unref(
-        G_APPLICATION(
-            application
-        )
-    );
-
-    // Result
-    return status;
 }

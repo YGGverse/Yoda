@@ -10,7 +10,7 @@ GTK 4 / C++ implementation branch
 
 ### Linux
 
-* `sudo apt install git libgtk-4-dev`
+* `sudo apt install git libgtkmm-4.0-dev`
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
 * `git checkout master`
@@ -26,7 +26,7 @@ GTK 4 / C++ implementation branch
 
 ### Environment
 
-* `pkg-config --cflags --libs gtk4`
+* `pkg-config --cflags --libs gtkmm-4.0`
 
 ### Contribution
 

@@ -1,53 +1,32 @@
-#pragma once
-
 #ifndef APP_BROWSER_H
 #define APP_BROWSER_H
 
-// Dependencies
-#include "../main.h"
-
-// Requirements
-#include "browser/header.h"
-#include "browser/container.h"
+#include <gtkmm/window.h>
+#include <gtkmm/headerbar.h>
+#include <gtkmm/notebook.h>
 
 namespace app
 {
-    namespace browser
-    {
-        class Header;
-        class Container;
-    }
-
-    class Browser
+    class Browser : public Gtk::Window
     {
         public:
 
-            // GTK
-            GtkWidget *gtk;
-
-            // Dependencies
-            GtkApplication *app;
-
-            // Requirements
-            browser::Header *header;
-            browser::Container *container;
-
-            // Defaults
+            const char* TITLE = "Basic application";
             const guint WIDTH = 640;
             const guint HEIGHT = 480;
 
-            // Constructor
-            Browser(
-                GtkApplication *application
-            );
+            Browser();
 
-        private:
+        class Header : Gtk::HeaderBar
+        {
 
-            // Events
-            static void _shutdown(
-                GtkApplication *application
-            );
+        };
+
+        class Container : Gtk::Notebook
+        {
+
+        };
     };
-};
+}
 
-#endif
+#endif // APP_BROWSER_H
