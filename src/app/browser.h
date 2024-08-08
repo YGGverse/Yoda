@@ -11,15 +11,19 @@ namespace app
     {
         public:
 
-            const char* TITLE = "Basic application";
-            const guint WIDTH = 640;
-            const guint HEIGHT = 480;
+            const Glib::ustring TITLE = "Basic application";
+            const int WIDTH = 640;
+            const int HEIGHT = 480;
 
             Browser();
 
         class Header : Gtk::HeaderBar
         {
+            public:
 
+                const bool SHOW_TITLE_BUTTONS = true;
+
+                Header();
         };
 
         class Container : Gtk::Notebook
