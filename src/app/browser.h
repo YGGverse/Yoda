@@ -11,7 +11,7 @@ namespace app
     {
         public:
 
-            const Glib::ustring TITLE = "Basic application";
+            const Glib::ustring TITLE = "Yoda";
             const int WIDTH = 640;
             const int HEIGHT = 480;
 
