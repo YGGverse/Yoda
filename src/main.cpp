@@ -5,7 +5,7 @@ int main(
     char* argv[]
 ) {
     auto app = Gtk::Application::create(
-        "Yoda"
+        "YGGverse.Yoda"
     );
 
     return app->make_window_and_run<app::Browser>(
