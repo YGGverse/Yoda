@@ -4,6 +4,7 @@ using namespace app::browser::header;
 
 Menu::Menu()
 {
+    // Init defaults
     set_tooltip_text(
         TOOLTIP
     );
