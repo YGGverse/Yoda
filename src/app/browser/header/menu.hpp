@@ -2,7 +2,6 @@
 #define APP_BROWSER_HEADER_MENU_H
 
 #include <giomm/menu.h>
-
 #include <glibmm/i18n.h>
 #include <gtkmm/menubutton.h>
 
