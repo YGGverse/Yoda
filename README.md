@@ -46,3 +46,8 @@ GTK 4 / C++ implementation branch
 * `git checkout master`
 * `git pull`
 * `git checkout -b 'contribution-name'`
+
+### Documentation
+
+* [GTK](https://docs.gtk.org)
+* [gtkmm](https://gtkmm.org)
