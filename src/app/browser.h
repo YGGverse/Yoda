@@ -1,6 +1,8 @@
 #ifndef APP_BROWSER_H
 #define APP_BROWSER_H
 
+#include <glibmm/i18n.h>
+
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/menubutton.h>
@@ -12,7 +14,7 @@ namespace app
     {
         public:
 
-            const Glib::ustring TITLE = "Yoda";
+            const char* TITLE = _("Yoda");
             const int WIDTH = 640;
             const int HEIGHT = 480;
 
@@ -30,7 +32,7 @@ namespace app
                     {
                         public:
 
-                            const Glib::ustring TOOLTIP = "Menu";
+                            const char* TOOLTIP = _("Menu");
 
                             Menu();
                     };
@@ -39,8 +41,8 @@ namespace app
                     {
                         public:
 
-                            const Glib::ustring ICON = "tab-new-symbolic";
-                            const Glib::ustring TOOLTIP = "New tab";
+                            const char* ICON = "tab-new-symbolic";
+                            const char* TOOLTIP = _("New tab");
 
                             Tab();
                     };

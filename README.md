@@ -10,7 +10,7 @@ GTK 4 / C++ implementation branch
 
 ### Linux
 
-* `sudo apt install git libgtkmm-4.0-dev`
+* `sudo apt install git libgtkmm-4.0-dev libglibmm-2.68-dev`
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
 * `git checkout master`
@@ -22,11 +22,23 @@ GTK 4 / C++ implementation branch
 * `make clean`
 * `make`
 
+## Localization
+
+### Official
+
+ * [Crowdin](https://crowdin.com/project/yoda-browser)
+
+### Personal
+
+* `sudo apt install intltool`
+* `cd po`
+* `intltool-update --pot`
+
 ## Development
 
 ### Environment
 
-* `pkg-config --cflags --libs gtkmm-4.0`
+* `pkg-config --cflags --libs gtkmm-4.0 glibmm-2.68`
 
 ### Contribution
 
