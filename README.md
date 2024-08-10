@@ -49,5 +49,5 @@ GTK 4 / C++ implementation branch
 
 ### Documentation
 
-* [GTK](https://docs.gtk.org)
+* [GTK](https://www.gtk.org)
 * [gtkmm](https://gtkmm.org)
