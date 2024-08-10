@@ -1,7 +1,7 @@
 # Define compiler and flags
 CXX = g++
-CXXFLAGS = `pkg-config --cflags gtkmm-4.0`
-LDFLAGS = `pkg-config --libs gtkmm-4.0`
+CXXFLAGS = `pkg-config --cflags gtkmm-4.0 glibmm-2.68`
+LDFLAGS = `pkg-config --libs gtkmm-4.0 glibmm-2.68`
 
 # Define target executable and source files
 TARGET = bin/Yoda

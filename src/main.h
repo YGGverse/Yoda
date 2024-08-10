@@ -1,5 +1,3 @@
-#include <gtkmm/application.h>
-
 #include "app/browser.h"
 
 const Glib::ustring APPLICATION_ID = "io.github.yggverse.Yoda";

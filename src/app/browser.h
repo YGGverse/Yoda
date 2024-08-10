@@ -3,6 +3,7 @@
 
 #include <glibmm/i18n.h>
 
+#include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/menubutton.h>
