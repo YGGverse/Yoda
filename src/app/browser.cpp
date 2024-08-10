@@ -1,4 +1,5 @@
-#include "browser.h"
+#include "browser.hpp"
+#include "browser/header.hpp"
 
 using namespace app;
 
@@ -14,46 +15,6 @@ Browser::Browser()
     );
 
     set_titlebar(
-        * new Header()
-    );
-}
-
-Browser::Header::Header()
-{
-    set_show_title_buttons(
-        SHOW_TITLE_BUTTONS
-    );
-
-    pack_start(
-        * new Menu()
-    );
-
-    pack_start(
-        * new Tab()
-    );
-}
-
-Browser::Header::Menu::Menu()
-{
-    set_tooltip_text(
-        TOOLTIP
-    );
-}
-
-Browser::Header::Tab::Tab()
-{
-    set_tooltip_text(
-        TOOLTIP
-    );
-
-    set_icon_name(
-        ICON
-    );
-}
-
-Browser::Container::Container()
-{
-    set_scrollable(
-        SCROLLABLE
+        * new browser::Header()
     );
 }

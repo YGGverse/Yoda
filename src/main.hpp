@@ -1,4 +1,4 @@
-#include "app/browser.h"
+#include <glibmm.h>
 
 const Glib::ustring APPLICATION_ID = "io.github.yggverse.Yoda";
 

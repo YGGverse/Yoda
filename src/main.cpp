@@ -1,4 +1,5 @@
-#include "main.h"
+#include "main.hpp"
+#include "app/browser.hpp"
 
 int main(
     int argc,

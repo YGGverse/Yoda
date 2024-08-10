@@ -5,7 +5,12 @@ LDFLAGS = `pkg-config --libs gtkmm-4.0 glibmm-2.68`
 
 # Define target executable and source files
 TARGET = bin/Yoda
-SRCS = src/main.cpp $(wildcard src/app/*.cpp)
+SRCS =  src/main.cpp\
+		src/app/browser.cpp\
+		src/app/browser/header.cpp\
+		src/app/browser/header/menu.cpp\
+		src/app/browser/header/tab.cpp\
+		src/app/browser/page.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

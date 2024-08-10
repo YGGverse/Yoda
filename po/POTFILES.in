@@ -1,4 +1,12 @@
 src/app/browser.cpp
-src/app/browser.h
+src/app/browser.hpp
+src/app/browser/header.cpp
+src/app/browser/header.hpp
+src/app/browser/header/menu.cpp
+src/app/browser/header/menu.hpp
+src/app/browser/header/tab.cpp
+src/app/browser/header/tab.hpp
+src/app/browser/page.cpp
+src/app/browser/page.hpp
 src/main.cpp
-src/main.h
+src/main.hpp
