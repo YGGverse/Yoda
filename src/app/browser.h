@@ -53,10 +53,44 @@ namespace app
             {
                 public:
 
+                    class Page
+                    {
+                        public:
+
+                            class Navbar
+                            {
+                                public:
+
+                                    Navbar();
+                            };
+
+                            class Body
+                            {
+                                public:
+
+                                    Body();
+                            };
+
+                            Page();
+
+                        private:
+
+                            Navbar _navbar;
+                            Body _body;
+                    };
+
                     const bool SCROLLABLE = true;
                     const bool REORDERABLE = true;
 
                     Container();
+
+                    Page append(
+                        char* request,
+                        bool open = true,
+                        bool focus = false
+                    );
+
+                    void update();
             };
     };
 }
