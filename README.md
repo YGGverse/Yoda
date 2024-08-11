@@ -56,5 +56,6 @@ pkg-config --cflags --libs gtkmm-4.0 glibmm-2.68 sqlite3
 
 #### Components
 
-* [GTK](https://gtk.org)
-* [gtkmm](https://gtkmm.org)
+* [GTK](https://gtk.org) - free and open-source cross-platform widget toolkit
+  * [gtkmm](https://gtkmm.org) - official C++ interface for GTK
+* [SQLite](https://sqlite.org) - profile database
