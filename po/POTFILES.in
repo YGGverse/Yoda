@@ -8,5 +8,6 @@ src/app/browser/header/tab.cpp
 src/app/browser/header/tab.hpp
 src/app/browser/page.cpp
 src/app/browser/page.hpp
+src/lib/database.hpp
 src/main.cpp
 src/main.hpp

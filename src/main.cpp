@@ -1,10 +1,16 @@
 #include "main.hpp"
 #include "app/browser.hpp"
+#include "lib/database.hpp"
 
 int main(
     int argc,
     char * argv[]
 ) {
+    // Init profile
+    auto database = lib::Database(
+        "database.sqlite3"
+    );
+
     // Init app
     auto app = Gtk::Application::create(
         "io.github.yggverse.Yoda"

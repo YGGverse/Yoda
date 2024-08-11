@@ -1,7 +1,7 @@
 # Define compiler and flags
 CXX = g++
-CXXFLAGS = `pkg-config --cflags gtkmm-4.0 glibmm-2.68`
-LDFLAGS = `pkg-config --libs gtkmm-4.0 glibmm-2.68`
+CXXFLAGS = `pkg-config --cflags gtkmm-4.0 glibmm-2.68 sqlite3`
+LDFLAGS = `pkg-config --libs gtkmm-4.0 glibmm-2.68 sqlite3`
 
 # Define target executable and source files
 TARGET = bin/Yoda
@@ -10,7 +10,8 @@ SRCS =  src/main.cpp\
 		src/app/browser/header.cpp\
 		src/app/browser/header/menu.cpp\
 		src/app/browser/header/tab.cpp\
-		src/app/browser/page.cpp
+		src/app/browser/page.cpp\
+		src/lib/database.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
