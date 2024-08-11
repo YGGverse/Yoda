@@ -5,6 +5,11 @@
 
 namespace lib
 {
+    namespace database
+    {
+        class Session;
+    }
+
     class Database
     {
         private:
@@ -16,6 +21,8 @@ namespace lib
             sqlite3 * connection;
 
         public:
+
+            database::Session * session;
 
             Database(
                 const char * filename
