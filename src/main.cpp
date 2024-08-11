@@ -6,11 +6,6 @@ int main(
     int argc,
     char * argv[]
 ) {
-    // Init profile
-    auto database = lib::Database(
-        "database.sqlite3"
-    );
-
     // Init app
     auto app = Gtk::Application::create(
         "io.github.yggverse.Yoda"
@@ -31,10 +26,16 @@ int main(
         "<Primary>q"
     );
 
+    // Init profile
+    auto db = lib::Database(
+        "database.sqlite3"
+    );
+
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
         argc,
         argv,
-        app
+        app,
+        db
     );
 }

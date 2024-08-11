@@ -4,6 +4,11 @@
 #include <glibmm/i18n.h>
 #include <gtkmm/applicationwindow.h>
 
+namespace lib
+{
+    class Database;
+}
+
 namespace app
 {
     class Browser : public Gtk::ApplicationWindow
@@ -15,7 +20,8 @@ namespace app
             const int HEIGHT = 480;
 
             Browser(
-                const Glib::RefPtr<Gtk::Application> & app
+                const Glib::RefPtr<Gtk::Application> & app,
+                const lib::Database & db
             );
 
             void debug();

@@ -4,7 +4,8 @@
 using namespace app;
 
 Browser::Browser(
-    const Glib::RefPtr<Gtk::Application> & app
+    const Glib::RefPtr<Gtk::Application> & app,
+    const lib::Database & db
 ) {
     set_title(
         TITLE
