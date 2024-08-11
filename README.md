@@ -11,7 +11,10 @@ GTK 4 / C++ implementation branch
 ### Linux
 
 ``` bash
-sudo apt install git libgtkmm-4.0-dev libglibmm-2.68-dev libsqlite3-dev
+apt install git \
+            libgtkmm-4.0-dev \
+            libglibmm-2.68-dev \
+            libsqlite3-dev
 ```
 
 * `git clone https://github.com/YGGverse/Yoda.git`
@@ -33,7 +36,7 @@ sudo apt install git libgtkmm-4.0-dev libglibmm-2.68-dev libsqlite3-dev
 
 ### Personal
 
-* `sudo apt install intltool`
+* `apt install intltool`
 * `cd po`
 * `intltool-update --pot`
 
@@ -42,7 +45,9 @@ sudo apt install git libgtkmm-4.0-dev libglibmm-2.68-dev libsqlite3-dev
 ### Environment
 
 ``` bash
-pkg-config --cflags --libs gtkmm-4.0 glibmm-2.68 sqlite3
+pkg-config --cflags --libs gtkmm-4.0 \
+                           glibmm-2.68 \
+                           sqlite3
 ```
 
 ### Contribution
