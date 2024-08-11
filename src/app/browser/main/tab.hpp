@@ -1,11 +1,11 @@
-#ifndef APP_BROWSER_PAGE_H
-#define APP_BROWSER_PAGE_H
+#ifndef APP_BROWSER_MAIN_TAB_H
+#define APP_BROWSER_MAIN_TAB_H
 
 #include <gtkmm/notebook.h>
 
-namespace app::browser
+namespace app::browser::main
 {
-    class Page : public Gtk::Notebook
+    class Tab : public Gtk::Notebook
     {
         public:
 
@@ -26,16 +26,16 @@ namespace app::browser
                     Body();
             };
 
-            Page();
+            Tab();
 
             void append(
-                char* request,
-                bool open = true,
-                bool focus = false
+                const char * request,
+                bool open,
+                bool focus
             );
 
             void update();
     };
 }
 
-#endif // APP_BROWSER_PAGE_H
+#endif // APP_BROWSER_MAIN_TAB_H

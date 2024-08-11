@@ -13,8 +13,8 @@ Menu::Menu()
     auto tab = Gio::Menu::create();
 
     tab->append(
-        _("New tab"),
-        "tab.new"
+        _("New tab.."),
+        "win.tab"
     );
 
     // Build tool submenu

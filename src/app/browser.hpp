@@ -11,8 +11,19 @@ namespace lib
 
 namespace app
 {
+    namespace browser
+    {
+        class Header;
+        class Main;
+    }
+
     class Browser : public Gtk::ApplicationWindow
     {
+        private:
+
+            app::browser::Header * header;
+            app::browser::Main * main;
+
         public:
 
             const char * TITLE = _("Yoda");
@@ -23,6 +34,8 @@ namespace app
                 const Glib::RefPtr<Gtk::Application> & app,
                 const lib::Database & db
             );
+
+            void mainTabAppend();
 
             void debug();
     };

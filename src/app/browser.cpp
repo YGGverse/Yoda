@@ -1,5 +1,6 @@
 #include "browser.hpp"
 #include "browser/header.hpp"
+#include "browser/main.hpp"
 
 using namespace app;
 
@@ -7,6 +8,7 @@ Browser::Browser(
     const Glib::RefPtr<Gtk::Application> & app,
     const lib::Database & db
 ) {
+    // Init window
     set_title(
         TITLE
     );
@@ -16,8 +18,27 @@ Browser::Browser(
         HEIGHT
     );
 
+    // Init header widget
+    header = new browser::Header();
+
     set_titlebar(
-        * new browser::Header()
+        * header
+    );
+
+    // Init main widget
+    main = new browser::Main();
+
+    set_child(
+        * main
+    );
+
+    // Init actions
+    add_action(
+        "tab",
+        sigc::mem_fun(
+            * this,
+            & Browser::mainTabAppend
+        )
     );
 
     add_action(
@@ -28,11 +49,22 @@ Browser::Browser(
         )
     );
 
+    // Init
+    app->set_accel_for_action(
+        "win.tab",
+        "<Primary>t"
+    );
+
     app->set_accel_for_action(
         "win.debug",
         "<Primary>i"
     );
 }
+
+void Browser::mainTabAppend()
+{
+    main->tabAppend();
+};
 
 void Browser::debug()
 {

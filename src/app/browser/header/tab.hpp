@@ -2,11 +2,11 @@
 #define APP_BROWSER_HEADER_TAB_H
 
 #include <glibmm/i18n.h>
-#include <gtkmm/menubutton.h>
+#include <gtkmm/button.h>
 
 namespace app::browser::header
 {
-    class Tab : public Gtk::MenuButton
+    class Tab : public Gtk::Button
     {
         public:
 
