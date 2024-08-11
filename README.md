@@ -11,9 +11,9 @@ GTK 4 / C++ implementation branch
 ### Linux
 
 ``` bash
-apt install git \
-            libgtkmm-4.0-dev \
-            libglibmm-2.68-dev \
+apt install git\
+            libgtkmm-4.0-dev\
+            libglibmm-2.68-dev\
             libsqlite3-dev
 ```
 
@@ -45,8 +45,8 @@ apt install git \
 ### Environment
 
 ``` bash
-pkg-config --cflags --libs gtkmm-4.0 \
-                           glibmm-2.68 \
+pkg-config --cflags --libs gtkmm-4.0\
+                           glibmm-2.68\
                            sqlite3
 ```
 
