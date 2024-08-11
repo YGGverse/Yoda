@@ -14,7 +14,7 @@ Menu::Menu()
 
     tab->append(
         _("New tab"),
-        "app.tab.new"
+        "tab.new"
     );
 
     // Build tool submenu
@@ -22,7 +22,7 @@ Menu::Menu()
 
     tool->append(
         _("Debug"),
-        "app.tool.debug"
+        "win.debug"
     );
 
     // Build main menu
@@ -40,7 +40,7 @@ Menu::Menu()
 
     main->append(
         _("Quit"),
-        "win.quit"
+        "app.quit"
     );
 
     set_menu_model(

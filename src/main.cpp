@@ -3,22 +3,23 @@
 
 int main(
     int argc,
-    char* argv[]
+    char * argv[]
 ) {
     // Init app
     auto app = Gtk::Application::create(
-        APPLICATION_ID
+        "io.github.yggverse.Yoda"
     );
 
     // Init actions
     app->add_action(
         "quit",
         sigc::mem_fun(
-            *app,
-            &Gtk::Application::quit
+            * app,
+            & Gtk::Application::quit
         )
     );
 
+    // Init accels
     app->set_accel_for_action(
         "app.quit",
         "<Primary>q"
@@ -27,6 +28,7 @@ int main(
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
         argc,
-        argv
+        argv,
+        app
     );
 }

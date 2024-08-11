@@ -3,8 +3,9 @@
 
 using namespace app;
 
-Browser::Browser()
-{
+Browser::Browser(
+    const Glib::RefPtr<Gtk::Application> & app
+) {
     set_title(
         TITLE
     );
@@ -17,4 +18,24 @@ Browser::Browser()
     set_titlebar(
         * new browser::Header()
     );
+
+    add_action(
+        "debug",
+        sigc::mem_fun(
+            * this,
+            & Browser::debug
+        )
+    );
+
+    app->set_accel_for_action(
+        "win.debug",
+        "<Primary>i"
+    );
 }
+
+void Browser::debug()
+{
+    gtk_window_set_interactive_debugging(
+        true
+    );
+};

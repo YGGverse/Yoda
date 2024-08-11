@@ -14,7 +14,11 @@ namespace app
             const int WIDTH = 640;
             const int HEIGHT = 480;
 
-            Browser();
+            Browser(
+                const Glib::RefPtr<Gtk::Application> & app
+            );
+
+            void debug();
     };
 }
 
