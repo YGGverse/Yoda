@@ -25,6 +25,9 @@ namespace app::browser
             void tab_append();
 
             void tab_close();
+            void tab_close_left();
+            void tab_close_right();
+            void tab_close_all();
     };
 }
 

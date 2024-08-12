@@ -50,6 +50,9 @@ namespace app::browser::main
             );
 
             void close();
+            void close_left();
+            void close_right();
+            void close_all();
 
             void update();
     };

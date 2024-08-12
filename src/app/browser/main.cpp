@@ -46,3 +46,18 @@ void Main::tab_close()
 {
     tab->close();
 };
+
+void Main::tab_close_left()
+{
+    tab->close_left();
+};
+
+void Main::tab_close_right()
+{
+    tab->close_right();
+};
+
+void Main::tab_close_all()
+{
+    tab->close_all();
+};

@@ -68,6 +68,23 @@ void Tab::close()
     remove_page(
         get_current_page()
     );
+
+    // @TODO clean memory
+    // @TODO fix GtkGizmo reported min height -3, but sizes must be >= 0
+}
+
+void Tab::close_left()
+{} // @TODO
+
+void Tab::close_right()
+{} // @TODO
+
+void Tab::close_all()
+{
+    while (0 <= get_current_page())
+    {
+        close();
+    }
 }
 
 void Tab::on_label_click(
@@ -77,6 +94,6 @@ void Tab::on_label_click(
 ) {
     if (n == 2) // double click
     {
-        Tab::close();
+        close();
     }
 }

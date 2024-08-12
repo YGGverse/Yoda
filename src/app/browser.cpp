@@ -41,6 +41,7 @@ Browser::Browser(
         )
     );
 
+    // Close
     add_action(
         "tab_close",
         sigc::mem_fun(
@@ -49,6 +50,32 @@ Browser::Browser(
         )
     );
 
+        // Close submenu
+        add_action(
+            "tab_close_left",
+            sigc::mem_fun(
+                * this,
+                & Browser::main_tab_close_left
+            )
+        );
+
+        add_action(
+            "tab_close_right",
+            sigc::mem_fun(
+                * this,
+                & Browser::main_tab_close_right
+            )
+        );
+
+        add_action(
+            "tab_close_all",
+            sigc::mem_fun(
+                * this,
+                & Browser::main_tab_close_all
+            )
+        );
+
+    // Tool
     add_action(
         "debug",
         sigc::mem_fun(
@@ -77,6 +104,21 @@ void Browser::main_tab_append()
 void Browser::main_tab_close()
 {
     main->tab_close();
+};
+
+void Browser::main_tab_close_left()
+{
+    main->tab_close_left();
+};
+
+void Browser::main_tab_close_right()
+{
+    main->tab_close_right();
+};
+
+void Browser::main_tab_close_all()
+{
+    main->tab_close_all();
 };
 
 void Browser::debug()
