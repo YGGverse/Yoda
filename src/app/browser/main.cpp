@@ -6,6 +6,10 @@ using namespace app::browser;
 Main::Main()
 {
     // Init container
+    set_orientation(
+        Gtk::Orientation::VERTICAL
+    );
+
     set_homogeneous(
         true
     );
