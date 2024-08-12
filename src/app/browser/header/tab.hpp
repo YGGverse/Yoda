@@ -16,8 +16,6 @@ namespace app::browser::header
             Tab();
 
             ~Tab();
-
-            void click();
     };
 }
 

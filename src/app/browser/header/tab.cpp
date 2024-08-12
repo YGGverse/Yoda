@@ -12,17 +12,9 @@ Tab::Tab()
         ICON
     );
 
-    signal_clicked().connect(
-        sigc::mem_fun(
-            * this,
-            & Tab::click
-        )
+    set_action_name(
+        "win.tab"
     );
 }
 
 Tab::~Tab() = default;
-
-void Tab::click()
-{
-    // @TODO
-}
