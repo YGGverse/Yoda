@@ -49,7 +49,10 @@ namespace app::browser::main
                 bool focus
             );
 
-            void close();
+            void close(
+                int number
+            );
+
             void close_left();
             void close_right();
             void close_all();

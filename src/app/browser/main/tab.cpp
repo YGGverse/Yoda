@@ -63,10 +63,11 @@ void Tab::append(
     }
 };
 
-void Tab::close()
-{
+void Tab::close(
+    int number
+) {
     remove_page(
-        get_current_page()
+        number
     );
 
     // @TODO clean memory
@@ -83,7 +84,9 @@ void Tab::close_all()
 {
     while (0 <= get_current_page())
     {
-        close();
+        close(
+            -1 // active
+        );
     }
 }
 
@@ -94,6 +97,8 @@ void Tab::on_label_click(
 ) {
     if (n == 2) // double click
     {
-        close();
+        close(
+            -1 // active
+        );
     }
 }

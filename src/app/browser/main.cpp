@@ -44,7 +44,9 @@ void Main::tab_append()
 
 void Main::tab_close()
 {
-    tab->close();
+    tab->close(
+        -1 // active
+    );
 };
 
 void Main::tab_close_left()
