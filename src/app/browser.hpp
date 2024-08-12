@@ -39,6 +39,8 @@ namespace app
 
             void main_tab_append();
 
+            void main_tab_close();
+
             void debug();
     };
 }

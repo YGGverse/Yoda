@@ -23,6 +23,8 @@ namespace app::browser
             ~Main();
 
             void tab_append();
+
+            void tab_close();
     };
 }
 

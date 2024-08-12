@@ -41,3 +41,8 @@ void Main::tab_append()
         true
     );
 };
+
+void Main::tab_close()
+{
+    tab->close();
+};

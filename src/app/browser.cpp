@@ -42,6 +42,14 @@ Browser::Browser(
     );
 
     add_action(
+        "tab_close",
+        sigc::mem_fun(
+            * this,
+            & Browser::main_tab_close
+        )
+    );
+
+    add_action(
         "debug",
         sigc::mem_fun(
             * this,
@@ -64,6 +72,11 @@ Browser::~Browser()
 void Browser::main_tab_append()
 {
     main->tab_append();
+};
+
+void Browser::main_tab_close()
+{
+    main->tab_close();
 };
 
 void Browser::debug()
