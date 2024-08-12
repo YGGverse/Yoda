@@ -20,25 +20,6 @@ namespace app::browser::main
 
         public:
 
-            const bool SCROLLABLE = true;
-            const bool REORDERABLE = true;
-
-            const char * LABEL = _("New tab");
-
-            class Navbar
-            {
-                public:
-
-                    Navbar();
-            };
-
-            class Body
-            {
-                public:
-
-                    Body();
-            };
-
             Tab();
 
             ~Tab();

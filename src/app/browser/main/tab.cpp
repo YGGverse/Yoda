@@ -5,7 +5,7 @@ using namespace app::browser::main;
 Tab::Tab()
 {
     set_scrollable(
-        SCROLLABLE
+        true
     );
 }
 
@@ -18,7 +18,7 @@ void Tab::append(
 ) {
     // Init new tab label
     Gtk::Label * name = new Gtk::Label(
-        LABEL
+        _("New tab")
     );
 
     // Setup label controller
@@ -50,7 +50,7 @@ void Tab::append(
 
     set_tab_reorderable(
         * data,
-        REORDERABLE
+        true
     );
 
     if (focus)
