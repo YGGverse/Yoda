@@ -20,8 +20,6 @@ namespace app::browser
 
         public:
 
-            const bool SHOW_TITLE_BUTTONS = true;
-
             Header();
 
             ~Header();

@@ -5,15 +5,15 @@ using namespace app::browser::header;
 Tab::Tab()
 {
     set_action_name(
-        ACTION
-    );
-
-    set_tooltip_text(
-        TOOLTIP
+        "win.tab_append"
     );
 
     set_icon_name(
-        ICON
+        "tab-new-symbolic"
+    );
+
+    set_tooltip_text(
+        _("New tab")
     );
 }
 

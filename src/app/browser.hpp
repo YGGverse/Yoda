@@ -26,10 +26,6 @@ namespace app
 
         public:
 
-            const char * TITLE = _("Yoda");
-            const int WIDTH = 640;
-            const int HEIGHT = 480;
-
             Browser(
                 //const Glib::RefPtr<Gtk::Application> & app,
                 //const std::shared_ptr<lib::Database> & db

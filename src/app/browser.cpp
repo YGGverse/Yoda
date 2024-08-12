@@ -10,12 +10,12 @@ Browser::Browser(
 ) {
     // Init window
     set_title(
-        TITLE
+        _("Yoda")
     );
 
     set_default_size(
-        WIDTH,
-        HEIGHT
+        640,
+        480
     );
 
     // Init header widget

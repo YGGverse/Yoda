@@ -18,8 +18,6 @@ namespace app::browser::header
 
         public:
 
-            const char* TOOLTIP = _("Menu");
-
             Menu();
 
             ~Menu();

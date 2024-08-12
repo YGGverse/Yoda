@@ -6,7 +6,7 @@ Menu::Menu()
 {
     // Set widget defaults
     set_tooltip_text(
-        TOOLTIP
+        _("Menu")
     );
 
     // Build tab submenu model
