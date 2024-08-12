@@ -26,12 +26,12 @@ Menu::Menu()
             );
 
             tab_close->append(
-                _("Tabs to left"),
+                _("All tabs to left"),
                 "win.tab_close_left"
             );
 
             tab_close->append(
-                _("Tabs to right"),
+                _("All tabs to right"),
                 "win.tab_close_right"
             );
 
@@ -62,7 +62,7 @@ Menu::Menu()
         );
 
         main->append_submenu(
-            _("Tool"),
+            _("Tools"),
             tool
         );
 
