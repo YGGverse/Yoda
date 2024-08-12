@@ -5,8 +5,8 @@
 using namespace app;
 
 Browser::Browser(
-    const Glib::RefPtr<Gtk::Application> & app,
-    const lib::Database & db
+    //const Glib::RefPtr<Gtk::Application> & app,
+    //const std::shared_ptr<lib::Database> & db
 ) {
     // Init window
     set_title(
@@ -47,17 +47,6 @@ Browser::Browser(
             * this,
             & Browser::debug
         )
-    );
-
-    // Init
-    app->set_accel_for_action(
-        "win.tab",
-        "<Primary>t"
-    );
-
-    app->set_accel_for_action(
-        "win.debug",
-        "<Primary>i"
     );
 }
 

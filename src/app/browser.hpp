@@ -31,8 +31,8 @@ namespace app
             const int HEIGHT = 480;
 
             Browser(
-                const Glib::RefPtr<Gtk::Application> & app,
-                const lib::Database & db
+                //const Glib::RefPtr<Gtk::Application> & app,
+                //const std::shared_ptr<lib::Database> & db
             );
 
             ~Browser();

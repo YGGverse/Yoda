@@ -6,12 +6,18 @@ int main(
     int argc,
     char * argv[]
 ) {
+    // Init profile database
+    const std::shared_ptr<lib::Database> db(
+        new lib::Database(
+            "database.sqlite3"
+        )
+    );
+
     // Init app
     const Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(
         "io.github.yggverse.Yoda"
     );
 
-    // Init actions
     app->add_action(
         "quit",
         sigc::mem_fun(
@@ -20,24 +26,27 @@ int main(
         )
     );
 
-    // Init accels
+    // Init accels @TODO db settings
+    app->set_accel_for_action(
+        "win.tab",
+        "<Primary>t"
+    );
+
+    app->set_accel_for_action(
+        "win.debug",
+        "<Primary>i"
+    );
+
     app->set_accel_for_action(
         "app.quit",
         "<Primary>q"
     );
 
-    // Init profile
-    const std::shared_ptr<lib::Database> db(
-        new lib::Database(
-            "database.sqlite3"
-        )
-    );
-
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
         argc,
-        argv,
-        app,
-        db
+        argv
+        //app,
+        //db
     );
 }
