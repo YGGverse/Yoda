@@ -17,8 +17,26 @@ void Tab::append(
     bool open,
     bool focus
 ) {
-    append_page( // @TODO
-        * new Gtk::Label("data"),
-        * new Gtk::Label("tab")
+    Gtk::Label * data = new Gtk::Label("data"); // @TODO
+
+    append_page(
+        * data,
+        * new Gtk::Label(
+            LABEL
+        )
     );
+
+    set_tab_reorderable(
+        * data,
+        REORDERABLE
+    );
+
+    if (focus)
+    {
+        set_current_page(
+            page_num(
+                * data
+            )
+        );
+    }
 };

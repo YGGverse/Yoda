@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_H
 #define APP_BROWSER_MAIN_TAB_H
 
+#include <glibmm/i18n.h>
 #include <gtkmm/notebook.h>
 
 namespace app::browser::main
@@ -11,6 +12,8 @@ namespace app::browser::main
 
             const bool SCROLLABLE = true;
             const bool REORDERABLE = true;
+
+            const char * LABEL = _("New tab");
 
             class Navbar
             {
