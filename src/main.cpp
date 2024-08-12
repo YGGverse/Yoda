@@ -7,7 +7,7 @@ int main(
     char * argv[]
 ) {
     // Init app
-    auto app = Gtk::Application::create(
+    const Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(
         "io.github.yggverse.Yoda"
     );
 
@@ -27,8 +27,10 @@ int main(
     );
 
     // Init profile
-    auto db = lib::Database(
-        "database.sqlite3"
+    const std::shared_ptr<lib::Database> db(
+        new lib::Database(
+            "database.sqlite3"
+        )
     );
 
     // Launch browser component
