@@ -63,6 +63,13 @@ void Tab::append(
     }
 };
 
+void Tab::close()
+{
+    remove_page(
+        get_current_page()
+    );
+}
+
 void Tab::on_label_click(
     int n,
     double x,
@@ -70,8 +77,6 @@ void Tab::on_label_click(
 ) {
     if (n == 2) // double click
     {
-        remove_page(
-            get_current_page()
-        );
+        Tab::close();
     }
 }

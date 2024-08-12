@@ -49,6 +49,8 @@ namespace app::browser::main
                 bool focus
             );
 
+            void close();
+
             void update();
     };
 }
