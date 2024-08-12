@@ -35,6 +35,8 @@ namespace app
                 const lib::Database & db
             );
 
+            ~Browser();
+
             void mainTabAppend();
 
             void debug();

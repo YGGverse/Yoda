@@ -61,6 +61,17 @@ Browser::Browser(
     );
 }
 
+Browser::~Browser()
+{
+    destroy();
+
+    delete header;
+    header = nullptr;
+
+    delete main;
+    main = nullptr;
+}
+
 void Browser::mainTabAppend()
 {
     main->tabAppend();

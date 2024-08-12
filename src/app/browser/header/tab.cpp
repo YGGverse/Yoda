@@ -12,3 +12,5 @@ Tab::Tab()
         ICON
     );
 }
+
+Tab::~Tab() = default;

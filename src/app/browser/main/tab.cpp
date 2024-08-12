@@ -10,6 +10,8 @@ Tab::Tab()
     );
 }
 
+Tab::~Tab() = default;
+
 void Tab::append(
     const char * request,
     bool open,

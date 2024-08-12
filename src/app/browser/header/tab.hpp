@@ -14,6 +14,8 @@ namespace app::browser::header
             const char* TOOLTIP = _("New tab");
 
             Tab();
+
+            ~Tab();
     };
 }
 

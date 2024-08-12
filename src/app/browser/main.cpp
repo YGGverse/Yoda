@@ -18,6 +18,17 @@ Main::Main()
     );
 }
 
+Main::~Main()
+{
+    remove(
+        * tab
+    );
+
+    delete tab;
+
+    tab = nullptr;
+}
+
 void Main::tabAppend()
 {
     tab->append(

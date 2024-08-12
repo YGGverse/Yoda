@@ -10,7 +10,7 @@ Menu::Menu()
     );
 
     // Build tab submenu
-    auto tab = Gio::Menu::create();
+    tab = Gio::Menu::create();
 
     tab->append(
         _("New tab.."),
@@ -18,7 +18,7 @@ Menu::Menu()
     );
 
     // Build tool submenu
-    auto tool = Gio::Menu::create();
+    tool = Gio::Menu::create();
 
     tool->append(
         _("Debug"),
@@ -26,7 +26,7 @@ Menu::Menu()
     );
 
     // Build main menu
-    auto main = Gio::Menu::create();
+    main = Gio::Menu::create();
 
     main->append_submenu(
         _("Tab"),
@@ -47,3 +47,5 @@ Menu::Menu()
         main
     );
 }
+
+Menu::~Menu() = default;

@@ -9,11 +9,19 @@ namespace app::browser::header
 {
     class Menu : public Gtk::MenuButton
     {
+        private:
+
+            Glib::RefPtr<Gio::Menu> tab,
+                                    tool,
+                                    main;
+
         public:
 
             const char* TOOLTIP = _("Menu");
 
             Menu();
+
+            ~Menu();
     };
 }
 

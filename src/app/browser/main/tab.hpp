@@ -28,6 +28,8 @@ namespace app::browser::main
 
             Tab();
 
+            ~Tab();
+
             void append(
                 const char * request,
                 bool open,

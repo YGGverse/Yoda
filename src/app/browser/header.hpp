@@ -5,13 +5,26 @@
 
 namespace app::browser
 {
+    namespace header
+    {
+        class Menu;
+        class Tab;
+    }
+
     class Header : public Gtk::HeaderBar
     {
+        private:
+
+            app::browser::header::Menu * menu;
+            app::browser::header::Tab * tab;
+
         public:
 
             const bool SHOW_TITLE_BUTTONS = true;
 
             Header();
+
+            ~Header();
     };
 }
 

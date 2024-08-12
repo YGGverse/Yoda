@@ -6,15 +6,41 @@ using namespace app::browser;
 
 Header::Header()
 {
+    // Init header bar
     set_show_title_buttons(
         SHOW_TITLE_BUTTONS
     );
 
-    pack_start(
-        * new header::Menu()
-    );
+    // Init menu
+    menu = new header::Menu();
 
     pack_start(
-        * new header::Tab()
+        * menu
     );
+
+    // Init tab
+    tab = new header::Tab();
+
+    pack_start(
+        * tab
+    );
+}
+
+Header::~Header()
+{
+    // Menu
+    remove(
+        * menu
+    );
+
+    delete menu;
+    menu = nullptr;
+
+    // Tab
+    remove(
+        * tab
+    );
+
+    delete tab;
+    tab = nullptr;
 }

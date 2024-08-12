@@ -20,6 +20,8 @@ namespace app::browser
 
             Main();
 
+            ~Main();
+
             void tabAppend();
     };
 }
