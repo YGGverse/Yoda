@@ -1,5 +1,5 @@
-#ifndef LIB_DATABASE_H
-#define LIB_DATABASE_H
+#ifndef LIB_DATABASE_HPP
+#define LIB_DATABASE_HPP
 
 #include <sqlite3.h>
 
@@ -30,4 +30,4 @@ namespace lib
     };
 }
 
-#endif // LIB_DATABASE_H
+#endif // LIB_DATABASE_HPP

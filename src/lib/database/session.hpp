@@ -1,5 +1,5 @@
-#ifndef LIB_DATABASE_SESSION_H
-#define LIB_DATABASE_SESSION_H
+#ifndef LIB_DATABASE_SESSION_HPP
+#define LIB_DATABASE_SESSION_HPP
 
 #include <sqlite3.h>
 
@@ -23,4 +23,4 @@ namespace lib::database
     };
 }
 
-#endif // LIB_DATABASE_SESSION_H
+#endif // LIB_DATABASE_SESSION_HPP

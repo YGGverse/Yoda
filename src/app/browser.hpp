@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_H
-#define APP_BROWSER_H
+#ifndef APP_BROWSER_HPP
+#define APP_BROWSER_HPP
 
 #include <glibmm/i18n.h>
 #include <gtkmm/applicationwindow.h>
@@ -44,4 +44,4 @@ namespace app
     };
 }
 
-#endif // APP_BROWSER_H
+#endif // APP_BROWSER_HPP

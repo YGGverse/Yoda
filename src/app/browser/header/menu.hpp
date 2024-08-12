@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_HEADER_MENU_H
-#define APP_BROWSER_HEADER_MENU_H
+#ifndef APP_BROWSER_HEADER_MENU_HPP
+#define APP_BROWSER_HEADER_MENU_HPP
 
 #include <giomm/menu.h>
 #include <glibmm/i18n.h>
@@ -24,4 +24,4 @@ namespace app::browser::header
     };
 }
 
-#endif // APP_BROWSER_HEADER_MENU_H
+#endif // APP_BROWSER_HEADER_MENU_HPP

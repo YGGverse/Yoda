@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_H
-#define APP_BROWSER_MAIN_H
+#ifndef APP_BROWSER_MAIN_HPP
+#define APP_BROWSER_MAIN_HPP
 
 #include <gtkmm/box.h>
 
@@ -31,4 +31,4 @@ namespace app::browser
     };
 }
 
-#endif // APP_BROWSER_MAIN_H
+#endif // APP_BROWSER_MAIN_HPP

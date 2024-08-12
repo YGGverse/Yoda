@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_HEADER_H
-#define APP_BROWSER_HEADER_H
+#ifndef APP_BROWSER_HEADER_HPP
+#define APP_BROWSER_HEADER_HPP
 
 #include <gtkmm/headerbar.h>
 
@@ -26,4 +26,4 @@ namespace app::browser
     };
 }
 
-#endif // APP_BROWSER_HEADER_H
+#endif // APP_BROWSER_HEADER_HPP

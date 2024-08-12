@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_HEADER_TAB_H
-#define APP_BROWSER_HEADER_TAB_H
+#ifndef APP_BROWSER_HEADER_TAB_HPP
+#define APP_BROWSER_HEADER_TAB_HPP
 
 #include <glibmm/i18n.h>
 #include <gtkmm/button.h>
@@ -16,4 +16,4 @@ namespace app::browser::header
     };
 }
 
-#endif // APP_BROWSER_HEADER_TAB_H
+#endif // APP_BROWSER_HEADER_TAB_HPP
