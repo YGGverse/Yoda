@@ -34,7 +34,7 @@ Browser::Browser(
 
     // Init actions
     add_action(
-        "tab",
+        "tab_append",
         sigc::mem_fun(
             * this,
             & Browser::mainTabAppend
