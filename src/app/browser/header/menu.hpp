@@ -12,6 +12,7 @@ namespace app::browser::header
         private:
 
             Glib::RefPtr<Gio::Menu> tab,
+                                    tab_close,
                                     tool,
                                     main;
 

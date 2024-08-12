@@ -17,14 +17,32 @@ Menu::Menu()
             "win.tab_append"
         );
 
-        tab->append(
-            _("Close active"),
-            "win.tab_close"
-        );
+        // Build tab close submenu model
+        tab_close = Gio::Menu::create();
 
-        tab->append(
-            _("Close all"),
-            "win.tab_close_all"
+            tab_close->append(
+                _("Active tab"),
+                "win.tab_close"
+            );
+
+            tab_close->append(
+                _("Tabs to left"),
+                "win.tab_close_left"
+            );
+
+            tab_close->append(
+                _("Tabs to right"),
+                "win.tab_close_right"
+            );
+
+            tab_close->append(
+                _("All tabs"),
+                "win.tab_close_all"
+            );
+
+        tab->append_submenu(
+            _("Close"),
+            tab_close
         );
 
     // Build tool submenu model
