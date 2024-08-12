@@ -2,12 +2,22 @@
 #define APP_BROWSER_MAIN_TAB_H
 
 #include <glibmm/i18n.h>
+#include <gtkmm/gestureclick.h>
+#include <gtkmm/label.h>
 #include <gtkmm/notebook.h>
 
 namespace app::browser::main
 {
     class Tab : public Gtk::Notebook
     {
+        private:
+
+            void on_label_click(
+                int n,
+                double x,
+                double y
+            );
+
         public:
 
             const bool SCROLLABLE = true;
