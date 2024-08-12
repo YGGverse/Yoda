@@ -33,7 +33,7 @@ Main::~Main()
     tab = nullptr;
 }
 
-void Main::tabAppend()
+void Main::tab_append()
 {
     tab->append(
         nullptr,

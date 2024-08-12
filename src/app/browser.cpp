@@ -37,7 +37,7 @@ Browser::Browser(
         "tab_append",
         sigc::mem_fun(
             * this,
-            & Browser::mainTabAppend
+            & Browser::main_tab_append
         )
     );
 
@@ -61,9 +61,9 @@ Browser::~Browser()
     main = nullptr;
 }
 
-void Browser::mainTabAppend()
+void Browser::main_tab_append()
 {
-    main->tabAppend();
+    main->tab_append();
 };
 
 void Browser::debug()

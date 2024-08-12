@@ -37,7 +37,7 @@ namespace app
 
             ~Browser();
 
-            void mainTabAppend();
+            void main_tab_append();
 
             void debug();
     };

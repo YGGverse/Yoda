@@ -22,7 +22,7 @@ namespace app::browser
 
             ~Main();
 
-            void tabAppend();
+            void tab_append();
     };
 }
 
