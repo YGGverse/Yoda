@@ -70,7 +70,7 @@ void Tab::close()
     );
 
     // @TODO clean memory
-    // @TODO fix GtkGizmo reported min height -3, but sizes must be >= 0
+    // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
 void Tab::close_left()
