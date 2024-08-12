@@ -10,6 +10,7 @@ namespace app::browser::header
     {
         public:
 
+            const char* ACTION = "win.tab";
             const char* ICON = "tab-new-symbolic";
             const char* TOOLTIP = _("New tab");
 
