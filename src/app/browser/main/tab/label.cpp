@@ -37,8 +37,8 @@ void Label::on_click(
 ) {
     if (n == 2) // double click
     {
-        //Tab::close(
-        //    -1 // active
-        //);
+        activate_action(
+            "win.tab_close"
+        );
     }
 }
