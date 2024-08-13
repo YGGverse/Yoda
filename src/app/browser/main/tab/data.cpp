@@ -10,10 +10,6 @@ Data::Data()
         Gtk::Orientation::VERTICAL
     );
 
-    set_homogeneous(
-        true
-    );
-
     // Init elements
     navbar = new data::Navbar();
 
