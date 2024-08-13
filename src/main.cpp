@@ -33,6 +33,11 @@ int main(
     );
 
     app->set_accel_for_action(
+        "tab.update",
+        "<Primary>r"
+    );
+
+    app->set_accel_for_action(
         "win.debug",
         "<Primary>i"
     );
