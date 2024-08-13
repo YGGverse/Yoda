@@ -3,11 +3,18 @@
 
 #include <glibmm/i18n.h>
 #include <gtkmm/entry.h>
+#include <sigc++/functors/mem_fun.h>
 
 namespace app::browser::main::tab::data::navbar
 {
     class Request : public Gtk::Entry
     {
+        private:
+
+            void on_activate();
+
+            void on_change();
+
         public:
 
             Request();
