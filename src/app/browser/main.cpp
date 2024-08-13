@@ -45,7 +45,7 @@ void Main::tab_append()
 void Main::tab_close()
 {
     tab->close(
-        -1 // active
+        tab->get_current_page() // active
     );
 };
 

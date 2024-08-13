@@ -64,7 +64,7 @@ void Tab::close_all()
     while (0 <= get_current_page())
     {
         close(
-            -1 // active
+            -1 // last
         );
     }
 }
