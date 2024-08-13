@@ -1,4 +1,5 @@
 #include "tab.hpp"
+#include "tab/label.hpp"
 
 using namespace app::browser::main;
 
@@ -17,35 +18,14 @@ void Tab::append(
     bool focus
 ) {
     // Init new tab label
-    Gtk::Label * name = new Gtk::Label(
-        _("New tab")
-    );
-
-    // Setup label controller
-    auto controller = Gtk::GestureClick::create();
-
-        /* @TODO remove as default
-        controller->set_button(
-            GDK_BUTTON_PRIMARY
-        );*/
-
-        controller->signal_pressed().connect(
-            sigc::mem_fun(
-                * this,
-                & Tab::on_label_click
-            )
-        );
-
-        name->add_controller(
-            controller
-        );
+    label = new tab::Label();
 
     // Init tab data container @TODO
     Gtk::Label * data = new Gtk::Label("data");
 
     append_page(
         * data,
-        * name
+        * label
     );
 
     set_tab_reorderable(
@@ -83,19 +63,6 @@ void Tab::close_right()
 void Tab::close_all()
 {
     while (0 <= get_current_page())
-    {
-        close(
-            -1 // active
-        );
-    }
-}
-
-void Tab::on_label_click(
-    int n,
-    double x,
-    double y
-) {
-    if (n == 2) // double click
     {
         close(
             -1 // active

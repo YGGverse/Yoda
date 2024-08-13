@@ -2,23 +2,20 @@
 #define APP_BROWSER_MAIN_TAB_HPP
 
 #include <glibmm/i18n.h>
-#include <gtkmm/gestureclick.h>
-#include <gtkmm/label.h>
 #include <gtkmm/notebook.h>
 
 namespace app::browser::main
 {
+    namespace tab
+    {
+        class Label;
+    }
+
     class Tab : public Gtk::Notebook
     {
-        private:
-
-            void on_label_click(
-                int n,
-                double x,
-                double y
-            );
-
         public:
+
+            tab::Label * label;
 
             Tab();
 
