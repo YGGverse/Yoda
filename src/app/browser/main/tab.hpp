@@ -8,6 +8,7 @@ namespace app::browser::main
 {
     namespace tab
     {
+        class Data;
         class Label;
     }
 
@@ -15,6 +16,7 @@ namespace app::browser::main
     {
         public:
 
+            tab::Data * data;
             tab::Label * label;
 
             Tab();

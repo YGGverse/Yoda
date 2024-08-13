@@ -1,4 +1,5 @@
 #include "tab.hpp"
+#include "tab/data.hpp"
 #include "tab/label.hpp"
 
 using namespace app::browser::main;
@@ -17,11 +18,9 @@ void Tab::append(
     bool open,
     bool focus
 ) {
-    // Init new tab label
     label = new tab::Label();
 
-    // Init tab data container @TODO
-    Gtk::Label * data = new Gtk::Label("data");
+    data = new tab::Data();
 
     append_page(
         * data,
