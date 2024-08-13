@@ -6,6 +6,10 @@ using namespace app::browser::main::tab::data::navbar;
 
 History::History()
 {
+    add_css_class(
+        "linked" // merge children elements
+    );
+
     back = new history::Back();
 
         append(
