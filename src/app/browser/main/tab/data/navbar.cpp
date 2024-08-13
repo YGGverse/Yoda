@@ -1,5 +1,6 @@
 #include "navbar.hpp"
 #include "navbar/base.hpp"
+#include "navbar/bookmark.hpp"
 #include "navbar/history.hpp"
 #include "navbar/update.hpp"
 
@@ -49,6 +50,12 @@ Navbar::Navbar()
 
         append(
             * update
+        );
+
+    bookmark = new navbar::Bookmark();
+
+        append(
+            * bookmark
         );
 }
 

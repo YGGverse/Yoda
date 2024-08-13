@@ -8,6 +8,7 @@ namespace app::browser::main::tab::data
     namespace navbar
     {
         class Base;
+        class Bookmark;
         class History;
         class Update;
     }
@@ -22,6 +23,7 @@ namespace app::browser::main::tab::data
 
             // Components
             navbar::Base * base;
+            navbar::Bookmark * bookmark;
             navbar::History * history;
             navbar::Update * update;
 
