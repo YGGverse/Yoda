@@ -2,6 +2,7 @@
 #include "navbar/base.hpp"
 #include "navbar/bookmark.hpp"
 #include "navbar/history.hpp"
+#include "navbar/request.hpp"
 #include "navbar/update.hpp"
 
 using namespace app::browser::main::tab::data;
@@ -50,6 +51,12 @@ Navbar::Navbar()
 
         append(
             * update
+        );
+
+    request = new navbar::Request();
+
+        append(
+            * request
         );
 
     bookmark = new navbar::Bookmark();

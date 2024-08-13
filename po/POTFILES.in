@@ -11,6 +11,7 @@ src/app/browser/main/tab/data/navbar/bookmark.cpp
 src/app/browser/main/tab/data/navbar/history.cpp
 src/app/browser/main/tab/data/navbar/history/back.cpp
 src/app/browser/main/tab/data/navbar/history/forward.cpp
+src/app/browser/main/tab/data/navbar/request.cpp
 src/app/browser/main/tab/data/navbar/update.cpp
 src/app/browser/main/tab/label.cpp
 src/lib/database.cpp

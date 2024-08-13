@@ -11,6 +11,7 @@ namespace app::browser::main::tab::data
         class Bookmark;
         class History;
         class Update;
+        class Request;
     }
 
     class Navbar : public Gtk::Box
@@ -25,6 +26,7 @@ namespace app::browser::main::tab::data
             navbar::Base * base;
             navbar::Bookmark * bookmark;
             navbar::History * history;
+            navbar::Request * request;
             navbar::Update * update;
 
         public:
