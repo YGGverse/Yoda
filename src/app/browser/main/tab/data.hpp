@@ -1,7 +1,6 @@
 #ifndef APP_BROWSER_MAIN_TAB_DATA_HPP
 #define APP_BROWSER_MAIN_TAB_DATA_HPP
 
-#include <glibmm/i18n.h>
 #include <gtkmm/box.h>
 
 namespace app::browser::main::tab
