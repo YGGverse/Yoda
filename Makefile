@@ -13,6 +13,7 @@ SRCS =  src/main.cpp\
 		src/app/browser/main.cpp\
 		src/app/browser/main/tab.cpp\
 		src/app/browser/main/tab/data.cpp\
+		src/app/browser/main/tab/data/content.cpp\
 		src/app/browser/main/tab/data/navbar.cpp\
 		src/app/browser/main/tab/data/navbar/base.cpp\
 		src/app/browser/main/tab/data/navbar/bookmark.cpp\
