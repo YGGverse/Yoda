@@ -5,8 +5,17 @@
 
 namespace app::browser::main::tab
 {
+    namespace data
+    {
+        class Navbar;
+    }
+
     class Data : public Gtk::Box
     {
+        private:
+
+            data::Navbar * navbar;
+
         public:
 
             Data();
