@@ -14,6 +14,7 @@ SRCS =  src/main.cpp\
 		src/app/browser/main/tab.cpp\
 		src/app/browser/main/tab/data.cpp\
 		src/app/browser/main/tab/data/navbar.cpp\
+		src/app/browser/main/tab/data/navbar/base.cpp\
 		src/app/browser/main/tab/label.cpp\
 		src/lib/database.cpp\
 		src/lib/database/session.cpp
