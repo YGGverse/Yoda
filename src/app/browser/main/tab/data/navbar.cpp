@@ -1,5 +1,6 @@
 #include "navbar.hpp"
 #include "navbar/base.hpp"
+#include "navbar/history.hpp"
 #include "navbar/update.hpp"
 
 using namespace app::browser::main::tab::data;
@@ -36,6 +37,12 @@ Navbar::Navbar()
 
         append(
             * base
+        );
+
+    history = new navbar::History();
+
+        append(
+            * history
         );
 
     update = new navbar::Update();
