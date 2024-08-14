@@ -25,4 +25,17 @@ Url::Url(
     query  = results[5];
 }
 
+string Url::to_string()
+{
+    string result;
+
+    if (!scheme.empty()) result += scheme + "://";
+    if (!host.empty())   result += host;
+    if (!port.empty())   result += ":" + port;
+    if (!path.empty())   result += "/" + path;
+    if (!query.empty())  result += "?" + query;
+
+    return result;
+}
+
 Url::~Url() = default;

@@ -20,6 +20,8 @@ namespace lib
                 std::string subject
             );
 
+            std::string to_string();
+
             ~Url();
     };
 }
