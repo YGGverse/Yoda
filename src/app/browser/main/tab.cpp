@@ -6,21 +6,30 @@ using namespace app::browser::main;
 
 Tab::Tab()
 {
+    // Init widget
     set_scrollable(
         true
+    );
+
+    // Init events
+    signal_switch_page().connect(
+        sigc::mem_fun(
+            * this,
+            & Tab::on_switch
+        )
     );
 }
 
 Tab::~Tab() = default;
 
+// Actions
 void Tab::append(
     const char * request,
     bool open,
     bool focus
 ) {
-    label = new tab::Label();
-
-    data = new tab::Data();
+    auto label = new tab::Label();
+    auto data  = new tab::Data();
 
     append_page(
         * data,
@@ -67,4 +76,25 @@ void Tab::close_all()
             -1 // last
         );
     }
+}
+
+void Tab::update(
+    int number
+) {
+    auto page = get_nth_page(
+        number
+    );
+
+    page->activate_action(
+        "tab.update"
+    );
+
+} // @TODO
+
+// Events
+void Tab::on_switch(
+    Gtk::Widget * page,
+    guint page_num
+) {
+    // @TODO update header
 }

@@ -2,22 +2,22 @@
 #define APP_BROWSER_MAIN_TAB_HPP
 
 #include <glibmm/i18n.h>
+#include <gtkmm/widget.h>
 #include <gtkmm/notebook.h>
+#include <sigc++/functors/mem_fun.h>
 
 namespace app::browser::main
 {
-    namespace tab
-    {
-        class Data;
-        class Label;
-    }
-
     class Tab : public Gtk::Notebook
     {
-        public:
+        private:
 
-            tab::Data * data;
-            tab::Label * label;
+            void on_switch(
+                Gtk::Widget * page,
+                guint page_num
+            );
+
+        public:
 
             Tab();
 
@@ -37,7 +37,9 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-            void update();
+            void update(
+                int number
+            );
     };
 }
 

@@ -2,6 +2,8 @@
 #define APP_BROWSER_MAIN_TAB_DATA_HPP
 
 #include <gtkmm/box.h>
+#include <giomm/simpleactiongroup.h>
+#include <sigc++/functors/mem_fun.h>
 
 namespace app::browser::main::tab
 {
@@ -14,6 +16,8 @@ namespace app::browser::main::tab
     {
         private:
 
+            Glib::RefPtr<Gio::SimpleActionGroup> action_group;
+
             data::Navbar * navbar;
 
         public:
@@ -21,6 +25,8 @@ namespace app::browser::main::tab
             Data();
 
             ~Data();
+
+            void update();
     };
 }
 
