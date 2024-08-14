@@ -30,7 +30,11 @@ Request::Request()
 Request::~Request() = default;
 
 void Request::on_activate()
-{} // @TODO
+{
+    activate_action(
+        "data.update"
+    );
+}
 
 void Request::on_change()
 {
