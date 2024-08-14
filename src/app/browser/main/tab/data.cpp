@@ -11,19 +11,6 @@ Data::Data()
         Gtk::Orientation::VERTICAL
     );
 
-    // Init components
-    navbar = new data::Navbar();
-
-        append(
-            * navbar
-        );
-
-    content = new data::Content();
-
-        append(
-            * content
-        );
-
     // Init actions group
     action_group = Gio::SimpleActionGroup::create();
 
@@ -40,6 +27,23 @@ Data::Data()
         "data",
         action_group
     );
+
+    // Init components
+    navbar = new data::Navbar();
+
+        append(
+            * navbar
+        );
+
+        // Refresh children elements view (e.g. buttons sensitivity)
+        // because of insert_action_group + append here @TODO
+        navbar->refresh();
+
+    content = new data::Content();
+
+        append(
+            * content
+        );
 }
 
 Data::~Data() = default;

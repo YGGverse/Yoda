@@ -15,10 +15,6 @@ Update::Update()
     set_tooltip_text(
         _("Update")
     );
-
-    set_sensitive(
-        false
-    );
 }
 
 Update::~Update() = default;
