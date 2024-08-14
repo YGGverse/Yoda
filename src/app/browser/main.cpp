@@ -44,13 +44,15 @@ void Main::tab_append()
 
 void Main::tab_update()
 {
-    tab->update();
+    tab->update(
+        tab->get_current_page()
+    );
 };
 
 void Main::tab_close()
 {
     tab->close(
-        tab->get_current_page() // active
+        tab->get_current_page()
     );
 };
 
