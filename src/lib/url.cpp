@@ -9,7 +9,7 @@ Url::Url(
     smatch results;
 
     static const regex pattern( // @TODO user:password@#fragment?
-        R"regex(^(\w+)://([^:\/]+):?(\d+)?\/?([^\?]+)?\??(.*)?$)regex"
+        R"regex(^((\w+):\/\/)?([^:\/]+)?(:(\d+))?([^\?$]+)?(\?(.*))?)regex"
     );
 
     regex_search(
@@ -18,11 +18,11 @@ Url::Url(
         pattern
     );
 
-    scheme = results[1];
-    host   = results[2];
-    port   = results[3];
-    path   = results[4];
-    query  = results[5];
+    scheme = results[2];
+    host   = results[3];
+    port   = results[5];
+    path   = results[6];
+    query  = results[8];
 }
 
 string Url::to_string()
