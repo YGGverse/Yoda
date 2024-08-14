@@ -9,7 +9,7 @@ Url::Url(
     smatch results;
 
     static const regex pattern( // @TODO user:password@#fragment?
-        R"regex(^((\w+):\/\/)?([^:\/]+)?(:(\d+))?([^\?$]+)?(\?(.*))?)regex"
+        R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex"
     );
 
     regex_search(
