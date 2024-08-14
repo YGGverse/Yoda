@@ -86,7 +86,7 @@ void Tab::update(
     );
 
     page->activate_action(
-        "tab.update"
+        "data.update"
     );
 
 } // @TODO
@@ -96,5 +96,5 @@ void Tab::on_switch(
     Gtk::Widget * page,
     guint page_num
 ) {
-    // @TODO update header
+    // @TODO update header text
 }
