@@ -103,7 +103,7 @@ void Navbar::refresh()
                     && !url->path.empty()
     );
 
-    delete url;
+    delete url; url = nullptr;
 
     // Toggle update button sensibility
     update->set_sensitive(
