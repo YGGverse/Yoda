@@ -33,4 +33,8 @@ void Request::on_activate()
 {} // @TODO
 
 void Request::on_change()
-{} // @TODO
+{
+    activate_action(
+        "navbar.refresh"
+    );
+}

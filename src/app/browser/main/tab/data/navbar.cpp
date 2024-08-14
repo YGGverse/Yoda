@@ -34,7 +34,7 @@ Navbar::Navbar()
         MARGIN
     );
 
-    // Init elements
+    // Init components
     base = new navbar::Base();
 
         append(
@@ -64,6 +64,38 @@ Navbar::Navbar()
         append(
             * bookmark
         );
+
+    // Init actions group
+    action_group = Gio::SimpleActionGroup::create();
+
+        // Define group actions
+        action_group->add_action(
+            "refresh",
+            sigc::mem_fun(
+                * this,
+                & Navbar::refresh
+            )
+        );
+
+    insert_action_group(
+        "navbar",
+        action_group
+    );
 }
 
 Navbar::~Navbar() = default;
+
+// Actions
+void Navbar::refresh()
+{
+    // Deactivate on request value is empty
+    update->set_sensitive(
+        (bool) request->get_text_length()
+    );
+}
+
+// Getters
+Glib::ustring Navbar::get_request_value()
+{
+    return request->get_text();
+}
