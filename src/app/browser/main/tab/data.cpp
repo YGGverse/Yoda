@@ -1,5 +1,6 @@
 #include "data.hpp"
 #include "data/navbar.hpp"
+#include "data/content.hpp"
 
 using namespace app::browser::main::tab;
 
@@ -13,9 +14,15 @@ Data::Data()
     // Init components
     navbar = new data::Navbar();
 
-    append(
-        * navbar
-    );
+        append(
+            * navbar
+        );
+
+    content = new data::Content();
+
+        append(
+            * content
+        );
 
     // Init actions group
     action_group = Gio::SimpleActionGroup::create();
