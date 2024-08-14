@@ -41,6 +41,14 @@ Browser::Browser(
         )
     );
 
+    add_action(
+        "tab_update",
+        sigc::mem_fun(
+            *this,
+            &Browser::main_tab_update
+        )
+    );
+
     // Close
     add_action(
         "tab_close",
@@ -99,6 +107,11 @@ Browser::~Browser()
 void Browser::main_tab_append()
 {
     main->tab_append();
+};
+
+void Browser::main_tab_update()
+{
+    main->tab_update();
 };
 
 void Browser::main_tab_close()

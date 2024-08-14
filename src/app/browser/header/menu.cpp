@@ -19,7 +19,7 @@ Menu::Menu()
 
         tab->append(
             _("Update"),
-            "tab.update"
+            "win.tab_update"
         );
 
         // Build tab close submenu model

@@ -42,6 +42,11 @@ void Main::tab_append()
     );
 };
 
+void Main::tab_update()
+{
+    tab->update();
+};
+
 void Main::tab_close()
 {
     tab->close(

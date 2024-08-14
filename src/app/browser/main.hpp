@@ -19,11 +19,10 @@ namespace app::browser
         public:
 
             Main();
-
             ~Main();
 
             void tab_append();
-
+            void tab_update();
             void tab_close();
             void tab_close_left();
             void tab_close_right();
