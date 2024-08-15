@@ -3,6 +3,7 @@
 using namespace app::browser::main::tab::data::navbar;
 using namespace std;
 
+// Construct
 Request::Request()
 {
     // Init entry
@@ -13,8 +14,6 @@ Request::Request()
     set_hexpand(
         true
     );
-
-    parse();
 
     // Connect events
     signal_changed().connect(
@@ -39,6 +38,8 @@ Request::Request()
         }
     );
 }
+
+Request::~Request() = default;
 
 // Getters
 string Request::get_scheme()
@@ -91,5 +92,3 @@ void Request::parse() // make private??
     path   = results[6];
     query  = results[8];
 }
-
-Request::~Request() = default;
