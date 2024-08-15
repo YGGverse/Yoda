@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HPP
-#define APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
 
 #include <giomm/simpleactiongroup.h>
 #include <glibmm/refptr.h>
@@ -7,7 +7,7 @@
 #include <gtkmm/box.h>
 #include <sigc++/functors/mem_fun.h>
 
-namespace app::browser::main::tab::data
+namespace app::browser::main::tab::page
 {
     namespace navbar
     {
@@ -49,4 +49,4 @@ namespace app::browser::main::tab::data
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP

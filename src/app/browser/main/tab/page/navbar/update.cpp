@@ -1,11 +1,11 @@
 #include "update.hpp"
 
-using namespace app::browser::main::tab::data::navbar;
+using namespace app::browser::main::tab::page::navbar;
 
 Update::Update()
 {
     set_action_name(
-        "data.update"
+        "page.update"
     );
 
     set_icon_name(

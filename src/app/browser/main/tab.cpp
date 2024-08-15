@@ -1,6 +1,6 @@
 #include "tab.hpp"
-#include "tab/data.hpp"
 #include "tab/label.hpp"
+#include "tab/page.hpp"
 
 using namespace app::browser::main;
 
@@ -29,15 +29,15 @@ void Tab::append(
     bool focus
 ) {
     auto label = new tab::Label();
-    auto data  = new tab::Data();
+    auto page  = new tab::Page();
 
     append_page(
-        * data,
+        * page,
         * label
     );
 
     set_tab_reorderable(
-        * data,
+        * page,
         true
     );
 
@@ -45,7 +45,7 @@ void Tab::append(
     {
         set_current_page(
             page_num(
-                * data
+                * page
             )
         );
     }
@@ -86,7 +86,7 @@ void Tab::update(
     );
 
     page->activate_action(
-        "data.update"
+        "page.update"
     );
 
 } // @TODO

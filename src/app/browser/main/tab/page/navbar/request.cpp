@@ -1,6 +1,6 @@
 #include "request.hpp"
 
-using namespace app::browser::main::tab::data::navbar;
+using namespace app::browser::main::tab::page::navbar;
 using namespace std;
 
 // Construct
@@ -33,7 +33,7 @@ Request::Request()
             parse();
 
             activate_action(
-                "data.update"
+                "page.update"
             );
         }
     );

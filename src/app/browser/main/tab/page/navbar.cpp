@@ -5,7 +5,7 @@
 #include "navbar/request.hpp"
 #include "navbar/update.hpp"
 
-using namespace app::browser::main::tab::data;
+using namespace app::browser::main::tab::page;
 
 Navbar::Navbar()
 {

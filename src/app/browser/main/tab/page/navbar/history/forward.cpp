@@ -1,6 +1,6 @@
 #include "forward.hpp"
 
-using namespace app::browser::main::tab::data::navbar::history;
+using namespace app::browser::main::tab::page::navbar::history;
 
 Forward::Forward()
 {

@@ -1,10 +1,10 @@
-#ifndef APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HISTORY_HPP
-#define APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HISTORY_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
 
 #include <glibmm/i18n.h>
 #include <gtkmm/box.h>
 
-namespace app::browser::main::tab::data::navbar
+namespace app::browser::main::tab::page::navbar
 {
     namespace history
     {
@@ -27,4 +27,4 @@ namespace app::browser::main::tab::data::navbar
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_DATA_NAVBAR_HISTORY_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP

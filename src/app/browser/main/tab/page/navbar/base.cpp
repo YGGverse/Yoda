@@ -1,6 +1,6 @@
 #include "base.hpp"
 
-using namespace app::browser::main::tab::data::navbar;
+using namespace app::browser::main::tab::page::navbar;
 
 Base::Base()
 {

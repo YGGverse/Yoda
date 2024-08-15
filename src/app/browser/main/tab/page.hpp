@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_DATA_HPP
-#define APP_BROWSER_MAIN_TAB_DATA_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_HPP
 
 #include <giomm/simpleactiongroup.h>
 #include <glibmm/refptr.h>
@@ -8,28 +8,28 @@
 
 namespace app::browser::main::tab
 {
-    namespace data
+    namespace page
     {
         class Navbar;
         class Content;
     }
 
-    class Data : public Gtk::Box
+    class Page : public Gtk::Box
     {
         private:
 
             Glib::RefPtr<Gio::SimpleActionGroup> action_group;
 
-            data::Navbar * navbar;
-            data::Content * content;
+            page::Navbar * navbar;
+            page::Content * content;
 
         public:
 
-            Data();
-            ~Data();
+            Page();
+            ~Page();
 
             void update();
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_DATA_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_HPP

@@ -2,7 +2,7 @@
 #include "history/back.hpp"
 #include "history/forward.hpp"
 
-using namespace app::browser::main::tab::data::navbar;
+using namespace app::browser::main::tab::page::navbar;
 
 History::History()
 {

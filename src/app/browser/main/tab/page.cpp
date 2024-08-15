@@ -1,10 +1,10 @@
-#include "data.hpp"
-#include "data/navbar.hpp"
-#include "data/content.hpp"
+#include "page.hpp"
+#include "page/navbar.hpp"
+#include "page/content.hpp"
 
 using namespace app::browser::main::tab;
 
-Data::Data()
+Page::Page()
 {
     // Init container
     set_orientation(
@@ -19,17 +19,17 @@ Data::Data()
             "update",
             sigc::mem_fun(
                 * this,
-                & Data::update
+                & Page::update
             )
         );
 
     insert_action_group(
-        "data",
+        "page",
         action_group
     );
 
     // Init components
-    navbar = new data::Navbar();
+    navbar = new page::Navbar();
 
         append(
             * navbar
@@ -39,17 +39,17 @@ Data::Data()
         // because of insert_action_group + append here @TODO
         navbar->refresh();
 
-    content = new data::Content();
+    content = new page::Content();
 
         append(
             * content
         );
 }
 
-Data::~Data() = default;
+Page::~Page() = default;
 
 // Actions
-void Data::update()
+void Page::update()
 {
     // navbar->get_request_value() @TODO
 }

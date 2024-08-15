@@ -1,6 +1,6 @@
 #include "content.hpp"
 
-using namespace app::browser::main::tab::data;
+using namespace app::browser::main::tab::page;
 
 Content::Content()
 {
