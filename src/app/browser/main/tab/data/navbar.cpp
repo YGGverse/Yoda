@@ -5,8 +5,6 @@
 #include "navbar/request.hpp"
 #include "navbar/update.hpp"
 
-#include "../../../../../lib/url.hpp"
-
 using namespace app::browser::main::tab::data;
 
 Navbar::Navbar()
@@ -90,24 +88,14 @@ Navbar::~Navbar() = default;
 // Actions
 void Navbar::refresh()
 {
-    // Detect request has value
-    bool has_request = request->get_text_length();
-
     // Toggle base button sensibility
-    auto url = new ::lib::Url(
-        request->get_text()
-    );
-
     base->set_sensitive(
-        has_request && !url->host.empty()
-                    && !url->path.empty()
+        !empty(request->get_host()) && !empty(request->get_path())
     );
-
-    delete url; url = nullptr;
 
     // Toggle update button sensibility
     update->set_sensitive(
-        has_request
+        (bool) request->get_text_length()
     );
 }
 

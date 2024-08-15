@@ -24,8 +24,7 @@ SRCS =  src/main.cpp\
 		src/app/browser/main/tab/data/navbar/update.cpp\
 		src/app/browser/main/tab/label.cpp\
 		src/lib/database.cpp\
-		src/lib/database/session.cpp\
-		src/lib/url.cpp
+		src/lib/database/session.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
