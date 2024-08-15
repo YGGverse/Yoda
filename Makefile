@@ -1,7 +1,7 @@
 # Define compiler and flags
 CXX = g++
-CXXFLAGS = `pkg-config --cflags gtkmm-4.0 glibmm-2.68 sqlite3`
-LDFLAGS = `pkg-config --libs gtkmm-4.0 glibmm-2.68 sqlite3`
+CXXFLAGS = `pkg-config --cflags gio-2.0 glibmm-2.68 gtkmm-4.0 sqlite3`
+LDFLAGS = `pkg-config --libs gio-2.0 glibmm-2.68 gtkmm-4.0 sqlite3`
 
 # Define target executable and source files
 TARGET = bin/Yoda
