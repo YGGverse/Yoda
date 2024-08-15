@@ -4,6 +4,7 @@ using namespace app::browser::main::tab::data::navbar;
 
 Request::Request()
 {
+    // Init entry
     set_placeholder_text(
         _("URL or search term...")
     );
@@ -12,33 +13,24 @@ Request::Request()
         true
     );
 
+    // Connect events
     signal_changed().connect(
-        sigc::mem_fun(
-            * this,
-            & Request::on_change
-        )
+        [this]
+        {
+            activate_action(
+                "navbar.refresh"
+            );
+        }
     );
 
     signal_activate().connect(
-        sigc::mem_fun(
-            * this,
-            & Request::on_activate
-        )
+        [this]
+        {
+            activate_action(
+                "data.update"
+            );
+        }
     );
 }
 
 Request::~Request() = default;
-
-void Request::on_activate()
-{
-    activate_action(
-        "data.update"
-    );
-}
-
-void Request::on_change()
-{
-    activate_action(
-        "navbar.refresh"
-    );
-}
