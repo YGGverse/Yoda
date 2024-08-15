@@ -70,7 +70,7 @@ int Request::get_port()
 }
 
 // Private helpers
-void Request::parse() // make private??
+void Request::parse()
 {
     string subject = get_text();
 
