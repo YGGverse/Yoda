@@ -14,10 +14,8 @@ namespace app::browser::main::tab::page::navbar
 
     class History : public Gtk::Box
     {
-        private:
-
-            history::Back * back;
-            history::Forward * forward;
+        history::Back * back;
+        history::Forward * forward;
 
         public:
 

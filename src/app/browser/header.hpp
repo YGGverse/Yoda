@@ -13,10 +13,8 @@ namespace app::browser
 
     class Header : public Gtk::HeaderBar
     {
-        private:
-
-            app::browser::header::Menu * menu;
-            app::browser::header::Tab * tab;
+        app::browser::header::Menu * menu;
+        app::browser::header::Tab * tab;
 
         public:
 

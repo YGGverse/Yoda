@@ -7,13 +7,11 @@ namespace lib::database
 {
     class Session
     {
-        private:
+        int status;
 
-            int status;
+        char * error;
 
-            char * error;
-
-            sqlite3 * connection;
+        sqlite3 * connection;
 
         public:
 

@@ -12,9 +12,7 @@ namespace app::browser
 
     class Main : public Gtk::Box
     {
-        private:
-
-            app::browser::main::Tab * tab;
+        app::browser::main::Tab * tab;
 
         public:
 

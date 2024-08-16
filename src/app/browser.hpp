@@ -19,10 +19,8 @@ namespace app
 
     class Browser : public Gtk::ApplicationWindow
     {
-        private:
-
-            app::browser::Header * header;
-            app::browser::Main * main;
+        app::browser::Header * header;
+        app::browser::Main * main;
 
         public:
 

@@ -20,21 +20,19 @@ namespace app::browser::main::tab::page
 
     class Navbar : public Gtk::Box
     {
-        private:
+        // Actions
+        Glib::RefPtr<Gio::SimpleActionGroup> action_group;
 
-            // Actions
-            Glib::RefPtr<Gio::SimpleActionGroup> action_group;
+        // Components
+        navbar::Base * base;
+        navbar::Bookmark * bookmark;
+        navbar::History * history;
+        navbar::Request * request;
+        navbar::Update * update;
 
-            // Components
-            navbar::Base * base;
-            navbar::Bookmark * bookmark;
-            navbar::History * history;
-            navbar::Request * request;
-            navbar::Update * update;
-
-            // Defaults
-            const int SPACING = 8;
-            const int MARGIN = 8;
+        // Defaults
+        const int SPACING = 8;
+        const int MARGIN = 8;
 
         public:
 

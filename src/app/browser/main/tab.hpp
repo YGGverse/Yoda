@@ -9,12 +9,10 @@ namespace app::browser::main
 {
     class Tab : public Gtk::Notebook
     {
-        private:
-
-            void on_switch(
-                Gtk::Widget * page,
-                guint page_num
-            );
+        void on_switch(
+            Gtk::Widget * page,
+            guint page_num
+        );
 
         public:
 

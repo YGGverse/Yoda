@@ -11,15 +11,13 @@ namespace app::browser::main::tab::page::navbar
 {
     class Request : public Gtk::Entry
     {
-        private:
+        std::string scheme,
+                    host,
+                    port,
+                    path,
+                    query;
 
-            std::string scheme,
-                        host,
-                        port,
-                        path,
-                        query;
-
-            void parse();
+        void parse();
 
         public:
 
