@@ -79,7 +79,7 @@ void Page::update()
 
         socket_client->connect_to_host_async(
             navbar->get_request_host(),
-            navbar->get_request_port().empty() ? 1965 : stoi(
+            navbar->get_request_port().empty() ? 1965 : std::stoi(
                 navbar->get_request_port()
             ),
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
