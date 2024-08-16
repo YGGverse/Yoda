@@ -3,6 +3,8 @@
 
 #include <gtkmm/box.h>
 
+#include <string>
+
 namespace app::browser::main::tab::page
 {
     class Content : public Gtk::Box
@@ -14,7 +16,7 @@ namespace app::browser::main::tab::page
             ~Content();
 
             void set(
-                std::string buffer
+                const std::string & buffer
             );
     };
 }

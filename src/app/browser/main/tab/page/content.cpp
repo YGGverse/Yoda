@@ -17,7 +17,7 @@ Content::Content()
 Content::~Content() = default;
 
 void Content::set(
-    string buffer
+    const string & buffer
 ) {
     // @TODO
 }
