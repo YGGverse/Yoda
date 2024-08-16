@@ -99,8 +99,33 @@ void Navbar::refresh()
     );
 }
 
-// Getters
-Glib::ustring Navbar::get_request_value()
+// Public getters
+Glib::ustring Navbar::get_request()
 {
     return request->get_text();
+}
+
+std::string Navbar::get_request_scheme()
+{
+    return request->get_scheme();
+}
+
+std::string Navbar::get_request_host()
+{
+    return request->get_host();
+}
+
+std::string Navbar::get_request_path()
+{
+    return request->get_path();
+}
+
+std::string Navbar::get_request_query()
+{
+    return request->get_query();
+}
+
+std::string Navbar::get_request_port()
+{
+    return request->get_port();
 }

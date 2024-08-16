@@ -6,6 +6,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <sigc++/functors/mem_fun.h>
+#include <string>
 
 namespace app::browser::main::tab::page
 {
@@ -45,7 +46,13 @@ namespace app::browser::main::tab::page
             void refresh();
 
             // Getters
-            Glib::ustring get_request_value();
+            Glib::ustring get_request();
+
+            std::string get_request_scheme();
+            std::string get_request_host();
+            std::string get_request_port();
+            std::string get_request_path();
+            std::string get_request_query();
     };
 }
 
