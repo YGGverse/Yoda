@@ -17,10 +17,10 @@ Page::Page()
         // Define group actions
         action_group->add_action(
             "update",
-            sigc::mem_fun(
-                * this,
-                & Page::update
-            )
+            [this]
+            {
+                Page::update();
+            }
         );
 
     insert_action_group(
@@ -46,12 +46,15 @@ Page::Page()
         );
 }
 
-Page::~Page() = default;
+Page::~Page()
+{
+    delete navbar;
+    delete content;
+}
 
-// Public actions
 void Page::update()
 {
-    // Route by request protocol
+    // Route by request scheme
     if ("file" == navbar->get_request_scheme())
     {
         // @TODO
@@ -59,55 +62,61 @@ void Page::update()
 
     else if ("gemini" == navbar->get_request_scheme())
     {
-        connect(
+        // Create new socket connection
+        socket_client = Gio::SocketClient::create();
+
+        socket_client->set_tls(
+            true
+        );
+
+        socket_client->set_tls_validation_flags(
+            Gio::TlsCertificateFlags::NO_FLAGS
+        );
+
+        socket_client->set_timeout(
+            15 // @TODO
+        );
+
+        socket_client->connect_to_host_async(
             navbar->get_request_host(),
             navbar->get_request_port().empty() ? 1965 : stoi(
                 navbar->get_request_port()
-            )
+            ),
+            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+            {
+                socket_connection = socket_client->connect_to_host_finish(
+                    result
+                );
+
+                // Request
+                const std::string request = navbar->get_request() + "\r\n";
+
+                socket_connection->get_output_stream()->write_async(
+                    request.data(),
+                    request.size(),
+                    [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                    {
+                        // Response
+                        socket_connection->get_input_stream()->read_all_async( // | read_async
+                            buffer,
+                            sizeof(buffer) - 1,
+                            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                            {
+                                content->set(
+                                    buffer
+                                );
+
+                                socket_connection->close();
+                            }
+                        );
+                    }
+                );
+            }
         );
     }
 
     else
     {
         // @TODO
-    }
-}
-
-// Private helpers
-void Page::connect(
-    const std::string & host,
-    int port
-) {
-    try
-    {
-        socket_client = Gio::SocketClient::create();
-
-        socket_client->connect_to_host_async(
-            host,
-            port,
-            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
-            {
-                try
-                {
-                    auto socket = socket_client->connect_finish(
-                        result
-                    );
-
-                    // @TODO read/write data
-
-                    socket->close();
-                }
-
-                catch (const Glib::Error & exception)
-                {
-                    // @TODO exception.what();
-                }
-            }
-        );
-    }
-
-    catch (const std::exception & exception)
-    {
-        // @TODO exception.what();
     }
 }

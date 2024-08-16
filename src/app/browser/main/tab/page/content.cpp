@@ -1,6 +1,7 @@
 #include "content.hpp"
 
 using namespace app::browser::main::tab::page;
+using namespace std;
 
 Content::Content()
 {
@@ -14,3 +15,9 @@ Content::Content()
 }
 
 Content::~Content() = default;
+
+void Content::set(
+    string buffer
+) {
+    // @TODO
+}

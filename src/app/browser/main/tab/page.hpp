@@ -1,14 +1,16 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_HPP
 
+#include <giomm/asyncresult.h>
+#include <giomm/inputstream.h>
+#include <giomm/outputstream.h>
 #include <giomm/simpleactiongroup.h>
+#include <giomm/socketclient.h>
+#include <giomm/socketconnection.h>
 #include <glibmm/refptr.h>
 #include <gtkmm/box.h>
-#include <sigc++/functors/mem_fun.h>
 
-#include <giomm/asyncresult.h>
-#include <giomm/socketconnection.h>
-#include <giomm/socketclient.h>
+#include <string>
 
 namespace app::browser::main::tab
 {
@@ -22,16 +24,14 @@ namespace app::browser::main::tab
     {
         private:
 
+            char buffer[0xfffff];
+
             Glib::RefPtr<Gio::SimpleActionGroup> action_group;
             Glib::RefPtr<Gio::SocketClient> socket_client;
+            Glib::RefPtr<Gio::SocketConnection> socket_connection;
 
             page::Navbar * navbar;
             page::Content * content;
-
-            void connect(
-                const std::string & host,
-                int port
-            );
 
         public:
 

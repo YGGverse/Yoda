@@ -12,6 +12,10 @@ namespace app::browser::main::tab::page
             Content();
 
             ~Content();
+
+            void set(
+                std::string buffer
+            );
     };
 }
 
