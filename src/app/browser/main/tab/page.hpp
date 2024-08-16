@@ -6,6 +6,10 @@
 #include <gtkmm/box.h>
 #include <sigc++/functors/mem_fun.h>
 
+#include <giomm/asyncresult.h>
+#include <giomm/socketconnection.h>
+#include <giomm/socketclient.h>
+
 namespace app::browser::main::tab
 {
     namespace page
@@ -19,9 +23,15 @@ namespace app::browser::main::tab
         private:
 
             Glib::RefPtr<Gio::SimpleActionGroup> action_group;
+            Glib::RefPtr<Gio::SocketClient> socket_client;
 
             page::Navbar * navbar;
             page::Content * content;
+
+            void connect(
+                const std::string & host,
+                int port
+            );
 
         public:
 

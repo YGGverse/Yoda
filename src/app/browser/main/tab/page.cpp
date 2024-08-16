@@ -48,8 +48,66 @@ Page::Page()
 
 Page::~Page() = default;
 
-// Actions
+// Public actions
 void Page::update()
 {
-    // navbar->get_request_value() @TODO
+    // Route by request protocol
+    if ("file" == navbar->get_request_scheme())
+    {
+        // @TODO
+    }
+
+    else if ("gemini" == navbar->get_request_scheme())
+    {
+        connect(
+            navbar->get_request_host(),
+            navbar->get_request_port().empty() ? 1965 : stoi(
+                navbar->get_request_port()
+            )
+        );
+    }
+
+    else
+    {
+        // @TODO
+    }
+}
+
+// Private helpers
+void Page::connect(
+    const std::string & host,
+    int port
+) {
+    try
+    {
+        socket_client = Gio::SocketClient::create();
+
+        socket_client->connect_to_host_async(
+            host,
+            port,
+            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+            {
+                try
+                {
+                    auto socket = socket_client->connect_finish(
+                        result
+                    );
+
+                    // @TODO read/write data
+
+                    socket->close();
+                }
+
+                catch (const Glib::Error & exception)
+                {
+                    // @TODO exception.what();
+                }
+            }
+        );
+    }
+
+    catch (const std::exception & exception)
+    {
+        // @TODO exception.what();
+    }
 }
