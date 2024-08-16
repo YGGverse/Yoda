@@ -29,10 +29,9 @@ namespace app::browser::main::tab::page::navbar
 
             std::string get_scheme();
             std::string get_host();
+            std::string get_port();
             std::string get_path();
             std::string get_query();
-
-            int get_port();
     };
 }
 

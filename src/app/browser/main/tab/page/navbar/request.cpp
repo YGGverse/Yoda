@@ -52,6 +52,11 @@ string Request::get_host()
     return host;
 }
 
+string Request::get_port()
+{
+    return port;
+}
+
 string Request::get_path()
 {
     return path;
@@ -60,13 +65,6 @@ string Request::get_path()
 string Request::get_query()
 {
     return path;
-}
-
-int Request::get_port()
-{
-    return stoi(
-        port
-    );
 }
 
 // Private helpers
