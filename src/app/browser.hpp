@@ -32,16 +32,6 @@ namespace app
             );
 
             ~Browser();
-
-            void main_tab_append();
-            void main_tab_update();
-
-            void main_tab_close();
-            void main_tab_close_left();
-            void main_tab_close_right();
-            void main_tab_close_all();
-
-            void debug();
     };
 }
 

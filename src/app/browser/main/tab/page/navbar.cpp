@@ -71,10 +71,10 @@ Navbar::Navbar()
         // Define group actions
         action_group->add_action(
             "refresh",
-            sigc::mem_fun(
-                * this,
-                & Navbar::refresh
-            )
+            [this]
+            {
+                refresh();
+            }
         );
 
     insert_action_group(

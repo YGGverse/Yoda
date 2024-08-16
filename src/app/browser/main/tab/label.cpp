@@ -17,10 +17,12 @@ Label::Label()
         );*/
 
         controller->signal_pressed().connect(
-            sigc::mem_fun(
-                * this,
-                & Label::on_click
-            )
+            [this](int n, double x, double y)
+            {
+                on_click(
+                    n, x, y
+                );
+            }
         );
 
         add_controller(

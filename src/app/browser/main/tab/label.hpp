@@ -5,7 +5,6 @@
 #include <glibmm/refptr.h>
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/label.h>
-#include <sigc++/functors/mem_fun.h>
 
 namespace app::browser::main::tab
 {

@@ -13,10 +13,13 @@ Tab::Tab()
 
     // Init events
     signal_switch_page().connect(
-        sigc::mem_fun(
-            * this,
-            & Tab::on_switch
-        )
+        [this](Gtk::Widget * page, guint page_num)
+        {
+            on_switch(
+                page,
+                page_num
+            );
+        }
     );
 }
 

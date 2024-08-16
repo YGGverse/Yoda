@@ -35,108 +35,68 @@ Browser::Browser(
     // Init actions
     add_action(
         "tab_append",
-        sigc::mem_fun(
-            * this,
-            & Browser::main_tab_append
-        )
+        [this]
+        {
+            main->tab_append();
+        }
     );
 
     add_action(
         "tab_update",
-        sigc::mem_fun(
-            *this,
-            &Browser::main_tab_update
-        )
+        [this]
+        {
+            main->tab_update();
+        }
     );
 
     // Close
     add_action(
         "tab_close",
-        sigc::mem_fun(
-            * this,
-            & Browser::main_tab_close
-        )
+        [this]
+        {
+            main->tab_close();
+        }
     );
 
         // Close submenu
         add_action(
             "tab_close_left",
-            sigc::mem_fun(
-                * this,
-                & Browser::main_tab_close_left
-            )
+            [this]
+            {
+                main->tab_close_left();
+            }
         );
 
         add_action(
             "tab_close_right",
-            sigc::mem_fun(
-                * this,
-                & Browser::main_tab_close_right
-            )
+            [this]
+            {
+                main->tab_close_right();
+            }
         );
 
         add_action(
             "tab_close_all",
-            sigc::mem_fun(
-                * this,
-                & Browser::main_tab_close_all
-            )
+            [this]
+            {
+                main->tab_close_all();
+            }
         );
 
     // Tool
     add_action(
         "debug",
-        sigc::mem_fun(
-            * this,
-            & Browser::debug
-        )
+        [this]
+        {
+            gtk_window_set_interactive_debugging(
+                true
+            );
+        }
     );
 }
 
 Browser::~Browser()
 {
-    destroy();
-
     delete header;
-    header = nullptr;
-
     delete main;
-    main = nullptr;
 }
-
-void Browser::main_tab_append()
-{
-    main->tab_append();
-};
-
-void Browser::main_tab_update()
-{
-    main->tab_update();
-};
-
-void Browser::main_tab_close()
-{
-    main->tab_close();
-};
-
-void Browser::main_tab_close_left()
-{
-    main->tab_close_left();
-};
-
-void Browser::main_tab_close_right()
-{
-    main->tab_close_right();
-};
-
-void Browser::main_tab_close_all()
-{
-    main->tab_close_all();
-};
-
-void Browser::debug()
-{
-    gtk_window_set_interactive_debugging(
-        true
-    );
-};

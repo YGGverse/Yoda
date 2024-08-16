@@ -5,7 +5,6 @@
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
-#include <sigc++/functors/mem_fun.h>
 #include <string>
 
 namespace app::browser::main::tab::page

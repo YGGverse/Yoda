@@ -4,7 +4,6 @@
 #include <glibmm/i18n.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/notebook.h>
-#include <sigc++/functors/mem_fun.h>
 
 namespace app::browser::main
 {

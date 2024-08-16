@@ -20,10 +20,10 @@ int main(
 
     app->add_action(
         "quit",
-        sigc::mem_fun(
-            * app,
-            & Gtk::Application::quit
-        )
+        [app]
+        {
+            app->quit();
+        }
     );
 
     // Init accels @TODO db settings
