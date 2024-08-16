@@ -1,4 +1,5 @@
-#include <glibmm.h>
+#include <glibmm/refptr.h>
+#include <gtkmm/application.h>
 
 int main(
     int argc,
