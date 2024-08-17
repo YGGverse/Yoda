@@ -43,7 +43,7 @@ namespace app::browser::main::tab::page
 
             // Setters
             void set_request(
-                const Glib::ustring value
+                const Glib::ustring & value
             );
 
             // Getters

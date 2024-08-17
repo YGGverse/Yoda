@@ -101,7 +101,7 @@ void Navbar::refresh()
 
 // Setters
 void Navbar::set_request(
-    const Glib::ustring value
+    const Glib::ustring & value
 ) {
     request->set_text(
         value
