@@ -57,11 +57,21 @@ void Tab::append(
 void Tab::close(
     int number
 ) {
+    auto page = get_nth_page(
+        number
+    );
+
+    auto label = get_tab_label(
+        * page
+    );
+
+    delete page;
+    delete label;
+
     remove_page(
         number
     );
 
-    // @TODO clean memory
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
