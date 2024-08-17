@@ -2,20 +2,19 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_REQUEST_HPP
 
 #include <glibmm/i18n.h>
+#include <glibmm/regex.h>
+#include <glibmm/ustring.h>
 #include <gtkmm/entry.h>
-
-#include <regex>
-#include <string>
 
 namespace app::browser::main::tab::page::navbar
 {
     class Request : public Gtk::Entry
     {
-        std::string scheme,
-                    host,
-                    port,
-                    path,
-                    query;
+        Glib::ustring scheme,
+                      host,
+                      port,
+                      path,
+                      query;
 
         void parse();
 
@@ -25,11 +24,11 @@ namespace app::browser::main::tab::page::navbar
 
             ~Request();
 
-            std::string get_scheme();
-            std::string get_host();
-            std::string get_port();
-            std::string get_path();
-            std::string get_query();
+            Glib::ustring get_scheme();
+            Glib::ustring get_host();
+            Glib::ustring get_port();
+            Glib::ustring get_path();
+            Glib::ustring get_query();
     };
 }
 

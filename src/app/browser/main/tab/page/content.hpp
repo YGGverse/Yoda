@@ -2,8 +2,7 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_HPP
 
 #include <gtkmm/box.h>
-
-#include <string>
+#include <glibmm/ustring.h>
 
 namespace app::browser::main::tab::page
 {
@@ -16,7 +15,7 @@ namespace app::browser::main::tab::page
             ~Content();
 
             void set(
-                const std::string & buffer
+                const Glib::ustring & buffer
             );
     };
 }

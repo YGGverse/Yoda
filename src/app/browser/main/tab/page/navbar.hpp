@@ -5,7 +5,6 @@
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
-#include <string>
 
 namespace app::browser::main::tab::page
 {
@@ -44,17 +43,17 @@ namespace app::browser::main::tab::page
 
             // Setters
             void set_request(
-                const std::string value
+                const Glib::ustring value
             );
 
             // Getters
             Glib::ustring get_request();
 
-            std::string get_request_scheme();
-            std::string get_request_host();
-            std::string get_request_port();
-            std::string get_request_path();
-            std::string get_request_query();
+            Glib::ustring get_request_scheme();
+            Glib::ustring get_request_host();
+            Glib::ustring get_request_port();
+            Glib::ustring get_request_path();
+            Glib::ustring get_request_query();
     };
 }
 

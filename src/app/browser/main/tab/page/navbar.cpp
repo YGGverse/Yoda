@@ -90,7 +90,7 @@ void Navbar::refresh()
 {
     // Toggle base button sensibility
     base->set_sensitive(
-        !empty(request->get_host()) && !empty(request->get_path())
+        !request->get_host().empty() && !request->get_path().empty()
     );
 
     // Toggle update button sensibility
@@ -101,7 +101,7 @@ void Navbar::refresh()
 
 // Setters
 void Navbar::set_request(
-    const std::string value
+    const Glib::ustring value
 ) {
     request->set_text(
         value
@@ -116,27 +116,27 @@ Glib::ustring Navbar::get_request()
     return request->get_text();
 }
 
-std::string Navbar::get_request_scheme()
+Glib::ustring Navbar::get_request_scheme()
 {
     return request->get_scheme();
 }
 
-std::string Navbar::get_request_host()
+Glib::ustring Navbar::get_request_host()
 {
     return request->get_host();
 }
 
-std::string Navbar::get_request_path()
+Glib::ustring Navbar::get_request_path()
 {
     return request->get_path();
 }
 
-std::string Navbar::get_request_query()
+Glib::ustring Navbar::get_request_query()
 {
     return request->get_query();
 }
 
-std::string Navbar::get_request_port()
+Glib::ustring Navbar::get_request_port()
 {
     return request->get_port();
 }

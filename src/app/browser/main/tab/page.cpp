@@ -88,7 +88,7 @@ void Page::update()
                 );
 
                 // Request
-                const std::string request = navbar->get_request() + "\r\n";
+                const Glib::ustring request = navbar->get_request() + "\r\n";
 
                 socket_connection->get_output_stream()->write_async(
                     request.data(),
@@ -117,15 +117,13 @@ void Page::update()
     // Scheme not found but host provided, redirect to gemini://
     else if (!navbar->get_request_host().empty())
     {
-        std::string request = "gemini://";
+        Glib::ustring request = "gemini://";
 
         request += navbar->get_request_host(); // @TODO validate
 
         if (!navbar->get_request_port().empty())
         {
-            request += std::stoi(
-                navbar->get_request_port()
-            );
+            request += navbar->get_request_port();
         }
 
         request += navbar->get_request_path();

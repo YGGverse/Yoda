@@ -1,7 +1,6 @@
 #include "request.hpp"
 
 using namespace app::browser::main::tab::page::navbar;
-using namespace std;
 
 // Construct
 Request::Request()
@@ -42,27 +41,27 @@ Request::Request()
 Request::~Request() = default;
 
 // Getters
-string Request::get_scheme()
+Glib::ustring Request::get_scheme()
 {
     return scheme;
 }
 
-string Request::get_host()
+Glib::ustring Request::get_host()
 {
     return host;
 }
 
-string Request::get_port()
+Glib::ustring Request::get_port()
 {
     return port;
 }
 
-string Request::get_path()
+Glib::ustring Request::get_path()
 {
     return path;
 }
 
-string Request::get_query()
+Glib::ustring Request::get_query()
 {
     return path;
 }
@@ -70,23 +69,30 @@ string Request::get_query()
 // Private helpers
 void Request::parse()
 {
-    string subject = get_text();
-
-    smatch results;
-
-    static const regex pattern( // @TODO user:password@#fragment?
-        R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex"
+    auto match = Glib::Regex::split_simple(
+        R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex",
+        get_text()
     );
 
-    regex_search(
-        subject,
-        results,
-        pattern
-    );
+    scheme = "";
+    host   = "";
+    port   = "";
+    path   = "";
+    query  = "";
 
-    scheme = results[2];
-    host   = results[3];
-    port   = results[5];
-    path   = results[6];
-    query  = results[8];
+    int index = 0;
+
+    for (const Glib::ustring & value : match)
+    {
+        switch (index)
+        {
+            case 2: scheme = value; break;
+            case 3: host   = value; break;
+            case 5: port   = value; break;
+            case 6: path   = value; break;
+            case 8: query  = value; break;
+        }
+
+        index++;
+    }
 }
