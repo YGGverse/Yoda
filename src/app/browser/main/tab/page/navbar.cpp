@@ -83,7 +83,14 @@ Navbar::Navbar()
     );
 }
 
-Navbar::~Navbar() = default;
+Navbar::~Navbar()
+{
+    delete base;
+    delete bookmark;
+    delete history;
+    delete request;
+    delete update;
+};
 
 // Actions
 void Navbar::refresh()

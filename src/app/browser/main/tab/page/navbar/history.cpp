@@ -23,4 +23,8 @@ History::History()
         );
 }
 
-History::~History() = default;
+History::~History()
+{
+    delete back;
+    delete forward;
+};

@@ -28,19 +28,6 @@ Header::Header()
 
 Header::~Header()
 {
-    // Menu
-    remove(
-        * menu
-    );
-
     delete menu;
-    menu = nullptr;
-
-    // Tab
-    remove(
-        * tab
-    );
-
     delete tab;
-    tab = nullptr;
 }

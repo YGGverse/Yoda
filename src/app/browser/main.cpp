@@ -24,13 +24,7 @@ Main::Main()
 
 Main::~Main()
 {
-    remove(
-        * tab
-    );
-
     delete tab;
-
-    tab = nullptr;
 }
 
 void Main::tab_append()
