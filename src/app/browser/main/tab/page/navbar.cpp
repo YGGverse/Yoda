@@ -99,7 +99,18 @@ void Navbar::refresh()
     );
 }
 
-// Public getters
+// Setters
+void Navbar::set_request(
+    const std::string value
+) {
+    request->set_text(
+        value
+    );
+
+    // refresh(); not wanted as on change listener do same @TODO
+}
+
+// Getters
 Glib::ustring Navbar::get_request()
 {
     return request->get_text();

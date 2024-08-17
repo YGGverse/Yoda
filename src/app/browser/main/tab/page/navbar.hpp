@@ -42,6 +42,11 @@ namespace app::browser::main::tab::page
             // Actions
             void refresh();
 
+            // Setters
+            void set_request(
+                const std::string value
+            );
+
             // Getters
             Glib::ustring get_request();
 

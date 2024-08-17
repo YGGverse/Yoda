@@ -54,7 +54,6 @@ Page::~Page()
 
 void Page::update()
 {
-    // Route by request scheme
     if ("file" == navbar->get_request_scheme())
     {
         // @TODO
@@ -115,8 +114,36 @@ void Page::update()
         );
     }
 
+    // Scheme not found but host provided, redirect to gemini://
+    else if (!navbar->get_request_host().empty())
+    {
+        std::string request = "gemini://";
+
+        request += navbar->get_request_host(); // @TODO validate
+
+        if (!navbar->get_request_port().empty())
+        {
+            request += std::stoi(
+                navbar->get_request_port()
+            );
+        }
+
+        request += navbar->get_request_path();
+
+        if (!navbar->get_request_query().empty())
+        {
+            request += "?" + navbar->get_request_query();
+        }
+
+        navbar->set_request(
+            request
+        );
+
+        update();
+    }
+
     else
     {
-        // @TODO
+        // @TODO search request
     }
 }
