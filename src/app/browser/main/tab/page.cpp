@@ -120,13 +120,17 @@ void Page::update()
 
                                     else
                                     {
-                                        // @TODO exception
+                                        content->text_plain(
+                                            _("MIME type not supported")
+                                        );
                                     }
                                 }
 
                                 else
                                 {
-                                    // @TODO exception
+                                    content->text_plain(
+                                        _("Could not open page")
+                                    );
                                 }
 
                                 socket_connection->close();

@@ -7,6 +7,7 @@
 #include <giomm/simpleactiongroup.h>
 #include <giomm/socketclient.h>
 #include <giomm/socketconnection.h>
+#include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>

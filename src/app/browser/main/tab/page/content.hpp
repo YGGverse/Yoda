@@ -24,6 +24,10 @@ namespace app::browser::main::tab::page
             void text_gemini(
                 const Glib::ustring & gemtext
             );
+
+            void text_plain(
+                const Glib::ustring & text
+            );
     };
 }
 

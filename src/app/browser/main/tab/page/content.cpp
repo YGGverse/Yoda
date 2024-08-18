@@ -1,5 +1,6 @@
 #include "content.hpp"
 #include "content/text/gemini.hpp"
+#include "content/text/plain.hpp"
 
 using namespace app::browser::main::tab::page;
 
@@ -28,6 +29,16 @@ void Content::text_gemini(
     update(
         new content::text::Gemini(
             gemtext
+        )
+    );
+}
+
+void Content::text_plain(
+    const Glib::ustring & text
+) {
+    update(
+        new content::text::Plain(
+            text
         )
     );
 }
