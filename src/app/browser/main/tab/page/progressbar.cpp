@@ -16,7 +16,7 @@ Progressbar::Progressbar()
         PULSE_STEP
     );
 
-    set_opacity(0);
+    set_opacity(0); // fixed height, not hide()
 }
 
 Progressbar::~Progressbar() = default;
