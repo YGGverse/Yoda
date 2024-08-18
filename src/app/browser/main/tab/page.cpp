@@ -110,8 +110,8 @@ void Page::update()
                                 // Route by status code
                                 if (meta[1] == "20")
                                 {
-                                    // Route by mime type
-                                    if (meta[2] == "text/gemini")
+                                    // Route by mime type or path extension
+                                    if (meta[2] == "text/gemini" || Glib::str_has_suffix(navbar->get_request_path(), ".gmi"))
                                     {
                                         content->text_gemini(
                                             buffer // @TODO

@@ -10,6 +10,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
 #include <glibmm/regex.h>
+#include <glibmm/stringutils.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 
