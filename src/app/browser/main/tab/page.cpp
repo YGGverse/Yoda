@@ -1,6 +1,7 @@
 #include "page.hpp"
-#include "page/navbar.hpp"
 #include "page/content.hpp"
+#include "page/navbar.hpp"
+#include "page/progressbar.hpp"
 
 using namespace app::browser::main::tab;
 
@@ -39,6 +40,12 @@ Page::Page()
         // because of insert_action_group + append here @TODO
         navbar->refresh();
 
+    progressbar = new page::Progressbar();
+
+        append(
+            * progressbar
+        );
+
     content = new page::Content();
 
         append(
@@ -50,10 +57,17 @@ Page::~Page()
 {
     delete navbar;
     delete content;
+    delete progressbar;
 }
 
 void Page::update()
 {
+    // Reset progress
+    progressbar->set(
+        0
+    );
+
+    // Connect scheme driver
     if ("file" == navbar->get_request_scheme())
     {
         // @TODO
@@ -83,6 +97,10 @@ void Page::update()
             ),
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
+                progressbar->set(
+                    .25
+                );
+
                 socket_connection = socket_client->connect_to_host_finish(
                     result
                 );
@@ -95,12 +113,20 @@ void Page::update()
                     request.size(),
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
+                        progressbar->set(
+                            .5
+                        );
+
                         // Response
                         socket_connection->get_input_stream()->read_async( // | read_all_async
                             buffer,
                             sizeof(buffer) - 1,
                             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                             {
+                                progressbar->set(
+                                    .75
+                                );
+
                                 // Parse meta
                                 auto meta = Glib::Regex::split_simple(
                                     R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
@@ -134,6 +160,10 @@ void Page::update()
                                 }
 
                                 socket_connection->close();
+
+                                progressbar->set(
+                                    1
+                                );
                             }
                         );
                     }

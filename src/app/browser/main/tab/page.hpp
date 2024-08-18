@@ -18,8 +18,9 @@ namespace app::browser::main::tab
 {
     namespace page
     {
-        class Navbar;
         class Content;
+        class Navbar;
+        class Progressbar;
     }
 
     class Page : public Gtk::Box
@@ -30,8 +31,9 @@ namespace app::browser::main::tab
         Glib::RefPtr<Gio::SocketClient> socket_client;
         Glib::RefPtr<Gio::SocketConnection> socket_connection;
 
-        page::Navbar * navbar;
         page::Content * content;
+        page::Navbar * navbar;
+        page::Progressbar * progressbar;
 
         public:
 
