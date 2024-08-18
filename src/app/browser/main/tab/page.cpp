@@ -96,14 +96,38 @@ void Page::update()
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
                         // Response
-                        socket_connection->get_input_stream()->read_all_async( // | read_async
+                        socket_connection->get_input_stream()->read_async( // | read_all_async
                             buffer,
                             sizeof(buffer) - 1,
                             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                             {
-                                content->set(
+                                // Parse meta
+                                auto meta = Glib::Regex::split_simple(
+                                    R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
                                     buffer
                                 );
+
+                                // Route by status code
+                                if (meta[1] == "20")
+                                {
+                                    // Route by mime type
+                                    if (meta[2] == "text/gemini")
+                                    {
+                                        content->text_gemini(
+                                            buffer // @TODO
+                                        );
+                                    }
+
+                                    else
+                                    {
+                                        // @TODO exception
+                                    }
+                                }
+
+                                else
+                                {
+                                    // @TODO exception
+                                }
 
                                 socket_connection->close();
                             }

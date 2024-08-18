@@ -8,6 +8,7 @@
 #include <giomm/socketclient.h>
 #include <giomm/socketconnection.h>
 #include <glibmm/refptr.h>
+#include <glibmm/regex.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 

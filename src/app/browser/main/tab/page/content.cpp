@@ -1,4 +1,5 @@
 #include "content.hpp"
+#include "content/text/gemini.hpp"
 
 using namespace app::browser::main::tab::page;
 
@@ -11,12 +12,44 @@ Content::Content()
     set_homogeneous(
         true
     );
+
+    widget = nullptr;
 }
 
-Content::~Content() = default;
+Content::~Content()
+{
+    delete widget;
+};
 
-void Content::set(
-    const Glib::ustring & buffer
+// Public actions
+void Content::text_gemini(
+    const Glib::ustring & gemtext
 ) {
-    // @TODO
+    update(
+        new content::text::Gemini(
+            gemtext
+        )
+    );
+}
+
+// @TODO text_plain, picture, video, etc.
+
+// Private helpers
+void Content::update(
+    Gtk::Widget * new_widget
+) {
+    if (widget != nullptr)
+    {
+        remove(
+            * widget
+        );
+
+        delete widget;
+    }
+
+    widget = new_widget;
+
+    append(
+        * widget
+    );
 }
