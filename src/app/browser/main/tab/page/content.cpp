@@ -23,20 +23,20 @@ Content::~Content()
 };
 
 // Public actions
-void Content::text_gemini(
+void Content::set_text_gemini(
     const Glib::ustring & gemtext
 ) {
-    update(
+    set_widget(
         new content::text::Gemini(
             gemtext
         )
     );
 }
 
-void Content::text_plain(
+void Content::set_text_plain(
     const Glib::ustring & text
 ) {
-    update(
+    set_widget(
         new content::text::Plain(
             text
         )
@@ -46,8 +46,8 @@ void Content::text_plain(
 // @TODO text_plain, picture, video, etc.
 
 // Private helpers
-void Content::update(
-    Gtk::Widget * new_widget
+void Content::set_widget(
+    Gtk::Widget * object
 ) {
     if (widget != nullptr)
     {
@@ -58,7 +58,7 @@ void Content::update(
         delete widget;
     }
 
-    widget = new_widget;
+    widget = object;
 
     append(
         * widget

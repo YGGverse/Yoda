@@ -113,14 +113,14 @@ void Page::update()
                                     // Route by mime type or path extension
                                     if (meta[2] == "text/gemini" || Glib::str_has_suffix(navbar->get_request_path(), ".gmi"))
                                     {
-                                        content->text_gemini(
+                                        content->set_text_gemini(
                                             buffer // @TODO
                                         );
                                     }
 
                                     else
                                     {
-                                        content->text_plain(
+                                        content->set_text_plain(
                                             _("MIME type not supported")
                                         );
                                     }
@@ -128,7 +128,7 @@ void Page::update()
 
                                 else
                                 {
-                                    content->text_plain(
+                                    content->set_text_plain(
                                         _("Could not open page")
                                     );
                                 }

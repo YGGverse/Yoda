@@ -11,8 +11,8 @@ namespace app::browser::main::tab::page
     {
         Gtk::Widget * widget;
 
-        void update(
-            Gtk::Widget * new_widget
+        void set_widget(
+            Gtk::Widget * object
         );
 
         public:
@@ -21,11 +21,11 @@ namespace app::browser::main::tab::page
 
             ~Content();
 
-            void text_gemini(
+            void set_text_gemini(
                 const Glib::ustring & gemtext
             );
 
-            void text_plain(
+            void set_text_plain(
                 const Glib::ustring & text
             );
     };
