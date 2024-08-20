@@ -22,3 +22,11 @@ Main::~Main()
 {
     delete title;
 }
+
+void Main::set_title(
+    const Glib::ustring text
+) {
+    title->set_text(
+        text
+    );
+}

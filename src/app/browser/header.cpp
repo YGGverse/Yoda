@@ -36,7 +36,15 @@ Header::Header()
 
 Header::~Header()
 {
+    delete main;
     delete menu;
     delete tab;
-    delete main;
+}
+
+void Header::set_title(
+    const Glib::ustring text
+) {
+    main->set_title(
+        text
+    );
 }

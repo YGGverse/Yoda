@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_HEADER_HPP
 #define APP_BROWSER_HEADER_HPP
 
+#include <glibmm/ustring.h>
 #include <gtkmm/headerbar.h>
 
 namespace app::browser
@@ -23,6 +24,10 @@ namespace app::browser
             Header();
 
             ~Header();
+
+            void set_title(
+                const Glib::ustring text
+            );
     };
 }
 
