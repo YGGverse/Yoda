@@ -7,12 +7,14 @@ namespace app::browser
 {
     namespace header
     {
+        class Main;
         class Menu;
         class Tab;
     }
 
     class Header : public Gtk::HeaderBar
     {
+        app::browser::header::Main * main;
         app::browser::header::Menu * menu;
         app::browser::header::Tab * tab;
 

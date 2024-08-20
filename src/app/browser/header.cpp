@@ -1,4 +1,5 @@
 #include "header.hpp"
+#include "header/main.hpp"
 #include "header/menu.hpp"
 #include "header/tab.hpp"
 
@@ -24,10 +25,18 @@ Header::Header()
     pack_start(
         * tab
     );
+
+    // Init main widget
+    main = new header::Main();
+
+    set_title_widget(
+        * main
+    );
 }
 
 Header::~Header()
 {
     delete menu;
     delete tab;
+    delete main;
 }
