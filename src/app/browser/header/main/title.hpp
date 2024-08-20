@@ -13,14 +13,6 @@ namespace app::browser::header::main
             Title();
 
             ~Title();
-
-            void set_title(
-                Glib::ustring $value
-            );
-
-            void set_subtitle(
-                Glib::ustring $value
-            );
     };
 }
 
