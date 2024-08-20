@@ -93,6 +93,17 @@ Browser::Browser(
             );
         }
     );
+
+    // Hidden
+    add_action(
+        "refresh",
+        [this]
+        {
+            header->set_title(
+                main->get_current_tab_label_text()
+            );
+        }
+    );
 }
 
 Browser::~Browser()
