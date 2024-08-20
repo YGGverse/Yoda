@@ -8,6 +8,18 @@ Title::Title()
         "title"
     );
 
+    set_single_line_mode(
+        true
+    );
+
+    set_ellipsize(
+        Pango::EllipsizeMode::END
+    );
+
+    set_width_chars(
+        WIDTH_CHARS
+    );
+
     // @TODO
 }
 
