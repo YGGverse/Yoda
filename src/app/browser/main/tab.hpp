@@ -2,23 +2,22 @@
 #define APP_BROWSER_MAIN_TAB_HPP
 
 #include <glibmm/i18n.h>
-#include <gtkmm/widget.h>
+#include <glibmm/ustring.h>
 #include <gtkmm/notebook.h>
 
 namespace app::browser::main
 {
     class Tab : public Gtk::Notebook
     {
-        void on_switch(
-            Gtk::Widget * page,
-            guint page_num
-        );
-
         public:
 
             Tab();
 
             ~Tab();
+
+            Glib::ustring get_label_text(
+                int page_number
+            );
 
             void append(
                 const char * request,

@@ -15,15 +15,35 @@ Tab::Tab()
     signal_switch_page().connect(
         [this](Gtk::Widget * page, guint page_num)
         {
-            on_switch(
-                page,
-                page_num
+            // Refresh window elements, e.g. tab label to header bar
+            activate_action(
+                "win.refresh"
             );
         }
     );
 }
 
 Tab::~Tab() = default;
+
+// Getters
+Glib::ustring Tab::get_label_text(
+    int page_number
+) {
+    auto page = get_nth_page(
+        page_number
+    );
+
+    if (page != nullptr)
+    {
+        return get_tab_label_text(
+            * get_nth_page(
+                page_number
+            )
+        );
+    }
+
+    return ""; // @TODO
+};
 
 // Actions
 void Tab::append(
@@ -92,22 +112,17 @@ void Tab::close_all()
 }
 
 void Tab::update(
-    int number
+    int page_number
 ) {
     auto page = get_nth_page(
-        number
+        page_number
     );
 
-    page->activate_action(
-        "page.update"
-    );
+    if (page != nullptr)
+    {
+        page->activate_action(
+            "page.update"
+        );
+    }
 
 } // @TODO
-
-// Events
-void Tab::on_switch(
-    Gtk::Widget * page,
-    guint page_num
-) {
-    // @TODO update header text
-}
