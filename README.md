@@ -15,6 +15,7 @@ apt install git\
             libglib2.0-dev\
             libglibmm-2.68-dev\
             libgtkmm-4.0-dev\
+            libpangomm-2.48-dev\
             libsqlite3-dev
 ```
 
@@ -49,6 +50,7 @@ apt install git\
 pkg-config --cflags --libs gio-2.0\
                            glibmm-2.68\
                            gtkmm-4.0\
+                           pangomm-2.48\
                            sqlite3
 ```
 
