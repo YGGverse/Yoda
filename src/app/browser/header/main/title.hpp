@@ -12,11 +12,17 @@ namespace app::browser::header::main
     {
         const int WIDTH_CHARS = 5;
 
+        const Glib::ustring DEFAULT_TEXT = "Yoda";
+
         public:
 
             Title();
 
             ~Title();
+
+            void set(
+                const Glib::ustring value
+            );
     };
 }
 

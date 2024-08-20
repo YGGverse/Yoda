@@ -28,9 +28,9 @@ Main::~Main()
 }
 
 void Main::set_title(
-    const Glib::ustring text
+    const Glib::ustring value
 ) {
-    title->set_text(
-        text
+    title->set(
+        value
     );
 }

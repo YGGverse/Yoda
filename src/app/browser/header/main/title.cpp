@@ -24,7 +24,17 @@ Title::Title()
         WIDTH_CHARS
     );
 
-    // @TODO
+    set_text(
+        DEFAULT_TEXT
+    );
 }
 
 Title::~Title() = default;
+
+void Title::set(
+    const Glib::ustring value
+) {
+    set_text(
+        value.empty() ? DEFAULT_TEXT : value + " - " + DEFAULT_TEXT
+    );
+}
