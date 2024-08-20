@@ -27,6 +27,17 @@ Main::~Main()
     delete tab;
 }
 
+// Getters
+Glib::ustring Main::get_current_tab_label_text()
+{
+    int page_number = tab->get_current_page();
+
+    return tab->get_label_text(
+        page_number
+    );
+};
+
+// Actions
 void Main::tab_append()
 {
     tab->append(

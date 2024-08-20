@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_HPP
 #define APP_BROWSER_MAIN_HPP
 
+#include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 
 namespace app::browser
@@ -19,12 +20,14 @@ namespace app::browser
             Main();
             ~Main();
 
+            Glib::ustring get_current_tab_label_text();
+
             void tab_append();
-            void tab_update();
-            void tab_close();
+            void tab_close_all();
             void tab_close_left();
             void tab_close_right();
-            void tab_close_all();
+            void tab_close();
+            void tab_update();
     };
 }
 
