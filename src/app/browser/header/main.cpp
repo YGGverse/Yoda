@@ -10,6 +10,10 @@ Main::Main()
         Gtk::Orientation::VERTICAL
     );
 
+    set_homogeneous(
+        true
+    );
+
     // Init title
     title = new main::Title();
 

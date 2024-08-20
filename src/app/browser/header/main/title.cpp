@@ -16,6 +16,10 @@ Title::Title()
         Pango::EllipsizeMode::END
     );
 
+    set_valign(
+        Gtk::Align::CENTER
+    );
+
     set_width_chars(
         WIDTH_CHARS
     );

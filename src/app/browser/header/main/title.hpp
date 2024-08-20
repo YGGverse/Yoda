@@ -2,6 +2,7 @@
 #define APP_BROWSER_HEADER_MAIN_TITLE_HPP
 
 #include <glibmm/ustring.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/label.h>
 #include <pangomm/layout.h>
 
