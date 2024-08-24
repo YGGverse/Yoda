@@ -14,8 +14,8 @@ Browser::Browser(
     );
 
     set_default_size(
-        640,
-        480
+        WIDTH,
+        HEIGHT
     );
 
     // Init header widget

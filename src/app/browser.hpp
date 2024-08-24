@@ -22,6 +22,9 @@ namespace app
         app::browser::Header * header;
         app::browser::Main * main;
 
+        const int WIDTH = 640;
+        const int HEIGHT = 480;
+
         public:
 
             Browser(
