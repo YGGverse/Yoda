@@ -3,16 +3,26 @@
 using namespace app::browser::main::tab::page::navbar;
 
 // Construct
-Request::Request()
-{
+Request::Request(
+    const Glib::ustring & text
+) {
     // Init entry
     set_placeholder_text(
         _("URL or search term...")
     );
 
     set_hexpand(
-        true
+        HEXPAND
     );
+
+    if (!text.empty())
+    {
+        set_text(
+            text
+        );
+
+        parse();
+    }
 
     // Connect events
     signal_changed().connect(

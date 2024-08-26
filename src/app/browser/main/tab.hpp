@@ -9,6 +9,9 @@ namespace app::browser::main
 {
     class Tab : public Gtk::Notebook
     {
+        const bool REORDERABLE = true;
+        const bool SCROLLABLE = true;
+
         public:
 
             Tab();
@@ -20,13 +23,12 @@ namespace app::browser::main
             );
 
             void append(
-                const char * request,
-                bool open,
-                bool focus
+                const Glib::ustring & page_navbar_request_text = "",
+                bool focus = true
             );
 
             void close(
-                int number
+                int page_number
             );
 
             void close_left();
@@ -34,7 +36,7 @@ namespace app::browser::main
             void close_all();
 
             void update(
-                int number
+                int page_number
             );
     };
 }

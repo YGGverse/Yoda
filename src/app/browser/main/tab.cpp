@@ -8,12 +8,12 @@ Tab::Tab()
 {
     // Init widget
     set_scrollable(
-        true
+        SCROLLABLE
     );
 
     // Init events
     signal_switch_page().connect(
-        [this](Gtk::Widget * page, guint page_num)
+        [this](Gtk::Widget * page, guint page_number)
         {
             // Refresh window elements, e.g. tab label to header bar
             activate_action(
@@ -47,49 +47,50 @@ Glib::ustring Tab::get_label_text(
 
 // Actions
 void Tab::append(
-    const char * request,
-    bool open,
+    const Glib::ustring & page_navbar_request_text,
     bool focus
 ) {
-    auto label = new tab::Label();
-    auto page  = new tab::Page();
+    auto label = new tab::Label;
 
-    append_page(
+    auto page  = new tab::Page(
+        page_navbar_request_text
+    );
+
+    int page_number = append_page(
         * page,
         * label
     );
 
     set_tab_reorderable(
         * page,
-        true
+        REORDERABLE
     );
 
     if (focus)
     {
         set_current_page(
-            page_num(
-                * page
-            )
+            page_number
         );
     }
 };
 
 void Tab::close(
-    int number
+    int page_number
 ) {
     auto page = get_nth_page(
-        number
+        page_number
     );
 
     auto label = get_tab_label(
         * page
     );
 
-    delete page;
-    delete label;
+    // @TODO data type
+    // delete page;
+    // delete label;
 
     remove_page(
-        number
+        page_number
     );
 
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0

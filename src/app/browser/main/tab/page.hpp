@@ -37,7 +37,10 @@ namespace app::browser::main::tab
 
         public:
 
-            Page();
+            Page(
+                const Glib::ustring & navbar_request_text = ""
+            );
+
             ~Page();
 
             void update();

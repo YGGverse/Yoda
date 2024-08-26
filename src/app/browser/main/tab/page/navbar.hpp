@@ -35,19 +35,22 @@ namespace app::browser::main::tab::page
 
         public:
 
-            Navbar();
+            Navbar(
+                const Glib::ustring & request_text = ""
+            );
+
             ~Navbar();
 
             // Actions
             void refresh();
 
             // Setters
-            void set_request(
+            void set_request_text(
                 const Glib::ustring & value
             );
 
             // Getters
-            Glib::ustring get_request();
+            Glib::ustring get_request_text();
 
             Glib::ustring get_request_scheme();
             Glib::ustring get_request_host();

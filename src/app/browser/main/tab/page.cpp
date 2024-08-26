@@ -5,8 +5,9 @@
 
 using namespace app::browser::main::tab;
 
-Page::Page()
-{
+Page::Page(
+    const Glib::ustring & navbar_request_text
+) {
     // Init container
     set_orientation(
         Gtk::Orientation::VERTICAL
@@ -30,7 +31,9 @@ Page::Page()
     );
 
     // Init components
-    navbar = new page::Navbar();
+    navbar = new page::Navbar(
+        navbar_request_text
+    );
 
         append(
             * navbar
@@ -106,11 +109,11 @@ void Page::update()
                 );
 
                 // Request
-                const Glib::ustring request = navbar->get_request() + "\r\n";
+                const Glib::ustring navbar_request_text = navbar->get_request_text() + "\r\n";
 
                 socket_connection->get_output_stream()->write_async(
-                    request.data(),
-                    request.size(),
+                    navbar_request_text.data(),
+                    navbar_request_text.size(),
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
                         progressbar->set(
@@ -175,24 +178,24 @@ void Page::update()
     // Scheme not found but host provided, redirect to gemini://
     else if (!navbar->get_request_host().empty())
     {
-        Glib::ustring request = "gemini://";
+        Glib::ustring navbar_request_text = "gemini://";
 
-        request += navbar->get_request_host(); // @TODO validate
+        navbar_request_text += navbar->get_request_host(); // @TODO validate
 
         if (!navbar->get_request_port().empty())
         {
-            request += navbar->get_request_port();
+            navbar_request_text += navbar->get_request_port();
         }
 
-        request += navbar->get_request_path();
+        navbar_request_text += navbar->get_request_path();
 
         if (!navbar->get_request_query().empty())
         {
-            request += "?" + navbar->get_request_query();
+            navbar_request_text += "?" + navbar->get_request_query();
         }
 
-        navbar->set_request(
-            request
+        navbar->set_request_text(
+            navbar_request_text
         );
 
         update();

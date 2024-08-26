@@ -40,11 +40,7 @@ Glib::ustring Main::get_current_tab_label_text()
 // Actions
 void Main::tab_append()
 {
-    tab->append(
-        nullptr,
-        true,
-        true
-    );
+    tab->append();
 };
 
 void Main::tab_update()

@@ -10,6 +10,8 @@ namespace app::browser::main::tab::page::navbar
 {
     class Request : public Gtk::Entry
     {
+        const bool HEXPAND = true;
+
         Glib::ustring scheme,
                       host,
                       port,
@@ -20,7 +22,9 @@ namespace app::browser::main::tab::page::navbar
 
         public:
 
-            Request();
+            Request(
+                const Glib::ustring & text = ""
+            );
 
             ~Request();
 

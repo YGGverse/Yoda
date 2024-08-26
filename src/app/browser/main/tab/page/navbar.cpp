@@ -7,8 +7,9 @@
 
 using namespace app::browser::main::tab::page;
 
-Navbar::Navbar()
-{
+Navbar::Navbar(
+    const Glib::ustring & request_text
+) {
     // Init container
     set_orientation(
         Gtk::Orientation::HORIZONTAL
@@ -53,7 +54,9 @@ Navbar::Navbar()
             * update
         );
 
-    request = new navbar::Request();
+    request = new navbar::Request(
+        request_text
+    );
 
         append(
             * request
@@ -107,7 +110,7 @@ void Navbar::refresh()
 }
 
 // Setters
-void Navbar::set_request(
+void Navbar::set_request_text(
     const Glib::ustring & value
 ) {
     request->set_text(
@@ -118,7 +121,7 @@ void Navbar::set_request(
 }
 
 // Getters
-Glib::ustring Navbar::get_request()
+Glib::ustring Navbar::get_request_text()
 {
     return request->get_text();
 }
