@@ -73,14 +73,6 @@ void Tab::append(
 void Tab::close(
     int page_number
 ) {
-    auto pageWidget = get_nth_page(
-        page_number
-    );
-
-    auto labelWidget = get_tab_label(
-        * pageWidget
-    );
-
     remove_page(
         page_number
     );
