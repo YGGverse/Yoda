@@ -2,7 +2,6 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
 
 #include <giomm/simpleactiongroup.h>
-#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 
@@ -19,15 +18,12 @@ namespace app::browser::main::tab::page
 
     class Navbar : public Gtk::Box
     {
-        // Actions
-        Glib::RefPtr<Gio::SimpleActionGroup> action_group;
-
         // Components
-        navbar::Base * base;
-        navbar::Bookmark * bookmark;
-        navbar::History * history;
-        navbar::Request * request;
-        navbar::Update * update;
+        navbar::Base * navbarBase;
+        navbar::Bookmark * navbarBookmark;
+        navbar::History * navbarHistory;
+        navbar::Request * navbarRequest;
+        navbar::Update * navbarUpdate;
 
         // Defaults
         const int SPACING = 8;

@@ -36,43 +36,43 @@ Navbar::Navbar(
     );
 
     // Init components
-    base = new navbar::Base();
+    navbarBase = new navbar::Base();
 
         append(
-            * base
+            * navbarBase
         );
 
-    history = new navbar::History();
+    navbarHistory = new navbar::History();
 
         append(
-            * history
+            * navbarHistory
         );
 
-    update = new navbar::Update();
+    navbarUpdate = new navbar::Update();
 
         append(
-            * update
+            * navbarUpdate
         );
 
-    request = new navbar::Request(
+    navbarRequest = new navbar::Request(
         request_text
     );
 
         append(
-            * request
+            * navbarRequest
         );
 
-    bookmark = new navbar::Bookmark();
+    navbarBookmark = new navbar::Bookmark();
 
         append(
-            * bookmark
+            * navbarBookmark
         );
 
     // Init actions group
-    action_group = Gio::SimpleActionGroup::create();
+    auto GioSimpleActionGroup_RefPtr = Gio::SimpleActionGroup::create();
 
         // Define group actions
-        action_group->add_action(
+        GioSimpleActionGroup_RefPtr->add_action(
             "refresh",
             [this]
             {
@@ -82,30 +82,30 @@ Navbar::Navbar(
 
     insert_action_group(
         "navbar",
-        action_group
+        GioSimpleActionGroup_RefPtr
     );
 }
 
 Navbar::~Navbar()
 {
-    delete base;
-    delete bookmark;
-    delete history;
-    delete request;
-    delete update;
+    delete navbarBase;
+    delete navbarBookmark;
+    delete navbarHistory;
+    delete navbarRequest;
+    delete navbarUpdate;
 };
 
 // Actions
 void Navbar::refresh()
 {
     // Toggle base button sensibility
-    base->set_sensitive(
-        !request->get_host().empty() && !request->get_path().empty()
+    navbarBase->set_sensitive(
+        !navbarRequest->get_host().empty() && !navbarRequest->get_path().empty()
     );
 
     // Toggle update button sensibility
-    update->set_sensitive(
-        (bool) request->get_text_length()
+    navbarUpdate->set_sensitive(
+        navbarRequest->get_text_length() > 0
     );
 }
 
@@ -113,7 +113,7 @@ void Navbar::refresh()
 void Navbar::set_request_text(
     const Glib::ustring & value
 ) {
-    request->set_text(
+    navbarRequest->set_text(
         value
     );
 
@@ -123,30 +123,30 @@ void Navbar::set_request_text(
 // Getters
 Glib::ustring Navbar::get_request_text()
 {
-    return request->get_text();
+    return navbarRequest->get_text();
 }
 
 Glib::ustring Navbar::get_request_scheme()
 {
-    return request->get_scheme();
+    return navbarRequest->get_scheme();
 }
 
 Glib::ustring Navbar::get_request_host()
 {
-    return request->get_host();
+    return navbarRequest->get_host();
 }
 
 Glib::ustring Navbar::get_request_path()
 {
-    return request->get_path();
+    return navbarRequest->get_path();
 }
 
 Glib::ustring Navbar::get_request_query()
 {
-    return request->get_query();
+    return navbarRequest->get_query();
 }
 
 Glib::ustring Navbar::get_request_port()
 {
-    return request->get_port();
+    return navbarRequest->get_port();
 }
