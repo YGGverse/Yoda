@@ -13,7 +13,7 @@ Tab::Tab()
 
     // Init events
     signal_switch_page().connect(
-        [this](Gtk::Widget * page, guint page_number)
+        [this](Gtk::Widget * pageWidget, guint page_number)
         {
             // Refresh window elements, e.g. tab label to header bar
             activate_action(
@@ -29,16 +29,14 @@ Tab::~Tab() = default;
 Glib::ustring Tab::get_label_text(
     int page_number
 ) {
-    auto page = get_nth_page(
+    auto pageWidget = get_nth_page(
         page_number
     );
 
-    if (page != nullptr)
+    if (pageWidget != nullptr)
     {
         return get_tab_label_text(
-            * get_nth_page(
-                page_number
-            )
+            * pageWidget
         );
     }
 
@@ -50,19 +48,17 @@ void Tab::append(
     const Glib::ustring & page_navbar_request_text,
     bool focus
 ) {
-    auto label = new tab::Label;
-
-    auto page  = new tab::Page(
+    auto tabPage  = new tab::Page(
         page_navbar_request_text
     );
 
     int page_number = append_page(
-        * page,
-        * label
+        * tabPage,
+        * new tab::Label
     );
 
     set_tab_reorderable(
-        * page,
+        * tabPage,
         REORDERABLE
     );
 
@@ -77,22 +73,19 @@ void Tab::append(
 void Tab::close(
     int page_number
 ) {
-    auto page = get_nth_page(
+    auto pageWidget = get_nth_page(
         page_number
     );
 
-    auto label = get_tab_label(
-        * page
+    auto labelWidget = get_tab_label(
+        * pageWidget
     );
-
-    // @TODO data type
-    // delete page;
-    // delete label;
 
     remove_page(
         page_number
     );
 
+    // @TODO memory cleanup
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
@@ -115,13 +108,13 @@ void Tab::close_all()
 void Tab::update(
     int page_number
 ) {
-    auto page = get_nth_page(
+    auto pageWidget = get_nth_page(
         page_number
     );
 
-    if (page != nullptr)
+    if (pageWidget != nullptr)
     {
-        page->activate_action(
+        pageWidget->activate_action(
             "page.update"
         );
     }
