@@ -14,10 +14,10 @@ Page::Page(
     );
 
     // Init actions group
-    action_group = Gio::SimpleActionGroup::create();
+    auto GioSimpleActionGroup_RefPtr = Gio::SimpleActionGroup::create();
 
         // Define group actions
-        action_group->add_action(
+        GioSimpleActionGroup_RefPtr->add_action(
             "update",
             [this]
             {
@@ -27,106 +27,106 @@ Page::Page(
 
     insert_action_group(
         "page",
-        action_group
+        GioSimpleActionGroup_RefPtr
     );
 
     // Init components
-    navbar = new page::Navbar(
+    pageNavbar = new page::Navbar(
         navbar_request_text
     );
 
         append(
-            * navbar
+            * pageNavbar
         );
 
         // Refresh children elements view (e.g. buttons sensitivity)
         // because of insert_action_group + append here @TODO
-        navbar->refresh();
+        pageNavbar->refresh();
 
-    progressbar = new page::Progressbar();
+    pageProgressbar = new page::Progressbar();
 
         append(
-            * progressbar
+            * pageProgressbar
         );
 
-    content = new page::Content();
+    pageContent = new page::Content();
 
         append(
-            * content
+            * pageContent
         );
 }
 
 Page::~Page()
 {
-    delete navbar;
-    delete content;
-    delete progressbar;
+    delete pageNavbar;
+    delete pageContent;
+    delete pageProgressbar;
 }
 
 void Page::update()
 {
     // Reset progress
-    progressbar->set(
+    pageProgressbar->set(
         0
     );
 
     // Connect scheme driver
-    if ("file" == navbar->get_request_scheme())
+    if ("file" == pageNavbar->get_request_scheme())
     {
         // @TODO
     }
 
-    else if ("gemini" == navbar->get_request_scheme())
+    else if ("gemini" == pageNavbar->get_request_scheme())
     {
         // Create new socket connection
-        socket_client = Gio::SocketClient::create();
+        GioSocketClient_RefPtr = Gio::SocketClient::create();
 
-        socket_client->set_tls(
+        GioSocketClient_RefPtr->set_tls(
             true
         );
 
-        socket_client->set_tls_validation_flags(
+        GioSocketClient_RefPtr->set_tls_validation_flags(
             Gio::TlsCertificateFlags::NO_FLAGS
         );
 
-        socket_client->set_timeout(
+        GioSocketClient_RefPtr->set_timeout(
             15 // @TODO
         );
 
-        socket_client->connect_to_host_async(
-            navbar->get_request_host(),
-            navbar->get_request_port().empty() ? 1965 : std::stoi(
-                navbar->get_request_port()
+        GioSocketClient_RefPtr->connect_to_host_async(
+            pageNavbar->get_request_host(),
+            pageNavbar->get_request_port().empty() ? 1965 : std::stoi(
+                pageNavbar->get_request_port()
             ),
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
-                progressbar->set(
+                pageProgressbar->set(
                     .25
                 );
 
-                socket_connection = socket_client->connect_to_host_finish(
+                GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_host_finish(
                     result
                 );
 
                 // Request
-                const Glib::ustring navbar_request_text = navbar->get_request_text() + "\r\n";
+                const Glib::ustring navbar_request_text = pageNavbar->get_request_text() + "\r\n";
 
-                socket_connection->get_output_stream()->write_async(
+                GioSocketConnection_RefPtr->get_output_stream()->write_async(
                     navbar_request_text.data(),
                     navbar_request_text.size(),
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
-                        progressbar->set(
+                        pageProgressbar->set(
                             .5
                         );
 
                         // Response
-                        socket_connection->get_input_stream()->read_async( // | read_all_async
+                        GioSocketConnection_RefPtr->get_input_stream()->read_async( // | read_all_async
                             buffer,
                             sizeof(buffer) - 1,
                             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                             {
-                                progressbar->set(
+                                pageProgressbar->set(
                                     .75
                                 );
 
@@ -140,16 +140,16 @@ void Page::update()
                                 if (meta[1] == "20")
                                 {
                                     // Route by mime type or path extension
-                                    if (meta[2] == "text/gemini" || Glib::str_has_suffix(navbar->get_request_path(), ".gmi"))
+                                    if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavbar->get_request_path(), ".gmi"))
                                     {
-                                        content->set_text_gemini(
+                                        pageContent->set_text_gemini(
                                             buffer // @TODO
                                         );
                                     }
 
                                     else
                                     {
-                                        content->set_text_plain(
+                                        pageContent->set_text_plain(
                                             _("MIME type not supported")
                                         );
                                     }
@@ -157,14 +157,14 @@ void Page::update()
 
                                 else
                                 {
-                                    content->set_text_plain(
+                                    pageContent->set_text_plain(
                                         _("Could not open page")
                                     );
                                 }
 
-                                socket_connection->close();
+                                GioSocketConnection_RefPtr->close();
 
-                                progressbar->set(
+                                pageProgressbar->set(
                                     1
                                 );
                             }
@@ -176,25 +176,25 @@ void Page::update()
     }
 
     // Scheme not found but host provided, redirect to gemini://
-    else if (!navbar->get_request_host().empty())
+    else if (!pageNavbar->get_request_host().empty())
     {
         Glib::ustring navbar_request_text = "gemini://";
 
-        navbar_request_text += navbar->get_request_host(); // @TODO validate
+        navbar_request_text += pageNavbar->get_request_host(); // @TODO validate
 
-        if (!navbar->get_request_port().empty())
+        if (!pageNavbar->get_request_port().empty())
         {
-            navbar_request_text += navbar->get_request_port();
+            navbar_request_text += pageNavbar->get_request_port();
         }
 
-        navbar_request_text += navbar->get_request_path();
+        navbar_request_text += pageNavbar->get_request_path();
 
-        if (!navbar->get_request_query().empty())
+        if (!pageNavbar->get_request_query().empty())
         {
-            navbar_request_text += "?" + navbar->get_request_query();
+            navbar_request_text += "?" + pageNavbar->get_request_query();
         }
 
-        navbar->set_request_text(
+        pageNavbar->set_request_text(
             navbar_request_text
         );
 

@@ -25,15 +25,14 @@ namespace app::browser::main::tab
 
     class Page : public Gtk::Box
     {
-        char buffer[0xfffff];
+        char buffer[0xfffff]; // 1Mb
 
-        Glib::RefPtr<Gio::SimpleActionGroup> action_group;
-        Glib::RefPtr<Gio::SocketClient> socket_client;
-        Glib::RefPtr<Gio::SocketConnection> socket_connection;
+        Glib::RefPtr<Gio::SocketClient> GioSocketClient_RefPtr;
+        Glib::RefPtr<Gio::SocketConnection> GioSocketConnection_RefPtr;
 
-        page::Content * content;
-        page::Navbar * navbar;
-        page::Progressbar * progressbar;
+        page::Content * pageContent;
+        page::Navbar * pageNavbar;
+        page::Progressbar * pageProgressbar;
 
         public:
 
