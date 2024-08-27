@@ -7,10 +7,12 @@ using namespace app::browser::main::tab;
 
 Page::Page(
     const Glib::ustring & TITLE,
+    const Glib::ustring & SUBTITLE,
     const Glib::ustring & REQUEST
 ) {
     // Init extras
     title = TITLE;
+    subtitle = SUBTITLE;
 
     // Init container
     set_orientation(

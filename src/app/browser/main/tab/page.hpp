@@ -28,6 +28,7 @@ namespace app::browser::main::tab
         char buffer[0xfffff]; // 1Mb
 
         Glib::ustring title;
+        Glib::ustring subtitle;
 
         Glib::RefPtr<Gio::SocketClient> GioSocketClient_RefPtr;
         Glib::RefPtr<Gio::SocketConnection> GioSocketConnection_RefPtr;
@@ -40,6 +41,7 @@ namespace app::browser::main::tab
 
             Page(
                 const Glib::ustring & TITLE,
+                const Glib::ustring & SUBTITLE = "",
                 const Glib::ustring & REQUEST = ""
             );
 
