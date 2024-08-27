@@ -120,14 +120,15 @@ void Tab::update(
         PAGE_NUMBER
     );
 
-    if (pageWidget != nullptr)
+    if (pageWidget == nullptr)
     {
-        pageWidget->activate_action(
-            "page.update"
-        );
+        throw _("Tab page not found!");
     }
 
-} // @TODO
+    pageWidget->activate_action(
+        "page.update"
+    );
+}
 
 // Private helpers
 tab::Label * Tab::get_tabLabel(
