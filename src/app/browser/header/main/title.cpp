@@ -27,6 +27,8 @@ Title::Title()
     set_text(
         DEFAULT_TEXT
     );
+
+    hide();
 }
 
 Title::~Title() = default;
@@ -37,4 +39,6 @@ void Title::set(
     set_text(
         TEXT.empty() ? DEFAULT_TEXT : TEXT + " - " + DEFAULT_TEXT
     );
+
+    if (get_text().empty()) hide(); else show();
 }

@@ -23,6 +23,8 @@ Subtitle::Subtitle()
     set_width_chars(
         WIDTH_CHARS
     );
+
+    hide();
 }
 
 Subtitle::~Subtitle() = default;
@@ -30,7 +32,10 @@ Subtitle::~Subtitle() = default;
 void Subtitle::set(
     const Glib::ustring & TEXT
 ) {
+
     set_text(
         TEXT
     );
+
+    if (get_text().empty()) hide(); else show();
 }
