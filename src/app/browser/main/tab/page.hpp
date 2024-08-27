@@ -25,14 +25,17 @@ namespace app::browser::main::tab
 
     class Page : public Gtk::Box
     {
-        char buffer[0xfffff]; // 1Mb
-
+        // Extras
         Glib::ustring title;
         Glib::ustring subtitle;
+
+        // Socket
+        char buffer[0xfffff]; // 1Mb
 
         Glib::RefPtr<Gio::SocketClient> GioSocketClient_RefPtr;
         Glib::RefPtr<Gio::SocketConnection> GioSocketConnection_RefPtr;
 
+        // Components
         page::Content * pageContent;
         page::Navbar * pageNavbar;
         page::Progressbar * pageProgressbar;
@@ -49,6 +52,7 @@ namespace app::browser::main::tab
 
             // Getters
             Glib::ustring get_title();
+            Glib::ustring get_subtitle();
 
             // Actions
             void update();

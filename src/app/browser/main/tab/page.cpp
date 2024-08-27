@@ -75,6 +75,11 @@ Glib::ustring Page::get_title()
     return title;
 }
 
+Glib::ustring Page::get_subtitle()
+{
+    return subtitle;
+}
+
 // Actions
 void Page::update()
 {
