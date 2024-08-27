@@ -28,6 +28,10 @@ namespace app::browser
             void set_title(
                 const Glib::ustring text
             );
+
+            void set_subtitle(
+                const Glib::ustring text
+            );
     };
 }
 

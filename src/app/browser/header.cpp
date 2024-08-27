@@ -48,3 +48,11 @@ void Header::set_title(
         text
     );
 }
+
+void Header::set_subtitle(
+    const Glib::ustring text
+) {
+    main->set_subtitle(
+        text
+    );
+}

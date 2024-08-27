@@ -42,3 +42,11 @@ void Main::set_title(
         TEXT
     );
 }
+
+void Main::set_subtitle(
+    const Glib::ustring & TEXT
+) {
+    mainSubtitle->set(
+        TEXT
+    );
+}
