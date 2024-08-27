@@ -17,7 +17,7 @@ namespace app::browser::main
         const bool REORDERABLE = true;
         const bool SCROLLABLE = true;
 
-        tab::Page * get_tab_page(
+        tab::Page * get_tab_page_ptr(
             const int & PAGE_NUMBER
         );
 
