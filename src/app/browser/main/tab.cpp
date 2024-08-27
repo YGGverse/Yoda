@@ -15,10 +15,6 @@ Tab::Tab()
     signal_switch_page().connect(
         [this](Gtk::Widget * pageWidget, guint page_number)
         {
-            refresh(
-                page_number
-            );
-
             // Refresh window elements, e.g. tab label to header bar
             activate_action(
                 "win.refresh"
