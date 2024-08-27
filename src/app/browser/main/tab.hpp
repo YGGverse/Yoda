@@ -18,11 +18,11 @@ namespace app::browser::main
         const bool REORDERABLE = true;
         const bool SCROLLABLE = true;
 
-        tab::Label * get_tabLabel_ptr(
+        tab::Label * get_tabLabel(
             const int & PAGE_NUMBER
         );
 
-        tab::Page * get_tabPage_ptr(
+        tab::Page * get_tabPage(
             const int & PAGE_NUMBER
         );
 

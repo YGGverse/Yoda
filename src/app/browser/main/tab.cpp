@@ -29,13 +29,13 @@ Tab::~Tab() = default;
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage_ptr(PAGE_NUMBER)->get_title();
+    return get_tabPage(PAGE_NUMBER)->get_title();
 };
 
 Glib::ustring Tab::get_page_subtitle(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage_ptr(PAGE_NUMBER)->get_subtitle();
+    return get_tabPage(PAGE_NUMBER)->get_subtitle();
 };
 
 // Actions
@@ -101,11 +101,11 @@ void Tab::close_all()
 void Tab::refresh(
     const int & PAGE_NUMBER
 ) {
-    auto tabPage = get_tabPage_ptr(
+    auto tabPage = get_tabPage(
         PAGE_NUMBER
     );
 
-    get_tabLabel_ptr(PAGE_NUMBER)->set_label(
+    get_tabLabel(PAGE_NUMBER)->set_label(
         tabPage->get_title()
     );
 
@@ -130,7 +130,7 @@ void Tab::update(
 } // @TODO
 
 // Private helpers
-tab::Label * Tab::get_tabLabel_ptr(
+tab::Label * Tab::get_tabLabel(
     const int & PAGE_NUMBER
 ) {
     auto pageWidget = get_nth_page(
@@ -154,7 +154,7 @@ tab::Label * Tab::get_tabLabel_ptr(
     return (tab::Label *) labelWidget;
 }
 
-tab::Page * Tab::get_tabPage_ptr(
+tab::Page * Tab::get_tabPage(
     const int & PAGE_NUMBER
 ) {
     auto pageWidget = get_nth_page(
