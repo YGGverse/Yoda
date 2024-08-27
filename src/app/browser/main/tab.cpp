@@ -51,7 +51,7 @@ Glib::ustring Tab::get_label_text(
 void Tab::append(
     const Glib::ustring & TITLE,
     const Glib::ustring & REQUEST,
-    const bool & TAB_FOCUS
+    const bool & FOCUS
 ) {
     auto tabPage = new tab::Page(
         TITLE,
@@ -70,7 +70,7 @@ void Tab::append(
         REORDERABLE
     );
 
-    if (TAB_FOCUS)
+    if (FOCUS)
     {
         set_current_page(
             page_number

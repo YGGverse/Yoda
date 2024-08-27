@@ -25,7 +25,7 @@ namespace app::browser::main
             void append(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & REQUEST = "",
-                const bool & TAB_FOCUS = true
+                const bool & FOCUS = true
             );
 
             void close(
