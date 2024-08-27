@@ -19,7 +19,7 @@ namespace app::browser::main
             ~Tab();
 
             Glib::ustring get_label_text(
-                int page_number
+                const int & page_number
             );
 
             void append(
@@ -28,7 +28,7 @@ namespace app::browser::main
             );
 
             void close(
-                int page_number
+                const int & page_number
             );
 
             void close_left();
@@ -36,11 +36,11 @@ namespace app::browser::main
             void close_all();
 
             void refresh(
-                int page_number
+                const int & page_number
             );
 
             void update(
-                int page_number
+                const int & page_number
             );
     };
 }

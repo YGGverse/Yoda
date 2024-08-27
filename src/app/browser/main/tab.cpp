@@ -31,7 +31,7 @@ Tab::~Tab() = default;
 
 // Getters
 Glib::ustring Tab::get_label_text(
-    int page_number
+    const int & page_number
 ) {
     auto pageWidget = get_nth_page(
         page_number
@@ -75,7 +75,7 @@ void Tab::append(
 };
 
 void Tab::close(
-    int page_number
+    const int & page_number
 ) {
     remove_page(
         page_number
@@ -102,7 +102,7 @@ void Tab::close_all()
 }
 
 void Tab::update(
-    int page_number
+    const int & page_number
 ) {
     auto pageWidget = get_nth_page(
         page_number
@@ -118,7 +118,7 @@ void Tab::update(
 } // @TODO
 
 void Tab::refresh(
-    int page_number
+    const int & page_number
 ) {
     auto pageWidget = get_nth_page(
         page_number
