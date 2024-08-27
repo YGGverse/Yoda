@@ -131,7 +131,7 @@ void Page::update()
                     ), .25
                 );
 
-                GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_host_finish(
+                GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_uri_finish(
                     result
                 );
 
