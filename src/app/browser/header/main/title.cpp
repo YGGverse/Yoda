@@ -24,11 +24,9 @@ Title::Title()
         WIDTH_CHARS
     );
 
-    set_text(
+    set(
         DEFAULT_TEXT
     );
-
-    hide();
 }
 
 Title::~Title() = default;
@@ -37,7 +35,7 @@ void Title::set(
     const Glib::ustring & TEXT
 ) {
     set_text(
-        TEXT.empty() ? DEFAULT_TEXT : TEXT + " - " + DEFAULT_TEXT
+        TEXT.empty() || TEXT == DEFAULT_TEXT ? DEFAULT_TEXT : TEXT + " - " + DEFAULT_TEXT
     );
 
     if (get_text().empty()) hide(); else show();
