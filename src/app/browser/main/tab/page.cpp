@@ -81,6 +81,11 @@ Glib::ustring Page::get_subtitle()
 }
 
 // Actions
+void Page::refresh()
+{
+    pageNavbar->refresh();
+}
+
 void Page::update()
 {
     title = _("Loading..");
