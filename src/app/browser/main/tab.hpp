@@ -23,8 +23,9 @@ namespace app::browser::main
             );
 
             void append(
-                const Glib::ustring & page_navbar_request_text = "",
-                bool focus = true
+                const Glib::ustring & TITLE,
+                const Glib::ustring & REQUEST = "",
+                const bool & TAB_FOCUS = true
             );
 
             void close(

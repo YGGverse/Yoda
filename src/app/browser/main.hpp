@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_HPP
 #define APP_BROWSER_MAIN_HPP
 
+#include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 

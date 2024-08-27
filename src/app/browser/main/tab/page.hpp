@@ -27,6 +27,8 @@ namespace app::browser::main::tab
     {
         char buffer[0xfffff]; // 1Mb
 
+        Glib::ustring title;
+
         Glib::RefPtr<Gio::SocketClient> GioSocketClient_RefPtr;
         Glib::RefPtr<Gio::SocketConnection> GioSocketConnection_RefPtr;
 
@@ -37,11 +39,16 @@ namespace app::browser::main::tab
         public:
 
             Page(
-                const Glib::ustring & navbar_request_text = ""
+                const Glib::ustring & TITLE,
+                const Glib::ustring & REQUEST = ""
             );
 
             ~Page();
 
+            // Getters
+            Glib::ustring get_title();
+
+            // Actions
             void update();
     };
 }

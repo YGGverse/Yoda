@@ -40,7 +40,9 @@ Glib::ustring Main::get_current_tab_label_text()
 // Actions
 void Main::tab_append()
 {
-    tab->append();
+    tab->append(
+        _("New page")
+    );
 };
 
 void Main::tab_update()

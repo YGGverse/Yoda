@@ -6,8 +6,12 @@
 using namespace app::browser::main::tab;
 
 Page::Page(
-    const Glib::ustring & navbar_request_text
+    const Glib::ustring & TITLE,
+    const Glib::ustring & REQUEST
 ) {
+    // Init extras
+    title = TITLE;
+
     // Init container
     set_orientation(
         Gtk::Orientation::VERTICAL
@@ -32,7 +36,7 @@ Page::Page(
 
     // Init components
     pageNavbar = new page::Navbar(
-        navbar_request_text
+        REQUEST
     );
 
         append(
@@ -63,8 +67,17 @@ Page::~Page()
     delete pageProgressbar;
 }
 
+// Getters
+Glib::ustring Page::get_title()
+{
+    return title;
+}
+
+// Actions
 void Page::update()
 {
+    title = _("Loading..");
+
     // Reset progress
     pageProgressbar->set(
         0

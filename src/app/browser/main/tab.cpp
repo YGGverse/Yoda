@@ -49,16 +49,20 @@ Glib::ustring Tab::get_label_text(
 
 // Actions
 void Tab::append(
-    const Glib::ustring & page_navbar_request_text,
-    bool focus
+    const Glib::ustring & TITLE,
+    const Glib::ustring & REQUEST,
+    const bool & TAB_FOCUS
 ) {
-    auto tabPage  = new tab::Page(
-        page_navbar_request_text
+    auto tabPage = new tab::Page(
+        TITLE,
+        REQUEST
     );
+
+    auto tabLabel = new tab::Label;
 
     int page_number = append_page(
         * tabPage,
-        * new tab::Label
+        * tabLabel
     );
 
     set_tab_reorderable(
@@ -66,7 +70,7 @@ void Tab::append(
         REORDERABLE
     );
 
-    if (focus)
+    if (TAB_FOCUS)
     {
         set_current_page(
             page_number
