@@ -11,7 +11,7 @@ Main::Main()
     );
 
     set_homogeneous(
-        true
+        HOMOGENEOUS
     );
 
     // Init tabs

@@ -14,15 +14,21 @@ namespace app::browser
 
     class Main : public Gtk::Box
     {
+        // Components
         main::Tab * mainTab;
+
+        // Defaults
+        const bool HOMOGENEOUS = true;
 
         public:
 
             Main();
             ~Main();
 
+            // Getters
             Glib::ustring get_current_tab_label_text();
 
+            // Actions
             void tab_append();
             void tab_close_all();
             void tab_close_left();
