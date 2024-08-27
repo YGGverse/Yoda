@@ -32,7 +32,7 @@ namespace app::browser::main::tab::page
         public:
 
             Navbar(
-                const Glib::ustring & request_text = ""
+                const Glib::ustring & REQUEST = ""
             );
 
             ~Navbar();
@@ -42,7 +42,7 @@ namespace app::browser::main::tab::page
 
             // Setters
             void set_request_text(
-                const Glib::ustring & value
+                const Glib::ustring & TEXT
             );
 
             // Getters

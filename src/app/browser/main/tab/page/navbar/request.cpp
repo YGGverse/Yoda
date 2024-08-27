@@ -4,7 +4,7 @@ using namespace app::browser::main::tab::page::navbar;
 
 // Construct
 Request::Request(
-    const Glib::ustring & text
+    const Glib::ustring & TEXT
 ) {
     // Init entry
     set_placeholder_text(
@@ -15,10 +15,10 @@ Request::Request(
         HEXPAND
     );
 
-    if (!text.empty())
+    if (!TEXT.empty())
     {
         set_text(
-            text
+            TEXT
         );
 
         parse();
@@ -92,15 +92,15 @@ void Request::parse()
 
     int index = 0;
 
-    for (const Glib::ustring & value : match)
+    for (const Glib::ustring & VALUE : match)
     {
         switch (index)
         {
-            case 2: scheme = value; break;
-            case 3: host   = value; break;
-            case 5: port   = value; break;
-            case 6: path   = value; break;
-            case 8: query  = value; break;
+            case 2: scheme = VALUE; break;
+            case 3: host   = VALUE; break;
+            case 5: port   = VALUE; break;
+            case 6: path   = VALUE; break;
+            case 8: query  = VALUE; break;
         }
 
         index++;

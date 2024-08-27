@@ -23,7 +23,7 @@ namespace app::browser::main::tab::page::navbar
         public:
 
             Request(
-                const Glib::ustring & text = ""
+                const Glib::ustring & VALUE = ""
             );
 
             ~Request();

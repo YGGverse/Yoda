@@ -8,7 +8,7 @@
 using namespace app::browser::main::tab::page;
 
 Navbar::Navbar(
-    const Glib::ustring & request_text
+    const Glib::ustring & REQUEST
 ) {
     // Init container
     set_orientation(
@@ -55,7 +55,7 @@ Navbar::Navbar(
         );
 
     navbarRequest = new navbar::Request(
-        request_text
+        REQUEST
     );
 
         append(
@@ -111,10 +111,10 @@ void Navbar::refresh()
 
 // Setters
 void Navbar::set_request_text(
-    const Glib::ustring & value
+    const Glib::ustring & TEXT
 ) {
     navbarRequest->set_text(
-        value
+        TEXT
     );
 
     // refresh(); not wanted as on change listener do same @TODO
