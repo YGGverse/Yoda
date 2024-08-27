@@ -15,9 +15,13 @@ namespace app::browser
 
     class Header : public Gtk::HeaderBar
     {
-        app::browser::header::Main * main;
-        app::browser::header::Menu * menu;
-        app::browser::header::Tab * tab;
+        // Components
+        header::Main * headerMain;
+        header::Menu * headerMenu;
+        header::Tab * headerTab;
+
+        // Defaults
+        const bool SHOW_TITLE_BUTTONS = true;
 
         public:
 
@@ -26,11 +30,11 @@ namespace app::browser
             ~Header();
 
             void set_title(
-                const Glib::ustring text
+                const Glib::ustring & VALUE
             );
 
             void set_subtitle(
-                const Glib::ustring text
+                const Glib::ustring & VALUE
             );
     };
 }

@@ -9,50 +9,50 @@ Header::Header()
 {
     // Init header bar
     set_show_title_buttons(
-        true
+        SHOW_TITLE_BUTTONS
     );
 
     // Init menu
-    menu = new header::Menu();
+    headerMenu = new header::Menu();
 
     pack_start(
-        * menu
+        * headerMenu
     );
 
     // Init tab
-    tab = new header::Tab();
+    headerTab = new header::Tab();
 
     pack_start(
-        * tab
+        * headerTab
     );
 
     // Init main widget
-    main = new header::Main();
+    headerMain = new header::Main();
 
     set_title_widget(
-        * main
+        * headerMain
     );
 }
 
 Header::~Header()
 {
-    delete main;
-    delete menu;
-    delete tab;
+    delete headerMain;
+    delete headerMenu;
+    delete headerTab;
 }
 
 void Header::set_title(
-    const Glib::ustring text
+    const Glib::ustring & VALUE
 ) {
-    main->set_title(
-        text
+    headerMain->set_title(
+        VALUE
     );
 }
 
 void Header::set_subtitle(
-    const Glib::ustring text
+    const Glib::ustring & VALUE
 ) {
-    main->set_subtitle(
-        text
+    headerMain->set_subtitle(
+        VALUE
     );
 }

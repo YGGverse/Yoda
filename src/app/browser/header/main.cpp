@@ -36,17 +36,17 @@ Main::~Main()
 }
 
 void Main::set_title(
-    const Glib::ustring & TEXT
+    const Glib::ustring & VALUE
 ) {
     mainTitle->set(
-        TEXT
+        VALUE
     );
 }
 
 void Main::set_subtitle(
-    const Glib::ustring & TEXT
+    const Glib::ustring & VALUE
 ) {
     mainSubtitle->set(
-        TEXT
+        VALUE
     );
 }
