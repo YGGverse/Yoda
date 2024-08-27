@@ -99,6 +99,8 @@ Browser::Browser(
         "refresh",
         [this]
         {
+            browserMain->refresh();
+
             browserHeader->set_title(
                 browserMain->get_current_tab_label_text()
             );

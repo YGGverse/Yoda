@@ -29,6 +29,8 @@ namespace app::browser
             void tab_close_right();
             void tab_close();
             void tab_update();
+
+            void refresh();
     };
 }
 

@@ -73,3 +73,10 @@ void Main::tab_close_all()
 {
     mainTab->close_all();
 };
+
+void Main::refresh()
+{
+    mainTab->refresh(
+        mainTab->get_current_page()
+    );
+};
