@@ -33,14 +33,14 @@ Glib::ustring Tab::get_page_title(
         PAGE_NUMBER
     );
 
-    if (pageWidget != nullptr)
+    if (pageWidget == nullptr)
     {
-        auto tabPage = (tab::Page *) pageWidget;
-
-        return tabPage->get_title();
+        throw _("Tab page not found!");
     }
 
-    return ""; // @TODO
+    auto tabPage = (tab::Page *) pageWidget;
+
+    return tabPage->get_title();
 };
 
 Glib::ustring Tab::get_page_subtitle(
@@ -50,14 +50,14 @@ Glib::ustring Tab::get_page_subtitle(
         PAGE_NUMBER
     );
 
-    if (pageWidget != nullptr)
+    if (pageWidget == nullptr)
     {
-        auto tabPage = (tab::Page *) pageWidget;
-
-        return tabPage->get_subtitle();
+        throw _("Tab page not found!");
     }
 
-    return ""; // @TODO
+    auto tabPage = (tab::Page *) pageWidget;
+
+    return tabPage->get_subtitle();
 };
 
 // Actions
