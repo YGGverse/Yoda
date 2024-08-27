@@ -35,6 +35,10 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
+            void refresh(
+                int page_number
+            );
+
             void update(
                 int page_number
             );

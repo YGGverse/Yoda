@@ -15,6 +15,10 @@ Tab::Tab()
     signal_switch_page().connect(
         [this](Gtk::Widget * pageWidget, guint page_number)
         {
+            refresh(
+                page_number
+            );
+
             // Refresh window elements, e.g. tab label to header bar
             activate_action(
                 "win.refresh"
@@ -112,3 +116,35 @@ void Tab::update(
     }
 
 } // @TODO
+
+void Tab::refresh(
+    int page_number
+) {
+    auto pageWidget = get_nth_page(
+        page_number
+    );
+
+    if (pageWidget == nullptr)
+    {
+        throw _("Tab page not found!");
+    }
+
+    auto labelWidget = get_tab_label(
+        * pageWidget
+    );
+
+    if (labelWidget == nullptr)
+    {
+        throw _("Tab label not found!");
+    }
+
+    auto tabPage = (tab::Page *) pageWidget;
+
+    auto tabLabel = (tab::Label *) labelWidget;
+
+    tabLabel->set_label(
+        tabPage->get_title()
+    );
+
+    // @TODO delegate refresh action to child level widgets (on available)
+}
