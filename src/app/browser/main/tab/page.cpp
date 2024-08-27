@@ -89,6 +89,7 @@ void Page::refresh()
 void Page::update()
 {
     title = _("Loading..");
+    subtitle = ""; // @TODO setter
 
     // Reset progress
     pageProgressbar->set(
