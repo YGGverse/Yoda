@@ -89,9 +89,11 @@ void Page::update()
 {
     // Update page extras
     set(
-        _("Loading.."),
-        pageNavbar->get_request_text(),
-        0
+        pageNavbar->get_request_host(),
+        Glib::ustring::sprintf(
+            _("load %s.."),
+            pageNavbar->get_request_text()
+        ), 0
     );
 
     // Connect scheme driver
@@ -125,9 +127,11 @@ void Page::update()
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
                 set(
-                    _("Connect.."),
                     pageNavbar->get_request_host(),
-                    .25
+                    Glib::ustring::sprintf(
+                        _("connect %s.."),
+                        pageNavbar->get_request_host()
+                    ), .25
                 );
 
                 GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_host_finish(
@@ -143,9 +147,12 @@ void Page::update()
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
                         set(
-                            _("Request.."),
                             pageNavbar->get_request_host(),
-                            .5
+                            Glib::ustring::sprintf(
+                                _("request %s.."),
+                                pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                       : pageNavbar->get_request_path()
+                            ), .5
                         );
 
                         // Response
@@ -155,9 +162,12 @@ void Page::update()
                             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                             {
                                 set(
-                                    _("Reading response.."),
                                     pageNavbar->get_request_host(),
-                                    .75
+                                    Glib::ustring::sprintf(
+                                        _("reading %s.."),
+                                        pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                               : pageNavbar->get_request_path()
+                                    ), .75
                                 );
 
                                 // Parse meta
@@ -195,9 +205,10 @@ void Page::update()
                                 GioSocketConnection_RefPtr->close();
 
                                 set(
-                                    _("Page title"), // @TODO
-                                    pageNavbar->get_request_host(),
-                                    1
+                                    pageNavbar->get_request_host(), // @TODO title
+                                    pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                           : pageNavbar->get_request_path()
+                                    , 1
                                 );
                             }
                         );
