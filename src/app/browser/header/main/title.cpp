@@ -32,9 +32,9 @@ Title::Title()
 Title::~Title() = default;
 
 void Title::set(
-    const Glib::ustring value
+    const Glib::ustring & TEXT
 ) {
     set_text(
-        value.empty() ? DEFAULT_TEXT : value + " - " + DEFAULT_TEXT
+        TEXT.empty() ? DEFAULT_TEXT : TEXT + " - " + DEFAULT_TEXT
     );
 }

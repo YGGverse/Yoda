@@ -21,7 +21,7 @@ namespace app::browser::header::main
             ~Title();
 
             void set(
-                const Glib::ustring value
+                const Glib::ustring & TEXT
             );
     };
 }
