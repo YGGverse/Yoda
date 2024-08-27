@@ -13,12 +13,6 @@ namespace app::browser::main::tab
     {
         Glib::RefPtr<Gtk::GestureClick> controller;
 
-        void on_click(
-            int n,
-            double x,
-            double y
-        );
-
         public:
 
             Label(

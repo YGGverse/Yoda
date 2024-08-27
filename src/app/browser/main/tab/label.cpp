@@ -20,9 +20,12 @@ Label::Label(
         controller->signal_pressed().connect(
             [this](int n, double x, double y)
             {
-                on_click(
-                    n, x, y
-                );
+                if (n == 2) // double click
+                {
+                    activate_action(
+                        "win.tab_close"
+                    );
+                }
             }
         );
 
@@ -32,16 +35,3 @@ Label::Label(
 }
 
 Label::~Label() = default;
-
-void Label::on_click(
-    int n,
-    double x,
-    double y
-) {
-    if (n == 2) // double click
-    {
-        activate_action(
-            "win.tab_close"
-        );
-    }
-}
