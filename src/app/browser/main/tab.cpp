@@ -29,35 +29,13 @@ Tab::~Tab() = default;
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
 ) {
-    auto pageWidget = get_nth_page(
-        PAGE_NUMBER
-    );
-
-    if (pageWidget == nullptr)
-    {
-        throw _("Tab page not found!");
-    }
-
-    auto tabPage = (tab::Page *) pageWidget;
-
-    return tabPage->get_title();
+    return get_tab_page(PAGE_NUMBER)->get_title();
 };
 
 Glib::ustring Tab::get_page_subtitle(
     const int & PAGE_NUMBER
 ) {
-    auto pageWidget = get_nth_page(
-        PAGE_NUMBER
-    );
-
-    if (pageWidget == nullptr)
-    {
-        throw _("Tab page not found!");
-    }
-
-    auto tabPage = (tab::Page *) pageWidget;
-
-    return tabPage->get_subtitle();
+    return get_tab_page(PAGE_NUMBER)->get_subtitle();
 };
 
 // Actions
@@ -168,3 +146,19 @@ void Tab::update(
     }
 
 } // @TODO
+
+// Private helpers
+tab::Page * Tab::get_tab_page(
+    const int & PAGE_NUMBER
+) {
+    auto pageWidget = get_nth_page(
+        PAGE_NUMBER
+    );
+
+    if (pageWidget == nullptr)
+    {
+        throw _("Tab page not found!");
+    }
+
+    return (tab::Page *) pageWidget;
+}

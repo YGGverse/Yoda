@@ -7,10 +7,19 @@
 
 namespace app::browser::main
 {
+    namespace tab
+    {
+        class Page;
+    }
+
     class Tab : public Gtk::Notebook
     {
         const bool REORDERABLE = true;
         const bool SCROLLABLE = true;
+
+        tab::Page * get_tab_page(
+            const int & PAGE_NUMBER
+        );
 
         public:
 
