@@ -2,10 +2,11 @@
 
 using namespace app::browser::main::tab;
 
-Label::Label()
-{
+Label::Label(
+    const Glib::ustring & TEXT
+) {
     set_text(
-        _("New tab")
+        TEXT
     );
 
     // Setup label controller

@@ -3,6 +3,7 @@
 
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/label.h>
 
@@ -20,7 +21,9 @@ namespace app::browser::main::tab
 
         public:
 
-            Label();
+            Label(
+                const Glib::ustring & TEXT
+            );
 
             ~Label();
     };

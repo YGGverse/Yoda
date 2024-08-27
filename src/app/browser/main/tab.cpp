@@ -58,7 +58,9 @@ void Tab::append(
         REQUEST
     );
 
-    auto tabLabel = new tab::Label;
+    auto tabLabel = new tab::Label(
+        TITLE
+    );
 
     int page_number = append_page(
         * tabPage,
