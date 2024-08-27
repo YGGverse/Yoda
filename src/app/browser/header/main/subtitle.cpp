@@ -37,5 +37,6 @@ void Subtitle::set(
         TEXT
     );
 
+    // Use GTK3 header behaviour
     if (get_text().empty()) hide(); else show();
 }

@@ -34,9 +34,11 @@ Title::~Title() = default;
 void Title::set(
     const Glib::ustring & TEXT
 ) {
+    // Append app name postfix
     set_text(
         TEXT.empty() || TEXT == DEFAULT_TEXT ? DEFAULT_TEXT : TEXT + " - " + DEFAULT_TEXT
     );
 
+    // Use GTK3 header behaviour
     if (get_text().empty()) hide(); else show();
 }
