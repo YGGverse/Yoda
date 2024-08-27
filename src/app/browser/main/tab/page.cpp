@@ -129,7 +129,7 @@ void Page::update()
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
                 set(
-                    _("Connected.."),
+                    _("Connect.."),
                     pageNavbar->get_request_host(),
                     .25
                 );
@@ -139,11 +139,11 @@ void Page::update()
                 );
 
                 // Request
-                const Glib::ustring navbar_request_text = pageNavbar->get_request_text() + "\r\n";
+                const Glib::ustring request = pageNavbar->get_request_text() + "\r\n";
 
                 GioSocketConnection_RefPtr->get_output_stream()->write_async(
-                    navbar_request_text.data(),
-                    navbar_request_text.size(),
+                    request.data(),
+                    request.size(),
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
                         set(
@@ -212,26 +212,10 @@ void Page::update()
     }
 
     // Scheme not found but host provided, redirect to gemini://
-    else if (!pageNavbar->get_request_host().empty())
+    else if (pageNavbar->get_request_scheme().empty() && !pageNavbar->get_request_host().empty())
     {
-        Glib::ustring navbar_request_text = "gemini://";
-
-        navbar_request_text += pageNavbar->get_request_host(); // @TODO validate
-
-        if (!pageNavbar->get_request_port().empty())
-        {
-            navbar_request_text += pageNavbar->get_request_port();
-        }
-
-        navbar_request_text += pageNavbar->get_request_path();
-
-        if (!pageNavbar->get_request_query().empty())
-        {
-            navbar_request_text += "?" + pageNavbar->get_request_query();
-        }
-
         pageNavbar->set_request_text(
-            navbar_request_text
+            "gemini://" + pageNavbar->get_request_text()
         );
 
         update();
