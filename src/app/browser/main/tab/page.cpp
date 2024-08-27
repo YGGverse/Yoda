@@ -119,11 +119,8 @@ void Page::update()
             15 // @TODO
         );
 
-        GioSocketClient_RefPtr->connect_to_host_async(
-            pageNavbar->get_request_host(),
-            pageNavbar->get_request_port().empty() ? 1965 : std::stoi(
-                pageNavbar->get_request_port()
-            ),
+        GioSocketClient_RefPtr->connect_to_uri_async(
+            pageNavbar->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
                 set(
