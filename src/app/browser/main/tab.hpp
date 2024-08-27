@@ -9,6 +9,7 @@ namespace app::browser::main
 {
     namespace tab
     {
+        class Label;
         class Page;
     }
 
@@ -17,7 +18,11 @@ namespace app::browser::main
         const bool REORDERABLE = true;
         const bool SCROLLABLE = true;
 
-        tab::Page * get_tab_page_ptr(
+        tab::Label * get_tabLabel_ptr(
+            const int & PAGE_NUMBER
+        );
+
+        tab::Page * get_tabPage_ptr(
             const int & PAGE_NUMBER
         );
 
