@@ -18,7 +18,11 @@ namespace app::browser::main
 
             ~Tab();
 
-            Glib::ustring get_label_text(
+            Glib::ustring get_page_title(
+                const int & PAGE_NUMBER
+            );
+
+            Glib::ustring get_page_subtitle(
                 const int & PAGE_NUMBER
             );
 

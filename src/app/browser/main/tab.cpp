@@ -26,7 +26,7 @@ Tab::Tab()
 Tab::~Tab() = default;
 
 // Getters
-Glib::ustring Tab::get_label_text(
+Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
 ) {
     auto pageWidget = get_nth_page(
@@ -35,9 +35,26 @@ Glib::ustring Tab::get_label_text(
 
     if (pageWidget != nullptr)
     {
-        return get_tab_label_text(
-            * pageWidget
-        );
+        auto tabPage = (tab::Page *) pageWidget;
+
+        return tabPage->get_title();
+    }
+
+    return ""; // @TODO
+};
+
+Glib::ustring Tab::get_page_subtitle(
+    const int & PAGE_NUMBER
+) {
+    auto pageWidget = get_nth_page(
+        PAGE_NUMBER
+    );
+
+    if (pageWidget != nullptr)
+    {
+        auto tabPage = (tab::Page *) pageWidget;
+
+        return tabPage->get_subtitle();
     }
 
     return ""; // @TODO

@@ -26,7 +26,8 @@ namespace app::browser
             ~Main();
 
             // Getters
-            Glib::ustring get_current_tab_label_text();
+            Glib::ustring get_current_tab_page_title();
+            Glib::ustring get_current_tab_page_subtitle();
 
             // Actions
             void tab_append();

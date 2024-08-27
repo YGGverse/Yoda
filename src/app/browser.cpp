@@ -102,7 +102,11 @@ Browser::Browser(
             browserMain->refresh();
 
             browserHeader->set_title(
-                browserMain->get_current_tab_label_text()
+                browserMain->get_current_tab_page_title()
+            );
+
+            browserHeader->set_subtitle(
+                browserMain->get_current_tab_page_subtitle()
             );
         }
     );

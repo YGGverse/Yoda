@@ -28,9 +28,16 @@ Main::~Main()
 }
 
 // Getters
-Glib::ustring Main::get_current_tab_label_text()
+Glib::ustring Main::get_current_tab_page_title()
 {
-    return mainTab->get_label_text(
+    return mainTab->get_page_title(
+        mainTab->get_current_page()
+    );
+};
+
+Glib::ustring Main::get_current_tab_page_subtitle()
+{
+    return mainTab->get_page_subtitle(
         mainTab->get_current_page()
     );
 };
