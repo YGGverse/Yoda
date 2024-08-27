@@ -14,7 +14,7 @@ namespace app::browser
 
     class Main : public Gtk::Box
     {
-        app::browser::main::Tab * tab;
+        main::Tab * mainTab;
 
         public:
 

@@ -15,24 +15,24 @@ Main::Main()
     );
 
     // Init tabs
-    tab = new main::Tab();
+    mainTab = new main::Tab();
 
     append(
-        * tab
+        * mainTab
     );
 }
 
 Main::~Main()
 {
-    delete tab;
+    delete mainTab;
 }
 
 // Getters
 Glib::ustring Main::get_current_tab_label_text()
 {
-    int page_number = tab->get_current_page();
+    int page_number = mainTab->get_current_page();
 
-    return tab->get_label_text(
+    return mainTab->get_label_text(
         page_number
     );
 };
@@ -40,36 +40,36 @@ Glib::ustring Main::get_current_tab_label_text()
 // Actions
 void Main::tab_append()
 {
-    tab->append(
+    mainTab->append(
         _("New page")
     );
 };
 
 void Main::tab_update()
 {
-    tab->update(
-        tab->get_current_page()
+    mainTab->update(
+        mainTab->get_current_page()
     );
 };
 
 void Main::tab_close()
 {
-    tab->close(
-        tab->get_current_page()
+    mainTab->close(
+        mainTab->get_current_page()
     );
 };
 
 void Main::tab_close_left()
 {
-    tab->close_left();
+    mainTab->close_left();
 };
 
 void Main::tab_close_right()
 {
-    tab->close_right();
+    mainTab->close_right();
 };
 
 void Main::tab_close_all()
 {
-    tab->close_all();
+    mainTab->close_all();
 };
