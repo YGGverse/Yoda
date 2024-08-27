@@ -19,8 +19,8 @@ namespace app
 
     class Browser : public Gtk::ApplicationWindow
     {
-        app::browser::Header * header;
-        app::browser::Main * main;
+        app::browser::Header * browserHeader;
+        app::browser::Main * browserMain;
 
         const int WIDTH = 640;
         const int HEIGHT = 480;

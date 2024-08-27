@@ -19,17 +19,17 @@ Browser::Browser(
     );
 
     // Init header widget
-    header = new browser::Header();
+    browserHeader = new browser::Header();
 
     set_titlebar(
-        * header
+        * browserHeader
     );
 
     // Init main widget
-    main = new browser::Main();
+    browserMain = new browser::Main();
 
     set_child(
-        * main
+        * browserMain
     );
 
     // Init actions
@@ -37,7 +37,7 @@ Browser::Browser(
         "tab_append",
         [this]
         {
-            main->tab_append();
+            browserMain->tab_append();
         }
     );
 
@@ -45,7 +45,7 @@ Browser::Browser(
         "tab_update",
         [this]
         {
-            main->tab_update();
+            browserMain->tab_update();
         }
     );
 
@@ -54,7 +54,7 @@ Browser::Browser(
         "tab_close",
         [this]
         {
-            main->tab_close();
+            browserMain->tab_close();
         }
     );
 
@@ -63,7 +63,7 @@ Browser::Browser(
             "tab_close_left",
             [this]
             {
-                main->tab_close_left();
+                browserMain->tab_close_left();
             }
         );
 
@@ -71,7 +71,7 @@ Browser::Browser(
             "tab_close_right",
             [this]
             {
-                main->tab_close_right();
+                browserMain->tab_close_right();
             }
         );
 
@@ -79,7 +79,7 @@ Browser::Browser(
             "tab_close_all",
             [this]
             {
-                main->tab_close_all();
+                browserMain->tab_close_all();
             }
         );
 
@@ -99,8 +99,8 @@ Browser::Browser(
         "refresh",
         [this]
         {
-            header->set_title(
-                main->get_current_tab_label_text()
+            browserHeader->set_title(
+                browserMain->get_current_tab_label_text()
             );
         }
     );
@@ -108,6 +108,6 @@ Browser::Browser(
 
 Browser::~Browser()
 {
-    delete header;
-    delete main;
+    delete browserHeader;
+    delete browserMain;
 }
