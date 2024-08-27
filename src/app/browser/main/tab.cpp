@@ -107,22 +107,6 @@ void Tab::close_all()
     }
 }
 
-void Tab::update(
-    const int & PAGE_NUMBER
-) {
-    auto pageWidget = get_nth_page(
-        PAGE_NUMBER
-    );
-
-    if (pageWidget != nullptr)
-    {
-        pageWidget->activate_action(
-            "page.update"
-        );
-    }
-
-} // @TODO
-
 void Tab::refresh(
     const int & PAGE_NUMBER
 ) {
@@ -155,3 +139,19 @@ void Tab::refresh(
     // Refresh children widgets
     tabPage->refresh();
 }
+
+void Tab::update(
+    const int & PAGE_NUMBER
+) {
+    auto pageWidget = get_nth_page(
+        PAGE_NUMBER
+    );
+
+    if (pageWidget != nullptr)
+    {
+        pageWidget->activate_action(
+            "page.update"
+        );
+    }
+
+} // @TODO
