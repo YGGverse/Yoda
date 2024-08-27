@@ -10,10 +10,6 @@ Page::Page(
     const Glib::ustring & SUBTITLE,
     const Glib::ustring & REQUEST
 ) {
-    // Init extras
-    title = TITLE;
-    subtitle = SUBTITLE;
-
     // Init container
     set_orientation(
         Gtk::Orientation::VERTICAL
@@ -60,6 +56,13 @@ Page::Page(
         append(
             * pageContent
         );
+
+    // Init extras
+    set(
+        TITLE,
+        SUBTITLE,
+        0
+    );
 }
 
 Page::~Page()
@@ -88,11 +91,10 @@ void Page::refresh()
 
 void Page::update()
 {
-    title = _("Loading..");
-    subtitle = ""; // @TODO setter
-
-    // Reset progress
-    pageProgressbar->set(
+    // Update page extras
+    set(
+        _("Loading.."),
+        pageNavbar->get_request_text(),
         0
     );
 
@@ -126,7 +128,9 @@ void Page::update()
             ),
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
-                pageProgressbar->set(
+                set(
+                    _("Connected.."),
+                    pageNavbar->get_request_host(),
                     .25
                 );
 
@@ -142,7 +146,9 @@ void Page::update()
                     navbar_request_text.size(),
                     [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                     {
-                        pageProgressbar->set(
+                        set(
+                            _("Request.."),
+                            pageNavbar->get_request_host(),
                             .5
                         );
 
@@ -152,7 +158,9 @@ void Page::update()
                             sizeof(buffer) - 1,
                             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                             {
-                                pageProgressbar->set(
+                                set(
+                                    _("Reading response.."),
+                                    pageNavbar->get_request_host(),
                                     .75
                                 );
 
@@ -190,7 +198,9 @@ void Page::update()
 
                                 GioSocketConnection_RefPtr->close();
 
-                                pageProgressbar->set(
+                                set(
+                                    _("Page title"), // @TODO
+                                    pageNavbar->get_request_host(),
                                     1
                                 );
                             }
@@ -231,4 +241,23 @@ void Page::update()
     {
         // @TODO search request
     }
+}
+
+// Private helpers
+void Page::set(
+    const Glib::ustring & TITLE,
+    const Glib::ustring & SUBTITLE,
+    const double & PROGRESS
+) {
+    title = TITLE;
+
+    subtitle = SUBTITLE;
+
+    pageProgressbar->set(
+        PROGRESS
+    );
+
+    activate_action(
+        "win.refresh"
+    );
 }
