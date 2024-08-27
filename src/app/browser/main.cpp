@@ -30,10 +30,8 @@ Main::~Main()
 // Getters
 Glib::ustring Main::get_current_tab_label_text()
 {
-    int page_number = mainTab->get_current_page();
-
     return mainTab->get_label_text(
-        page_number
+        mainTab->get_current_page()
     );
 };
 
