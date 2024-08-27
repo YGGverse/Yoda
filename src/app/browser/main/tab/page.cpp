@@ -41,10 +41,6 @@ Page::Page(
             * pageNavbar
         );
 
-        // Refresh children elements view (e.g. buttons sensitivity)
-        // because of insert_action_group + append here @TODO
-        pageNavbar->refresh();
-
     pageProgressbar = new page::Progressbar();
 
         append(
