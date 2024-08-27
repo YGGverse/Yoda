@@ -152,5 +152,6 @@ void Tab::refresh(
         tabPage->get_title()
     );
 
-    // @TODO delegate refresh action to child level widgets (on available)
+    // Refresh children widgets
+    tabPage->refresh();
 }
