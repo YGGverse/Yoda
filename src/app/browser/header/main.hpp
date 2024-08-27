@@ -9,11 +9,15 @@ namespace app::browser::header
     namespace main
     {
         class Title;
+        class Subtitle;
     }
 
     class Main : public Gtk::Box
     {
-        main::Title * title;
+        main::Title * mainTitle;
+        main::Subtitle * mainSubtitle;
+
+        const bool HOMOGENEOUS = true;
 
         public:
 
@@ -22,7 +26,7 @@ namespace app::browser::header
             ~Main();
 
             void set_title(
-                const Glib::ustring text
+                const Glib::ustring & TEXT
             );
     };
 }

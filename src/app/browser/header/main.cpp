@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "main/title.hpp"
+#include "main/subtitle.hpp"
 
 using namespace app::browser::header;
 
@@ -11,26 +12,33 @@ Main::Main()
     );
 
     set_homogeneous(
-        true
+        HOMOGENEOUS
     );
 
     // Init title
-    title = new main::Title();
+    mainTitle = new main::Title();
 
     append(
-        * title
+        * mainTitle
+    );
+
+    mainSubtitle = new main::Subtitle();
+
+    append(
+        * mainSubtitle
     );
 }
 
 Main::~Main()
 {
-    delete title;
+    delete mainTitle;
+    delete mainSubtitle;
 }
 
 void Main::set_title(
-    const Glib::ustring value
+    const Glib::ustring & TEXT
 ) {
-    title->set(
-        value
+    mainTitle->set(
+        TEXT
     );
 }
