@@ -10,14 +10,14 @@ Label::Label(
     );
 
     // Setup label controller
-    controller = Gtk::GestureClick::create();
+    auto GtkGestureClick_RefPtr = Gtk::GestureClick::create();
 
         /* @TODO remove as default
         controller->set_button(
             GDK_BUTTON_PRIMARY
         );*/
 
-        controller->signal_pressed().connect(
+        GtkGestureClick_RefPtr->signal_pressed().connect(
             [this](int n, double x, double y)
             {
                 if (n == 2) // double click
@@ -30,7 +30,7 @@ Label::Label(
         );
 
         add_controller(
-            controller
+            GtkGestureClick_RefPtr
         );
 }
 

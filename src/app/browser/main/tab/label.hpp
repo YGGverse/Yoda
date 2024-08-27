@@ -11,8 +11,6 @@ namespace app::browser::main::tab
 {
     class Label : public Gtk::Label
     {
-        Glib::RefPtr<Gtk::GestureClick> controller;
-
         public:
 
             Label(
