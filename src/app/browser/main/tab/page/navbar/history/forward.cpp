@@ -5,7 +5,7 @@ using namespace app::browser::main::tab::page::navbar::history;
 Forward::Forward()
 {
     set_action_name(
-        "tab.forward"
+        "win.tab_history_forward"
     );
 
     set_icon_name(

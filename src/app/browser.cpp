@@ -110,6 +110,22 @@ Browser::Browser(
             );
         }
     );
+
+    add_action(
+        "tab_history_back",
+        [this]
+        {
+            // @TODO
+        }
+    );
+
+    add_action(
+        "tab_history_forward",
+        [this]
+        {
+            // @TODO
+        }
+    );
 }
 
 Browser::~Browser()
