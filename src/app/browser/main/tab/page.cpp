@@ -131,86 +131,100 @@ void Page::update()
                     ), .25
                 );
 
-                GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_uri_finish(
-                    result
-                );
+                try
+                {
+                    GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_uri_finish(
+                        result
+                    );
+                }
 
-                // Request
-                const Glib::ustring request = pageNavbar->get_request_text() + "\r\n";
+                catch (const Glib::Error & EXCEPTION)
+                {
+                    set(
+                        pageNavbar->get_request_host(),
+                        EXCEPTION.what(), 1
+                    );
+                }
 
-                GioSocketConnection_RefPtr->get_output_stream()->write_async(
-                    request.data(),
-                    request.size(),
-                    [this](const Glib::RefPtr<Gio::AsyncResult> & result)
-                    {
-                        set(
-                            pageNavbar->get_request_host(),
-                            Glib::ustring::sprintf(
-                                _("request %s.."),
-                                pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                       : pageNavbar->get_request_path()
-                            ), .5
-                        );
+                // Connection established, begin request
+                if (GioSocketConnection_RefPtr != nullptr)
+                {
+                    const Glib::ustring request = pageNavbar->get_request_text() + "\r\n";
 
-                        // Response
-                        GioSocketConnection_RefPtr->get_input_stream()->read_async( // | read_all_async
-                            buffer,
-                            sizeof(buffer) - 1,
-                            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
-                            {
-                                set(
-                                    pageNavbar->get_request_host(),
-                                    Glib::ustring::sprintf(
-                                        _("reading %s.."),
-                                        pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                               : pageNavbar->get_request_path()
-                                    ), .75
-                                );
+                    GioSocketConnection_RefPtr->get_output_stream()->write_async(
+                        request.data(),
+                        request.size(),
+                        [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                        {
+                            set(
+                                pageNavbar->get_request_host(),
+                                Glib::ustring::sprintf(
+                                    _("request %s.."),
+                                    pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                           : pageNavbar->get_request_path()
+                                ), .5
+                            );
 
-                                // Parse meta
-                                auto meta = Glib::Regex::split_simple(
-                                    R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
-                                    buffer
-                                );
-
-                                // Route by status code
-                                if (meta[1] == "20")
+                            // Response
+                            GioSocketConnection_RefPtr->get_input_stream()->read_async( // | read_all_async
+                                buffer,
+                                sizeof(buffer) - 1,
+                                [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
-                                    // Route by mime type or path extension
-                                    if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavbar->get_request_path(), ".gmi"))
+                                    set(
+                                        pageNavbar->get_request_host(),
+                                        Glib::ustring::sprintf(
+                                            _("reading %s.."),
+                                            pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                                   : pageNavbar->get_request_path()
+                                        ), .75
+                                    );
+
+                                    // Parse meta
+                                    auto meta = Glib::Regex::split_simple(
+                                        R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
+                                        buffer
+                                    );
+
+                                    // Route by status code
+                                    if (meta[1] == "20")
                                     {
-                                        pageContent->set_text_gemini(
-                                            buffer // @TODO
-                                        );
+                                        // Route by mime type or path extension
+                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavbar->get_request_path(), ".gmi"))
+                                        {
+                                            pageContent->set_text_gemini(
+                                                buffer // @TODO
+                                            );
+                                        }
+
+                                        else
+                                        {
+                                            pageContent->set_text_plain(
+                                                _("MIME type not supported")
+                                            );
+                                        }
                                     }
 
                                     else
                                     {
                                         pageContent->set_text_plain(
-                                            _("MIME type not supported")
+                                            _("Could not open page")
                                         );
                                     }
-                                }
 
-                                else
-                                {
-                                    pageContent->set_text_plain(
-                                        _("Could not open page")
+                                    GioSocketConnection_RefPtr->close();
+
+                                    set(
+                                        pageNavbar->get_request_host(), // @TODO title
+                                        pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
+                                                                               : pageNavbar->get_request_path()
+                                        , 1
                                     );
                                 }
-
-                                GioSocketConnection_RefPtr->close();
-
-                                set(
-                                    pageNavbar->get_request_host(), // @TODO title
-                                    pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                           : pageNavbar->get_request_path()
-                                    , 1
-                                );
-                            }
-                        );
-                    }
-                );
+                            );
+                        }
+                    );
+                }
             }
         );
     }
