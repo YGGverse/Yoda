@@ -122,10 +122,10 @@ void Navbar::refresh()
 
 // Setters
 void Navbar::set_request_text(
-    const Glib::ustring & TEXT
+    const Glib::ustring & VALUE
 ) {
     navbarRequest->set_text(
-        TEXT
+        VALUE
     );
 
     // refresh(); not wanted as on change listener do same @TODO
