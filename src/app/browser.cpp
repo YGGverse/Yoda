@@ -115,7 +115,7 @@ Browser::Browser(
         "tab_history_back",
         [this]
         {
-            // @TODO
+            browserMain->tab_history_back();
         }
     );
 
@@ -123,7 +123,7 @@ Browser::Browser(
         "tab_history_forward",
         [this]
         {
-            // @TODO
+            browserMain->tab_history_forward();
         }
     );
 }

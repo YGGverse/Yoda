@@ -79,6 +79,16 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
+void Main::tab_history_back()
+{
+    mainTab->history_back();
+};
+
+void Main::tab_history_forward()
+{
+    mainTab->history_forward();
+};
+
 void Main::refresh()
 {
     mainTab->refresh(

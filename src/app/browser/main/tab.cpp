@@ -98,6 +98,12 @@ void Tab::close_all()
     }
 }
 
+void Tab::history_back()
+{} // @TODO
+
+void Tab::history_forward()
+{} // @TODO
+
 void Tab::refresh(
     const int & PAGE_NUMBER
 ) {
