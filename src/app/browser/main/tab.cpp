@@ -98,11 +98,31 @@ void Tab::close_all()
     }
 }
 
-void Tab::history_back()
-{} // @TODO
+void Tab::history_back(
+    const int & PAGE_NUMBER
+) {
+    auto tabPage = get_tabPage(
+        PAGE_NUMBER
+    );
 
-void Tab::history_forward()
-{} // @TODO
+    // @TODO tabPage->back()
+
+    // Refresh children widgets
+    tabPage->refresh();
+}
+
+void Tab::history_forward(
+    const int & PAGE_NUMBER
+) {
+    auto tabPage = get_tabPage(
+        PAGE_NUMBER
+    );
+
+    // @TODO tabPage->forward()
+
+    // Refresh children widgets
+    tabPage->refresh();
+}
 
 void Tab::refresh(
     const int & PAGE_NUMBER

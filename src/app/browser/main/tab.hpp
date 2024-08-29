@@ -54,8 +54,13 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-            void history_back();
-            void history_forward();
+            void history_back(
+                const int & PAGE_NUMBER
+            );
+
+            void history_forward(
+                const int & PAGE_NUMBER
+            );
 
             void refresh(
                 const int & PAGE_NUMBER
