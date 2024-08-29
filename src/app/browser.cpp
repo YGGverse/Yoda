@@ -88,6 +88,7 @@ Browser::Browser(
         "debug",
         [this]
         {
+            // @TODO https://gitlab.gnome.org/GNOME/gtkmm/-/commit/5f3b82537d3daad7bda59dd01e719788070f4b6c
             gtk_window_set_interactive_debugging(
                 true
             );
