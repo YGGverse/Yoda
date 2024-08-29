@@ -29,6 +29,13 @@ History::~History()
     delete forward;
 };
 
+// Actions
+void History::push(
+    const Glib::ustring & VALUE
+) {
+    // @TODO
+}
+
 void History::refresh()
 {
     back->set_sensitive(

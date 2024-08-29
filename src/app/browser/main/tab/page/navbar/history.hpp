@@ -30,6 +30,10 @@ namespace app::browser::main::tab::page::navbar
 
             ~History();
 
+            void push(
+                const Glib::ustring & VALUE
+            );
+
             void refresh();
     };
 }

@@ -96,6 +96,14 @@ Navbar::~Navbar()
 };
 
 // Actions
+void Navbar::history_push(
+    const Glib::ustring & VALUE
+) {
+    navbarHistory->push(
+        VALUE
+    );
+}
+
 void Navbar::refresh()
 {
     // Toggle base button sensibility

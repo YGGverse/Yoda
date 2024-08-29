@@ -87,6 +87,11 @@ void Page::refresh()
 
 void Page::update()
 {
+    // Update navigation history
+    pageNavbar->history_push(
+        pageNavbar->get_request_text()
+    );
+
     // Update page extras
     set(
         pageNavbar->get_request_host(),

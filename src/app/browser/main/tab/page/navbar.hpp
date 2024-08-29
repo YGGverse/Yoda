@@ -38,6 +38,10 @@ namespace app::browser::main::tab::page
             ~Navbar();
 
             // Actions
+            void history_push(
+                const Glib::ustring & VALUE
+            );
+
             void refresh();
 
             // Setters
