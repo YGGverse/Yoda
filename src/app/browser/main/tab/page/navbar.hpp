@@ -32,7 +32,7 @@ namespace app::browser::main::tab::page
         public:
 
             Navbar(
-                const Glib::ustring & REQUEST = ""
+                const Glib::ustring & REQUEST
             );
 
             ~Navbar();
