@@ -10,23 +10,23 @@ History::History()
         "linked" // merge children elements
     );
 
-    back = new history::Back();
+    historyBack = new history::Back();
 
         append(
-            * back
+            * historyBack
         );
 
-    forward = new history::Forward();
+    historyForward = new history::Forward();
 
         append(
-            * forward
+            * historyForward
         );
 }
 
 History::~History()
 {
-    delete back;
-    delete forward;
+    delete historyBack;
+    delete historyForward;
 };
 
 // Actions
@@ -38,11 +38,11 @@ void History::push(
 
 void History::refresh()
 {
-    back->set_sensitive(
+    historyBack->set_sensitive(
         false // @TODO
     );
 
-    forward->set_sensitive(
+    historyForward->set_sensitive(
         false // @TODO
     );
 }

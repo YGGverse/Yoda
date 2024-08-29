@@ -21,8 +21,8 @@ namespace app::browser::main::tab::page::navbar
         std::vector<Glib::ustring>::iterator index;
 
         // Components
-        history::Back * back;
-        history::Forward * forward;
+        history::Back * historyBack;
+        history::Forward * historyForward;
 
         public:
 
