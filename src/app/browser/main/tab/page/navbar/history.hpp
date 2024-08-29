@@ -29,6 +29,8 @@ namespace app::browser::main::tab::page::navbar
             History();
 
             ~History();
+
+            void refresh();
     };
 }
 

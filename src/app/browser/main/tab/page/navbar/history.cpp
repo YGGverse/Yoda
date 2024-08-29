@@ -28,3 +28,14 @@ History::~History()
     delete back;
     delete forward;
 };
+
+void History::refresh()
+{
+    back->set_sensitive(
+        false // @TODO
+    );
+
+    forward->set_sensitive(
+        false // @TODO
+    );
+}

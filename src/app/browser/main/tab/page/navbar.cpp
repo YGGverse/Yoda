@@ -107,6 +107,9 @@ void Navbar::refresh()
     navbarUpdate->set_sensitive(
         navbarRequest->get_text_length() > 0
     );
+
+    // Refresh history widget
+    navbarHistory->refresh();
 }
 
 // Setters
