@@ -15,6 +15,10 @@ Forward::Forward()
     set_tooltip_text(
         _("Forward")
     );
+
+    set_sensitive(
+        false // @TODO no effect by set_action_name
+    );
 }
 
 Forward::~Forward() = default;
