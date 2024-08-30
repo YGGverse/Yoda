@@ -31,9 +31,20 @@ History::~History()
 
 // Actions
 void History::push(
-    const Glib::ustring & VALUE
+    const Glib::ustring & REQUEST
 ) {
-    // @TODO
+    if (memory.empty() || memory.back().request != REQUEST)
+    {
+        memory.push_back(
+            {
+                REQUEST,
+                std::time(
+                    nullptr
+                ),
+                true
+            }
+        );
+    }
 }
 
 void History::refresh()

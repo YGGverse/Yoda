@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
 
+#include <ctime>
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
@@ -16,9 +17,16 @@ namespace app::browser::main::tab::page::navbar
 
     class History : public Gtk::Box
     {
-        // Memory
-        std::vector<Glib::ustring> history;
-        std::vector<Glib::ustring>::iterator index;
+        // Extras
+        struct Memory
+        {
+            Glib::ustring request;
+            std::time_t time;      // event unix time
+            bool permanent;        // save in database (on application close) @TODO
+        };
+
+        std::vector<Memory> memory;
+        std::vector<Memory>::iterator memory_index;
 
         // Components
         history::Back * historyBack;
@@ -31,7 +39,7 @@ namespace app::browser::main::tab::page::navbar
             ~History();
 
             void push(
-                const Glib::ustring & VALUE
+                const Glib::ustring & REQUEST
             );
 
             void refresh();
