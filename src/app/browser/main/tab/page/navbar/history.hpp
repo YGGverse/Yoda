@@ -1,8 +1,8 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
 
-#include "glibmm/ustring.h"
 #include <glibmm/i18n.h>
+#include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <vector>
 
