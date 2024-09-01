@@ -62,7 +62,8 @@ namespace app::browser::main::tab
             Glib::ustring get_subtitle();
 
             // Actions
-            void refresh();
+            void back();
+            void forward();
             void update();
     };
 }

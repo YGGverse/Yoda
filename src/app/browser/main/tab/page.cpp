@@ -80,15 +80,20 @@ Glib::ustring Page::get_subtitle()
 }
 
 // Actions
-void Page::refresh()
+void Page::back()
 {
-    pageNavbar->refresh();
+    pageNavbar->back();
+}
+
+void Page::forward()
+{
+    pageNavbar->forward();
 }
 
 void Page::update()
 {
     // Update navigation history
-    pageNavbar->history_push(
+    pageNavbar->push(
         pageNavbar->get_request_text()
     );
 

@@ -30,6 +30,16 @@ History::~History()
 };
 
 // Actions
+void History::back()
+{
+    historyBack->activate();
+}
+
+void History::forward()
+{
+    historyForward->activate();
+}
+
 void History::push(
     const Glib::ustring & REQUEST
 ) {
@@ -50,10 +60,10 @@ void History::push(
 void History::refresh()
 {
     historyBack->set_sensitive(
-        false // @TODO
+        false // @TODO memory.size() > 0
     );
 
     historyForward->set_sensitive(
-        false // @TODO
+        false // @TODO memory.size() > 0
     );
 }

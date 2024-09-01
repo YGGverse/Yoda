@@ -38,7 +38,11 @@ namespace app::browser::main::tab::page
             ~Navbar();
 
             // Actions
-            void history_push(
+            void back();
+
+            void forward();
+
+            void push(
                 const Glib::ustring & VALUE
             );
 

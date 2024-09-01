@@ -96,7 +96,17 @@ Navbar::~Navbar()
 };
 
 // Actions
-void Navbar::history_push(
+void Navbar::back()
+{
+    navbarHistory->back();
+}
+
+void Navbar::forward()
+{
+    navbarHistory->forward();
+}
+
+void Navbar::push(
     const Glib::ustring & VALUE
 ) {
     navbarHistory->push(

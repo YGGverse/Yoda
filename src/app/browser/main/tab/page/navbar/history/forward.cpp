@@ -19,6 +19,15 @@ Forward::Forward()
     set_sensitive(
         false // @TODO no effect by set_action_name
     );
+
+    signal_clicked().connect(
+        [this]
+        {
+            activate_action(
+                "win.tab_history_forward"
+            );
+        }
+    );
 }
 
 Forward::~Forward() = default;

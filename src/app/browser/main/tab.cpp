@@ -98,30 +98,20 @@ void Tab::close_all()
     }
 }
 
-void Tab::history_back(
+void Tab::back(
     const int & PAGE_NUMBER
 ) {
-    auto tabPage = get_tabPage(
+    get_tabPage(
         PAGE_NUMBER
-    );
-
-    // @TODO tabPage->back()
-
-    // Refresh children widgets
-    tabPage->refresh();
+    )->back();
 }
 
-void Tab::history_forward(
+void Tab::forward(
     const int & PAGE_NUMBER
 ) {
-    auto tabPage = get_tabPage(
+    get_tabPage(
         PAGE_NUMBER
-    );
-
-    // @TODO tabPage->forward()
-
-    // Refresh children widgets
-    tabPage->refresh();
+    )->forward();
 }
 
 void Tab::refresh(
@@ -134,9 +124,6 @@ void Tab::refresh(
     get_tabLabel(PAGE_NUMBER)->set_label(
         tabPage->get_title()
     );
-
-    // Refresh children widgets
-    tabPage->refresh();
 }
 
 void Tab::update(

@@ -38,6 +38,9 @@ namespace app::browser::main::tab::page::navbar
 
             ~History();
 
+            void back();
+            void forward();
+
             void push(
                 const Glib::ustring & REQUEST
             );

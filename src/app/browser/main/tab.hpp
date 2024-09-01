@@ -54,11 +54,11 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-            void history_back(
+            void back(
                 const int & PAGE_NUMBER
             );
 
-            void history_forward(
+            void forward(
                 const int & PAGE_NUMBER
             );
 

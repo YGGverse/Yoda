@@ -81,14 +81,14 @@ void Main::tab_close_all()
 
 void Main::tab_history_back()
 {
-    mainTab->history_back(
+    mainTab->back(
         mainTab->get_current_page()
     );
 };
 
 void Main::tab_history_forward()
 {
-    mainTab->history_forward(
+    mainTab->forward(
         mainTab->get_current_page()
     );
 };
