@@ -41,13 +41,6 @@ namespace app::browser::main::tab
         page::Navbar * pageNavbar;
         page::Progressbar * pageProgressbar;
 
-        // Helpers
-        void set(
-            const Glib::ustring & TITLE,
-            const Glib::ustring & SUBTITLE,
-            const double & PROGRESS
-        );
-
         public:
 
             Page(
@@ -63,6 +56,13 @@ namespace app::browser::main::tab
             // Actions
             void back();
             void forward();
+
+            void refresh(
+                const Glib::ustring & TITLE,
+                const Glib::ustring & SUBTITLE,
+                const double & PROGRESS
+            );
+
             void update();
     };
 }

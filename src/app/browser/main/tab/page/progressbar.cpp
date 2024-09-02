@@ -20,7 +20,7 @@ Progressbar::Progressbar()
 }
 
 // Public actions
-void Progressbar::set(
+void Progressbar::refresh(
     double fraction
 ) {
     // Toggle transparency

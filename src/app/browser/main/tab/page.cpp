@@ -54,7 +54,7 @@ Page::Page(
         );
 
     // Init extras
-    set(
+    refresh(
         TITLE,
         SUBTITLE,
         0
@@ -83,6 +83,24 @@ void Page::forward()
     pageNavbar->forward();
 }
 
+void Page::refresh(
+    const Glib::ustring & TITLE,
+    const Glib::ustring & SUBTITLE,
+    const double & PROGRESS
+) {
+    title = TITLE;
+
+    subtitle = SUBTITLE;
+
+    pageProgressbar->refresh(
+        PROGRESS
+    );
+
+    activate_action(
+        "win.refresh"
+    );
+}
+
 void Page::update()
 {
     // Update navigation history
@@ -91,7 +109,7 @@ void Page::update()
     );
 
     // Update page extras
-    set(
+    refresh(
         pageNavbar->get_request_host(),
         Glib::ustring::sprintf(
             _("load %s.."),
@@ -126,7 +144,7 @@ void Page::update()
             pageNavbar->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
-                set(
+                refresh(
                     pageNavbar->get_request_host(),
                     Glib::ustring::sprintf(
                         _("connect %s.."),
@@ -143,7 +161,7 @@ void Page::update()
 
                 catch (const Glib::Error & EXCEPTION)
                 {
-                    set(
+                    refresh(
                         pageNavbar->get_request_host(),
                         EXCEPTION.what(), 1
                     );
@@ -159,7 +177,7 @@ void Page::update()
                         request.size(),
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                         {
-                            set(
+                            refresh(
                                 pageNavbar->get_request_host(),
                                 Glib::ustring::sprintf(
                                     _("request %s.."),
@@ -174,7 +192,7 @@ void Page::update()
                                 sizeof(buffer) - 1,
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
-                                    set(
+                                    refresh(
                                         pageNavbar->get_request_host(),
                                         Glib::ustring::sprintf(
                                             _("reading %s.."),
@@ -217,7 +235,7 @@ void Page::update()
 
                                     GioSocketConnection_RefPtr->close();
 
-                                    set(
+                                    refresh(
                                         pageNavbar->get_request_host(), // @TODO title
                                         pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
                                                                                : pageNavbar->get_request_path()
@@ -246,23 +264,4 @@ void Page::update()
     {
         // @TODO search request
     }
-}
-
-// Private helpers
-void Page::set(
-    const Glib::ustring & TITLE,
-    const Glib::ustring & SUBTITLE,
-    const double & PROGRESS
-) {
-    title = TITLE;
-
-    subtitle = SUBTITLE;
-
-    pageProgressbar->set(
-        PROGRESS
-    );
-
-    activate_action(
-        "win.refresh"
-    );
 }
