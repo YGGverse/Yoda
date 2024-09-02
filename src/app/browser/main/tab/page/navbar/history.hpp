@@ -5,6 +5,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
+#include <gtkmm/object.h>
 #include <vector>
 
 namespace app::browser::main::tab::page::navbar
@@ -35,8 +36,6 @@ namespace app::browser::main::tab::page::navbar
         public:
 
             History();
-
-            ~History();
 
             void back();
             void forward();

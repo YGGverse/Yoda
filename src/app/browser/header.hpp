@@ -3,6 +3,7 @@
 
 #include <glibmm/ustring.h>
 #include <gtkmm/headerbar.h>
+#include <gtkmm/object.h>
 
 namespace app::browser
 {
@@ -26,8 +27,6 @@ namespace app::browser
         public:
 
             Header();
-
-            ~Header();
 
             void set_title(
                 const Glib::ustring & VALUE

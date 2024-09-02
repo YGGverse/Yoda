@@ -15,16 +15,11 @@ Main::Main()
     );
 
     // Init tabs
-    mainTab = new main::Tab();
+    mainTab = Gtk::make_managed<main::Tab>();
 
     append(
         * mainTab
     );
-}
-
-Main::~Main()
-{
-    delete mainTab;
 }
 
 // Getters

@@ -16,23 +16,17 @@ Main::Main()
     );
 
     // Init title
-    mainTitle = new main::Title();
+    mainTitle = Gtk::make_managed<main::Title>();
 
     append(
         * mainTitle
     );
 
-    mainSubtitle = new main::Subtitle();
+    mainSubtitle = Gtk::make_managed<main::Subtitle>();
 
     append(
         * mainSubtitle
     );
-}
-
-Main::~Main()
-{
-    delete mainTitle;
-    delete mainSubtitle;
 }
 
 void Main::set_title(

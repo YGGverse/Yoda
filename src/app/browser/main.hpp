@@ -4,6 +4,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
+#include <gtkmm/object.h>
 
 namespace app::browser
 {
@@ -23,7 +24,6 @@ namespace app::browser
         public:
 
             Main();
-            ~Main();
 
             // Getters
             Glib::ustring get_current_tab_page_title();

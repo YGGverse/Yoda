@@ -33,7 +33,7 @@ Page::Page(
     );
 
     // Init components
-    pageNavbar = new page::Navbar(
+    pageNavbar = Gtk::make_managed<page::Navbar>(
         REQUEST
     );
 
@@ -41,13 +41,13 @@ Page::Page(
             * pageNavbar
         );
 
-    pageProgressbar = new page::Progressbar();
+    pageProgressbar = Gtk::make_managed<page::Progressbar>();
 
         append(
             * pageProgressbar
         );
 
-    pageContent = new page::Content();
+    pageContent = Gtk::make_managed<page::Content>();
 
         append(
             * pageContent
@@ -59,13 +59,6 @@ Page::Page(
         SUBTITLE,
         0
     );
-}
-
-Page::~Page()
-{
-    delete pageNavbar;
-    delete pageContent;
-    delete pageProgressbar;
 }
 
 // Getters

@@ -13,6 +13,7 @@
 #include <glibmm/stringutils.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
+#include <gtkmm/object.h>
 
 namespace app::browser::main::tab
 {
@@ -54,8 +55,6 @@ namespace app::browser::main::tab
                 const Glib::ustring & SUBTITLE = "",
                 const Glib::ustring & REQUEST = ""
             );
-
-            ~Page();
 
             // Getters
             Glib::ustring get_title();

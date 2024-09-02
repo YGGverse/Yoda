@@ -3,6 +3,7 @@
 
 #include <glibmm/i18n.h>
 #include <gtkmm/applicationwindow.h>
+#include <gtkmm/object.h>
 
 namespace lib
 {
@@ -31,8 +32,6 @@ namespace app
                 //const Glib::RefPtr<Gtk::Application> & app,
                 //const std::shared_ptr<lib::Database> & db
             );
-
-            ~Browser();
     };
 }
 

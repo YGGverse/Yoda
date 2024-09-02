@@ -36,25 +36,25 @@ Navbar::Navbar(
     );
 
     // Init components
-    navbarBase = new navbar::Base();
+    navbarBase = Gtk::make_managed<navbar::Base>();
 
         append(
             * navbarBase
         );
 
-    navbarHistory = new navbar::History();
+    navbarHistory = Gtk::make_managed<navbar::History>();
 
         append(
             * navbarHistory
         );
 
-    navbarUpdate = new navbar::Update();
+    navbarUpdate = Gtk::make_managed<navbar::Update>();
 
         append(
             * navbarUpdate
         );
 
-    navbarRequest = new navbar::Request(
+    navbarRequest = Gtk::make_managed<navbar::Request>(
         REQUEST
     );
 
@@ -62,7 +62,7 @@ Navbar::Navbar(
             * navbarRequest
         );
 
-    navbarBookmark = new navbar::Bookmark();
+    navbarBookmark = Gtk::make_managed<navbar::Bookmark>();
 
         append(
             * navbarBookmark
@@ -85,15 +85,6 @@ Navbar::Navbar(
         GioSimpleActionGroup_RefPtr
     );
 }
-
-Navbar::~Navbar()
-{
-    delete navbarBase;
-    delete navbarBookmark;
-    delete navbarHistory;
-    delete navbarRequest;
-    delete navbarUpdate;
-};
 
 // Actions
 void Navbar::back()

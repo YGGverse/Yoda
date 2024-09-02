@@ -13,32 +13,25 @@ Header::Header()
     );
 
     // Init menu
-    headerMenu = new header::Menu();
+    headerMenu = Gtk::make_managed<header::Menu>();
 
     pack_start(
         * headerMenu
     );
 
     // Init tab
-    headerTab = new header::Tab();
+    headerTab = Gtk::make_managed<header::Tab>();
 
     pack_start(
         * headerTab
     );
 
     // Init main widget
-    headerMain = new header::Main();
+    headerMain = Gtk::make_managed<header::Main>();
 
     set_title_widget(
         * headerMain
     );
-}
-
-Header::~Header()
-{
-    delete headerMain;
-    delete headerMenu;
-    delete headerTab;
 }
 
 void Header::set_title(

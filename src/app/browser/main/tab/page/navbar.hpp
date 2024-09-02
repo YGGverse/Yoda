@@ -4,6 +4,7 @@
 #include <giomm/simpleactiongroup.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
+#include <gtkmm/object.h>
 
 namespace app::browser::main::tab::page
 {
@@ -34,8 +35,6 @@ namespace app::browser::main::tab::page
             Navbar(
                 const Glib::ustring & REQUEST
             );
-
-            ~Navbar();
 
             // Actions
             void back();

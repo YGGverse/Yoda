@@ -19,14 +19,14 @@ Browser::Browser(
     );
 
     // Init header widget
-    browserHeader = new browser::Header();
+    browserHeader = Gtk::make_managed<browser::Header>();
 
     set_titlebar(
         * browserHeader
     );
 
     // Init main widget
-    browserMain = new browser::Main();
+    browserMain = Gtk::make_managed<browser::Main>();
 
     set_child(
         * browserMain
@@ -127,10 +127,4 @@ Browser::Browser(
             browserMain->tab_history_forward();
         }
     );
-}
-
-Browser::~Browser()
-{
-    delete browserHeader;
-    delete browserMain;
 }

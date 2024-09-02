@@ -10,24 +10,18 @@ History::History()
         "linked" // merge children elements
     );
 
-    historyBack = new history::Back();
+    historyBack = Gtk::make_managed<history::Back>();
 
         append(
             * historyBack
         );
 
-    historyForward = new history::Forward();
+    historyForward = Gtk::make_managed<history::Forward>();
 
         append(
             * historyForward
         );
 }
-
-History::~History()
-{
-    delete historyBack;
-    delete historyForward;
-};
 
 // Actions
 void History::back()
