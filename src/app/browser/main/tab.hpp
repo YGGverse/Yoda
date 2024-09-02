@@ -4,6 +4,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/notebook.h>
+#include <gtkmm/object.h>
 
 namespace app::browser::main
 {
@@ -29,8 +30,6 @@ namespace app::browser::main
         public:
 
             Tab();
-
-            ~Tab();
 
             Glib::ustring get_page_title(
                 const int & PAGE_NUMBER
