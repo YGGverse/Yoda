@@ -23,8 +23,6 @@ Tab::Tab()
     );
 }
 
-Tab::~Tab() = default;
-
 // Getters
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER

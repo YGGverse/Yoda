@@ -30,8 +30,6 @@ namespace app::browser::main
 
             Tab();
 
-            ~Tab();
-
             Glib::ustring get_page_title(
                 const int & PAGE_NUMBER
             );
