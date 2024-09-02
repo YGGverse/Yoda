@@ -23,6 +23,8 @@ Tab::Tab()
     );
 }
 
+Tab::~Tab() = default;
+
 // Getters
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
@@ -42,12 +44,12 @@ void Tab::append(
     const Glib::ustring & REQUEST,
     const bool & FOCUS
 ) {
-    auto tabPage = Gtk::make_managed<tab::Page>(
+    auto tabPage = new tab::Page(
         TITLE,
         REQUEST
     );
 
-    auto tabLabel = Gtk::make_managed<tab::Label>(
+    auto tabLabel = new tab::Label(
         TITLE
     );
 
@@ -76,6 +78,7 @@ void Tab::close(
         PAGE_NUMBER
     );
 
+    // @TODO memory cleanup
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
