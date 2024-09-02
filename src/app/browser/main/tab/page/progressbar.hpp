@@ -17,7 +17,6 @@ namespace app::browser::main::tab::page
         public:
 
             Progressbar();
-            ~Progressbar();
 
             void set(
                 double fraction

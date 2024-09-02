@@ -19,8 +19,6 @@ Progressbar::Progressbar()
     set_opacity(0); // fixed height, not hide()
 }
 
-Progressbar::~Progressbar() = default;
-
 // Public actions
 void Progressbar::set(
     double fraction
