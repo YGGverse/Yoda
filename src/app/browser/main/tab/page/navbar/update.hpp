@@ -11,8 +11,6 @@ namespace app::browser::main::tab::page::navbar
         public:
 
             Update();
-
-            ~Update();
     };
 }
 

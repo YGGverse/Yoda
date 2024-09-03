@@ -48,8 +48,6 @@ Request::Request(
     );
 }
 
-Request::~Request() = default;
-
 // Getters
 Glib::ustring Request::get_scheme()
 {
