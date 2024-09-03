@@ -75,12 +75,12 @@ Glib::ustring Page::get_subtitle()
 // Actions
 void Page::back()
 {
-    pageNavbar->back();
+    pageNavbar->history_back();
 }
 
 void Page::forward()
 {
-    pageNavbar->forward();
+    pageNavbar->history_forward();
 }
 
 void Page::refresh(
@@ -104,7 +104,7 @@ void Page::refresh(
 void Page::update()
 {
     // Update navigation history
-    pageNavbar->push(
+    pageNavbar->history_push(
         pageNavbar->get_request_text()
     );
 

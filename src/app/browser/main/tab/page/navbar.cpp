@@ -87,7 +87,7 @@ Navbar::Navbar(
 }
 
 // Actions
-void Navbar::back()
+void Navbar::history_back()
 {
     navbar::History::Memory match;
 
@@ -101,7 +101,7 @@ void Navbar::back()
     }
 }
 
-void Navbar::forward()
+void Navbar::history_forward()
 {
     navbar::History::Memory match;
 
@@ -115,7 +115,7 @@ void Navbar::forward()
     }
 }
 
-void Navbar::push(
+void Navbar::history_push(
     const Glib::ustring & VALUE
 ) {
     navbarHistory->push(
