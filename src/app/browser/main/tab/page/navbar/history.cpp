@@ -24,7 +24,7 @@ History::History()
 }
 
 // Actions
-bool History::back(
+bool History::try_back(
     Memory & match,
     bool follow
 ) {
@@ -48,7 +48,7 @@ bool History::back(
     }
 }
 
-bool History::forward(
+bool History::try_forward(
     Memory & match,
     bool follow
 ) {
@@ -96,14 +96,14 @@ void History::refresh()
     Memory match;
 
     historyBack->set_sensitive(
-        back(
+        try_back(
             match,
             false
         )
     );
 
     historyForward->set_sensitive(
-        forward(
+        try_forward(
             match,
             false
         )

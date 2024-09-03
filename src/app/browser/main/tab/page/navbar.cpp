@@ -91,7 +91,7 @@ void Navbar::back()
 {
     navbar::History::Memory match;
 
-    if (navbarHistory->back(match))
+    if (navbarHistory->try_back(match))
     {
         navbarRequest->set_text(
             match.request
@@ -105,7 +105,7 @@ void Navbar::forward()
 {
     navbar::History::Memory match;
 
-    if (navbarHistory->forward(match))
+    if (navbarHistory->try_forward(match))
     {
         navbarRequest->set_text(
             match.request

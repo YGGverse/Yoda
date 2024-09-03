@@ -40,12 +40,12 @@ namespace app::browser::main::tab::page::navbar
             History();
 
             // Actions
-            bool back(
+            bool try_back(
                 Memory & match,
                 bool follow = true
             );
 
-            bool forward(
+            bool try_forward(
                 Memory & match,
                 bool follow = true
             );
