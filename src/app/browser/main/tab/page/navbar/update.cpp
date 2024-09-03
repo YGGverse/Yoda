@@ -16,5 +16,3 @@ Update::Update()
         _("Update")
     );
 }
-
-Update::~Update() = default;

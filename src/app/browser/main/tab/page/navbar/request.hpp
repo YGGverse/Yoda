@@ -26,8 +26,6 @@ namespace app::browser::main::tab::page::navbar
                 const Glib::ustring & VALUE = ""
             );
 
-            ~Request();
-
             Glib::ustring get_scheme();
             Glib::ustring get_host();
             Glib::ustring get_port();
