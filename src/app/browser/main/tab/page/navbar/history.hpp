@@ -26,8 +26,13 @@ namespace app::browser::main::tab::page::navbar
             bool permanent;        // save in database (on application close) @TODO
         };
 
+        // Define navigation history storage
         std::vector<Memory> memory;
-        std::vector<Memory>::iterator memory_index;
+        int index = 0;
+
+        // Private helpers
+        Memory & get_memory_back();
+        Memory & get_memory_forward();
 
         // Components
         history::Back * historyBack;
@@ -37,6 +42,7 @@ namespace app::browser::main::tab::page::navbar
 
             History();
 
+            // Actions
             void back();
             void forward();
 
@@ -45,6 +51,14 @@ namespace app::browser::main::tab::page::navbar
             );
 
             void refresh();
+
+            // Getters
+            bool has_memory_back();
+            bool has_memory_forward();
+
+            // Copying getters (to keep private members encapsulation)
+            Glib::ustring make_memory_back_request();
+            Glib::ustring make_memory_forward_request();
     };
 }
 

@@ -89,12 +89,30 @@ Navbar::Navbar(
 // Actions
 void Navbar::back()
 {
-    navbarHistory->back();
+    if (navbarHistory->has_memory_back())
+    {
+        navbarRequest->set_text(
+            navbarHistory->make_memory_back_request()
+        );
+
+        navbarHistory->back(); // --
+
+        navbarUpdate->activate();
+    }
 }
 
 void Navbar::forward()
 {
-    navbarHistory->forward();
+    if (navbarHistory->has_memory_forward())
+    {
+        navbarRequest->set_text(
+            navbarHistory->make_memory_forward_request()
+        );
+
+        navbarHistory->forward(); // ++
+
+        navbarUpdate->activate();
+    }
 }
 
 void Navbar::push(
@@ -121,7 +139,7 @@ void Navbar::refresh()
     navbarHistory->refresh();
 }
 
-// Setters
+// Setters @TODO is really wanted?
 void Navbar::set_request_text(
     const Glib::ustring & VALUE
 ) {
@@ -132,7 +150,7 @@ void Navbar::set_request_text(
     // refresh(); not wanted as on change listener do same @TODO
 }
 
-// Getters
+// Getters @TODO &
 Glib::ustring Navbar::get_request_text()
 {
     return navbarRequest->get_text();

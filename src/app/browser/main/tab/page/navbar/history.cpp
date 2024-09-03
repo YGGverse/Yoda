@@ -26,12 +26,18 @@ History::History()
 // Actions
 void History::back()
 {
-    historyBack->activate();
+    if (has_memory_back())
+    {
+        index--;
+    }
 }
 
 void History::forward()
 {
-    historyForward->activate();
+    if (has_memory_forward())
+    {
+        index++;
+    }
 }
 
 void History::push(
@@ -48,16 +54,89 @@ void History::push(
                 true
             }
         );
+
+        index = memory.size(); // @TODO
     }
 }
 
 void History::refresh()
 {
     historyBack->set_sensitive(
-        false // @TODO memory.size() > 0
+        has_memory_back()
     );
 
     historyForward->set_sensitive(
-        false // @TODO memory.size() > 0
+        has_memory_forward()
+    );
+}
+
+// Getters
+bool History::has_memory_back() // @TODO & MEMORY
+{
+    try
+    {
+        const History::Memory & MEMORY = get_memory_back();
+
+        return true;
+    }
+
+    catch (const std::out_of_range & EXCEPTION)
+    {
+        return false;
+    }
+}
+
+bool History::has_memory_forward() // @TODO & MEMORY
+{
+    try
+    {
+        const History::Memory & MEMORY = get_memory_forward();
+
+        return true;
+    }
+
+    catch (const std::out_of_range & EXCEPTION)
+    {
+        return false;
+    }
+}
+
+// Copying getters
+Glib::ustring History::make_memory_back_request()
+{
+    Glib::ustring request;
+
+    if (has_memory_back())
+    {
+        request = get_memory_back().request;
+    }
+
+    return request;
+}
+
+Glib::ustring History::make_memory_forward_request()
+{
+    Glib::ustring request;
+
+    if (has_memory_forward())
+    {
+        request = get_memory_forward().request;
+    }
+
+    return request;
+}
+
+// Private helpers
+History::Memory & History::get_memory_back()
+{
+    return memory.at(
+        index - 1
+    );
+}
+
+History::Memory & History::get_memory_forward()
+{
+    return memory.at(
+        index + 1
     );
 }
