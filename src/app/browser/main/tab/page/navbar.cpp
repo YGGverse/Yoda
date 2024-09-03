@@ -89,13 +89,13 @@ Navbar::Navbar(
 // Actions
 void Navbar::back()
 {
-    if (navbarHistory->has_memory_back())
+    navbar::History::Memory match;
+
+    if (navbarHistory->back(match))
     {
         navbarRequest->set_text(
-            navbarHistory->make_memory_back_request()
+            match.request
         );
-
-        navbarHistory->back(); // --
 
         navbarUpdate->activate();
     }
@@ -103,13 +103,13 @@ void Navbar::back()
 
 void Navbar::forward()
 {
-    if (navbarHistory->has_memory_forward())
+    navbar::History::Memory match;
+
+    if (navbarHistory->forward(match))
     {
         navbarRequest->set_text(
-            navbarHistory->make_memory_forward_request()
+            match.request
         );
-
-        navbarHistory->forward(); // ++
 
         navbarUpdate->activate();
     }

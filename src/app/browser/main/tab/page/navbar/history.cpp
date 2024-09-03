@@ -24,19 +24,51 @@ History::History()
 }
 
 // Actions
-void History::back()
-{
-    if (has_memory_back())
+bool History::back(
+    Memory & match,
+    bool follow
+) {
+    try
     {
-        index--;
+        match = memory.at(
+            index - 1
+        );
+
+        if (follow)
+        {
+            index--;
+        }
+
+        return true;
+    }
+
+    catch (std::out_of_range)
+    {
+        return false;
     }
 }
 
-void History::forward()
-{
-    if (has_memory_forward())
+bool History::forward(
+    Memory & match,
+    bool follow
+) {
+    try
     {
-        index++;
+        match = memory.at(
+            index + 1
+        );
+
+        if (follow)
+        {
+            index++;
+        }
+
+        return true;
+    }
+
+    catch (std::out_of_range)
+    {
+        return false;
     }
 }
 
@@ -61,82 +93,19 @@ void History::push(
 
 void History::refresh()
 {
+    Memory match;
+
     historyBack->set_sensitive(
-        has_memory_back()
+        back(
+            match,
+            false
+        )
     );
 
     historyForward->set_sensitive(
-        has_memory_forward()
-    );
-}
-
-// Getters
-bool History::has_memory_back() // @TODO & MEMORY
-{
-    try
-    {
-        const History::Memory & MEMORY = get_memory_back();
-
-        return true;
-    }
-
-    catch (const std::out_of_range & EXCEPTION)
-    {
-        return false;
-    }
-}
-
-bool History::has_memory_forward() // @TODO & MEMORY
-{
-    try
-    {
-        const History::Memory & MEMORY = get_memory_forward();
-
-        return true;
-    }
-
-    catch (const std::out_of_range & EXCEPTION)
-    {
-        return false;
-    }
-}
-
-// Copying getters
-Glib::ustring History::make_memory_back_request()
-{
-    Glib::ustring request;
-
-    if (has_memory_back())
-    {
-        request = get_memory_back().request;
-    }
-
-    return request;
-}
-
-Glib::ustring History::make_memory_forward_request()
-{
-    Glib::ustring request;
-
-    if (has_memory_forward())
-    {
-        request = get_memory_forward().request;
-    }
-
-    return request;
-}
-
-// Private helpers
-History::Memory & History::get_memory_back()
-{
-    return memory.at(
-        index - 1
-    );
-}
-
-History::Memory & History::get_memory_forward()
-{
-    return memory.at(
-        index + 1
+        forward(
+            match,
+            false
+        )
     );
 }
