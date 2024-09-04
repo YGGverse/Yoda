@@ -16,10 +16,10 @@ Page::Page(
     );
 
     // Init actions group
-    auto GioSimpleActionGroup_RefPtr = Gio::SimpleActionGroup::create();
+    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
 
         // Define group actions
-        GioSimpleActionGroup_RefPtr->add_action(
+        GioSimpleActionGroup->add_action(
             "update",
             [this]
             {
@@ -29,7 +29,7 @@ Page::Page(
 
     insert_action_group(
         "page",
-        GioSimpleActionGroup_RefPtr
+        GioSimpleActionGroup
     );
 
     // Init components
@@ -130,21 +130,21 @@ void Page::update(
     else if ("gemini" == pageNavbar->get_request_scheme())
     {
         // Create new socket connection
-        GioSocketClient_RefPtr = Gio::SocketClient::create();
+        GioSocketClient = Gio::SocketClient::create();
 
-        GioSocketClient_RefPtr->set_tls(
+        GioSocketClient->set_tls(
             true
         );
 
-        GioSocketClient_RefPtr->set_tls_validation_flags(
+        GioSocketClient->set_tls_validation_flags(
             Gio::TlsCertificateFlags::NO_FLAGS
         );
 
-        GioSocketClient_RefPtr->set_timeout(
+        GioSocketClient->set_timeout(
             15 // @TODO
         );
 
-        GioSocketClient_RefPtr->connect_to_uri_async(
+        GioSocketClient->connect_to_uri_async(
             pageNavbar->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
@@ -158,7 +158,7 @@ void Page::update(
 
                 try
                 {
-                    GioSocketConnection_RefPtr = GioSocketClient_RefPtr->connect_to_uri_finish(
+                    GioSocketConnection = GioSocketClient->connect_to_uri_finish(
                         result
                     );
                 }
@@ -172,11 +172,11 @@ void Page::update(
                 }
 
                 // Connection established, begin request
-                if (GioSocketConnection_RefPtr != nullptr)
+                if (GioSocketConnection != nullptr)
                 {
                     const Glib::ustring request = pageNavbar->get_request_text() + "\r\n";
 
-                    GioSocketConnection_RefPtr->get_output_stream()->write_async(
+                    GioSocketConnection->get_output_stream()->write_async(
                         request.data(),
                         request.size(),
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
@@ -191,7 +191,7 @@ void Page::update(
                             );
 
                             // Response
-                            GioSocketConnection_RefPtr->get_input_stream()->read_async( // | read_all_async
+                            GioSocketConnection->get_input_stream()->read_async( // | read_all_async
                                 buffer,
                                 sizeof(buffer) - 1,
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
@@ -237,7 +237,7 @@ void Page::update(
                                         );
                                     }
 
-                                    GioSocketConnection_RefPtr->close();
+                                    GioSocketConnection->close();
 
                                     refresh(
                                         pageNavbar->get_request_host(), // @TODO title

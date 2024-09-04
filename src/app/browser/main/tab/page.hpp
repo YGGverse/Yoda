@@ -33,8 +33,8 @@ namespace app::browser::main::tab
         // Socket
         char buffer[0xfffff]; // 1Mb
 
-        Glib::RefPtr<Gio::SocketClient> GioSocketClient_RefPtr;
-        Glib::RefPtr<Gio::SocketConnection> GioSocketConnection_RefPtr;
+        Glib::RefPtr<Gio::SocketClient> GioSocketClient;
+        Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
 
         // Components
         page::Content * pageContent;

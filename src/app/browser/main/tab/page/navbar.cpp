@@ -69,10 +69,10 @@ Navbar::Navbar(
         );
 
     // Init actions group
-    auto GioSimpleActionGroup_RefPtr = Gio::SimpleActionGroup::create();
+    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
 
         // Define group actions
-        GioSimpleActionGroup_RefPtr->add_action(
+        GioSimpleActionGroup->add_action(
             "refresh",
             [this]
             {
@@ -82,7 +82,7 @@ Navbar::Navbar(
 
     insert_action_group(
         "navbar",
-        GioSimpleActionGroup_RefPtr
+        GioSimpleActionGroup
     );
 }
 
