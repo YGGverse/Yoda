@@ -17,5 +17,3 @@ Plain::Plain(
         text
     );
 }
-
-Plain::~Plain() = default;

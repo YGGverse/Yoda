@@ -17,5 +17,3 @@ Gemini::Gemini(
         gemtext // @TODO
     );
 }
-
-Gemini::~Gemini() = default;

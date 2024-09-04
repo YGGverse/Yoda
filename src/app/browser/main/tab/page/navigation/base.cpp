@@ -16,5 +16,3 @@ Base::Base()
         _("Base")
     );
 }
-
-Base::~Base() = default;

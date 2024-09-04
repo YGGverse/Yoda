@@ -29,5 +29,3 @@ Forward::Forward()
         }
     );
 }
-
-Forward::~Forward() = default;

@@ -29,5 +29,3 @@ Back::Back()
         }
     );
 }
-
-Back::~Back() = default;

@@ -13,8 +13,6 @@ namespace app::browser::main::tab::page::content::text
             Gemini(
                 const Glib::ustring & gemtext
             );
-
-            ~Gemini();
     };
 }
 

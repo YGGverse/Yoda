@@ -27,8 +27,6 @@ Subtitle::Subtitle()
     hide();
 }
 
-Subtitle::~Subtitle() = default;
-
 void Subtitle::set(
     const Glib::ustring & TEXT
 ) {

@@ -13,8 +13,6 @@ namespace app::browser::main::tab::page::content::text
             Plain(
                 const Glib::ustring & text
             );
-
-            ~Plain();
     };
 }
 

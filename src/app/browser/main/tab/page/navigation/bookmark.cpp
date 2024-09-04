@@ -16,5 +16,3 @@ Bookmark::Bookmark()
         _("Toggle bookmark")
     );
 }
-
-Bookmark::~Bookmark() = default;

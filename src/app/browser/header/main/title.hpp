@@ -18,8 +18,6 @@ namespace app::browser::header::main
 
             Title();
 
-            ~Title();
-
             void set(
                 const Glib::ustring & TEXT
             );

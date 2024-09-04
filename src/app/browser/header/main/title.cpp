@@ -29,8 +29,6 @@ Title::Title()
     );
 }
 
-Title::~Title() = default;
-
 void Title::set(
     const Glib::ustring & TEXT
 ) {

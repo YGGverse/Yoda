@@ -33,5 +33,3 @@ Label::Label(
             GtkGestureClick
         );
 }
-
-Label::~Label() = default;

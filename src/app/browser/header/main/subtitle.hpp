@@ -16,8 +16,6 @@ namespace app::browser::header::main
 
             Subtitle();
 
-            ~Subtitle();
-
             void set(
                 const Glib::ustring & TEXT
             );

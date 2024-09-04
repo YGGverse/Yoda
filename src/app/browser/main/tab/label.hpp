@@ -16,8 +16,6 @@ namespace app::browser::main::tab
             Label(
                 const Glib::ustring & TEXT
             );
-
-            ~Label();
     };
 }
 
