@@ -96,20 +96,20 @@ void Tab::close_all()
     }
 }
 
-void Tab::back(
+void Tab::page_navigation_history_back(
     const int & PAGE_NUMBER
 ) {
     get_tabPage(
         PAGE_NUMBER
-    )->back();
+    )->navigation_history_back();
 }
 
-void Tab::forward(
+void Tab::page_navigation_history_forward(
     const int & PAGE_NUMBER
 ) {
     get_tabPage(
         PAGE_NUMBER
-    )->forward();
+    )->navigation_history_forward();
 }
 
 void Tab::refresh(

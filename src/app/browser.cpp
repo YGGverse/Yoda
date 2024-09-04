@@ -83,6 +83,23 @@ Browser::Browser(
             }
         );
 
+        // History
+        add_action(
+            "main_tab_page_navigation_history_back",
+            [this]
+            {
+                browserMain->tab_page_navigation_history_back();
+            }
+        );
+
+        add_action(
+            "main_tab_page_navigation_history_forward",
+            [this]
+            {
+                browserMain->tab_page_navigation_history_forward();
+            }
+        );
+
     // Tool
     add_action(
         "debug",
@@ -109,22 +126,6 @@ Browser::Browser(
             browserHeader->set_subtitle(
                 browserMain->get_current_tab_page_subtitle()
             );
-        }
-    );
-
-    add_action(
-        "tab_history_back", // @TODO rename
-        [this]
-        {
-            browserMain->tab_history_back();
-        }
-    );
-
-    add_action(
-        "tab_history_forward", // @TODO rename
-        [this]
-        {
-            browserMain->tab_history_forward();
         }
     );
 }

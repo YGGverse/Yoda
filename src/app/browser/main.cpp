@@ -74,16 +74,16 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
-void Main::tab_history_back()
+void Main::tab_page_navigation_history_back()
 {
-    mainTab->back(
+    mainTab->page_navigation_history_back(
         mainTab->get_current_page()
     );
 };
 
-void Main::tab_history_forward()
+void Main::tab_page_navigation_history_forward()
 {
-    mainTab->forward(
+    mainTab->page_navigation_history_forward(
         mainTab->get_current_page()
     );
 };

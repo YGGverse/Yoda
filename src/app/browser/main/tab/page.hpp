@@ -54,8 +54,8 @@ namespace app::browser::main::tab
             Glib::ustring get_subtitle();
 
             // Actions
-            void back();
-            void forward();
+            void navigation_history_back();
+            void navigation_history_forward();
 
             void refresh(
                 const Glib::ustring & TITLE,

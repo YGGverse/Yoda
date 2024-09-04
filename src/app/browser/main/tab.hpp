@@ -30,6 +30,7 @@ namespace app::browser::main
 
             Tab();
 
+            // Getters
             Glib::ustring get_page_title(
                 const int & PAGE_NUMBER
             );
@@ -38,6 +39,7 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
+            // Actions
             void append(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & REQUEST = "",
@@ -52,11 +54,11 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-            void back(
+            void page_navigation_history_back(
                 const int & PAGE_NUMBER
             );
 
-            void forward(
+            void page_navigation_history_forward(
                 const int & PAGE_NUMBER
             );
 

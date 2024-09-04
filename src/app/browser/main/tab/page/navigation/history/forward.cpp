@@ -5,7 +5,7 @@ using namespace app::browser::main::tab::page::navigation::history;
 Forward::Forward()
 {
     set_action_name(
-        "win.tab_history_forward"
+        "win.main_tab_page_navigation_history_forward"
     );
 
     set_icon_name(
@@ -18,14 +18,5 @@ Forward::Forward()
 
     set_sensitive(
         false // @TODO no effect by set_action_name
-    );
-
-    signal_clicked().connect(
-        [this]
-        {
-            activate_action(
-                "win.tab_history_forward"
-            );
-        }
     );
 }
