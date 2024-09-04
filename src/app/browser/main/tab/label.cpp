@@ -23,7 +23,7 @@ Label::Label(
                 if (n == 2) // double click
                 {
                     activate_action(
-                        "win.tab_close"
+                        "win.main_tab_close"
                     );
                 }
             }
