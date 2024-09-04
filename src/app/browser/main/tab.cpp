@@ -96,20 +96,20 @@ void Tab::close_all()
     }
 }
 
-void Tab::page_navigation_history_back(
+bool Tab::page_navigation_history_try_back(
     const int & PAGE_NUMBER
 ) {
-    get_tabPage(
+    return get_tabPage(
         PAGE_NUMBER
-    )->navigation_history_back();
+    )->navigation_history_try_back();
 }
 
-void Tab::page_navigation_history_forward(
+bool Tab::page_navigation_history_try_forward(
     const int & PAGE_NUMBER
 ) {
-    get_tabPage(
+    return get_tabPage(
         PAGE_NUMBER
-    )->navigation_history_forward();
+    )->navigation_history_try_forward();
 }
 
 void Tab::refresh(

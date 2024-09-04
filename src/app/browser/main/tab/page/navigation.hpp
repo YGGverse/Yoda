@@ -41,9 +41,8 @@ namespace app::browser::main::tab::page
                 const Glib::ustring & VALUE
             );
 
-            void history_back();
-            void history_forward();
-
+            bool history_try_back();
+            bool history_try_forward();
 
             void refresh();
 

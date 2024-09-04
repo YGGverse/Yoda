@@ -85,18 +85,18 @@ Browser::Browser(
 
         // History
         add_action(
-            "main_tab_page_navigation_history_back",
+            "main_tab_page_navigation_history_try_back",
             [this]
             {
-                browserMain->tab_page_navigation_history_back();
+                browserMain->tab_page_navigation_history_try_back();
             }
         );
 
         add_action(
-            "main_tab_page_navigation_history_forward",
+            "main_tab_page_navigation_history_try_forward",
             [this]
             {
-                browserMain->tab_page_navigation_history_forward();
+                browserMain->tab_page_navigation_history_try_forward();
             }
         );
 

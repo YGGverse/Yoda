@@ -74,18 +74,34 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
-void Main::tab_page_navigation_history_back()
+bool Main::tab_page_navigation_history_try_back()
 {
-    mainTab->page_navigation_history_back(
-        mainTab->get_current_page()
-    );
+    const int & PAGE_NUMBER = mainTab->get_current_page();
+
+    if (PAGE_NUMBER >= 0)
+    {
+        return mainTab->page_navigation_history_try_back(
+            PAGE_NUMBER
+        );
+    }
+
+    return false;
 };
 
-void Main::tab_page_navigation_history_forward()
+bool Main::tab_page_navigation_history_try_forward()
 {
-    mainTab->page_navigation_history_forward(
-        mainTab->get_current_page()
-    );
+    const int & PAGE_NUMBER = mainTab->get_current_page();
+
+    if (PAGE_NUMBER >= 0)
+    {
+        return mainTab->page_navigation_history_try_forward(
+            PAGE_NUMBER
+        );
+
+        return true;
+    }
+
+    return false;
 };
 
 void Main::refresh()

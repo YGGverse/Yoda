@@ -73,14 +73,14 @@ Glib::ustring Page::get_subtitle()
 }
 
 // Actions
-void Page::navigation_history_back()
+bool Page::navigation_history_try_back()
 {
-    pageNavigation->history_back();
+    return pageNavigation->history_try_back();
 }
 
-void Page::navigation_history_forward()
+bool Page::navigation_history_try_forward()
 {
-    pageNavigation->history_forward();
+    return pageNavigation->history_try_forward();
 }
 
 void Page::refresh(

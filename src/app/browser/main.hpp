@@ -35,9 +35,11 @@ namespace app::browser
             void tab_close_left();
             void tab_close_right();
             void tab_close();
-            void tab_page_navigation_history_back();
-            void tab_page_navigation_history_forward();
+
             void tab_update();
+
+            bool tab_page_navigation_history_try_back();
+            bool tab_page_navigation_history_try_forward();
 
             void refresh();
     };

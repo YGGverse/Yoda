@@ -87,7 +87,7 @@ Navigation::Navigation(
 }
 
 // Actions
-void Navigation::history_back()
+bool Navigation::history_try_back()
 {
     navigation::History::Memory match;
 
@@ -98,10 +98,14 @@ void Navigation::history_back()
         );
 
         navigationUpdate->activate();
+
+        return true;
     }
+
+    return false;
 }
 
-void Navigation::history_forward()
+bool Navigation::history_try_forward()
 {
     navigation::History::Memory match;
 
@@ -112,7 +116,11 @@ void Navigation::history_forward()
         );
 
         navigationUpdate->activate();
+
+        return true;
     }
+
+    return false;
 }
 
 void Navigation::history_add(
