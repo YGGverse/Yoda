@@ -40,7 +40,7 @@ void History::add(
 
     if (FOLLOW)
     {
-        index = memory.size(); // @TODO not last index, use iterator
+        index = memory.size() - 1;
     }
 }
 

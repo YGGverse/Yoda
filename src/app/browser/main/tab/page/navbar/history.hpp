@@ -22,7 +22,7 @@ namespace app::browser::main::tab::page::navbar
         history::Back * historyBack;
         history::Forward * historyForward;
 
-        int index = 0;
+        int index = -1;
 
         public:
 
