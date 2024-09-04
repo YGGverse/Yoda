@@ -55,6 +55,8 @@ namespace app::browser::main::tab::page::navbar
                 const bool & FOLLOW = true
             );
 
+            void save(); // @TODO save history to the permanent storage
+
             void refresh();
     };
 }
