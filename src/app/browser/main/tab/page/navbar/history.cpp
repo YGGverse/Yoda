@@ -88,7 +88,7 @@ void History::push(
 
     if (FOLLOW)
     {
-        index = memory.size();
+        index = memory.size(); // @TODO not last index, use iterator
     }
 }
 
