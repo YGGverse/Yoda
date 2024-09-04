@@ -76,22 +76,19 @@ void History::push(
     const Glib::ustring & REQUEST,
     const bool & FOLLOW
 ) {
-    if (memory.empty() || memory.back().request != REQUEST)
-    {
-        memory.push_back(
-            {
-                REQUEST,
-                std::time(
-                    nullptr
-                ),
-                true
-            }
-        );
-
-        if (FOLLOW)
+    memory.push_back(
         {
-            index = memory.size();
+            REQUEST,
+            std::time(
+                nullptr
+            ),
+            true
         }
+    );
+
+    if (FOLLOW)
+    {
+        index = memory.size();
     }
 }
 
