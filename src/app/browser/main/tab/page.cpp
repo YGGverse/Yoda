@@ -101,12 +101,16 @@ void Page::refresh(
     );
 }
 
-void Page::update()
-{
+void Page::update(
+    const bool & HISTORY
+) {
     // Update navigation history
-    pageNavbar->history_add(
-        pageNavbar->get_request_text()
-    );
+    if (HISTORY)
+    {
+        pageNavbar->history_add(
+            pageNavbar->get_request_text()
+        );
+    }
 
     // Update page extras
     refresh(
