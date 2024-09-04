@@ -73,7 +73,8 @@ bool History::try_forward(
 }
 
 void History::push(
-    const Glib::ustring & REQUEST
+    const Glib::ustring & REQUEST,
+    bool follow
 ) {
     if (memory.empty() || memory.back().request != REQUEST)
     {
@@ -87,7 +88,10 @@ void History::push(
             }
         );
 
-        index = memory.size(); // @TODO
+        if (follow)
+        {
+            index = memory.size();
+        }
     }
 }
 

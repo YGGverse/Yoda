@@ -51,7 +51,8 @@ namespace app::browser::main::tab::page::navbar
             );
 
             void push(
-                const Glib::ustring & REQUEST
+                const Glib::ustring & REQUEST,
+                bool follow = true
             );
 
             void refresh();
