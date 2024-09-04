@@ -42,17 +42,17 @@ namespace app::browser::main::tab::page::navbar
             // Actions
             bool try_back(
                 Memory & match,
-                bool follow = true
+                const bool & FOLLOW = true
             );
 
             bool try_forward(
                 Memory & match,
-                bool follow = true
+                const bool & FOLLOW = true
             );
 
             void push(
                 const Glib::ustring & REQUEST,
-                bool follow = true
+                const bool & FOLLOW = true
             );
 
             void refresh();
