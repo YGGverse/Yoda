@@ -104,7 +104,7 @@ void Page::refresh(
 void Page::update()
 {
     // Update navigation history
-    pageNavbar->history_push(
+    pageNavbar->history_add(
         pageNavbar->get_request_text()
     );
 

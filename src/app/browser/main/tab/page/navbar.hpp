@@ -37,11 +37,13 @@ namespace app::browser::main::tab::page
             );
 
             // Actions
-            void history_back();
-            void history_forward();
-            void history_push(
+            void history_add(
                 const Glib::ustring & VALUE
             );
+
+            void history_back();
+            void history_forward();
+
 
             void refresh();
 

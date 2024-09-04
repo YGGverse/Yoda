@@ -40,6 +40,15 @@ namespace app::browser::main::tab::page::navbar
             History();
 
             // Actions
+            void add(
+                const Glib::ustring & REQUEST,
+                const bool & FOLLOW = true
+            );
+
+            void refresh();
+
+            void save(); // @TODO save history to the permanent storage
+
             bool try_back(
                 Memory & match,
                 const bool & FOLLOW = true
@@ -49,15 +58,6 @@ namespace app::browser::main::tab::page::navbar
                 Memory & match,
                 const bool & FOLLOW = true
             );
-
-            void push(
-                const Glib::ustring & REQUEST,
-                const bool & FOLLOW = true
-            );
-
-            void save(); // @TODO save history to the permanent storage
-
-            void refresh();
     };
 }
 

@@ -24,6 +24,46 @@ History::History()
 }
 
 // Actions
+void History::add(
+    const Glib::ustring & REQUEST,
+    const bool & FOLLOW
+) {
+    memory.push_back(
+        {
+            REQUEST,
+            std::time(
+                nullptr
+            ),
+            true
+        }
+    );
+
+    if (FOLLOW)
+    {
+        index = memory.size(); // @TODO not last index, use iterator
+    }
+}
+
+void History::refresh()
+{
+    Memory match;
+
+    historyBack->set_sensitive(
+        try_back(
+            match,
+            false
+        )
+    );
+
+    historyForward->set_sensitive(
+        try_forward(
+            match,
+            false
+        )
+    );
+}
+
+
 bool History::try_back(
     Memory & match,
     const bool & FOLLOW
@@ -70,43 +110,4 @@ bool History::try_forward(
     {
         return false;
     }
-}
-
-void History::push(
-    const Glib::ustring & REQUEST,
-    const bool & FOLLOW
-) {
-    memory.push_back(
-        {
-            REQUEST,
-            std::time(
-                nullptr
-            ),
-            true
-        }
-    );
-
-    if (FOLLOW)
-    {
-        index = memory.size(); // @TODO not last index, use iterator
-    }
-}
-
-void History::refresh()
-{
-    Memory match;
-
-    historyBack->set_sensitive(
-        try_back(
-            match,
-            false
-        )
-    );
-
-    historyForward->set_sensitive(
-        try_forward(
-            match,
-            false
-        )
-    );
 }

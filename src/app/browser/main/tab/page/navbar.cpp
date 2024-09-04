@@ -115,10 +115,10 @@ void Navbar::history_forward()
     }
 }
 
-void Navbar::history_push(
+void Navbar::history_add(
     const Glib::ustring & VALUE
 ) {
-    navbarHistory->push(
+    navbarHistory->add(
         VALUE
     );
 }
