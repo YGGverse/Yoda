@@ -34,7 +34,7 @@ Browser::Browser(
 
     // Init actions
     add_action(
-        "tab_append",
+        "main_tab_append",
         [this]
         {
             browserMain->tab_append();
@@ -42,7 +42,7 @@ Browser::Browser(
     );
 
     add_action(
-        "tab_update",
+        "main_tab_update",
         [this]
         {
             browserMain->tab_update();
@@ -51,7 +51,7 @@ Browser::Browser(
 
     // Close
     add_action(
-        "tab_close",
+        "main_tab_close",
         [this]
         {
             browserMain->tab_close();
@@ -60,7 +60,7 @@ Browser::Browser(
 
         // Close submenu
         add_action(
-            "tab_close_left",
+            "main_tab_close_left",
             [this]
             {
                 browserMain->tab_close_left();
@@ -68,7 +68,7 @@ Browser::Browser(
         );
 
         add_action(
-            "tab_close_right",
+            "main_tab_close_right",
             [this]
             {
                 browserMain->tab_close_right();
@@ -76,7 +76,7 @@ Browser::Browser(
         );
 
         add_action(
-            "tab_close_all",
+            "main_tab_close_all",
             [this]
             {
                 browserMain->tab_close_all();
@@ -113,7 +113,7 @@ Browser::Browser(
     );
 
     add_action(
-        "tab_history_back",
+        "tab_history_back", // @TODO rename
         [this]
         {
             browserMain->tab_history_back();
@@ -121,7 +121,7 @@ Browser::Browser(
     );
 
     add_action(
-        "tab_history_forward",
+        "tab_history_forward", // @TODO rename
         [this]
         {
             browserMain->tab_history_forward();

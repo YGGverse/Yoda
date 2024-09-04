@@ -17,8 +17,6 @@ namespace app::browser::header
         public:
 
             Menu();
-
-            ~Menu();
     };
 }
 

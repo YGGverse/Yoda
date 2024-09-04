@@ -11,8 +11,6 @@ namespace app::browser::header
         public:
 
             Tab();
-
-            ~Tab();
     };
 }
 

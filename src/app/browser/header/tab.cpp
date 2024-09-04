@@ -5,7 +5,7 @@ using namespace app::browser::header;
 Tab::Tab()
 {
     set_action_name(
-        "win.tab_append"
+        "win.main_tab_append"
     );
 
     set_icon_name(
@@ -16,5 +16,3 @@ Tab::Tab()
         _("New tab")
     );
 }
-
-Tab::~Tab() = default;

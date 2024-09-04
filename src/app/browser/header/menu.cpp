@@ -14,12 +14,12 @@ Menu::Menu()
 
         tab->append(
             _("New tab.."),
-            "win.tab_append"
+            "win.main_tab_append"
         );
 
         tab->append(
             _("Update"),
-            "win.tab_update"
+            "win.main_tab_update"
         );
 
         // Build tab close submenu model
@@ -27,22 +27,22 @@ Menu::Menu()
 
             tab_close->append(
                 _("Active tab"),
-                "win.tab_close"
+                "win.main_tab_close"
             );
 
             tab_close->append(
                 _("All tabs to left"),
-                "win.tab_close_left"
+                "win.main_tab_close_left"
             );
 
             tab_close->append(
                 _("All tabs to right"),
-                "win.tab_close_right"
+                "win.main_tab_close_right"
             );
 
             tab_close->append(
                 _("All tabs"),
-                "win.tab_close_all"
+                "win.main_tab_close_all"
             );
 
         tab->append_submenu(
@@ -81,5 +81,3 @@ Menu::Menu()
         main
     );
 }
-
-Menu::~Menu() = default;

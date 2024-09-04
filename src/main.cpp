@@ -28,12 +28,12 @@ int main(
 
     // Init accels @TODO db settings
     app->set_accel_for_action(
-        "win.tab_append",
+        "win.main_tab_append",
         "<Primary>t"
     );
 
     app->set_accel_for_action(
-        "win.tab_update",
+        "win.main_tab_update",
         "<Primary>r"
     );
 
