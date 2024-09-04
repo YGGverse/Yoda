@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HPP
 
 #include <giomm/simpleactiongroup.h>
 #include <glibmm/ustring.h>
@@ -8,7 +8,7 @@
 
 namespace app::browser::main::tab::page
 {
-    namespace navbar
+    namespace navigation
     {
         class Base;
         class Bookmark;
@@ -17,14 +17,14 @@ namespace app::browser::main::tab::page
         class Request;
     }
 
-    class Navbar : public Gtk::Box
+    class Navigation : public Gtk::Box
     {
         // Components
-        navbar::Base * navbarBase;
-        navbar::Bookmark * navbarBookmark;
-        navbar::History * navbarHistory;
-        navbar::Request * navbarRequest;
-        navbar::Update * navbarUpdate;
+        navigation::Base * navigationBase;
+        navigation::Bookmark * navigationBookmark;
+        navigation::History * navigationHistory;
+        navigation::Request * navigationRequest;
+        navigation::Update * navigationUpdate;
 
         // Defaults
         const int SPACING = 8;
@@ -32,7 +32,7 @@ namespace app::browser::main::tab::page
 
         public:
 
-            Navbar(
+            Navigation(
                 const Glib::ustring & REQUEST
             );
 
@@ -63,4 +63,4 @@ namespace app::browser::main::tab::page
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HPP

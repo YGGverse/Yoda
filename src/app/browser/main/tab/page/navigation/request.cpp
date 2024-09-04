@@ -1,6 +1,6 @@
 #include "request.hpp"
 
-using namespace app::browser::main::tab::page::navbar;
+using namespace app::browser::main::tab::page::navigation;
 
 // Construct
 Request::Request(
@@ -31,7 +31,7 @@ Request::Request(
             parse();
 
             activate_action(
-                "navbar.refresh"
+                "navigation.refresh"
             );
         }
     );

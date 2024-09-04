@@ -1,7 +1,7 @@
 #include "page.hpp"
 #include "page/content.hpp"
-#include "page/navbar.hpp"
-#include "page/progressbar.hpp"
+#include "page/navigation.hpp"
+#include "page/progress.hpp"
 
 using namespace app::browser::main::tab;
 
@@ -33,18 +33,18 @@ Page::Page(
     );
 
     // Init components
-    pageNavbar = Gtk::make_managed<page::Navbar>(
+    pageNavigation = Gtk::make_managed<page::Navigation>(
         REQUEST
     );
 
         append(
-            * pageNavbar
+            * pageNavigation
         );
 
-    pageProgressbar = Gtk::make_managed<page::Progressbar>();
+    pageProgress = Gtk::make_managed<page::Progress>();
 
         append(
-            * pageProgressbar
+            * pageProgress
         );
 
     pageContent = Gtk::make_managed<page::Content>();
@@ -75,12 +75,12 @@ Glib::ustring Page::get_subtitle()
 // Actions
 void Page::back()
 {
-    pageNavbar->history_back();
+    pageNavigation->history_back();
 }
 
 void Page::forward()
 {
-    pageNavbar->history_forward();
+    pageNavigation->history_forward();
 }
 
 void Page::refresh(
@@ -92,7 +92,7 @@ void Page::refresh(
 
     subtitle = SUBTITLE;
 
-    pageProgressbar->refresh(
+    pageProgress->refresh(
         PROGRESS
     );
 
@@ -107,27 +107,27 @@ void Page::update(
     // Update navigation history
     if (HISTORY)
     {
-        pageNavbar->history_add(
-            pageNavbar->get_request_text()
+        pageNavigation->history_add(
+            pageNavigation->get_request_text()
         );
     }
 
     // Update page extras
     refresh(
-        pageNavbar->get_request_host(),
+        pageNavigation->get_request_host(),
         Glib::ustring::sprintf(
             _("load %s.."),
-            pageNavbar->get_request_text()
+            pageNavigation->get_request_text()
         ), 0
     );
 
     // Connect scheme driver
-    if ("file" == pageNavbar->get_request_scheme())
+    if ("file" == pageNavigation->get_request_scheme())
     {
         // @TODO
     }
 
-    else if ("gemini" == pageNavbar->get_request_scheme())
+    else if ("gemini" == pageNavigation->get_request_scheme())
     {
         // Create new socket connection
         GioSocketClient = Gio::SocketClient::create();
@@ -145,14 +145,14 @@ void Page::update(
         );
 
         GioSocketClient->connect_to_uri_async(
-            pageNavbar->get_request_text(), 1965,
+            pageNavigation->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
                 refresh(
-                    pageNavbar->get_request_host(),
+                    pageNavigation->get_request_host(),
                     Glib::ustring::sprintf(
                         _("connect %s.."),
-                        pageNavbar->get_request_host()
+                        pageNavigation->get_request_host()
                     ), .25
                 );
 
@@ -166,7 +166,7 @@ void Page::update(
                 catch (const Glib::Error & EXCEPTION)
                 {
                     refresh(
-                        pageNavbar->get_request_host(),
+                        pageNavigation->get_request_host(),
                         EXCEPTION.what(), 1
                     );
                 }
@@ -174,7 +174,7 @@ void Page::update(
                 // Connection established, begin request
                 if (GioSocketConnection != nullptr)
                 {
-                    const Glib::ustring request = pageNavbar->get_request_text() + "\r\n";
+                    const Glib::ustring request = pageNavigation->get_request_text() + "\r\n";
 
                     GioSocketConnection->get_output_stream()->write_async(
                         request.data(),
@@ -182,11 +182,11 @@ void Page::update(
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                         {
                             refresh(
-                                pageNavbar->get_request_host(),
+                                pageNavigation->get_request_host(),
                                 Glib::ustring::sprintf(
                                     _("request %s.."),
-                                    pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                           : pageNavbar->get_request_path()
+                                    pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                           : pageNavigation->get_request_path()
                                 ), .5
                             );
 
@@ -197,11 +197,11 @@ void Page::update(
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
                                     refresh(
-                                        pageNavbar->get_request_host(),
+                                        pageNavigation->get_request_host(),
                                         Glib::ustring::sprintf(
                                             _("reading %s.."),
-                                            pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                                   : pageNavbar->get_request_path()
+                                            pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                                   : pageNavigation->get_request_path()
                                         ), .75
                                     );
 
@@ -215,7 +215,7 @@ void Page::update(
                                     if (meta[1] == "20")
                                     {
                                         // Route by mime type or path extension
-                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavbar->get_request_path(), ".gmi"))
+                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
                                         {
                                             pageContent->set_text_gemini(
                                                 buffer // @TODO
@@ -240,9 +240,9 @@ void Page::update(
                                     GioSocketConnection->close();
 
                                     refresh(
-                                        pageNavbar->get_request_host(), // @TODO title
-                                        pageNavbar->get_request_path().empty() ? pageNavbar->get_request_host()
-                                                                               : pageNavbar->get_request_path()
+                                        pageNavigation->get_request_host(), // @TODO title
+                                        pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                               : pageNavigation->get_request_path()
                                         , 1
                                     );
                                 }
@@ -255,10 +255,10 @@ void Page::update(
     }
 
     // Scheme not found but host provided, redirect to gemini://
-    else if (pageNavbar->get_request_scheme().empty() && !pageNavbar->get_request_host().empty())
+    else if (pageNavigation->get_request_scheme().empty() && !pageNavigation->get_request_host().empty())
     {
-        pageNavbar->set_request_text(
-            "gemini://" + pageNavbar->get_request_text()
+        pageNavigation->set_request_text(
+            "gemini://" + pageNavigation->get_request_text()
         );
 
         update();

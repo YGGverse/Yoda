@@ -1,12 +1,12 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_PROGRESSBAR_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_PROGRESSBAR_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_PROGRESS_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_PROGRESS_HPP
 
 #include <glibmm/main.h>
 #include <gtkmm/progressbar.h>
 
 namespace app::browser::main::tab::page
 {
-    class Progressbar : public Gtk::ProgressBar
+    class Progress : public Gtk::ProgressBar
     {
         const int MARGIN = 2;
         const double PULSE_STEP = .1;
@@ -16,7 +16,7 @@ namespace app::browser::main::tab::page
 
         public:
 
-            Progressbar();
+            Progress();
 
             void refresh(
                 double fraction
@@ -24,4 +24,4 @@ namespace app::browser::main::tab::page
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_PROGRESSBAR_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_PROGRESS_HPP

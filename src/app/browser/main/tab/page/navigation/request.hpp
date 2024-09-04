@@ -1,12 +1,12 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_REQUEST_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_REQUEST_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST_HPP
 
 #include <glibmm/i18n.h>
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/entry.h>
 
-namespace app::browser::main::tab::page::navbar
+namespace app::browser::main::tab::page::navigation
 {
     class Request : public Gtk::Entry
     {
@@ -34,4 +34,4 @@ namespace app::browser::main::tab::page::navbar
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_REQUEST_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST_HPP

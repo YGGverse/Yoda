@@ -19,15 +19,15 @@ SRCS =  src/main.cpp\
 		src/app/browser/main/tab/page/content.cpp\
 		src/app/browser/main/tab/page/content/text/gemini.cpp\
 		src/app/browser/main/tab/page/content/text/plain.cpp\
-		src/app/browser/main/tab/page/navbar.cpp\
-		src/app/browser/main/tab/page/navbar/base.cpp\
-		src/app/browser/main/tab/page/navbar/bookmark.cpp\
-		src/app/browser/main/tab/page/navbar/history.cpp\
-		src/app/browser/main/tab/page/navbar/history/back.cpp\
-		src/app/browser/main/tab/page/navbar/history/forward.cpp\
-		src/app/browser/main/tab/page/navbar/request.cpp\
-		src/app/browser/main/tab/page/navbar/update.cpp\
-		src/app/browser/main/tab/page/progressbar.cpp\
+		src/app/browser/main/tab/page/navigation.cpp\
+		src/app/browser/main/tab/page/navigation/base.cpp\
+		src/app/browser/main/tab/page/navigation/bookmark.cpp\
+		src/app/browser/main/tab/page/navigation/history.cpp\
+		src/app/browser/main/tab/page/navigation/history/back.cpp\
+		src/app/browser/main/tab/page/navigation/history/forward.cpp\
+		src/app/browser/main/tab/page/navigation/request.cpp\
+		src/app/browser/main/tab/page/navigation/update.cpp\
+		src/app/browser/main/tab/page/progress.cpp\
 		src/app/browser/main/tab/label.cpp\
 		src/lib/database.cpp\
 		src/lib/database/session.cpp

@@ -1,8 +1,8 @@
-#include "progressbar.hpp"
+#include "progress.hpp"
 
 using namespace app::browser::main::tab::page;
 
-Progressbar::Progressbar()
+Progress::Progress()
 {
     set_margin_top(
         MARGIN
@@ -20,7 +20,7 @@ Progressbar::Progressbar()
 }
 
 // Public actions
-void Progressbar::refresh(
+void Progress::refresh(
     double fraction
 ) {
     // Toggle transparency

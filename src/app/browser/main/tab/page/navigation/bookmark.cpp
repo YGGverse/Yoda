@@ -1,6 +1,6 @@
 #include "bookmark.hpp"
 
-using namespace app::browser::main::tab::page::navbar;
+using namespace app::browser::main::tab::page::navigation;
 
 Bookmark::Bookmark()
 {

@@ -1,19 +1,19 @@
-#include "forward.hpp"
+#include "back.hpp"
 
-using namespace app::browser::main::tab::page::navbar::history;
+using namespace app::browser::main::tab::page::navigation::history;
 
-Forward::Forward()
+Back::Back()
 {
     set_action_name(
-        "win.tab_history_forward"
+        "win.tab_history_back"
     );
 
     set_icon_name(
-        "go-next-symbolic"
+        "go-previous-symbolic"
     );
 
     set_tooltip_text(
-        _("Forward")
+        _("Back")
     );
 
     set_sensitive(
@@ -24,10 +24,10 @@ Forward::Forward()
         [this]
         {
             activate_action(
-                "win.tab_history_forward"
+                "win.tab_history_back"
             );
         }
     );
 }
 
-Forward::~Forward() = default;
+Back::~Back() = default;

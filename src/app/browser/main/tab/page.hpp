@@ -20,8 +20,8 @@ namespace app::browser::main::tab
     namespace page
     {
         class Content;
-        class Navbar;
-        class Progressbar;
+        class Navigation;
+        class Progress;
     }
 
     class Page : public Gtk::Box
@@ -38,8 +38,8 @@ namespace app::browser::main::tab
 
         // Components
         page::Content * pageContent;
-        page::Navbar * pageNavbar;
-        page::Progressbar * pageProgressbar;
+        page::Navigation * pageNavigation;
+        page::Progress * pageProgress;
 
         public:
 

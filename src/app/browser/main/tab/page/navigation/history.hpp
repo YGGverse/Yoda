@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HISTORY_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HISTORY_HPP
 
 #include <ctime>
 #include <glibmm/i18n.h>
@@ -8,7 +8,7 @@
 #include <gtkmm/object.h>
 #include <vector>
 
-namespace app::browser::main::tab::page::navbar
+namespace app::browser::main::tab::page::navigation
 {
     namespace history
     {
@@ -61,4 +61,4 @@ namespace app::browser::main::tab::page::navbar
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVBAR_HISTORY_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HISTORY_HPP
