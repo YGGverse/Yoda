@@ -44,8 +44,8 @@ namespace app::browser::main::tab
 
             Page(
                 const Glib::ustring & TITLE,
-                const Glib::ustring & SUBTITLE = "",
-                const Glib::ustring & REQUEST = ""
+                const Glib::ustring & SUBTITLE,
+                const Glib::ustring & REQUEST
             );
 
             // Actions
