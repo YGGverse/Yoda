@@ -37,8 +37,9 @@ namespace app::browser::main
 
             void append(
                 const Glib::ustring & TITLE,
-                const Glib::ustring & REQUEST = "",
-                const bool & FOCUS = true
+                const Glib::ustring & SUBTITLE,
+                const Glib::ustring & REQUEST,
+                const bool & FOCUS
             );
 
             void close(
@@ -51,7 +52,7 @@ namespace app::browser::main
 
                 void page_navigation_update(
                     const int & PAGE_NUMBER,
-                    const bool & ADD_HISTORY = true
+                    const bool & ADD_HISTORY
                 );
 
                 void page_navigation_history_back(
