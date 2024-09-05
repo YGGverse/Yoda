@@ -106,8 +106,6 @@ bool Main::tab_page_navigation_history_try_forward()
         return mainTab->page_navigation_history_try_forward(
             PAGE_NUMBER
         );
-
-        return true;
     }
 
     return false;
