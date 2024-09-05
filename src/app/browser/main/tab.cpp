@@ -38,11 +38,13 @@ void Tab::refresh(
 
 void Tab::append(
     const Glib::ustring & TITLE,
+    const Glib::ustring & SUBTITLE,
     const Glib::ustring & REQUEST,
     const bool & FOCUS
 ) {
     auto tabPage = new tab::Page(
         TITLE,
+        SUBTITLE,
         REQUEST
     );
 
