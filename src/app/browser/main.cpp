@@ -33,7 +33,10 @@ void Main::refresh()
 void Main::tab_append()
 {
     mainTab->append(
-        _("New page")
+        _("New page"),
+        "", // @TODO
+        "",
+        true
     );
 };
 
@@ -61,7 +64,8 @@ void Main::tab_close_all()
 
 void Main::tab_page_navigation_update() {
     mainTab->page_navigation_update(
-        mainTab->get_current_page() // @TODO
+        mainTab->get_current_page(), // @TODO
+        true
     );
 };
 
