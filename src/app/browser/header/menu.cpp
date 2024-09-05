@@ -24,8 +24,8 @@ Menu::Menu()
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main(
-    const Glib::RefPtr<Gio::Menu> MAIN_TAB,
-    const Glib::RefPtr<Gio::Menu> MAIN_TOOLS
+    const Glib::RefPtr<Gio::Menu> & MAIN_TAB,
+    const Glib::RefPtr<Gio::Menu> & MAIN_TOOLS
 ) {
     auto menu = Gio::Menu::create();
 
@@ -48,8 +48,8 @@ Glib::RefPtr<Gio::Menu> Menu::main(
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab(
-    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE,
-    const Glib::RefPtr<Gio::Menu> MAIN_TAB_CLOSE
+    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE,
+    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_CLOSE
 ) {
     auto menu = Gio::Menu::create();
 
@@ -72,7 +72,7 @@ Glib::RefPtr<Gio::Menu> Menu::main_tab(
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page(
-    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION
+    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION
 ) {
     auto menu = Gio::Menu::create();
 
@@ -85,7 +85,7 @@ Glib::RefPtr<Gio::Menu> Menu::main_tab_page(
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation(
-    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION_HISTORY
+    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION_HISTORY
 ) {
     auto menu = Gio::Menu::create();
 
