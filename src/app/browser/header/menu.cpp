@@ -24,19 +24,19 @@ Menu::Menu()
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main(
-    Glib::RefPtr<Gio::Menu> main_tab,
-    Glib::RefPtr<Gio::Menu> main_tools
+    const Glib::RefPtr<Gio::Menu> MAIN_TAB,
+    const Glib::RefPtr<Gio::Menu> MAIN_TOOLS
 ) {
     auto menu = Gio::Menu::create();
 
     menu->append_submenu(
         _("Tab"),
-        main_tab
+        MAIN_TAB
     );
 
     menu->append_submenu(
         _("Tools"),
-        main_tools
+        MAIN_TOOLS
     );
 
     menu->append(
@@ -48,8 +48,8 @@ Glib::RefPtr<Gio::Menu> Menu::main(
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab(
-    Glib::RefPtr<Gio::Menu> main_tab_page,
-    Glib::RefPtr<Gio::Menu> main_tab_close
+    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE,
+    const Glib::RefPtr<Gio::Menu> MAIN_TAB_CLOSE
 ) {
     auto menu = Gio::Menu::create();
 
@@ -60,38 +60,38 @@ Glib::RefPtr<Gio::Menu> Menu::main_tab(
 
     menu->append_submenu(
         _("Page"),
-        main_tab_page
+        MAIN_TAB_PAGE
     );
 
     menu->append_submenu(
         _("Close"),
-        main_tab_close
+        MAIN_TAB_CLOSE
     );
 
     return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page(
-    Glib::RefPtr<Gio::Menu> main_tab_page_navigation
+    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION
 ) {
     auto menu = Gio::Menu::create();
 
     menu->append_submenu(
         _("Navigation"),
-        main_tab_page_navigation
+        MAIN_TAB_PAGE_NAVIGATION
     );
 
     return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation(
-    Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history
+    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION_HISTORY
 ) {
     auto menu = Gio::Menu::create();
 
     menu->append_submenu(
         _("History"),
-        main_tab_page_navigation_history
+        MAIN_TAB_PAGE_NAVIGATION_HISTORY
     );
 
     menu->append(

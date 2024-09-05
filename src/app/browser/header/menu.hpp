@@ -11,24 +11,24 @@ namespace app::browser::header
     {
         // 1 level
         static Glib::RefPtr<Gio::Menu> main(
-            Glib::RefPtr<Gio::Menu> main_tab,
-            Glib::RefPtr<Gio::Menu> main_tools
+            const Glib::RefPtr<Gio::Menu> MAIN_TAB,
+            const Glib::RefPtr<Gio::Menu> MAIN_TOOLS
         );
 
             // 2 level
             static Glib::RefPtr<Gio::Menu> main_tab(
-                Glib::RefPtr<Gio::Menu> main_tab_page,
-                Glib::RefPtr<Gio::Menu> main_tab_close
+                const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE,
+                const Glib::RefPtr<Gio::Menu> MAIN_TAB_CLOSE
             );
 
                 // 3 level
                 static Glib::RefPtr<Gio::Menu> main_tab_page(
-                    Glib::RefPtr<Gio::Menu> main_tab_page_navigation
+                    const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION
                 );
 
                     // 4 level
                     static Glib::RefPtr<Gio::Menu> main_tab_page_navigation(
-                        Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history
+                        const Glib::RefPtr<Gio::Menu> MAIN_TAB_PAGE_NAVIGATION_HISTORY
                     );
 
                         // 5 level
