@@ -61,17 +61,14 @@ void Page::refresh(
     const Glib::ustring & SUBTITLE,
     const double & PROGRESS
 ) {
-    title = TITLE;
-
+    title = TITLE; // @TODO copy
     subtitle = SUBTITLE;
 
     pageProgress->refresh(
         PROGRESS
     );
 
-    activate_action(
-        "win.refresh"
-    );
+    pageNavigation->refresh();
 }
 
 void Page::navigation_update(
