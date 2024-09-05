@@ -104,15 +104,17 @@ Browser::Browser(
             // Tab page navigation actions
             add_action(
                 "main_tab_page_navigation_update",
-                [this]
+                [this](const bool & ADD_HISTORY = false)
                 {
-                    browserMain->tab_page_navigation_update();
+                    browserMain->tab_page_navigation_update(
+                        ADD_HISTORY
+                    );
                 }
             );
 
             add_action(
                 "main_tab_page_navigation_history_try_back",
-                [this]
+                [this]()
                 {
                     browserMain->tab_page_navigation_history_try_back();
                 }

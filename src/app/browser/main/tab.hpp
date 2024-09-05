@@ -59,7 +59,8 @@ namespace app::browser::main
             void close_all();
 
                 void page_navigation_update(
-                    const int & PAGE_NUMBER
+                    const int & PAGE_NUMBER,
+                    const bool & ADD_HISTORY
                 );
 
                 bool page_navigation_history_try_back(

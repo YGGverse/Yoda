@@ -97,9 +97,9 @@ bool Navigation::history_try_back()
             match.request
         );
 
-        navigationUpdate->activate();
-
-        return true;
+        return activate_action(
+            "win.main_tab_page_navigation_update"
+        );
     }
 
     return false;
@@ -115,9 +115,9 @@ bool Navigation::history_try_forward()
             match.request
         );
 
-        navigationUpdate->activate();
-
-        return true;
+        return activate_action(
+            "win.main_tab_page_navigation_update"
+        );
     }
 
     return false;

@@ -108,11 +108,14 @@ void Tab::close_all()
 }
 
 void Tab::page_navigation_update(
-    const int & PAGE_NUMBER
+    const int & PAGE_NUMBER,
+    const bool & ADD_HISTORY
 ) {
     get_tabPage(
         PAGE_NUMBER
-    )->navigation_update();
+    )->navigation_update(
+        ADD_HISTORY
+    );
 }
 
 bool Tab::page_navigation_history_try_back(

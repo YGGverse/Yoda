@@ -60,7 +60,7 @@ namespace app::browser::main::tab
             );
 
             void navigation_update(
-                const bool & ADD_HISTORY = false
+                const bool & ADD_HISTORY
             );
 
             bool navigation_history_try_back();

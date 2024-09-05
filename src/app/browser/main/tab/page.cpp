@@ -234,7 +234,9 @@ void Page::navigation_update(
             "gemini://" + pageNavigation->get_request_text()
         );
 
-        navigation_update();
+        navigation_update(
+            false
+        );
     }
 
     else
