@@ -44,17 +44,6 @@ Page::Page(
     );
 }
 
-// Getters
-Glib::ustring Page::get_title()
-{
-    return title;
-}
-
-Glib::ustring Page::get_subtitle()
-{
-    return subtitle;
-}
-
 // Actions
 void Page::refresh(
     const Glib::ustring & TITLE,
@@ -273,4 +262,15 @@ void Page::navigation_history_forward()
             false
         );
     }
+}
+
+// Getters
+Glib::ustring Page::get_title()
+{
+    return title;
+}
+
+Glib::ustring Page::get_subtitle()
+{
+    return subtitle;
 }

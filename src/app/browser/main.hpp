@@ -25,10 +25,6 @@ namespace app::browser
 
             Main();
 
-            // Getters
-            Glib::ustring get_current_tab_page_title();
-            Glib::ustring get_current_tab_page_subtitle();
-
             // Actions
             void refresh();
 
@@ -41,6 +37,10 @@ namespace app::browser
                     void tab_page_navigation_update();
                     void tab_page_navigation_history_back();
                     void tab_page_navigation_history_forward();
+
+            // Getters
+            Glib::ustring get_current_tab_page_title();
+            Glib::ustring get_current_tab_page_subtitle();
     };
 }
 

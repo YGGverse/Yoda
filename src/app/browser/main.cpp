@@ -22,21 +22,6 @@ Main::Main()
     );
 }
 
-// Getters
-Glib::ustring Main::get_current_tab_page_title()
-{
-    return mainTab->get_page_title(
-        mainTab->get_current_page()
-    );
-};
-
-Glib::ustring Main::get_current_tab_page_subtitle()
-{
-    return mainTab->get_page_subtitle(
-        mainTab->get_current_page()
-    );
-};
-
 // Actions
 void Main::refresh()
 {
@@ -91,5 +76,20 @@ void Main::tab_page_navigation_history_forward()
 {
     mainTab->page_navigation_history_forward(
         mainTab->get_current_page() // @TODO
+    );
+};
+
+// Getters
+Glib::ustring Main::get_current_tab_page_title()
+{
+    return mainTab->get_page_title(
+        mainTab->get_current_page()
+    );
+};
+
+Glib::ustring Main::get_current_tab_page_subtitle()
+{
+    return mainTab->get_page_subtitle(
+        mainTab->get_current_page()
     );
 };

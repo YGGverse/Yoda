@@ -23,19 +23,6 @@ Tab::Tab()
     );
 }
 
-// Getters
-Glib::ustring Tab::get_page_title(
-    const int & PAGE_NUMBER
-) {
-    return get_tabPage(PAGE_NUMBER)->get_title();
-};
-
-Glib::ustring Tab::get_page_subtitle(
-    const int & PAGE_NUMBER
-) {
-    return get_tabPage(PAGE_NUMBER)->get_subtitle();
-};
-
 // Actions
 void Tab::refresh(
     const int & PAGE_NUMBER
@@ -133,6 +120,19 @@ void Tab::page_navigation_history_forward(
         PAGE_NUMBER
     )->navigation_history_forward();
 }
+
+// Getters
+Glib::ustring Tab::get_page_title(
+    const int & PAGE_NUMBER
+) {
+    return get_tabPage(PAGE_NUMBER)->get_title();
+};
+
+Glib::ustring Tab::get_page_subtitle(
+    const int & PAGE_NUMBER
+) {
+    return get_tabPage(PAGE_NUMBER)->get_subtitle();
+};
 
 // Private helpers
 tab::Label * Tab::get_tabLabel(

@@ -30,15 +30,6 @@ namespace app::browser::main
 
             Tab();
 
-            // Getters
-            Glib::ustring get_page_title(
-                const int & PAGE_NUMBER
-            );
-
-            Glib::ustring get_page_subtitle(
-                const int & PAGE_NUMBER
-            );
-
             // Actions
             void refresh(
                 const int & PAGE_NUMBER // @TODO
@@ -70,6 +61,15 @@ namespace app::browser::main
                 void page_navigation_history_forward(
                     const int & PAGE_NUMBER
                 );
+
+            // Getters
+            Glib::ustring get_page_title(
+                const int & PAGE_NUMBER
+            );
+
+            Glib::ustring get_page_subtitle(
+                const int & PAGE_NUMBER
+            );
     };
 }
 

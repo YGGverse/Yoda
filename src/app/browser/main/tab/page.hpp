@@ -48,10 +48,6 @@ namespace app::browser::main::tab
                 const Glib::ustring & REQUEST = ""
             );
 
-            // Getters
-            Glib::ustring get_title();
-            Glib::ustring get_subtitle();
-
             // Actions
             void refresh(
                 const Glib::ustring & TITLE,
@@ -65,6 +61,10 @@ namespace app::browser::main::tab
 
             void navigation_history_back();
             void navigation_history_forward();
+
+            // Getters
+            Glib::ustring get_title();
+            Glib::ustring get_subtitle();
     };
 }
 
