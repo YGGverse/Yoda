@@ -37,16 +37,22 @@ namespace app::browser::main::tab::page
             );
 
             // Actions
+            void refresh();
+
             void history_add(
                 const Glib::ustring & REQUEST,
                 const bool & UPDATE_MEMORY_INDEX
             );
 
-            void refresh();
+            // Actionable getters
+            bool try_history_back(
+                Glib::ustring & request,
+                const bool & UPDATE_MEMORY_INDEX
+            );
 
-            // Setters
-            void set_request_text(
-                const Glib::ustring & VALUE
+            bool try_history_forward(
+                Glib::ustring & request,
+                const bool & UPDATE_MEMORY_INDEX
             );
 
             // Getters
@@ -58,15 +64,9 @@ namespace app::browser::main::tab::page
             Glib::ustring get_request_path();
             Glib::ustring get_request_query();
 
-            // Actionable getters
-            bool try_history_back(
-                Glib::ustring & request,
-                const bool & UPDATE_MEMORY_INDEX
-            );
-
-            bool try_history_forward(
-                Glib::ustring & request,
-                const bool & UPDATE_MEMORY_INDEX
+            // Setters
+            void set_request_text(
+                const Glib::ustring & VALUE
             );
     };
 }

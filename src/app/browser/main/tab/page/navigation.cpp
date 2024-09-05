@@ -87,16 +87,6 @@ Navigation::Navigation(
 }
 
 // Actions
-void Navigation::history_add(
-    const Glib::ustring & REQUEST,
-    const bool & UPDATE_MEMORY_INDEX
-) {
-    navigationHistory->add(
-        REQUEST,
-        UPDATE_MEMORY_INDEX
-    );
-}
-
 void Navigation::refresh()
 {
     // Toggle base button sensibility
@@ -113,46 +103,14 @@ void Navigation::refresh()
     navigationHistory->refresh();
 }
 
-// Setters @TODO is really wanted?
-void Navigation::set_request_text(
-    const Glib::ustring & VALUE
+void Navigation::history_add(
+    const Glib::ustring & REQUEST,
+    const bool & UPDATE_MEMORY_INDEX
 ) {
-    navigationRequest->set_text(
-        VALUE
+    navigationHistory->add(
+        REQUEST,
+        UPDATE_MEMORY_INDEX
     );
-
-    // refresh(); not wanted as on change listener do same @TODO
-}
-
-// Getters @TODO &
-Glib::ustring Navigation::get_request_text()
-{
-    return navigationRequest->get_text();
-}
-
-Glib::ustring Navigation::get_request_scheme()
-{
-    return navigationRequest->get_scheme();
-}
-
-Glib::ustring Navigation::get_request_host()
-{
-    return navigationRequest->get_host();
-}
-
-Glib::ustring Navigation::get_request_path()
-{
-    return navigationRequest->get_path();
-}
-
-Glib::ustring Navigation::get_request_query()
-{
-    return navigationRequest->get_query();
-}
-
-Glib::ustring Navigation::get_request_port()
-{
-    return navigationRequest->get_port();
 }
 
 // Actionable getters
@@ -186,4 +144,44 @@ bool Navigation::try_history_forward(
     }
 
     return false;
+}
+
+// Getters @TODO &
+Glib::ustring Navigation::get_request_text()
+{
+    return navigationRequest->get_text();
+}
+
+Glib::ustring Navigation::get_request_scheme()
+{
+    return navigationRequest->get_scheme();
+}
+
+Glib::ustring Navigation::get_request_host()
+{
+    return navigationRequest->get_host();
+}
+
+Glib::ustring Navigation::get_request_path()
+{
+    return navigationRequest->get_path();
+}
+
+Glib::ustring Navigation::get_request_query()
+{
+    return navigationRequest->get_query();
+}
+
+Glib::ustring Navigation::get_request_port()
+{
+    return navigationRequest->get_port();
+}
+
+// Setters
+void Navigation::set_request_text(
+    const Glib::ustring & VALUE
+) {
+    navigationRequest->set_text(
+        VALUE
+    );
 }
