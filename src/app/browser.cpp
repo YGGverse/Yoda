@@ -106,7 +106,7 @@ Browser::Browser(
                 "main_tab_page_navigation_update",
                 [this]
                 {
-                    browserMain->tab_page_update();
+                    browserMain->tab_page_navigation_update();
                 }
             );
 

@@ -30,18 +30,19 @@ namespace app::browser
             Glib::ustring get_current_tab_page_subtitle();
 
             // Actions
-            void tab_append();
-            void tab_close_all();
-            void tab_close_left();
-            void tab_close_right();
-            void tab_close();
-
-            void tab_page_update();
-
-            bool tab_page_navigation_history_try_back();
-            bool tab_page_navigation_history_try_forward();
-
             void refresh();
+
+                void tab_append();
+                void tab_close_all();
+                void tab_close_left();
+                void tab_close_right();
+                void tab_close();
+
+                    void tab_page_navigation_update();
+                    bool tab_page_navigation_history_try_back();
+                    bool tab_page_navigation_history_try_forward();
+
+
     };
 }
 

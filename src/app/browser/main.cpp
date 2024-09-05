@@ -74,9 +74,9 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
-void Main::tab_page_update()
+void Main::tab_page_navigation_update()
 {
-    mainTab->page_update(
+    mainTab->page_navigation_update(
         mainTab->get_current_page()
     );
 };

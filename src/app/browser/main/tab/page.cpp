@@ -84,7 +84,7 @@ void Page::refresh(
     );
 }
 
-void Page::update(
+void Page::navigation_update(
     const bool & HISTORY
 ) {
     // Update navigation history
@@ -244,7 +244,7 @@ void Page::update(
             "gemini://" + pageNavigation->get_request_text()
         );
 
-        update();
+        navigation_update();
     }
 
     else

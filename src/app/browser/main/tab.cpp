@@ -37,6 +37,18 @@ Glib::ustring Tab::get_page_subtitle(
 };
 
 // Actions
+void Tab::refresh(
+    const int & PAGE_NUMBER
+) {
+    auto tabPage = get_tabPage(
+        PAGE_NUMBER
+    );
+
+    get_tabLabel(PAGE_NUMBER)->set_label(
+        tabPage->get_title()
+    );
+}
+
 void Tab::append(
     const Glib::ustring & TITLE,
     const Glib::ustring & REQUEST,
@@ -96,6 +108,14 @@ void Tab::close_all()
     }
 }
 
+void Tab::page_navigation_update(
+    const int & PAGE_NUMBER
+) {
+    get_tabPage(
+        PAGE_NUMBER
+    )->navigation_update();
+}
+
 bool Tab::page_navigation_history_try_back(
     const int & PAGE_NUMBER
 ) {
@@ -110,26 +130,6 @@ bool Tab::page_navigation_history_try_forward(
     return get_tabPage(
         PAGE_NUMBER
     )->navigation_history_try_forward();
-}
-
-void Tab::refresh(
-    const int & PAGE_NUMBER
-) {
-    auto tabPage = get_tabPage(
-        PAGE_NUMBER
-    );
-
-    get_tabLabel(PAGE_NUMBER)->set_label(
-        tabPage->get_title()
-    );
-}
-
-void Tab::page_update(
-    const int & PAGE_NUMBER
-) {
-    get_tabPage(
-        PAGE_NUMBER
-    )->update();
 }
 
 // Private helpers

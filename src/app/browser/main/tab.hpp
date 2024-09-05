@@ -58,17 +58,17 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-                void page_update(
+                void page_navigation_update(
                     const int & PAGE_NUMBER
                 );
 
-                    bool page_navigation_history_try_back(
-                        const int & PAGE_NUMBER
-                    );
+                bool page_navigation_history_try_back(
+                    const int & PAGE_NUMBER
+                );
 
-                    bool page_navigation_history_try_forward(
-                        const int & PAGE_NUMBER
-                    );
+                bool page_navigation_history_try_forward(
+                    const int & PAGE_NUMBER
+                );
     };
 }
 

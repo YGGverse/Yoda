@@ -62,7 +62,7 @@ namespace app::browser::main::tab
                 const double & PROGRESS
             );
 
-            void update(
+            void navigation_update(
                 const bool & HISTORY = false
             );
     };
