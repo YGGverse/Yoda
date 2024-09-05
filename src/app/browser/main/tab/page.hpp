@@ -53,9 +53,6 @@ namespace app::browser::main::tab
             Glib::ustring get_subtitle();
 
             // Actions
-            bool navigation_history_try_back();
-            bool navigation_history_try_forward();
-
             void refresh(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE,
@@ -65,6 +62,9 @@ namespace app::browser::main::tab
             void navigation_update(
                 const bool & HISTORY = false
             );
+
+            bool navigation_history_try_back();
+            bool navigation_history_try_forward();
     };
 }
 

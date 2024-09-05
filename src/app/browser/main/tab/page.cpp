@@ -56,16 +56,6 @@ Glib::ustring Page::get_subtitle()
 }
 
 // Actions
-bool Page::navigation_history_try_back()
-{
-    return pageNavigation->history_try_back();
-}
-
-bool Page::navigation_history_try_forward()
-{
-    return pageNavigation->history_try_forward();
-}
-
 void Page::refresh(
     const Glib::ustring & TITLE,
     const Glib::ustring & SUBTITLE,
@@ -251,4 +241,14 @@ void Page::navigation_update(
     {
         // @TODO search request
     }
+}
+
+bool Page::navigation_history_try_back()
+{
+    return pageNavigation->history_try_back();
+}
+
+bool Page::navigation_history_try_forward()
+{
+    return pageNavigation->history_try_forward();
 }
