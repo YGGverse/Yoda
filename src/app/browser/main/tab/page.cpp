@@ -75,10 +75,10 @@ void Page::refresh(
 }
 
 void Page::navigation_update(
-    const bool & HISTORY
+    const bool & ADD_HISTORY
 ) {
     // Update navigation history
-    if (HISTORY)
+    if (ADD_HISTORY)
     {
         pageNavigation->history_add(
             pageNavigation->get_request_text()
