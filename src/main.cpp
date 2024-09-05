@@ -47,6 +47,16 @@ int main(
                 "<Primary>r"
             );
 
+                app->set_accel_for_action(
+                    "win.main_tab_page_navigation_history_back",
+                    "<Primary>Left"
+                );
+
+                app->set_accel_for_action(
+                    "win.main_tab_page_navigation_history_forward",
+                    "<Primary>Right"
+                );
+
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
         argc,
