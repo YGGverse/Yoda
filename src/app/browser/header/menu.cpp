@@ -10,58 +10,84 @@ Menu::Menu()
     );
 
     // Build tab submenu model
-    tab = Gio::Menu::create();
+    main_tab = Gio::Menu::create();
 
-        tab->append(
+        main_tab->append(
             _("New tab.."),
             "win.main_tab_append"
         );
 
         // Build tab page submenu model
-        tab_page = Gio::Menu::create();
+        main_tab_page = Gio::Menu::create();
 
-            tab_page->append(
-                _("Update"),
-                "win.main_tab_page_update"
+            // Build tab page navigation submenu model
+            main_tab_page_navigation = Gio::Menu::create();
+
+                // Build tab page navigation history submenu model
+                main_tab_page_navigation_history = Gio::Menu::create();
+
+                    main_tab_page_navigation_history->append(
+                        _("Back"),
+                        "win.main_tab_page_navigation_history_try_back"
+                    );
+
+                    main_tab_page_navigation_history->append(
+                        _("Forward"),
+                        "win.main_tab_page_navigation_history_try_forward"
+                    );
+
+                main_tab_page_navigation->append_submenu(
+                    _("History"),
+                    main_tab_page_navigation_history
+                );
+
+                main_tab_page_navigation->append(
+                    _("Update"),
+                    "win.main_tab_page_update"
+                );
+
+            main_tab_page->append_submenu(
+                _("Navigation"),
+                main_tab_page_navigation
             );
 
-        tab->append_submenu(
+        main_tab->append_submenu(
             _("Page"),
-            tab_page
+            main_tab_page
         );
 
         // Build tab close submenu model
-        tab_close = Gio::Menu::create();
+        main_tab_close = Gio::Menu::create();
 
-            tab_close->append(
+            main_tab_close->append(
                 _("Active tab"),
                 "win.main_tab_close"
             );
 
-            tab_close->append(
+            main_tab_close->append(
                 _("All tabs to left"),
                 "win.main_tab_close_left"
             );
 
-            tab_close->append(
+            main_tab_close->append(
                 _("All tabs to right"),
                 "win.main_tab_close_right"
             );
 
-            tab_close->append(
+            main_tab_close->append(
                 _("All tabs"),
                 "win.main_tab_close_all"
             );
 
-        tab->append_submenu(
+        main_tab->append_submenu(
             _("Close"),
-            tab_close
+            main_tab_close
         );
 
-    // Build tool submenu model
-    tool = Gio::Menu::create();
+    // Build tools submenu model
+    main_tools = Gio::Menu::create();
 
-        tool->append(
+        main_tools->append(
             _("Debug"),
             "win.debug"
         );
@@ -71,12 +97,12 @@ Menu::Menu()
 
         main->append_submenu(
             _("Tab"),
-            tab
+            main_tab
         );
 
         main->append_submenu(
             _("Tools"),
-            tool
+            main_tools
         );
 
         main->append(
