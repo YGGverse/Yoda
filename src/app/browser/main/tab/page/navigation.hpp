@@ -38,7 +38,8 @@ namespace app::browser::main::tab::page
 
             // Actions
             void history_add(
-                const Glib::ustring & REQUEST
+                const Glib::ustring & REQUEST,
+                const bool & FOLLOW
             );
 
             void refresh();
@@ -57,12 +58,15 @@ namespace app::browser::main::tab::page
             Glib::ustring get_request_path();
             Glib::ustring get_request_query();
 
+            // Actionable getters
             bool try_history_back(
-                Glib::ustring & request
+                Glib::ustring & request,
+                const bool & FOLLOW
             );
 
             bool try_history_forward(
-                Glib::ustring & request
+                Glib::ustring & request,
+                const bool & FOLLOW
             );
     };
 }

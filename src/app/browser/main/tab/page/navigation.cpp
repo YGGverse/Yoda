@@ -88,10 +88,12 @@ Navigation::Navigation(
 
 // Actions
 void Navigation::history_add(
-    const Glib::ustring & REQUEST
+    const Glib::ustring & REQUEST,
+    const bool & FOLLOW
 ) {
     navigationHistory->add(
-        REQUEST
+        REQUEST,
+        FOLLOW
     );
 }
 
@@ -153,12 +155,14 @@ Glib::ustring Navigation::get_request_port()
     return navigationRequest->get_port();
 }
 
+// Actionable getters
 bool Navigation::try_history_back(
-    Glib::ustring & request
+    Glib::ustring & request,
+    const bool & FOLLOW
 ) {
     navigation::History::Memory match;
 
-    if (navigationHistory->try_back(match))
+    if (navigationHistory->try_back(match, FOLLOW))
     {
         request = match.request;
 
@@ -169,11 +173,12 @@ bool Navigation::try_history_back(
 }
 
 bool Navigation::try_history_forward(
-    Glib::ustring & request
+    Glib::ustring & request,
+    const bool & FOLLOW
 ) {
     navigation::History::Memory match;
 
-    if (navigationHistory->try_forward(match))
+    if (navigationHistory->try_forward(match, FOLLOW))
     {
         request = match.request;
 

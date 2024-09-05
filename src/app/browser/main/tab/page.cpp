@@ -78,7 +78,8 @@ void Page::navigation_update(
     if (ADD_HISTORY)
     {
         pageNavigation->history_add(
-            pageNavigation->get_request_text()
+            pageNavigation->get_request_text(),
+            true
         );
     }
 
@@ -246,7 +247,7 @@ void Page::navigation_history_back()
 {
     Glib::ustring request;
 
-    if (pageNavigation->try_history_back(request))
+    if (pageNavigation->try_history_back(request, true))
     {
         pageNavigation->set_request_text(
             request
@@ -262,7 +263,7 @@ void Page::navigation_history_forward()
 {
     Glib::ustring request;
 
-    if (pageNavigation->try_history_forward(request))
+    if (pageNavigation->try_history_forward(request, true))
     {
         pageNavigation->set_request_text(
             request
