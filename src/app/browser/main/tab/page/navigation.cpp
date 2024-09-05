@@ -87,47 +87,11 @@ Navigation::Navigation(
 }
 
 // Actions
-bool Navigation::history_try_back()
-{
-    navigation::History::Memory match;
-
-    if (navigationHistory->try_back(match))
-    {
-        navigationRequest->set_text(
-            match.request
-        );
-
-        return activate_action(
-            "win.main_tab_page_navigation_update"
-        );
-    }
-
-    return false;
-}
-
-bool Navigation::history_try_forward()
-{
-    navigation::History::Memory match;
-
-    if (navigationHistory->try_forward(match))
-    {
-        navigationRequest->set_text(
-            match.request
-        );
-
-        return activate_action(
-            "win.main_tab_page_navigation_update"
-        );
-    }
-
-    return false;
-}
-
 void Navigation::history_add(
-    const Glib::ustring & VALUE
+    const Glib::ustring & REQUEST
 ) {
     navigationHistory->add(
-        VALUE
+        REQUEST
     );
 }
 
@@ -187,4 +151,34 @@ Glib::ustring Navigation::get_request_query()
 Glib::ustring Navigation::get_request_port()
 {
     return navigationRequest->get_port();
+}
+
+bool Navigation::try_history_back(
+    Glib::ustring & request
+) {
+    navigation::History::Memory match;
+
+    if (navigationHistory->try_back(match))
+    {
+        request = match.request;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool Navigation::try_history_forward(
+    Glib::ustring & request
+) {
+    navigation::History::Memory match;
+
+    if (navigationHistory->try_forward(match))
+    {
+        request = match.request;
+
+        return true;
+    }
+
+    return false;
 }

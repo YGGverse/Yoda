@@ -74,39 +74,22 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
-void Main::tab_page_navigation_update(
-    const bool & ADD_HISTORY
-) {
+void Main::tab_page_navigation_update() {
     mainTab->page_navigation_update(
-        mainTab->get_current_page(), // @TODO
-        ADD_HISTORY
+        mainTab->get_current_page() // @TODO
     );
 };
 
-bool Main::tab_page_navigation_history_try_back()
+void Main::tab_page_navigation_history_back()
 {
-    const int & PAGE_NUMBER = mainTab->get_current_page();
-
-    if (PAGE_NUMBER >= 0)
-    {
-        return mainTab->page_navigation_history_try_back(
-            PAGE_NUMBER
-        );
-    }
-
-    return false;
+    mainTab->page_navigation_history_back(
+        mainTab->get_current_page() // @TODO
+    );
 };
 
-bool Main::tab_page_navigation_history_try_forward()
+void Main::tab_page_navigation_history_forward()
 {
-    const int & PAGE_NUMBER = mainTab->get_current_page();
-
-    if (PAGE_NUMBER >= 0)
-    {
-        return mainTab->page_navigation_history_try_forward(
-            PAGE_NUMBER
-        );
-    }
-
-    return false;
+    mainTab->page_navigation_history_forward(
+        mainTab->get_current_page() // @TODO
+    );
 };

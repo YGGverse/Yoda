@@ -38,11 +38,8 @@ namespace app::browser::main::tab::page
 
             // Actions
             void history_add(
-                const Glib::ustring & VALUE
+                const Glib::ustring & REQUEST
             );
-
-            bool history_try_back();
-            bool history_try_forward();
 
             void refresh();
 
@@ -59,6 +56,14 @@ namespace app::browser::main::tab::page
             Glib::ustring get_request_port();
             Glib::ustring get_request_path();
             Glib::ustring get_request_query();
+
+            bool try_history_back(
+                Glib::ustring & request
+            );
+
+            bool try_history_forward(
+                Glib::ustring & request
+            );
     };
 }
 

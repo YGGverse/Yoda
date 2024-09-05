@@ -118,20 +118,20 @@ void Tab::page_navigation_update(
     );
 }
 
-bool Tab::page_navigation_history_try_back(
+void Tab::page_navigation_history_back(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(
+    get_tabPage(
         PAGE_NUMBER
-    )->navigation_history_try_back();
+    )->navigation_history_back();
 }
 
-bool Tab::page_navigation_history_try_forward(
+void Tab::page_navigation_history_forward(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(
+    get_tabPage(
         PAGE_NUMBER
-    )->navigation_history_try_forward();
+    )->navigation_history_forward();
 }
 
 // Private helpers

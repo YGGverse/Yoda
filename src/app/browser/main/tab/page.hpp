@@ -63,8 +63,8 @@ namespace app::browser::main::tab
                 const bool & ADD_HISTORY
             );
 
-            bool navigation_history_try_back();
-            bool navigation_history_try_forward();
+            void navigation_history_back();
+            void navigation_history_forward();
     };
 }
 

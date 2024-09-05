@@ -108,12 +108,12 @@ Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation_history()
 
     menu->append(
         _("Back"),
-        "win.main_tab_page_navigation_history_try_back"
+        "win.main_tab_page_navigation_history_back"
     );
 
     menu->append(
         _("Forward"),
-        "win.main_tab_page_navigation_history_try_forward"
+        "win.main_tab_page_navigation_history_forward"
     );
 
     return menu;

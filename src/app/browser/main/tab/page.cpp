@@ -242,12 +242,34 @@ void Page::navigation_update(
     }
 }
 
-bool Page::navigation_history_try_back()
+void Page::navigation_history_back()
 {
-    return pageNavigation->history_try_back();
+    Glib::ustring request;
+
+    if (pageNavigation->try_history_back(request))
+    {
+        pageNavigation->set_request_text(
+            request
+        );
+
+        navigation_update(
+            false
+        );
+    }
 }
 
-bool Page::navigation_history_try_forward()
+void Page::navigation_history_forward()
 {
-    return pageNavigation->history_try_forward();
+    Glib::ustring request;
+
+    if (pageNavigation->try_history_forward(request))
+    {
+        pageNavigation->set_request_text(
+            request
+        );
+
+        navigation_update(
+            false
+        );
+    }
 }

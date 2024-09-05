@@ -60,14 +60,14 @@ namespace app::browser::main
 
                 void page_navigation_update(
                     const int & PAGE_NUMBER,
-                    const bool & ADD_HISTORY
+                    const bool & ADD_HISTORY = true
                 );
 
-                bool page_navigation_history_try_back(
+                void page_navigation_history_back(
                     const int & PAGE_NUMBER
                 );
 
-                bool page_navigation_history_try_forward(
+                void page_navigation_history_forward(
                     const int & PAGE_NUMBER
                 );
     };

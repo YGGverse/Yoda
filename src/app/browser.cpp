@@ -104,27 +104,25 @@ Browser::Browser(
             // Tab page navigation actions
             add_action(
                 "main_tab_page_navigation_update",
-                [this](const bool & ADD_HISTORY = false)
-                {
-                    browserMain->tab_page_navigation_update(
-                        ADD_HISTORY
-                    );
-                }
-            );
-
-            add_action(
-                "main_tab_page_navigation_history_try_back",
                 [this]()
                 {
-                    browserMain->tab_page_navigation_history_try_back();
+                    browserMain->tab_page_navigation_update();
                 }
             );
 
             add_action(
-                "main_tab_page_navigation_history_try_forward",
+                "main_tab_page_navigation_history_back",
+                [this]()
+                {
+                    browserMain->tab_page_navigation_history_back();
+                }
+            );
+
+            add_action(
+                "main_tab_page_navigation_history_forward",
                 [this]
                 {
-                    browserMain->tab_page_navigation_history_try_forward();
+                    browserMain->tab_page_navigation_history_forward();
                 }
             );
 }
