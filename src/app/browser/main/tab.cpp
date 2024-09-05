@@ -88,7 +88,6 @@ void Tab::close(
         PAGE_NUMBER
     );
 
-    // @TODO memory cleanup
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
