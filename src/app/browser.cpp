@@ -42,7 +42,7 @@ Browser::Browser(
     );
 
     add_action(
-        "main_tab_update",
+        "main_tab_page_update",
         [this]
         {
             browserMain->tab_update();

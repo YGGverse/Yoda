@@ -17,9 +17,17 @@ Menu::Menu()
             "win.main_tab_append"
         );
 
-        tab->append(
-            _("Update"),
-            "win.main_tab_update"
+        // Build tab page submenu model
+        tab_page = Gio::Menu::create();
+
+            tab_page->append(
+                _("Update"),
+                "win.main_tab_page_update"
+            );
+
+        tab->append_submenu(
+            _("Page"),
+            tab_page
         );
 
         // Build tab close submenu model

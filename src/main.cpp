@@ -33,7 +33,7 @@ int main(
     );
 
     app->set_accel_for_action(
-        "win.main_tab_update",
+        "win.main_tab_page_update",
         "<Primary>r"
     );
 
