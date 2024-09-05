@@ -32,33 +32,51 @@ Browser::Browser(
         * browserMain
     );
 
-    // Init actions
+    // Init browser window actions
     add_action(
-        "main_tab_append",
+        "refresh",
         [this]
         {
-            browserMain->tab_append();
+            browserMain->refresh();
+
+            browserHeader->set_title(
+                browserMain->get_current_tab_page_title()
+            );
+
+            browserHeader->set_subtitle(
+                browserMain->get_current_tab_page_subtitle()
+            );
         }
     );
 
     add_action(
-        "main_tab_page_update",
+        "debug",
         [this]
         {
-            browserMain->tab_update();
+            // @TODO https://gitlab.gnome.org/GNOME/gtkmm/-/commit/5f3b82537d3daad7bda59dd01e719788070f4b6c
+            gtk_window_set_interactive_debugging(
+                true
+            );
         }
     );
 
-    // Close
-    add_action(
-        "main_tab_close",
-        [this]
-        {
-            browserMain->tab_close();
-        }
-    );
+        // Tab actions
+        add_action(
+            "main_tab_append",
+            [this]
+            {
+                browserMain->tab_append();
+            }
+        );
 
-        // Close submenu
+        add_action(
+            "main_tab_close",
+            [this]
+            {
+                browserMain->tab_close();
+            }
+        );
+
         add_action(
             "main_tab_close_left",
             [this]
@@ -83,49 +101,28 @@ Browser::Browser(
             }
         );
 
-        // History
-        add_action(
-            "main_tab_page_navigation_history_try_back",
-            [this]
-            {
-                browserMain->tab_page_navigation_history_try_back();
-            }
-        );
-
-        add_action(
-            "main_tab_page_navigation_history_try_forward",
-            [this]
-            {
-                browserMain->tab_page_navigation_history_try_forward();
-            }
-        );
-
-    // Tool
-    add_action(
-        "debug",
-        [this]
-        {
-            // @TODO https://gitlab.gnome.org/GNOME/gtkmm/-/commit/5f3b82537d3daad7bda59dd01e719788070f4b6c
-            gtk_window_set_interactive_debugging(
-                true
-            );
-        }
-    );
-
-    // Hidden
-    add_action(
-        "refresh",
-        [this]
-        {
-            browserMain->refresh();
-
-            browserHeader->set_title(
-                browserMain->get_current_tab_page_title()
+            // Tab page navigation actions
+            add_action(
+                "main_tab_page_navigation_update",
+                [this]
+                {
+                    browserMain->tab_page_update();
+                }
             );
 
-            browserHeader->set_subtitle(
-                browserMain->get_current_tab_page_subtitle()
+            add_action(
+                "main_tab_page_navigation_history_try_back",
+                [this]
+                {
+                    browserMain->tab_page_navigation_history_try_back();
+                }
             );
-        }
-    );
+
+            add_action(
+                "main_tab_page_navigation_history_try_forward",
+                [this]
+                {
+                    browserMain->tab_page_navigation_history_try_forward();
+                }
+            );
 }

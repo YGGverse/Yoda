@@ -36,7 +36,7 @@ namespace app::browser
             void tab_close_right();
             void tab_close();
 
-            void tab_update();
+            void tab_page_update();
 
             bool tab_page_navigation_history_try_back();
             bool tab_page_navigation_history_try_forward();

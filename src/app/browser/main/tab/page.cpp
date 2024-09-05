@@ -15,23 +15,6 @@ Page::Page(
         Gtk::Orientation::VERTICAL
     );
 
-    // Init actions group
-    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
-
-        // Define group actions
-        GioSimpleActionGroup->add_action(
-            "update",
-            [this]
-            {
-                Page::update();
-            }
-        );
-
-    insert_action_group(
-        "page",
-        GioSimpleActionGroup
-    );
-
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         REQUEST

@@ -96,7 +96,7 @@ Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation(
 
     menu->append(
         _("Update"),
-        "win.main_tab_page_update"
+        "win.main_tab_page_navigation_update"
     );
 
     return menu;

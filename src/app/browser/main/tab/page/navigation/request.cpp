@@ -42,7 +42,7 @@ Request::Request(
             parse();
 
             activate_action(
-                "page.update"
+                "win.main_tab_page_navigation_update"
             );
         }
     );

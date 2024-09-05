@@ -124,21 +124,12 @@ void Tab::refresh(
     );
 }
 
-void Tab::update(
+void Tab::page_update(
     const int & PAGE_NUMBER
 ) {
-    auto pageWidget = get_nth_page(
+    get_tabPage(
         PAGE_NUMBER
-    );
-
-    if (pageWidget == nullptr)
-    {
-        throw _("Tab page not found!");
-    }
-
-    pageWidget->activate_action(
-        "page.update"
-    );
+    )->update();
 }
 
 // Private helpers

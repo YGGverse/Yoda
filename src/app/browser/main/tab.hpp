@@ -40,6 +40,10 @@ namespace app::browser::main
             );
 
             // Actions
+            void refresh(
+                const int & PAGE_NUMBER // @TODO
+            );
+
             void append(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & REQUEST = "",
@@ -54,21 +58,17 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-            bool page_navigation_history_try_back(
-                const int & PAGE_NUMBER
-            );
+                void page_update(
+                    const int & PAGE_NUMBER
+                );
 
-            bool page_navigation_history_try_forward(
-                const int & PAGE_NUMBER
-            );
+                    bool page_navigation_history_try_back(
+                        const int & PAGE_NUMBER
+                    );
 
-            void refresh(
-                const int & PAGE_NUMBER
-            );
-
-            void update(
-                const int & PAGE_NUMBER
-            );
+                    bool page_navigation_history_try_forward(
+                        const int & PAGE_NUMBER
+                    );
     };
 }
 

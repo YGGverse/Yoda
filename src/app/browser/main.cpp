@@ -38,17 +38,17 @@ Glib::ustring Main::get_current_tab_page_subtitle()
 };
 
 // Actions
+void Main::refresh()
+{
+    mainTab->refresh(
+        mainTab->get_current_page()
+    );
+};
+
 void Main::tab_append()
 {
     mainTab->append(
         _("New page")
-    );
-};
-
-void Main::tab_update()
-{
-    mainTab->update(
-        mainTab->get_current_page()
     );
 };
 
@@ -72,6 +72,13 @@ void Main::tab_close_right()
 void Main::tab_close_all()
 {
     mainTab->close_all();
+};
+
+void Main::tab_page_update()
+{
+    mainTab->page_update(
+        mainTab->get_current_page()
+    );
 };
 
 bool Main::tab_page_navigation_history_try_back()
@@ -102,11 +109,4 @@ bool Main::tab_page_navigation_history_try_forward()
     }
 
     return false;
-};
-
-void Main::refresh()
-{
-    mainTab->refresh(
-        mainTab->get_current_page()
-    );
 };

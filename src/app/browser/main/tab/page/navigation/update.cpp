@@ -5,7 +5,7 @@ using namespace app::browser::main::tab::page::navigation;
 Update::Update()
 {
     set_action_name(
-        "page.update"
+        "win.main_tab_page_navigation_update"
     );
 
     set_icon_name(

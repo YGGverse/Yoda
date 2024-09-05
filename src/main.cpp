@@ -28,16 +28,6 @@ int main(
 
     // Init accels @TODO db settings
     app->set_accel_for_action(
-        "win.main_tab_append",
-        "<Primary>t"
-    );
-
-    app->set_accel_for_action(
-        "win.main_tab_page_update",
-        "<Primary>r"
-    );
-
-    app->set_accel_for_action(
         "win.debug",
         "<Primary>i"
     );
@@ -46,6 +36,16 @@ int main(
         "app.quit",
         "<Primary>q"
     );
+
+        app->set_accel_for_action(
+            "win.main_tab_append",
+            "<Primary>t"
+        );
+
+            app->set_accel_for_action(
+                "win.main_tab_page_navigation_update",
+                "<Primary>r"
+            );
 
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
