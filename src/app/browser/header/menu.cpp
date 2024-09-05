@@ -27,133 +27,133 @@ Glib::RefPtr<Gio::Menu> Menu::main(
     Glib::RefPtr<Gio::Menu> main_tab,
     Glib::RefPtr<Gio::Menu> main_tools
 ) {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append_submenu(
+    menu->append_submenu(
         _("Tab"),
         main_tab
     );
 
-    model->append_submenu(
+    menu->append_submenu(
         _("Tools"),
         main_tools
     );
 
-    model->append(
+    menu->append(
         _("Quit"),
         "app.quit"
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab(
     Glib::RefPtr<Gio::Menu> main_tab_page,
     Glib::RefPtr<Gio::Menu> main_tab_close
 ) {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append(
+    menu->append(
         _("New.."),
         "win.main_tab_append"
     );
 
-    model->append_submenu(
+    menu->append_submenu(
         _("Page"),
         main_tab_page
     );
 
-    model->append_submenu(
+    menu->append_submenu(
         _("Close"),
         main_tab_close
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page(
     Glib::RefPtr<Gio::Menu> main_tab_page_navigation
 ) {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append_submenu(
+    menu->append_submenu(
         _("Navigation"),
         main_tab_page_navigation
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation(
     Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history
 ) {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append_submenu(
+    menu->append_submenu(
         _("History"),
         main_tab_page_navigation_history
     );
 
-    model->append(
+    menu->append(
         _("Update"),
         "win.main_tab_page_update"
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation_history()
 {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append(
+    menu->append(
         _("Back"),
         "win.main_tab_page_navigation_history_try_back"
     );
 
-    model->append(
+    menu->append(
         _("Forward"),
         "win.main_tab_page_navigation_history_try_forward"
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tab_close()
 {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append(
+    menu->append(
         _("Active tab"),
         "win.main_tab_close"
     );
 
-    model->append(
+    menu->append(
         _("All tabs to left"),
         "win.main_tab_close_left"
     );
 
-    model->append(
+    menu->append(
         _("All tabs to right"),
         "win.main_tab_close_right"
     );
 
-    model->append(
+    menu->append(
         _("All tabs"),
         "win.main_tab_close_all"
     );
 
-    return model;
+    return menu;
 }
 
 Glib::RefPtr<Gio::Menu> Menu::main_tools()
 {
-    auto model = Gio::Menu::create();
+    auto menu = Gio::Menu::create();
 
-    model->append(
+    menu->append(
         _("Debug"),
         "win.debug"
     );
 
-    return model;
+    return menu;
 }
