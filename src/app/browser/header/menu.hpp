@@ -10,33 +10,33 @@ namespace app::browser::header
     class Menu : public Gtk::MenuButton
     {
         // 1 level
-        Glib::RefPtr<Gio::Menu> main(
+        static Glib::RefPtr<Gio::Menu> main(
             Glib::RefPtr<Gio::Menu> main_tab,
             Glib::RefPtr<Gio::Menu> main_tools
         );
 
             // 2 level
-            Glib::RefPtr<Gio::Menu> main_tab(
+            static Glib::RefPtr<Gio::Menu> main_tab(
                 Glib::RefPtr<Gio::Menu> main_tab_page,
                 Glib::RefPtr<Gio::Menu> main_tab_close
             );
 
                 // 3 level
-                Glib::RefPtr<Gio::Menu> main_tab_page(
+                static Glib::RefPtr<Gio::Menu> main_tab_page(
                     Glib::RefPtr<Gio::Menu> main_tab_page_navigation
                 );
 
                     // 4 level
-                    Glib::RefPtr<Gio::Menu> main_tab_page_navigation(
+                    static Glib::RefPtr<Gio::Menu> main_tab_page_navigation(
                         Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history
                     );
 
                         // 5 level
-                        Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history();
+                        static Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history();
 
-                Glib::RefPtr<Gio::Menu> main_tab_close();
+                static Glib::RefPtr<Gio::Menu> main_tab_close();
 
-            Glib::RefPtr<Gio::Menu> main_tools();
+            static Glib::RefPtr<Gio::Menu> main_tools();
 
         public:
 
