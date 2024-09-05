@@ -26,7 +26,7 @@ History::History()
 // Actions
 void History::add(
     const Glib::ustring & REQUEST,
-    const bool & FOLLOW
+    const bool & UPDATE_MEMORY_INDEX
 ) {
     memory.push_back(
         {
@@ -38,7 +38,7 @@ void History::add(
         }
     );
 
-    if (FOLLOW)
+    if (UPDATE_MEMORY_INDEX)
     {
         index = memory.size() - 1;
     }
@@ -66,7 +66,7 @@ void History::refresh()
 
 bool History::try_back(
     Memory & match,
-    const bool & FOLLOW
+    const bool & UPDATE_MEMORY_INDEX
 ) {
     try
     {
@@ -74,7 +74,7 @@ bool History::try_back(
             index - 1
         );
 
-        if (FOLLOW)
+        if (UPDATE_MEMORY_INDEX)
         {
             index--;
         }
@@ -90,7 +90,7 @@ bool History::try_back(
 
 bool History::try_forward(
     Memory & match,
-    const bool & FOLLOW
+    const bool & UPDATE_MEMORY_INDEX
 ) {
     try
     {
@@ -98,7 +98,7 @@ bool History::try_forward(
             index + 1
         );
 
-        if (FOLLOW)
+        if (UPDATE_MEMORY_INDEX)
         {
             index++;
         }

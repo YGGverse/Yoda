@@ -42,7 +42,7 @@ namespace app::browser::main::tab::page::navigation
             // Actions
             void add(
                 const Glib::ustring & REQUEST,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
 
             void refresh();
@@ -51,12 +51,12 @@ namespace app::browser::main::tab::page::navigation
 
             bool try_back(
                 Memory & match,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
 
             bool try_forward(
                 Memory & match,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
     };
 }

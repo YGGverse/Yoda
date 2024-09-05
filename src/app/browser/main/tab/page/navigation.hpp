@@ -39,7 +39,7 @@ namespace app::browser::main::tab::page
             // Actions
             void history_add(
                 const Glib::ustring & REQUEST,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
 
             void refresh();
@@ -61,12 +61,12 @@ namespace app::browser::main::tab::page
             // Actionable getters
             bool try_history_back(
                 Glib::ustring & request,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
 
             bool try_history_forward(
                 Glib::ustring & request,
-                const bool & FOLLOW
+                const bool & UPDATE_MEMORY_INDEX
             );
     };
 }
