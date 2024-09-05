@@ -9,13 +9,34 @@ namespace app::browser::header
 {
     class Menu : public Gtk::MenuButton
     {
-        Glib::RefPtr<Gio::Menu> main,
-                                    main_tab,
-                                        main_tab_page,
-                                            main_tab_page_navigation,
-                                                main_tab_page_navigation_history,
-                                        main_tab_close,
-                                    main_tools;
+        // 1 level
+        Glib::RefPtr<Gio::Menu> main(
+            Glib::RefPtr<Gio::Menu> main_tab,
+            Glib::RefPtr<Gio::Menu> main_tools
+        );
+
+            // 2 level
+            Glib::RefPtr<Gio::Menu> main_tab(
+                Glib::RefPtr<Gio::Menu> main_tab_page,
+                Glib::RefPtr<Gio::Menu> main_tab_close
+            );
+
+                // 3 level
+                Glib::RefPtr<Gio::Menu> main_tab_page(
+                    Glib::RefPtr<Gio::Menu> main_tab_page_navigation
+                );
+
+                    // 4 level
+                    Glib::RefPtr<Gio::Menu> main_tab_page_navigation(
+                        Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history
+                    );
+
+                        // 5 level
+                        Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history();
+
+                Glib::RefPtr<Gio::Menu> main_tab_close();
+
+            Glib::RefPtr<Gio::Menu> main_tools();
 
         public:
 
