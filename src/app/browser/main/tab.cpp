@@ -77,6 +77,7 @@ void Tab::close(
         PAGE_NUMBER
     );
 
+    // @TODO cleanup memory ot use managed children widgets
     // @TODO fix GtkGizmo reported min height, but sizes must be >= 0
 }
 
