@@ -104,7 +104,7 @@ Browser::Browser(
             // Tab page navigation actions
             add_action(
                 "main_tab_page_navigation_update",
-                [this]()
+                [this]
                 {
                     browserMain->tab_page_navigation_update();
                 }
@@ -112,7 +112,7 @@ Browser::Browser(
 
             add_action(
                 "main_tab_page_navigation_history_back",
-                [this]()
+                [this]
                 {
                     browserMain->tab_page_navigation_history_back();
                 }
