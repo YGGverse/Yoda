@@ -65,18 +65,22 @@ void Request::refresh(
         {
             double current_progress_fraction = get_progress_fraction();
 
+            // Animation in progress
             if (current_progress_fraction < progress_fraction)
             {
                 set_progress_fraction(
                     current_progress_fraction + PROGRESS_PULSE_STEP
                 );
 
-                return false;
+                return true; // continue
             }
 
-            return true; // 100% of value
+            // 100% of value, reset
+            set_progress_fraction(
+                progress_fraction = 0
+            );
 
-            //return current_progress_fraction < 1; // until 100% of value
+            return false; // stop
         },
         PROGRESS_ANIMATION_TIME
     );
