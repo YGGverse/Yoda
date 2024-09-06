@@ -1,7 +1,6 @@
 #include "page.hpp"
 #include "page/content.hpp"
 #include "page/navigation.hpp"
-#include "page/progress.hpp"
 
 using namespace app::browser::main::tab;
 
@@ -24,12 +23,6 @@ Page::Page(
             * pageNavigation
         );
 
-    pageProgress = Gtk::make_managed<page::Progress>();
-
-        append(
-            * pageProgress
-        );
-
     pageContent = Gtk::make_managed<page::Content>();
 
         append(
@@ -48,16 +41,14 @@ Page::Page(
 void Page::refresh(
     const Glib::ustring & TITLE,
     const Glib::ustring & SUBTITLE,
-    const double & PROGRESS
+    const double & PROGRESS_FRACTION
 ) {
     title = TITLE; // @TODO copy
     subtitle = SUBTITLE;
 
-    pageProgress->refresh(
-        PROGRESS
+    pageNavigation->refresh(
+        PROGRESS_FRACTION
     );
-
-    pageNavigation->refresh();
 }
 
 void Page::navigation_update(

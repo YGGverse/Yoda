@@ -20,7 +20,6 @@ namespace app::browser::main::tab
     {
         class Content;
         class Navigation;
-        class Progress;
     }
 
     class Page : public Gtk::Box
@@ -38,7 +37,6 @@ namespace app::browser::main::tab
         // Components
         page::Content * pageContent;
         page::Navigation * pageNavigation;
-        page::Progress * pageProgress;
 
         public:
 
@@ -52,7 +50,7 @@ namespace app::browser::main::tab
             void refresh(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE,
-                const double & PROGRESS
+                const double & PROGRESS_FRACTION
             );
 
             void navigation_update(

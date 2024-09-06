@@ -76,7 +76,7 @@ Navigation::Navigation(
             "refresh",
             [this]
             {
-                refresh();
+                refresh(0);
             }
         );
 
@@ -87,20 +87,26 @@ Navigation::Navigation(
 }
 
 // Actions
-void Navigation::refresh()
-{
+void Navigation::refresh(
+    const double & PROGRESS_FRACTION
+) {
     // Toggle base button sensibility
     navigationBase->set_sensitive(
         !navigationRequest->get_host().empty() && !navigationRequest->get_path().empty()
     );
+
+    // Refresh history widget
+    navigationHistory->refresh();
 
     // Toggle update button sensibility
     navigationUpdate->set_sensitive(
         navigationRequest->get_text_length() > 0
     );
 
-    // Refresh history widget
-    navigationHistory->refresh();
+    // Refresh request area (with progressbar)
+    navigationRequest->refresh(
+        PROGRESS_FRACTION
+    );
 }
 
 void Navigation::history_add(

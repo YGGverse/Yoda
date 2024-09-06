@@ -27,7 +27,6 @@ SRCS =  src/main.cpp\
 		src/app/browser/main/tab/page/navigation/history/forward.cpp\
 		src/app/browser/main/tab/page/navigation/request.cpp\
 		src/app/browser/main/tab/page/navigation/update.cpp\
-		src/app/browser/main/tab/page/progress.cpp\
 		src/app/browser/main/tab/label.cpp\
 		src/lib/database.cpp\
 		src/lib/database/session.cpp

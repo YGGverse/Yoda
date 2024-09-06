@@ -15,6 +15,10 @@ Request::Request(
         HEXPAND
     );
 
+    set_progress_pulse_step(
+        PROGRESS_PULSE_STEP
+    );
+
     if (!TEXT.empty())
     {
         set_text(
@@ -45,6 +49,36 @@ Request::Request(
                 "win.main_tab_page_navigation_update"
             );
         }
+    );
+}
+
+// Actions
+void Request::refresh(
+    const double & PROGRESS_FRACTION
+) {
+    // Update progress
+    progress_fraction = PROGRESS_FRACTION;
+
+    // Animate progress function
+    Glib::signal_timeout().connect(
+        [this]() -> bool
+        {
+            double current_progress_fraction = get_progress_fraction();
+
+            if (current_progress_fraction < progress_fraction)
+            {
+                set_progress_fraction(
+                    current_progress_fraction + PROGRESS_PULSE_STEP
+                );
+
+                return false;
+            }
+
+            return true; // 100% of value
+
+            //return current_progress_fraction < 1; // until 100% of value
+        },
+        PROGRESS_ANIMATION_TIME
     );
 }
 

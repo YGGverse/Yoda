@@ -37,7 +37,9 @@ namespace app::browser::main::tab::page
             );
 
             // Actions
-            void refresh();
+            void refresh(
+                const double & PROGRESS_FRACTION
+            );
 
             void history_add(
                 const Glib::ustring & REQUEST,
