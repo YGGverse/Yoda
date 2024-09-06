@@ -24,26 +24,6 @@ History::History()
 }
 
 // Actions
-void History::add(
-    const Glib::ustring & REQUEST,
-    const bool & UPDATE_MEMORY_INDEX
-) {
-    memory.push_back(
-        {
-            REQUEST,
-            std::time(
-                nullptr
-            ),
-            true
-        }
-    );
-
-    if (UPDATE_MEMORY_INDEX)
-    {
-        index = memory.size() - 1;
-    }
-}
-
 void History::refresh()
 {
     Memory match;
@@ -63,6 +43,25 @@ void History::refresh()
     );
 }
 
+void History::add(
+    const Glib::ustring & REQUEST,
+    const bool & UPDATE_MEMORY_INDEX
+) {
+    memory.push_back(
+        {
+            REQUEST,
+            std::time(
+                nullptr
+            ),
+            true
+        }
+    );
+
+    if (UPDATE_MEMORY_INDEX)
+    {
+        index = memory.size() - 1;
+    }
+}
 
 bool History::try_back(
     Memory & match,
