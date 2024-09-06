@@ -86,33 +86,6 @@ void Request::refresh(
     );
 }
 
-// Getters
-Glib::ustring Request::get_scheme()
-{
-    return scheme;
-}
-
-Glib::ustring Request::get_host()
-{
-    return host;
-}
-
-Glib::ustring Request::get_port()
-{
-    return port;
-}
-
-Glib::ustring Request::get_path()
-{
-    return path;
-}
-
-Glib::ustring Request::get_query()
-{
-    return path;
-}
-
-// Private helpers
 void Request::parse()
 {
     auto match = Glib::Regex::split_simple(
@@ -141,4 +114,30 @@ void Request::parse()
 
         index++;
     }
+}
+
+// Getters
+Glib::ustring Request::get_scheme()
+{
+    return scheme;
+}
+
+Glib::ustring Request::get_host()
+{
+    return host;
+}
+
+Glib::ustring Request::get_port()
+{
+    return port;
+}
+
+Glib::ustring Request::get_path()
+{
+    return path;
+}
+
+Glib::ustring Request::get_query()
+{
+    return path;
 }
