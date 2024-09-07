@@ -1,6 +1,6 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
-C++ / GTK 4 implementation, see also [PHP-GTK3](https://github.com/YGGverse/Yoda/tree/PHP-GTK3) branch
+C++ / GTK 4 implementation, see also [PHP-GTK3](https://github.com/YGGverse/Yoda/tree/PHP-GTK3) experimental branch
 
 > [!IMPORTANT]
 > Project in development!
