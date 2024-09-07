@@ -21,7 +21,7 @@ apt install git\
 
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
-* `git checkout master`
+* `git checkout cpp-gtk4`
 * `make`
 
 #### Update
@@ -57,7 +57,7 @@ pkg-config --cflags --libs gio-2.0\
 ### Contribution
 
 * `cd Yoda`
-* `git checkout master`
+* `git checkout cpp-gtk4`
 * `git pull`
 * `git checkout -b 'contribution-name'`
 
