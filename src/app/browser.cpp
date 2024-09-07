@@ -75,6 +75,8 @@ Browser::Browser(
             {
                 browserMain->tab_close();
             }
+        )->set_enabled(
+            false
         );
 
         add_action(
@@ -83,6 +85,8 @@ Browser::Browser(
             {
                 browserMain->tab_close_left();
             }
+        )->set_enabled(
+            false
         );
 
         add_action(
@@ -91,6 +95,8 @@ Browser::Browser(
             {
                 browserMain->tab_close_right();
             }
+        )->set_enabled(
+            false
         );
 
         add_action(
@@ -99,6 +105,8 @@ Browser::Browser(
             {
                 browserMain->tab_close_all();
             }
+        )->set_enabled(
+            false
         );
 
             // Tab page navigation actions
@@ -108,6 +116,8 @@ Browser::Browser(
                 {
                     browserMain->tab_page_navigation_update();
                 }
+            )->set_enabled(
+                false
             );
 
             add_action(
@@ -116,6 +126,8 @@ Browser::Browser(
                 {
                     browserMain->tab_page_navigation_history_back();
                 }
+            )->set_enabled(
+                false
             );
 
             add_action(
@@ -124,5 +136,7 @@ Browser::Browser(
                 {
                     browserMain->tab_page_navigation_history_forward();
                 }
+            )->set_enabled(
+                false
             );
 }
