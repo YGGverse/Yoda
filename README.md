@@ -1,6 +1,6 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
-GTK 4 / C++ implementation branch
+C++ / GTK 4 implementation, see also [PHP-GTK3](https://github.com/YGGverse/Yoda/tree/PHP-GTK3) branch!
 
 > [!IMPORTANT]
 > Project in development!
@@ -21,7 +21,7 @@ apt install git\
 
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
-* `git checkout cpp-gtk4`
+* `git checkout CPP-GTK4`
 * `make`
 
 #### Update
@@ -57,7 +57,7 @@ pkg-config --cflags --libs gio-2.0\
 ### Contribution
 
 * `cd Yoda`
-* `git checkout cpp-gtk4`
+* `git checkout CPP-GTK4`
 * `git pull`
 * `git checkout -b 'contribution-name'`
 
