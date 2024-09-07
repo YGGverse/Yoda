@@ -16,3 +16,9 @@ Back::Back()
         _("Back")
     );
 }
+
+void Back::refresh(
+    const bool & ENABLED
+) {
+    // @TODO update action status
+}

@@ -11,6 +11,10 @@ namespace app::browser::main::tab::page::navigation::history
         public:
 
             Forward();
+
+            void refresh(
+                const bool & ENABLED
+            );
     };
 }
 

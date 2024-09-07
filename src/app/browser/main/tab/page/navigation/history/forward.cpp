@@ -16,3 +16,9 @@ Forward::Forward()
         _("Forward")
     );
 }
+
+void Forward::refresh(
+    const bool & ENABLED
+) {
+    // @TODO update action status
+}

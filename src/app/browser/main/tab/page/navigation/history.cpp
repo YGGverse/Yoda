@@ -28,14 +28,14 @@ void History::refresh()
 {
     Memory match;
 
-    historyBack->set_sensitive( // @TODO operate with action status
+    historyBack->refresh(
         try_back(
             match,
             false
         )
     );
 
-    historyForward->set_sensitive( // @TODO operate with action status
+    historyForward->refresh(
         try_forward(
             match,
             false
