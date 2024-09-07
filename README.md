@@ -1,7 +1,7 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
 > [!IMPORTANT]
-> This is experimental PHP / GTK3 branch, checkout [cpp-gtk4](https://github.com/YGGverse/Yoda/tree/cpp-gtk4) for C++ / GTK4 implementation
+> This is experimental PHP / GTK3 branch, checkout [CPP-GTK4](https://github.com/YGGverse/Yoda/tree/CPP-GTK4) for C++ / GTK4 implementation
 >
 
 ## Install
@@ -10,7 +10,7 @@
 
 * `git clone https://github.com/YGGverse/Yoda.git`
 * `cd Yoda`
-* `git checkout php-gtk3`
+* `git checkout PHP-GTK3`
 * Run `./INSTALL.sh` to auto-build Yoda for Linux systems, using latest [PHP](https://github.com/php/php-src), [PHP-CPP](https://github.com/fast-debug/PHP-CPP) and [PHP-GTK3](https://github.com/scorninpc/php-gtk3)
 
 Tool does not change global PHP version, not requires root permissions, but optionally install system dependencies, through `apt` or `yum`
