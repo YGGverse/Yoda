@@ -8,31 +8,7 @@ Browser::Browser(
     //const Glib::RefPtr<Gtk::Application> & app,
     //const std::shared_ptr<lib::Database> & db
 ) {
-    // Init window
-    set_title(
-        _("Yoda")
-    );
-
-    set_default_size(
-        WIDTH,
-        HEIGHT
-    );
-
-    // Init header widget
-    browserHeader = Gtk::make_managed<browser::Header>();
-
-    set_titlebar(
-        * browserHeader
-    );
-
-    // Init main widget
-    browserMain = Gtk::make_managed<browser::Main>();
-
-    set_child(
-        * browserMain
-    );
-
-    // Init browser window actions
+    // Init window actions
     add_action(
         "refresh",
         [this]
@@ -139,4 +115,28 @@ Browser::Browser(
             )->set_enabled(
                 false
             );
+
+    // Init widget
+    set_title(
+        _("Yoda")
+    );
+
+    set_default_size(
+        WIDTH,
+        HEIGHT
+    );
+
+    // Init header widget
+    browserHeader = Gtk::make_managed<browser::Header>();
+
+    set_titlebar(
+        * browserHeader
+    );
+
+    // Init main widget
+    browserMain = Gtk::make_managed<browser::Main>();
+
+    set_child(
+        * browserMain
+    );
 }
