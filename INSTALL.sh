@@ -70,6 +70,9 @@ fi
 # Build App
 cd "$DIR_APP"
 
+## Checkout PHP-GTK3 branch
+git checkout php-gtk3
+
 ## Update application sources
 git pull
 
