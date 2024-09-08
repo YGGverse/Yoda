@@ -59,6 +59,15 @@ Browser::Browser(
         }
     );
 
+        ACTION__MAIN_TAB_CLOSE_ACTIVE->set_enabled(
+            false
+        );
+
+        APP->set_accel_for_action(
+            "win.main_tab_close_active",
+            "<Primary>Escape"
+        );
+
     add_action(
         "main_tab_close_left",
         [this]
