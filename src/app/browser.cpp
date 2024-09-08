@@ -15,11 +15,8 @@ Browser::Browser(
         {
             browserMain->refresh();
 
-            browserHeader->set_title(
-                browserMain->get_current_tab_page_title()
-            );
-
-            browserHeader->set_subtitle(
+            browserHeader->refresh(
+                browserMain->get_current_tab_page_title(),
                 browserMain->get_current_tab_page_subtitle()
             );
         }
@@ -91,6 +88,10 @@ Browser::Browser(
                     browserMain->tab_page_navigation_update();
                 }
             );
+
+                ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE->set_enabled(
+                    false
+                );
 
             const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
                 "main_tab_page_navigation_history_back",

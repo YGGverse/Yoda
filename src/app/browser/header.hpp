@@ -28,12 +28,9 @@ namespace app::browser
 
             Header();
 
-            void set_title(
-                const Glib::ustring & VALUE
-            );
-
-            void set_subtitle(
-                const Glib::ustring & VALUE
+            void refresh(
+                const Glib::ustring & TITLE,
+                const Glib::ustring & SUBTITLE
             );
     };
 }

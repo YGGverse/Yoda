@@ -34,18 +34,15 @@ Header::Header()
     );
 }
 
-void Header::set_title(
-    const Glib::ustring & VALUE
+void Header::refresh(
+    const Glib::ustring & TITLE,
+    const Glib::ustring & SUBTITLE
 ) {
     headerMain->set_title(
-        VALUE
+        TITLE
     );
-}
 
-void Header::set_subtitle(
-    const Glib::ustring & VALUE
-) {
     headerMain->set_subtitle(
-        VALUE
+        SUBTITLE
     );
 }
