@@ -4,9 +4,12 @@ using namespace app::browser::main::tab::page::navigation;
 
 // Construct
 Request::Request(
-    const Glib::ustring & TEXT
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
-    // Init entry
+    // Init actions
+    action__update = ACTION__UPDATE;
+
+    // Init widget
     set_placeholder_text(
         _("URL or search term...")
     );
@@ -19,15 +22,6 @@ Request::Request(
         PROGRESS_PULSE_STEP
     );
 
-    if (!TEXT.empty())
-    {
-        set_text(
-            TEXT
-        );
-
-        parse();
-    }
-
     // Connect events
     signal_changed().connect(
         [this]
@@ -35,7 +29,7 @@ Request::Request(
             parse();
 
             activate_action(
-                "navigation.refresh"
+                "navigation.refresh" // @TODO
             );
         }
     );
@@ -45,9 +39,7 @@ Request::Request(
         {
             parse();
 
-            activate_action(
-                "win.main_tab_page_navigation_update"
-            );
+            action__update->activate();
         }
     );
 }

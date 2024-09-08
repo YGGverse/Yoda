@@ -1,8 +1,10 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST_HPP
 
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
+#include <glibmm/refptr.h>
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/entry.h>
@@ -11,6 +13,9 @@ namespace app::browser::main::tab::page::navigation
 {
     class Request : public Gtk::Entry
     {
+        // Actions
+        Glib::RefPtr<Gio::SimpleAction> action__update;
+
         // Extras
         double progress_fraction;
 
@@ -31,7 +36,7 @@ namespace app::browser::main::tab::page::navigation
         public:
 
             Request(
-                const Glib::ustring & VALUE = "" // @TODO remove default value
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
 
             // Actions

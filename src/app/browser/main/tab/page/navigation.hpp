@@ -35,7 +35,6 @@ namespace app::browser::main::tab::page
         public:
 
             Navigation(
-                const Glib::ustring & REQUEST,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE

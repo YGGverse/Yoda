@@ -55,7 +55,6 @@ namespace app::browser::main
             void append(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE,
-                const Glib::ustring & REQUEST,
                 const bool & FOCUS
             );
 
