@@ -7,7 +7,9 @@ using namespace app::browser::main::tab;
 Page::Page(
     const Glib::ustring & TITLE,
     const Glib::ustring & SUBTITLE,
-    const Glib::ustring & REQUEST
+    const Glib::ustring & REQUEST,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD
 ) {
     // Init container
     set_orientation(
@@ -16,7 +18,9 @@ Page::Page(
 
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
-        REQUEST
+        REQUEST,
+        ACTION__PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__PAGE_NAVIGATION_HISTORY_FORWARD
     );
 
         append(

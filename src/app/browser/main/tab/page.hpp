@@ -4,6 +4,7 @@
 #include <giomm/asyncresult.h>
 #include <giomm/inputstream.h>
 #include <giomm/outputstream.h>
+#include <giomm/simpleaction.h>
 #include <giomm/socketclient.h>
 #include <giomm/socketconnection.h>
 #include <glibmm/i18n.h>
@@ -43,7 +44,9 @@ namespace app::browser::main::tab
             Page(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE,
-                const Glib::ustring & REQUEST
+                const Glib::ustring & REQUEST,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD
             );
 
             // Actions

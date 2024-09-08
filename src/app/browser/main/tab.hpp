@@ -1,7 +1,9 @@
 #ifndef APP_BROWSER_MAIN_TAB_HPP
 #define APP_BROWSER_MAIN_TAB_HPP
 
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
+#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/notebook.h>
 
@@ -15,9 +17,13 @@ namespace app::browser::main
 
     class Tab : public Gtk::Notebook
     {
-        const bool REORDERABLE = true;
-        const bool SCROLLABLE = true;
+        // Actions
+        Glib::RefPtr<Gio::SimpleAction> action__refresh,
+                                        action__tab_close,
+                                        action__tab_page_navigation_history_back,
+                                        action__tab_page_navigation_history_forward;
 
+        // Components
         tab::Label * get_tabLabel(
             const int & PAGE_NUMBER
         );
@@ -26,9 +32,18 @@ namespace app::browser::main
             const int & PAGE_NUMBER
         );
 
+        // Defaults
+        const bool REORDERABLE = true;
+        const bool SCROLLABLE = true;
+
         public:
 
-            Tab();
+            Tab(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+            );
 
             // Actions
             void refresh(

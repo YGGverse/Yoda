@@ -8,7 +8,9 @@
 using namespace app::browser::main::tab::page;
 
 Navigation::Navigation(
-    const Glib::ustring & REQUEST
+    const Glib::ustring & REQUEST,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD
 ) {
     // Init container
     set_orientation(
@@ -42,7 +44,10 @@ Navigation::Navigation(
             * navigationBase
         );
 
-    navigationHistory = Gtk::make_managed<navigation::History>();
+    navigationHistory = Gtk::make_managed<navigation::History>(
+        ACTION__NAVIGATION_HISTORY_BACK,
+        ACTION__NAVIGATION_HISTORY_FORWARD
+    );
 
         append(
             * navigationHistory

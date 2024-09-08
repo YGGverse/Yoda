@@ -4,21 +4,29 @@
 
 using namespace app::browser::main;
 
-Tab::Tab()
-{
+Tab::Tab(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+) {
+    // Init actions
+    action__refresh                             = ACTION__REFRESH;
+    action__tab_close                           = ACTION__TAB_CLOSE;
+    action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
+    action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
+
     // Init widget
     set_scrollable(
         SCROLLABLE
     );
 
-    // Init events
+    // Init event listeners
     signal_switch_page().connect(
         [this](Gtk::Widget*, guint)
         {
             // Refresh window elements, e.g. tab label to header bar
-            activate_action(
-                "win.refresh"
-            );
+            action__refresh->activate();
         }
     );
 }
@@ -31,7 +39,9 @@ void Tab::refresh(
         PAGE_NUMBER
     );
 
-    get_tabLabel(PAGE_NUMBER)->set_label(
+    get_tabLabel(
+        PAGE_NUMBER
+    )->set_label(
         tabPage->get_title()
     );
 }
@@ -45,11 +55,13 @@ void Tab::append(
     auto tabPage = new tab::Page(
         TITLE,
         SUBTITLE,
-        REQUEST
+        REQUEST,
+        action__tab_page_navigation_history_back,
+        action__tab_page_navigation_history_forward
     );
 
     auto tabLabel = new tab::Label(
-        TITLE
+        action__tab_close
     );
 
     int page_number = append_page(

@@ -2,7 +2,9 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HISTORY_HPP
 
 #include <ctime>
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
+#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/object.h>
@@ -37,7 +39,10 @@ namespace app::browser::main::tab::page::navigation
             // Define navigation history storage
             std::vector<Memory> memory;
 
-            History();
+            History(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD
+            );
 
             // Actions
             void add(

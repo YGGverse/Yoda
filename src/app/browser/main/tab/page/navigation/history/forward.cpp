@@ -2,10 +2,11 @@
 
 using namespace app::browser::main::tab::page::navigation::history;
 
-Forward::Forward()
-{
+Forward::Forward(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__FORWARD
+) {
     set_action_name(
-        "win.main_tab_page_navigation_history_forward"
+        "win.main_tab_page_navigation_history_forward" // @TODO
     );
 
     set_icon_name(

@@ -3,11 +3,10 @@
 using namespace app::browser::main::tab;
 
 Label::Label(
-    const Glib::ustring & TEXT
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE
 ) {
-    set_text(
-        TEXT
-    );
+    // Init actions
+    action__close = ACTION__CLOSE;
 
     // Setup label controller
     auto GtkGestureClick = Gtk::GestureClick::create();
@@ -22,9 +21,7 @@ Label::Label(
             {
                 if (n == 2) // double click
                 {
-                    activate_action(
-                        "win.main_tab_close"
-                    );
+                    action__close->activate();
                 }
             }
         );

@@ -9,7 +9,7 @@ Browser::Browser(
     //const std::shared_ptr<lib::Database> & db
 ) {
     // Init window actions
-    add_action(
+    const auto ACTION__REFRESH = add_action(
         "refresh",
         [this]
         {
@@ -45,14 +45,12 @@ Browser::Browser(
             }
         );
 
-        add_action(
+        const auto ACTION__MAIN_TAB_CLOSE = add_action(
             "main_tab_close",
             [this]
             {
                 browserMain->tab_close();
             }
-        )->set_enabled(
-            false
         );
 
         add_action(
@@ -96,24 +94,20 @@ Browser::Browser(
                 false
             );
 
-            add_action(
+            const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
                 "main_tab_page_navigation_history_back",
                 [this]
                 {
                     browserMain->tab_page_navigation_history_back();
                 }
-            )->set_enabled(
-                false
             );
 
-            add_action(
+            const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD = add_action(
                 "main_tab_page_navigation_history_forward",
                 [this]
                 {
                     browserMain->tab_page_navigation_history_forward();
                 }
-            )->set_enabled(
-                false
             );
 
     // Init widget
@@ -134,7 +128,12 @@ Browser::Browser(
     );
 
     // Init main widget
-    browserMain = Gtk::make_managed<browser::Main>();
+    browserMain = Gtk::make_managed<browser::Main>(
+        ACTION__REFRESH,
+        ACTION__MAIN_TAB_CLOSE,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+    );
 
     set_child(
         * browserMain

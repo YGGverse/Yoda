@@ -4,19 +4,25 @@
 
 using namespace app::browser::main::tab::page::navigation;
 
-History::History()
-{
+History::History(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD
+) {
     add_css_class(
         "linked" // merge children elements
     );
 
-    historyBack = Gtk::make_managed<history::Back>();
+    historyBack = Gtk::make_managed<history::Back>(
+        ACTION__HISTORY_BACK
+    );
 
         append(
             * historyBack
         );
 
-    historyForward = Gtk::make_managed<history::Forward>();
+    historyForward = Gtk::make_managed<history::Forward>(
+        ACTION__HISTORY_FORWARD
+    );
 
         append(
             * historyForward
