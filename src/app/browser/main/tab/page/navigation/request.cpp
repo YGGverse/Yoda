@@ -4,10 +4,12 @@ using namespace app::browser::main::tab::page::navigation;
 
 // Construct
 Request::Request(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init actions
-    action__update = ACTION__UPDATE;
+    action__refresh = ACTION__REFRESH;
+    action__update  = ACTION__UPDATE;
 
     // Init widget
     set_placeholder_text(
@@ -28,9 +30,7 @@ Request::Request(
         {
             parse();
 
-            activate_action(
-                "navigation.refresh" // @TODO
-            );
+            action__refresh->activate();
         }
     );
 

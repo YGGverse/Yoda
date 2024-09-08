@@ -14,7 +14,8 @@ namespace app::browser::main::tab::page::navigation
     class Request : public Gtk::Entry
     {
         // Actions
-        Glib::RefPtr<Gio::SimpleAction> action__update;
+        Glib::RefPtr<Gio::SimpleAction> action__refresh,
+                                        action__update;
 
         // Extras
         double progress_fraction;
@@ -36,6 +37,7 @@ namespace app::browser::main::tab::page::navigation
         public:
 
             Request(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
 

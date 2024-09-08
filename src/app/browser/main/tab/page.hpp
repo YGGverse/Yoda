@@ -42,6 +42,7 @@ namespace app::browser::main::tab
         public:
 
             Page(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE

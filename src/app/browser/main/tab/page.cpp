@@ -5,12 +5,14 @@
 using namespace app::browser::main::tab;
 
 Page::Page(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
+        ACTION__REFRESH,
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
         ACTION__PAGE_NAVIGATION_UPDATE

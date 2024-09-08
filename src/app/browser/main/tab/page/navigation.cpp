@@ -8,6 +8,7 @@
 using namespace app::browser::main::tab::page;
 
 Navigation::Navigation(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
@@ -62,6 +63,7 @@ Navigation::Navigation(
         );
 
     navigationRequest = Gtk::make_managed<navigation::Request>(
+        ACTION__REFRESH,
         ACTION__NAVIGATION_UPDATE
     );
 
@@ -74,23 +76,6 @@ Navigation::Navigation(
         append(
             * navigationBookmark
         );
-
-    // Init actions group
-    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
-
-        // Define group actions
-        GioSimpleActionGroup->add_action(
-            "refresh",
-            [this]
-            {
-                refresh(0);
-            }
-        );
-
-    insert_action_group(
-        "navigation",
-        GioSimpleActionGroup
-    );
 }
 
 // Actions

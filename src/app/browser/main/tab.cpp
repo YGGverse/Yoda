@@ -46,12 +46,19 @@ void Tab::refresh(
     )->set_label(
         tabPage->get_title()
     );
+
+    tabPage->refresh(
+        tabPage->get_title(),
+        tabPage->get_subtitle(),
+        0 // @TODO
+    );
 }
 
 void Tab::append(
     const bool & FOCUS
 ) {
     auto tabPage = new tab::Page(
+        action__refresh,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
         action__tab_page_navigation_update

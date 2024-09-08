@@ -2,7 +2,6 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HPP
 
 #include <giomm/simpleaction.h>
-#include <giomm/simpleactiongroup.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
@@ -35,6 +34,7 @@ namespace app::browser::main::tab::page
         public:
 
             Navigation(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
