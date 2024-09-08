@@ -44,8 +44,6 @@ void Main::refresh()
 void Main::tab_append()
 {
     mainTab->append(
-        _("New page"),
-        "", // @TODO
         true
     );
 };

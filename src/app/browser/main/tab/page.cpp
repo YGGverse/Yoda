@@ -5,17 +5,10 @@
 using namespace app::browser::main::tab;
 
 Page::Page(
-    const Glib::ustring & TITLE,
-    const Glib::ustring & SUBTITLE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
-    // Init container
-    set_orientation(
-        Gtk::Orientation::VERTICAL
-    );
-
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
@@ -33,11 +26,13 @@ Page::Page(
             * pageContent
         );
 
-    // Init extras
+    // Init widget
+    set_orientation(
+        Gtk::Orientation::VERTICAL
+    );
+
     refresh(
-        TITLE,
-        SUBTITLE,
-        0
+        _("New page"), "", 0
     );
 }
 

@@ -49,13 +49,9 @@ void Tab::refresh(
 }
 
 void Tab::append(
-    const Glib::ustring & TITLE,
-    const Glib::ustring & SUBTITLE,
     const bool & FOCUS
 ) {
     auto tabPage = new tab::Page(
-        TITLE,
-        SUBTITLE,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
         action__tab_page_navigation_update
