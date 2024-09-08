@@ -52,6 +52,12 @@ void Tab::refresh(
         tabPage->get_subtitle(),
         0 // @TODO
     );
+
+    action__tab_close_active->set_enabled(
+        get_n_pages() > 0
+    );
+
+    // @TODO toggle close all
 }
 
 void Tab::append(
