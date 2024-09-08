@@ -11,4 +11,8 @@ Base::Base()
     set_tooltip_text(
         _("Base")
     );
+
+    set_sensitive(
+        false
+    );
 }
