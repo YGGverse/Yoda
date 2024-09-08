@@ -10,7 +10,7 @@ Main::Main(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
 ) {
-    // Init container
+    // Init widget
     set_orientation(
         Gtk::Orientation::VERTICAL
     );
@@ -19,7 +19,7 @@ Main::Main(
         HOMOGENEOUS
     );
 
-    // Init tabs
+    // Init components
     mainTab = Gtk::make_managed<main::Tab>(
         ACTION__REFRESH,
         ACTION__MAIN_TAB_CLOSE,
@@ -28,9 +28,9 @@ Main::Main(
         ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
-    append(
-        * mainTab
-    );
+        append(
+            * mainTab
+        );
 }
 
 // Actions
