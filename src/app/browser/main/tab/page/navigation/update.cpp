@@ -17,15 +17,26 @@ Update::Update(
         _("Update")
     );
 
-    /* @TODO
     set_sensitive(
         false
-    ); */
+    );
 
     signal_clicked().connect(
         [this]
         {
             action__update->activate();
         }
+    );
+}
+
+void Update::refresh(
+    const bool & ENABLED
+) {
+    set_sensitive(
+        ENABLED
+    );
+
+    action__update->set_enabled(
+        ENABLED
     );
 }

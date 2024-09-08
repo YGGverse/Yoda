@@ -107,7 +107,7 @@ void Navigation::refresh(
     navigationHistory->refresh();
 
     // Toggle update button sensibility
-    navigationUpdate->set_sensitive(
+    navigationUpdate->refresh(
         navigationRequest->get_text_length() > 0
     );
 

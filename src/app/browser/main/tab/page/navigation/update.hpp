@@ -17,6 +17,10 @@ namespace app::browser::main::tab::page::navigation
             Update(
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
+
+            void refresh(
+                const bool & ENABLED
+            );
     };
 }
 
