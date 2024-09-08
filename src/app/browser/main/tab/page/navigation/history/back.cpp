@@ -5,10 +5,10 @@ using namespace app::browser::main::tab::page::navigation::history;
 Back::Back(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__BACK
 ) {
-    set_action_name(
-        "win.main_tab_page_navigation_history_back" // @TODO
-    );
+    // Init actions
+    action__back = ACTION__BACK;
 
+    // Init widget
     set_icon_name(
         "go-previous-symbolic"
     );
@@ -16,10 +16,27 @@ Back::Back(
     set_tooltip_text(
         _("Back")
     );
+
+    set_sensitive(
+        false
+    );
+
+    signal_clicked().connect(
+        [this]
+        {
+            action__back->activate();
+        }
+    );
 }
 
 void Back::refresh(
     const bool & ENABLED
 ) {
-    // @TODO update action status
+    set_sensitive(
+        ENABLED
+    );
+
+    action__back->set_enabled(
+        ENABLED
+    );
 }

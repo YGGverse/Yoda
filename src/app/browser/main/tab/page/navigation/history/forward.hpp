@@ -10,6 +10,8 @@ namespace app::browser::main::tab::page::navigation::history
 {
     class Forward : public Gtk::Button
     {
+        Glib::RefPtr<Gio::SimpleAction> action__forward;
+
         public:
 
             Forward(

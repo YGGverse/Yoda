@@ -5,10 +5,10 @@ using namespace app::browser::main::tab::page::navigation::history;
 Forward::Forward(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__FORWARD
 ) {
-    set_action_name(
-        "win.main_tab_page_navigation_history_forward" // @TODO
-    );
+    // Init actions
+    action__forward = ACTION__FORWARD;
 
+    // Init widget
     set_icon_name(
         "go-next-symbolic"
     );
@@ -16,10 +16,27 @@ Forward::Forward(
     set_tooltip_text(
         _("Forward")
     );
+
+    set_sensitive(
+        false
+    );
+
+    signal_clicked().connect(
+        [this]
+        {
+            action__forward->activate();
+        }
+    );
 }
 
 void Forward::refresh(
     const bool & ENABLED
 ) {
-    // @TODO update action status
+    set_sensitive(
+        ENABLED
+    );
+
+    action__forward->set_enabled(
+        ENABLED
+    );
 }
