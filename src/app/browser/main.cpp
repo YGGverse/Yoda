@@ -7,7 +7,8 @@ Main::Main(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init container
     set_orientation(
@@ -23,7 +24,8 @@ Main::Main(
         ACTION__REFRESH,
         ACTION__MAIN_TAB_CLOSE,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
     append(

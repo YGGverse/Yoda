@@ -84,14 +84,12 @@ Browser::Browser(
         );
 
             // Tab page navigation actions
-            add_action(
+            const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE = add_action(
                 "main_tab_page_navigation_update",
                 [this]
                 {
                     browserMain->tab_page_navigation_update();
                 }
-            )->set_enabled(
-                false
             );
 
             const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
@@ -132,7 +130,8 @@ Browser::Browser(
         ACTION__REFRESH,
         ACTION__MAIN_TAB_CLOSE,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
     set_child(

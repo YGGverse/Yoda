@@ -9,7 +9,8 @@ Page::Page(
     const Glib::ustring & SUBTITLE,
     const Glib::ustring & REQUEST,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
     // Init container
     set_orientation(
@@ -20,7 +21,8 @@ Page::Page(
     pageNavigation = Gtk::make_managed<page::Navigation>(
         REQUEST,
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__PAGE_NAVIGATION_HISTORY_FORWARD
+        ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__PAGE_NAVIGATION_UPDATE
     );
 
         append(

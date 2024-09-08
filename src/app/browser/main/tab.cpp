@@ -8,13 +8,15 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init actions
     action__refresh                             = ACTION__REFRESH;
     action__tab_close                           = ACTION__TAB_CLOSE;
     action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
     action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
+    action__tab_page_navigation_update          = ACTION__TAB_PAGE_NAVIGATION_UPDATE;
 
     // Init widget
     set_scrollable(
@@ -57,7 +59,8 @@ void Tab::append(
         SUBTITLE,
         REQUEST,
         action__tab_page_navigation_history_back,
-        action__tab_page_navigation_history_forward
+        action__tab_page_navigation_history_forward,
+        action__tab_page_navigation_update
     );
 
     auto tabLabel = new tab::Label(
