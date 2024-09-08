@@ -163,7 +163,7 @@ tab::Label * Tab::get_tabLabel(
 
     if (pageWidget == nullptr)
     {
-        throw _("Tab page not found!");
+        throw _("Tab page not found!");  // @TODO
     }
 
     auto labelWidget = get_tab_label(
@@ -172,7 +172,7 @@ tab::Label * Tab::get_tabLabel(
 
     if (labelWidget == nullptr)
     {
-        throw _("Tab label not found!");
+        throw _("Tab label not found!"); // @TODO
     }
 
     return (tab::Label *) labelWidget;
@@ -187,7 +187,7 @@ tab::Page * Tab::get_tabPage(
 
     if (pageWidget == nullptr)
     {
-        throw _("Tab page not found!");
+        throw _("Tab page not found!"); // @TODO
     }
 
     return (tab::Page *) pageWidget;
