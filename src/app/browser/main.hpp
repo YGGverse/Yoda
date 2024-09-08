@@ -7,6 +7,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/object.h>
+#include <SQLiteCpp/SQLiteCpp.h>
 
 namespace app::browser
 {
@@ -26,6 +27,7 @@ namespace app::browser
         public:
 
             Main(
+                SQLite::Database & db,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,

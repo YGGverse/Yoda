@@ -7,6 +7,7 @@
 #include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/object.h>
+#include <SQLiteCpp/SQLiteCpp.h>
 
 namespace lib
 {
@@ -34,8 +35,8 @@ namespace app
         public:
 
             Browser(
+                SQLite::Database & db,
                 const Glib::RefPtr<Gtk::Application> & APP
-                //const std::shared_ptr<lib::Database> & db
             );
     };
 }

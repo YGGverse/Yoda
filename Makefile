@@ -5,7 +5,7 @@ LDFLAGS = `pkg-config --libs gio-2.0 glibmm-2.68 gtkmm-4.0 pangomm-2.48 sqlite3`
 
 # Define target executable and source files
 TARGET = bin/Yoda
-SRCS =  src/main.cpp\
+SRCS =  src/app.cpp\
 		src/app/browser.cpp\
 		src/app/browser/header.cpp\
 		src/app/browser/header/main.cpp\
@@ -27,9 +27,7 @@ SRCS =  src/main.cpp\
 		src/app/browser/main/tab/page/navigation/history/forward.cpp\
 		src/app/browser/main/tab/page/navigation/request.cpp\
 		src/app/browser/main/tab/page/navigation/update.cpp\
-		src/app/browser/main/tab/label.cpp\
-		src/lib/database.cpp\
-		src/lib/database/session.cpp
+		src/app/browser/main/tab/label.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

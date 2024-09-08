@@ -5,6 +5,7 @@
 using namespace app::browser::main;
 
 Tab::Tab(
+    SQLite::Database & db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
@@ -12,6 +13,18 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
 ) {
+    // Init database
+    db.exec(
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser_tab`
+            (
+                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`    INTEGER NOT NULL,
+                `request` VARCHAR(1024)
+            )
+        )SQL"
+    );
+
     // Init actions
     action__refresh                             = ACTION__REFRESH;
     action__tab_close_active                    = ACTION__TAB_CLOSE_ACTIVE;

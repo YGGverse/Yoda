@@ -5,8 +5,8 @@
 using namespace app;
 
 Browser::Browser(
+    SQLite::Database & db,
     const Glib::RefPtr<Gtk::Application> & APP
-    //const std::shared_ptr<lib::Database> & db
 ) {
     // Init window actions
     const auto ACTION__REFRESH = add_action(
@@ -177,6 +177,7 @@ Browser::Browser(
         );
 
     browserMain = Gtk::make_managed<browser::Main>(
+        db,
         ACTION__REFRESH,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,

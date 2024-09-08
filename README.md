@@ -16,7 +16,8 @@ apt install git\
             libglibmm-2.68-dev\
             libgtkmm-4.0-dev\
             libpangomm-2.48-dev\
-            libsqlite3-dev
+            libsqlite3-dev\
+            libsqlitecpp-dev
 ```
 
 * `git clone https://github.com/YGGverse/Yoda.git`
@@ -68,3 +69,4 @@ pkg-config --cflags --libs gio-2.0\
 * [GTK](https://gtk.org) - free and open-source cross-platform widget toolkit
   * [gtkmm](https://gtkmm.org) - official C++ interface for GTK
 * [SQLite](https://sqlite.org) - profile database
+  * [SQLiteCpp](https://github.com/SRombauts/SQLiteCpp) - SQLite3 C++ wrapper
