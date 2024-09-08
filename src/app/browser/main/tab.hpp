@@ -19,7 +19,7 @@ namespace app::browser::main
     {
         // Actions
         Glib::RefPtr<Gio::SimpleAction> action__refresh,
-                                        action__tab_close,
+                                        action__tab_close_active,
                                         action__tab_page_navigation_history_back,
                                         action__tab_page_navigation_history_forward,
                                         action__tab_page_navigation_update;
@@ -41,7 +41,7 @@ namespace app::browser::main
 
             Tab(
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE

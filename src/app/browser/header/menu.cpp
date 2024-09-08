@@ -5,7 +5,8 @@ using namespace app::browser::header;
 Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
@@ -74,7 +75,7 @@ Menu::Menu(
                 MENU__MAIN_TAB_CLOSE->append(
                     _("Active tab"),
                     get_action_detailed_name(
-                        ACTION__MAIN_TAB_CLOSE
+                        ACTION__MAIN_TAB_CLOSE_ACTIVE
                     )
                 );
 
@@ -83,24 +84,23 @@ Menu::Menu(
                 MENU__MAIN_TAB_CLOSE->append(
                     _("All tabs to left"),
                     get_action_detailed_name(
-                        ACTION__MAIN_TAB_CLOSE
+                        ACTION__MAIN_TAB_CLOSE_LEFT
                     )
                 );
 
                 MENU__MAIN_TAB_CLOSE->append(
                     _("All tabs to right"),
                     get_action_detailed_name(
-                        ACTION__MAIN_TAB_CLOSE
-                    )
-                );
-
-                MENU__MAIN_TAB_CLOSE->append(
-                    _("All tabs"),
-                    get_action_detailed_name(
-                        ACTION__MAIN_TAB_CLOSE
+                        ACTION__MAIN_TAB_CLOSE_RIGHT
                     )
                 );
                 */
+                MENU__MAIN_TAB_CLOSE->append(
+                    _("All tabs"),
+                    get_action_detailed_name(
+                        ACTION__MAIN_TAB_CLOSE_ALL
+                    )
+                );
 
             MENU__MAIN_TAB->append_submenu(
                 _("Close"),

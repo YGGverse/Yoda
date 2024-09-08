@@ -12,12 +12,12 @@ namespace app::browser::main::tab
 {
     class Label : public Gtk::Label
     {
-        Glib::RefPtr<Gio::SimpleAction> action__close;
+        Glib::RefPtr<Gio::SimpleAction> action__close_active;
 
         public:
 
             Label(
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ACTIVE
             );
     };
 }
