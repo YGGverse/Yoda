@@ -16,7 +16,7 @@ Tab::Tab(
     // Init database
     db.exec(
         R"SQL(
-            CREATE TABLE IF NOT EXISTS `app_browser_tab`
+            CREATE TABLE IF NOT EXISTS `app_browser_main_tab`
             (
                 `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`    INTEGER NOT NULL,
@@ -46,6 +46,8 @@ Tab::Tab(
             action__refresh->activate();
         }
     );
+
+    // @TODO restore session from DB
 }
 
 // Actions
