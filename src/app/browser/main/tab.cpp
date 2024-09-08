@@ -7,6 +7,7 @@ using namespace app::browser::main;
 Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
@@ -14,6 +15,7 @@ Tab::Tab(
     // Init actions
     action__refresh                             = ACTION__REFRESH;
     action__tab_close_active                    = ACTION__TAB_CLOSE_ACTIVE;
+    action__tab_close_all                       = ACTION__MAIN_TAB_CLOSE_ALL;
     action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
     action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
     action__tab_page_navigation_update          = ACTION__TAB_PAGE_NAVIGATION_UPDATE;
@@ -57,7 +59,9 @@ void Tab::refresh(
         get_n_pages() > 0
     );
 
-    // @TODO toggle close all
+    action__tab_close_all->set_enabled(
+        get_n_pages() > 0
+    );
 }
 
 void Tab::append(
