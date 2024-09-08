@@ -2,158 +2,144 @@
 
 using namespace app::browser::header;
 
-Menu::Menu()
-{
+Menu::Menu(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+) {
+    // Init widget
     set_tooltip_text(
         _("Menu")
     );
 
-    set_menu_model(
-        main(
-            main_tab(
-                main_tab_page(
-                    main_tab_page_navigation(
-                        main_tab_page_navigation_history()
+    // Init components @TODO make builder
+    const auto MENU__MAIN = Gio::Menu::create();
+
+        const auto MENU__MAIN_TAB = Gio::Menu::create();
+
+            MENU__MAIN_TAB->append(
+                _("New.."),
+                get_action_detailed_name(
+                    ACTION__MAIN_TAB_APPEND
+                )
+            );
+
+            const auto MENU__MAIN_TAB_PAGE = Gio::Menu::create();
+
+                const auto MENU__MAIN_TAB_PAGE_NAVIGATION = Gio::Menu::create();
+
+                    const auto MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY = Gio::Menu::create();
+
+                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
+                            _("Back"),
+                            get_action_detailed_name(
+                                ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK
+                            )
+                        );
+
+                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
+                            _("Forward"),
+                            get_action_detailed_name(
+                                ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+                            )
+                        );
+
+                    MENU__MAIN_TAB_PAGE_NAVIGATION->append_submenu(
+                        _("History"),
+                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY
+                    );
+
+                    MENU__MAIN_TAB_PAGE_NAVIGATION->append(
+                        _("Update"),
+                        get_action_detailed_name(
+                            ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+                        )
+                    );
+
+                MENU__MAIN_TAB_PAGE->append_submenu(
+                    _("Navigation"),
+                    MENU__MAIN_TAB_PAGE_NAVIGATION
+                );
+
+            MENU__MAIN_TAB->append_submenu(
+                _("Page"),
+                MENU__MAIN_TAB_PAGE
+            );
+
+            const auto MENU__MAIN_TAB_CLOSE = Gio::Menu::create();
+
+                MENU__MAIN_TAB_CLOSE->append(
+                    _("Active tab"),
+                    get_action_detailed_name(
+                        ACTION__MAIN_TAB_CLOSE
                     )
-                ),
-                main_tab_close()
-            ),
-            main_tools()
-        )
+                );
+
+                // @TODO
+                /*
+                MENU__MAIN_TAB_CLOSE->append(
+                    _("All tabs to left"),
+                    get_action_detailed_name(
+                        ACTION__MAIN_TAB_CLOSE
+                    )
+                );
+
+                MENU__MAIN_TAB_CLOSE->append(
+                    _("All tabs to right"),
+                    get_action_detailed_name(
+                        ACTION__MAIN_TAB_CLOSE
+                    )
+                );
+
+                MENU__MAIN_TAB_CLOSE->append(
+                    _("All tabs"),
+                    get_action_detailed_name(
+                        ACTION__MAIN_TAB_CLOSE
+                    )
+                );
+                */
+
+            MENU__MAIN_TAB->append_submenu(
+                _("Close"),
+                MENU__MAIN_TAB_CLOSE
+            );
+
+        MENU__MAIN->append_submenu(
+            _("Tab"),
+            MENU__MAIN_TAB
+        );
+
+        const auto MENU__MAIN_TOOLS = Gio::Menu::create();
+
+            MENU__MAIN_TOOLS->append(
+                _("Debug"),
+                get_action_detailed_name(
+                    ACTION__DEBUG
+                )
+            );
+
+        MENU__MAIN->append_submenu(
+            _("Tools"),
+            MENU__MAIN_TOOLS
+        );
+
+        MENU__MAIN->append(
+            _("Quit"),
+            "app.quit" // @TODO
+        );
+
+    set_menu_model(
+        MENU__MAIN
     );
 }
 
-Glib::RefPtr<Gio::Menu> Menu::main(
-    const Glib::RefPtr<Gio::Menu> & MAIN_TAB,
-    const Glib::RefPtr<Gio::Menu> & MAIN_TOOLS
+Glib::ustring Menu::get_action_detailed_name(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION
 ) {
-    auto menu = Gio::Menu::create();
-
-    menu->append_submenu(
-        _("Tab"),
-        MAIN_TAB
+    return Glib::ustring::sprintf(
+        "win.%s", ACTION->get_name()
     );
-
-    menu->append_submenu(
-        _("Tools"),
-        MAIN_TOOLS
-    );
-
-    menu->append(
-        _("Quit"),
-        "app.quit"
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tab(
-    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE,
-    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_CLOSE
-) {
-    auto menu = Gio::Menu::create();
-
-    menu->append(
-        _("New.."),
-        "win.main_tab_append"
-    );
-
-    menu->append_submenu(
-        _("Page"),
-        MAIN_TAB_PAGE
-    );
-
-    menu->append_submenu(
-        _("Close"),
-        MAIN_TAB_CLOSE
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tab_page(
-    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION
-) {
-    auto menu = Gio::Menu::create();
-
-    menu->append_submenu(
-        _("Navigation"),
-        MAIN_TAB_PAGE_NAVIGATION
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation(
-    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION_HISTORY
-) {
-    auto menu = Gio::Menu::create();
-
-    menu->append_submenu(
-        _("History"),
-        MAIN_TAB_PAGE_NAVIGATION_HISTORY
-    );
-
-    menu->append(
-        _("Update"),
-        "win.main_tab_page_navigation_update"
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tab_page_navigation_history()
-{
-    auto menu = Gio::Menu::create();
-
-    menu->append(
-        _("Back"),
-        "win.main_tab_page_navigation_history_back"
-    );
-
-    menu->append(
-        _("Forward"),
-        "win.main_tab_page_navigation_history_forward"
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tab_close()
-{
-    auto menu = Gio::Menu::create();
-
-    menu->append(
-        _("Active tab"),
-        "win.main_tab_close"
-    );
-
-    menu->append(
-        _("All tabs to left"),
-        "win.main_tab_close_left"
-    );
-
-    menu->append(
-        _("All tabs to right"),
-        "win.main_tab_close_right"
-    );
-
-    menu->append(
-        _("All tabs"),
-        "win.main_tab_close_all"
-    );
-
-    return menu;
-}
-
-Glib::RefPtr<Gio::Menu> Menu::main_tools()
-{
-    auto menu = Gio::Menu::create();
-
-    menu->append(
-        _("Debug"),
-        "win.debug"
-    );
-
-    return menu;
 }

@@ -1,6 +1,8 @@
 #ifndef APP_BROWSER_HEADER_HPP
 #define APP_BROWSER_HEADER_HPP
 
+#include <giomm/simpleaction.h>
+#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/object.h>
@@ -26,7 +28,14 @@ namespace app::browser
 
         public:
 
-            Header();
+            Header(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+            );
 
             void refresh(
                 const Glib::ustring & TITLE,

@@ -22,7 +22,7 @@ Browser::Browser(
         }
     );
 
-    add_action(
+    const auto ACTION__DEBUG = add_action(
         "debug",
         [this]
         {
@@ -38,7 +38,7 @@ Browser::Browser(
             "<Primary>i"
         );
 
-    add_action(
+    const auto ACTION__MAIN_TAB_APPEND = add_action(
         "main_tab_append",
         [this]
         {
@@ -151,7 +151,14 @@ Browser::Browser(
     );
 
     // Init components
-    browserHeader = Gtk::make_managed<browser::Header>();
+    browserHeader = Gtk::make_managed<browser::Header>(
+        ACTION__DEBUG,
+        ACTION__MAIN_TAB_APPEND,
+        ACTION__MAIN_TAB_CLOSE,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+    );
 
         set_titlebar(
             * browserHeader

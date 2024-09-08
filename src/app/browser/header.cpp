@@ -5,33 +5,44 @@
 
 using namespace app::browser;
 
-Header::Header()
-{
-    // Init header bar
+Header::Header(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+) {
+    // Init widget
     set_show_title_buttons(
         SHOW_TITLE_BUTTONS
     );
 
-    // Init menu
-    headerMenu = Gtk::make_managed<header::Menu>();
-
-    pack_start(
-        * headerMenu
+    // Init components
+    headerMenu = Gtk::make_managed<header::Menu>(
+        ACTION__DEBUG,
+        ACTION__MAIN_TAB_APPEND,
+        ACTION__MAIN_TAB_CLOSE,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
-    // Init tab
+        pack_start(
+            * headerMenu
+        );
+
     headerTab = Gtk::make_managed<header::Tab>();
 
-    pack_start(
-        * headerTab
-    );
+        pack_start(
+            * headerTab
+        );
 
-    // Init main widget
     headerMain = Gtk::make_managed<header::Main>();
 
-    set_title_widget(
-        * headerMain
-    );
+        set_title_widget(
+            * headerMain
+        );
 }
 
 void Header::refresh(

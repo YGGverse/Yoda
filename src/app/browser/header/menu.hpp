@@ -2,45 +2,29 @@
 #define APP_BROWSER_HEADER_MENU_HPP
 
 #include <giomm/menu.h>
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
+#include <glibmm/refptr.h>
 #include <gtkmm/menubutton.h>
 
 namespace app::browser::header
 {
     class Menu : public Gtk::MenuButton
     {
-        // 1 level
-        static Glib::RefPtr<Gio::Menu> main(
-            const Glib::RefPtr<Gio::Menu> & MAIN_TAB,
-            const Glib::RefPtr<Gio::Menu> & MAIN_TOOLS
+        static Glib::ustring get_action_detailed_name(
+            const Glib::RefPtr<Gio::SimpleAction> & ACTION
         );
-
-            // 2 level
-            static Glib::RefPtr<Gio::Menu> main_tab(
-                const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE,
-                const Glib::RefPtr<Gio::Menu> & MAIN_TAB_CLOSE
-            );
-
-                // 3 level
-                static Glib::RefPtr<Gio::Menu> main_tab_page(
-                    const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION
-                );
-
-                    // 4 level
-                    static Glib::RefPtr<Gio::Menu> main_tab_page_navigation(
-                        const Glib::RefPtr<Gio::Menu> & MAIN_TAB_PAGE_NAVIGATION_HISTORY
-                    );
-
-                        // 5 level
-                        static Glib::RefPtr<Gio::Menu> main_tab_page_navigation_history();
-
-                static Glib::RefPtr<Gio::Menu> main_tab_close();
-
-            static Glib::RefPtr<Gio::Menu> main_tools();
 
         public:
 
-            Menu();
+            Menu(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+            );
     };
 }
 
