@@ -4,6 +4,7 @@
 #include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
+#include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/object.h>
 
@@ -33,7 +34,7 @@ namespace app
         public:
 
             Browser(
-                //const Glib::RefPtr<Gtk::Application> & app,
+                const Glib::RefPtr<Gtk::Application> & APP
                 //const std::shared_ptr<lib::Database> & db
             );
     };
