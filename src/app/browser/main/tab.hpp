@@ -66,13 +66,10 @@ namespace app::browser::main
 
             // Actions
             void refresh(
-                const int & PAGE_NUMBER // @TODO
+                const int & PAGE_NUMBER
             );
 
-            int append(
-                const unsigned char * REQUEST,
-                const bool & FOCUS
-            );
+            int append();
 
             void close(
                 const int & PAGE_NUMBER

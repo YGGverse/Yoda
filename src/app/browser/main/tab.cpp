@@ -68,12 +68,17 @@ Tab::Tab(
             {
                 while (sqlite3_step(statement) == SQLITE_ROW)
                 {
-                    append(
-                        ::sqlite3_column_text(
-                            statement,
-                            DB::APP_BROWSER_MAIN_TAB::REQUEST
-                        ),
-                        true
+                    const int PAGE_NUMBER = append();
+
+                    /* @TODO set request
+                    ::sqlite3_column_text(
+                        statement,
+                        DB::APP_BROWSER_MAIN_TAB::REQUEST
+                    );
+                    */
+
+                    set_current_page(
+                        PAGE_NUMBER
                     );
                 }
             }
@@ -167,10 +172,8 @@ void Tab::refresh(
     );
 }
 
-int Tab::append(
-    const unsigned char * REQUEST,
-    const bool & FOCUS
-) {
+int Tab::append()
+{
     const auto TAB_PAGE = new tab::Page(
         action__refresh,
         action__tab_page_navigation_history_back,
@@ -191,13 +194,6 @@ int Tab::append(
         * TAB_PAGE,
         REORDERABLE
     );
-
-    if (FOCUS)
-    {
-        set_current_page(
-            PAGE_NUMBER
-        );
-    }
 
     return PAGE_NUMBER;
 };

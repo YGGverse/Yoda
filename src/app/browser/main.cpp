@@ -47,11 +47,8 @@ void Main::refresh()
 
 void Main::tab_append()
 {
-    const unsigned char * REQUEST; // @TODO
-
-    mainTab->append(
-        REQUEST,
-        true
+    mainTab->set_current_page(
+        mainTab->append()
     );
 };
 
