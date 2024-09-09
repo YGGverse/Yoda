@@ -66,7 +66,7 @@ Tab::Tab(
 
             if (PREPARE == SQLITE_OK)
             {
-                while (sqlite3_step(statement) == SQLITE_ROW)
+                while (::sqlite3_step(statement) == SQLITE_ROW)
                 {
                     const int PAGE_NUMBER = append();
 
