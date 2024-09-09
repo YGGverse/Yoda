@@ -65,6 +65,8 @@ namespace app::browser::main::tab
             // Getters
             Glib::ustring get_title();
             Glib::ustring get_subtitle();
+
+            Glib::ustring get_navigation_request_text();
     };
 }
 

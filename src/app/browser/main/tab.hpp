@@ -18,6 +18,9 @@ namespace app::browser::main
 
     class Tab : public Gtk::Notebook
     {
+        // Database
+        sqlite3 * db;
+
         // Actions
         Glib::RefPtr<Gio::SimpleAction> action__refresh,
                                         action__tab_close_active,
@@ -80,6 +83,8 @@ namespace app::browser::main
                 void page_navigation_history_forward(
                     const int & PAGE_NUMBER
                 );
+
+            void shutdown();
 
             // Getters
             Glib::ustring get_page_title(

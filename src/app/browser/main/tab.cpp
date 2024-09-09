@@ -14,22 +14,24 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init database
-    char * errmsg;
+    this->db = db;
 
-    ::sqlite3_exec(
-        db,
-        R"SQL(
-            CREATE TABLE IF NOT EXISTS `app_browser_main_tab`
-            (
-                `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time`    INTEGER NOT NULL,
-                `request` VARCHAR(1024)
-            )
-        )SQL",
-        nullptr,
-        nullptr,
-        &errmsg
-    );
+        char * error;
+
+        ::sqlite3_exec(
+            db,
+            R"SQL(
+                CREATE TABLE IF NOT EXISTS `app_browser_main_tab`
+                (
+                    `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `time`    INTEGER NOT NULL,
+                    `request` VARCHAR(1024)
+                )
+            )SQL",
+            nullptr,
+            nullptr,
+            &error
+        );
 
     // Init actions
     action__refresh                             = ACTION__REFRESH;
@@ -54,6 +56,51 @@ Tab::Tab(
     );
 
     // @TODO restore session from DB
+}
+
+void Tab::shutdown()
+{
+    char * error; // @TODO
+
+    // Delete previous tab session
+    ::sqlite3_exec(
+        db,
+        R"SQL(
+            DELETE FROM `app_browser_main_tab`
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
+
+    // Save current tab session
+    for (int page_number = 0; page_number < get_n_pages(); page_number++)
+    {
+        auto tabPage = get_tabPage(
+            page_number
+        );
+
+        ::sqlite3_exec(
+            db,
+            Glib::ustring::sprintf(
+                R"SQL(
+                    INSERT INTO `app_browser_main_tab` (
+                        `time`,
+                        `request`
+                    ) VALUES (
+                        CURRENT_TIMESTAMP,
+                        '%s'
+                    )
+                )SQL",
+                tabPage->get_navigation_request_text()
+            ).c_str(),
+            nullptr,
+            nullptr,
+            &error
+        );
+    }
+
+    // @TODO shutdown children components
 }
 
 // Actions

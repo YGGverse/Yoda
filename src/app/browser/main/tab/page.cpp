@@ -266,3 +266,8 @@ Glib::ustring Page::get_subtitle()
 {
     return subtitle;
 }
+
+Glib::ustring Page::get_navigation_request_text()
+{
+    return pageNavigation->get_request_text();
+}

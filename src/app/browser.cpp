@@ -189,4 +189,15 @@ Browser::Browser(
         set_child(
             * browserMain
         );
+
+    // Connect signals
+    signal_close_request().connect(
+        [this]
+        {
+            browserMain->shutdown();
+
+            return false;
+        },
+        true
+    );
 }
