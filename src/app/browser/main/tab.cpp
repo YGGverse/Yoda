@@ -21,7 +21,7 @@ Tab::Tab(
         ::sqlite3_exec(
             db,
             R"SQL(
-                CREATE TABLE IF NOT EXISTS `app_browser_main_tab_session`
+                CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
                 (
                     `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     `time`    INTEGER NOT NULL,
@@ -73,7 +73,7 @@ void Tab::session_restore()
     const int PREPARE = ::sqlite3_prepare_v3(
         this->db,
         R"SQL(
-            SELECT * FROM `app_browser_main_tab_session` ORDER BY `number` ASC
+            SELECT * FROM `app_browser_main_tab__session` ORDER BY `number` ASC
         )SQL",
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -93,12 +93,12 @@ void Tab::session_restore()
                 reinterpret_cast<const char*>(
                     ::sqlite3_column_text(
                         statement,
-                        DB::APP_BROWSER_MAIN_TAB_SESSION::REQUEST
+                        DB::APP_BROWSER_MAIN_TAB__SESSION::REQUEST
                     )
                 )
             );
 
-            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB_SESSION::CURRENT) == 1)
+            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB__SESSION::CURRENT) == 1)
             {
                 set_current_page(
                     PAGE_NUMBER
@@ -120,7 +120,7 @@ void Tab::session_save()
     ::sqlite3_exec(
         db,
         R"SQL(
-            DELETE FROM `app_browser_main_tab_session`
+            DELETE FROM `app_browser_main_tab__session`
         )SQL",
         nullptr,
         nullptr,
@@ -138,7 +138,7 @@ void Tab::session_save()
             db,
             Glib::ustring::sprintf(
                 R"SQL(
-                    INSERT INTO `app_browser_main_tab_session` (
+                    INSERT INTO `app_browser_main_tab__session` (
                         `time`,
                         `number`,
                         `current`,

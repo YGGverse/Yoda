@@ -23,7 +23,7 @@ namespace app::browser::main
 
         struct DB
         {
-            enum APP_BROWSER_MAIN_TAB_SESSION
+            enum APP_BROWSER_MAIN_TAB__SESSION
             {
                 ID,
                 TIME,
