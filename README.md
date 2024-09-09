@@ -46,7 +46,7 @@ apt install git\
 
 ### Structure
 
-Main application sources located at `src/app` folder, by following principles:
+Application sources located at `src/app` folder, written by following principles:
 
 * Every file extends one of GTK 4 Widgets according to subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
 * `src/app` does not contain other class types like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
