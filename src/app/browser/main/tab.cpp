@@ -66,11 +66,11 @@ Tab::Tab(
     );
 }
 
-void Tab::session_restore()
+int Tab::session_restore()
 {
     sqlite3_stmt* statement;
 
-    const int PREPARE = ::sqlite3_prepare_v3(
+    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
         this->db,
         R"SQL(
             SELECT * FROM `app_browser_main_tab__session` ORDER BY `number` ASC
@@ -81,7 +81,7 @@ void Tab::session_restore()
         nullptr
     );
 
-    if (PREPARE == SQLITE_OK)
+    if (PREPARE_STATUS == SQLITE_OK)
     {
         close_all();
 
@@ -109,17 +109,19 @@ void Tab::session_restore()
         }
     }
 
-    sqlite3_finalize(
+    ::sqlite3_finalize(
         statement
     );
+
+    return PREPARE_STATUS;
 }
 
-void Tab::session_save()
+int Tab::session_save()
 {
     char * error; // @TODO
 
     // Delete previous tab session
-    ::sqlite3_exec(
+    const int EXEC_STATUS = ::sqlite3_exec(
         db,
         R"SQL(
             DELETE FROM `app_browser_main_tab__session`
@@ -129,38 +131,43 @@ void Tab::session_save()
         &error
     );
 
-    // Save current tab session
-    for (int page_number = 0; page_number < get_n_pages(); page_number++)
+    if (EXEC_STATUS == SQLITE_OK)
     {
-        auto tabPage = get_tabPage(
-            page_number
-        );
+        // Save current tab session
+        for (int page_number = 0; page_number < get_n_pages(); page_number++)
+        {
+            auto tabPage = get_tabPage(
+                page_number
+            );
 
-        ::sqlite3_exec(
-            db,
-            Glib::ustring::sprintf(
-                R"SQL(
-                    INSERT INTO `app_browser_main_tab__session` (
-                        `time`,
-                        `number`,
-                        `current`,
-                        `request`
-                    ) VALUES (
-                        CURRENT_TIMESTAMP,
-                        '%d',
-                        '%d',
-                        '%s'
-                    )
-                )SQL",
-                page_number,
-                page_number == get_current_page() ? 1 : 0,
-                tabPage->get_navigation_request_text()
-            ).c_str(),
-            nullptr,
-            nullptr,
-            &error
-        );
+            ::sqlite3_exec(
+                db,
+                Glib::ustring::sprintf(
+                    R"SQL(
+                        INSERT INTO `app_browser_main_tab__session` (
+                            `time`,
+                            `number`,
+                            `current`,
+                            `request`
+                        ) VALUES (
+                            CURRENT_TIMESTAMP,
+                            '%d',
+                            '%d',
+                            '%s'
+                        )
+                    )SQL",
+                    page_number,
+                    page_number == get_current_page() ? 1 : 0,
+                    tabPage->get_navigation_request_text()
+                ).c_str(),
+                nullptr,
+                nullptr,
+                &error
+            );
+        }
     }
+
+    return EXEC_STATUS;
 }
 
 void Tab::shutdown()

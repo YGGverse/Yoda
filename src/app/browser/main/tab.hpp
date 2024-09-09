@@ -94,8 +94,8 @@ namespace app::browser::main
                     const int & PAGE_NUMBER
                 );
 
-            void session_restore();
-            void session_save();
+            int session_restore();
+            int session_save();
 
             void shutdown();
 
