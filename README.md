@@ -44,9 +44,11 @@ apt install git\
 
 ## Development
 
-### Structure
+### Introduction
 
-Application sources located at `src/app` folder, written by following principles:
+As project structure and codebase in development, this section would help with understand what is going on, before you start to read the sources.
+
+Currently, application sources located at `src/app` folder, written by following principles:
 
 * Every file implement (extend) one of GTK 4 Widgets, according to the functional subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
 * `src/app` does not contain other class types like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
