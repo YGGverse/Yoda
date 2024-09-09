@@ -4,7 +4,7 @@
 using namespace app::browser;
 
 Main::Main(
-    SQLite::Database & db,
+    sqlite3 * db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,

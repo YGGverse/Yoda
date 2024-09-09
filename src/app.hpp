@@ -1,6 +1,6 @@
 #include <glibmm/refptr.h>
 #include <gtkmm/application.h>
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <sqlite3.h>
 
 int main(
     int argc,

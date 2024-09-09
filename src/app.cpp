@@ -6,9 +6,11 @@ int main(
     char * argv[]
 ) {
     // Init database
-    SQLite::Database db(
+    sqlite3 * db;
+
+    sqlite3_open(
         "database.sqlite3",
-        SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE
+        &db
     );
 
     // Init application

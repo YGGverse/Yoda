@@ -5,7 +5,7 @@
 using namespace app;
 
 Browser::Browser(
-    SQLite::Database & db,
+    sqlite3 * db,
     const Glib::RefPtr<Gtk::Application> & APP
 ) {
     // Init window actions
