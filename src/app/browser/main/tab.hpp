@@ -27,7 +27,7 @@ namespace app::browser::main
             {
                 ID,
                 TIME,
-                REQUEST,
+                REQUEST
             };
         };
 
