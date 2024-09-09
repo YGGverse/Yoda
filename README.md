@@ -50,7 +50,7 @@ Project structure and codebase in development, it promise to grow. This section 
 
 #### `src/app`
 
-Currently, all application sources located at `src/app` folder, written by following principles:
+Currently, main application sources located at `src/app` folder, written by following principles:
 
 * Every file implement (extend) one of GTK 4 Widgets, according to the functional subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
 * `src/app` does not contain other class types like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
