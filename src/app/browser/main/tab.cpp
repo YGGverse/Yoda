@@ -70,12 +70,16 @@ Tab::Tab(
                 {
                     const int PAGE_NUMBER = append();
 
-                    /* @TODO set request
-                    ::sqlite3_column_text(
-                        statement,
-                        DB::APP_BROWSER_MAIN_TAB::REQUEST
+                    get_tabPage(
+                        PAGE_NUMBER
+                    )->set_navbar_request_text(
+                        reinterpret_cast<const char*>(
+                            ::sqlite3_column_text(
+                                statement,
+                                DB::APP_BROWSER_MAIN_TAB::REQUEST
+                            )
+                        )
                     );
-                    */
 
                     set_current_page(
                         PAGE_NUMBER
