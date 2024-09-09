@@ -23,7 +23,7 @@ namespace app::browser::main
 
         struct DB
         {
-            enum APP_BROWSER_MAIN_TAB
+            enum APP_BROWSER_MAIN_TAB_SESSION
             {
                 ID,
                 TIME,
@@ -94,9 +94,8 @@ namespace app::browser::main
                     const int & PAGE_NUMBER
                 );
 
-            void restore();
-
-            void save();
+            void session_restore();
+            void session_save();
 
             void shutdown();
 

@@ -49,8 +49,8 @@ namespace app::browser
                     void tab_page_navigation_history_back();
                     void tab_page_navigation_history_forward();
 
-                void tab_restore();
-                void tab_save();
+                void tab_session_restore();
+                void tab_session_save();
 
             void shutdown();
 

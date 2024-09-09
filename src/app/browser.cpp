@@ -155,7 +155,7 @@ Browser::Browser(
         "main_tab_session_restore",
         [this]
         {
-            browserMain->tab_restore();
+            browserMain->tab_session_restore();
         }
     );
 
@@ -163,7 +163,7 @@ Browser::Browser(
         "main_tab_session_save",
         [this]
         {
-            browserMain->tab_save();
+            browserMain->tab_session_save();
         }
     );
 

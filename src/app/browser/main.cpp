@@ -95,14 +95,14 @@ void Main::tab_page_navigation_history_forward()
     );
 };
 
-void Main::tab_restore()
+void Main::tab_session_restore()
 {
-    mainTab->restore();
+    mainTab->session_restore();
 };
 
-void Main::tab_save()
+void Main::tab_session_save()
 {
-    mainTab->save();
+    mainTab->session_save();
 };
 
 void Main::shutdown()

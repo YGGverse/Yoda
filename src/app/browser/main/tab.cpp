@@ -21,7 +21,7 @@ Tab::Tab(
         ::sqlite3_exec(
             db,
             R"SQL(
-                CREATE TABLE IF NOT EXISTS `app_browser_main_tab`
+                CREATE TABLE IF NOT EXISTS `app_browser_main_tab_session`
                 (
                     `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     `time`    INTEGER NOT NULL,
@@ -53,7 +53,7 @@ Tab::Tab(
         [this]
         {
             // Restore session from DB
-            restore();
+            session_restore();
         }
     );
 
@@ -66,14 +66,14 @@ Tab::Tab(
     );
 }
 
-void Tab::restore()
+void Tab::session_restore()
 {
     sqlite3_stmt* statement;
 
     const int PREPARE = ::sqlite3_prepare_v3(
         this->db,
         R"SQL(
-            SELECT * FROM `app_browser_main_tab` ORDER BY `number` ASC
+            SELECT * FROM `app_browser_main_tab_session` ORDER BY `number` ASC
         )SQL",
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -93,12 +93,12 @@ void Tab::restore()
                 reinterpret_cast<const char*>(
                     ::sqlite3_column_text(
                         statement,
-                        DB::APP_BROWSER_MAIN_TAB::REQUEST
+                        DB::APP_BROWSER_MAIN_TAB_SESSION::REQUEST
                     )
                 )
             );
 
-            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB::CURRENT) == 1)
+            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB_SESSION::CURRENT) == 1)
             {
                 set_current_page(
                     PAGE_NUMBER
@@ -112,7 +112,7 @@ void Tab::restore()
     );
 }
 
-void Tab::save()
+void Tab::session_save()
 {
     char * error; // @TODO
 
@@ -120,7 +120,7 @@ void Tab::save()
     ::sqlite3_exec(
         db,
         R"SQL(
-            DELETE FROM `app_browser_main_tab`
+            DELETE FROM `app_browser_main_tab_session`
         )SQL",
         nullptr,
         nullptr,
@@ -138,7 +138,7 @@ void Tab::save()
             db,
             Glib::ustring::sprintf(
                 R"SQL(
-                    INSERT INTO `app_browser_main_tab` (
+                    INSERT INTO `app_browser_main_tab_session` (
                         `time`,
                         `number`,
                         `current`,
@@ -163,7 +163,7 @@ void Tab::save()
 
 void Tab::shutdown()
 {
-    save();
+    session_save();
 
     // @TODO shutdown children components
 }
