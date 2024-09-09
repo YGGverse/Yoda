@@ -48,12 +48,15 @@ apt install git\
 
 Project structure and codebase in development, it promise to grow. This section would help with understand what is going on, before you start to work with code.
 
-Currently, application sources located at `src/app` folder, written by following principles:
+#### `src/app`
+
+Currently, all application sources located at `src/app` folder, written by following principles:
 
 * Every file implement (extend) one of GTK 4 Widgets, according to the functional subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
 * `src/app` does not contain other class types like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
 * Namespaces match filesystem path, where directory namespaces are lowercase
 * Every file work with it own, 1th level child only, to prevent massive logic levels keeping in mind
+* All classes (but window) never work with parents (including their dependencies) but may receive system data types as the arguments in constructors
 * To access any children features, deeper or higher than 1th level of current class, use delegation methods (actions, getters and setters)
 * One file - one class. If the file requires additional (GTK) component, this component should be placed at similar folder with same name as parent filename. So we have simple hierarchy navigation logic - from app to window, from window to it container, etc.
 * At this moment, all constants named with uppercase, const everything that not mutable
