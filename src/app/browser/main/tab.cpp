@@ -210,6 +210,10 @@ int Tab::append()
         REORDERABLE
     );
 
+    refresh(
+        PAGE_NUMBER
+    );
+
     return PAGE_NUMBER;
 };
 
