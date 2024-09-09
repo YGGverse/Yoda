@@ -83,6 +83,8 @@ void Tab::session_restore()
 
     if (PREPARE == SQLITE_OK)
     {
+        close_all();
+
         while (::sqlite3_step(statement) == SQLITE_ROW)
         {
             const int PAGE_NUMBER = append();
