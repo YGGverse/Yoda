@@ -46,7 +46,7 @@ apt install git\
 
 ### Introduction
 
-Project structure and codebase in development, this section would help with understand what is going on, before you start to read the sources.
+Project structure and codebase in development, this section would help with understand what is going on, before you start to work with code.
 
 Currently, application sources located at `src/app` folder, written by following principles:
 
