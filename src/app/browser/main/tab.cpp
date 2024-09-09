@@ -53,48 +53,7 @@ Tab::Tab(
         [this]
         {
             // Restore session from DB
-            sqlite3_stmt* statement;
-
-            const int PREPARE = ::sqlite3_prepare_v3(
-                this->db,
-                R"SQL(
-                    SELECT * FROM `app_browser_main_tab` ORDER BY `number` ASC
-                )SQL",
-                -1,
-                SQLITE_PREPARE_NORMALIZE,
-                &statement,
-                nullptr
-            );
-
-            if (PREPARE == SQLITE_OK)
-            {
-                while (::sqlite3_step(statement) == SQLITE_ROW)
-                {
-                    const int PAGE_NUMBER = append();
-
-                    get_tabPage(
-                        PAGE_NUMBER
-                    )->set_navbar_request_text(
-                        reinterpret_cast<const char*>(
-                            ::sqlite3_column_text(
-                                statement,
-                                DB::APP_BROWSER_MAIN_TAB::REQUEST
-                            )
-                        )
-                    );
-
-                    if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB::CURRENT) == 1)
-                    {
-                        set_current_page(
-                            PAGE_NUMBER
-                        );
-                    }
-                }
-            }
-
-            sqlite3_finalize(
-                statement
-            );
+            restore();
         }
     );
 
@@ -104,6 +63,52 @@ Tab::Tab(
             // Refresh window elements, e.g. tab label to header bar
             action__refresh->activate();
         }
+    );
+}
+
+void Tab::restore()
+{
+    sqlite3_stmt* statement;
+
+    const int PREPARE = ::sqlite3_prepare_v3(
+        this->db,
+        R"SQL(
+            SELECT * FROM `app_browser_main_tab` ORDER BY `number` ASC
+        )SQL",
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE == SQLITE_OK)
+    {
+        while (::sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const int PAGE_NUMBER = append();
+
+            get_tabPage(
+                PAGE_NUMBER
+            )->set_navbar_request_text(
+                reinterpret_cast<const char*>(
+                    ::sqlite3_column_text(
+                        statement,
+                        DB::APP_BROWSER_MAIN_TAB::REQUEST
+                    )
+                )
+            );
+
+            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB::CURRENT) == 1)
+            {
+                set_current_page(
+                    PAGE_NUMBER
+                );
+            }
+        }
+    }
+
+    sqlite3_finalize(
+        statement
     );
 }
 
