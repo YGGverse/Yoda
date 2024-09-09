@@ -21,6 +21,16 @@ namespace app::browser::main
         // Database
         sqlite3 * db;
 
+        struct DB
+        {
+            enum APP_BROWSER_MAIN_TAB
+            {
+                ID,
+                TIME,
+                REQUEST,
+            };
+        };
+
         // Actions
         Glib::RefPtr<Gio::SimpleAction> action__refresh,
                                         action__tab_close_active,
@@ -60,6 +70,7 @@ namespace app::browser::main
             );
 
             void append(
+                const unsigned char * REQUEST,
                 const bool & FOCUS
             );
 

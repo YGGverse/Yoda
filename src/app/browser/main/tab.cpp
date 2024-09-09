@@ -46,7 +46,44 @@ Tab::Tab(
         SCROLLABLE
     );
 
-    // Init event listeners
+    // Init events
+    signal_realize().connect(
+        [this]
+        {
+            // Restore session from DB
+            sqlite3_stmt* statement;
+
+            int prepare = sqlite3_prepare_v3(
+                this->db,
+                R"SQL(
+                    SELECT * FROM `app_browser_main_tab`
+                )SQL",
+                -1,
+                SQLITE_PREPARE_NORMALIZE,
+                &statement,
+                nullptr
+            );
+
+            if (prepare == SQLITE_OK)
+            {
+                while (sqlite3_step(statement) == SQLITE_ROW)
+                {
+                    append(
+                        sqlite3_column_text(
+                            statement,
+                            DB::APP_BROWSER_MAIN_TAB::REQUEST
+                        ),
+                        true
+                    );
+                }
+            }
+
+            sqlite3_finalize(
+                statement
+            );
+        }
+    );
+
     signal_switch_page().connect(
         [this](Gtk::Widget*, guint)
         {
@@ -54,8 +91,6 @@ Tab::Tab(
             action__refresh->activate();
         }
     );
-
-    // @TODO restore session from DB
 }
 
 void Tab::shutdown()
@@ -133,6 +168,7 @@ void Tab::refresh(
 }
 
 void Tab::append(
+    const unsigned char * REQUEST,
     const bool & FOCUS
 ) {
     auto tabPage = new tab::Page(
