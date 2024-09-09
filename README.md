@@ -49,7 +49,7 @@ apt install git\
 Main application sources located at `src/app` folder, by following principles:
 
 * Every file extends one of GTK 4 Widgets according to subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
-* `src/app` does not contain other class entities like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
+* `src/app` does not contain other class types like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
 * Namespaces match filesystem path, where directories are named lowercase
 * Every file work with it own, 1th level child only, to prevent massive logic levels keeping in mind
 * To access any children features, deeper or higher than 1th level of current class, use delegation methods (actions, getters and setters)
