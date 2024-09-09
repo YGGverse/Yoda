@@ -107,7 +107,7 @@ Tab::Tab(
     );
 }
 
-void Tab::shutdown()
+void Tab::save()
 {
     char * error; // @TODO
 
@@ -154,6 +154,11 @@ void Tab::shutdown()
             &error
         );
     }
+}
+
+void Tab::shutdown()
+{
+    save();
 
     // @TODO shutdown children components
 }
