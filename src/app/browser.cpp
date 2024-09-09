@@ -151,7 +151,22 @@ Browser::Browser(
             "<Primary>Right"
         );
 
-    // Init actions
+    const auto ACTION__MAIN_TAB_SESSION_RESTORE = add_action(
+        "main_tab_session_restore",
+        [this]
+        {
+            browserMain->tab_restore();
+        }
+    );
+
+    const auto ACTION__MAIN_TAB_SESSION_SAVE = add_action(
+        "main_tab_session_save",
+        [this]
+        {
+            browserMain->tab_save();
+        }
+    );
+
     const auto ACTION__QUIT = add_action(
         "quit",
         [this]
@@ -184,7 +199,9 @@ Browser::Browser(
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE,
+        ACTION__MAIN_TAB_SESSION_RESTORE,
+        ACTION__MAIN_TAB_SESSION_SAVE
     );
 
         set_titlebar(

@@ -95,6 +95,16 @@ void Main::tab_page_navigation_history_forward()
     );
 };
 
+void Main::tab_restore()
+{
+    mainTab->restore();
+};
+
+void Main::tab_save()
+{
+    mainTab->save();
+};
+
 void Main::shutdown()
 {
     mainTab->shutdown();

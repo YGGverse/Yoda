@@ -10,7 +10,9 @@ Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_SESSION_RESTORE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_SESSION_SAVE
 ) {
     // Init widget
     set_tooltip_text(
@@ -29,47 +31,68 @@ Menu::Menu(
                 )
             );
 
-            const auto MENU__MAIN_TAB_PAGE = Gio::Menu::create();
+                const auto MENU__MAIN_TAB_PAGE = Gio::Menu::create();
 
-                const auto MENU__MAIN_TAB_PAGE_NAVIGATION = Gio::Menu::create();
+                    const auto MENU__MAIN_TAB_PAGE_NAVIGATION = Gio::Menu::create();
 
-                    const auto MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY = Gio::Menu::create();
+                        const auto MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY = Gio::Menu::create();
 
-                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
-                            _("Back"),
+                            MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
+                                _("Back"),
+                                get_action_detailed_name(
+                                    ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK
+                                )
+                            );
+
+                            MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
+                                _("Forward"),
+                                get_action_detailed_name(
+                                    ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+                                )
+                            );
+
+                        MENU__MAIN_TAB_PAGE_NAVIGATION->append_submenu(
+                            _("History"),
+                            MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY
+                        );
+
+                        MENU__MAIN_TAB_PAGE_NAVIGATION->append(
+                            _("Update"),
                             get_action_detailed_name(
-                                ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK
+                                ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
                             )
                         );
 
-                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY->append(
-                            _("Forward"),
-                            get_action_detailed_name(
-                                ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD
-                            )
-                        );
-
-                    MENU__MAIN_TAB_PAGE_NAVIGATION->append_submenu(
-                        _("History"),
-                        MENU__MAIN_TAB_PAGE_NAVIGATION_HISTORY
+                    MENU__MAIN_TAB_PAGE->append_submenu(
+                        _("Navigation"),
+                        MENU__MAIN_TAB_PAGE_NAVIGATION
                     );
-
-                    MENU__MAIN_TAB_PAGE_NAVIGATION->append(
-                        _("Update"),
-                        get_action_detailed_name(
-                            ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
-                        )
-                    );
-
-                MENU__MAIN_TAB_PAGE->append_submenu(
-                    _("Navigation"),
-                    MENU__MAIN_TAB_PAGE_NAVIGATION
-                );
 
             MENU__MAIN_TAB->append_submenu(
                 _("Page"),
                 MENU__MAIN_TAB_PAGE
             );
+
+                const auto MENU__MAIN_TAB_SESSION = Gio::Menu::create();
+
+                    MENU__MAIN_TAB_SESSION->append(
+                        _("Restore"),
+                        get_action_detailed_name(
+                            ACTION__MAIN_TAB_SESSION_RESTORE
+                        )
+                    );
+
+                    MENU__MAIN_TAB_SESSION->append(
+                        _("Save"),
+                        get_action_detailed_name(
+                            ACTION__MAIN_TAB_SESSION_SAVE
+                        )
+                    );
+
+                MENU__MAIN_TAB->append_submenu(
+                    _("Session"),
+                    MENU__MAIN_TAB_SESSION
+                );
 
             const auto MENU__MAIN_TAB_CLOSE = Gio::Menu::create();
 
