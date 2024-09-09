@@ -30,6 +30,7 @@ namespace app::browser
 
             Header(
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__QUIT,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,

@@ -18,20 +18,6 @@ int main(
         "io.github.yggverse.Yoda"
     );
 
-        // Init actions
-        app->add_action(
-            "quit",
-            [app]
-            {
-                app->quit();
-            }
-        );
-
-            app->set_accel_for_action(
-                "app.quit",
-                "<Primary>q"
-            );
-
     // Launch browser component
     return app->make_window_and_run<app::Browser>(
         argc,

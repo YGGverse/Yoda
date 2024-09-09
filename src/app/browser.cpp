@@ -151,6 +151,20 @@ Browser::Browser(
             "<Primary>Right"
         );
 
+    // Init actions
+    const auto ACTION__QUIT = add_action(
+        "quit",
+        [this]
+        {
+            close();
+        }
+    );
+
+        APP->set_accel_for_action(
+            "win.quit",
+            "<Primary>q"
+        );
+
     // Init widget
     set_title(
         _("Yoda")
@@ -164,6 +178,7 @@ Browser::Browser(
     // Init components
     browserHeader = Gtk::make_managed<browser::Header>(
         ACTION__DEBUG,
+        ACTION__QUIT,
         ACTION__MAIN_TAB_APPEND,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,

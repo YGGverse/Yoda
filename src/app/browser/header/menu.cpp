@@ -4,6 +4,7 @@ using namespace app::browser::header;
 
 Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__QUIT,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
@@ -128,7 +129,9 @@ Menu::Menu(
 
         MENU__MAIN->append(
             _("Quit"),
-            "app.quit" // @TODO
+            get_action_detailed_name(
+                ACTION__QUIT
+            )
         );
 
     set_menu_model(

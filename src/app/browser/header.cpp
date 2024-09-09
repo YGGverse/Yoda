@@ -7,6 +7,7 @@ using namespace app::browser;
 
 Header::Header(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__QUIT,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
@@ -22,6 +23,7 @@ Header::Header(
     // Init components
     headerMenu = Gtk::make_managed<header::Menu>(
         ACTION__DEBUG,
+        ACTION__QUIT,
         ACTION__MAIN_TAB_APPEND,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,
