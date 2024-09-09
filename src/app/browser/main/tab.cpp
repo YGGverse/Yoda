@@ -53,7 +53,7 @@ Tab::Tab(
             // Restore session from DB
             sqlite3_stmt* statement;
 
-            int prepare = sqlite3_prepare_v3(
+            const int PREPARE = ::sqlite3_prepare_v3(
                 this->db,
                 R"SQL(
                     SELECT * FROM `app_browser_main_tab`
@@ -64,12 +64,12 @@ Tab::Tab(
                 nullptr
             );
 
-            if (prepare == SQLITE_OK)
+            if (PREPARE == SQLITE_OK)
             {
                 while (sqlite3_step(statement) == SQLITE_ROW)
                 {
                     append(
-                        sqlite3_column_text(
+                        ::sqlite3_column_text(
                             statement,
                             DB::APP_BROWSER_MAIN_TAB::REQUEST
                         ),
@@ -142,19 +142,19 @@ void Tab::shutdown()
 void Tab::refresh(
     const int & PAGE_NUMBER
 ) {
-    auto tabPage = get_tabPage(
+    const auto TAB_PAGE = get_tabPage(
         PAGE_NUMBER
     );
 
     get_tabLabel(
         PAGE_NUMBER
     )->set_label(
-        tabPage->get_title()
+        TAB_PAGE->get_title()
     );
 
-    tabPage->refresh(
-        tabPage->get_title(),
-        tabPage->get_subtitle(),
+    TAB_PAGE->refresh(
+        TAB_PAGE->get_title(),
+        TAB_PAGE->get_subtitle(),
         0 // @TODO
     );
 
@@ -171,31 +171,31 @@ void Tab::append(
     const unsigned char * REQUEST,
     const bool & FOCUS
 ) {
-    auto tabPage = new tab::Page(
+    const auto TAB_PAGE = new tab::Page(
         action__refresh,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
         action__tab_page_navigation_update
     );
 
-    auto tabLabel = new tab::Label(
+    const auto TAB_LABEL = new tab::Label(
         action__tab_close_active
     );
 
-    int page_number = append_page(
-        * tabPage,
-        * tabLabel
+    const int PAGE_NUMBER = append_page(
+        * TAB_PAGE,
+        * TAB_LABEL
     );
 
     set_tab_reorderable(
-        * tabPage,
+        * TAB_PAGE,
         REORDERABLE
     );
 
     if (FOCUS)
     {
         set_current_page(
-            page_number
+            PAGE_NUMBER
         );
     }
 };
@@ -258,51 +258,78 @@ void Tab::page_navigation_history_forward(
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(PAGE_NUMBER)->get_title();
+    return get_tabPage(
+        PAGE_NUMBER
+    )->get_title();
 };
 
 Glib::ustring Tab::get_page_subtitle(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(PAGE_NUMBER)->get_subtitle();
+    return get_tabPage(
+        PAGE_NUMBER
+    )->get_subtitle();
 };
 
 // Private helpers
 tab::Label * Tab::get_tabLabel(
     const int & PAGE_NUMBER
 ) {
-    auto pageWidget = get_nth_page(
+    // Get page pointer to find label widget
+    const auto PAGE = get_nth_page(
         PAGE_NUMBER
     );
 
-    if (pageWidget == nullptr)
-    {
-        throw _("Tab page not found!");  // @TODO
-    }
+        if (PAGE == nullptr)
+        {
+            throw _("Page not found!");  // @TODO
+        }
 
-    auto labelWidget = get_tab_label(
-        * pageWidget
+    // Get label widget by page pointer
+    const auto LABEL = get_tab_label(
+        * PAGE
     );
 
-    if (labelWidget == nullptr)
-    {
-        throw _("Tab label not found!"); // @TODO
-    }
+        if (LABEL == nullptr)
+        {
+            throw _("Label not found!"); // @TODO
+        }
 
-    return (tab::Label *) labelWidget;
+    // Downcast
+    const auto TAB_LABEL = dynamic_cast<tab::Label*>(
+        LABEL
+    );
+
+        if (TAB_LABEL == nullptr)
+        {
+            throw _("Tab label not found!"); // @TODO
+        }
+
+    return TAB_LABEL;
 }
 
 tab::Page * Tab::get_tabPage(
     const int & PAGE_NUMBER
 ) {
-    auto pageWidget = get_nth_page(
+    // Get page widget
+    const auto PAGE = get_nth_page(
         PAGE_NUMBER
     );
 
-    if (pageWidget == nullptr)
-    {
-        throw _("Tab page not found!"); // @TODO
-    }
+        if (PAGE == nullptr)
+        {
+            throw _("Page not found!"); // @TODO
+        }
 
-    return (tab::Page *) pageWidget;
+    // Downcast
+    const auto TAB_PAGE = dynamic_cast<tab::Page*>(
+        PAGE
+    );
+
+        if (TAB_PAGE == nullptr)
+        {
+            throw _("Tab page not found!"); // @TODO
+        }
+
+    return TAB_PAGE;
 }
