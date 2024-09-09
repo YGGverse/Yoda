@@ -46,7 +46,7 @@ apt install git\
 
 ### Structure
 
-Application sources located at `src/app` folder, by following basic principles:
+Main application sources located at `src/app` folder, by following basic principles:
 
 * Every file extends one of GTK 4 Widgets according to subject (e.g. `class Browser : public Gtk::ApplicationWindow`)
 * `src/app` does not contain other class entities like models or libraries (another folders and namespaces at `src` root are reserved for these needs)
@@ -54,6 +54,7 @@ Application sources located at `src/app` folder, by following basic principles:
 * To access any children features, deeper or higher than 1th level of current class, use delegation methods (actions, getters and setters)
 * One file - one class. If the file requires additional (GTK) component, this component should be placed at similar folder with same name as parent filename. So we have simple hierarchy navigation logic - from app to window, from window to it container, etc.
 * At this moment, all constants named with uppercase, const everything that not mutable
+* `#include` application `.hpp` files in `.cpp`. For system libraries, use headers only. Do not place system dependencies in `.cpp`
 
 ### Environment
 
