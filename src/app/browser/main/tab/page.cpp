@@ -271,3 +271,12 @@ Glib::ustring Page::get_navigation_request_text()
 {
     return pageNavigation->get_request_text();
 }
+
+// Setters
+void Page::set_navbar_request_text(
+    const Glib::ustring & VALUE
+) {
+    pageNavigation->set_request_text(
+        VALUE
+    );
+}

@@ -67,6 +67,11 @@ namespace app::browser::main::tab
             Glib::ustring get_subtitle();
 
             Glib::ustring get_navigation_request_text();
+
+            // Setters
+            void set_navbar_request_text(
+                const Glib::ustring & VALUE
+            );
     };
 }
 
