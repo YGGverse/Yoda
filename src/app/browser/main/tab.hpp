@@ -69,7 +69,7 @@ namespace app::browser::main
                 const int & PAGE_NUMBER // @TODO
             );
 
-            void append(
+            int append(
                 const unsigned char * REQUEST,
                 const bool & FOCUS
             );

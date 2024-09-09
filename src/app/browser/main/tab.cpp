@@ -167,7 +167,7 @@ void Tab::refresh(
     );
 }
 
-void Tab::append(
+int Tab::append(
     const unsigned char * REQUEST,
     const bool & FOCUS
 ) {
@@ -198,6 +198,8 @@ void Tab::append(
             PAGE_NUMBER
         );
     }
+
+    return PAGE_NUMBER;
 };
 
 void Tab::close(
