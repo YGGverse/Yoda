@@ -25,6 +25,8 @@ Tab::Tab(
                 (
                     `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     `time`    INTEGER NOT NULL,
+                    `number`  INTEGER NOT NULL,
+                    `current` INTEGER NOT NULL,
                     `request` VARCHAR(1024)
                 )
             )SQL",
@@ -56,7 +58,7 @@ Tab::Tab(
             const int PREPARE = ::sqlite3_prepare_v3(
                 this->db,
                 R"SQL(
-                    SELECT * FROM `app_browser_main_tab`
+                    SELECT * FROM `app_browser_main_tab` ORDER BY `number` ASC
                 )SQL",
                 -1,
                 SQLITE_PREPARE_NORMALIZE,
@@ -81,9 +83,12 @@ Tab::Tab(
                         )
                     );
 
-                    set_current_page(
-                        PAGE_NUMBER
-                    );
+                    if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB::CURRENT) == 1)
+                    {
+                        set_current_page(
+                            PAGE_NUMBER
+                        );
+                    }
                 }
             }
 
@@ -130,12 +135,18 @@ void Tab::shutdown()
                 R"SQL(
                     INSERT INTO `app_browser_main_tab` (
                         `time`,
+                        `number`,
+                        `current`,
                         `request`
                     ) VALUES (
                         CURRENT_TIMESTAMP,
+                        '%d',
+                        '%d',
                         '%s'
                     )
                 )SQL",
+                page_number,
+                page_number == get_current_page() ? 1 : 0,
                 tabPage->get_navigation_request_text()
             ).c_str(),
             nullptr,

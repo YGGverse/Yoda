@@ -27,6 +27,8 @@ namespace app::browser::main
             {
                 ID,
                 TIME,
+                NUMBER,
+                CURRENT,
                 REQUEST
             };
         };
