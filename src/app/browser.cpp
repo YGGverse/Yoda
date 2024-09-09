@@ -211,6 +211,8 @@ Browser::Browser(
         {
             browserMain->shutdown();
 
+            // @TODO sqlite3_close(db);
+
             return false;
         },
         true
