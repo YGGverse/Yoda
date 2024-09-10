@@ -25,27 +25,30 @@ namespace app::browser::main::tab
 
     class Page : public Gtk::Box
     {
-        // Extras
-        enum class MIME
-        {
-            TEXT_PLAIN,
-            TEXT_GEMINI,
-            UNDEFINED
-        };
+        public:
 
-        MIME mime;
-        Glib::ustring title;
-        Glib::ustring subtitle;
+            enum class MIME
+            {
+                TEXT_PLAIN,
+                TEXT_GEMINI,
+                UNDEFINED
+            };
 
-        // Socket
-        char buffer[0xfffff]; // 1Mb
+        private:
 
-        Glib::RefPtr<Gio::SocketClient> GioSocketClient;
-        Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
+            MIME mime;
+            Glib::ustring title;
+            Glib::ustring subtitle;
 
-        // Components
-        page::Content * pageContent;
-        page::Navigation * pageNavigation;
+            // Socket
+            char buffer[0xfffff]; // 1Mb
+
+            Glib::RefPtr<Gio::SocketClient> GioSocketClient;
+            Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
+
+            // Components
+            page::Content * pageContent;
+            page::Navigation * pageNavigation;
 
         public:
 
@@ -58,6 +61,7 @@ namespace app::browser::main::tab
 
             // Actions
             void refresh(
+                const MIME & MIME,
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE,
                 const double & PROGRESS_FRACTION

@@ -185,6 +185,7 @@ void Tab::refresh(
     );
 
     TAB_PAGE->refresh(
+        tab::Page::MIME::UNDEFINED,
         TAB_PAGE->get_title(),
         TAB_PAGE->get_subtitle(),
         0 // @TODO

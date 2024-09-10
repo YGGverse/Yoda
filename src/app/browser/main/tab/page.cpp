@@ -10,11 +10,6 @@ Page::Page(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
-    // Init extras
-    mime = MIME::UNDEFINED;
-    title = _("New page");
-    subtitle = "";
-
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         ACTION__REFRESH,
@@ -39,14 +34,16 @@ Page::Page(
     );
 
     refresh(
-        title,
-        subtitle,
+        MIME::UNDEFINED,
+        _("New page"),
+        "",
         0
     );
 }
 
 // Actions
 void Page::refresh(
+    const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & SUBTITLE,
     const double & PROGRESS_FRACTION
@@ -73,6 +70,7 @@ void Page::navigation_update(
 
     // Update page extras
     refresh(
+        MIME::UNDEFINED,
         pageNavigation->get_request_host(),
         Glib::ustring::sprintf(
             _("load %s.."),
@@ -108,6 +106,7 @@ void Page::navigation_update(
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
                 refresh(
+                    MIME::UNDEFINED,
                     pageNavigation->get_request_host(),
                     Glib::ustring::sprintf(
                         _("connect %s.."),
@@ -125,6 +124,7 @@ void Page::navigation_update(
                 catch (const Glib::Error & EXCEPTION)
                 {
                     refresh(
+                        MIME::UNDEFINED,
                         pageNavigation->get_request_host(),
                         EXCEPTION.what(), 1
                     );
@@ -141,6 +141,7 @@ void Page::navigation_update(
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                         {
                             refresh(
+                                MIME::UNDEFINED,
                                 pageNavigation->get_request_host(),
                                 Glib::ustring::sprintf(
                                     _("request %s.."),
@@ -156,6 +157,7 @@ void Page::navigation_update(
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
                                     refresh(
+                                        MIME::UNDEFINED,
                                         pageNavigation->get_request_host(),
                                         Glib::ustring::sprintf(
                                             _("reading %s.."),
@@ -176,7 +178,13 @@ void Page::navigation_update(
                                         // Route by mime type or path extension
                                         if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
                                         {
-                                            mime = MIME::TEXT_GEMINI;
+                                            refresh(
+                                                MIME::TEXT_GEMINI,
+                                                pageNavigation->get_request_host(), // @TODO title
+                                                pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                                           : pageNavigation->get_request_path()
+                                                , 1
+                                            );
 
                                             pageContent->set_text_gemini(
                                                 buffer // @TODO
@@ -185,10 +193,12 @@ void Page::navigation_update(
 
                                         else
                                         {
-                                            mime = MIME::UNDEFINED;
-
-                                            title = _("Oops");
-                                            subtitle = _("MIME type not supported");
+                                            refresh(
+                                                MIME::UNDEFINED,
+                                                _("Oops"),
+                                                _("MIME type not supported")
+                                                , 1
+                                            );
 
                                             pageContent->set_text_plain( // @TODO
                                                 subtitle
@@ -198,13 +208,14 @@ void Page::navigation_update(
 
                                     else
                                     {
-                                        mime = MIME::UNDEFINED;
-
-                                        title = _("Oops");
-
-                                        subtitle = Glib::ustring::sprintf(
-                                            _("Response code %s not supported"),
-                                            meta[1]
+                                        refresh(
+                                            MIME::UNDEFINED,
+                                            _("Oops"),
+                                            Glib::ustring::sprintf(
+                                                _("Response code %s not supported"),
+                                                meta[1]
+                                            )
+                                            , 1
                                         );
 
                                         pageContent->set_text_plain( // @TODO
@@ -215,6 +226,7 @@ void Page::navigation_update(
                                     GioSocketConnection->close();
 
                                     refresh(
+                                        MIME::UNDEFINED,
                                         pageNavigation->get_request_host(), // @TODO title
                                         pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
                                                                                    : pageNavigation->get_request_path()
