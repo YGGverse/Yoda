@@ -40,18 +40,18 @@ namespace app::browser::main
 
                     static int init(
                         sqlite3 * db
-                    ); // return SQLite status code
+                    ); // return sqlite3_exec status code
 
                     static int clean(
                         sqlite3 * db
-                    ); // return SQLite status code
+                    ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
                         const int & PAGE_NUMBER,
                         const bool & IS_CURRENT,
                         const Glib::ustring & LABEL_TEXT
-                    ); // return last insert ID
+                    ); // return sqlite3_last_insert_rowid
 
                 };
             };

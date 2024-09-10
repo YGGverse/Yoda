@@ -55,12 +55,12 @@ namespace app::browser::main::tab
 
                     static int init(
                         sqlite3 * db
-                    ); // return SQLite status code
+                    ); // return sqlite3_exec status code
 
                     static int clean(
                         sqlite3 * db,
                         const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
-                    ); // return SQLite status code
+                    ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
@@ -68,7 +68,7 @@ namespace app::browser::main::tab
                         const Page::MIME & MIME,
                         const Glib::ustring & TITLE,
                         const Glib::ustring & DESCRIPTION
-                    ); // return last insert ID
+                    ); // return sqlite3_last_insert_rowid
                 };
             };
 
