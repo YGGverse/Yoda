@@ -26,6 +26,14 @@ namespace app::browser::main::tab
     class Page : public Gtk::Box
     {
         // Extras
+        enum MIME
+        {
+            TEXT_PLAIN,
+            TEXT_GEMINI,
+            UNDEFINED
+        };
+
+        MIME mime;
         Glib::ustring title;
         Glib::ustring subtitle;
 
@@ -63,6 +71,7 @@ namespace app::browser::main::tab
             void navigation_history_forward();
 
             // Getters
+            Page::MIME get_mime();
             Glib::ustring get_title();
             Glib::ustring get_subtitle();
 

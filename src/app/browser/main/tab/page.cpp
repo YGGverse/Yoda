@@ -10,6 +10,11 @@ Page::Page(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
+    // Init extras
+    mime = MIME::UNDEFINED;
+    title = _("New page");
+    subtitle = "";
+
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         ACTION__REFRESH,
@@ -34,7 +39,9 @@ Page::Page(
     );
 
     refresh(
-        _("New page"), "", 0
+        title,
+        subtitle,
+        0
     );
 }
 
@@ -138,7 +145,7 @@ void Page::navigation_update(
                                 Glib::ustring::sprintf(
                                     _("request %s.."),
                                     pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                           : pageNavigation->get_request_path()
+                                                                               : pageNavigation->get_request_path()
                                 ), .5
                             );
 
@@ -153,7 +160,7 @@ void Page::navigation_update(
                                         Glib::ustring::sprintf(
                                             _("reading %s.."),
                                             pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                                   : pageNavigation->get_request_path()
+                                                                                       : pageNavigation->get_request_path()
                                         ), .75
                                     );
 
@@ -169,6 +176,8 @@ void Page::navigation_update(
                                         // Route by mime type or path extension
                                         if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
                                         {
+                                            mime = MIME::TEXT_GEMINI;
+
                                             pageContent->set_text_gemini(
                                                 buffer // @TODO
                                             );
@@ -176,6 +185,8 @@ void Page::navigation_update(
 
                                         else
                                         {
+                                            mime = MIME::TEXT_PLAIN;
+
                                             pageContent->set_text_plain(
                                                 _("MIME type not supported")
                                             );
@@ -194,7 +205,7 @@ void Page::navigation_update(
                                     refresh(
                                         pageNavigation->get_request_host(), // @TODO title
                                         pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                               : pageNavigation->get_request_path()
+                                                                                   : pageNavigation->get_request_path()
                                         , 1
                                     );
                                 }
@@ -257,6 +268,11 @@ void Page::navigation_history_forward()
 }
 
 // Getters
+Page::MIME Page::get_mime()
+{
+    return mime;
+}
+
 Glib::ustring Page::get_title()
 {
     return title;
