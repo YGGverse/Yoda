@@ -99,7 +99,9 @@ namespace app::browser::main
 
             int restore();
 
-            int save();
+            void clean();
+
+            void save();
 
             // Getters
             Glib::ustring get_page_title(
