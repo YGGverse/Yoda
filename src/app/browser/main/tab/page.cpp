@@ -10,6 +10,9 @@ Page::Page(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
+    // Init actions
+    action__refresh = ACTION__REFRESH;
+
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         ACTION__REFRESH,
@@ -33,30 +36,42 @@ Page::Page(
         Gtk::Orientation::VERTICAL
     );
 
-    refresh(
-        MIME::UNDEFINED,
-        _("New page"),
-        "",
-        0
+    // Connect events
+    signal_realize().connect(
+        [this]
+        {
+            update(
+                MIME::UNDEFINED,
+                _("New page"),
+                "",
+                0
+            );
+        }
     );
 }
 
 // Actions
-void Page::refresh(
+void Page::refresh()
+{
+    pageNavigation->refresh(
+        progress_fraction
+    );
+}
+
+void Page::update(
     const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
 ) {
     // Refresh page data
-    mime        = MIME;
-    title       = TITLE;
-    description = DESCRIPTION;
+    mime              = MIME;
+    title             = TITLE;
+    description       = DESCRIPTION;
+    progress_fraction = PROGRESS_FRACTION;
 
-    // Refresh components
-    pageNavigation->refresh(
-        PROGRESS_FRACTION
-    );
+    // Refresh parent window
+    action__refresh->activate();
 }
 
 void Page::navigation_update(
@@ -72,7 +87,7 @@ void Page::navigation_update(
     }
 
     // Update page extras
-    refresh(
+    update(
         MIME::UNDEFINED,
         _("Update"),
         Glib::ustring::sprintf(
@@ -109,7 +124,7 @@ void Page::navigation_update(
             pageNavigation->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
-                refresh(
+                update(
                     MIME::UNDEFINED,
                     _("Connect"),
                     Glib::ustring::sprintf(
@@ -128,7 +143,7 @@ void Page::navigation_update(
 
                 catch (const Glib::Error & EXCEPTION)
                 {
-                    refresh(
+                    update(
                         MIME::UNDEFINED,
                         _("Oops"),
                         EXCEPTION.what(),
@@ -146,7 +161,7 @@ void Page::navigation_update(
                         request.size(),
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                         {
-                            refresh(
+                            update(
                                 MIME::UNDEFINED,
                                 _("Request"),
                                 Glib::ustring::sprintf(
@@ -163,7 +178,7 @@ void Page::navigation_update(
                                 sizeof(buffer) - 1,
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
-                                    refresh(
+                                    update(
                                         MIME::UNDEFINED,
                                         _("Reading"),
                                         Glib::ustring::sprintf(
@@ -186,7 +201,7 @@ void Page::navigation_update(
                                         // Route by mime type or path extension
                                         if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
                                         {
-                                            refresh(
+                                            update(
                                                 MIME::TEXT_GEMINI,
                                                 pageNavigation->get_request_host(), // @TODO title
                                                 pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
@@ -202,7 +217,7 @@ void Page::navigation_update(
 
                                         else
                                         {
-                                            refresh(
+                                            update(
                                                 MIME::UNDEFINED,
                                                 _("Oops"),
                                                 _("MIME type not supported"),
@@ -217,7 +232,7 @@ void Page::navigation_update(
 
                                     else
                                     {
-                                        refresh(
+                                        update(
                                             MIME::UNDEFINED,
                                             _("Oops"),
                                             Glib::ustring::sprintf(

@@ -184,12 +184,7 @@ void Tab::refresh(
         TAB_PAGE->get_title()
     );
 
-    TAB_PAGE->refresh(
-        tab::Page::MIME::UNDEFINED,
-        TAB_PAGE->get_title(),
-        TAB_PAGE->get_description(),
-        0 // @TODO
-    );
+    TAB_PAGE->refresh();
 
     action__tab_close_active->set_enabled(
         get_n_pages() > 0
