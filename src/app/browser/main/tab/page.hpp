@@ -60,12 +60,12 @@ namespace app::browser::main::tab
 
                     static int clean(
                         sqlite3 * db,
-                        const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+                        const int & APP_BROWSER_MAIN_TAB__SESSION_ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
-                        const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+                        const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION_ID,
                         const Page::MIME & MIME,
                         const Glib::ustring & TITLE,
                         const Glib::ustring & DESCRIPTION
@@ -120,7 +120,7 @@ namespace app::browser::main::tab
             void refresh();
 
             int save(
-                const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION_ID
             );
 
             void update(

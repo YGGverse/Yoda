@@ -109,12 +109,12 @@ void Navigation::refresh(
 }
 
 int Navigation::save(
-    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
     return navigationRequest->save(
         DB::SESSION::add(
             db,
-            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
         )
     );
 }
@@ -225,7 +225,7 @@ int Navigation::DB::SESSION::init(
 
 int Navigation::DB::SESSION::clean(
     sqlite3 * db,
-    const int & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const int & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -236,7 +236,7 @@ int Navigation::DB::SESSION::clean(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_page_navigation__session` WHERE `app_browser_main_tab_page__session_id` = %d
             )SQL",
-            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
         ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -285,7 +285,7 @@ int Navigation::DB::SESSION::clean(
 
 sqlite3_int64 Navigation::DB::SESSION::add(
     sqlite3 * db,
-    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
     char * error; // @TODO
 
@@ -299,7 +299,7 @@ sqlite3_int64 Navigation::DB::SESSION::add(
                     '%d'
                 )
             )SQL",
-            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
         ).c_str(),
         nullptr,
         nullptr,

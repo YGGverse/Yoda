@@ -71,13 +71,13 @@ void Page::refresh()
 }
 
 int Page::save(
-    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
     // Delegate save action to child components
     return pageNavigation->save(
         DB::SESSION::add(
             db,
-            DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+            APP_BROWSER_MAIN_TAB__SESSION_ID,
             mime,
             title,
             description
@@ -390,7 +390,7 @@ int Page::DB::SESSION::init(
 
 int Page::DB::SESSION::clean(
     sqlite3 * db,
-    const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+    const int & APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -401,7 +401,7 @@ int Page::DB::SESSION::clean(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_page__session` WHERE `app_browser_main_tab__session_id` = %d
             )SQL",
-            DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+            APP_BROWSER_MAIN_TAB__SESSION_ID
         ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -450,7 +450,7 @@ int Page::DB::SESSION::clean(
 
 sqlite3_int64 Page::DB::SESSION::add(
     sqlite3 * db,
-    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION_ID,
     const Page::MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION
@@ -473,7 +473,7 @@ sqlite3_int64 Page::DB::SESSION::add(
                     '%s'
                 )
             )SQL",
-            DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+            APP_BROWSER_MAIN_TAB__SESSION_ID,
             MIME,
             TITLE,
             DESCRIPTION

@@ -39,12 +39,12 @@ namespace app::browser::main::tab::page::navigation
 
                     static int clean(
                         sqlite3 * db,
-                        const int & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                        const int & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
-                        const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
+                        const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
                         const Glib::ustring & TEXT
                     ); // return sqlite3_last_insert_rowid
                 };
@@ -96,7 +96,7 @@ namespace app::browser::main::tab::page::navigation
             );
 
             int save(
-                const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
             );
 
             // Getters
