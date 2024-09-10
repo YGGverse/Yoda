@@ -74,11 +74,12 @@ void Page::navigation_update(
     // Update page extras
     refresh(
         MIME::UNDEFINED,
-        pageNavigation->get_request_host(),
+        _("Update"),
         Glib::ustring::sprintf(
-            _("load %s.."),
+            _("Begin update for %s.."),
             pageNavigation->get_request_text()
-        ), 0
+        ),
+        0
     );
 
     // Connect scheme driver
@@ -110,11 +111,12 @@ void Page::navigation_update(
             {
                 refresh(
                     MIME::UNDEFINED,
-                    pageNavigation->get_request_host(),
+                    _("Connect"),
                     Glib::ustring::sprintf(
-                        _("connect %s.."),
+                        _("Connecting to %s.."),
                         pageNavigation->get_request_host()
-                    ), .25
+                    ),
+                    .25
                 );
 
                 try
@@ -128,8 +130,9 @@ void Page::navigation_update(
                 {
                     refresh(
                         MIME::UNDEFINED,
-                        pageNavigation->get_request_host(),
-                        EXCEPTION.what(), 1
+                        _("Oops"),
+                        EXCEPTION.what(),
+                        1
                     );
                 }
 
@@ -145,12 +148,13 @@ void Page::navigation_update(
                         {
                             refresh(
                                 MIME::UNDEFINED,
-                                pageNavigation->get_request_host(),
+                                _("Request"),
                                 Glib::ustring::sprintf(
-                                    _("request %s.."),
+                                    _("Begin request to %s.."),
                                     pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
                                                                                : pageNavigation->get_request_path()
-                                ), .5
+                                ),
+                                .5
                             );
 
                             // Response
@@ -161,12 +165,13 @@ void Page::navigation_update(
                                 {
                                     refresh(
                                         MIME::UNDEFINED,
-                                        pageNavigation->get_request_host(),
+                                        _("Reading"),
                                         Glib::ustring::sprintf(
-                                            _("reading %s.."),
+                                            _("Reading response from %s.."),
                                             pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
                                                                                        : pageNavigation->get_request_path()
-                                        ), .75
+                                        ),
+                                        .75
                                     );
 
                                     // Parse meta
@@ -186,7 +191,8 @@ void Page::navigation_update(
                                                 pageNavigation->get_request_host(), // @TODO title
                                                 pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
                                                                                            : pageNavigation->get_request_path()
-                                                , 1
+                                                ,
+                                                1
                                             );
 
                                             pageContent->set_text_gemini(
@@ -199,8 +205,8 @@ void Page::navigation_update(
                                             refresh(
                                                 MIME::UNDEFINED,
                                                 _("Oops"),
-                                                _("MIME type not supported")
-                                                , 1
+                                                _("MIME type not supported"),
+                                                1
                                             );
 
                                             pageContent->set_text_plain( // @TODO
@@ -217,8 +223,8 @@ void Page::navigation_update(
                                             Glib::ustring::sprintf(
                                                 _("Response code %s not supported"),
                                                 meta[1]
-                                            )
-                                            , 1
+                                            ),
+                                            1
                                         );
 
                                         pageContent->set_text_plain( // @TODO
@@ -227,14 +233,6 @@ void Page::navigation_update(
                                     }
 
                                     GioSocketConnection->close();
-
-                                    refresh(
-                                        MIME::UNDEFINED,
-                                        pageNavigation->get_request_host(), // @TODO title
-                                        pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                                   : pageNavigation->get_request_path()
-                                        , 1
-                                    );
                                 }
                             );
                         }
