@@ -105,7 +105,6 @@ int Page::save(
                     '%d',
                     CURRENT_TIMESTAMP,
                     '%d',
-                    '%d',
                     '%s',
                     '%s'
                 )
