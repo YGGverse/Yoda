@@ -85,11 +85,11 @@ void Request::refresh(
 }
 
 int Request::save(
-    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     return DB::SESSION::add(
         db,
-        APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
+        APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
         get_text()
     );
 }
@@ -161,7 +161,7 @@ int Request::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page_navigation_request__session`
             (
-                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab_page_navigation__session_id` INTEGER NOT NULL,
+                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab_page_navigation__session__id` INTEGER NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `text` VARCHAR (1024) NOT NULL
             )
@@ -174,7 +174,7 @@ int Request::DB::SESSION::init(
 
 int Request::DB::SESSION::clean(
     sqlite3 * db,
-    const int & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+    const int & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -184,9 +184,9 @@ int Request::DB::SESSION::clean(
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_page_navigation_request__session`
-                        WHERE `app_browser_main_tab_page_navigation__session_id` = %d
+                        WHERE `app_browser_main_tab_page_navigation__session__id` = %d
             )SQL",
-            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
         ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -230,7 +230,7 @@ int Request::DB::SESSION::clean(
 
 sqlite3_int64 Request::DB::SESSION::add(
     sqlite3 * db,
-    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
     const Glib::ustring & TEXT
 ) {
     char * error; // @TODO
@@ -240,14 +240,14 @@ sqlite3_int64 Request::DB::SESSION::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_page_navigation_request__session` (
-                    `app_browser_main_tab_page_navigation__session_id`,
+                    `app_browser_main_tab_page_navigation__session__id`,
                     `text`
                 ) VALUES (
                     '%d',
                     '%s'
                 )
             )SQL",
-            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
+            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
             TEXT
         ).c_str(),
         nullptr,

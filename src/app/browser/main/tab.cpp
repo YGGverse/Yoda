@@ -377,7 +377,7 @@ int Tab::DB::SESSION::clean(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB__SESSION_ID = sqlite3_column_int(
+            const int APP_BROWSER_MAIN_TAB__SESSION__ID = sqlite3_column_int(
                 statement,
                 DB::SESSION::ID
             );
@@ -389,7 +389,7 @@ int Tab::DB::SESSION::clean(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab__session` WHERE `id` = %d
                     )SQL",
-                    APP_BROWSER_MAIN_TAB__SESSION_ID
+                    APP_BROWSER_MAIN_TAB__SESSION__ID
                 ).c_str(),
                 nullptr,
                 nullptr,
@@ -401,7 +401,7 @@ int Tab::DB::SESSION::clean(
             {
                 tab::Page::DB::SESSION::clean(
                     db,
-                    APP_BROWSER_MAIN_TAB__SESSION_ID
+                    APP_BROWSER_MAIN_TAB__SESSION__ID
                 );
             }
         }

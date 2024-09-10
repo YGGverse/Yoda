@@ -109,12 +109,12 @@ void Navigation::refresh(
 }
 
 int Navigation::save(
-    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     return navigationRequest->save(
         DB::SESSION::add(
             db,
-            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
         )
     );
 }
@@ -213,7 +213,7 @@ int Navigation::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page_navigation__session`
             (
-                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab_page__session_id` INTEGER NOT NULL,
+                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab_page__session__id` INTEGER NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         )SQL",
@@ -225,7 +225,7 @@ int Navigation::DB::SESSION::init(
 
 int Navigation::DB::SESSION::clean(
     sqlite3 * db,
-    const int & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const int & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -234,9 +234,9 @@ int Navigation::DB::SESSION::clean(
         db,
         Glib::ustring::sprintf(
             R"SQL(
-                SELECT * FROM `app_browser_main_tab_page_navigation__session` WHERE `app_browser_main_tab_page__session_id` = %d
+                SELECT * FROM `app_browser_main_tab_page_navigation__session` WHERE `app_browser_main_tab_page__session__id` = %d
             )SQL",
-            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
         ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -248,7 +248,7 @@ int Navigation::DB::SESSION::clean(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID = sqlite3_column_int(
+            const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID = sqlite3_column_int(
                 statement,
                 DB::SESSION::ID
             );
@@ -260,7 +260,7 @@ int Navigation::DB::SESSION::clean(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab_page_navigation__session` WHERE `id` = %d
                     )SQL",
-                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
                 ).c_str(),
                 nullptr,
                 nullptr,
@@ -272,7 +272,7 @@ int Navigation::DB::SESSION::clean(
             {
                 navigation::Request::DB::SESSION::clean(
                     db,
-                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
                 );
             }
         }
@@ -285,7 +285,7 @@ int Navigation::DB::SESSION::clean(
 
 sqlite3_int64 Navigation::DB::SESSION::add(
     sqlite3 * db,
-    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     char * error; // @TODO
 
@@ -294,12 +294,12 @@ sqlite3_int64 Navigation::DB::SESSION::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_page_navigation__session` (
-                    `app_browser_main_tab_page__session_id`
+                    `app_browser_main_tab_page__session__id`
                 ) VALUES (
                     '%d'
                 )
             )SQL",
-            APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
         ).c_str(),
         nullptr,
         nullptr,
