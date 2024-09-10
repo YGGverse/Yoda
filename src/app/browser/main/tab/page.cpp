@@ -40,6 +40,7 @@ Page::Page(
     signal_realize().connect(
         [this]
         {
+            // Make initial data setup
             update(
                 MIME::UNDEFINED,
                 _("New page"),
