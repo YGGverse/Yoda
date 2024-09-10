@@ -3,6 +3,7 @@
 
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/object.h>
 
 namespace app::browser::header

@@ -11,6 +11,10 @@ Main::Main()
         Gtk::Orientation::VERTICAL
     );
 
+    set_valign(
+        Gtk::Align::CENTER
+    );
+
     set_homogeneous(
         HOMOGENEOUS
     );
