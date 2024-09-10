@@ -8,11 +8,17 @@
 using namespace app::browser::main::tab::page;
 
 Navigation::Navigation(
+    sqlite3 * db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
 ) {
+    // Init database
+    DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::init(
+        this->db = db
+    );
+
     // Init container
     set_orientation(
         Gtk::Orientation::HORIZONTAL
@@ -63,6 +69,7 @@ Navigation::Navigation(
         );
 
     navigationRequest = Gtk::make_managed<navigation::Request>(
+        db,
         ACTION__REFRESH,
         ACTION__NAVIGATION_UPDATE
     );
@@ -104,9 +111,12 @@ void Navigation::refresh(
 int Navigation::save(
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
-    navigationRequest->save();
-
-    return 1; // @TODO SQL
+    return navigationRequest->save(
+        DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::add(
+            db,
+            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+        )
+    );
 }
 
 void Navigation::history_add(
@@ -189,5 +199,114 @@ void Navigation::set_request_text(
 ) {
     navigationRequest->set_text(
         VALUE
+    );
+}
+
+// Database model
+int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::init(
+    sqlite3 * db
+) {
+    char * error;
+
+    return sqlite3_exec(
+        db,
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page_navigation__session`
+            (
+                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab_page__session_id` INTEGER NOT NULL,
+                `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
+}
+
+int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
+    sqlite3 * db,
+    const int & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+) {
+    char * error; // @TODO
+    sqlite3_stmt * statement;
+
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab_page_navigation__session` WHERE `app_browser_main_tab_page__session_id` = %d
+            )SQL",
+            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+        ).c_str(),
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        while (::sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID = sqlite3_column_int(
+                statement,
+                DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::ID
+            );
+
+            // Delete record
+            const int EXEC_STATUS = sqlite3_exec(
+                db,
+                Glib::ustring::sprintf(
+                    R"SQL(
+                        DELETE FROM `app_browser_main_tab_page_navigation__session` WHERE `id` = %d
+                    )SQL",
+                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                ).c_str(),
+                nullptr,
+                nullptr,
+                &error
+            );
+
+            // Delegate children dependencies cleanup
+            if (EXEC_STATUS == SQLITE_OK)
+            {
+                navigation::Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
+                    db,
+                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
+                );
+            }
+        }
+    }
+
+    return sqlite3_finalize(
+        statement
+    );
+}
+
+sqlite3_int64 Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::add(
+    sqlite3 * db,
+    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+) {
+    char * error; // @TODO
+
+    sqlite3_exec(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                INSERT INTO `app_browser_main_tab_page_navigation__session` (
+                    `app_browser_main_tab_page__session_id`
+                ) VALUES (
+                    '%d'
+                )
+            )SQL",
+            DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+        ).c_str(),
+        nullptr,
+        nullptr,
+        &error
+    );
+
+    return sqlite3_last_insert_rowid(
+        db
     );
 }

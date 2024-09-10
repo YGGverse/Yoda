@@ -35,8 +35,7 @@ Tab::Tab(
     signal_realize().connect(
         [this]
         {
-            // Restore session from DB
-            restore();
+            restore(); // last session from DB
         }
     );
 
@@ -82,6 +81,8 @@ int Tab::restore()
                     DB::APP_BROWSER_MAIN_TAB__SESSION::IS_CURRENT
                 ) == 1
             );
+
+            // @TODO restore child widget sessions
         }
     }
 
@@ -382,7 +383,7 @@ int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clean(
             );
 
             // Delete record
-            sqlite3_exec(
+            const int EXEC_STATUS = sqlite3_exec(
                 db,
                 Glib::ustring::sprintf(
                     R"SQL(
@@ -395,11 +396,14 @@ int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clean(
                 &error
             );
 
-            // Delegate cleanup childs
-            tab::Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
-                db,
-                APP_BROWSER_MAIN_TAB__SESSION_ID
-            );
+            // Delegate children dependencies cleanup
+            if (EXEC_STATUS == SQLITE_OK)
+            {
+                tab::Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
+                    db,
+                    APP_BROWSER_MAIN_TAB__SESSION_ID
+                );
+            }
         }
     }
 

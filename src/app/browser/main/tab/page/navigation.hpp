@@ -21,20 +21,65 @@ namespace app::browser::main::tab::page
 
     class Navigation : public Gtk::Box
     {
-        // Components
-        navigation::Base * navigationBase;
-        navigation::Bookmark * navigationBookmark;
-        navigation::History * navigationHistory;
-        navigation::Request * navigationRequest;
-        navigation::Update * navigationUpdate;
+        public:
 
-        // Defaults
-        const int SPACING = 8;
-        const int MARGIN = 8;
+            /*
+             * Class database
+             *
+             * Allowed parental access to enums and relationship methods
+             */
+            struct DB
+            {
+                struct APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION
+                {
+                    enum
+                    {
+                        ID,
+                        TIME
+                    }; // table fields index
 
+                    static int init(
+                        sqlite3 * db
+                    ); // return sqlite3_exec status code
+
+                    static int clean(
+                        sqlite3 * db,
+                        const int & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+                    ); // return sqlite3_finalize status code
+
+                    static sqlite3_int64 add(
+                        sqlite3 * db,
+                        const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+                    ); // return sqlite3_last_insert_rowid
+                };
+            };
+
+        /*
+         * Internal members
+         */
+        private:
+
+            // Database
+            sqlite3 * db;
+
+            // Components
+            navigation::Base * navigationBase;
+            navigation::Bookmark * navigationBookmark;
+            navigation::History * navigationHistory;
+            navigation::Request * navigationRequest;
+            navigation::Update * navigationUpdate;
+
+            // Defaults
+            const int SPACING = 8;
+            const int MARGIN = 8;
+
+        /*
+         * Class API
+         */
         public:
 
             Navigation(
+                sqlite3 * db,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,

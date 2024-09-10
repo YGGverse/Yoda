@@ -30,6 +30,7 @@ Page::Page(
 
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
+        this->db,
         ACTION__REFRESH,
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
@@ -74,7 +75,7 @@ int Page::save(
 ) {
     // Delegate save action to child components
     return pageNavigation->save(
-        Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
+        DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
             db,
             DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
             mime,
@@ -417,10 +418,8 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
                 DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::ID
             );
 
-            // @TODO Delegate cleanup to the child components
-
             // Delete record
-            sqlite3_exec(
+            const int EXEC_STATUS = sqlite3_exec(
                 db,
                 Glib::ustring::sprintf(
                     R"SQL(
@@ -432,6 +431,15 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
                 nullptr,
                 &error
             );
+
+            // Delegate children dependencies cleanup
+            if (EXEC_STATUS == SQLITE_OK)
+            {
+                page::Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
+                    db,
+                    APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+                );
+            }
         }
     }
 
