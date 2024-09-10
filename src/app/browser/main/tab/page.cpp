@@ -63,6 +63,13 @@ void Page::refresh()
     );
 }
 
+int Page::save()
+{
+    pageNavigation->save();
+
+    return 1; // @TODO SQL
+}
+
 void Page::update(
     const enum MIME & MIME,
     const Glib::ustring & TITLE,

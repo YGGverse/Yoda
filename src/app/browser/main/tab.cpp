@@ -129,7 +129,7 @@ int Tab::save()
         // Save current tab session
         for (int page_number = 0; page_number < get_n_pages(); page_number++)
         {
-            auto tabLabel = get_tabLabel(
+            const auto TAB_LABEL = get_tabLabel(
                 page_number
             );
 
@@ -151,12 +151,17 @@ int Tab::save()
                     )SQL",
                     page_number,
                     page_number == get_current_page() ? 1 : 0,
-                    tabLabel->get_text()
+                    TAB_LABEL->get_text()
                 ).c_str(),
                 nullptr,
                 nullptr,
                 &error
             );
+
+            // Delegate save action to the page component
+            get_tabPage(
+                page_number
+            )->save();
         }
     }
 

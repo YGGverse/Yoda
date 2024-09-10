@@ -70,6 +70,8 @@ namespace app::browser::main::tab
             // Actions
             void refresh();
 
+            int save();
+
             void update(
                 const MIME & MIME,
                 const Glib::ustring & TITLE,

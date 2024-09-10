@@ -45,6 +45,8 @@ namespace app::browser::main::tab::page
                 const double & PROGRESS_FRACTION
             );
 
+            int save();
+
             void history_add(
                 const Glib::ustring & REQUEST,
                 const bool & UPDATE_MEMORY_INDEX

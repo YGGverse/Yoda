@@ -101,6 +101,13 @@ void Navigation::refresh(
     );
 }
 
+int Navigation::save()
+{
+    navigationRequest->save();
+
+    return 1; // @TODO SQL
+}
+
 void Navigation::history_add(
     const Glib::ustring & REQUEST,
     const bool & UPDATE_MEMORY_INDEX

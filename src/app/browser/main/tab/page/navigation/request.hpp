@@ -46,6 +46,8 @@ namespace app::browser::main::tab::page::navigation
                 const double & PROGRESS_FRACTION
             );
 
+            int save();
+
             // Getters
             Glib::ustring get_scheme();
             Glib::ustring get_host();

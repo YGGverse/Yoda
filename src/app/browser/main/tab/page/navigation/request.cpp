@@ -78,6 +78,11 @@ void Request::refresh(
     );
 }
 
+int Request::save()
+{
+    return 1; // @TODO SQL
+}
+
 void Request::parse()
 {
     auto match = Glib::Regex::split_simple(
