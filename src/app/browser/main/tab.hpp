@@ -98,8 +98,6 @@ namespace app::browser::main
 
             int save();
 
-            void shutdown();
-
             // Getters
             Glib::ustring get_page_title(
                 const int & PAGE_NUMBER

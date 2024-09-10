@@ -105,11 +105,6 @@ void Main::tab_page_navigation_history_forward()
     );
 };
 
-void Main::shutdown()
-{
-    mainTab->shutdown();
-}
-
 // Getters
 Glib::ustring Main::get_current_tab_page_title()
 {

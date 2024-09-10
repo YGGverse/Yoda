@@ -226,7 +226,7 @@ Browser::Browser(
     signal_close_request().connect(
         [this]
         {
-            browserMain->shutdown();
+            browserMain->save();
 
             // @TODO sqlite3_close(db);
 

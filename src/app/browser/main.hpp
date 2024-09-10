@@ -53,8 +53,6 @@ namespace app::browser
                     void tab_page_navigation_history_back();
                     void tab_page_navigation_history_forward();
 
-            void shutdown();
-
             // Getters
             Glib::ustring get_current_tab_page_title();
             Glib::ustring get_current_tab_page_subtitle();

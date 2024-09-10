@@ -170,13 +170,6 @@ int Tab::save()
     return EXEC_STATUS;
 }
 
-void Tab::shutdown()
-{
-    save();
-
-    // @TODO shutdown children components
-}
-
 // Actions
 void Tab::refresh(
     const int & PAGE_NUMBER
