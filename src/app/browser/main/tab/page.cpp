@@ -48,9 +48,12 @@ void Page::refresh(
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
 ) {
-    title = TITLE; // @TODO copy
+    // Refresh page data
+    mime        = MIME;
+    title       = TITLE;
     description = DESCRIPTION;
 
+    // Refresh components
     pageNavigation->refresh(
         PROGRESS_FRACTION
     );
