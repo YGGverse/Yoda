@@ -369,7 +369,7 @@ int Page::DB::init(
 ) {
     char * error;
 
-    return ::sqlite3_exec(
+    return sqlite3_exec(
         db,
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page__session`
@@ -394,7 +394,7 @@ int Page::DB::clear(
     char * error; // @TODO
     sqlite3_stmt * statement;
 
-    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
         Glib::ustring::sprintf(
             R"SQL(
@@ -412,7 +412,7 @@ int Page::DB::clear(
     {
         while (::sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID = ::sqlite3_column_int(
+            const int APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID = sqlite3_column_int(
                 statement,
                 DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::ID
             );
@@ -420,7 +420,7 @@ int Page::DB::clear(
             // @TODO Delegate cleanup to the child components
 
             // Delete record
-            ::sqlite3_exec(
+            sqlite3_exec(
                 db,
                 Glib::ustring::sprintf(
                     R"SQL(
@@ -435,7 +435,7 @@ int Page::DB::clear(
         }
     }
 
-    return ::sqlite3_finalize(
+    return sqlite3_finalize(
         statement
     );
 }
@@ -449,7 +449,7 @@ sqlite3_int64 Page::DB::add(
 ) {
     char * error; // @TODO
 
-    ::sqlite3_exec(
+    sqlite3_exec(
         db,
         Glib::ustring::sprintf(
             R"SQL(
@@ -477,7 +477,7 @@ sqlite3_int64 Page::DB::add(
         &error
     );
 
-    return ::sqlite3_last_insert_rowid(
+    return sqlite3_last_insert_rowid(
         db
     );
 }

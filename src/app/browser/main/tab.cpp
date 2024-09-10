@@ -53,7 +53,7 @@ int Tab::restore()
 {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
 
-    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
         R"SQL(
             SELECT * FROM `app_browser_main_tab__session` ORDER BY `page_number` ASC
@@ -72,12 +72,12 @@ int Tab::restore()
         {
             const int PAGE_NUMBER = append(
                 reinterpret_cast<const char*>(
-                    ::sqlite3_column_text(
+                    sqlite3_column_text(
                         statement,
                         DB::APP_BROWSER_MAIN_TAB__SESSION::LABEL_TEXT
                     )
                 ),
-                ::sqlite3_column_int(
+                sqlite3_column_int(
                     statement,
                     DB::APP_BROWSER_MAIN_TAB__SESSION::IS_CURRENT
                 ) == 1
@@ -85,7 +85,7 @@ int Tab::restore()
         }
     }
 
-    ::sqlite3_finalize(
+    sqlite3_finalize(
         statement
     );
 
@@ -338,7 +338,7 @@ int Tab::DB::init(
 ) {
     char * error;
 
-    return ::sqlite3_exec(
+    return sqlite3_exec(
         db,
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
@@ -362,7 +362,7 @@ int Tab::DB::clear(
     char * error; // @TODO
     sqlite3_stmt * statement;
 
-    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
         R"SQL(
             SELECT * FROM `app_browser_main_tab__session`
@@ -377,13 +377,13 @@ int Tab::DB::clear(
     {
         while (::sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB__SESSION_ID = ::sqlite3_column_int(
+            const int APP_BROWSER_MAIN_TAB__SESSION_ID = sqlite3_column_int(
                 statement,
                 DB::APP_BROWSER_MAIN_TAB__SESSION::ID
             );
 
             // Delete record
-            ::sqlite3_exec(
+            sqlite3_exec(
                 db,
                 Glib::ustring::sprintf(
                     R"SQL(
@@ -404,7 +404,7 @@ int Tab::DB::clear(
         }
     }
 
-    return ::sqlite3_finalize(
+    return sqlite3_finalize(
         statement
     );
 }
@@ -417,7 +417,7 @@ sqlite3_int64 Tab::DB::add(
 ) {
     char * error; // @TODO
 
-    ::sqlite3_exec(
+    sqlite3_exec(
         db,
         Glib::ustring::sprintf(
             R"SQL(
@@ -442,7 +442,7 @@ sqlite3_int64 Tab::DB::add(
         &error
     );
 
-    return ::sqlite3_last_insert_rowid(
+    return sqlite3_last_insert_rowid(
         db
     );
 }
