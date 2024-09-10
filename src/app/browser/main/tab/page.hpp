@@ -37,31 +37,34 @@ namespace app::browser::main::tab
 
             struct DB
             {
-                enum APP_BROWSER_MAIN_TAB_PAGE__SESSION
+                struct APP_BROWSER_MAIN_TAB_PAGE__SESSION
                 {
-                    ID,
-                    TIME,
-                    MIME,
-                    TITLE,
-                    DESCRIPTION
+                    enum
+                    {
+                        ID,
+                        TIME,
+                        MIME,
+                        TITLE,
+                        DESCRIPTION
+                    };
+
+                    static int init(
+                        sqlite3 * db
+                    );
+
+                    static int clear(
+                        sqlite3 * db,
+                        const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+                    );
+
+                    static sqlite3_int64 add(
+                        sqlite3 * db,
+                        const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+                        const Page::MIME & MIME,
+                        const Glib::ustring & TITLE,
+                        const Glib::ustring & DESCRIPTION
+                    );
                 };
-
-                static int init(
-                    sqlite3 * db
-                );
-
-                static int clear(
-                    sqlite3 * db,
-                    const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
-                );
-
-                static sqlite3_int64 add(
-                    sqlite3 * db,
-                    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
-                    const Page::MIME & MIME,
-                    const Glib::ustring & TITLE,
-                    const Glib::ustring & DESCRIPTION
-                );
             };
 
         private:

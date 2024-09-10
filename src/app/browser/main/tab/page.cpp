@@ -24,7 +24,7 @@ Page::Page(
     action__refresh = ACTION__REFRESH;
 
     // Init database
-    DB::init(
+    DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
         this->db = db
     );
 
@@ -74,7 +74,7 @@ int Page::save(
 ) {
     // Delegate save action to child components
     return pageNavigation->save(
-        Page::DB::add(
+        Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
             db,
             DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
             mime,
@@ -364,7 +364,7 @@ void Page::set_navbar_request_text(
 }
 
 // Database model
-int Page::DB::init(
+int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
     sqlite3 * db
 ) {
     char * error;
@@ -387,7 +387,7 @@ int Page::DB::init(
     );
 }
 
-int Page::DB::clear(
+int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clear(
     sqlite3 * db,
     const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
@@ -440,7 +440,7 @@ int Page::DB::clear(
     );
 }
 
-sqlite3_int64 Page::DB::add(
+sqlite3_int64 Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
     sqlite3 * db,
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
     const Page::MIME & MIME,

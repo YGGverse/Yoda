@@ -22,29 +22,33 @@ namespace app::browser::main
 
             struct DB
             {
-                enum APP_BROWSER_MAIN_TAB__SESSION
+                struct APP_BROWSER_MAIN_TAB__SESSION
                 {
-                    ID,
-                    TIME,
-                    PAGE_NUMBER,
-                    IS_CURRENT,
-                    LABEL_TEXT
+                    enum
+                    {
+                        ID,
+                        TIME,
+                        PAGE_NUMBER,
+                        IS_CURRENT,
+                        LABEL_TEXT
+                    };
+
+                    static int init(
+                        sqlite3 * db
+                    );
+
+                    static int clear(
+                        sqlite3 * db
+                    );
+
+                    static sqlite3_int64 add(
+                        sqlite3 * db,
+                        const int & PAGE_NUMBER,
+                        const bool & IS_CURRENT,
+                        const Glib::ustring & LABEL_TEXT
+                    );
+
                 };
-
-                static int init(
-                    sqlite3 * db
-                );
-
-                static int clear(
-                    sqlite3 * db
-                );
-
-                static sqlite3_int64 add(
-                    sqlite3 * db,
-                    const int & PAGE_NUMBER,
-                    const bool & IS_CURRENT,
-                    const Glib::ustring & LABEL_TEXT
-                );
             };
 
         private:

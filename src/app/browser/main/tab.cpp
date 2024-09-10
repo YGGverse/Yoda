@@ -14,7 +14,7 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init database
-    DB::init(
+    DB::APP_BROWSER_MAIN_TAB__SESSION::init(
         this->db = db
     );
 
@@ -94,7 +94,7 @@ int Tab::restore()
 
 void Tab::clear() // @TODO menu action?
 {
-    DB::clear(
+    DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
         db
     );
 
@@ -106,7 +106,7 @@ void Tab::save()
     char * error; // @TODO
 
     // Delete previous data
-    DB::clear(
+    DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
         db
     );
 
@@ -117,7 +117,7 @@ void Tab::save()
         get_tabPage(
             page_number
         )->save(
-            DB::add(
+            DB::APP_BROWSER_MAIN_TAB__SESSION::add(
                 db,
                 page_number,
                 page_number == get_current_page() ? 1 : 0,
@@ -331,9 +331,8 @@ tab::Page * Tab::get_tabPage(
     return TAB_PAGE;
 }
 
-
-// Database model
-int Tab::DB::init(
+// Database
+int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::init(
     sqlite3 * db
 ) {
     char * error;
@@ -356,7 +355,7 @@ int Tab::DB::init(
     );
 }
 
-int Tab::DB::clear(
+int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
     sqlite3 * db
 ) {
     char * error; // @TODO
@@ -397,7 +396,7 @@ int Tab::DB::clear(
             );
 
             // Delegate cleanup childs
-            tab::Page::DB::clear(
+            tab::Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clear(
                 db,
                 APP_BROWSER_MAIN_TAB__SESSION_ID
             );
@@ -409,7 +408,7 @@ int Tab::DB::clear(
     );
 }
 
-sqlite3_int64 Tab::DB::add(
+sqlite3_int64 Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::add(
     sqlite3 * db,
     const int & PAGE_NUMBER,
     const bool & IS_CURRENT,
