@@ -15,7 +15,7 @@ Navigation::Navigation(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
 ) {
     // Init database
-    DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::init(
+    DB::SESSION::init(
         this->db = db
     );
 
@@ -112,7 +112,7 @@ int Navigation::save(
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
     return navigationRequest->save(
-        DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::add(
+        DB::SESSION::add(
             db,
             DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
         )
@@ -203,7 +203,7 @@ void Navigation::set_request_text(
 }
 
 // Database model
-int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::init(
+int Navigation::DB::SESSION::init(
     sqlite3 * db
 ) {
     char * error;
@@ -223,7 +223,7 @@ int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::init(
     );
 }
 
-int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
+int Navigation::DB::SESSION::clean(
     sqlite3 * db,
     const int & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {
@@ -250,7 +250,7 @@ int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
         {
             const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID = sqlite3_column_int(
                 statement,
-                DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::ID
+                DB::SESSION::ID
             );
 
             // Delete record
@@ -270,7 +270,7 @@ int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                navigation::Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
+                navigation::Request::DB::SESSION::clean(
                     db,
                     APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
                 );
@@ -283,7 +283,7 @@ int Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
     );
 }
 
-sqlite3_int64 Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::add(
+sqlite3_int64 Navigation::DB::SESSION::add(
     sqlite3 * db,
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
 ) {

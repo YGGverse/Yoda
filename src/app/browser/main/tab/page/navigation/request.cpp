@@ -9,7 +9,7 @@ Request::Request(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
-    DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::init(
+    DB::SESSION::init(
         this->db = db
     );
 
@@ -87,7 +87,7 @@ void Request::refresh(
 int Request::save(
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
 ) {
-    return DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::add(
+    return DB::SESSION::add(
         db,
         DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
         get_text()
@@ -151,7 +151,7 @@ Glib::ustring Request::get_query()
 }
 
 // Database model
-int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::init(
+int Request::DB::SESSION::init(
     sqlite3 * db
 ) {
     char * error;
@@ -172,7 +172,7 @@ int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::init(
     );
 }
 
-int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
+int Request::DB::SESSION::clean(
     sqlite3 * db,
     const int & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
 ) {
@@ -183,7 +183,8 @@ int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
         db,
         Glib::ustring::sprintf(
             R"SQL(
-                SELECT * FROM `app_browser_main_tab_page_navigation_request__session` WHERE `app_browser_main_tab_page_navigation__session_id` = %d
+                SELECT * FROM `app_browser_main_tab_page_navigation_request__session`
+                        WHERE `app_browser_main_tab_page_navigation__session_id` = %d
             )SQL",
             DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID
         ).c_str(),
@@ -199,7 +200,7 @@ int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
         {
             const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION_ID = sqlite3_column_int(
                 statement,
-                DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::ID
+                DB::SESSION::ID
             );
 
             // Delete record
@@ -229,7 +230,7 @@ int Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::clean(
     );
 }
 
-sqlite3_int64 Request::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION::add(
+sqlite3_int64 Request::DB::SESSION::add(
     sqlite3 * db,
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID,
     const Glib::ustring & TEXT

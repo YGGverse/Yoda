@@ -30,7 +30,8 @@ namespace app::browser::main::tab::page
              */
             struct DB
             {
-                struct APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION
+                // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__*
+                struct SESSION
                 {
                     enum
                     {

@@ -24,7 +24,7 @@ Page::Page(
     action__refresh = ACTION__REFRESH;
 
     // Init database
-    DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
+    DB::SESSION::init(
         this->db = db
     );
 
@@ -75,7 +75,7 @@ int Page::save(
 ) {
     // Delegate save action to child components
     return pageNavigation->save(
-        DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
+        DB::SESSION::add(
             db,
             DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
             mime,
@@ -365,7 +365,7 @@ void Page::set_navbar_request_text(
 }
 
 // Database model
-int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
+int Page::DB::SESSION::init(
     sqlite3 * db
 ) {
     char * error;
@@ -388,7 +388,7 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
     );
 }
 
-int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
+int Page::DB::SESSION::clean(
     sqlite3 * db,
     const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
@@ -415,7 +415,7 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
         {
             const int APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID = sqlite3_column_int(
                 statement,
-                DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::ID
+                DB::SESSION::ID
             );
 
             // Delete record
@@ -435,7 +435,7 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                page::Navigation::DB::APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION::clean(
+                page::Navigation::DB::SESSION::clean(
                     db,
                     APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
                 );
@@ -448,7 +448,7 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
     );
 }
 
-sqlite3_int64 Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::add(
+sqlite3_int64 Page::DB::SESSION::add(
     sqlite3 * db,
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
     const Page::MIME & MIME,
