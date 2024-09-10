@@ -117,7 +117,7 @@ namespace app::browser::main::tab
             );
 
             // Actions
-            void refresh();
+            void update();
 
             int save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID

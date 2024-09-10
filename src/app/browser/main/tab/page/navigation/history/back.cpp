@@ -29,7 +29,7 @@ Back::Back(
     );
 }
 
-void Back::refresh(
+void Back::update(
     const bool & ENABLED
 ) {
     set_sensitive(

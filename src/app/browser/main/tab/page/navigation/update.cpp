@@ -29,7 +29,7 @@ Update::Update(
     );
 }
 
-void Update::refresh(
+void Update::update(
     const bool & ENABLED
 ) {
     set_sensitive(

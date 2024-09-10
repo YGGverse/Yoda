@@ -119,7 +119,7 @@ namespace app::browser::main
                     const int & PAGE_NUMBER
                 );
 
-            void refresh(
+            void update(
                 const int & PAGE_NUMBER
             );
 

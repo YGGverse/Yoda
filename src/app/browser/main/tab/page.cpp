@@ -63,9 +63,9 @@ Page::Page(
 }
 
 // Actions
-void Page::refresh()
+void Page::update()
 {
-    pageNavigation->refresh(
+    pageNavigation->update(
         progress_fraction
     );
 }

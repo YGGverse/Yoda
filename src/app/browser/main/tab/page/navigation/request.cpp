@@ -51,7 +51,7 @@ Request::Request(
 }
 
 // Actions
-void Request::refresh(
+void Request::update(
     const double & PROGRESS_FRACTION
 ) {
     // Update progress

@@ -53,7 +53,7 @@ Header::Header(
         );
 }
 
-void Header::refresh(
+void Header::update(
     const Glib::ustring & TITLE,
     const Glib::ustring & SUBTITLE
 ) {

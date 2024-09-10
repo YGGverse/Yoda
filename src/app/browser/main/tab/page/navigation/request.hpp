@@ -91,7 +91,7 @@ namespace app::browser::main::tab::page::navigation
             );
 
             // Actions
-            void refresh(
+            void update(
                 const double & PROGRESS_FRACTION
             );
 

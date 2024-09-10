@@ -38,9 +38,9 @@ Main::Main(
 }
 
 // Actions
-void Main::refresh()
+void Main::update()
 {
-    mainTab->refresh(
+    mainTab->update(
         mainTab->get_current_page()
     );
 };

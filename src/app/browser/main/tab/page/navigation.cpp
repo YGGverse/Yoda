@@ -86,7 +86,7 @@ Navigation::Navigation(
 }
 
 // Actions
-void Navigation::refresh(
+void Navigation::update(
     const double & PROGRESS_FRACTION
 ) {
     // Toggle base button sensibility
@@ -95,15 +95,15 @@ void Navigation::refresh(
     );
 
     // Refresh history widget
-    navigationHistory->refresh();
+    navigationHistory->update();
 
     // Toggle update button sensibility
-    navigationUpdate->refresh(
+    navigationUpdate->update(
         navigationRequest->get_text_length() > 0
     );
 
     // Refresh request area (with progressbar)
-    navigationRequest->refresh(
+    navigationRequest->update(
         PROGRESS_FRACTION
     );
 }

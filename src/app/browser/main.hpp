@@ -37,7 +37,7 @@ namespace app::browser
             );
 
             // Actions
-            void refresh();
+            void update();
             void restore();
             void save();
 

@@ -13,9 +13,9 @@ Browser::Browser(
         "refresh",
         [this]
         {
-            browserMain->refresh();
+            browserMain->update();
 
-            browserHeader->refresh(
+            browserHeader->update(
                 browserMain->get_current_tab_page_title(),
                 browserMain->get_current_tab_page_description()
             );

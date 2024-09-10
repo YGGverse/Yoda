@@ -18,7 +18,7 @@ namespace app::browser::main::tab::page::navigation::history
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__FORWARD
             );
 
-            void refresh(
+            void update(
                 const bool & ENABLED
             );
     };

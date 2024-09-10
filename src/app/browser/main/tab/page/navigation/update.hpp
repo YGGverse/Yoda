@@ -18,7 +18,7 @@ namespace app::browser::main::tab::page::navigation
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
 
-            void refresh(
+            void update(
                 const bool & ENABLED
             );
     };

@@ -29,7 +29,7 @@ Forward::Forward(
     );
 }
 
-void Forward::refresh(
+void Forward::update(
     const bool & ENABLED
 ) {
     set_sensitive(

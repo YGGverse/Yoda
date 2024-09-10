@@ -41,7 +41,7 @@ namespace app::browser
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
             );
 
-            void refresh(
+            void update(
                 const Glib::ustring & TITLE,
                 const Glib::ustring & SUBTITLE
             );

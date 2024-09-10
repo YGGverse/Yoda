@@ -131,7 +131,7 @@ void Tab::save()
 }
 
 // Actions
-void Tab::refresh(
+void Tab::update(
     const int & PAGE_NUMBER
 ) {
     const auto TAB_PAGE = get_tabPage(
@@ -144,7 +144,7 @@ void Tab::refresh(
         TAB_PAGE->get_title()
     );
 
-    TAB_PAGE->refresh();
+    TAB_PAGE->update();
 
     action__tab_close_active->set_enabled(
         get_n_pages() > 0
@@ -192,7 +192,7 @@ int Tab::append(
         );
     }
 
-    refresh(
+    update(
         PAGE_NUMBER
     );
 

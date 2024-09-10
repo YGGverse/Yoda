@@ -30,18 +30,18 @@ History::History(
 }
 
 // Actions
-void History::refresh()
+void History::update()
 {
     Memory match;
 
-    historyBack->refresh(
+    historyBack->update(
         try_back(
             match,
             false
         )
     );
 
-    historyForward->refresh(
+    historyForward->update(
         try_forward(
             match,
             false

@@ -50,7 +50,7 @@ namespace app::browser::main::tab::page::navigation
                 const bool & UPDATE_MEMORY_INDEX
             );
 
-            void refresh();
+            void update();
 
             void save(); // @TODO save history to the permanent storage
 
