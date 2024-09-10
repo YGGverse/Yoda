@@ -375,7 +375,7 @@ int Page::DB::init(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page__session`
             (
                 `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session_id` INTEGER NOT NULL,
-                `time`        INTEGER NOT NULL,
+                `time`        INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `mime`        INTEGER NOT NULL,
                 `title`       VARCHAR(1024) NOT NULL,
                 `description` VARCHAR(1024) NOT NULL
@@ -455,13 +455,11 @@ sqlite3_int64 Page::DB::add(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_page__session` (
                     `app_browser_main_tab__session_id`,
-                    `time`,
                     `mime`,
                     `title`,
                     `description`
                 ) VALUES (
                     '%d',
-                    CURRENT_TIMESTAMP,
                     '%d',
                     '%s',
                     '%s'

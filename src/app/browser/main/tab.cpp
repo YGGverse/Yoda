@@ -344,7 +344,7 @@ int Tab::DB::init(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
             (
                 `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time`        INTEGER NOT NULL,
+                `time`        INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `page_number` INTEGER NOT NULL,
                 `is_current`  INTEGER NOT NULL,
                 `label_text`  VARCHAR(1024)
@@ -422,12 +422,10 @@ sqlite3_int64 Tab::DB::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab__session` (
-                    `time`,
                     `page_number`,
                     `is_current`,
                     `label_text`
                 ) VALUES (
-                    CURRENT_TIMESTAMP,
                     '%d',
                     '%d',
                     '%s'
