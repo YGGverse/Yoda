@@ -61,6 +61,7 @@ Currently, main application sources located at `src/app` folder, written by foll
 * One file - one class. If the file requires additional (GTK) component, this component should be placed at similar folder with same name as parent filename. So we have simple hierarchy navigation logic - from app to window, from window to it container, etc.
 * At this moment, all constants named with uppercase, const everything that not mutable
 * `#include` application `.hpp` files in `.cpp`. For system libraries, use headers only. Do not place system dependencies in `.cpp`
+* App interact SQLite database, where table name match related class namespace, it may contain optional feature postfix (separated with double line)
 
 ### Environment
 
