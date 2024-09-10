@@ -52,7 +52,7 @@ namespace app::browser::main::tab
                         sqlite3 * db
                     );
 
-                    static int clear(
+                    static int clean(
                         sqlite3 * db,
                         const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
                     );

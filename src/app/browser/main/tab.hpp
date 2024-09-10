@@ -37,7 +37,7 @@ namespace app::browser::main
                         sqlite3 * db
                     );
 
-                    static int clear(
+                    static int clean(
                         sqlite3 * db
                     );
 
@@ -113,7 +113,7 @@ namespace app::browser::main
 
             int restore();
 
-            void clear();
+            void clean();
 
             void save();
 

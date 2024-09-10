@@ -92,9 +92,9 @@ int Tab::restore()
     return PREPARE_STATUS;
 }
 
-void Tab::clear() // @TODO menu action?
+void Tab::clean() // @TODO menu action?
 {
-    DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
+    DB::APP_BROWSER_MAIN_TAB__SESSION::clean(
         db
     );
 
@@ -106,7 +106,7 @@ void Tab::save()
     char * error; // @TODO
 
     // Delete previous data
-    DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
+    DB::APP_BROWSER_MAIN_TAB__SESSION::clean(
         db
     );
 
@@ -355,7 +355,7 @@ int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::init(
     );
 }
 
-int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
+int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clean(
     sqlite3 * db
 ) {
     char * error; // @TODO
@@ -396,7 +396,7 @@ int Tab::DB::APP_BROWSER_MAIN_TAB__SESSION::clear(
             );
 
             // Delegate cleanup childs
-            tab::Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clear(
+            tab::Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
                 db,
                 APP_BROWSER_MAIN_TAB__SESSION_ID
             );

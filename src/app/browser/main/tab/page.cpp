@@ -387,7 +387,7 @@ int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::init(
     );
 }
 
-int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clear(
+int Page::DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::clean(
     sqlite3 * db,
     const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
