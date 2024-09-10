@@ -6,6 +6,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/object.h>
+#include <sqlite3.h>
 
 namespace app::browser::main::tab::page
 {
@@ -45,7 +46,9 @@ namespace app::browser::main::tab::page
                 const double & PROGRESS_FRACTION
             );
 
-            int save();
+            int save(
+                const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+            );
 
             void history_add(
                 const Glib::ustring & REQUEST,

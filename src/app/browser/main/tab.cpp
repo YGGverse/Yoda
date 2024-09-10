@@ -71,7 +71,7 @@ int Tab::restore()
     sqlite3_stmt* statement;
 
     const int PREPARE_STATUS = ::sqlite3_prepare_v3(
-        this->db,
+        db,
         R"SQL(
             SELECT * FROM `app_browser_main_tab__session` ORDER BY `page_number` ASC
         )SQL",
@@ -161,7 +161,11 @@ int Tab::save()
             // Delegate save action to the page component
             get_tabPage(
                 page_number
-            )->save();
+            )->save(
+                ::sqlite3_last_insert_rowid(
+                    db
+                )
+            );
         }
     }
 
@@ -198,7 +202,7 @@ int Tab::append(
     const bool & IS_CURRENT
 ) {
     const auto TAB_PAGE = new tab::Page(
-
+        db,
         tab::Page::MIME::UNDEFINED,
         LABEL_TEXT,
         "", // @TODO restore feature

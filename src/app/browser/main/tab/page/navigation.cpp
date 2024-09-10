@@ -101,8 +101,9 @@ void Navigation::refresh(
     );
 }
 
-int Navigation::save()
-{
+int Navigation::save(
+    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+) {
     navigationRequest->save();
 
     return 1; // @TODO SQL

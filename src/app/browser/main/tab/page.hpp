@@ -14,6 +14,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/object.h>
+#include <sqlite3.h>
 
 namespace app::browser::main::tab
 {
@@ -45,6 +46,21 @@ namespace app::browser::main::tab
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__refresh;
 
+            // Database
+            sqlite3 * db;
+
+            struct DB
+            {
+                enum APP_BROWSER_MAIN_TAB_PAGE__DATA
+                {
+                    ID,
+                    TIME,
+                    MIME,
+                    TITLE,
+                    DESCRIPTION
+                };
+            };
+
             // Socket
             char buffer[0xfffff]; // 1Mb
 
@@ -58,6 +74,7 @@ namespace app::browser::main::tab
         public:
 
             Page(
+                sqlite3 * db,
                 const MIME & MIME,
                 const Glib::ustring & TITLE,
                 const Glib::ustring & DESCRIPTION,
@@ -70,7 +87,9 @@ namespace app::browser::main::tab
             // Actions
             void refresh();
 
-            int save();
+            int save(
+                const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+            );
 
             void update(
                 const MIME & MIME,

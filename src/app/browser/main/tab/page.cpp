@@ -5,6 +5,7 @@
 using namespace app::browser::main::tab;
 
 Page::Page(
+    sqlite3 * db,
     const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
@@ -21,6 +22,28 @@ Page::Page(
 
     // Init actions
     action__refresh = ACTION__REFRESH;
+
+    // Init database
+    this->db = db;
+
+    char * error;
+
+    ::sqlite3_exec(
+        db,
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page__session`
+            (
+                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session_id` INTEGER NOT NULL,
+                `time`        INTEGER NOT NULL,
+                `mime`        INTEGER NOT NULL,
+                `title`       VARCHAR(1024) NOT NULL,
+                `description` VARCHAR(1024) NOT NULL
+            )
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
 
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
@@ -63,9 +86,46 @@ void Page::refresh()
     );
 }
 
-int Page::save()
-{
-    pageNavigation->save();
+int Page::save(
+    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+) {
+    char * error; // @TODO
+
+    ::sqlite3_exec(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                INSERT INTO `app_browser_main_tab_page__session` (
+                    `app_browser_main_tab__session_id`,
+                    `time`,
+                    `mime`,
+                    `title`,
+                    `description`
+                ) VALUES (
+                    '%d',
+                    CURRENT_TIMESTAMP,
+                    '%d',
+                    '%d',
+                    '%s',
+                    '%s'
+                )
+            )SQL",
+            DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+            mime,
+            title,
+            description
+        ).c_str(),
+        nullptr,
+        nullptr,
+        &error
+    ); // @TODO auto-clean old records somewhere
+
+    // Delegate save action to child components
+    pageNavigation->save(
+        ::sqlite3_last_insert_rowid(
+            db
+        )
+    );
 
     return 1; // @TODO SQL
 }
