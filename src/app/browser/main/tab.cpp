@@ -109,7 +109,7 @@ void Tab::save()
     // Delete previous data
     DB::SESSION::clean(
         db
-    );
+    ); // @TODO run on background
 
     // Save current tab session
     for (int page_number = 0; page_number < get_n_pages(); page_number++)
