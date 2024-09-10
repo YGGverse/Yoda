@@ -20,6 +20,11 @@ namespace app::browser::main
     {
         public:
 
+            /*
+             * Class database
+             *
+             * Allowed parental access to enums and relationship methods
+             */
             struct DB
             {
                 struct APP_BROWSER_MAIN_TAB__SESSION
@@ -31,26 +36,29 @@ namespace app::browser::main
                         PAGE_NUMBER,
                         IS_CURRENT,
                         LABEL_TEXT
-                    };
+                    }; // table fields index
 
                     static int init(
                         sqlite3 * db
-                    );
+                    ); // return SQLite status code
 
                     static int clean(
                         sqlite3 * db
-                    );
+                    ); // return SQLite status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
                         const int & PAGE_NUMBER,
                         const bool & IS_CURRENT,
                         const Glib::ustring & LABEL_TEXT
-                    );
+                    ); // return last insert ID
 
                 };
             };
 
+        /*
+         * Internal members
+         */
         private:
 
             // Database
@@ -68,6 +76,9 @@ namespace app::browser::main
             const bool REORDERABLE = true;
             const bool SCROLLABLE = true;
 
+        /*
+         * Class API
+         */
         public:
 
             Tab(

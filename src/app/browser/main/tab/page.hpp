@@ -35,6 +35,11 @@ namespace app::browser::main::tab
                 UNDEFINED
             };
 
+            /*
+             * Class database
+             *
+             * Allowed parental access to enums and relationship methods
+             */
             struct DB
             {
                 struct APP_BROWSER_MAIN_TAB_PAGE__SESSION
@@ -46,16 +51,16 @@ namespace app::browser::main::tab
                         MIME,
                         TITLE,
                         DESCRIPTION
-                    };
+                    }; // table fields index
 
                     static int init(
                         sqlite3 * db
-                    );
+                    ); // return SQLite status code
 
                     static int clean(
                         sqlite3 * db,
                         const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
-                    );
+                    ); // return SQLite status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
@@ -63,10 +68,13 @@ namespace app::browser::main::tab
                         const Page::MIME & MIME,
                         const Glib::ustring & TITLE,
                         const Glib::ustring & DESCRIPTION
-                    );
+                    ); // return last insert ID
                 };
             };
 
+        /*
+         * Internal members
+         */
         private:
 
             // Meta
@@ -91,6 +99,9 @@ namespace app::browser::main::tab
             page::Content * pageContent;
             page::Navigation * pageNavigation;
 
+        /*
+         * Class API
+         */
         public:
 
             Page(
