@@ -22,6 +22,27 @@ Menu::Menu(
     // Init components @TODO make builder
     const auto MENU__MAIN = Gio::Menu::create();
 
+        const auto MENU__MAIN_SESSION = Gio::Menu::create();
+
+            MENU__MAIN_SESSION->append(
+                _("Restore"),
+                get_action_detailed_name(
+                    ACTION__RESTORE
+                )
+            );
+
+            MENU__MAIN_SESSION->append(
+                _("Save"),
+                get_action_detailed_name(
+                    ACTION__SAVE
+                )
+            );
+
+        MENU__MAIN->append_submenu(
+            _("Session"),
+            MENU__MAIN_SESSION
+        );
+
         const auto MENU__MAIN_TAB = Gio::Menu::create();
 
             MENU__MAIN_TAB->append(
@@ -113,27 +134,6 @@ Menu::Menu(
         MENU__MAIN->append_submenu(
             _("Tab"),
             MENU__MAIN_TAB
-        );
-
-        const auto MENU__MAIN_SESSION = Gio::Menu::create();
-
-            MENU__MAIN_SESSION->append(
-                _("Restore"),
-                get_action_detailed_name(
-                    ACTION__RESTORE
-                )
-            );
-
-            MENU__MAIN_SESSION->append(
-                _("Save"),
-                get_action_detailed_name(
-                    ACTION__SAVE
-                )
-            );
-
-        MENU__MAIN->append_submenu(
-            _("Session"),
-            MENU__MAIN_SESSION
         );
 
         const auto MENU__MAIN_TOOLS = Gio::Menu::create();
