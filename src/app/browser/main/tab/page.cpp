@@ -185,18 +185,30 @@ void Page::navigation_update(
 
                                         else
                                         {
-                                            mime = MIME::TEXT_PLAIN;
+                                            mime = MIME::UNDEFINED;
 
-                                            pageContent->set_text_plain(
-                                                _("MIME type not supported")
+                                            title = _("Oops");
+                                            subtitle = _("MIME type not supported");
+
+                                            pageContent->set_text_plain( // @TODO
+                                                subtitle
                                             );
                                         }
                                     }
 
                                     else
                                     {
-                                        pageContent->set_text_plain(
-                                            _("Could not open page")
+                                        mime = MIME::UNDEFINED;
+
+                                        title = _("Oops");
+
+                                        subtitle = Glib::ustring::sprintf(
+                                            _("Response code %s not supported"),
+                                            meta[1]
+                                        );
+
+                                        pageContent->set_text_plain( // @TODO
+                                            subtitle
                                         );
                                     }
 
