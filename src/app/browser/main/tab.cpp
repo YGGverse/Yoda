@@ -14,26 +14,9 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init database
-    this->db = db;
-
-        char * error;
-
-        ::sqlite3_exec(
-            db,
-            R"SQL(
-                CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
-                (
-                    `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `time`        INTEGER NOT NULL,
-                    `page_number` INTEGER NOT NULL,
-                    `is_current`  INTEGER NOT NULL,
-                    `label_text`  VARCHAR(1024)
-                )
-            )SQL",
-            nullptr,
-            nullptr,
-            &error
-        );
+    DB::init(
+        this->db = db
+    );
 
     // Init actions
     action__refresh                             = ACTION__REFRESH;
@@ -68,7 +51,7 @@ Tab::Tab(
 
 int Tab::restore()
 {
-    sqlite3_stmt* statement;
+    sqlite3_stmt* statement; // @TODO move to the DB model namespace
 
     const int PREPARE_STATUS = ::sqlite3_prepare_v3(
         db,
@@ -109,51 +92,10 @@ int Tab::restore()
     return PREPARE_STATUS;
 }
 
-void Tab::clean()
+void Tab::clear() // @TODO menu action?
 {
-    char * error; // @TODO
-    sqlite3_stmt * statement;
-
-    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
-        db,
-        R"SQL(
-            SELECT * FROM `app_browser_main_tab__session`
-        )SQL",
-        -1,
-        SQLITE_PREPARE_NORMALIZE,
-        &statement,
-        nullptr
-    );
-
-    if (PREPARE_STATUS == SQLITE_OK)
-    {
-        while (::sqlite3_step(statement) == SQLITE_ROW)
-        {
-            const int APP_BROWSER_MAIN_TAB__SESSION_ID = ::sqlite3_column_int(
-                statement,
-                DB::APP_BROWSER_MAIN_TAB__SESSION::ID
-            );
-
-            // @TODO Delegate cleanup to the child components
-
-            // Delete record
-            ::sqlite3_exec(
-                db,
-                Glib::ustring::sprintf(
-                    R"SQL(
-                        DELETE FROM `app_browser_main_tab__session` WHERE `id` = %d
-                    )SQL",
-                    APP_BROWSER_MAIN_TAB__SESSION_ID
-                ).c_str(),
-                nullptr,
-                nullptr,
-                &error
-            );
-        }
-    }
-
-    ::sqlite3_finalize(
-        statement
+    DB::clear(
+        db
     );
 
     close_all();
@@ -164,46 +106,24 @@ void Tab::save()
     char * error; // @TODO
 
     // Delete previous data
-    clean();
+    DB::clear(
+        db
+    );
 
     // Save current tab session
     for (int page_number = 0; page_number < get_n_pages(); page_number++)
     {
-        const auto TAB_LABEL = get_tabLabel(
-            page_number
-        );
-
-        ::sqlite3_exec(
-            db,
-            Glib::ustring::sprintf(
-                R"SQL(
-                    INSERT INTO `app_browser_main_tab__session` (
-                        `time`,
-                        `page_number`,
-                        `is_current`,
-                        `label_text`
-                    ) VALUES (
-                        CURRENT_TIMESTAMP,
-                        '%d',
-                        '%d',
-                        '%s'
-                    )
-                )SQL",
-                page_number,
-                page_number == get_current_page() ? 1 : 0,
-                TAB_LABEL->get_text()
-            ).c_str(),
-            nullptr,
-            nullptr,
-            &error
-        );
-
-        // Delegate save action to the page component
+        // Delegate save actions to child page component
         get_tabPage(
             page_number
         )->save(
-            ::sqlite3_last_insert_rowid(
-                db
+            DB::add(
+                db,
+                page_number,
+                page_number == get_current_page() ? 1 : 0,
+                get_tabLabel(
+                    page_number
+                )->get_text()
             )
         );
     }
@@ -349,7 +269,6 @@ Glib::ustring Tab::get_page_description(
     )->get_description();
 };
 
-// Private helpers
 tab::Label * Tab::get_tabLabel(
     const int & PAGE_NUMBER
 ) {
@@ -410,4 +329,120 @@ tab::Page * Tab::get_tabPage(
         }
 
     return TAB_PAGE;
+}
+
+
+// Database model
+int Tab::DB::init(
+    sqlite3 * db
+) {
+    char * error;
+
+    return ::sqlite3_exec(
+        db,
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
+            (
+                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`        INTEGER NOT NULL,
+                `page_number` INTEGER NOT NULL,
+                `is_current`  INTEGER NOT NULL,
+                `label_text`  VARCHAR(1024)
+            )
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
+}
+
+int Tab::DB::clear(
+    sqlite3 * db
+) {
+    char * error; // @TODO
+    sqlite3_stmt * statement;
+
+    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
+        db,
+        R"SQL(
+            SELECT * FROM `app_browser_main_tab__session`
+        )SQL",
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        while (::sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const int APP_BROWSER_MAIN_TAB__SESSION_ID = ::sqlite3_column_int(
+                statement,
+                DB::APP_BROWSER_MAIN_TAB__SESSION::ID
+            );
+
+            // Delete record
+            ::sqlite3_exec(
+                db,
+                Glib::ustring::sprintf(
+                    R"SQL(
+                        DELETE FROM `app_browser_main_tab__session` WHERE `id` = %d
+                    )SQL",
+                    APP_BROWSER_MAIN_TAB__SESSION_ID
+                ).c_str(),
+                nullptr,
+                nullptr,
+                &error
+            );
+
+            // Delegate cleanup childs
+            tab::Page::DB::clear(
+                db,
+                APP_BROWSER_MAIN_TAB__SESSION_ID
+            );
+        }
+    }
+
+    return ::sqlite3_finalize(
+        statement
+    );
+}
+
+sqlite3_int64 Tab::DB::add(
+    sqlite3 * db,
+    const int & PAGE_NUMBER,
+    const bool & IS_CURRENT,
+    const Glib::ustring & LABEL_TEXT
+) {
+    char * error; // @TODO
+
+    ::sqlite3_exec(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                INSERT INTO `app_browser_main_tab__session` (
+                    `time`,
+                    `page_number`,
+                    `is_current`,
+                    `label_text`
+                ) VALUES (
+                    CURRENT_TIMESTAMP,
+                    '%d',
+                    '%d',
+                    '%s'
+                )
+            )SQL",
+            PAGE_NUMBER,
+            IS_CURRENT,
+            LABEL_TEXT
+        ).c_str(),
+        nullptr,
+        nullptr,
+        &error
+    );
+
+    return ::sqlite3_last_insert_rowid(
+        db
+    );
 }

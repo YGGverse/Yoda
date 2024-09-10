@@ -24,25 +24,8 @@ Page::Page(
     action__refresh = ACTION__REFRESH;
 
     // Init database
-    this->db = db;
-
-    char * error;
-
-    ::sqlite3_exec(
-        db,
-        R"SQL(
-            CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page__session`
-            (
-                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session_id` INTEGER NOT NULL,
-                `time`        INTEGER NOT NULL,
-                `mime`        INTEGER NOT NULL,
-                `title`       VARCHAR(1024) NOT NULL,
-                `description` VARCHAR(1024) NOT NULL
-            )
-        )SQL",
-        nullptr,
-        nullptr,
-        &error
+    DB::init(
+        this->db = db
     );
 
     // Init components
@@ -89,44 +72,16 @@ void Page::refresh()
 int Page::save(
     const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
 ) {
-    char * error; // @TODO
-
-    ::sqlite3_exec(
-        db,
-        Glib::ustring::sprintf(
-            R"SQL(
-                INSERT INTO `app_browser_main_tab_page__session` (
-                    `app_browser_main_tab__session_id`,
-                    `time`,
-                    `mime`,
-                    `title`,
-                    `description`
-                ) VALUES (
-                    '%d',
-                    CURRENT_TIMESTAMP,
-                    '%d',
-                    '%s',
-                    '%s'
-                )
-            )SQL",
+    // Delegate save action to child components
+    return pageNavigation->save(
+        Page::DB::add(
+            db,
             DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
             mime,
             title,
             description
-        ).c_str(),
-        nullptr,
-        nullptr,
-        &error
-    ); // @TODO auto-clean old records somewhere
-
-    // Delegate save action to child components
-    pageNavigation->save(
-        ::sqlite3_last_insert_rowid(
-            db
         )
     );
-
-    return 1; // @TODO SQL
 }
 
 void Page::update(
@@ -405,5 +360,124 @@ void Page::set_navbar_request_text(
 ) {
     pageNavigation->set_request_text(
         VALUE
+    );
+}
+
+// Database model
+int Page::DB::init(
+    sqlite3 * db
+) {
+    char * error;
+
+    return ::sqlite3_exec(
+        db,
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser_main_tab_page__session`
+            (
+                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session_id` INTEGER NOT NULL,
+                `time`        INTEGER NOT NULL,
+                `mime`        INTEGER NOT NULL,
+                `title`       VARCHAR(1024) NOT NULL,
+                `description` VARCHAR(1024) NOT NULL
+            )
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
+}
+
+int Page::DB::clear(
+    sqlite3 * db,
+    const int & DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+) {
+    char * error; // @TODO
+    sqlite3_stmt * statement;
+
+    const int PREPARE_STATUS = ::sqlite3_prepare_v3(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab_page__session` WHERE `app_browser_main_tab__session_id` = %d
+            )SQL",
+            DB__APP_BROWSER_MAIN_TAB__SESSION_ID
+        ).c_str(),
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        while (::sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const int APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID = ::sqlite3_column_int(
+                statement,
+                DB::APP_BROWSER_MAIN_TAB_PAGE__SESSION::ID
+            );
+
+            // @TODO Delegate cleanup to the child components
+
+            // Delete record
+            ::sqlite3_exec(
+                db,
+                Glib::ustring::sprintf(
+                    R"SQL(
+                        DELETE FROM `app_browser_main_tab_page__session` WHERE `id` = %d
+                    )SQL",
+                    APP_BROWSER_MAIN_TAB_PAGE__SESSION_ID
+                ).c_str(),
+                nullptr,
+                nullptr,
+                &error
+            );
+        }
+    }
+
+    return ::sqlite3_finalize(
+        statement
+    );
+}
+
+sqlite3_int64 Page::DB::add(
+    sqlite3 * db,
+    const sqlite3_int64 & DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+    const Page::MIME & MIME,
+    const Glib::ustring & TITLE,
+    const Glib::ustring & DESCRIPTION
+) {
+    char * error; // @TODO
+
+    ::sqlite3_exec(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                INSERT INTO `app_browser_main_tab_page__session` (
+                    `app_browser_main_tab__session_id`,
+                    `time`,
+                    `mime`,
+                    `title`,
+                    `description`
+                ) VALUES (
+                    '%d',
+                    CURRENT_TIMESTAMP,
+                    '%d',
+                    '%s',
+                    '%s'
+                )
+            )SQL",
+            DB__APP_BROWSER_MAIN_TAB__SESSION_ID,
+            MIME,
+            TITLE,
+            DESCRIPTION
+        ).c_str(),
+        nullptr,
+        nullptr,
+        &error
+    );
+
+    return ::sqlite3_last_insert_rowid(
+        db
     );
 }
