@@ -196,7 +196,7 @@ int Request::DB::SESSION::clean(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        while (::sqlite3_step(statement) == SQLITE_ROW)
+        while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(

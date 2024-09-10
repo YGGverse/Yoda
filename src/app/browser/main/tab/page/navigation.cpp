@@ -246,7 +246,7 @@ int Navigation::DB::SESSION::clean(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        while (::sqlite3_step(statement) == SQLITE_ROW)
+        while (sqlite3_step(statement) == SQLITE_ROW)
         {
             const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION_ID = sqlite3_column_int(
                 statement,
