@@ -51,7 +51,7 @@ namespace app::browser::main::tab
 
             struct DB
             {
-                enum APP_BROWSER_MAIN_TAB_PAGE__DATA
+                enum APP_BROWSER_MAIN_TAB_PAGE__SESSION
                 {
                     ID,
                     TIME,
