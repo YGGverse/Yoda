@@ -198,11 +198,6 @@ int Request::DB::SESSION::clean(
     {
         while (::sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION_ID = sqlite3_column_int(
-                statement,
-                DB::SESSION::ID
-            );
-
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(
                 db,
@@ -210,7 +205,10 @@ int Request::DB::SESSION::clean(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab_page_navigation_request__session` WHERE `id` = %d
                     )SQL",
-                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__SESSION_ID
+                    sqlite3_column_int(
+                        statement,
+                        DB::SESSION::ID
+                    )
                 ).c_str(),
                 nullptr,
                 nullptr,
