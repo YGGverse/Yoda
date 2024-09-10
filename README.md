@@ -62,7 +62,7 @@ Currently, main application sources located at `src/app` folder, written by foll
 * At this moment, all constants named with uppercase, const everything that not mutable
 * `#include` application `.hpp` files in `.cpp`. For system libraries, use headers only. Do not place system dependencies in `.cpp`
 * App interact SQLite database, where table name match related class namespace, it may contain optional feature postfix (separated with double line)
-* Database class tables must contain only members of class and may include primary keys to their parent class tables, according to the app hierarchy
+* Database table fields must contain only members of their class (e.g. private and public variable values) and may include primary keys to their parent class (tables) according to the app hierarchy
 
 ### Environment
 
