@@ -26,7 +26,7 @@ namespace app::browser::main::tab
     class Page : public Gtk::Box
     {
         // Extras
-        enum MIME
+        enum class MIME
         {
             TEXT_PLAIN,
             TEXT_GEMINI,
