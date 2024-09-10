@@ -22,6 +22,22 @@ Browser::Browser(
         }
     );
 
+    const auto ACTION__RESTORE = add_action(
+        "restore",
+        [this]
+        {
+            browserMain->restore();
+        }
+    );
+
+    const auto ACTION__SAVE = add_action(
+        "save",
+        [this]
+        {
+            browserMain->save();
+        }
+    );
+
     const auto ACTION__DEBUG = add_action(
         "debug",
         [this]
@@ -151,22 +167,6 @@ Browser::Browser(
             "<Primary>Right"
         );
 
-    const auto ACTION__MAIN_TAB_SESSION_RESTORE = add_action(
-        "main_tab_session_restore",
-        [this]
-        {
-            browserMain->tab_session_restore();
-        }
-    );
-
-    const auto ACTION__MAIN_TAB_SESSION_SAVE = add_action(
-        "main_tab_session_save",
-        [this]
-        {
-            browserMain->tab_session_save();
-        }
-    );
-
     const auto ACTION__QUIT = add_action(
         "quit",
         [this]
@@ -194,14 +194,14 @@ Browser::Browser(
     browserHeader = Gtk::make_managed<browser::Header>(
         ACTION__DEBUG,
         ACTION__QUIT,
+        ACTION__RESTORE,
+        ACTION__SAVE,
         ACTION__MAIN_TAB_APPEND,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE,
-        ACTION__MAIN_TAB_SESSION_RESTORE,
-        ACTION__MAIN_TAB_SESSION_SAVE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
         set_titlebar(

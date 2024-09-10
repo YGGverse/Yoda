@@ -53,7 +53,7 @@ Tab::Tab(
         [this]
         {
             // Restore session from DB
-            session_restore();
+            restore();
         }
     );
 
@@ -66,7 +66,7 @@ Tab::Tab(
     );
 }
 
-int Tab::session_restore()
+int Tab::restore()
 {
     sqlite3_stmt* statement;
 
@@ -116,7 +116,7 @@ int Tab::session_restore()
     return PREPARE_STATUS;
 }
 
-int Tab::session_save()
+int Tab::save()
 {
     char * error; // @TODO
 
@@ -172,7 +172,7 @@ int Tab::session_save()
 
 void Tab::shutdown()
 {
-    session_save();
+    save();
 
     // @TODO shutdown children components
 }

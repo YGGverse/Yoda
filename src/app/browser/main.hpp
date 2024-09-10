@@ -38,19 +38,20 @@ namespace app::browser
 
             // Actions
             void refresh();
+            void restore();
+            void save();
 
                 void tab_append();
+
                 void tab_close_all();
                 void tab_close_left();
                 void tab_close_right();
                 void tab_close();
 
                     void tab_page_navigation_update();
+
                     void tab_page_navigation_history_back();
                     void tab_page_navigation_history_forward();
-
-                void tab_session_restore();
-                void tab_session_save();
 
             void shutdown();
 

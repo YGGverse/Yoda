@@ -8,14 +8,14 @@ using namespace app::browser;
 Header::Header(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__QUIT,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RESTORE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__SAVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_SESSION_RESTORE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_SESSION_SAVE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
 ) {
     // Init widget
     set_show_title_buttons(
@@ -26,14 +26,14 @@ Header::Header(
     headerMenu = Gtk::make_managed<header::Menu>(
         ACTION__DEBUG,
         ACTION__QUIT,
+        ACTION__RESTORE,
+        ACTION__SAVE,
         ACTION__MAIN_TAB_APPEND,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE,
-        ACTION__MAIN_TAB_SESSION_RESTORE,
-        ACTION__MAIN_TAB_SESSION_SAVE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
     );
 
         pack_start(

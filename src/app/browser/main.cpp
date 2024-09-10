@@ -52,6 +52,16 @@ void Main::tab_append()
     );
 };
 
+void Main::restore()
+{
+    mainTab->restore();
+};
+
+void Main::save()
+{
+    mainTab->save();
+};
+
 void Main::tab_close()
 {
     mainTab->close(
@@ -93,16 +103,6 @@ void Main::tab_page_navigation_history_forward()
     mainTab->page_navigation_history_forward(
         mainTab->get_current_page() // @TODO
     );
-};
-
-void Main::tab_session_restore()
-{
-    mainTab->session_restore();
-};
-
-void Main::tab_session_save()
-{
-    mainTab->session_save();
 };
 
 void Main::shutdown()
