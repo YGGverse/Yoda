@@ -187,7 +187,7 @@ void Tab::refresh(
     TAB_PAGE->refresh(
         tab::Page::MIME::UNDEFINED,
         TAB_PAGE->get_title(),
-        TAB_PAGE->get_subtitle(),
+        TAB_PAGE->get_description(),
         0 // @TODO
     );
 
@@ -293,12 +293,12 @@ Glib::ustring Tab::get_page_title(
     )->get_title();
 };
 
-Glib::ustring Tab::get_page_subtitle(
+Glib::ustring Tab::get_page_description(
     const int & PAGE_NUMBER
 ) {
     return get_tabPage(
         PAGE_NUMBER
-    )->get_subtitle();
+    )->get_description();
 };
 
 // Private helpers

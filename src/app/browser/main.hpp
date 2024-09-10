@@ -55,7 +55,7 @@ namespace app::browser
 
             // Getters
             Glib::ustring get_current_tab_page_title();
-            Glib::ustring get_current_tab_page_subtitle();
+            Glib::ustring get_current_tab_page_description();
     };
 }
 

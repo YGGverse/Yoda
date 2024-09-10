@@ -113,9 +113,9 @@ Glib::ustring Main::get_current_tab_page_title()
     );
 };
 
-Glib::ustring Main::get_current_tab_page_subtitle()
+Glib::ustring Main::get_current_tab_page_description()
 {
-    return mainTab->get_page_subtitle(
+    return mainTab->get_page_description(
         mainTab->get_current_page()
     );
 };

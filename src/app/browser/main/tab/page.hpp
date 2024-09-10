@@ -38,7 +38,7 @@ namespace app::browser::main::tab
 
             MIME mime;
             Glib::ustring title;
-            Glib::ustring subtitle;
+            Glib::ustring description;
 
             // Socket
             char buffer[0xfffff]; // 1Mb
@@ -63,7 +63,7 @@ namespace app::browser::main::tab
             void refresh(
                 const MIME & MIME,
                 const Glib::ustring & TITLE,
-                const Glib::ustring & SUBTITLE,
+                const Glib::ustring & DESCRIPTION,
                 const double & PROGRESS_FRACTION
             );
 
@@ -75,9 +75,9 @@ namespace app::browser::main::tab
             void navigation_history_forward();
 
             // Getters
-            Page::MIME get_mime();
+            MIME get_mime();
             Glib::ustring get_title();
-            Glib::ustring get_subtitle();
+            Glib::ustring get_description();
 
             Glib::ustring get_navigation_request_text();
 

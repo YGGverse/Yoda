@@ -45,11 +45,11 @@ Page::Page(
 void Page::refresh(
     const MIME & MIME,
     const Glib::ustring & TITLE,
-    const Glib::ustring & SUBTITLE,
+    const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
 ) {
     title = TITLE; // @TODO copy
-    subtitle = SUBTITLE;
+    description = DESCRIPTION;
 
     pageNavigation->refresh(
         PROGRESS_FRACTION
@@ -201,7 +201,7 @@ void Page::navigation_update(
                                             );
 
                                             pageContent->set_text_plain( // @TODO
-                                                subtitle
+                                                description
                                             );
                                         }
                                     }
@@ -219,7 +219,7 @@ void Page::navigation_update(
                                         );
 
                                         pageContent->set_text_plain( // @TODO
-                                            subtitle
+                                            description
                                         );
                                     }
 
@@ -302,9 +302,9 @@ Glib::ustring Page::get_title()
     return title;
 }
 
-Glib::ustring Page::get_subtitle()
+Glib::ustring Page::get_description()
 {
-    return subtitle;
+    return description;
 }
 
 Glib::ustring Page::get_navigation_request_text()

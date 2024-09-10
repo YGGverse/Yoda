@@ -103,7 +103,7 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
-            Glib::ustring get_page_subtitle(
+            Glib::ustring get_page_description(
                 const int & PAGE_NUMBER
             );
     };
