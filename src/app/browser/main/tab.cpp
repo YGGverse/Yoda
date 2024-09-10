@@ -23,11 +23,11 @@ Tab::Tab(
             R"SQL(
                 CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
                 (
-                    `id`      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `time`    INTEGER NOT NULL,
-                    `number`  INTEGER NOT NULL,
-                    `current` INTEGER NOT NULL,
-                    `request` VARCHAR(1024)
+                    `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `time`        INTEGER NOT NULL,
+                    `page_number` INTEGER NOT NULL,
+                    `is_current`  INTEGER NOT NULL,
+                    `label_text`  VARCHAR(1024)
                 )
             )SQL",
             nullptr,
@@ -73,7 +73,7 @@ int Tab::restore()
     const int PREPARE_STATUS = ::sqlite3_prepare_v3(
         this->db,
         R"SQL(
-            SELECT * FROM `app_browser_main_tab__session` ORDER BY `number` ASC
+            SELECT * FROM `app_browser_main_tab__session` ORDER BY `page_number` ASC
         )SQL",
         -1,
         SQLITE_PREPARE_NORMALIZE,
@@ -87,25 +87,18 @@ int Tab::restore()
 
         while (::sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int PAGE_NUMBER = append();
-
-            get_tabPage(
-                PAGE_NUMBER
-            )->set_navbar_request_text(
+            const int PAGE_NUMBER = append(
                 reinterpret_cast<const char*>(
                     ::sqlite3_column_text(
                         statement,
-                        DB::APP_BROWSER_MAIN_TAB__SESSION::REQUEST
+                        DB::APP_BROWSER_MAIN_TAB__SESSION::LABEL_TEXT
                     )
-                )
+                ),
+                ::sqlite3_column_int(
+                    statement,
+                    DB::APP_BROWSER_MAIN_TAB__SESSION::IS_CURRENT
+                ) == 1
             );
-
-            if (::sqlite3_column_int(statement, DB::APP_BROWSER_MAIN_TAB__SESSION::CURRENT) == 1)
-            {
-                set_current_page(
-                    PAGE_NUMBER
-                );
-            }
         }
     }
 
@@ -136,7 +129,7 @@ int Tab::save()
         // Save current tab session
         for (int page_number = 0; page_number < get_n_pages(); page_number++)
         {
-            auto tabPage = get_tabPage(
+            auto tabLabel = get_tabLabel(
                 page_number
             );
 
@@ -146,9 +139,9 @@ int Tab::save()
                     R"SQL(
                         INSERT INTO `app_browser_main_tab__session` (
                             `time`,
-                            `number`,
-                            `current`,
-                            `request`
+                            `page_number`,
+                            `is_current`,
+                            `label_text`
                         ) VALUES (
                             CURRENT_TIMESTAMP,
                             '%d',
@@ -158,7 +151,7 @@ int Tab::save()
                     )SQL",
                     page_number,
                     page_number == get_current_page() ? 1 : 0,
-                    tabPage->get_navigation_request_text()
+                    tabLabel->get_text()
                 ).c_str(),
                 nullptr,
                 nullptr,
@@ -195,16 +188,23 @@ void Tab::refresh(
     );
 }
 
-int Tab::append()
-{
+int Tab::append(
+    const Glib::ustring & LABEL_TEXT,
+    const bool & IS_CURRENT
+) {
     const auto TAB_PAGE = new tab::Page(
+
+        tab::Page::MIME::UNDEFINED,
+        LABEL_TEXT,
+        "", // @TODO restore feature
+
         action__refresh,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
         action__tab_page_navigation_update
     );
 
-    const auto TAB_LABEL = new tab::Label(
+    const auto TAB_LABEL = new tab::Label( // @TODO managed
         action__tab_close_active
     );
 
@@ -217,6 +217,13 @@ int Tab::append()
         * TAB_PAGE,
         REORDERABLE
     );
+
+    if (IS_CURRENT)
+    {
+        set_current_page(
+            PAGE_NUMBER
+        );
+    }
 
     refresh(
         PAGE_NUMBER

@@ -5,11 +5,20 @@
 using namespace app::browser::main::tab;
 
 Page::Page(
+    const MIME & MIME,
+    const Glib::ustring & TITLE,
+    const Glib::ustring & DESCRIPTION,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
 ) {
+    // Init meta
+    mime = MIME;
+    title = TITLE;
+    description = DESCRIPTION;
+    progress_fraction = 0;
+
     // Init actions
     action__refresh = ACTION__REFRESH;
 
@@ -40,13 +49,8 @@ Page::Page(
     signal_realize().connect(
         [this]
         {
-            // Make initial data setup
-            update(
-                MIME::UNDEFINED,
-                _("New page"),
-                "",
-                0
-            );
+            // Refresh parent window
+            action__refresh->activate();
         }
     );
 }
@@ -60,7 +64,7 @@ void Page::refresh()
 }
 
 void Page::update(
-    const MIME & MIME,
+    const enum MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION

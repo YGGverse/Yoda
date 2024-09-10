@@ -27,9 +27,9 @@ namespace app::browser::main
             {
                 ID,
                 TIME,
-                NUMBER,
-                CURRENT,
-                REQUEST
+                PAGE_NUMBER,
+                IS_CURRENT,
+                LABEL_TEXT
             };
         };
 
@@ -67,11 +67,10 @@ namespace app::browser::main
             );
 
             // Actions
-            void refresh(
-                const int & PAGE_NUMBER
+            int append(
+                const Glib::ustring & LABEL_TEXT,
+                const bool & IS_CURRENT
             );
-
-            int append();
 
             void close(
                 const int & PAGE_NUMBER
@@ -93,6 +92,10 @@ namespace app::browser::main
                 void page_navigation_history_forward(
                     const int & PAGE_NUMBER
                 );
+
+            void refresh(
+                const int & PAGE_NUMBER
+            );
 
             int restore();
 

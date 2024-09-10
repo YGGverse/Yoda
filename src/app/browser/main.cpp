@@ -47,8 +47,9 @@ void Main::refresh()
 
 void Main::tab_append()
 {
-    mainTab->set_current_page(
-        mainTab->append()
+    mainTab->append(
+        _("New tab"),
+        true
     );
 };
 

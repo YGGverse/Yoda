@@ -25,36 +25,42 @@ namespace app::browser::main::tab
 
     class Page : public Gtk::Box
     {
-        // Extras
-        enum class MIME
-        {
-            TEXT_PLAIN,
-            TEXT_GEMINI,
-            UNDEFINED
-        };
+        public:
 
-        // Data
-        MIME mime;
-        Glib::ustring title;
-        Glib::ustring description;
-        double progress_fraction;
+            enum class MIME
+            {
+                TEXT_PLAIN,
+                TEXT_GEMINI,
+                UNDEFINED
+            };
 
-        // Actions
-        Glib::RefPtr<Gio::SimpleAction> action__refresh;
+        private:
 
-        // Socket
-        char buffer[0xfffff]; // 1Mb
+            // Meta
+            MIME mime;
+            Glib::ustring title;
+            Glib::ustring description;
+            double progress_fraction;
 
-        Glib::RefPtr<Gio::SocketClient> GioSocketClient;
-        Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
+            // Actions
+            Glib::RefPtr<Gio::SimpleAction> action__refresh;
 
-        // Components
-        page::Content * pageContent;
-        page::Navigation * pageNavigation;
+            // Socket
+            char buffer[0xfffff]; // 1Mb
+
+            Glib::RefPtr<Gio::SocketClient> GioSocketClient;
+            Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
+
+            // Components
+            page::Content * pageContent;
+            page::Navigation * pageNavigation;
 
         public:
 
             Page(
+                const MIME & MIME,
+                const Glib::ustring & TITLE,
+                const Glib::ustring & DESCRIPTION,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
