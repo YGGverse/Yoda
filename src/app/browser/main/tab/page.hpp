@@ -143,11 +143,6 @@ namespace app::browser::main::tab
             MIME get_mime();
             Glib::ustring get_title();
             Glib::ustring get_description();
-
-            // Setters
-            void set_navbar_request_text(
-                const Glib::ustring & VALUE
-            );
     };
 }
 

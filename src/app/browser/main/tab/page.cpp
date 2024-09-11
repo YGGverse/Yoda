@@ -417,15 +417,6 @@ Glib::ustring Page::get_description()
     return description;
 }
 
-// Setters
-void Page::set_navbar_request_text(
-    const Glib::ustring & VALUE
-) {
-    pageNavigation->set_request_text(
-        VALUE
-    );
-}
-
 // Database model
 int Page::DB::SESSION::init(
     sqlite3 * db
