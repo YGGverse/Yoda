@@ -108,6 +108,49 @@ void Navigation::update(
     );
 }
 
+int Navigation::restore(
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+) {
+    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab_page_navigation__session`
+                        WHERE `app_browser_main_tab_page__session__id` = %d
+                        ORDER BY `id` DESC LIMIT 1
+            )SQL",
+            APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+        ).c_str(),
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        // Use latest record as order
+        while (sqlite3_step(statement) == SQLITE_ROW)
+        {
+            // Restore children components
+            navigationRequest->restore(
+                sqlite3_column_int64(
+                    statement,
+                    DB::SESSION::ID
+                )
+            );
+        }
+    }
+
+    sqlite3_finalize(
+        statement
+    );
+
+    return PREPARE_STATUS;
+}
+
 int Navigation::save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
@@ -225,7 +268,7 @@ int Navigation::DB::SESSION::init(
 
 int Navigation::DB::SESSION::clean(
     sqlite3 * db,
-    const int & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -248,7 +291,7 @@ int Navigation::DB::SESSION::clean(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID = sqlite3_column_int(
+            const sqlite3_int64 APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID = sqlite3_column_int64(
                 statement,
                 DB::SESSION::ID
             );

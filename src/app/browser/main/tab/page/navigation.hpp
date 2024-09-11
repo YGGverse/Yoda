@@ -36,6 +36,7 @@ namespace app::browser::main::tab::page
                     enum
                     {
                         ID,
+                        APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID,
                         TIME
                     }; // table fields index
 
@@ -45,7 +46,7 @@ namespace app::browser::main::tab::page
 
                     static int clean(
                         sqlite3 * db,
-                        const int & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+                        const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
@@ -90,6 +91,10 @@ namespace app::browser::main::tab::page
             // Actions
             void update(
                 const double & PROGRESS_FRACTION
+            );
+
+            int restore(
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             );
 
             int save(

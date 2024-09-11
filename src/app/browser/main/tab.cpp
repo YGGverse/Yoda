@@ -82,7 +82,15 @@ int Tab::restore()
                 ) == 1
             );
 
-            // @TODO restore child widget sessions
+            // Restore children components
+            get_tabPage(
+                PAGE_NUMBER
+            )->restore(
+                sqlite3_column_int64(
+                    statement,
+                    DB::SESSION::ID
+                )
+            );
         }
     }
 
@@ -377,7 +385,7 @@ int Tab::DB::SESSION::clean(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            const int APP_BROWSER_MAIN_TAB__SESSION__ID = sqlite3_column_int(
+            const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = sqlite3_column_int64(
                 statement,
                 DB::SESSION::ID
             );

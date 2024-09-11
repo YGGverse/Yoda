@@ -48,6 +48,7 @@ namespace app::browser::main::tab
                     enum
                     {
                         ID,
+                        APP_BROWSER_MAIN_TAB__SESSION__ID,
                         TIME,
                         MIME,
                         TITLE,
@@ -60,7 +61,7 @@ namespace app::browser::main::tab
 
                     static int clean(
                         sqlite3 * db,
-                        const int & APP_BROWSER_MAIN_TAB__SESSION__ID
+                        const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
@@ -118,6 +119,10 @@ namespace app::browser::main::tab
 
             // Actions
             void update();
+
+            int restore(
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
+            );
 
             int save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID

@@ -84,6 +84,53 @@ void Request::update(
     );
 }
 
+int Request::restore(
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+) {
+    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab_page_navigation_request__session`
+                        WHERE `app_browser_main_tab_page_navigation__session__id` = %d
+                        ORDER BY `id` DESC LIMIT 1
+            )SQL",
+            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+        ).c_str(),
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        // Use latest record as order
+        while (sqlite3_step(statement) == SQLITE_ROW)
+        {
+            // Restore widget data
+            set_text(
+                reinterpret_cast<const char*>(
+                    sqlite3_column_text(
+                        statement,
+                        DB::SESSION::TEXT
+                    )
+                )
+            );
+
+            // Restore children components here (on available)
+        }
+    }
+
+    sqlite3_finalize(
+        statement
+    );
+
+    return PREPARE_STATUS;
+}
+
 int Request::save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
@@ -174,7 +221,7 @@ int Request::DB::SESSION::init(
 
 int Request::DB::SESSION::clean(
     sqlite3 * db,
-    const int & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+    const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
@@ -205,7 +252,7 @@ int Request::DB::SESSION::clean(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab_page_navigation_request__session` WHERE `id` = %d
                     )SQL",
-                    sqlite3_column_int(
+                    sqlite3_column_int64(
                         statement,
                         DB::SESSION::ID
                     )
