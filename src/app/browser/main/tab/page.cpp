@@ -158,7 +158,7 @@ void Page::update()
 void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {
-    // Update navigation history
+    // Update navigation history?
     if (ADD_HISTORY)
     {
         pageNavigation->history_add(
@@ -167,7 +167,7 @@ void Page::navigation_reload(
         );
     }
 
-    // Update page data
+    // Reset page data
     mime = MIME::UNDEFINED;
 
     title = _("Update");
@@ -179,7 +179,26 @@ void Page::navigation_reload(
 
     progress_fraction = 0;
 
-    action__update->signal_activate();
+    // Begin progress listener in main thread (as this method use async data loader)
+    Glib::signal_timeout().connect(
+        [this]() -> bool
+        {
+            // Page update in progress..
+            if (progress_fraction < 1)
+            {
+                return true; // continue
+            }
+
+            // Page update completed, reset progress_fraction anyway
+            progress_fraction = 0;
+
+            // Activate window update action
+            action__update->signal_activate();
+
+            return false; // stop iteration
+        },
+        500 // @TODO add timeout
+    );
 
     // Connect scheme driver
     if ("file" == pageNavigation->get_request_scheme())
@@ -218,8 +237,6 @@ void Page::navigation_reload(
 
                 progress_fraction = .25;
 
-                action__update->signal_activate();
-
                 try
                 {
                     GioSocketConnection = GioSocketClient->connect_to_uri_finish(
@@ -235,8 +252,6 @@ void Page::navigation_reload(
                     description = EXCEPTION.what();
 
                     progress_fraction = 1;
-
-                    action__update->signal_activate();
                 }
 
                 // Connection established, begin request
@@ -260,8 +275,6 @@ void Page::navigation_reload(
 
                             progress_fraction = .5;
 
-                            action__update->signal_activate();
-
                             // Response
                             GioSocketConnection->get_input_stream()->read_async( // | read_all_async
                                 buffer,
@@ -278,8 +291,6 @@ void Page::navigation_reload(
                                     );
 
                                     progress_fraction = .75;
-
-                                    action__update->signal_activate();
 
                                     // Parse meta
                                     auto meta = Glib::Regex::split_simple(
@@ -309,8 +320,6 @@ void Page::navigation_reload(
                                             pageContent->set_text_gemini( // @TODO
                                                 buffer
                                             );
-
-                                            action__update->signal_activate();
                                         }
 
                                         else
@@ -321,8 +330,6 @@ void Page::navigation_reload(
                                             description = _("MIME type not supported");
 
                                             progress_fraction = 1;
-
-                                            action__update->signal_activate();
                                         }
                                     }
 
@@ -337,8 +344,6 @@ void Page::navigation_reload(
                                         );
 
                                         progress_fraction = 1;
-
-                                        action__update->signal_activate();
                                     }
 
                                     GioSocketConnection->close();
