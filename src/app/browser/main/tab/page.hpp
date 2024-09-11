@@ -143,9 +143,6 @@ namespace app::browser::main::tab
             MIME get_mime();
             Glib::ustring get_title();
             Glib::ustring get_description();
-            double get_progress_fraction();
-
-                Glib::ustring get_navigation_request_text();
 
             // Setters
             void set_navbar_request_text(

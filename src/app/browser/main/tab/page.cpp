@@ -417,16 +417,6 @@ Glib::ustring Page::get_description()
     return description;
 }
 
-double Page::get_progress_fraction()
-{
-    return progress_fraction;
-}
-
-Glib::ustring Page::get_navigation_request_text()
-{
-    return pageNavigation->get_request_text();
-}
-
 // Setters
 void Page::set_navbar_request_text(
     const Glib::ustring & VALUE
