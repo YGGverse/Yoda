@@ -156,12 +156,7 @@ void Tab::update(
     );
 
     // Update tab page component
-    TAB_PAGE->update(
-        TAB_PAGE->get_mime(),
-        TAB_PAGE->get_title(),
-        TAB_PAGE->get_description(),
-        TAB_PAGE->get_progress_fraction()
-    ); // just action delegate @TODO
+    TAB_PAGE->update();
 
     // Update tab label component
     get_tabLabel(

@@ -127,12 +127,6 @@ namespace app::browser::main::tab
             );
 
             void update();
-            void update(
-                const MIME & MIME,
-                const Glib::ustring & TITLE,
-                const Glib::ustring & DESCRIPTION,
-                const double & PROGRESS_FRACTION
-            );
 
             void navigation_reload(
                 const bool & ADD_HISTORY

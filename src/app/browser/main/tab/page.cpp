@@ -154,20 +154,6 @@ void Page::update()
     );
 }
 
-void Page::update(
-    const MIME & MIME,
-    const Glib::ustring & TITLE,
-    const Glib::ustring & DESCRIPTION,
-    const double & PROGRESS_FRACTION
-) {
-    mime              = MIME;
-    title             = TITLE;
-    description       = DESCRIPTION;
-    progress_fraction = PROGRESS_FRACTION;
-
-    update();
-}
-
 void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {
@@ -180,16 +166,19 @@ void Page::navigation_reload(
         );
     }
 
-    // Update page extras
-    update(
-        MIME::UNDEFINED,
-        _("Update"),
-        Glib::ustring::sprintf(
-            _("Begin update for %s.."),
-            pageNavigation->get_request_text()
-        ),
-        0
+    // Update page data
+    mime = MIME::UNDEFINED;
+
+    title = _("Update");
+
+    description = Glib::ustring::sprintf(
+        _("Begin update for %s.."),
+        pageNavigation->get_request_text()
     );
+
+    progress_fraction = 0;
+
+    action__update->signal_activate();
 
     // Connect scheme driver
     if ("file" == pageNavigation->get_request_scheme())
@@ -218,15 +207,17 @@ void Page::navigation_reload(
             pageNavigation->get_request_text(), 1965,
             [this](const Glib::RefPtr<Gio::AsyncResult> & result)
             {
-                update(
-                    MIME::UNDEFINED,
-                    _("Connect"),
-                    Glib::ustring::sprintf(
-                        _("Connecting to %s.."),
-                        pageNavigation->get_request_host()
-                    ),
-                    .25
+                // Update
+                title = _("Connect");
+
+                description = Glib::ustring::sprintf(
+                    _("Connecting to %s.."),
+                    pageNavigation->get_request_host()
                 );
+
+                progress_fraction = .25;
+
+                action__update->signal_activate();
 
                 try
                 {
@@ -237,12 +228,14 @@ void Page::navigation_reload(
 
                 catch (const Glib::Error & EXCEPTION)
                 {
-                    update(
-                        MIME::UNDEFINED,
-                        _("Oops"),
-                        EXCEPTION.what(),
-                        1
-                    );
+                    // Update
+                    title = _("Oops");
+
+                    description = EXCEPTION.what();
+
+                    progress_fraction = 1;
+
+                    action__update->signal_activate();
                 }
 
                 // Connection established, begin request
@@ -255,16 +248,18 @@ void Page::navigation_reload(
                         request.size(),
                         [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                         {
-                            update(
-                                MIME::UNDEFINED,
-                                _("Request"),
-                                Glib::ustring::sprintf(
-                                    _("Begin request to %s.."),
-                                    pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                               : pageNavigation->get_request_path()
-                                ),
-                                .5
+                            // Update
+                            title = _("Request");
+
+                            description = Glib::ustring::sprintf(
+                                _("Begin request to %s.."),
+                                pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                           : pageNavigation->get_request_path()
                             );
+
+                            progress_fraction = .5;
+
+                            action__update->signal_activate();
 
                             // Response
                             GioSocketConnection->get_input_stream()->read_async( // | read_all_async
@@ -272,16 +267,18 @@ void Page::navigation_reload(
                                 sizeof(buffer) - 1,
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
                                 {
-                                    update(
-                                        MIME::UNDEFINED,
-                                        _("Reading"),
-                                        Glib::ustring::sprintf(
-                                            _("Reading response from %s.."),
-                                            pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                                       : pageNavigation->get_request_path()
-                                        ),
-                                        .75
+                                    // Update
+                                    title = _("Reading");
+
+                                    description = Glib::ustring::sprintf(
+                                        _("Reading response from %s.."),
+                                        pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
+                                                                                   : pageNavigation->get_request_path()
                                     );
+
+                                    progress_fraction = .75;
+
+                                    action__update->signal_activate();
 
                                     // Parse meta
                                     auto meta = Glib::Regex::split_simple(
@@ -295,50 +292,52 @@ void Page::navigation_reload(
                                         // Route by mime type or path extension
                                         if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
                                         {
-                                            update(
-                                                MIME::TEXT_GEMINI,
-                                                pageNavigation->get_request_host(), // @TODO title
+                                            // Update
+                                            mime = MIME::TEXT_GEMINI;
+
+                                            title = _("Parsing");
+
+                                            description = Glib::ustring::sprintf(
+                                                _("Parsing response from %s.."),
                                                 pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
                                                                                            : pageNavigation->get_request_path()
-                                                ,
-                                                1
                                             );
 
-                                            pageContent->set_text_gemini(
-                                                buffer // @TODO
+                                            progress_fraction = .8;
+
+                                            pageContent->set_text_gemini( // @TODO
+                                                buffer
                                             );
+
+                                            action__update->signal_activate();
                                         }
 
                                         else
                                         {
-                                            update(
-                                                MIME::UNDEFINED,
-                                                _("Oops"),
-                                                _("MIME type not supported"),
-                                                1
-                                            );
+                                            // Update
+                                            title = _("Oops");
 
-                                            pageContent->set_text_plain( // @TODO
-                                                description
-                                            );
+                                            description = _("MIME type not supported");
+
+                                            progress_fraction = 1;
+
+                                            action__update->signal_activate();
                                         }
                                     }
 
                                     else
                                     {
-                                        update(
-                                            MIME::UNDEFINED,
-                                            _("Oops"),
-                                            Glib::ustring::sprintf(
-                                                _("Response code %s not supported"),
-                                                meta[1]
-                                            ),
-                                            1
+                                        // Update
+                                        title = _("Oops");
+
+                                        description = Glib::ustring::sprintf(
+                                            _("Response code %s not supported"),
+                                            meta[1]
                                         );
 
-                                        pageContent->set_text_plain( // @TODO
-                                            description
-                                        );
+                                        progress_fraction = 1;
+
+                                        action__update->signal_activate();
                                     }
 
                                     GioSocketConnection->close();
