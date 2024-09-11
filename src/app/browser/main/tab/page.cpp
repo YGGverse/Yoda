@@ -53,12 +53,13 @@ Page::Page(
     );
 
     // Connect events
+    /* activated twice on tab change @TODO
     signal_realize().connect(
         [this]
         {
             action__update->activate();
         }
-    );
+    );*/
 }
 
 // Actions
