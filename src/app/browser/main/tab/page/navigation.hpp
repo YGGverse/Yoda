@@ -15,7 +15,7 @@ namespace app::browser::main::tab::page
         class Base;
         class Bookmark;
         class History;
-        class Update;
+        class Reload;
         class Request;
     }
 
@@ -68,8 +68,8 @@ namespace app::browser::main::tab::page
             navigation::Base * navigationBase;
             navigation::Bookmark * navigationBookmark;
             navigation::History * navigationHistory;
+            navigation::Reload * navigationReload;
             navigation::Request * navigationRequest;
-            navigation::Update * navigationUpdate;
 
             // Defaults
             const int SPACING = 8;
@@ -85,7 +85,7 @@ namespace app::browser::main::tab::page
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_RELOAD
             );
 
             // Actions

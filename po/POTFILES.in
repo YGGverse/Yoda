@@ -20,6 +20,6 @@ src/app/browser/main/tab/page/navigation/bookmark.cpp
 src/app/browser/main/tab/page/navigation/history.cpp
 src/app/browser/main/tab/page/navigation/history/back.cpp
 src/app/browser/main/tab/page/navigation/history/forward.cpp
+src/app/browser/main/tab/page/navigation/reload.cpp
 src/app/browser/main/tab/page/navigation/request.cpp
-src/app/browser/main/tab/page/navigation/update.cpp
 src/app/browser/main/tab/label.cpp

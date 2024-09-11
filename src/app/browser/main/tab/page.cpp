@@ -12,7 +12,7 @@ Page::Page(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_RELOAD
 ) {
     // Init meta
     mime = MIME;
@@ -34,7 +34,7 @@ Page::Page(
         ACTION__REFRESH,
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__PAGE_NAVIGATION_UPDATE
+        ACTION__PAGE_NAVIGATION_RELOAD
     );
 
         append(
@@ -165,7 +165,7 @@ void Page::update(
     );
 }
 
-void Page::navigation_update(
+void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {
     // Update navigation history
@@ -355,7 +355,7 @@ void Page::navigation_update(
             "gemini://" + pageNavigation->get_request_text()
         );
 
-        navigation_update(
+        navigation_reload(
             false
         );
     }
@@ -376,7 +376,7 @@ void Page::navigation_history_back()
             request
         );
 
-        navigation_update(
+        navigation_reload(
             false
         );
     }
@@ -392,7 +392,7 @@ void Page::navigation_history_forward()
             request
         );
 
-        navigation_update(
+        navigation_reload(
             false
         );
     }

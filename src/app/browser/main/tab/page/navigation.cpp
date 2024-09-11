@@ -3,7 +3,7 @@
 #include "navigation/bookmark.hpp"
 #include "navigation/history.hpp"
 #include "navigation/request.hpp"
-#include "navigation/update.hpp"
+#include "navigation/reload.hpp"
 
 using namespace app::browser::main::tab::page;
 
@@ -12,7 +12,7 @@ Navigation::Navigation(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_RELOAD
 ) {
     // Init database
     DB::SESSION::init(
@@ -60,18 +60,18 @@ Navigation::Navigation(
             * navigationHistory
         );
 
-    navigationUpdate = Gtk::make_managed<navigation::Update>(
-        ACTION__NAVIGATION_UPDATE
+    navigationReload = Gtk::make_managed<navigation::Reload>(
+        ACTION__NAVIGATION_RELOAD
     );
 
         append(
-            * navigationUpdate
+            * navigationReload
         );
 
     navigationRequest = Gtk::make_managed<navigation::Request>(
         db,
         ACTION__REFRESH,
-        ACTION__NAVIGATION_UPDATE
+        ACTION__NAVIGATION_RELOAD
     );
 
         append(
@@ -98,7 +98,7 @@ void Navigation::update(
     navigationHistory->update();
 
     // Toggle update button sensibility
-    navigationUpdate->update(
+    navigationReload->update(
         navigationRequest->get_text_length() > 0
     );
 

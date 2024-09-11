@@ -12,7 +12,7 @@ Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init widget
     set_tooltip_text(
@@ -78,9 +78,9 @@ Menu::Menu(
                         );
 
                         MENU__MAIN_TAB_PAGE_NAVIGATION->append(
-                            _("Update"),
+                            _("Reload"),
                             get_action_detailed_name(
-                                ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+                                ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
                             )
                         );
 

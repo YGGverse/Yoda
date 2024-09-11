@@ -11,7 +11,7 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init database
     DB::SESSION::init(
@@ -24,7 +24,7 @@ Tab::Tab(
     action__tab_close_all                       = ACTION__MAIN_TAB_CLOSE_ALL;
     action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
     action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
-    action__tab_page_navigation_update          = ACTION__TAB_PAGE_NAVIGATION_UPDATE;
+    action__tab_page_navigation_reload          = ACTION__TAB_PAGE_NAVIGATION_RELOAD;
 
     // Init widget
     set_scrollable(
@@ -193,7 +193,7 @@ int Tab::append(
         action__refresh,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
-        action__tab_page_navigation_update
+        action__tab_page_navigation_reload
     );
 
     const auto TAB_LABEL = new tab::Label( // @TODO manage
@@ -252,13 +252,13 @@ void Tab::close_all()
     }
 }
 
-void Tab::page_navigation_update(
+void Tab::page_navigation_reload(
     const int & PAGE_NUMBER,
     const bool & ADD_HISTORY
 ) {
     get_tabPage(
         PAGE_NUMBER
-    )->navigation_update(
+    )->navigation_reload(
         ADD_HISTORY
     );
 }

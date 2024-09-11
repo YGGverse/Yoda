@@ -116,20 +116,20 @@ Browser::Browser(
             false
         );
 
-    const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE = add_action(
-        "main_tab_page_navigation_update",
+    const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD = add_action(
+        "main_tab_page_navigation_reload",
         [this]
         {
-            browserMain->tab_page_navigation_update();
+            browserMain->tab_page_navigation_reload();
         }
     );
 
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE->set_enabled(
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD->set_enabled(
             false
         );
 
         APP->set_accel_for_action(
-            "win.main_tab_page_navigation_update",
+            "win.main_tab_page_navigation_reload",
             "<Primary>r"
         );
 
@@ -201,7 +201,7 @@ Browser::Browser(
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
     );
 
         set_titlebar(
@@ -215,7 +215,7 @@ Browser::Browser(
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
     );
 
         set_child(

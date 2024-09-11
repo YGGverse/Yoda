@@ -1,12 +1,12 @@
-#include "update.hpp"
+#include "reload.hpp"
 
 using namespace app::browser::main::tab::page::navigation;
 
-Update::Update(
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
+Reload::Reload(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD
 ) {
     // Init actions
-    action__update = ACTION__UPDATE;
+    action__reload = ACTION__RELOAD;
 
     // Init widget
     set_icon_name(
@@ -14,7 +14,7 @@ Update::Update(
     );
 
     set_tooltip_text(
-        _("Update")
+        _("Reload")
     );
 
     set_sensitive(
@@ -24,19 +24,19 @@ Update::Update(
     signal_clicked().connect(
         [this]
         {
-            action__update->activate();
+            action__reload->activate();
         }
     );
 }
 
-void Update::update(
+void Reload::update(
     const bool & ENABLED
 ) {
     set_sensitive(
         ENABLED
     );
 
-    action__update->set_enabled(
+    action__reload->set_enabled(
         ENABLED
     );
 }

@@ -10,7 +10,7 @@ Main::Main(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init widget
     set_orientation(
@@ -29,7 +29,7 @@ Main::Main(
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_UPDATE
+        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
     );
 
         append(
@@ -85,8 +85,8 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
-void Main::tab_page_navigation_update() {
-    mainTab->page_navigation_update(
+void Main::tab_page_navigation_reload() {
+    mainTab->page_navigation_reload(
         mainTab->get_current_page(), // @TODO
         true
     );

@@ -69,7 +69,7 @@ namespace app::browser::main
                                             action__tab_close_all,
                                             action__tab_page_navigation_history_back,
                                             action__tab_page_navigation_history_forward,
-                                            action__tab_page_navigation_update;
+                                            action__tab_page_navigation_reload;
 
             // Defaults
             const bool REORDERABLE = true;
@@ -87,7 +87,7 @@ namespace app::browser::main
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_UPDATE
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
             );
 
             // Actions
@@ -104,7 +104,7 @@ namespace app::browser::main
             void close_right();
             void close_all();
 
-                void page_navigation_update(
+                void page_navigation_reload(
                     const int & PAGE_NUMBER,
                     const bool & ADD_HISTORY
                 );
