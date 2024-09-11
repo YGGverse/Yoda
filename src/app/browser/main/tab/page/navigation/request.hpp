@@ -98,7 +98,7 @@ namespace app::browser::main::tab::page::navigation
 
             int restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
-            );
+            ); // return sqlite3_finalize status code
 
             int save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID

@@ -70,12 +70,7 @@ int Tab::restore()
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             const int PAGE_NUMBER = append(
-                reinterpret_cast<const char*>(
-                    sqlite3_column_text(
-                        statement,
-                        DB::SESSION::LABEL_TEXT
-                    )
-                ),
+                _("Restore.."),
                 sqlite3_column_int(
                     statement,
                     DB::SESSION::IS_CURRENT
@@ -83,6 +78,15 @@ int Tab::restore()
             );
 
             // Restore children components
+            get_tabLabel(
+                PAGE_NUMBER
+            )->restore(
+                sqlite3_column_int64(
+                    statement,
+                    DB::SESSION::ID
+                )
+            );
+
             get_tabPage(
                 PAGE_NUMBER
             )->restore(
@@ -94,11 +98,9 @@ int Tab::restore()
         }
     }
 
-    sqlite3_finalize(
+    return sqlite3_finalize(
         statement
     );
-
-    return PREPARE_STATUS;
 }
 
 void Tab::clean() // @TODO menu action?
@@ -122,18 +124,24 @@ void Tab::save()
     // Save current tab session
     for (int page_number = 0; page_number < get_n_pages(); page_number++)
     {
-        // Delegate save actions to child page component
+        // Create new session
+        const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = DB::SESSION::add(
+            db,
+            page_number,
+            page_number == get_current_page() ? 1 : 0
+        );
+
+        // Delegate save actions to children components
+        get_tabLabel(
+            page_number
+        )->save(
+            APP_BROWSER_MAIN_TAB__SESSION__ID
+        );
+
         get_tabPage(
             page_number
         )->save(
-            DB::SESSION::add(
-                db,
-                page_number,
-                page_number == get_current_page() ? 1 : 0,
-                get_tabLabel(
-                    page_number
-                )->get_text() // @TODO use separated table for children widget
-            )
+            APP_BROWSER_MAIN_TAB__SESSION__ID
         );
     }
 }
@@ -152,7 +160,7 @@ void Tab::update(
         TAB_PAGE->get_title()
     );
 
-    TAB_PAGE->update();
+    // TAB_PAGE->update(); @TODO meant refresh?
 
     action__tab_close_active->set_enabled(
         get_n_pages() > 0
@@ -167,7 +175,7 @@ int Tab::append(
     const Glib::ustring & LABEL_TEXT,
     const bool & IS_CURRENT
 ) {
-    const auto TAB_PAGE = new tab::Page(
+    const auto TAB_PAGE = new tab::Page( // @TODO manage
         db,
         tab::Page::MIME::UNDEFINED,
         LABEL_TEXT,
@@ -179,7 +187,8 @@ int Tab::append(
         action__tab_page_navigation_update
     );
 
-    const auto TAB_LABEL = new tab::Label( // @TODO managed
+    const auto TAB_LABEL = new tab::Label( // @TODO manage
+        db,
         action__tab_close_active
     );
 
@@ -354,8 +363,7 @@ int Tab::DB::SESSION::init(
                 `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time`        INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `page_number` INTEGER NOT NULL,
-                `is_current`  INTEGER NOT NULL,
-                `label_text`  VARCHAR(1024)
+                `is_current`  INTEGER NOT NULL
             )
         )SQL",
         nullptr,
@@ -407,6 +415,11 @@ int Tab::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
+                tab::Label::DB::SESSION::clean(
+                    db,
+                    APP_BROWSER_MAIN_TAB__SESSION__ID
+                );
+
                 tab::Page::DB::SESSION::clean(
                     db,
                     APP_BROWSER_MAIN_TAB__SESSION__ID
@@ -423,8 +436,7 @@ int Tab::DB::SESSION::clean(
 sqlite3_int64 Tab::DB::SESSION::add(
     sqlite3 * db,
     const int & PAGE_NUMBER,
-    const bool & IS_CURRENT,
-    const Glib::ustring & LABEL_TEXT
+    const bool & IS_CURRENT
 ) {
     char * error; // @TODO
 
@@ -434,17 +446,14 @@ sqlite3_int64 Tab::DB::SESSION::add(
             R"SQL(
                 INSERT INTO `app_browser_main_tab__session` (
                     `page_number`,
-                    `is_current`,
-                    `label_text`
+                    `is_current`
                 ) VALUES (
-                    '%d',
-                    '%d',
-                    '%s'
+                    %d,
+                    %d
                 )
             )SQL",
             PAGE_NUMBER,
-            IS_CURRENT,
-            LABEL_TEXT
+            IS_CURRENT
         ).c_str(),
         nullptr,
         nullptr,

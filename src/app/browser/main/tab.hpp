@@ -35,8 +35,7 @@ namespace app::browser::main
                         ID,
                         TIME,
                         PAGE_NUMBER,
-                        IS_CURRENT,
-                        LABEL_TEXT
+                        IS_CURRENT
                     }; // table fields index
 
                     static int init(
@@ -50,8 +49,7 @@ namespace app::browser::main
                     static sqlite3_int64 add(
                         sqlite3 * db,
                         const int & PAGE_NUMBER,
-                        const bool & IS_CURRENT,
-                        const Glib::ustring & LABEL_TEXT
+                        const bool & IS_CURRENT
                     ); // return sqlite3_last_insert_rowid
 
                 };
@@ -123,7 +121,7 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
-            int restore();
+            int restore(); // return sqlite3_finalize status code
 
             void clean();
 

@@ -63,13 +63,6 @@ Page::Page(
 }
 
 // Actions
-void Page::update()
-{
-    pageNavigation->update(
-        progress_fraction
-    );
-}
-
 int Page::restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
@@ -106,11 +99,9 @@ int Page::restore(
         }
     }
 
-    sqlite3_finalize(
+    return sqlite3_finalize(
         statement
     );
-
-    return PREPARE_STATUS;
 }
 
 int Page::save(
@@ -139,6 +130,11 @@ void Page::update(
     title             = TITLE;
     description       = DESCRIPTION;
     progress_fraction = PROGRESS_FRACTION;
+
+    // Refresh children components
+    pageNavigation->update(
+        progress_fraction
+    );
 
     // Refresh parent window
     action__refresh->activate();

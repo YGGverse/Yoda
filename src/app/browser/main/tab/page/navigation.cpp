@@ -144,11 +144,9 @@ int Navigation::restore(
         }
     }
 
-    sqlite3_finalize(
+    return sqlite3_finalize(
         statement
     );
-
-    return PREPARE_STATUS;
 }
 
 int Navigation::save(
