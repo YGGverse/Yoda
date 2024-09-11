@@ -125,19 +125,16 @@ void Page::update(
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
 ) {
-    // Refresh page data
+    // Update page data
     mime              = MIME;
     title             = TITLE;
     description       = DESCRIPTION;
     progress_fraction = PROGRESS_FRACTION;
 
-    // Refresh children components
+    // Update children components
     pageNavigation->update(
         progress_fraction
     );
-
-    // Refresh parent window
-    action__refresh->activate();
 }
 
 void Page::navigation_update(
@@ -387,6 +384,11 @@ Glib::ustring Page::get_title()
 Glib::ustring Page::get_description()
 {
     return description;
+}
+
+double Page::get_progress_fraction()
+{
+    return progress_fraction;
 }
 
 Glib::ustring Page::get_navigation_request_text()
