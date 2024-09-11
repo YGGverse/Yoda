@@ -9,7 +9,7 @@ Page::Page(
     const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_RELOAD
@@ -21,7 +21,7 @@ Page::Page(
     progress_fraction = 0;
 
     // Init actions
-    action__refresh = ACTION__REFRESH;
+    action__update = ACTION__UPDATE;
 
     // Init database
     DB::SESSION::init(
@@ -31,7 +31,7 @@ Page::Page(
     // Init components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         this->db,
-        ACTION__REFRESH,
+        ACTION__UPDATE,
         ACTION__PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
         ACTION__PAGE_NAVIGATION_RELOAD
@@ -56,8 +56,7 @@ Page::Page(
     signal_realize().connect(
         [this]
         {
-            // Refresh parent window
-            action__refresh->activate();
+            action__update->activate();
         }
     );
 }

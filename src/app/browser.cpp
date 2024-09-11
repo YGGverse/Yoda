@@ -9,8 +9,8 @@ Browser::Browser(
     const Glib::RefPtr<Gtk::Application> & APP
 ) {
     // Init window actions
-    const auto ACTION__REFRESH = add_action(
-        "refresh",
+    const auto ACTION__UPDATE = add_action(
+        "update",
         [this]
         {
             browserMain->update();
@@ -210,7 +210,7 @@ Browser::Browser(
 
     browserMain = Gtk::make_managed<browser::Main>(
         db,
-        ACTION__REFRESH,
+        ACTION__UPDATE,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,

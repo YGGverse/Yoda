@@ -64,7 +64,7 @@ namespace app::browser::main
             sqlite3 * db;
 
             // Actions
-            Glib::RefPtr<Gio::SimpleAction> action__refresh,
+            Glib::RefPtr<Gio::SimpleAction> action__update,
                                             action__tab_close_active,
                                             action__tab_close_all,
                                             action__tab_page_navigation_history_back,
@@ -82,7 +82,7 @@ namespace app::browser::main
 
             Tab(
                 sqlite3 * db,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,

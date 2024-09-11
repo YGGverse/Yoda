@@ -5,8 +5,8 @@ using namespace app::browser::main::tab::page::navigation;
 // Construct
 Request::Request(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD
 ) {
     // Init database
     DB::SESSION::init(
@@ -14,8 +14,8 @@ Request::Request(
     );
 
     // Init actions
-    action__refresh = ACTION__REFRESH;
-    action__update  = ACTION__UPDATE;
+    action__update = ACTION__UPDATE;
+    action__reload = ACTION__RELOAD;
 
     // Init widget
     set_placeholder_text(
@@ -36,7 +36,7 @@ Request::Request(
         {
             parse();
 
-            action__refresh->activate();
+            action__update->activate();
         }
     );
 
@@ -45,7 +45,7 @@ Request::Request(
         {
             parse();
 
-            action__update->activate();
+            action__reload->activate();
         }
     );
 }

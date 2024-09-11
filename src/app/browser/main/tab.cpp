@@ -6,7 +6,7 @@ using namespace app::browser::main;
 
 Tab::Tab(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
@@ -19,7 +19,7 @@ Tab::Tab(
     );
 
     // Init actions
-    action__refresh                             = ACTION__REFRESH;
+    action__update                              = ACTION__UPDATE;
     action__tab_close_active                    = ACTION__TAB_CLOSE_ACTIVE;
     action__tab_close_all                       = ACTION__MAIN_TAB_CLOSE_ALL;
     action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
@@ -42,8 +42,8 @@ Tab::Tab(
     signal_switch_page().connect(
         [this](Gtk::Widget*, guint)
         {
-            // Refresh window elements, e.g. tab label to header bar
-            action__refresh->activate();
+            // Update window elements, e.g. tab label to header bar
+            action__update->activate();
         }
     );
 }
@@ -190,7 +190,7 @@ int Tab::append(
         LABEL_TEXT,
         "", // @TODO restore feature
 
-        action__refresh,
+        action__update,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
         action__tab_page_navigation_reload

@@ -5,7 +5,7 @@ using namespace app::browser;
 
 Main::Main(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ACTIVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
@@ -24,7 +24,7 @@ Main::Main(
     // Init components
     mainTab = Gtk::make_managed<main::Tab>(
         db,
-        ACTION__REFRESH,
+        ACTION__UPDATE,
         ACTION__MAIN_TAB_CLOSE_ACTIVE,
         ACTION__MAIN_TAB_CLOSE_ALL,
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,

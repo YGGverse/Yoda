@@ -9,7 +9,7 @@ using namespace app::browser::main::tab::page;
 
 Navigation::Navigation(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_RELOAD
@@ -70,7 +70,7 @@ Navigation::Navigation(
 
     navigationRequest = Gtk::make_managed<navigation::Request>(
         db,
-        ACTION__REFRESH,
+        ACTION__UPDATE,
         ACTION__NAVIGATION_RELOAD
     );
 
@@ -94,7 +94,7 @@ void Navigation::update(
         !navigationRequest->get_host().empty() && !navigationRequest->get_path().empty()
     );
 
-    // Refresh history widget
+    // Update history widget
     navigationHistory->update();
 
     // Toggle update button sensibility
@@ -102,7 +102,7 @@ void Navigation::update(
         navigationRequest->get_text_length() > 0
     );
 
-    // Refresh request area (with progressbar)
+    // Update request area (with progressbar)
     navigationRequest->update(
         PROGRESS_FRACTION
     );

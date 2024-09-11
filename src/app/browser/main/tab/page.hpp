@@ -86,7 +86,7 @@ namespace app::browser::main::tab
             double progress_fraction;
 
             // Actions
-            Glib::RefPtr<Gio::SimpleAction> action__refresh;
+            Glib::RefPtr<Gio::SimpleAction> action__update;
 
             // Database
             sqlite3 * db;
@@ -111,7 +111,7 @@ namespace app::browser::main::tab
                 const MIME & MIME,
                 const Glib::ustring & TITLE,
                 const Glib::ustring & DESCRIPTION,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__REFRESH,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_RELOAD
