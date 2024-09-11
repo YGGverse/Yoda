@@ -70,7 +70,7 @@ int Tab::restore()
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             const int PAGE_NUMBER = append(
-                _("Restore.."),
+                _("Restore"),
                 sqlite3_column_int(
                     statement,
                     DB::SESSION::IS_CURRENT
@@ -85,7 +85,7 @@ int Tab::restore()
                     statement,
                     DB::SESSION::ID
                 )
-            );
+            ); // maybe not much reasons to restore as page title in use @TODO
 
             get_tabPage(
                 PAGE_NUMBER
@@ -150,18 +150,27 @@ void Tab::save()
 void Tab::update(
     const int & PAGE_NUMBER
 ) {
+    // Get tab page
     const auto TAB_PAGE = get_tabPage(
         PAGE_NUMBER
     );
 
+    // Update tab page component
+    TAB_PAGE->update(
+        TAB_PAGE->get_mime(),
+        TAB_PAGE->get_title(),
+        TAB_PAGE->get_description(),
+        TAB_PAGE->get_progress_fraction()
+    ); // just action delegate @TODO
+
+    // Update tab label component
     get_tabLabel(
         PAGE_NUMBER
     )->set_label(
         TAB_PAGE->get_title()
     );
 
-    // TAB_PAGE->update(); @TODO meant refresh?
-
+    // Update tab actions status
     action__tab_close_active->set_enabled(
         get_n_pages() > 0
     );
