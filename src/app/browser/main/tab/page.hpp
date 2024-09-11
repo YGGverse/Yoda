@@ -83,7 +83,11 @@ namespace app::browser::main::tab
             MIME mime;
             Glib::ustring title;
             Glib::ustring description;
-            double progress_fraction;
+
+            // Tools
+            double progress_fraction; // Page preparation status, wanted for following needs:
+                                      // * indication widgets (progress bar)
+                                      // * toggle window update action in main thread (e.g. on async data loading)
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__update;
