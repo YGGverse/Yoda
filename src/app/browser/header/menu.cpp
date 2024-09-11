@@ -5,6 +5,7 @@ using namespace app::browser::header;
 Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__DEBUG,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__QUIT,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLEAN,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__RESTORE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__SAVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_APPEND,
@@ -23,6 +24,13 @@ Menu::Menu(
     const auto MENU__MAIN = Gio::Menu::create();
 
         const auto MENU__MAIN_SESSION = Gio::Menu::create();
+
+            MENU__MAIN_SESSION->append(
+                _("Clean"),
+                get_action_detailed_name(
+                    ACTION__CLEAN
+                )
+            );
 
             MENU__MAIN_SESSION->append(
                 _("Restore"),

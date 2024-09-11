@@ -38,6 +38,7 @@ namespace app::browser
 
             // Actions
             void update();
+            void clean();
             void restore();
             void save();
 

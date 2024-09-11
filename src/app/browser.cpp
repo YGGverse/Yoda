@@ -22,6 +22,14 @@ Browser::Browser(
         }
     );
 
+    const auto ACTION__CLEAN = add_action(
+        "clean",
+        [this]
+        {
+            browserMain->clean();
+        }
+    );
+
     const auto ACTION__RESTORE = add_action(
         "restore",
         [this]
@@ -194,6 +202,7 @@ Browser::Browser(
     browserHeader = Gtk::make_managed<browser::Header>(
         ACTION__DEBUG,
         ACTION__QUIT,
+        ACTION__CLEAN,
         ACTION__RESTORE,
         ACTION__SAVE,
         ACTION__MAIN_TAB_APPEND,

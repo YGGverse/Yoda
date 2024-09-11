@@ -53,6 +53,11 @@ void Main::tab_append()
     );
 };
 
+void Main::clean()
+{
+    mainTab->clean();
+};
+
 void Main::restore()
 {
     mainTab->restore();
