@@ -124,7 +124,7 @@ void Tab::save()
                 page_number == get_current_page() ? 1 : 0,
                 get_tabLabel(
                     page_number
-                )->get_text()
+                )->get_text() // @TODO use separated table for children widget
             )
         );
     }
