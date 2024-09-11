@@ -147,22 +147,26 @@ int Page::save(
     );
 }
 
+void Page::update()
+{
+    // Update children components
+    pageNavigation->update(
+        progress_fraction
+    );
+}
+
 void Page::update(
     const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
 ) {
-    // Update page data
     mime              = MIME;
     title             = TITLE;
     description       = DESCRIPTION;
     progress_fraction = PROGRESS_FRACTION;
 
-    // Update children components
-    pageNavigation->update(
-        progress_fraction
-    );
+    update();
 }
 
 void Page::navigation_reload(

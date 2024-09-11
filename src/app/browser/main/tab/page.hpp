@@ -126,6 +126,7 @@ namespace app::browser::main::tab
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             );
 
+            void update();
             void update(
                 const MIME & MIME,
                 const Glib::ustring & TITLE,
