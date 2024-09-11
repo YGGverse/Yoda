@@ -89,7 +89,33 @@ int Page::restore(
         // Use latest record as order
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            // Restore page data @TODO
+            // Restore page data
+            switch (
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::MIME
+                )
+            ) {
+                case 0: mime = MIME::TEXT_PLAIN; break;
+                case 1: mime = MIME::TEXT_GEMINI; break;
+                case 2: mime = MIME::UNDEFINED; break;
+                default:
+                    throw _("Undefined MIME type");
+            } // @TODO
+
+            title = reinterpret_cast<const char*>(
+                sqlite3_column_text(
+                    statement,
+                    DB::SESSION::TITLE
+                )
+            );
+
+            description = reinterpret_cast<const char*>(
+                sqlite3_column_text(
+                    statement,
+                    DB::SESSION::DESCRIPTION
+                )
+            );
 
             // Restore children components
             pageNavigation->restore(
@@ -122,7 +148,7 @@ int Page::save(
 }
 
 void Page::update(
-    const enum MIME & MIME,
+    const MIME & MIME,
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
     const double & PROGRESS_FRACTION
