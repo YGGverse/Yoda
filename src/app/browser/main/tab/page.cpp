@@ -28,7 +28,12 @@ Page::Page(
         this->db = db
     );
 
-    // Init components
+    // Init widget
+    set_orientation(
+        Gtk::Orientation::VERTICAL
+    );
+
+    // Init widget components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         this->db,
         ACTION__UPDATE,
@@ -46,11 +51,6 @@ Page::Page(
         append(
             * pageContent
         );
-
-    // Init widget
-    set_orientation(
-        Gtk::Orientation::VERTICAL
-    );
 
     // Connect events
     /* activated twice on tab change @TODO
