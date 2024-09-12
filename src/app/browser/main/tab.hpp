@@ -43,11 +43,13 @@ namespace app::browser::main
                     ); // return sqlite3_exec status code
 
                     static int clean(
-                        sqlite3 * db
+                        sqlite3 * db,
+                        const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
                         sqlite3 * db,
+                        const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID,
                         const int & PAGE_NUMBER,
                         const bool & IS_CURRENT
                     ); // return sqlite3_last_insert_rowid
@@ -121,11 +123,13 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
-            int restore(); // return sqlite3_finalize status code
+            int restore(
+                const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
+            ); // return sqlite3_finalize status code
 
-            void clean();
-
-            void save();
+            void save(
+                const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
+            );
 
             // Getters
             Glib::ustring get_page_title(

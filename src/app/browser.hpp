@@ -24,20 +24,76 @@ namespace app
 
     class Browser : public Gtk::ApplicationWindow
     {
-        // Components
-        app::browser::Header * browserHeader;
-        app::browser::Main * browserMain;
+        public:
 
-        // Defaults
-        const int WIDTH = 640;
-        const int HEIGHT = 480;
+            /*
+             * Tab class database
+             *
+             * Allowed parental access to enums and relationship methods
+             */
+            struct DB
+            {
+                // APP_BROWSER_MAIN_TAB__*
+                struct SESSION
+                {
+                    enum
+                    {
+                        ID,
+                        TIME,
+                        WIDTH,
+                        HEIGHT,
+                        IS_FULL_SCREEN
+                    }; // table fields index
 
+                    static int init(
+                        sqlite3 * db
+                    ); // return sqlite3_exec status code
+
+                    static int clean(
+                        sqlite3 * db
+                    ); // return sqlite3_finalize status code
+
+                    static sqlite3_int64 add(
+                        sqlite3 * db,
+                        const int & WIDTH,
+                        const int & HEIGHT,
+                        const bool & IS_FULL_SCREEN
+                    ); // return sqlite3_last_insert_rowid
+                };
+            };
+
+        /*
+         * Internal members
+         */
+        private:
+
+            // Database
+            sqlite3 * db;
+
+            // Components
+            app::browser::Header * browserHeader;
+            app::browser::Main * browserMain;
+
+            // Defaults
+            const int WIDTH = 640;
+            const int HEIGHT = 480;
+
+        /*
+         * Browser class API
+         */
         public:
 
             Browser(
                 sqlite3 * db,
                 const Glib::RefPtr<Gtk::Application> & APP
             );
+
+            // Actions
+            int restore(); // return sqlite3_finalize status code
+
+            void clean();
+
+            void save();
     };
 }
 

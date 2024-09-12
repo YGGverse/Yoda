@@ -8,6 +8,11 @@ Browser::Browser(
     sqlite3 * db,
     const Glib::RefPtr<Gtk::Application> & APP
 ) {
+    // Init database
+    DB::SESSION::init(
+        this->db = db
+    );
+
     // Init window actions
     const auto ACTION__UPDATE = add_action(
         "update",
@@ -26,7 +31,7 @@ Browser::Browser(
         "clean",
         [this]
         {
-            browserMain->clean();
+            clean();
         }
     );
 
@@ -34,7 +39,7 @@ Browser::Browser(
         "restore",
         [this]
         {
-            browserMain->restore();
+            restore();
         }
     );
 
@@ -42,7 +47,7 @@ Browser::Browser(
         "save",
         [this]
         {
-            browserMain->save();
+            save();
         }
     );
 
@@ -232,15 +237,215 @@ Browser::Browser(
         );
 
     // Connect signals
+    signal_realize().connect(
+        [this]
+        {
+            restore(); // last session from DB
+        }
+    );
+
     signal_close_request().connect(
         [this]
         {
-            browserMain->save();
+            save();
 
             // @TODO sqlite3_close(db);
 
             return false;
         },
         true
+    );
+}
+
+// Actions
+int Browser::restore()
+{
+    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
+        db,
+        R"SQL(
+            SELECT * FROM `app_browser__session` ORDER BY `page_number` ASC
+        )SQL",
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        while (sqlite3_step(statement) == SQLITE_ROW)
+        {
+            // Restore widget settings
+            set_default_size( // @TODO actualize
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::WIDTH
+                ),
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::HEIGHT
+                )
+            );
+
+            // Restore children components
+            browserMain->restore(
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::ID
+                )
+            );
+        }
+    }
+
+    return sqlite3_finalize(
+        statement
+    );
+}
+
+void Browser::clean()
+{
+    DB::SESSION::clean(
+        db
+    );
+}
+
+void Browser::save()
+{
+    char * error; // @TODO
+
+    // Delete previous data
+    DB::SESSION::clean(
+        db
+    ); // @TODO run on background
+
+    // Create new session
+    const sqlite3_int64 APP_BROWSER__SESSION__ID = DB::SESSION::add(
+        db,
+        get_width(),
+        get_height(),
+        false // @TODO full screen status
+    );
+
+    // Delegate save actions to children components
+    browserMain->save(
+        APP_BROWSER__SESSION__ID
+    );
+}
+
+// Database
+int Browser::DB::SESSION::init(
+    sqlite3 * db
+) {
+    char * error;
+
+    return sqlite3_exec(
+        db,
+        R"SQL(
+            CREATE TABLE IF NOT EXISTS `app_browser__session`
+            (
+                `id`             INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`           INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `width`          INTEGER NOT NULL,
+                `height`         INTEGER NOT NULL,
+                `is_full_screen` INTEGER NOT NULL
+            )
+        )SQL",
+        nullptr,
+        nullptr,
+        &error
+    );
+}
+
+int Browser::DB::SESSION::clean(
+    sqlite3 * db
+) {
+    char * error; // @TODO
+    sqlite3_stmt * statement;
+
+    const int PREPARE_STATUS = sqlite3_prepare_v3(
+        db,
+        R"SQL(
+            SELECT * FROM `app_browser__session`
+        )SQL",
+        -1,
+        SQLITE_PREPARE_NORMALIZE,
+        &statement,
+        nullptr
+    );
+
+    if (PREPARE_STATUS == SQLITE_OK)
+    {
+        while (sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const sqlite3_int64 APP_BROWSER__SESSION__ID = sqlite3_column_int64(
+                statement,
+                DB::SESSION::ID
+            );
+
+            // Delete record
+            const int EXEC_STATUS = sqlite3_exec(
+                db,
+                Glib::ustring::sprintf(
+                    R"SQL(
+                        DELETE FROM `app_browser__session` WHERE `id` = %d
+                    )SQL",
+                    APP_BROWSER__SESSION__ID
+                ).c_str(),
+                nullptr,
+                nullptr,
+                &error
+            );
+
+            // Delegate children dependencies cleanup
+            if (EXEC_STATUS == SQLITE_OK)
+            {
+                browser::Main::DB::SESSION::clean(
+                    db,
+                    APP_BROWSER__SESSION__ID
+                );
+            }
+        }
+    }
+
+    return sqlite3_finalize(
+        statement
+    );
+}
+
+sqlite3_int64 Browser::DB::SESSION::add(
+    sqlite3 * db,
+    const int & WIDTH,
+    const int & HEIGHT,
+    const bool & IS_FULL_SCREEN
+) {
+    char * error; // @TODO
+
+    sqlite3_exec(
+        db,
+        Glib::ustring::sprintf(
+            R"SQL(
+                INSERT INTO `app_browser__session` (
+                    `width`,
+                    `height`,
+                    `is_full_screen`
+                ) VALUES (
+                    %d,
+                    %d,
+                    %d
+                )
+            )SQL",
+            WIDTH,
+            HEIGHT,
+            IS_FULL_SCREEN ? 1 : 0
+        ).c_str(),
+        nullptr,
+        nullptr,
+        &error
+    );
+
+    return sqlite3_last_insert_rowid(
+        db
     );
 }

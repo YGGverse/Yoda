@@ -18,12 +18,58 @@ namespace app::browser
 
     class Main : public Gtk::Box
     {
-        // Components
-        main::Tab * mainTab;
+        public:
 
-        // Defaults
-        const bool HOMOGENEOUS = true;
+            /*
+             * Tab class database
+             *
+             * Allowed parental access to enums and relationship methods
+             */
+            struct DB
+            {
+                // APP_BROWSER_MAIN__*
+                struct SESSION
+                {
+                    enum
+                    {
+                        ID,
+                        TIME
+                    }; // table fields index
 
+                    static int init(
+                        sqlite3 * db
+                    ); // return sqlite3_exec status code
+
+                    static int clean(
+                        sqlite3 * db,
+                        const sqlite3_int64 & APP_BROWSER__SESSION__ID
+                    ); // return sqlite3_finalize status code
+
+                    static sqlite3_int64 add(
+                        sqlite3 * db,
+                        const sqlite3_int64 & APP_BROWSER__SESSION__ID
+                    ); // return sqlite3_last_insert_rowid
+
+                };
+            };
+
+        /*
+         * Internal members
+         */
+        private:
+
+            // Database
+            sqlite3 * db;
+
+            // Components
+            main::Tab * mainTab;
+
+            // Defaults
+            const bool HOMOGENEOUS = true;
+
+        /*
+         * Main class API
+         */
         public:
 
             Main(
@@ -37,10 +83,6 @@ namespace app::browser
             );
 
             // Actions
-            void clean();
-            void restore();
-            void save();
-
             void tab_append();
 
             void tab_close_all();
@@ -51,6 +93,18 @@ namespace app::browser
                 void tab_page_navigation_reload();
                 void tab_page_navigation_history_back();
                 void tab_page_navigation_history_forward();
+
+            int restore(
+                const sqlite3_int64 & APP_BROWSER__SESSION__ID
+            ); // return sqlite3_finalize status code
+
+            void clean(
+                const sqlite3_int64 & APP_BROWSER__SESSION__ID
+            );
+
+            void save(
+                const sqlite3_int64 & APP_BROWSER__SESSION__ID
+            );
 
             void update();
 

@@ -31,14 +31,6 @@ Tab::Tab(
         SCROLLABLE
     );
 
-    // Init events
-    signal_realize().connect(
-        [this]
-        {
-            restore(); // last session from DB
-        }
-    );
-
     signal_switch_page().connect(
         [this](Gtk::Widget*, guint)
         {
@@ -48,15 +40,20 @@ Tab::Tab(
     );
 }
 
-int Tab::restore()
-{
+int Tab::restore(
+    const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
+) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
-        R"SQL(
-            SELECT * FROM `app_browser_main_tab__session` ORDER BY `page_number` ASC
-        )SQL",
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab__session`
+                        WHERE `app_browser_main__session_id` = %d ORDER BY `page_number` ASC
+            )SQL",
+            APP_BROWSER_MAIN__SESSION__ID
+        ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
         &statement,
@@ -103,22 +100,15 @@ int Tab::restore()
     );
 }
 
-void Tab::clean() // @TODO menu action?
-{
-    DB::SESSION::clean(
-        db
-    );
-
-    close_all();
-}
-
-void Tab::save()
-{
+void Tab::save(
+    const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
+) {
     char * error; // @TODO
 
     // Delete previous data
     DB::SESSION::clean(
-        db
+        db,
+        APP_BROWSER_MAIN__SESSION__ID
     ); // @TODO run on background
 
     // Save current tab session
@@ -127,6 +117,7 @@ void Tab::save()
         // Create new session
         const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = DB::SESSION::add(
             db,
+            APP_BROWSER_MAIN__SESSION__ID,
             page_number,
             page_number == get_current_page() ? 1 : 0
         );
@@ -377,16 +368,21 @@ int Tab::DB::SESSION::init(
 }
 
 int Tab::DB::SESSION::clean(
-    sqlite3 * db
+    sqlite3 * db,
+    const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
-        R"SQL(
-            SELECT * FROM `app_browser_main_tab__session`
-        )SQL",
+        Glib::ustring::sprintf(
+            R"SQL(
+                SELECT * FROM `app_browser_main_tab__session`
+                        WHERE `app_browser_main_tab__session_id` = %d
+            )SQL",
+            APP_BROWSER_MAIN__SESSION__ID
+        ).c_str(),
         -1,
         SQLITE_PREPARE_NORMALIZE,
         &statement,
@@ -439,6 +435,7 @@ int Tab::DB::SESSION::clean(
 
 sqlite3_int64 Tab::DB::SESSION::add(
     sqlite3 * db,
+    const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID,
     const int & PAGE_NUMBER,
     const bool & IS_CURRENT
 ) {
@@ -449,13 +446,16 @@ sqlite3_int64 Tab::DB::SESSION::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab__session` (
+                    `app_browser_main__session_id`,
                     `page_number`,
                     `is_current`
                 ) VALUES (
                     %d,
+                    %d,
                     %d
                 )
             )SQL",
+            APP_BROWSER_MAIN__SESSION__ID,
             PAGE_NUMBER,
             IS_CURRENT
         ).c_str(),
