@@ -37,21 +37,22 @@ namespace app::browser
             );
 
             // Actions
-            void update();
             void clean();
             void restore();
             void save();
 
-                void tab_append();
+            void tab_append();
 
-                void tab_close_all();
-                void tab_close_left();
-                void tab_close_right();
-                void tab_close();
+            void tab_close_all();
+            void tab_close_left();
+            void tab_close_right();
+            void tab_close();
 
-                    void tab_page_navigation_reload();
-                    void tab_page_navigation_history_back();
-                    void tab_page_navigation_history_forward();
+                void tab_page_navigation_reload();
+                void tab_page_navigation_history_back();
+                void tab_page_navigation_history_forward();
+
+            void update();
 
             // Getters
             Glib::ustring get_tab_page_title();

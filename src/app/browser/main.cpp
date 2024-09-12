@@ -38,21 +38,8 @@ Main::Main(
 }
 
 // Actions
-void Main::update()
-{
-    mainTab->update(
-        mainTab->get_current_page()
-    );
-};
 
-void Main::tab_append()
-{
-    mainTab->append(
-        _("New tab"),
-        true
-    );
-};
-
+/// Session
 void Main::clean()
 {
     mainTab->clean();
@@ -66,6 +53,15 @@ void Main::restore()
 void Main::save()
 {
     mainTab->save();
+};
+
+/// Tab actions
+void Main::tab_append()
+{
+    mainTab->append(
+        _("New tab"),
+        true
+    );
 };
 
 void Main::tab_close()
@@ -90,6 +86,7 @@ void Main::tab_close_all()
     mainTab->close_all();
 };
 
+//// Tab page navigation
 void Main::tab_page_navigation_reload() {
     mainTab->page_navigation_reload(
         mainTab->get_current_page(), // @TODO
@@ -97,6 +94,7 @@ void Main::tab_page_navigation_reload() {
     );
 };
 
+///// Tab page navigation history
 void Main::tab_page_navigation_history_back()
 {
     mainTab->page_navigation_history_back(
@@ -108,6 +106,14 @@ void Main::tab_page_navigation_history_forward()
 {
     mainTab->page_navigation_history_forward(
         mainTab->get_current_page() // @TODO
+    );
+};
+
+/// Other
+void Main::update()
+{
+    mainTab->update(
+        mainTab->get_current_page()
     );
 };
 
