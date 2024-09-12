@@ -379,7 +379,7 @@ int Tab::DB::SESSION::clean(
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab__session`
-                        WHERE `app_browser_main_tab__session_id` = %d
+                        WHERE `app_browser_main__session_id` = %d
             )SQL",
             APP_BROWSER_MAIN__SESSION__ID
         ).c_str(),
