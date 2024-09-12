@@ -305,8 +305,26 @@ void Page::navigation_reload(
 
                                             action__update->activate();
 
-                                            pageContent->set_text_gemini( // @TODO
-                                                buffer
+                                            // Continue reading..
+                                            GioSocketConnection->get_input_stream()->read_async( // | read_all_async
+                                                buffer,
+                                                sizeof(buffer) - 1,
+                                                [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                                                {
+                                                    // Update
+                                                    title = _("Done"); // @TODO page title
+
+                                                    description = pageNavigation->get_request_host();
+
+                                                    progress_fraction = 1;
+
+                                                    action__update->activate();
+
+                                                    // Set content driver
+                                                    pageContent->set_text_gemini( // @TODO
+                                                        buffer
+                                                    );
+                                                }
                                             );
                                         }
 
