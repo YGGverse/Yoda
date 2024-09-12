@@ -139,7 +139,7 @@ int Request::save(
     );
 }
 
-void Request::parse()
+void Request::parse() // @TODO https://docs.gtk.org/glib/struct.Uri.html
 {
     auto match = Glib::Regex::split_simple(
         R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex",
