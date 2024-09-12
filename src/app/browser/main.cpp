@@ -70,7 +70,10 @@ int Main::restore(
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             mainTab->restore(
-                DB::SESSION::ID
+                sqlite3_column_int64(
+                    statement,
+                    DB::SESSION::ID
+                )
             );
         }
     }
