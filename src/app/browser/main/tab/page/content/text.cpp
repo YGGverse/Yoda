@@ -17,6 +17,10 @@ void Text::set_gemini(
         NULL  //Gtk::Adjustment::V
     );
 
+    viewport->set_scroll_to_focus(
+        false
+    );
+
     viewport->set_child(
         * new text::Gemini( // @TODO manage
             GEMTEXT
