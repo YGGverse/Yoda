@@ -203,6 +203,8 @@ Browser::Browser(
         HEIGHT
     );
 
+    IS_FULLSCREEN ? fullscreen() : unfullscreen();
+
     // Init components
     browserHeader = Gtk::make_managed<browser::Header>(
         ACTION__DEBUG,
@@ -278,7 +280,7 @@ int Browser::restore()
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore widget settings
-            set_default_size( // @TODO actualize
+            set_default_size(
                 sqlite3_column_int(
                     statement,
                     DB::SESSION::WIDTH
@@ -288,6 +290,11 @@ int Browser::restore()
                     DB::SESSION::HEIGHT
                 )
             );
+
+            sqlite3_column_int(
+                statement,
+                DB::SESSION::IS_FULLSCREEN
+            ) ? fullscreen() : unfullscreen();
 
             // Restore children components
             browserMain->restore(
@@ -327,7 +334,7 @@ void Browser::save()
         db,
         get_width(),
         get_height(),
-        false // @TODO full screen status
+        is_fullscreen()
     );
 
     // Delegate save actions to children components
@@ -347,11 +354,11 @@ int Browser::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser__session`
             (
-                `id`             INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time`           INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                `width`          INTEGER NOT NULL,
-                `height`         INTEGER NOT NULL,
-                `is_full_screen` INTEGER NOT NULL
+                `id`            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time`          INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `width`         INTEGER NOT NULL,
+                `height`        INTEGER NOT NULL,
+                `is_fullscreen` INTEGER NOT NULL
             )
         )SQL",
         nullptr,
@@ -420,7 +427,7 @@ sqlite3_int64 Browser::DB::SESSION::add(
     sqlite3 * db,
     const int & WIDTH,
     const int & HEIGHT,
-    const bool & IS_FULL_SCREEN
+    const bool & IS_FULLSCREEN
 ) {
     char * error; // @TODO
 
@@ -431,7 +438,7 @@ sqlite3_int64 Browser::DB::SESSION::add(
                 INSERT INTO `app_browser__session` (
                     `width`,
                     `height`,
-                    `is_full_screen`
+                    `is_fullscreen`
                 ) VALUES (
                     %d,
                     %d,
@@ -440,7 +447,7 @@ sqlite3_int64 Browser::DB::SESSION::add(
             )SQL",
             WIDTH,
             HEIGHT,
-            IS_FULL_SCREEN ? 1 : 0
+            IS_FULLSCREEN ? 1 : 0
         ).c_str(),
         nullptr,
         nullptr,

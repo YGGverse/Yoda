@@ -42,7 +42,7 @@ namespace app
                         TIME,
                         WIDTH,
                         HEIGHT,
-                        IS_FULL_SCREEN
+                        IS_FULLSCREEN
                     }; // table fields index
 
                     static int init(
@@ -57,7 +57,7 @@ namespace app
                         sqlite3 * db,
                         const int & WIDTH,
                         const int & HEIGHT,
-                        const bool & IS_FULL_SCREEN
+                        const bool & IS_FULLSCREEN
                     ); // return sqlite3_last_insert_rowid
                 };
             };
@@ -77,6 +77,7 @@ namespace app
             // Defaults
             const int WIDTH = 640;
             const int HEIGHT = 480;
+            const bool IS_FULLSCREEN = false;
 
         /*
          * Browser class API
