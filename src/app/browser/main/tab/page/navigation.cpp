@@ -52,6 +52,7 @@ Navigation::Navigation(
         );
 
     navigationHistory = Gtk::make_managed<navigation::History>(
+        db,
         ACTION__NAVIGATION_HISTORY_BACK,
         ACTION__NAVIGATION_HISTORY_FORWARD
     );
@@ -135,6 +136,13 @@ int Navigation::restore(
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore children components
+            navigationHistory->restore(
+                sqlite3_column_int64(
+                    statement,
+                    DB::SESSION::ID
+                )
+            );
+
             navigationRequest->restore(
                 sqlite3_column_int64(
                     statement,
@@ -149,13 +157,33 @@ int Navigation::restore(
     );
 }
 
-int Navigation::save(
+void Navigation::save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
-    return navigationRequest->save(
+    // Delete previous session
+    DB::SESSION::clean(
+        db,
+        APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+    );
+
+    // Create new record
+    const sqlite3_int64 APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID = DB::SESSION::add(
+        db,
+        APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+    );
+
+    // Delegate save action to children components
+    navigationHistory->save(
         DB::SESSION::add(
             db,
-            APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
+            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+        )
+    );
+
+    navigationRequest->save(
+        DB::SESSION::add(
+            db,
+            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
         )
     );
 }
@@ -275,7 +303,8 @@ int Navigation::DB::SESSION::clean(
         db,
         Glib::ustring::sprintf(
             R"SQL(
-                SELECT * FROM `app_browser_main_tab_page_navigation__session` WHERE `app_browser_main_tab_page__session__id` = %d
+                SELECT * FROM `app_browser_main_tab_page_navigation__session`
+                        WHERE `app_browser_main_tab_page__session__id` = %d
             )SQL",
             APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
         ).c_str(),

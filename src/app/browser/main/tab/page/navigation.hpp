@@ -94,11 +94,11 @@ namespace app::browser::main::tab::page
             );
 
             int restore(
-                const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            int save(
-                const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
+            void save(
+                const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
             );
 
             void history_add(
