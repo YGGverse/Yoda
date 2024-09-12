@@ -86,9 +86,7 @@ namespace app::browser::main::tab
             Glib::ustring description;
 
             // Tools
-            double progress_fraction; // Page preparation status, wanted for following needs:
-                                      // * indication widgets (progress bar)
-                                      // * toggle window update action in main thread (e.g. on async data loading complete)
+            double progress_fraction; // async load indication (progress bar)
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__update;
