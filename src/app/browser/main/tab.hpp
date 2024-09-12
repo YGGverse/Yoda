@@ -21,7 +21,7 @@ namespace app::browser::main
         public:
 
             /*
-             * Class database
+             * Tab class database
              *
              * Allowed parental access to enums and relationship methods
              */
@@ -76,7 +76,7 @@ namespace app::browser::main
             const bool SCROLLABLE = true;
 
         /*
-         * Class API
+         * Tab class API
          */
         public:
 
