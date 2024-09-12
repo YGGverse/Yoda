@@ -254,8 +254,7 @@ void Page::navigation_reload(
 
                             description = Glib::ustring::sprintf(
                                 _("Begin request to %s.."),
-                                pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                           : pageNavigation->get_request_path()
+                                pageNavigation->get_request_host()
                             );
 
                             progress_fraction = .5;
@@ -273,8 +272,7 @@ void Page::navigation_reload(
 
                                     description = Glib::ustring::sprintf(
                                         _("Reading response from %s.."),
-                                        pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                                   : pageNavigation->get_request_path()
+                                        pageNavigation->get_request_host()
                                     );
 
                                     progress_fraction = .75;
@@ -300,8 +298,7 @@ void Page::navigation_reload(
 
                                             description = Glib::ustring::sprintf(
                                                 _("Parsing response from %s.."),
-                                                pageNavigation->get_request_path().empty() ? pageNavigation->get_request_host()
-                                                                                           : pageNavigation->get_request_path()
+                                                pageNavigation->get_request_host()
                                             );
 
                                             progress_fraction = .8;
