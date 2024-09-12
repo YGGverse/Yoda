@@ -55,7 +55,7 @@ int Main::restore(
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main__session`
-                        WHERE `app_browser__session_id` = %d
+                        WHERE `app_browser__session__id` = %d
             )SQL",
             APP_BROWSER__SESSION__ID
         ).c_str(),

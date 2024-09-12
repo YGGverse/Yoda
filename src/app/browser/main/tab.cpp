@@ -50,7 +50,7 @@ int Tab::restore(
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab__session`
-                        WHERE `app_browser_main__session_id` = %d ORDER BY `page_number` ASC
+                        WHERE `app_browser_main__session__id` = %d ORDER BY `page_number` ASC
             )SQL",
             APP_BROWSER_MAIN__SESSION__ID
         ).c_str(),
@@ -355,7 +355,7 @@ int Tab::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
             (
-                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main__session_id` INTEGER NOT NULL,
+                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main__session__id` INTEGER NOT NULL,
                 `time`        INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `page_number` INTEGER NOT NULL,
                 `is_current`  INTEGER NOT NULL
@@ -379,7 +379,7 @@ int Tab::DB::SESSION::clean(
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab__session`
-                        WHERE `app_browser_main__session_id` = %d
+                        WHERE `app_browser_main__session__id` = %d
             )SQL",
             APP_BROWSER_MAIN__SESSION__ID
         ).c_str(),
@@ -446,7 +446,7 @@ sqlite3_int64 Tab::DB::SESSION::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab__session` (
-                    `app_browser_main__session_id`,
+                    `app_browser_main__session__id`,
                     `page_number`,
                     `is_current`
                 ) VALUES (

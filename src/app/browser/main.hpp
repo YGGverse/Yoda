@@ -33,7 +33,7 @@ namespace app::browser
                     enum
                     {
                         ID,
-                        APP_BROWSER__SESSION_ID,
+                        APP_BROWSER__SESSION__ID,
                         TIME
                     }; // table fields index
 
