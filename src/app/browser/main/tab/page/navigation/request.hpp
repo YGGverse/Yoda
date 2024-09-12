@@ -17,7 +17,7 @@ namespace app::browser::main::tab::page::navigation
         public:
 
             /*
-             * Class database
+             * Request class database
              *
              * Allowed parental access to enums and relationship methods
              */
