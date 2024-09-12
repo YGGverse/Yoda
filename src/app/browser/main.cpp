@@ -192,7 +192,7 @@ int Main::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main__session`
             (
-                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser__session__id` INTEGER NOT NULL
+                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser__session__id` INTEGER NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         )SQL",
