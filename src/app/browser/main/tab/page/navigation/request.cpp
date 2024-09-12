@@ -192,7 +192,7 @@ Glib::ustring Request::get_path()
 
 Glib::ustring Request::get_query()
 {
-    return path;
+    return query;
 }
 
 // Database model
