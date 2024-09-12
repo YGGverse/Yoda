@@ -3,7 +3,7 @@
 using namespace app::browser::main::tab::page::content::text;
 
 Gemini::Gemini(
-    const Glib::ustring & gemtext
+    const Glib::ustring & GEMTEXT
 ) {
     set_wrap(
         true
@@ -14,6 +14,6 @@ Gemini::Gemini(
     );
 
     set_markup(
-        gemtext // @TODO
+        GEMTEXT // @TODO
     );
 }

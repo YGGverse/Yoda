@@ -22,11 +22,11 @@ namespace app::browser::main::tab::page
             ~Content();
 
             void set_text_gemini(
-                const Glib::ustring & gemtext
+                const Glib::ustring & GEMTEXT
             );
 
             void set_text_plain(
-                const Glib::ustring & text
+                const Glib::ustring & TEXT
             );
     };
 }

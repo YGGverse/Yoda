@@ -1,6 +1,5 @@
 #include "content.hpp"
-#include "content/text/gemini.hpp"
-#include "content/text/plain.hpp"
+#include "content/text.hpp"
 
 using namespace app::browser::main::tab::page;
 
@@ -24,23 +23,23 @@ Content::~Content()
 
 // Public actions
 void Content::set_text_gemini(
-    const Glib::ustring & gemtext
+    const Glib::ustring & GEMTEXT
 ) {
+    auto contentText = new content::Text; // @TODO manage
+
+    contentText->set_gemini(
+        GEMTEXT
+    );
+
     set_widget(
-        new content::text::Gemini(
-            gemtext
-        )
+        contentText
     );
 }
 
 void Content::set_text_plain(
-    const Glib::ustring & text
+    const Glib::ustring & TEXT
 ) {
-    set_widget(
-        new content::text::Plain(
-            text
-        )
-    );
+    // @TODO
 }
 
 // @TODO text_plain, picture, video, etc.

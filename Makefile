@@ -17,6 +17,7 @@ SRCS =  src/app.cpp\
 		src/app/browser/main/tab.cpp\
 		src/app/browser/main/tab/page.cpp\
 		src/app/browser/main/tab/page/content.cpp\
+		src/app/browser/main/tab/page/content/text.cpp\
 		src/app/browser/main/tab/page/content/text/gemini.cpp\
 		src/app/browser/main/tab/page/content/text/plain.cpp\
 		src/app/browser/main/tab/page/navigation.cpp\

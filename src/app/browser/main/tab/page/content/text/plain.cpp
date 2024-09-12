@@ -3,7 +3,7 @@
 using namespace app::browser::main::tab::page::content::text;
 
 Plain::Plain(
-    const Glib::ustring & text
+    const Glib::ustring & TEXT
 ) {
     set_wrap(
         true
@@ -14,6 +14,6 @@ Plain::Plain(
     );
 
     set_text(
-        text
+        TEXT
     );
 }

@@ -11,7 +11,7 @@ namespace app::browser::main::tab::page::content::text
         public:
 
             Gemini(
-                const Glib::ustring & gemtext
+                const Glib::ustring & GEMTEXT
             );
     };
 }

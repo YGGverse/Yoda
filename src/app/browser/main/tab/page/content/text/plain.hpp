@@ -11,7 +11,7 @@ namespace app::browser::main::tab::page::content::text
         public:
 
             Plain(
-                const Glib::ustring & text
+                const Glib::ustring & TEXT
             );
     };
 }
