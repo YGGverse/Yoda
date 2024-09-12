@@ -174,17 +174,11 @@ void Navigation::save(
 
     // Delegate save action to children components
     navigationHistory->save(
-        DB::SESSION::add(
-            db,
-            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
-        )
+        APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
 
     navigationRequest->save(
-        DB::SESSION::add(
-            db,
-            APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
-        )
+        APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
 }
 
