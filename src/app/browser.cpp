@@ -309,6 +309,8 @@ void Browser::clean()
     DB::SESSION::clean(
         db
     );
+
+    browserMain->tab_close_all();
 }
 
 void Browser::save()

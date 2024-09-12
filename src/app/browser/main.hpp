@@ -98,10 +98,6 @@ namespace app::browser
                 const sqlite3_int64 & APP_BROWSER__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            void clean(
-                const sqlite3_int64 & APP_BROWSER__SESSION__ID
-            );
-
             void save(
                 const sqlite3_int64 & APP_BROWSER__SESSION__ID
             );

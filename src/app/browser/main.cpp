@@ -45,17 +45,6 @@ Main::Main(
 // Actions
 
 /// Session
-void Main::clean(
-    const sqlite3_int64 & APP_BROWSER__SESSION__ID
-) {
-    DB::SESSION::clean(
-        db,
-        APP_BROWSER__SESSION__ID
-    );
-
-    mainTab->close_all();
-};
-
 int Main::restore(
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
