@@ -13,6 +13,10 @@ Gemini::Gemini(
         true
     );
 
+    set_use_markup(
+        true
+    );
+
     set_markup(
         GEMTEXT // @TODO
     );
