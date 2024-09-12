@@ -2,7 +2,9 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_HPP
 
 #include <glibmm/ustring.h>
+//#include <gtkmm/adjustment.h> @TODO
 #include <gtkmm/scrolledwindow.h>
+#include <gtkmm/viewport.h>
 
 namespace app::browser::main::tab::page::content
 {

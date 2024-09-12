@@ -12,10 +12,19 @@ Text::Text()
 void Text::set_gemini(
     const Glib::ustring & GEMTEXT
 ) {
-    set_child(
+    auto viewport = new Gtk::Viewport( // @TODO
+        NULL, //Gtk::Adjustment::H
+        NULL  //Gtk::Adjustment::V
+    );
+
+    viewport->set_child(
         * new text::Gemini( // @TODO manage
             GEMTEXT
         )
+    );
+
+    set_child(
+        * viewport
     );
 }
 
