@@ -132,6 +132,13 @@ int Request::restore(
 int Request::save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
+    // Delete previous records
+    DB::SESSION::clean(
+        db,
+        APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+    );
+
+    // Add new record
     return DB::SESSION::add(
         db,
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
