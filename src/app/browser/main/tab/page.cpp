@@ -132,11 +132,11 @@ int Page::restore(
     );
 }
 
-int Page::save(
+void Page::save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     // Delegate save action to child components
-    return pageNavigation->save(
+    pageNavigation->save(
         DB::SESSION::add(
             db,
             APP_BROWSER_MAIN_TAB__SESSION__ID,

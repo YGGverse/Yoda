@@ -125,7 +125,7 @@ namespace app::browser::main::tab
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            int save(
+            void save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             );
 
