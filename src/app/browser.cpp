@@ -16,8 +16,8 @@ Browser::Browser(
             browserMain->update();
 
             browserHeader->update(
-                browserMain->get_current_tab_page_title(),
-                browserMain->get_current_tab_page_description()
+                browserMain->get_tab_page_title(),
+                browserMain->get_tab_page_description()
             );
         }
     );

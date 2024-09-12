@@ -112,14 +112,14 @@ void Main::tab_page_navigation_history_forward()
 };
 
 // Getters
-Glib::ustring Main::get_current_tab_page_title()
+Glib::ustring Main::get_tab_page_title()
 {
     return mainTab->get_page_title(
         mainTab->get_current_page()
     );
 };
 
-Glib::ustring Main::get_current_tab_page_description()
+Glib::ustring Main::get_tab_page_description()
 {
     return mainTab->get_page_description(
         mainTab->get_current_page()

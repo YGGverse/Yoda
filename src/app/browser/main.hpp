@@ -50,13 +50,12 @@ namespace app::browser
                 void tab_close();
 
                     void tab_page_navigation_reload();
-
                     void tab_page_navigation_history_back();
                     void tab_page_navigation_history_forward();
 
             // Getters
-            Glib::ustring get_current_tab_page_title();
-            Glib::ustring get_current_tab_page_description();
+            Glib::ustring get_tab_page_title();
+            Glib::ustring get_tab_page_description();
     };
 }
 
