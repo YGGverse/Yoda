@@ -33,6 +33,7 @@ namespace app::browser::main
                     enum
                     {
                         ID,
+                        APP_BROWSER_MAIN__SESSION_ID,
                         TIME,
                         PAGE_NUMBER,
                         IS_CURRENT

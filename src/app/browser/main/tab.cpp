@@ -355,7 +355,7 @@ int Tab::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab__session`
             (
-                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `id`          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main__session_id` INTEGER NOT NULL,
                 `time`        INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `page_number` INTEGER NOT NULL,
                 `is_current`  INTEGER NOT NULL
