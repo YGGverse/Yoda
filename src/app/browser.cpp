@@ -265,7 +265,7 @@ int Browser::restore()
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
         R"SQL(
-            SELECT * FROM `app_browser__session` ORDER BY `page_number` ASC
+            SELECT * FROM `app_browser__session`
         )SQL",
         -1,
         SQLITE_PREPARE_NORMALIZE,
