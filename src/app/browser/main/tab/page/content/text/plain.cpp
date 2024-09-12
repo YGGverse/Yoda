@@ -5,6 +5,10 @@ using namespace app::browser::main::tab::page::content::text;
 Plain::Plain(
     const Glib::ustring & TEXT
 ) {
+    set_valign(
+        Gtk::Align::START
+    );
+
     set_wrap(
         true
     );

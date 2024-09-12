@@ -2,6 +2,7 @@
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_HPP
 
 #include <glibmm/ustring.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/label.h>
 
 namespace app::browser::main::tab::page::content::text

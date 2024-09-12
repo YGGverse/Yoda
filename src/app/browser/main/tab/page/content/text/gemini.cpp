@@ -5,6 +5,10 @@ using namespace app::browser::main::tab::page::content::text;
 Gemini::Gemini(
     const Glib::ustring & GEMTEXT
 ) {
+    set_valign(
+        Gtk::Align::START
+    );
+
     set_wrap(
         true
     );
