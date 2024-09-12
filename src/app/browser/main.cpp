@@ -286,7 +286,7 @@ sqlite3_int64 Main::DB::SESSION::add(
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main__session` (
-                    `app_browser_main__session__id`
+                    `app_browser__session__id`
                 ) VALUES (
                     %d
                 )
