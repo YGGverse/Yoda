@@ -13,6 +13,14 @@ Content::Content()
         true
     );
 
+    set_hexpand(
+        true
+    );
+
+    set_vexpand(
+        true
+    );
+
     widget = nullptr;
 }
 
