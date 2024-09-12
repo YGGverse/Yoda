@@ -119,7 +119,7 @@ void Tab::save(
             db,
             APP_BROWSER_MAIN__SESSION__ID,
             page_number,
-            page_number == get_current_page() ? 1 : 0
+            page_number == get_current_page()
         );
 
         // Delegate save actions to children components
@@ -457,7 +457,7 @@ sqlite3_int64 Tab::DB::SESSION::add(
             )SQL",
             APP_BROWSER_MAIN__SESSION__ID,
             PAGE_NUMBER,
-            IS_CURRENT
+            IS_CURRENT ? 1 : 0
         ).c_str(),
         nullptr,
         nullptr,
