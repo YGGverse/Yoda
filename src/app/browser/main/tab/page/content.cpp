@@ -5,6 +5,7 @@ using namespace app::browser::main::tab::page;
 
 Content::Content()
 {
+    // Init widget
     set_orientation(
         Gtk::Orientation::VERTICAL
     );
@@ -21,53 +22,56 @@ Content::Content()
         true
     );
 
-    widget = nullptr;
+    // Init child types
+    contentText = nullptr;
 }
 
 Content::~Content()
 {
-    delete widget;
-};
-
-// Public actions
-void Content::set_text_gemini(
-    const Glib::ustring & GEMTEXT
-) {
-    auto contentText = new content::Text; // @TODO manage
-
-    contentText->set_gemini(
-        GEMTEXT
-    );
-
-    set_widget(
-        contentText
-    );
+    delete contentText;
 }
 
-void Content::set_text_plain(
-    const Glib::ustring & TEXT
+// Setters
+void Content::update(
+    const MIME & MIME,
+    const Glib::ustring & DATA
 ) {
-    // @TODO
-}
-
-// @TODO text_plain, picture, video, etc.
-
-// Private helpers
-void Content::set_widget(
-    Gtk::Widget * object
-) {
-    if (widget != nullptr)
+    // Cleanup, free memory
+    if (contentText != nullptr)
     {
         remove(
-            * widget
+            * contentText
         );
 
-        delete widget;
+        delete contentText;
+
+        contentText = nullptr;
+    } // @TODO other types..
+
+    // Create new content widget for MIME type requested
+    switch (MIME)
+    {
+        case MIME::TEXT_GEMINI:
+
+            contentText = new content::Text(
+                content::Text::Type::GEMINI,
+                DATA
+            );
+
+            append(
+                * contentText
+            );
+
+        break;
+
+        case MIME::TEXT_PLAIN:
+
+            // @TODO
+
+        break;
+
+        default:
+
+            throw _("Invalid content MIME type");
     }
-
-    widget = object;
-
-    append(
-        * widget
-    );
 }

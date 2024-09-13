@@ -5,6 +5,7 @@ using namespace app::browser::main::tab::page::content::text;
 Gemini::Gemini(
     const Glib::ustring & GEMTEXT
 ) {
+    // Init widget
     set_valign(
         Gtk::Align::START
     );
@@ -22,6 +23,6 @@ Gemini::Gemini(
     );
 
     set_markup(
-        GEMTEXT // @TODO
+        GEMTEXT//markup
     );
 }

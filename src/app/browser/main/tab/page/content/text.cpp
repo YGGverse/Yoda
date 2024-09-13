@@ -4,36 +4,59 @@
 
 using namespace app::browser::main::tab::page::content;
 
-Text::Text()
-{
-    // @TODO GtkViewport?
-}
-
-void Text::set_gemini(
-    const Glib::ustring & GEMTEXT
+Text::Text(
+    const Type & TYPE,
+    const Glib::ustring & VALUE
 ) {
-    auto viewport = new Gtk::Viewport( // @TODO
+    // Init components
+    textGemini = nullptr;
+    textPlain = nullptr;
+
+    // GtkLabel does not support ScrolledWindow features, create GtkViewport
+    auto viewport = new Gtk::Viewport( // @TODO manage
         NULL, //Gtk::Adjustment::H
         NULL  //Gtk::Adjustment::V
-    );
+    ); // @TODO manage, optimize
 
     viewport->set_scroll_to_focus(
         false
     );
 
-    viewport->set_child(
-        * new text::Gemini( // @TODO manage
-            GEMTEXT
-        )
-    );
+    // Detect text driver by text type requested
+    switch (TYPE)
+    {
+        case GEMINI:
+
+            textGemini = new text::Gemini(
+                VALUE
+            );
+
+            viewport->set_child(
+                * textGemini
+            );
+
+        break;
+
+        case PLAIN:
+
+            // @TODO
+
+        break;
+
+        default:
+
+            throw _("Invalid text type enum"); // @TODO
+    }
 
     set_child(
         * viewport
     );
 }
 
-void Text::set_plain(
-    const Glib::ustring & TEXT
-) {
+Text::~Text()
+{
+    delete textGemini;
+    delete textPlain;
+
     // @TODO
 }

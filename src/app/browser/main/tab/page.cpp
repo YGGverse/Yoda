@@ -319,7 +319,8 @@ void Page::navigation_reload(
                                                     progress_fraction = 1;
 
                                                     // Set content driver
-                                                    pageContent->set_text_gemini( // @TODO
+                                                    pageContent->update(
+                                                        page::Content::MIME::TEXT_GEMINI,
                                                         buffer
                                                     );
 

@@ -7,26 +7,38 @@
 
 namespace app::browser::main::tab::page
 {
+    namespace content
+    {
+        class Text;
+    }
+
     class Content : public Gtk::Box
     {
-        Gtk::Widget * widget;
+        /*
+         * Internal members
+         */
+        private:
 
-        void set_widget(
-            Gtk::Widget * object
-        );
+            // Components
+            content::Text * contentText;
 
+        /*
+         * Class API
+         */
         public:
 
-            Content();
+            enum MIME
+            {
+                TEXT_GEMINI,
+                TEXT_PLAIN
+            };
 
+            Content();
             ~Content();
 
-            void set_text_gemini(
-                const Glib::ustring & GEMTEXT
-            );
-
-            void set_text_plain(
-                const Glib::ustring & TEXT
+            void update(
+                const MIME & MIME,
+                const Glib::ustring & DATA
             );
     };
 }
