@@ -134,14 +134,14 @@ void History::save(
     );
 
     // Add new records
-    for (const auto & VALUE : memory)
+    int offset = -1; for (const auto & MEMORY : memory)
     {
         DB::SESSION::add(
             db,
             APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
-            VALUE.time,
-            VALUE.request,
-            -1 == index // @TODO
+            MEMORY.time,
+            MEMORY.request,
+            ++offset == index // is current
         );
     }
 }
