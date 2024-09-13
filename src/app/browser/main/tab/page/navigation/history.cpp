@@ -67,7 +67,7 @@ int History::restore(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_page_navigation_history__session`
                         WHERE `app_browser_main_tab_page_navigation__session__id` = %d
-                        ORDER BY `id` DESC LIMIT 1
+                        ORDER BY `id` DESC
             )SQL",
             APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
         ).c_str(),
@@ -79,12 +79,15 @@ int History::restore(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        // Use latest record as order
+        // Reset current memory index
+        index = -1;
+
+        // Cleanup memory vector
+        memory.clear();
+
+        // Restore memory from database records
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            // Cleanup
-            memory.clear();
-
             // Restore
             memory.push_back(
                 {
@@ -107,6 +110,12 @@ int History::restore(
             }
 
             // Restore children components here (on available)
+        }
+
+        // Navigate to latest memory index on current value still not found in database
+        if (index == -1)
+        {
+            index = memory.size() - 1;
         }
     }
 
