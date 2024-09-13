@@ -320,7 +320,7 @@ void Page::navigation_reload(
 
                                                     // Set content driver
                                                     pageContent->update(
-                                                        page::Content::MIME::TEXT_GEMINI,
+                                                        page::Content::TEXT_GEMINI,
                                                         buffer
                                                     );
 
