@@ -4,13 +4,12 @@
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/label.h>
+#include <gtkmm/viewport.h>
 
 namespace app::browser::main::tab::page::content::text
 {
-    class Gemini : public Gtk::Label
+    class Gemini : public Gtk::Viewport
     {
-        Glib::ustring markup;
-
         public:
 
             Gemini(
