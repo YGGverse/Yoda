@@ -3,7 +3,7 @@
 
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
-#include <gtkmm/widget.h>
+#include <gtkmm/enums.h>
 
 namespace app::browser::main::tab::page
 {
