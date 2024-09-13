@@ -15,6 +15,10 @@ namespace app::browser::main::tab::page::content::text
             Gemini(
                 const Glib::ustring & GEMTEXT
             );
+
+            static Glib::ustring to_pango(
+                const Glib::ustring & GEMTEXT
+            );
     };
 }
 

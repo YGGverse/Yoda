@@ -13,7 +13,9 @@ Gemini::Gemini(
     );
 
     auto label = Gtk::make_managed<Gtk::Label>( // @TODO separated file?
-        GEMTEXT
+        to_pango(
+            GEMTEXT
+        )
     );
 
         // Init widget
@@ -36,4 +38,10 @@ Gemini::Gemini(
     set_child(
         * label
     );
+}
+
+Glib::ustring Gemini::to_pango(
+    const Glib::ustring & GEMTEXT
+) {
+    return GEMTEXT; // @TODO
 }
