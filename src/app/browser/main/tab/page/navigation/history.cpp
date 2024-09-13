@@ -67,7 +67,7 @@ int History::restore(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_page_navigation_history__session`
                         WHERE `app_browser_main_tab_page_navigation__session__id` = %d
-                        ORDER BY `id` DESC
+                        ORDER BY `id` ASC
             )SQL",
             APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
         ).c_str(),
