@@ -86,7 +86,7 @@ int Page::restore(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        // Use latest record as order
+        // Restore page data from latest database record
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore page data

@@ -61,7 +61,7 @@ int Label::restore(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        // Use latest record as order
+        // Restore label text from latest database record
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore widget data

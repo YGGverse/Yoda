@@ -132,7 +132,7 @@ int Navigation::restore(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        // Use latest record as order
+        // Restore navigation components from latest database record
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore children components

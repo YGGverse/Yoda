@@ -107,7 +107,7 @@ int Request::restore(
 
     if (PREPARE_STATUS == SQLITE_OK)
     {
-        // Use latest record as order
+        // Restore entry value from latest database record
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore widget data
