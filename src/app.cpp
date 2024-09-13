@@ -15,7 +15,7 @@ int main(
 
     // Init application
     auto app = Gtk::Application::create(
-        "io.github.yggverse.Yoda"
+        "io.github.yggverse.Yoda.app"
     );
 
     // Launch browser component
