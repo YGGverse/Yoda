@@ -9,11 +9,6 @@
 #include <gtkmm/object.h>
 #include <sqlite3.h>
 
-namespace lib
-{
-    class Database;
-}
-
 namespace app
 {
     namespace browser
