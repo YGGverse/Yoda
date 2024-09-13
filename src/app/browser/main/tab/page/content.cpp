@@ -48,7 +48,7 @@ void Content::update(
         contentText = nullptr;
     } // @TODO other types..
 
-    // Create new content widget for MIME type requested
+    // Create new DATA widget for MIME type requested
     switch (MIME)
     {
         case MIME::TEXT_GEMINI:
