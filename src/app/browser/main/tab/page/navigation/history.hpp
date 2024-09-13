@@ -21,7 +21,7 @@ namespace app::browser::main::tab::page::navigation
 
     class History : public Gtk::Box
     {
-        private:
+        public:
             /*
              * History class database
              *

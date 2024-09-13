@@ -334,6 +334,11 @@ int Navigation::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
+                navigation::History::DB::SESSION::clean(
+                    db,
+                    APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
+                );
+
                 navigation::Request::DB::SESSION::clean(
                     db,
                     APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
