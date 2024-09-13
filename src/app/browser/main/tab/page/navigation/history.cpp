@@ -189,6 +189,24 @@ bool History::try_back(
     }
 }
 
+bool History::try_current(
+    Memory & match
+) {
+    try
+    {
+        match = memory.at(
+            index
+        );
+
+        return true;
+    }
+
+    catch (std::out_of_range)
+    {
+        return false;
+    }
+}
+
 bool History::try_forward(
     Memory & match,
     const bool & UPDATE_MEMORY_INDEX

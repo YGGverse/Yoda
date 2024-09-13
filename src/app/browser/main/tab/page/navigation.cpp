@@ -209,6 +209,21 @@ bool Navigation::try_history_back(
     return false;
 }
 
+bool Navigation::try_history_current(
+    Glib::ustring & request
+) {
+    navigation::History::Memory match;
+
+    if (navigationHistory->try_current(match))
+    {
+        request = match.request;
+
+        return true;
+    }
+
+    return false;
+}
+
 bool Navigation::try_history_forward(
     Glib::ustring & request,
     const bool & UPDATE_MEMORY_INDEX

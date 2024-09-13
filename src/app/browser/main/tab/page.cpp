@@ -161,10 +161,20 @@ void Page::navigation_reload(
     // Update navigation history?
     if (ADD_HISTORY)
     {
-        pageNavigation->history_add(
-            pageNavigation->get_request_text(),
-            true
+        // Skip same
+        Glib::ustring request;
+
+        pageNavigation->try_history_current(
+            request
         );
+
+        if (request != pageNavigation->get_request_text())
+        {
+            pageNavigation->history_add(
+                pageNavigation->get_request_text(),
+                true
+            );
+        }
     }
 
     // Reset page data

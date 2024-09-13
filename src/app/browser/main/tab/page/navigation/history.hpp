@@ -117,6 +117,10 @@ namespace app::browser::main::tab::page::navigation
                 const bool & UPDATE_MEMORY_INDEX
             );
 
+            bool try_current(
+                Memory & match
+            );
+
             bool try_forward(
                 Memory & match,
                 const bool & UPDATE_MEMORY_INDEX

@@ -112,6 +112,10 @@ namespace app::browser::main::tab::page
                 const bool & UPDATE_MEMORY_INDEX
             );
 
+            bool try_history_current(
+                Glib::ustring & request
+            );
+
             bool try_history_forward(
                 Glib::ustring & request,
                 const bool & UPDATE_MEMORY_INDEX
