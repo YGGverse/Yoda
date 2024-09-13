@@ -9,7 +9,7 @@ int main(
     sqlite3 * db;
 
     sqlite3_open(
-        "database.sqlite3",
+        "app.sqlite3",
         &db
     );
 
