@@ -22,7 +22,6 @@ int main(
     return app->make_window_and_run<app::Browser>(
         argc,
         argv,
-        db,
-        app
+        db
     );
 }

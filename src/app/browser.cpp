@@ -5,8 +5,7 @@
 using namespace app;
 
 Browser::Browser(
-    sqlite3 * db,
-    const Glib::RefPtr<Gtk::Application> & APP
+    sqlite3 * db
 ) {
     // Init database
     DB::SESSION::init(
@@ -62,11 +61,6 @@ Browser::Browser(
         }
     );
 
-        APP->set_accel_for_action(
-            "win.debug",
-            "<Primary>i"
-        );
-
     const auto ACTION__MAIN_TAB_APPEND = add_action(
         "main_tab_append",
         [this]
@@ -74,11 +68,6 @@ Browser::Browser(
             browserMain->tab_append();
         }
     );
-
-        APP->set_accel_for_action(
-            "win.main_tab_append",
-            "<Primary>t"
-        );
 
     const auto ACTION__MAIN_TAB_CLOSE_ACTIVE = add_action(
         "main_tab_close_active",
@@ -90,11 +79,6 @@ Browser::Browser(
 
         ACTION__MAIN_TAB_CLOSE_ACTIVE->set_enabled(
             false
-        );
-
-        APP->set_accel_for_action(
-            "win.main_tab_close_active",
-            "<Primary>Escape"
         );
 
     add_action(
@@ -141,11 +125,6 @@ Browser::Browser(
             false
         );
 
-        APP->set_accel_for_action(
-            "win.main_tab_page_navigation_reload",
-            "<Primary>r"
-        );
-
     const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
         "main_tab_page_navigation_history_back",
         [this]
@@ -156,11 +135,6 @@ Browser::Browser(
 
         ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK->set_enabled(
             false
-        );
-
-        APP->set_accel_for_action(
-            "win.main_tab_page_navigation_history_back",
-            "<Primary>Left"
         );
 
     const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD = add_action(
@@ -175,11 +149,6 @@ Browser::Browser(
             false
         );
 
-        APP->set_accel_for_action(
-            "win.main_tab_page_navigation_history_forward",
-            "<Primary>Right"
-        );
-
     const auto ACTION__QUIT = add_action(
         "quit",
         [this]
@@ -187,11 +156,6 @@ Browser::Browser(
             close();
         }
     );
-
-        APP->set_accel_for_action(
-            "win.quit",
-            "<Primary>q"
-        );
 
     // Init widget
     set_title(
@@ -242,6 +206,43 @@ Browser::Browser(
     signal_realize().connect(
         [this]
         {
+            const auto APP = get_application();
+
+            APP->set_accel_for_action(
+                "win.debug",
+                "<Primary>i"
+            );
+
+            APP->set_accel_for_action(
+                "win.main_tab_append",
+                "<Primary>t"
+            );
+
+            APP->set_accel_for_action(
+                "win.main_tab_close_active",
+                "<Primary>Escape"
+            );
+
+            APP->set_accel_for_action(
+                "win.main_tab_page_navigation_reload",
+                "<Primary>r"
+            );
+
+            APP->set_accel_for_action(
+                "win.main_tab_page_navigation_history_back",
+                "<Primary>Left"
+            );
+
+            APP->set_accel_for_action(
+                "win.main_tab_page_navigation_history_forward",
+                "<Primary>Right"
+            );
+
+            APP->set_accel_for_action(
+                "win.quit",
+                "<Primary>q"
+            );
+
             restore(); // last session from DB
         }
     );

@@ -80,8 +80,7 @@ namespace app
         public:
 
             Browser(
-                sqlite3 * db,
-                const Glib::RefPtr<Gtk::Application> & APP
+                sqlite3 * db
             );
 
             // Actions
