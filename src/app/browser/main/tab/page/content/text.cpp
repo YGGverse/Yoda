@@ -1,12 +1,12 @@
 #include "text.hpp"
 #include "text/gemini.hpp"
-// #include "text/plain.hpp" @TODO
+#include "text/plain.hpp"
 
 using namespace app::browser::main::tab::page::content;
 
 Text::Text(
     const Type & TYPE,
-    const Glib::ustring & VALUE
+    const Glib::ustring & TEXT
 ) {
     switch (TYPE)
     {
@@ -14,7 +14,7 @@ Text::Text(
 
             set_child(
                 * Gtk::make_managed<text::Gemini>(
-                    VALUE
+                    TEXT
                 )
             );
 
@@ -22,7 +22,11 @@ Text::Text(
 
         case PLAIN:
 
-            // @TODO
+            set_child(
+                * Gtk::make_managed<text::Plain>(
+                    TEXT
+                )
+            );
 
         break;
 
