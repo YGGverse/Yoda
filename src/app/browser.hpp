@@ -33,7 +33,7 @@ namespace app
              */
             struct DB
             {
-                // APP_BROWSER_MAIN_TAB__*
+                // APP_BROWSER__*
                 struct SESSION
                 {
                     enum
