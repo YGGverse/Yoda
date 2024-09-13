@@ -318,12 +318,12 @@ void Page::navigation_reload(
 
                                                     progress_fraction = 1;
 
-                                                    action__update->activate();
-
                                                     // Set content driver
                                                     pageContent->set_text_gemini( // @TODO
                                                         buffer
                                                     );
+
+                                                    action__update->activate();
                                                 }
                                             );
                                         }
