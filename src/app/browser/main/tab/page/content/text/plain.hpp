@@ -4,10 +4,11 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/label.h>
+#include <gtkmm/viewport.h>
 
 namespace app::browser::main::tab::page::content::text
 {
-    class Plain : public Gtk::Label
+    class Plain : public Gtk::Viewport
     {
         public:
 
