@@ -48,7 +48,7 @@ Reader::Reader(
         {
             markup.append(
                 Make::link(
-                    g_uri_to_string(
+                    g_uri_to_string( // @TODO validate NULL
                         base
                     ),
                     address,
