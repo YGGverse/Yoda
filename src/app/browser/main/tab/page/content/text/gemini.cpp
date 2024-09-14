@@ -1,5 +1,5 @@
 #include "gemini.hpp"
-#include "gemini/markup.hpp"
+#include "gemini/reader.hpp"
 
 using namespace app::browser::main::tab::page::content::text;
 
@@ -15,7 +15,7 @@ Gemini::Gemini(
     );
 
     set_child(
-        * Gtk::make_managed<gemini::Markup>(
+        * Gtk::make_managed<gemini::Reader>(
             GEMTEXT
         )
     );

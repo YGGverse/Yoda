@@ -1,5 +1,5 @@
 #include "plain.hpp"
-#include "plain/markup.hpp"
+#include "plain/reader.hpp"
 
 using namespace app::browser::main::tab::page::content::text;
 
@@ -14,7 +14,7 @@ Plain::Plain(
     );
 
     set_child(
-        * Gtk::make_managed<plain::Markup>(
+        * Gtk::make_managed<plain::Reader>(
             TEXT
         )
     );

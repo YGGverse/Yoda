@@ -1,8 +1,8 @@
-#include "markup.hpp"
+#include "reader.hpp"
 
 using namespace app::browser::main::tab::page::content::text::gemini;
 
-Markup::Markup(
+Reader::Reader(
     const Glib::ustring & GEMTEXT
 ) {
     // Init widget
@@ -23,7 +23,7 @@ Markup::Markup(
     );
 
     set_markup(
-        Markup::make(
+        Reader::make(
             GEMTEXT
         )
     );
@@ -41,7 +41,7 @@ Markup::Markup(
 }
 
 // Match tools
-bool Markup::Line::Match::link(
+bool Reader::Line::Match::link(
     const Glib::ustring & GEMTEXT,
     Glib::ustring & address,
     Glib::ustring & date,
@@ -68,7 +68,7 @@ bool Markup::Line::Match::link(
 }
 
 // Markup tools
-Glib::ustring Markup::make(
+Glib::ustring Reader::make(
     const Glib::ustring & GEMTEXT
 ) {
     Glib::ustring pango;
@@ -89,7 +89,7 @@ Glib::ustring Markup::make(
         if (Line::Match::link(line, address, date, alt))
         {
             pango.append(
-                Markup::Make::link(
+                Reader::Make::link(
                     address,
                     date,
                     alt
@@ -114,7 +114,7 @@ Glib::ustring Markup::make(
     return pango;
 }
 
-Glib::ustring Markup::Make::link(
+Glib::ustring Reader::Make::link(
     const Glib::ustring & ADDRESS,
     const Glib::ustring & DATE,
     const Glib::ustring & ALT

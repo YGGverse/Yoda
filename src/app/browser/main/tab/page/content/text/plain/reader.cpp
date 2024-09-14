@@ -1,8 +1,8 @@
-#include "markup.hpp"
+#include "reader.hpp"
 
 using namespace app::browser::main::tab::page::content::text::plain;
 
-Markup::Markup(
+Reader::Reader(
     const Glib::ustring & TEXT
 ) {
     // Init widget

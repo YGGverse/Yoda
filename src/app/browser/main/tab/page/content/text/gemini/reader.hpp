@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_MARKUP_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_MARKUP_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
 
 #include <glibmm/markup.h>
 #include <glibmm/regex.h>
@@ -8,7 +8,7 @@
 
 namespace app::browser::main::tab::page::content::text::gemini
 {
-    class Markup : public Gtk::Label
+    class Reader : public Gtk::Label
     {
         /*
          * Tools (currently is private)
@@ -44,10 +44,10 @@ namespace app::browser::main::tab::page::content::text::gemini
          */
         public:
 
-            Markup(
+            Reader(
                 const Glib::ustring & GEMTEXT
             );
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_MARKUP_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP

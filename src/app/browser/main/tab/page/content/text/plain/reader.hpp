@@ -1,5 +1,5 @@
-#ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_MARKUP_HPP
-#define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_MARKUP_HPP
+#ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_READER_HPP
+#define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_READER_HPP
 
 #include <glibmm/markup.h>
 #include <glibmm/ustring.h>
@@ -7,17 +7,17 @@
 
 namespace app::browser::main::tab::page::content::text::plain
 {
-    class Markup : public Gtk::Label
+    class Reader : public Gtk::Label
     {
         /*
          * Gemini class API
          */
         public:
 
-            Markup(
+            Reader(
                 const Glib::ustring & TEXT
             );
     };
 }
 
-#endif // APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_MARKUP_HPP
+#endif // APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_PLAIN_READER_HPP
