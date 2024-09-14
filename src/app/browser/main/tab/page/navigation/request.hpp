@@ -67,10 +67,10 @@ namespace app::browser::main::tab::page::navigation
             double progress_fraction;
 
             Glib::ustring scheme,
-                        host,
-                        port,
-                        path,
-                        query;
+                          host,
+                          port,
+                          path,
+                          query;
 
             // Defaults
             const bool HEXPAND = true;

@@ -148,20 +148,18 @@ int Request::save(
 
 void Request::parse() // @TODO https://docs.gtk.org/glib/struct.Uri.html
 {
+    scheme.clear();
+    host.clear();
+    port.clear();
+    path.clear();
+    query.clear();
+
     auto match = Glib::Regex::split_simple(
         R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex",
         get_text()
     );
 
-    scheme = "";
-    host   = "";
-    port   = "";
-    path   = "";
-    query  = "";
-
-    int index = 0;
-
-    for (const Glib::ustring & VALUE : match)
+    int index = 0; for (const Glib::ustring & VALUE : match)
     {
         switch (index)
         {
