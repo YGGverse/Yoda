@@ -308,7 +308,7 @@ Glib::ustring Reader::Make::link(
     Glib::ustring alt;
 
         // Indicate external links
-        if (strcmp(URI_HOST, BASE_HOST))
+        if (0 != strcmp(URI_HOST, BASE_HOST))
         {
             alt.append(
                 "⇖"
