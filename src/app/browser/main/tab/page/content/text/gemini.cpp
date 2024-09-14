@@ -111,7 +111,7 @@ Glib::ustring Gemini::Markup::make(
         else
         {
             pango.append(
-                GEMTEXT
+                line
             );
         }
 
