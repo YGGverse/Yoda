@@ -6,7 +6,6 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/label.h>
 #include <gtkmm/viewport.h>
-#include <sstream>
 
 namespace app::browser::main::tab::page::content::text
 {
