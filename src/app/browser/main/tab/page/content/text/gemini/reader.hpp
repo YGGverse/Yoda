@@ -5,6 +5,7 @@
 #include <glibmm/markup.h>
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/cssprovider.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/label.h>
 

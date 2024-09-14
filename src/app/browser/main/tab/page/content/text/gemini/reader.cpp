@@ -28,6 +28,18 @@ Reader::Reader(
         )
     );
 
+    // Connect CSS
+    auto css = Gtk::CssProvider::create();
+
+        css->load_from_path(
+            "src/app/browser/main/tab/page/content/text/gemini/reader.css" // @TODO
+        );
+
+        get_style_context()->add_provider(
+            css,
+            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
+
     // Connect signals
     signal_activate_link().connect(
         [this](const Glib::ustring & URI) -> bool
