@@ -41,6 +41,30 @@ Reader::Reader(
 }
 
 // Match tools
+bool Reader::Line::Match::header(
+    const Glib::ustring & GEMTEXT,
+    int & level,
+    Glib::ustring & text
+) {
+    auto match = Glib::Regex::split_simple(
+        R"regex(^(#{1,3})(.*)$)regex",
+        GEMTEXT
+    );
+
+    int index = 0; for (const Glib::ustring & MATCH : match)
+    {
+        switch (index)
+        {
+            case 1: level = MATCH.length(); break;
+            case 2: text  = MATCH; break;
+        }
+
+        index++;
+    }
+
+    return level > 0 && !text.empty();
+}
+
 bool Reader::Line::Match::link(
     const Glib::ustring & GEMTEXT,
     Glib::ustring & address,
@@ -81,7 +105,23 @@ Glib::ustring Reader::make(
 
     while (std::getline(stream, line))
     {
-        // Links
+        // Header
+        int level;
+        Glib::ustring text;
+
+        if (Line::Match::header(line, level, text))
+        {
+            pango.append(
+                Reader::Make::header(
+                    level,
+                    text
+                )
+            );
+
+            continue;
+        }
+
+        // Link
         Glib::ustring address;
         Glib::ustring date;
         Glib::ustring alt;
@@ -95,23 +135,59 @@ Glib::ustring Reader::make(
                     alt
                 )
             );
-        }
 
-        else
-        {
-            pango.append(
-                line
-            );
+            continue;
         }
 
         // @TODO other tags..
 
         pango.append(
-            "\n" // @TODO
+            line.append(
+                "\n"
+            ) // @TODO
         );
     }
 
     return pango;
+}
+
+Glib::ustring Reader::Make::header(
+    const int & LEVEL,
+    const Glib::ustring & VALUE
+) {
+    switch (LEVEL)
+    {
+        case 1:
+
+            return Glib::ustring::sprintf(
+                "<span size=\"xx-large\">%s</span>\n",
+                Glib::Markup::escape_text(
+                    VALUE
+                )
+            );
+
+        case 2:
+
+            return Glib::ustring::sprintf(
+                "<span size=\"x-large\">%s</span>\n",
+                Glib::Markup::escape_text(
+                    VALUE
+                )
+            );
+
+        case 3:
+
+            return Glib::ustring::sprintf(
+                "<span size=\"large\">%s</span>\n",
+                Glib::Markup::escape_text(
+                    VALUE
+                )
+            );
+
+        default:
+
+            throw _("Header level not supported"); // @TODO
+    }
 }
 
 Glib::ustring Reader::Make::link(
@@ -136,7 +212,7 @@ Glib::ustring Reader::Make::link(
     }
 
     return Glib::ustring::sprintf(
-        "<a href=\"%s\" title=\"%s\">%s</a>",
+        "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(
             ADDRESS // @TODO to absolute
         ),

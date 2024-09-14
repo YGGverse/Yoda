@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
 
+#include <glibmm/i18n.h>
 #include <glibmm/markup.h>
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
@@ -18,6 +19,12 @@ namespace app::browser::main::tab::page::content::text::gemini
         {
             struct Match
             {
+                static bool header(
+                    const Glib::ustring & GEMTEXT,
+                    int & level,
+                    Glib::ustring & text
+                );
+
                 static bool link(
                     const Glib::ustring & GEMTEXT,
                     Glib::ustring & address,
@@ -29,6 +36,11 @@ namespace app::browser::main::tab::page::content::text::gemini
 
         struct Make
         {
+            static Glib::ustring header(
+                const int & LEVEL,
+                const Glib::ustring & VALUE
+            );
+
             static Glib::ustring link(
                 const Glib::ustring & ADDRESS,
                 const Glib::ustring & DATE,
