@@ -52,6 +52,10 @@ namespace app::browser::main::tab::page::content::text::gemini
                 const Glib::ustring & ALT
             );
 
+            static Glib::ustring plain(
+                const Glib::ustring & TEXT
+            );
+
             static Glib::ustring quote(
                 const Glib::ustring & TEXT
             );

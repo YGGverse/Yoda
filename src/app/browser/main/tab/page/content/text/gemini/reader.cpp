@@ -161,7 +161,7 @@ Glib::ustring Reader::make(
             continue;
         }
 
-        // Header
+        // Quote
         Glib::ustring quote;
 
         if (Line::Match::quote(line, quote))
@@ -177,10 +177,11 @@ Glib::ustring Reader::make(
 
         // @TODO other tags..
 
+        // Default
         pango.append(
-            line.append(
-                "\n"
-            ) // @TODO
+            Make::plain(
+                line
+            )
         );
     }
 
@@ -257,6 +258,17 @@ Glib::ustring Reader::Make::link(
         ),
         Glib::Markup::escape_text(
             description
+        )
+    );
+}
+
+Glib::ustring Reader::Make::plain(
+    const Glib::ustring & TEXT
+) {
+    return Glib::ustring::sprintf(
+        "%s\n",
+        Glib::Markup::escape_text(
+            TEXT
         )
     );
 }
