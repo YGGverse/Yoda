@@ -48,7 +48,7 @@ namespace app::browser::main::tab::page::content::text::gemini
             );
 
             static Glib::ustring link(
-                const Glib::ustring & REQUEST,
+                const Glib::ustring & BASE,
                 const Glib::ustring & ADDRESS,
                 const Glib::ustring & DATE,
                 const Glib::ustring & ALT
@@ -69,9 +69,9 @@ namespace app::browser::main::tab::page::content::text::gemini
         public:
 
             Reader(
-                const Glib::ustring & REQUEST,
                 const Glib::ustring & GEMTEXT,
-                Glib::ustring & title
+                Glib::ustring & title,
+                GUri * uri
             );
     };
 }

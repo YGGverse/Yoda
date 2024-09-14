@@ -3,9 +3,9 @@
 using namespace app::browser::main::tab::page::content::text::gemini;
 
 Reader::Reader(
-    const Glib::ustring & REQUEST,
     const Glib::ustring & GEMTEXT,
-    Glib::ustring & title
+    Glib::ustring & title,
+    GUri * base
 ) {
     // Build markup
     Glib::ustring markup;
@@ -48,7 +48,9 @@ Reader::Reader(
         {
             markup.append(
                 Make::link(
-                    REQUEST,
+                    g_uri_to_string(
+                        base
+                    ),
                     address,
                     date,
                     alt

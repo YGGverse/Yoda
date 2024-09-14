@@ -30,8 +30,8 @@ namespace app::browser::main::tab::page::content
             */
             Text(
                 const Type & TYPE,
-                const Glib::ustring & REQUEST,
-                const Glib::ustring & SOURCE
+                const Glib::ustring & SOURCE,
+                GUri * uri
             );
 
             // Getters

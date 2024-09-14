@@ -351,8 +351,8 @@ void Page::navigation_reload(
                                             // Set content driver
                                             pageContent->update(
                                                 page::Content::TEXT_GEMINI,
-                                                pageNavigation->get_request_text(), // @TODO use current page URI parsed instead of request able to change after
-                                                buffer
+                                                buffer,
+                                                uri
                                             );
 
                                                 // Update title on detected by document provider

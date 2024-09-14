@@ -6,8 +6,8 @@ using namespace app::browser::main::tab::page::content;
 
 Text::Text(
     const Type & TYPE,
-    const Glib::ustring & REQUEST,
-    const Glib::ustring & SOURCE
+    const Glib::ustring & SOURCE,
+    GUri * uri
 ) {
     switch (TYPE)
     {
@@ -15,9 +15,9 @@ Text::Text(
 
             set_child(
                 * Gtk::make_managed<text::Gemini>(
-                    REQUEST,
                     SOURCE,
-                    title
+                    title,
+                    uri
                 )
             );
 
