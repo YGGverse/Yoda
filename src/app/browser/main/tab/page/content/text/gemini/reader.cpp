@@ -48,9 +48,7 @@ Reader::Reader(
         {
             markup.append(
                 Make::link(
-                    g_uri_to_string( // @TODO validate NULL
-                        base
-                    ),
+                    base,
                     address,
                     date,
                     alt
@@ -249,36 +247,49 @@ Glib::ustring Reader::Make::header(
 }
 
 Glib::ustring Reader::Make::link(
-    const Glib::ustring & BASE,
+    GUri * base,
     const Glib::ustring & ADDRESS,
     const Glib::ustring & DATE,
     const Glib::ustring & ALT
 ) {
-    // Compose link description using optional date/alt values
-    Glib::ustring description;
-
-    if (!DATE.empty())
-    {
-        description.append(
-            DATE
-        );
-    }
-
-    if (!ALT.empty())
-    {
-        description.append(
-            description.empty() ? ALT : description + " " + ALT
-        );
-    }
-
-    // Make relative links absolute using base given
+    // Make relative links absolute
     const auto ABSOLUTE = g_uri_resolve_relative(
-        BASE.c_str(),
+        g_uri_to_string(
+            base
+        ),
         ADDRESS.c_str(),
         G_URI_FLAGS_NONE,
         NULL // GError * @TODO
     );
 
+    // Build link text
+    Glib::ustring alt;
+
+        // Indicate external links
+        if (strcmp(g_uri_get_host(base), g_uri_get_host(g_uri_parse(ABSOLUTE, G_URI_FLAGS_NONE, NULL))))
+        {
+            alt.append(
+                "⇖"
+            );
+        }
+
+        // Append date on available
+        if (!DATE.empty())
+        {
+            alt.append(
+                alt.empty() ? DATE : " " + DATE
+            );
+        }
+
+        // Append alt text
+        if (!ALT.empty())
+        {
+            alt.append(
+                alt.empty() ? ALT : " " + ALT
+            );
+        }
+
+    // Build markup and get result
     return Glib::ustring::sprintf(
         "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(
@@ -288,7 +299,7 @@ Glib::ustring Reader::Make::link(
             ADDRESS
         ),
         Glib::Markup::escape_text(
-            description
+            alt
         )
     );
 }

@@ -48,7 +48,7 @@ namespace app::browser::main::tab::page::content::text::gemini
             );
 
             static Glib::ustring link(
-                const Glib::ustring & BASE,
+                GUri * base,
                 const Glib::ustring & ADDRESS,
                 const Glib::ustring & DATE,
                 const Glib::ustring & ALT
