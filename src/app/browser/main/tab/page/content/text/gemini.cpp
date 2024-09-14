@@ -4,6 +4,7 @@
 using namespace app::browser::main::tab::page::content::text;
 
 Gemini::Gemini(
+    const Glib::ustring & REQUEST,
     const Glib::ustring & GEMTEXT,
     Glib::ustring & title
 ) : Gtk::Viewport( // add scrolled window features to childs
@@ -17,6 +18,7 @@ Gemini::Gemini(
 
     set_child(
         * Gtk::make_managed<gemini::Reader>(
+            REQUEST,
             GEMTEXT,
             title
         )

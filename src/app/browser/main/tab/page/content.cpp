@@ -40,7 +40,8 @@ Glib::ustring Content::get_title()
 // Setters
 void Content::update(
     const MIME & MIME,
-    const Glib::ustring & DATA
+    const Glib::ustring & REQUEST,
+    const Glib::ustring & SOURCE
 ) {
     // Cleanup, free memory
     if (contentText != nullptr)
@@ -63,7 +64,8 @@ void Content::update(
 
             contentText = new content::Text(
                 content::Text::Type::GEMINI,
-                DATA
+                REQUEST,
+                SOURCE
             );
 
             title = contentText->get_title();

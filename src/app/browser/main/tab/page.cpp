@@ -351,6 +351,7 @@ void Page::navigation_reload(
                                             // Set content driver
                                             pageContent->update(
                                                 page::Content::TEXT_GEMINI,
+                                                pageNavigation->get_request_text(),
                                                 buffer
                                             );
 

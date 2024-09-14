@@ -42,7 +42,8 @@ namespace app::browser::main::tab::page
             // Actions
             void update(
                 const MIME & MIME,
-                const Glib::ustring & DATA
+                const Glib::ustring & REQUEST,
+                const Glib::ustring & SOURCE
             );
 
             // Getters

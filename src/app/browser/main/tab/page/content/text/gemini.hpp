@@ -14,6 +14,7 @@ namespace app::browser::main::tab::page::content::text
         public:
 
             Gemini(
+                const Glib::ustring & REQUEST,
                 const Glib::ustring & GEMTEXT,
                 Glib::ustring & title
             );

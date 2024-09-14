@@ -3,6 +3,7 @@
 using namespace app::browser::main::tab::page::content::text::gemini;
 
 Reader::Reader(
+    const Glib::ustring & REQUEST,
     const Glib::ustring & GEMTEXT,
     Glib::ustring & title
 ) {
@@ -47,6 +48,7 @@ Reader::Reader(
         {
             markup.append(
                 Make::link(
+                    REQUEST,
                     address,
                     date,
                     alt
@@ -245,6 +247,7 @@ Glib::ustring Reader::Make::header(
 }
 
 Glib::ustring Reader::Make::link(
+    const Glib::ustring & BASE,
     const Glib::ustring & ADDRESS,
     const Glib::ustring & DATE,
     const Glib::ustring & ALT
@@ -265,25 +268,15 @@ Glib::ustring Reader::Make::link(
         );
     }
 
-    /* @TODO
-
-    GError * error;
-
-    g_uri_resolve_relative(
-        get_text().c_str(),
-        get_text().c_str(),
-        G_URI_FLAGS_NONE,
-        &error
-    );
-
-    if (NULL)
-
-    */
-
     return Glib::ustring::sprintf(
         "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(
-            ADDRESS // @TODO to absolute
+            g_uri_resolve_relative(
+                BASE.c_str(),
+                ADDRESS.c_str(),
+                G_URI_FLAGS_NONE,
+                NULL // GError * @TODO
+            )
         ),
         Glib::Markup::escape_text(
             ADDRESS
