@@ -3,8 +3,83 @@
 using namespace app::browser::main::tab::page::content::text::gemini;
 
 Reader::Reader(
-    const Glib::ustring & GEMTEXT
+    const Glib::ustring & GEMTEXT,
+    Glib::ustring & title
 ) {
+    // Build markup
+    Glib::ustring markup;
+
+    std::istringstream stream(
+        GEMTEXT
+    );
+
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        // Header
+        int level;
+        Glib::ustring header;
+
+        if (Line::Match::header(line, level, header))
+        {
+            markup.append(
+                Make::header(
+                    level,
+                    header
+                )
+            );
+
+            if (title.empty())
+            {
+                title = header;
+            }
+
+            continue;
+        }
+
+        // Link
+        Glib::ustring address;
+        Glib::ustring date;
+        Glib::ustring alt;
+
+        if (Line::Match::link(line, address, date, alt))
+        {
+            markup.append(
+                Make::link(
+                    address,
+                    date,
+                    alt
+                )
+            );
+
+            continue;
+        }
+
+        // Quote
+        Glib::ustring quote;
+
+        if (Line::Match::quote(line, quote))
+        {
+            markup.append(
+                Make::quote(
+                    quote
+                )
+            );
+
+            continue;
+        }
+
+        // @TODO other tags..
+
+        // Default
+        markup.append(
+            Make::plain(
+                line
+            )
+        );
+    }
+
     // Init widget
     set_valign(
         Gtk::Align::START
@@ -23,9 +98,7 @@ Reader::Reader(
     );
 
     set_markup(
-        make(
-            GEMTEXT
-        )
+        markup
     );
 
     // Connect CSS
@@ -50,12 +123,6 @@ Reader::Reader(
         },
         false // after
     );
-}
-
-// Getters
-Glib::ustring Reader::get_title()
-{
-    return title;
 }
 
 // Match tools
@@ -132,85 +199,6 @@ bool Reader::Line::Match::quote(
 }
 
 // Markup tools
-Glib::ustring Reader::make(
-    const Glib::ustring & GEMTEXT
-) {
-    Glib::ustring pango;
-
-    std::istringstream stream(
-        GEMTEXT
-    );
-
-    std::string line;
-
-    while (std::getline(stream, line))
-    {
-        // Header
-        int level;
-        Glib::ustring header;
-
-        if (Line::Match::header(line, level, header))
-        {
-            pango.append(
-                Make::header(
-                    level,
-                    header
-                )
-            );
-
-            if (title.empty())
-            {
-                title = header;
-            }
-
-            continue;
-        }
-
-        // Link
-        Glib::ustring address;
-        Glib::ustring date;
-        Glib::ustring alt;
-
-        if (Line::Match::link(line, address, date, alt))
-        {
-            pango.append(
-                Make::link(
-                    address,
-                    date,
-                    alt
-                )
-            );
-
-            continue;
-        }
-
-        // Quote
-        Glib::ustring quote;
-
-        if (Line::Match::quote(line, quote))
-        {
-            pango.append(
-                Make::quote(
-                    quote
-                )
-            );
-
-            continue;
-        }
-
-        // @TODO other tags..
-
-        // Default
-        pango.append(
-            Make::plain(
-                line
-            )
-        );
-    }
-
-    return pango;
-}
-
 Glib::ustring Reader::Make::header(
     const int & LEVEL,
     const Glib::ustring & TEXT

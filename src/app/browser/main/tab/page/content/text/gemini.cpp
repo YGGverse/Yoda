@@ -10,20 +10,15 @@ Gemini::Gemini(
     NULL,
     NULL
 ) {
-    // Init components
-    auto geminiReader = Gtk::make_managed<gemini::Reader>(
-        GEMTEXT
-    );
-
-        // Grab title
-        title = geminiReader->get_title();
-
     // Init widget
     set_scroll_to_focus(
         false
     );
 
     set_child(
-        * geminiReader
+        * Gtk::make_managed<gemini::Reader>(
+            GEMTEXT,
+            title
+        )
     );
 }

@@ -62,26 +62,15 @@ namespace app::browser::main::tab::page::content::text::gemini
             );
         };
 
-        Glib::ustring make(
-            const Glib::ustring & GEMTEXT
-        );
-
-        /*
-         * Private members
-         */
-        Glib::ustring title;
-
         /*
          * Reader class API
          */
         public:
 
             Reader(
-                const Glib::ustring & GEMTEXT
+                const Glib::ustring & GEMTEXT,
+                Glib::ustring & title
             );
-
-            // Getters
-            Glib::ustring get_title();
     };
 }
 
