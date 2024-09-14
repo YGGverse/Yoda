@@ -12,13 +12,44 @@ namespace app::browser::main::tab::page::content::text
 {
     class Gemini : public Gtk::Viewport
     {
+        /*
+         * Tools (currently is private)
+         */
+        struct Line
+        {
+            struct Match
+            {
+                static bool link(
+                    const Glib::ustring & GEMTEXT,
+                    Glib::ustring & address,
+                    Glib::ustring & date,
+                    Glib::ustring & alt
+                );
+            };
+        };
+
+        struct Markup
+        {
+            struct Make
+            {
+                static Glib::ustring link(
+                    const Glib::ustring & ADDRESS,
+                    const Glib::ustring & DATE,
+                    const Glib::ustring & ALT
+                );
+            };
+
+            static Glib::ustring make(
+                const Glib::ustring & GEMTEXT
+            );
+        };
+
+        /*
+         * Gemini class API
+         */
         public:
 
             Gemini(
-                const Glib::ustring & GEMTEXT
-            );
-
-            static Glib::ustring to_pango_markup(
                 const Glib::ustring & GEMTEXT
             );
     };

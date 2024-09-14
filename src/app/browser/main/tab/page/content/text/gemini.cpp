@@ -13,7 +13,7 @@ Gemini::Gemini(
     );
 
     auto label = Gtk::make_managed<Gtk::Label>( // @TODO separated file?
-        to_pango_markup(
+        Markup::make(
             GEMTEXT
         )
     );
@@ -51,10 +51,38 @@ Gemini::Gemini(
     );
 }
 
-Glib::ustring Gemini::to_pango_markup(
+// Match tools
+bool Gemini::Line::Match::link(
+    const Glib::ustring & GEMTEXT,
+    Glib::ustring & address,
+    Glib::ustring & date,
+    Glib::ustring & alt
+) {
+    auto match = Glib::Regex::split_simple(
+        R"regex(^=>\s*([^\s]+)(\s(\d{4}-\d{2}-\d{2}))?(\s(.+))?$)regex",
+        GEMTEXT
+    );
+
+    int index = 0; for (const Glib::ustring & MATCH : match)
+    {
+        switch (index)
+        {
+            case 1: address = MATCH; break;
+            case 3: date    = MATCH; break;
+            case 5: alt     = MATCH; break;
+        }
+
+        index++;
+    }
+
+    return !address.empty();
+}
+
+// Markup tools
+Glib::ustring Gemini::Markup::make(
     const Glib::ustring & GEMTEXT
 ) {
-    Glib::ustring markup;
+    Glib::ustring pango;
 
     std::istringstream stream(
         GEMTEXT
@@ -64,81 +92,70 @@ Glib::ustring Gemini::to_pango_markup(
 
     while (std::getline(stream, line))
     {
-        // Convert links
-        auto match = Glib::Regex::split_simple(
-            R"regex(^=>\s*([^\s]+)(\s(\d{4}-\d{2}-\d{2}))?(\s(.+))?$)regex",
-            line.c_str()
-        );
+        // Links
+        Glib::ustring address;
+        Glib::ustring date;
+        Glib::ustring alt;
 
-        Glib::ustring address = "";
-        Glib::ustring date    = "";
-        Glib::ustring alt     = "";
-
-        int index = 0;
-
-        for (const Glib::ustring & VALUE : match)
+        if (Line::Match::link(line, address, date, alt))
         {
-            switch (index)
-            {
-                case 1: address = VALUE; break;
-                case 3: date    = VALUE; break;
-                case 5: alt     = VALUE; break;
-            }
-
-            index++;
-        }
-
-        // Keep original on address not found in line
-        if (address.empty())
-        {
-            markup.append(
-                line
-            );
-        }
-
-        // Make pango link
-        else
-        {
-            // Crate link name
-            Glib::ustring name;
-
-            if (!date.empty())
-            {
-                name.append(
-                    date
-                );
-            }
-
-            if (!alt.empty())
-            {
-                name.append(
-                    name.empty() ? alt
-                                 : name + " " + alt // append (to date)
-                );
-            }
-
-            // Create pango markup
-            markup.append(
-                Glib::ustring::sprintf(
-                    "<a href=\"%s\" title=\"%s\">%s</a>",
-                    Glib::Markup::escape_text(
-                        address // @TODO to absolute
-                    ),
-                    Glib::Markup::escape_text(
-                        address
-                    ),
-                    Glib::Markup::escape_text(
-                        name
-                    )
+            pango.append(
+                Markup::Make::link(
+                    address,
+                    date,
+                    alt
                 )
             );
         }
 
-        markup.append(
+        else
+        {
+            pango.append(
+                GEMTEXT
+            );
+        }
+
+        // @TODO other tags..
+
+        pango.append(
             "\n" // @TODO
         );
     }
 
-    // Return original gemtext on failure or pango markup on success
-    return markup.empty() ? GEMTEXT : markup;
+    return pango;
+}
+
+Glib::ustring Gemini::Markup::Make::link(
+    const Glib::ustring & ADDRESS,
+    const Glib::ustring & DATE,
+    const Glib::ustring & ALT
+) {
+    Glib::ustring description;
+
+    if (!DATE.empty())
+    {
+        description.append(
+            DATE
+        );
+    }
+
+    if (!ALT.empty())
+    {
+        description.append(
+            description.empty() ? ALT : description + " " + ALT // append (to date)
+        );
+    }
+
+    return Glib::ustring::sprintf(
+        "<a href=\"%s\" title=\"%s\">%s</a>",
+        Glib::Markup::escape_text(
+            ADDRESS // @TODO to absolute
+        ),
+        Glib::Markup::escape_text(
+            ADDRESS
+        ),
+        Glib::Markup::escape_text(
+            description
+        )
+    );
 }
