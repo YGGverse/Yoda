@@ -117,7 +117,13 @@ Reader::Reader(
     signal_activate_link().connect(
         [this](const Glib::ustring & URI) -> bool
         {
-            // @TODO follow action
+            // Open link URI
+            activate_action(
+                "win.open",
+                Glib::Variant<Glib::ustring>::create(
+                    URI
+                )
+            );
 
             return false;
         },
