@@ -31,6 +31,11 @@ namespace app::browser::main::tab::page::content::text::gemini
                     Glib::ustring & date,
                     Glib::ustring & alt
                 );
+
+                static bool quote(
+                    const Glib::ustring & GEMTEXT,
+                    Glib::ustring & text
+                );
             };
         };
 
@@ -38,13 +43,17 @@ namespace app::browser::main::tab::page::content::text::gemini
         {
             static Glib::ustring header(
                 const int & LEVEL,
-                const Glib::ustring & VALUE
+                const Glib::ustring & TEXT
             );
 
             static Glib::ustring link(
                 const Glib::ustring & ADDRESS,
                 const Glib::ustring & DATE,
                 const Glib::ustring & ALT
+            );
+
+            static Glib::ustring quote(
+                const Glib::ustring & TEXT
             );
         };
 

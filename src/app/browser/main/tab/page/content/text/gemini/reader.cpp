@@ -91,6 +91,28 @@ bool Reader::Line::Match::link(
     return !address.empty();
 }
 
+bool Reader::Line::Match::quote(
+    const Glib::ustring & GEMTEXT,
+    Glib::ustring & quote
+) {
+    auto match = Glib::Regex::split_simple(
+        R"regex(^>(.*)$)regex",
+        GEMTEXT
+    );
+
+    int index = 0; for (const Glib::ustring & MATCH : match)
+    {
+        switch (index)
+        {
+            case 1: quote = MATCH; break;
+        }
+
+        index++;
+    }
+
+    return !quote.empty();
+}
+
 // Markup tools
 Glib::ustring Reader::make(
     const Glib::ustring & GEMTEXT
@@ -107,14 +129,14 @@ Glib::ustring Reader::make(
     {
         // Header
         int level;
-        Glib::ustring text;
+        Glib::ustring header;
 
-        if (Line::Match::header(line, level, text))
+        if (Line::Match::header(line, level, header))
         {
             pango.append(
                 Make::header(
                     level,
-                    text
+                    header
                 )
             );
 
@@ -139,6 +161,20 @@ Glib::ustring Reader::make(
             continue;
         }
 
+        // Header
+        Glib::ustring quote;
+
+        if (Line::Match::quote(line, quote))
+        {
+            pango.append(
+                Make::quote(
+                    quote
+                )
+            );
+
+            continue;
+        }
+
         // @TODO other tags..
 
         pango.append(
@@ -153,7 +189,7 @@ Glib::ustring Reader::make(
 
 Glib::ustring Reader::Make::header(
     const int & LEVEL,
-    const Glib::ustring & VALUE
+    const Glib::ustring & TEXT
 ) {
     switch (LEVEL)
     {
@@ -162,7 +198,7 @@ Glib::ustring Reader::Make::header(
             return Glib::ustring::sprintf(
                 "<span size=\"xx-large\">%s</span>\n",
                 Glib::Markup::escape_text(
-                    VALUE
+                    TEXT
                 )
             );
 
@@ -171,7 +207,7 @@ Glib::ustring Reader::Make::header(
             return Glib::ustring::sprintf(
                 "<span size=\"x-large\">%s</span>\n",
                 Glib::Markup::escape_text(
-                    VALUE
+                    TEXT
                 )
             );
 
@@ -180,7 +216,7 @@ Glib::ustring Reader::Make::header(
             return Glib::ustring::sprintf(
                 "<span size=\"large\">%s</span>\n",
                 Glib::Markup::escape_text(
-                    VALUE
+                    TEXT
                 )
             );
 
@@ -221,6 +257,17 @@ Glib::ustring Reader::Make::link(
         ),
         Glib::Markup::escape_text(
             description
+        )
+    );
+}
+
+Glib::ustring Reader::Make::quote(
+    const Glib::ustring & TEXT
+) {
+    return Glib::ustring::sprintf(
+        "<i>%s</i>\n",
+        Glib::Markup::escape_text(
+            TEXT
         )
     );
 }
