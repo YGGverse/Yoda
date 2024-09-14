@@ -23,7 +23,7 @@ Reader::Reader(
     );
 
     set_markup(
-        Reader::make(
+        make(
             GEMTEXT
         )
     );
@@ -112,7 +112,7 @@ Glib::ustring Reader::make(
         if (Line::Match::header(line, level, text))
         {
             pango.append(
-                Reader::Make::header(
+                Make::header(
                     level,
                     text
                 )
@@ -129,7 +129,7 @@ Glib::ustring Reader::make(
         if (Line::Match::link(line, address, date, alt))
         {
             pango.append(
-                Reader::Make::link(
+                Make::link(
                     address,
                     date,
                     alt
