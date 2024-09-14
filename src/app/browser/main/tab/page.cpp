@@ -272,7 +272,7 @@ void Page::navigation_reload(
                             action__update->activate();
 
                             // Response
-                            GioSocketConnection->get_input_stream()->read_async( // | read_all_async
+                            GioSocketConnection->get_input_stream()->read_all_async( // | read_async @TODO
                                 buffer,
                                 sizeof(buffer) - 1,
                                 [this](const Glib::RefPtr<Gio::AsyncResult> & result)
@@ -304,39 +304,19 @@ void Page::navigation_reload(
                                             // Update
                                             mime = MIME::TEXT_GEMINI;
 
-                                            title = _("Parsing");
+                                            title = _("Done"); // @TODO page title
 
-                                            description = Glib::ustring::sprintf(
-                                                _("Parsing response from %s.."),
-                                                pageNavigation->get_request_host()
+                                            description = pageNavigation->get_request_host();
+
+                                            progress_fraction = 1;
+
+                                            // Set content driver
+                                            pageContent->update(
+                                                page::Content::TEXT_GEMINI,
+                                                buffer
                                             );
-
-                                            progress_fraction = .8;
 
                                             action__update->activate();
-
-                                            // Continue reading..
-                                            GioSocketConnection->get_input_stream()->read_async( // | read_all_async
-                                                buffer,
-                                                sizeof(buffer) - 1,
-                                                [this](const Glib::RefPtr<Gio::AsyncResult> & result)
-                                                {
-                                                    // Update
-                                                    title = _("Done"); // @TODO page title
-
-                                                    description = pageNavigation->get_request_host();
-
-                                                    progress_fraction = 1;
-
-                                                    // Set content driver
-                                                    pageContent->update(
-                                                        page::Content::TEXT_GEMINI,
-                                                        buffer
-                                                    );
-
-                                                    action__update->activate();
-                                                }
-                                            );
                                         }
 
                                         else
