@@ -252,6 +252,7 @@ Glib::ustring Reader::Make::link(
     const Glib::ustring & DATE,
     const Glib::ustring & ALT
 ) {
+    // Compose link description using optional date/alt values
     Glib::ustring description;
 
     if (!DATE.empty())
@@ -264,19 +265,22 @@ Glib::ustring Reader::Make::link(
     if (!ALT.empty())
     {
         description.append(
-            description.empty() ? ALT : description + " " + ALT // append (to date)
+            description.empty() ? ALT : description + " " + ALT
         );
     }
+
+    // Make relative links absolute using base given
+    const auto ABSOLUTE = g_uri_resolve_relative(
+        BASE.c_str(),
+        ADDRESS.c_str(),
+        G_URI_FLAGS_NONE,
+        NULL // GError * @TODO
+    );
 
     return Glib::ustring::sprintf(
         "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(
-            g_uri_resolve_relative(
-                BASE.c_str(),
-                ADDRESS.c_str(),
-                G_URI_FLAGS_NONE,
-                NULL // GError * @TODO
-            )
+            ABSOLUTE == NULL ? ADDRESS : ABSOLUTE // @TODO exception?
         ),
         Glib::Markup::escape_text(
             ADDRESS
