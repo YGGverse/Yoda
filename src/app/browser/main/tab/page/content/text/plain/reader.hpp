@@ -3,6 +3,7 @@
 
 #include <glibmm/markup.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/label.h>
 
 namespace app::browser::main::tab::page::content::text::plain
