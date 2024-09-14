@@ -140,7 +140,7 @@ bool Reader::Line::Match::header(
     Glib::ustring & text
 ) {
     auto match = Glib::Regex::split_simple(
-        R"regex(^(#{1,3})(.*)$)regex",
+        R"regex(^(#{1,3})\s*(.*)$)regex",
         GEMTEXT
     );
 
@@ -189,7 +189,7 @@ bool Reader::Line::Match::quote(
     Glib::ustring & quote
 ) {
     auto match = Glib::Regex::split_simple(
-        R"regex(^>(.*)$)regex",
+        R"regex(^>\s*(.*)$)regex",
         GEMTEXT
     );
 
