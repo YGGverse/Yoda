@@ -333,7 +333,7 @@ Glib::ustring Reader::Make::link(
 
     // Build markup and get result
     return Glib::ustring::sprintf(
-        "<a href=\"%s\" title=\"%s\">%s</a>\n",
+        "<a href=\"%s\" title=\"%s\"><span underline=\"none\">%s</span></a>\n",
         Glib::Markup::escape_text(
             ABSOLUTE_URI
         ),
