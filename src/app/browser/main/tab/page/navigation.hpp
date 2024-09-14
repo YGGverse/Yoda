@@ -124,12 +124,6 @@ namespace app::browser::main::tab::page
             // Getters
             Glib::ustring get_request_text();
 
-            Glib::ustring get_request_scheme();
-            Glib::ustring get_request_host();
-            Glib::ustring get_request_port();
-            Glib::ustring get_request_path();
-            Glib::ustring get_request_query();
-
             // Setters
             void set_request_text(
                 const Glib::ustring & VALUE

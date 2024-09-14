@@ -265,6 +265,21 @@ Glib::ustring Reader::Make::link(
         );
     }
 
+    /* @TODO
+
+    GError * error;
+
+    g_uri_resolve_relative(
+        get_text().c_str(),
+        get_text().c_str(),
+        G_URI_FLAGS_NONE,
+        &error
+    );
+
+    if (NULL)
+
+    */
+
     return Glib::ustring::sprintf(
         "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(

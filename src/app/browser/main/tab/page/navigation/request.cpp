@@ -34,8 +34,6 @@ Request::Request(
     signal_changed().connect(
         [this]
         {
-            parse();
-
             action__update->activate();
         }
     );
@@ -43,8 +41,6 @@ Request::Request(
     signal_activate().connect(
         [this]
         {
-            parse();
-
             action__reload->activate();
         }
     );
@@ -144,60 +140,6 @@ int Request::save(
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
         get_text()
     );
-}
-
-void Request::parse() // @TODO https://docs.gtk.org/glib/struct.Uri.html
-{
-    scheme.clear();
-    host.clear();
-    port.clear();
-    path.clear();
-    query.clear();
-
-    auto match = Glib::Regex::split_simple(
-        R"regex(^((\w+)?:\/\/)?([^:\/]+)?(:(\d+)?)?([^\?$]+)?(\?(.*)?)?)regex",
-        get_text()
-    );
-
-    int index = 0; for (const Glib::ustring & VALUE : match)
-    {
-        switch (index)
-        {
-            case 2: scheme = VALUE; break;
-            case 3: host   = VALUE; break;
-            case 5: port   = VALUE; break;
-            case 6: path   = VALUE; break;
-            case 8: query  = VALUE; break;
-        }
-
-        index++;
-    }
-}
-
-// Getters
-Glib::ustring Request::get_scheme()
-{
-    return scheme;
-}
-
-Glib::ustring Request::get_host()
-{
-    return host;
-}
-
-Glib::ustring Request::get_port()
-{
-    return port;
-}
-
-Glib::ustring Request::get_path()
-{
-    return path;
-}
-
-Glib::ustring Request::get_query()
-{
-    return query;
 }
 
 // Database model

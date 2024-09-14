@@ -91,8 +91,16 @@ void Navigation::update(
     const double & PROGRESS_FRACTION
 ) {
     // Toggle base button sensibility
+    GUri * uri = g_uri_parse(
+        navigationRequest->get_text().c_str(),
+        G_URI_FLAGS_NONE,
+        NULL // @TODO GError *
+    );
+
     navigationBase->set_sensitive(
-        !navigationRequest->get_host().empty() && !navigationRequest->get_path().empty()
+        NULL != uri &&
+        NULL != g_uri_get_host(uri) &&
+        NULL != g_uri_get_path(uri)
     );
 
     // Update history widget
@@ -244,31 +252,6 @@ bool Navigation::try_history_forward(
 Glib::ustring Navigation::get_request_text()
 {
     return navigationRequest->get_text();
-}
-
-Glib::ustring Navigation::get_request_scheme()
-{
-    return navigationRequest->get_scheme();
-}
-
-Glib::ustring Navigation::get_request_host()
-{
-    return navigationRequest->get_host();
-}
-
-Glib::ustring Navigation::get_request_path()
-{
-    return navigationRequest->get_path();
-}
-
-Glib::ustring Navigation::get_request_query()
-{
-    return navigationRequest->get_query();
-}
-
-Glib::ustring Navigation::get_request_port()
-{
-    return navigationRequest->get_port();
 }
 
 // Setters

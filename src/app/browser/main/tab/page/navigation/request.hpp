@@ -66,19 +66,10 @@ namespace app::browser::main::tab::page::navigation
             // Extras
             double progress_fraction;
 
-            Glib::ustring scheme,
-                          host,
-                          port,
-                          path,
-                          query;
-
             // Defaults
             const bool HEXPAND = true;
             const double PROGRESS_PULSE_STEP = .1;
             const int PROGRESS_ANIMATION_TIME = 10;
-
-            // Private helpers
-            void parse();
 
         /*
          * Class API
@@ -103,13 +94,6 @@ namespace app::browser::main::tab::page::navigation
             int save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
             );
-
-            // Getters
-            Glib::ustring get_scheme();
-            Glib::ustring get_host();
-            Glib::ustring get_port();
-            Glib::ustring get_path();
-            Glib::ustring get_query();
     };
 }
 

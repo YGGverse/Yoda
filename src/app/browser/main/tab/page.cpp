@@ -177,6 +177,13 @@ void Page::navigation_reload(
         }
     }
 
+    // Parse request string
+    uri = g_uri_parse(
+        pageNavigation->get_request_text().c_str(),
+        G_URI_FLAGS_NONE,
+        NULL // @TODO GError *
+    );
+
     // Reset page data
     mime = MIME::UNDEFINED;
 
@@ -191,13 +198,36 @@ void Page::navigation_reload(
 
     action__update->activate();
 
+    if (NULL == uri || NULL == g_uri_get_scheme(uri))
+    {
+        // Scheme not found but host provided, redirect to gemini://
+        if (NULL != g_uri_get_host(uri))
+        {
+            pageNavigation->set_request_text(
+                "gemini://" + pageNavigation->get_request_text()
+            );
+
+            navigation_reload(
+                false
+            );
+        }
+
+        // Make search request
+        else
+        {
+            throw _("Search request not implemented yet"); // @TODO
+        }
+    }
+
     // Connect scheme driver
-    if ("file" == pageNavigation->get_request_scheme())
+    else
+    if (g_uri_get_scheme(uri) == Glib::ustring("file"))
     {
         // @TODO
     }
 
-    else if ("gemini" == pageNavigation->get_request_scheme())
+    else
+    if (g_uri_get_scheme(uri) == Glib::ustring("gemini"))
     {
         // Create new socket connection
         GioSocketClient = Gio::SocketClient::create();
@@ -223,7 +253,9 @@ void Page::navigation_reload(
 
                 description = Glib::ustring::sprintf(
                     _("Connecting to %s.."),
-                    pageNavigation->get_request_host()
+                    g_uri_get_host(
+                        uri
+                    )
                 );
 
                 progress_fraction = .25;
@@ -264,7 +296,9 @@ void Page::navigation_reload(
 
                             description = Glib::ustring::sprintf(
                                 _("Begin request to %s.."),
-                                pageNavigation->get_request_host()
+                                g_uri_get_host(
+                                    uri
+                                )
                             );
 
                             progress_fraction = .5;
@@ -282,7 +316,9 @@ void Page::navigation_reload(
 
                                     description = Glib::ustring::sprintf(
                                         _("Reading response from %s.."),
-                                        pageNavigation->get_request_host()
+                                        g_uri_get_host(
+                                            uri
+                                        )
                                     );
 
                                     progress_fraction = .75;
@@ -299,14 +335,16 @@ void Page::navigation_reload(
                                     if (meta[1] == "20")
                                     {
                                         // Route by mime type or path extension
-                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(pageNavigation->get_request_path(), ".gmi"))
+                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(g_uri_get_path(uri), ".gmi"))
                                         {
                                             // Update
                                             mime = MIME::TEXT_GEMINI;
 
                                             title = _("Done"); // @TODO page title
 
-                                            description = pageNavigation->get_request_host();
+                                            description = g_uri_get_host(
+                                                uri
+                                            );
 
                                             progress_fraction = 1;
 
@@ -363,21 +401,9 @@ void Page::navigation_reload(
         );
     }
 
-    // Scheme not found but host provided, redirect to gemini://
-    else if (pageNavigation->get_request_scheme().empty() && !pageNavigation->get_request_host().empty())
-    {
-        pageNavigation->set_request_text(
-            "gemini://" + pageNavigation->get_request_text()
-        );
-
-        navigation_reload(
-            false
-        );
-    }
-
     else
     {
-        // @TODO search request
+        throw _("Exception"); // @TODO
     }
 }
 

@@ -88,6 +88,8 @@ namespace app::browser::main::tab
             // Tools
             double progress_fraction; // async load indication (progress bar)
 
+            GUri * uri;
+
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__update;
 
