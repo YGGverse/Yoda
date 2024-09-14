@@ -35,6 +35,17 @@ Gemini::Gemini(
             true
         );
 
+        // Connect signals
+        label->signal_activate_link().connect(
+            [label](const Glib::ustring & URI) -> bool
+            {
+                // @TODO follow action
+
+                return false;
+            },
+            false // after
+        );
+
     set_child(
         * label
     );
