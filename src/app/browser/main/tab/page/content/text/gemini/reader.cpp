@@ -52,6 +52,12 @@ Reader::Reader(
     );
 }
 
+// Getters
+Glib::ustring Reader::get_title()
+{
+    return title;
+}
+
 // Match tools
 bool Reader::Line::Match::header(
     const Glib::ustring & GEMTEXT,
@@ -151,6 +157,11 @@ Glib::ustring Reader::make(
                     header
                 )
             );
+
+            if (title.empty())
+            {
+                title = header;
+            }
 
             continue;
         }

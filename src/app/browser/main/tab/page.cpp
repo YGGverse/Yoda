@@ -316,6 +316,12 @@ void Page::navigation_reload(
                                                 buffer
                                             );
 
+                                                // Update title on detected by document provider
+                                                if (!pageContent->get_title().empty())
+                                                {
+                                                    title = pageContent->get_title();
+                                                }
+
                                             action__update->activate();
                                         }
 

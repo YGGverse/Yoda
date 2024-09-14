@@ -14,7 +14,8 @@ Text::Text(
 
             set_child(
                 * Gtk::make_managed<text::Gemini>(
-                    TEXT
+                    TEXT,
+                    title
                 )
             );
 
@@ -34,4 +35,10 @@ Text::Text(
 
             throw _("Invalid text type enum"); // @TODO
     }
+}
+
+// Getters
+Glib::ustring Text::get_title()
+{
+    return title;
 }

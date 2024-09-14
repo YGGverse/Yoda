@@ -22,8 +22,11 @@ namespace app::browser::main::tab::page
             // Components
             content::Text * contentText;
 
+            // Extra features
+            Glib::ustring title;
+
         /*
-         * Class API
+         * Content class API
          */
         public:
 
@@ -36,10 +39,14 @@ namespace app::browser::main::tab::page
             Content();
             ~Content();
 
+            // Actions
             void update(
                 const MIME & MIME,
                 const Glib::ustring & DATA
             );
+
+            // Getters
+            Glib::ustring get_title();
     };
 }
 

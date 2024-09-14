@@ -31,6 +31,12 @@ Content::~Content()
     delete contentText;
 }
 
+// Getters
+Glib::ustring Content::get_title()
+{
+    return title;
+}
+
 // Setters
 void Content::update(
     const MIME & MIME,
@@ -39,6 +45,8 @@ void Content::update(
     // Cleanup, free memory
     if (contentText != nullptr)
     {
+        title.clear();
+
         remove(
             * contentText
         );
@@ -57,6 +65,8 @@ void Content::update(
                 content::Text::Type::GEMINI,
                 DATA
             );
+
+            title = contentText->get_title();
 
             append(
                 * contentText

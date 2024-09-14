@@ -9,18 +9,32 @@ namespace app::browser::main::tab::page::content
 {
     class Text : public Gtk::ScrolledWindow
     {
+        /*
+         * Private members
+         */
+        Glib::ustring title;
+
         public:
 
+            /*
+            * Extra features
+            */
             enum Type
             {
                 GEMINI,
                 PLAIN
             };
 
+            /*
+            * Text class API
+            */
             Text(
                 const Type & TYPE,
                 const Glib::ustring & TEXT
             );
+
+            // Getters
+            Glib::ustring get_title();
     };
 }
 

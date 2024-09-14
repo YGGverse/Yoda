@@ -8,10 +8,14 @@ namespace app::browser::main::tab::page::content::text
 {
     class Gemini : public Gtk::Viewport
     {
+        /*
+         * Gemini class API
+         */
         public:
 
             Gemini(
-                const Glib::ustring & GEMTEXT
+                const Glib::ustring & GEMTEXT,
+                Glib::ustring & title
             );
     };
 }
