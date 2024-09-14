@@ -28,7 +28,7 @@ namespace app::browser::main::tab::page::content::text::gemini
 
                 static bool link(
                     const Glib::ustring & GEMTEXT,
-                    Glib::ustring & address,
+                    Glib::ustring & uri,
                     Glib::ustring & date,
                     Glib::ustring & alt
                 );
@@ -49,7 +49,7 @@ namespace app::browser::main::tab::page::content::text::gemini
 
             static Glib::ustring link(
                 GUri * base,
-                const Glib::ustring & ADDRESS,
+                const Glib::ustring & URI,
                 const Glib::ustring & DATE,
                 const Glib::ustring & ALT
             );

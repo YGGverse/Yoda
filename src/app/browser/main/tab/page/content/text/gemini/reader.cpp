@@ -40,16 +40,16 @@ Reader::Reader(
         }
 
         // Link
-        Glib::ustring address;
+        Glib::ustring uri;
         Glib::ustring date;
         Glib::ustring alt;
 
-        if (Line::Match::link(line, address, date, alt))
+        if (Line::Match::link(line, uri, date, alt))
         {
             markup.append(
                 Make::link(
                     base,
-                    address,
+                    uri,
                     date,
                     alt
                 )
@@ -160,7 +160,7 @@ bool Reader::Line::Match::header(
 
 bool Reader::Line::Match::link(
     const Glib::ustring & GEMTEXT,
-    Glib::ustring & address,
+    Glib::ustring & uri,
     Glib::ustring & date,
     Glib::ustring & alt
 ) {
@@ -173,7 +173,7 @@ bool Reader::Line::Match::link(
     {
         switch (index)
         {
-            case 1: address = MATCH; break;
+            case 1: uri = MATCH; break;
             case 3: date    = MATCH; break;
             case 5: alt     = MATCH; break;
         }
@@ -181,7 +181,7 @@ bool Reader::Line::Match::link(
         index++;
     }
 
-    return !address.empty();
+    return !uri.empty();
 }
 
 bool Reader::Line::Match::quote(
@@ -248,25 +248,67 @@ Glib::ustring Reader::Make::header(
 
 Glib::ustring Reader::Make::link(
     GUri * base,
-    const Glib::ustring & ADDRESS,
+    const Glib::ustring & URI,
     const Glib::ustring & DATE,
     const Glib::ustring & ALT
 ) {
-    // Make relative links absolute
-    const auto ABSOLUTE = g_uri_resolve_relative(
-        g_uri_to_string(
+    // Convert relative URI to absolute
+    const gchar * ABSOLUTE_URI = g_uri_resolve_relative(
+        g_uri_to_string( // seems could be NULL
             base
         ),
-        ADDRESS.c_str(),
+        URI.c_str(),
         G_URI_FLAGS_NONE,
         NULL // GError * @TODO
     );
 
-    // Build link text
+        // Validate conversion success to continue
+        if (ABSOLUTE_URI == NULL)
+        {
+            throw _("Could not resolve absolute URI"); // @TODO
+        }
+
+    // Get host from base
+    const gchar * BASE_HOST = g_uri_get_host(
+        base
+    );
+
+        // Validate base host parsed
+        if (BASE_HOST == NULL)
+        {
+            throw _("Could not parse base host"); // @TODO
+        }
+
+
+    // Create GUri pointer from absolute URI
+    GUri * absolute_uri_base = g_uri_parse(
+        ABSOLUTE_URI,
+        G_URI_FLAGS_NONE,
+        NULL // GError * @TODO
+    );
+
+        // Validate it's created to continue
+        if (ABSOLUTE_URI == NULL)
+        {
+            throw _("Could not create GUri pointer for absolute URI"); // @TODO
+        }
+
+    // Get host from absolute URI base
+    const gchar * URI_HOST = g_uri_get_host(
+        absolute_uri_base
+    );
+
+        // Validate base host parsed
+        if (URI_HOST == NULL)
+        {
+            throw _("Could not parse absolute base host"); // @TODO
+        }
+
+    // Everything done, make link info
     Glib::ustring alt;
 
         // Indicate external links
-        if (strcmp(g_uri_get_host(base), g_uri_get_host(g_uri_parse(ABSOLUTE, G_URI_FLAGS_NONE, NULL))))
+        if (strcmp(URI_HOST, BASE_HOST))
         {
             alt.append(
                 "⇖"
@@ -293,10 +335,10 @@ Glib::ustring Reader::Make::link(
     return Glib::ustring::sprintf(
         "<a href=\"%s\" title=\"%s\">%s</a>\n",
         Glib::Markup::escape_text(
-            ABSOLUTE == NULL ? ADDRESS : ABSOLUTE // @TODO exception?
+            ABSOLUTE_URI
         ),
         Glib::Markup::escape_text(
-            ADDRESS
+            URI
         ),
         Glib::Markup::escape_text(
             alt
