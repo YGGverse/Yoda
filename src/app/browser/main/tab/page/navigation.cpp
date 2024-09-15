@@ -11,6 +11,7 @@ Navigation::Navigation(
     sqlite3 * db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
@@ -45,7 +46,9 @@ Navigation::Navigation(
     );
 
     // Init components
-    navigationBase = Gtk::make_managed<navigation::Base>();
+    navigationBase = Gtk::make_managed<navigation::Base>(
+        ACTION__OPEN_LINK_VARIANT
+    );
 
         append(
             * navigationBase

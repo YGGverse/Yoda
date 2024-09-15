@@ -62,6 +62,7 @@ Page::Page(
         this->db,
         ACTION__HISTORY_BACK,
         ACTION__HISTORY_FORWARD,
+        ACTION__OPEN_LINK_VARIANT,
         ACTION__RELOAD,
         ACTION__UPDATE
     );
