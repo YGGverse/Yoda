@@ -21,6 +21,7 @@ Reload::Reload(
         false
     );
 
+    // Init events
     signal_clicked().connect(
         [this]
         {
