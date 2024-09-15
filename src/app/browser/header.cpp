@@ -42,7 +42,9 @@ Header::Header(
             * headerMenu
         );
 
-    headerTab = Gtk::make_managed<header::Tab>();
+    headerTab = Gtk::make_managed<header::Tab>(
+        ACTION__TAB_APPEND
+    );
 
         pack_start(
             * headerTab
