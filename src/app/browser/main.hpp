@@ -105,6 +105,10 @@ namespace app::browser
 
             void update();
 
+            void update(
+                const Glib::ustring & URI
+            );
+
             // Getters
             Glib::ustring get_tab_page_title();
             Glib::ustring get_tab_page_description();

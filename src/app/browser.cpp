@@ -33,9 +33,17 @@ Browser::Browser(
         {
             if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
             {
+                browserMain->update(
+                    Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(
+                        PARAMETER
+                    ).get()
+                );
+
+                browserHeader->update(
+                    browserMain->get_tab_page_title(),
+                    browserMain->get_tab_page_description()
+                );
             }
-            // @TODO process request
-            // Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(parameter).get()
         }
     );
 

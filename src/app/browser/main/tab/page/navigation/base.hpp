@@ -11,6 +11,10 @@ namespace app::browser::main::tab::page::navigation
         public:
 
             Base();
+
+            void update(
+                const Glib::ustring & URI
+            );
     };
 }
 

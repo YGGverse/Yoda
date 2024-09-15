@@ -89,6 +89,11 @@ namespace app::browser::main::tab::page::navigation
                 const double & PROGRESS_FRACTION
             );
 
+            void update(
+                const Glib::ustring & TEXT,
+                const double & PROGRESS_FRACTION
+            );
+
             int restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
             ); // return sqlite3_finalize status code

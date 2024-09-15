@@ -124,6 +124,11 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
+            void update(
+                const int & PAGE_NUMBER,
+                const Glib::ustring & URI
+            );
+
             int restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
             ); // return sqlite3_finalize status code

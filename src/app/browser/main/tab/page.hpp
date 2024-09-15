@@ -133,6 +133,10 @@ namespace app::browser::main::tab
 
             void update();
 
+            void update(
+                const Glib::ustring & URI
+            );
+
             void navigation_reload(
                 const bool & ADD_HISTORY
             );

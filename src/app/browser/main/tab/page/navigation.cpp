@@ -117,6 +117,30 @@ void Navigation::update(
     );
 }
 
+void Navigation::update(
+    const Glib::ustring & REQUEST_TEXT,
+    const double & REQUEST_PROGRESS_FRACTION
+) {
+    // Update base widget
+    navigationBase->update(
+        REQUEST_TEXT
+    );
+
+    // Update history widget
+    navigationHistory->update();
+
+    // Toggle update button sensibility
+    navigationReload->update(
+        navigationRequest->get_text_length() > 0
+    );
+
+    // Update request area (with progressbar)
+    navigationRequest->update(
+        REQUEST_TEXT,
+        REQUEST_PROGRESS_FRACTION
+    );
+}
+
 int Navigation::restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {

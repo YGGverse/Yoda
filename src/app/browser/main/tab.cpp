@@ -166,6 +166,37 @@ void Tab::update(
     );
 }
 
+void Tab::update(
+    const int & PAGE_NUMBER,
+    const Glib::ustring & URI
+) {
+    // Get tab page
+    const auto TAB_PAGE = get_tabPage(
+        PAGE_NUMBER
+    );
+
+    // Update tab page component
+    TAB_PAGE->update(
+        URI
+    );
+
+    // Update tab label component
+    get_tabLabel(
+        PAGE_NUMBER
+    )->set_label(
+        TAB_PAGE->get_title()
+    );
+
+    // Update tab actions status
+    action__tab_close_active->set_enabled(
+        get_n_pages() > 0
+    );
+
+    action__tab_close_all->set_enabled(
+        get_n_pages() > 0
+    );
+}
+
 int Tab::append(
     const Glib::ustring & LABEL_TEXT,
     const bool & IS_CURRENT
