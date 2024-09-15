@@ -10,9 +10,9 @@ using namespace app::browser::main::tab::page;
 Navigation::Navigation(
     sqlite3 * db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init database
     DB::SESSION::init(
@@ -53,8 +53,8 @@ Navigation::Navigation(
 
     navigationHistory = Gtk::make_managed<navigation::History>(
         db,
-        ACTION__NAVIGATION_HISTORY_BACK,
-        ACTION__NAVIGATION_HISTORY_FORWARD
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
     );
 
         append(
@@ -62,7 +62,7 @@ Navigation::Navigation(
         );
 
     navigationReload = Gtk::make_managed<navigation::Reload>(
-        ACTION__NAVIGATION_RELOAD
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD
     );
 
         append(
@@ -72,7 +72,7 @@ Navigation::Navigation(
     navigationRequest = Gtk::make_managed<navigation::Request>(
         db,
         ACTION__UPDATE,
-        ACTION__NAVIGATION_RELOAD
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD
     );
 
         append(

@@ -117,9 +117,9 @@ namespace app::browser::main::tab
                 const Glib::ustring & TITLE,
                 const Glib::ustring & DESCRIPTION,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_RELOAD
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
             );
 
             // Actions

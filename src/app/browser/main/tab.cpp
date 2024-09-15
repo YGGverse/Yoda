@@ -7,8 +7,8 @@ using namespace app::browser::main;
 Tab::Tab(
     sqlite3 * db,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ACTIVE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__MAIN_TAB_CLOSE_ALL,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
@@ -20,8 +20,8 @@ Tab::Tab(
 
     // Init actions
     action__update                              = ACTION__UPDATE;
-    action__tab_close_active                    = ACTION__TAB_CLOSE_ACTIVE;
-    action__tab_close_all                       = ACTION__MAIN_TAB_CLOSE_ALL;
+    action__tab_close                           = ACTION__TAB_CLOSE;
+    action__tab_close_all                       = ACTION__TAB_CLOSE_ALL;
     action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
     action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
     action__tab_page_navigation_reload          = ACTION__TAB_PAGE_NAVIGATION_RELOAD;
@@ -157,7 +157,7 @@ void Tab::update(
     );
 
     // Update tab actions status
-    action__tab_close_active->set_enabled(
+    action__tab_close->set_enabled(
         get_n_pages() > 0
     );
 
@@ -188,7 +188,7 @@ void Tab::update(
     );
 
     // Update tab actions status
-    action__tab_close_active->set_enabled(
+    action__tab_close->set_enabled(
         get_n_pages() > 0
     );
 
@@ -215,7 +215,7 @@ int Tab::append(
 
     const auto TAB_LABEL = new tab::Label( // @TODO manage
         db,
-        action__tab_close_active
+        action__tab_close
     );
 
     const int PAGE_NUMBER = append_page(

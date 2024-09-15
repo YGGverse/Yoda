@@ -10,9 +10,9 @@ Page::Page(
     const Glib::ustring & TITLE,
     const Glib::ustring & DESCRIPTION,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init meta
     mime = MIME;
@@ -37,9 +37,9 @@ Page::Page(
     pageNavigation = Gtk::make_managed<page::Navigation>(
         this->db,
         ACTION__UPDATE,
-        ACTION__PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__PAGE_NAVIGATION_RELOAD
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD
     );
 
         append(

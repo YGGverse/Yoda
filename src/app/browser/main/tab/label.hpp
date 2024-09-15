@@ -59,7 +59,7 @@ namespace app::browser::main::tab
             sqlite3 * db;
 
             // Actions
-            Glib::RefPtr<Gio::SimpleAction> action__close_active;
+            Glib::RefPtr<Gio::SimpleAction> action__tab_close;
 
         /*
          * Class API
@@ -68,7 +68,7 @@ namespace app::browser::main::tab
 
             Label(
                 sqlite3 * db,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ACTIVE
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE
             );
 
             // Actions

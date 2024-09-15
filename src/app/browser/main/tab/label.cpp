@@ -4,7 +4,7 @@ using namespace app::browser::main::tab;
 
 Label::Label(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ACTIVE
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE
 ) {
     // Init database
     DB::SESSION::init(
@@ -12,7 +12,7 @@ Label::Label(
     );
 
     // Init actions
-    action__close_active = ACTION__CLOSE_ACTIVE;
+    action__tab_close = ACTION__TAB_CLOSE;
 
     // Setup label controller
     auto GtkGestureClick = Gtk::GestureClick::create();
@@ -27,7 +27,7 @@ Label::Label(
             {
                 if (n == 2) // double click
                 {
-                    action__close_active->activate();
+                    action__tab_close->activate();
                 }
             }
         );

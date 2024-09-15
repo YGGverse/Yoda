@@ -47,32 +47,32 @@ Browser::Browser(
         }
     );
 
-    const auto ACTION__CLEAN = add_action(
-        "clean",
+    const auto ACTION__SESSION_CLEAN = add_action(
+        "session_clean",
         [this]
         {
             clean();
         }
     );
 
-    const auto ACTION__RESTORE = add_action(
-        "restore",
+    const auto ACTION__SESSION_RESTORE = add_action(
+        "session_restore",
         [this]
         {
             restore();
         }
     );
 
-    const auto ACTION__SAVE = add_action(
-        "save",
+    const auto ACTION__SESSION_SAVE = add_action(
+        "session_save",
         [this]
         {
             save();
         }
     );
 
-    const auto ACTION__DEBUG = add_action(
-        "debug",
+    const auto ACTION__TOOLS_DEBUG = add_action(
+        "tools_debug",
         [this]
         {
             // @TODO https://gitlab.gnome.org/GNOME/gtkmm/-/commit/5f3b82537d3daad7bda59dd01e719788070f4b6c
@@ -82,28 +82,28 @@ Browser::Browser(
         }
     );
 
-    const auto ACTION__MAIN_TAB_APPEND = add_action(
-        "main_tab_append",
+    const auto ACTION__TAB_APPEND = add_action(
+        "tab_append",
         [this]
         {
             browserMain->tab_append();
         }
     );
 
-    const auto ACTION__MAIN_TAB_CLOSE_ACTIVE = add_action(
-        "main_tab_close_active",
+    const auto ACTION__TAB_CLOSE = add_action(
+        "tab_close",
         [this]
         {
             browserMain->tab_close();
         }
     );
 
-        ACTION__MAIN_TAB_CLOSE_ACTIVE->set_enabled(
+        ACTION__TAB_CLOSE->set_enabled(
             false
         );
 
     add_action(
-        "main_tab_close_left",
+        "tab_close_left",
         [this]
         {
             browserMain->tab_close_left();
@@ -113,7 +113,7 @@ Browser::Browser(
     );
 
     add_action(
-        "main_tab_close_right",
+        "tab_close_right",
         [this]
         {
             browserMain->tab_close_right();
@@ -122,51 +122,51 @@ Browser::Browser(
         false
     );
 
-    const auto ACTION__MAIN_TAB_CLOSE_ALL = add_action(
-        "main_tab_close_all",
+    const auto ACTION__TAB_CLOSE_ALL = add_action(
+        "tab_close_all",
         [this]
         {
             browserMain->tab_close_all();
         }
     );
 
-        ACTION__MAIN_TAB_CLOSE_ALL->set_enabled(
+        ACTION__TAB_CLOSE_ALL->set_enabled(
             false
         );
 
-    const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD = add_action(
-        "main_tab_page_navigation_reload",
+    const auto ACTION__TAB_PAGE_NAVIGATION_RELOAD = add_action(
+        "tab_page_navigation_reload",
         [this]
         {
             browserMain->tab_page_navigation_reload();
         }
     );
 
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD->set_enabled(
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD->set_enabled(
             false
         );
 
-    const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
-        "main_tab_page_navigation_history_back",
+    const auto ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK = add_action(
+        "tab_page_navigation_history_back",
         [this]
         {
             browserMain->tab_page_navigation_history_back();
         }
     );
 
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK->set_enabled(
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK->set_enabled(
             false
         );
 
-    const auto ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD = add_action(
-        "main_tab_page_navigation_history_forward",
+    const auto ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD = add_action(
+        "tab_page_navigation_history_forward",
         [this]
         {
             browserMain->tab_page_navigation_history_forward();
         }
     );
 
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD->set_enabled(
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD->set_enabled(
             false
         );
 
@@ -192,17 +192,17 @@ Browser::Browser(
 
     // Init components
     browserHeader = Gtk::make_managed<browser::Header>(
-        ACTION__DEBUG,
+        ACTION__TOOLS_DEBUG,
         ACTION__QUIT,
-        ACTION__CLEAN,
-        ACTION__RESTORE,
-        ACTION__SAVE,
-        ACTION__MAIN_TAB_APPEND,
-        ACTION__MAIN_TAB_CLOSE_ACTIVE,
-        ACTION__MAIN_TAB_CLOSE_ALL,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
+        ACTION__SESSION_CLEAN,
+        ACTION__SESSION_RESTORE,
+        ACTION__SESSION_SAVE,
+        ACTION__TAB_APPEND,
+        ACTION__TAB_CLOSE,
+        ACTION__TAB_CLOSE_ALL,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD
     );
 
         set_titlebar(
@@ -212,11 +212,11 @@ Browser::Browser(
     browserMain = Gtk::make_managed<browser::Main>(
         db,
         ACTION__UPDATE,
-        ACTION__MAIN_TAB_CLOSE_ACTIVE,
-        ACTION__MAIN_TAB_CLOSE_ALL,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__MAIN_TAB_PAGE_NAVIGATION_RELOAD
+        ACTION__TAB_CLOSE,
+        ACTION__TAB_CLOSE_ALL,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
+        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD
     );
 
         set_child(
@@ -235,27 +235,27 @@ Browser::Browser(
             );
 
             APP->set_accel_for_action(
-                "win.main_tab_append",
+                "win.tab_append",
                 "<Primary>t"
             );
 
             APP->set_accel_for_action(
-                "win.main_tab_close_active",
+                "win.tab_close",
                 "<Primary>Escape"
             );
 
             APP->set_accel_for_action(
-                "win.main_tab_page_navigation_reload",
+                "win.tab_page_navigation_reload",
                 "<Primary>r"
             );
 
             APP->set_accel_for_action(
-                "win.main_tab_page_navigation_history_back",
+                "win.tab_page_navigation_history_back",
                 "<Primary>Left"
             );
 
             APP->set_accel_for_action(
-                "win.main_tab_page_navigation_history_forward",
+                "win.tab_page_navigation_history_forward",
                 "<Primary>Right"
             );
 
