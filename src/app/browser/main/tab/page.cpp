@@ -21,7 +21,7 @@ Page::Page(
         this->db = db
     );
 
-    // Init actions
+    // Init shared actions
     action__update = ACTION__UPDATE;
 
     // Init widget
