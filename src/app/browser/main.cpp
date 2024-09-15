@@ -110,7 +110,6 @@ void Main::save(
 void Main::tab_append()
 {
     mainTab->append(
-        _("New tab"),
         true
     );
 };

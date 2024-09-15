@@ -83,13 +83,13 @@ namespace app::browser::main::tab
 
             // Meta
             MIME mime;
-            Glib::ustring title;
-            Glib::ustring description;
 
-            // Tools
-            double progress_fraction; // async load indication (progress bar)
+            double progress_fraction;
 
             GUri * uri;
+
+            Glib::ustring title;
+            Glib::ustring description;
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__update;
@@ -114,9 +114,6 @@ namespace app::browser::main::tab
 
             Page(
                 sqlite3 * db,
-                const MIME & MIME,
-                const Glib::ustring & TITLE,
-                const Glib::ustring & DESCRIPTION,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,

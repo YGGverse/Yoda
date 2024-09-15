@@ -15,14 +15,14 @@ Label::Label(
     action__tab_close = ACTION__TAB_CLOSE;
 
     // Setup label controller
-    auto GtkGestureClick = Gtk::GestureClick::create();
+    auto const EVENT__GESTURE_CLICK = Gtk::GestureClick::create();
 
         /* @TODO remove as default
         controller->set_button(
             GDK_BUTTON_PRIMARY
         );*/
 
-        GtkGestureClick->signal_pressed().connect(
+        EVENT__GESTURE_CLICK->signal_pressed().connect(
             [this](int n, double x, double y)
             {
                 if (n == 2) // double click
@@ -33,8 +33,14 @@ Label::Label(
         );
 
         add_controller(
-            GtkGestureClick
+            EVENT__GESTURE_CLICK
         );
+
+    // Init widget
+    /* not in use, overwritten by page init @TODO
+    set_text(
+        _("New page")
+    );*/
 }
 
 // Actions

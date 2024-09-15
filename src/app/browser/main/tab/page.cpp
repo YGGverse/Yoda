@@ -6,27 +6,23 @@ using namespace app::browser::main::tab;
 
 Page::Page(
     sqlite3 * db,
-    const MIME & MIME,
-    const Glib::ustring & TITLE,
-    const Glib::ustring & DESCRIPTION,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init meta
-    mime = MIME;
-    title = TITLE;
-    description = DESCRIPTION;
+    mime = MIME::UNDEFINED;
+    title = _("New page");
     progress_fraction = 0;
-
-    // Init actions
-    action__update = ACTION__UPDATE;
 
     // Init database
     DB::SESSION::init(
         this->db = db
     );
+
+    // Init actions
+    action__update = ACTION__UPDATE;
 
     // Init widget
     set_orientation(

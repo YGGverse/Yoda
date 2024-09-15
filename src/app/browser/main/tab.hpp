@@ -95,7 +95,6 @@ namespace app::browser::main
 
             // Actions
             int append(
-                const Glib::ustring & LABEL_TEXT,
                 const bool & IS_CURRENT
             );
 

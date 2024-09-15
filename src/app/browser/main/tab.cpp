@@ -67,7 +67,6 @@ int Tab::restore(
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             const int PAGE_NUMBER = append(
-                _("Restore"),
                 sqlite3_column_int(
                     statement,
                     DB::SESSION::IS_CURRENT
@@ -167,15 +166,10 @@ void Tab::update(
 }
 
 int Tab::append(
-    const Glib::ustring & LABEL_TEXT,
     const bool & IS_CURRENT
 ) {
     const auto TAB_PAGE = new tab::Page( // @TODO manage
         db,
-        tab::Page::MIME::UNDEFINED,
-        LABEL_TEXT,
-        "", // @TODO restore feature
-
         action__update,
         action__tab_page_navigation_history_back,
         action__tab_page_navigation_history_forward,
