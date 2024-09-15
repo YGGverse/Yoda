@@ -26,27 +26,6 @@ Browser::Browser(
         }
     );
 
-    add_action_with_parameter(
-        "open",
-        Glib::VARIANT_TYPE_STRING,
-        [this](const Glib::VariantBase & PARAMETER)
-        {
-            if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
-            {
-                browserMain->update(
-                    Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(
-                        PARAMETER
-                    ).get()
-                );
-
-                browserHeader->update(
-                    browserMain->get_tab_page_title(),
-                    browserMain->get_tab_page_description()
-                );
-            }
-        }
-    );
-
     const auto ACTION__SESSION_CLEAN = add_action(
         "session_clean",
         [this]

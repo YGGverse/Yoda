@@ -52,6 +52,35 @@ Page::Page(
             * pageContent
         );
 
+    // Init widget action group @TODO
+    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
+
+        // Define group actions
+        GioSimpleActionGroup->add_action_with_parameter(
+            "open",
+            Glib::VARIANT_TYPE_STRING,
+            [this](const Glib::VariantBase & PARAMETER)
+            {
+                if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
+                {
+                    pageNavigation->set_request_text(
+                        Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(
+                            PARAMETER
+                        ).get()
+                    );
+
+                    navigation_reload(
+                        true
+                    );
+                }
+            }
+        );
+
+        insert_action_group(
+            "page",
+            GioSimpleActionGroup
+        );
+
     // Connect events
     /* activated twice on tab change @TODO
     signal_realize().connect(
