@@ -61,8 +61,8 @@ namespace app::browser::main::tab::page::navigation
             sqlite3 * db;
 
             // Actions
-            Glib::RefPtr<Gio::SimpleAction> action__update,
-                                            action__tab_page_navigation_reload;
+            Glib::RefPtr<Gio::SimpleAction> action__reload,
+                                            action__update;
 
             // Extras
             double progress_fraction;
@@ -80,8 +80,8 @@ namespace app::browser::main::tab::page::navigation
 
             Request(
                 sqlite3 * db,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
 
             // Actions

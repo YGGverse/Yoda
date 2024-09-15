@@ -6,8 +6,8 @@ using namespace app::browser::main::tab::page::navigation;
 
 History::History(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD
 ) {
     // Init database
     DB::SESSION::init(
@@ -20,7 +20,7 @@ History::History(
     );
 
     historyBack = Gtk::make_managed<history::Back>(
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK
+        ACTION__HISTORY_BACK
     );
 
         append(
@@ -28,7 +28,7 @@ History::History(
         );
 
     historyForward = Gtk::make_managed<history::Forward>(
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD
+        ACTION__HISTORY_FORWARD
     );
 
         append(

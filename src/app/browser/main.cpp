@@ -5,12 +5,12 @@ using namespace app::browser;
 
 Main::Main(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ALL,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
     DB::SESSION::init(
@@ -29,12 +29,12 @@ Main::Main(
     // Init components
     mainTab = Gtk::make_managed<main::Tab>(
         db,
-        ACTION__UPDATE,
-        ACTION__TAB_CLOSE,
-        ACTION__TAB_CLOSE_ALL,
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__TAB_PAGE_NAVIGATION_RELOAD
+        ACTION__CLOSE,
+        ACTION__CLOSE_ALL,
+        ACTION__HISTORY_BACK,
+        ACTION__HISTORY_FORWARD,
+        ACTION__RELOAD,
+        ACTION__UPDATE
     );
 
         append(

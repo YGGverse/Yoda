@@ -3,10 +3,10 @@
 using namespace app::browser::main::tab::page::navigation;
 
 Reload::Reload(
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD
 ) {
     // Init actions
-    action__tab_page_navigation_reload = ACTION__TAB_PAGE_NAVIGATION_RELOAD;
+    action__reload = ACTION__RELOAD;
 
     // Init widget
     set_icon_name(
@@ -24,7 +24,7 @@ Reload::Reload(
     signal_clicked().connect(
         [this]
         {
-            action__tab_page_navigation_reload->activate();
+            action__reload->activate();
         }
     );
 }
@@ -36,7 +36,7 @@ void Reload::update(
         !REQUEST_TEXT.empty()
     );
 
-    action__tab_page_navigation_reload->set_enabled(
+    action__reload->set_enabled(
         !REQUEST_TEXT.empty()
     );
 }

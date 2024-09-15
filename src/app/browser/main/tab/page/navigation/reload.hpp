@@ -10,12 +10,12 @@ namespace app::browser::main::tab::page::navigation
 {
     class Reload : public Gtk::Button
     {
-        Glib::RefPtr<Gio::SimpleAction> action__tab_page_navigation_reload;
+        Glib::RefPtr<Gio::SimpleAction> action__reload;
 
         public:
 
             Reload(
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD
             );
 
             void update(

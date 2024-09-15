@@ -190,12 +190,12 @@ Browser::Browser(
 
     browserMain = Gtk::make_managed<browser::Main>(
         db,
-        ACTION__UPDATE,
         ACTION__TAB_CLOSE,
         ACTION__TAB_CLOSE_ALL,
         ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
         ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__TAB_PAGE_NAVIGATION_RELOAD
+        ACTION__TAB_PAGE_NAVIGATION_RELOAD,
+        ACTION__UPDATE
     );
 
         set_child(

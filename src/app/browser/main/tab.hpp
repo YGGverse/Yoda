@@ -67,12 +67,12 @@ namespace app::browser::main
             sqlite3 * db;
 
             // Actions
-            Glib::RefPtr<Gio::SimpleAction> action__update,
-                                            action__tab_close,
-                                            action__tab_close_all,
-                                            action__tab_page_navigation_history_back,
-                                            action__tab_page_navigation_history_forward,
-                                            action__tab_page_navigation_reload;
+            Glib::RefPtr<Gio::SimpleAction> action__close_all,
+                                            action__close,
+                                            action__history_back,
+                                            action__history_forward,
+                                            action__reload,
+                                            action__update;
 
             // Defaults
             const bool REORDERABLE = true;
@@ -85,12 +85,12 @@ namespace app::browser::main
 
             Tab(
                 sqlite3 * db,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ALL,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );
 
             // Actions

@@ -6,10 +6,10 @@ using namespace app::browser::main::tab;
 
 Page::Page(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init meta
     title = _("New page");
@@ -32,10 +32,10 @@ Page::Page(
     // Init widget components
     pageNavigation = Gtk::make_managed<page::Navigation>(
         this->db,
-        ACTION__UPDATE,
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-        ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-        ACTION__TAB_PAGE_NAVIGATION_RELOAD
+        ACTION__HISTORY_BACK,
+        ACTION__HISTORY_FORWARD,
+        ACTION__RELOAD,
+        ACTION__UPDATE
     );
 
         append(

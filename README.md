@@ -63,7 +63,7 @@ Currently, main application sources located at `src/app` folder, written by foll
 * `#include` application `.hpp` files in `.cpp`. For system libraries, use headers only. Do not place system dependencies in `.cpp`
 * App interact SQLite database, where table name match related class namespace, it may contain optional feature postfix (separated with double line)
 * App class tables in database wanted to store user data between app sessions and must contain only fields that related to this class (e.g. private and public variable values); also may contain primary key fields, to their parent (table) according to the namespace hierarchy
-* Window actions called same as their menu actors. Children widgets operate with `SimpleAction` objects, not name strings (follow encapsulation)
+* Follow encapsulation, do not use static dependencies like external action names, use `SimpleAction` objects instead of `win.action_name`, etc
 
 ### Environment
 

@@ -6,12 +6,12 @@ using namespace app::browser::main;
 
 Tab::Tab(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ALL,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
     DB::SESSION::init(
@@ -19,12 +19,12 @@ Tab::Tab(
     );
 
     // Init actions
-    action__update                              = ACTION__UPDATE;
-    action__tab_close                           = ACTION__TAB_CLOSE;
-    action__tab_close_all                       = ACTION__TAB_CLOSE_ALL;
-    action__tab_page_navigation_history_back    = ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK;
-    action__tab_page_navigation_history_forward = ACTION__TAB_PAGE_NAVIGATION_HISTORY_FORWARD;
-    action__tab_page_navigation_reload          = ACTION__TAB_PAGE_NAVIGATION_RELOAD;
+    action__close           = ACTION__CLOSE;
+    action__close_all       = ACTION__CLOSE_ALL;
+    action__history_back    = ACTION__HISTORY_BACK;
+    action__history_forward = ACTION__HISTORY_FORWARD;
+    action__reload          = ACTION__RELOAD;
+    action__update          = ACTION__UPDATE;
 
     // Init widget
     set_scrollable(
@@ -156,11 +156,11 @@ void Tab::update(
     );
 
     // Update tab actions status
-    action__tab_close->set_enabled(
+    action__close->set_enabled(
         get_n_pages() > 0
     );
 
-    action__tab_close_all->set_enabled(
+    action__close_all->set_enabled(
         get_n_pages() > 0
     );
 }
@@ -170,15 +170,15 @@ int Tab::append(
 ) {
     const auto TAB_PAGE = new tab::Page( // @TODO manage
         db,
-        action__update,
-        action__tab_page_navigation_history_back,
-        action__tab_page_navigation_history_forward,
-        action__tab_page_navigation_reload
+        action__history_back,
+        action__history_forward,
+        action__reload,
+        action__update
     );
 
     const auto TAB_LABEL = new tab::Label( // @TODO manage
         db,
-        action__tab_close
+        action__close
     );
 
     const int PAGE_NUMBER = append_page(

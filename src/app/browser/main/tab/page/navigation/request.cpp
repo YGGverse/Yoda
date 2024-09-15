@@ -5,8 +5,8 @@ using namespace app::browser::main::tab::page::navigation;
 // Construct
 Request::Request(
     sqlite3 * db,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE,
-    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
     DB::SESSION::init(
@@ -14,8 +14,8 @@ Request::Request(
     );
 
     // Init actions
+    action__reload = ACTION__RELOAD;
     action__update = ACTION__UPDATE;
-    action__tab_page_navigation_reload = ACTION__TAB_PAGE_NAVIGATION_RELOAD;
 
     // Init extras
     progress_fraction = 0;
@@ -44,7 +44,7 @@ Request::Request(
     signal_activate().connect(
         [this]
         {
-            action__tab_page_navigation_reload->activate();
+            action__reload->activate();
         }
     );
 }
