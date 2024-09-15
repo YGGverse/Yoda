@@ -4,6 +4,7 @@
 #include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
+#include <glibmm/varianttype.h>
 #include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/object.h>

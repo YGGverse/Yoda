@@ -26,11 +26,14 @@ Browser::Browser(
         }
     );
 
-    const auto ACTION__OPEN = add_action_with_parameter(
+    add_action_with_parameter(
         "open",
-        Glib::VariantType("s"), // string
-        [this](const Glib::VariantBase & parameter)
+        Glib::VARIANT_TYPE_STRING,
+        [this](const Glib::VariantBase & PARAMETER)
         {
+            if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
+            {
+            }
             // @TODO process request
             // Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(parameter).get()
         }
