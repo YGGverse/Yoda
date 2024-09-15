@@ -30,8 +30,12 @@ Base::Base(
                 Glib::Variant<Glib::ustring>::create(
                     Glib::ustring::sprintf(
                         "%s://%s/",
-                        g_uri_get_scheme(uri), // @TODO NULL validate?
-                        g_uri_get_host(uri)
+                        g_uri_get_scheme(
+                            uri
+                        ), // @TODO NULL validate?
+                        g_uri_get_host(
+                            uri
+                        )
                     ) // at this moment, there is no G_URI_HIDE_*HOST option for g_uri_to_string_partial,
                       // build address manually using sprintf @TODO
                 )
@@ -49,9 +53,28 @@ void Base::update(
         NULL // @TODO GError *
     );
 
+    bool sensitive = false;
+
+    if (uri != NULL)
+    {
+        const char * HOST = g_uri_get_host(
+            uri
+        );
+
+        if (HOST != NULL)
+        {
+            const char * PATH = g_uri_get_path(
+                uri
+            );
+
+            if (PATH != NULL && 0 != strcmp(PATH, "/"))
+            {
+                sensitive = true;
+            }
+        }
+    }
+
     set_sensitive(
-        NULL != uri &&
-        NULL != g_uri_get_host(uri) &&
-        NULL != g_uri_get_path(uri)
+        sensitive
     );
 }
