@@ -168,15 +168,6 @@ void Main::update()
     );
 };
 
-void Main::update(
-    const Glib::ustring & URI
-) {
-    mainTab->update(
-        mainTab->get_current_page(),
-        URI
-    );
-};
-
 // Getters
 Glib::ustring Main::get_tab_page_title()
 {

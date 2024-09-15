@@ -30,13 +30,13 @@ Reload::Reload(
 }
 
 void Reload::update(
-    const bool & IS_ENABLED
+    const Glib::ustring & REQUEST_TEXT
 ) {
     set_sensitive(
-        IS_ENABLED
+        !REQUEST_TEXT.empty()
     );
 
     action__tab_page_navigation_reload->set_enabled(
-        IS_ENABLED
+        !REQUEST_TEXT.empty()
     );
 }

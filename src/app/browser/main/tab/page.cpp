@@ -184,16 +184,6 @@ void Page::update()
     );
 }
 
-void Page::update(
-    const Glib::ustring & URI
-) {
-    // Update children components
-    pageNavigation->update(
-        URI,
-        progress_fraction
-    );
-}
-
 void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {

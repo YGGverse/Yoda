@@ -89,19 +89,6 @@ void Request::update(
     );
 }
 
-void Request::update(
-    const Glib::ustring & TEXT,
-    const double & PROGRESS_FRACTION
-) {
-    set_text(
-        TEXT
-    );
-
-    update(
-        PROGRESS_FRACTION
-    );
-}
-
 int Request::restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {

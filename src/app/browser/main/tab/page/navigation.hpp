@@ -93,11 +93,6 @@ namespace app::browser::main::tab::page
                 const double & PROGRESS_FRACTION
             );
 
-            void update(
-                const Glib::ustring & REQUEST_TEXT,
-                const double & REQUEST_PROGRESS_FRACTION
-            );
-
             int restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
             ); // return sqlite3_finalize status code

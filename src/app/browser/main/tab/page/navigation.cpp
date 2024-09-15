@@ -90,54 +90,19 @@ Navigation::Navigation(
 void Navigation::update(
     const double & PROGRESS_FRACTION
 ) {
-    // Toggle base button sensibility
-    GUri * uri = g_uri_parse(
-        navigationRequest->get_text().c_str(),
-        G_URI_FLAGS_NONE,
-        NULL // @TODO GError *
+    // Update childs
+    navigationBase->update(
+        navigationRequest->get_text()
     );
 
-    navigationBase->set_sensitive(
-        NULL != uri &&
-        NULL != g_uri_get_host(uri) &&
-        NULL != g_uri_get_path(uri)
-    );
-
-    // Update history widget
     navigationHistory->update();
 
-    // Toggle update button sensibility
     navigationReload->update(
-        navigationRequest->get_text_length() > 0
+        navigationRequest->get_text()
     );
 
-    // Update request area (with progressbar)
     navigationRequest->update(
         PROGRESS_FRACTION
-    );
-}
-
-void Navigation::update(
-    const Glib::ustring & REQUEST_TEXT,
-    const double & REQUEST_PROGRESS_FRACTION
-) {
-    // Update base widget
-    navigationBase->update(
-        REQUEST_TEXT
-    );
-
-    // Update history widget
-    navigationHistory->update();
-
-    // Toggle update button sensibility
-    navigationReload->update(
-        REQUEST_TEXT.length() > 0
-    );
-
-    // Update request area (with progressbar)
-    navigationRequest->update(
-        REQUEST_TEXT,
-        REQUEST_PROGRESS_FRACTION
     );
 }
 
