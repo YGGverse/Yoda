@@ -30,13 +30,13 @@ Reload::Reload(
 }
 
 void Reload::update(
-    const bool & ENABLED
+    const bool & IS_ENABLED
 ) {
     set_sensitive(
-        ENABLED
+        IS_ENABLED
     );
 
     action__reload->set_enabled(
-        ENABLED
+        IS_ENABLED
     );
 }

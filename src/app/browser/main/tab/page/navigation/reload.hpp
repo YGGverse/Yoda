@@ -19,7 +19,7 @@ namespace app::browser::main::tab::page::navigation
             );
 
             void update(
-                const bool & ENABLED
+                const bool & IS_ENABLED
             );
     };
 }
