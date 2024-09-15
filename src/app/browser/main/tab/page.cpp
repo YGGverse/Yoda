@@ -24,7 +24,35 @@ Page::Page(
     // Init shared actions
     action__update = ACTION__UPDATE;
 
+    // Init additional local action group (for clickable content)
+    const auto ACTION_GROUP__PAGE = Gio::SimpleActionGroup::create();
+
+    const auto ACTION__OPEN_LINK_VARIANT = ACTION_GROUP__PAGE->add_action_with_parameter(
+        "open_link_variant",
+        Glib::VARIANT_TYPE_STRING,
+        [this](const Glib::VariantBase & PARAMETER)
+        {
+            if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
+            {
+                pageNavigation->set_request_text(
+                    Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(
+                        PARAMETER
+                    ).get()
+                );
+
+                navigation_reload(
+                    true
+                );
+            }
+        }
+    );
+
     // Init widget
+    insert_action_group(
+        "page",
+        ACTION_GROUP__PAGE
+    );
+
     set_orientation(
         Gtk::Orientation::VERTICAL
     );
@@ -42,39 +70,12 @@ Page::Page(
             * pageNavigation
         );
 
-    pageContent = Gtk::make_managed<page::Content>();
+    pageContent = Gtk::make_managed<page::Content>(
+        ACTION__OPEN_LINK_VARIANT
+    );
 
         append(
             * pageContent
-        );
-
-    // Init widget action group @TODO
-    auto GioSimpleActionGroup = Gio::SimpleActionGroup::create();
-
-        // Define group actions
-        GioSimpleActionGroup->add_action_with_parameter(
-            "open",
-            Glib::VARIANT_TYPE_STRING,
-            [this](const Glib::VariantBase & PARAMETER)
-            {
-                if (PARAMETER.is_of_type(Glib::VARIANT_TYPE_STRING))
-                {
-                    pageNavigation->set_request_text(
-                        Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(
-                            PARAMETER
-                        ).get()
-                    );
-
-                    navigation_reload(
-                        true
-                    );
-                }
-            }
-        );
-
-        insert_action_group(
-            "page",
-            GioSimpleActionGroup
         );
 
     // Connect events

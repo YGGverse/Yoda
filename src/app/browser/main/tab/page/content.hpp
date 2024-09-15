@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_HPP
 
+#include <giomm/simpleaction.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/enums.h>
@@ -19,6 +20,9 @@ namespace app::browser::main::tab::page
          */
         private:
 
+            // Actions
+            Glib::RefPtr<Gio::SimpleAction> action__open_link_variant;
+
             // Components
             content::Text * contentText;
 
@@ -36,7 +40,10 @@ namespace app::browser::main::tab::page
                 TEXT_PLAIN
             };
 
-            Content();
+            Content(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT
+            );
+
             ~Content();
 
             // Actions

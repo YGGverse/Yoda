@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_GEMINI_READER_HPP
 
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/markup.h>
 #include <glibmm/regex.h>
@@ -64,11 +65,17 @@ namespace app::browser::main::tab::page::content::text::gemini
         };
 
         /*
+         * Internal members
+         */
+        Glib::RefPtr<Gio::SimpleAction> action__open_link_variant;
+
+        /*
          * Reader class API
          */
         public:
 
             Reader(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
                 const Glib::ustring & GEMTEXT,
                 Glib::ustring & title,
                 GUri * uri

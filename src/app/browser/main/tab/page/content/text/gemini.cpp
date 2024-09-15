@@ -4,6 +4,7 @@
 using namespace app::browser::main::tab::page::content::text;
 
 Gemini::Gemini(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
     const Glib::ustring & GEMTEXT,
     Glib::ustring & title,
     GUri * uri
@@ -18,6 +19,7 @@ Gemini::Gemini(
 
     set_child(
         * Gtk::make_managed<gemini::Reader>(
+            ACTION__OPEN_LINK_VARIANT,
             GEMTEXT,
             title,
             uri

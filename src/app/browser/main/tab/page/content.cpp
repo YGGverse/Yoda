@@ -3,8 +3,12 @@
 
 using namespace app::browser::main::tab::page;
 
-Content::Content()
-{
+Content::Content(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT
+) {
+    // Init actions
+    action__open_link_variant = ACTION__OPEN_LINK_VARIANT;
+
     // Init widget
     set_orientation(
         Gtk::Orientation::VERTICAL
@@ -63,6 +67,7 @@ void Content::update(
         case MIME::TEXT_GEMINI:
 
             contentText = new content::Text(
+                action__open_link_variant,
                 content::Text::Type::GEMINI,
                 SOURCE,
                 uri

@@ -1,6 +1,7 @@
 #ifndef APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_HPP
 #define APP_BROWSER_MAIN_TAB_PAGE_CONTENT_TEXT_HPP
 
+#include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/scrolledwindow.h>
@@ -29,6 +30,7 @@ namespace app::browser::main::tab::page::content
             * Text class API
             */
             Text(
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
                 const Type & TYPE,
                 const Glib::ustring & SOURCE,
                 GUri * uri

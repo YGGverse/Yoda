@@ -5,6 +5,7 @@
 using namespace app::browser::main::tab::page::content;
 
 Text::Text(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
     const Type & TYPE,
     const Glib::ustring & SOURCE,
     GUri * uri
@@ -15,6 +16,7 @@ Text::Text(
 
             set_child(
                 * Gtk::make_managed<text::Gemini>(
+                    ACTION__OPEN_LINK_VARIANT,
                     SOURCE,
                     title,
                     uri

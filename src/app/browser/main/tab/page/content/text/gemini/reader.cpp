@@ -3,10 +3,14 @@
 using namespace app::browser::main::tab::page::content::text::gemini;
 
 Reader::Reader(
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__OPEN_LINK_VARIANT,
     const Glib::ustring & GEMTEXT,
     Glib::ustring & title,
     GUri * base
 ) {
+    // Init shared actions
+    action__open_link_variant = ACTION__OPEN_LINK_VARIANT;
+
     // Build markup
     Glib::ustring markup;
 
@@ -125,12 +129,13 @@ Reader::Reader(
 
             if (SCHEME == NULL || SCHEME == Glib::ustring("gemini"))
             {
-                return activate_action(
-                    "page.open", // @TODO use action argument
+                action__open_link_variant->activate_variant(
                     Glib::Variant<Glib::ustring>::create(
                         URI
                     )
                 );
+
+                return true;
             }
 
             return false; // delegate unsupported URI to external application
