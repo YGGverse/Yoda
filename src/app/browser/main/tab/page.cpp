@@ -193,6 +193,39 @@ void Page::navigation_reload(
         G_URI_FLAGS_NONE,
         NULL // @TODO GError *
     );
+        // Try auto prepend default scheme on fail
+        if (uri == NULL)
+        {
+            uri = g_uri_parse(
+                Glib::ustring::sprintf(
+                    "gemini://%s",
+                    pageNavigation->get_request_text()
+                ).c_str(),
+                G_URI_FLAGS_NONE,
+                NULL // @TODO GError *
+            );
+
+            // Still not parsed, redirect to search provider
+            if (uri == NULL)
+            {
+                // @TODO
+            }
+
+            // URI parsed, redirect
+            else
+            {
+                // Redirect to fixed URI
+                pageNavigation->set_request_text(
+                    g_uri_to_string(
+                        uri
+                    )
+                );
+
+                navigation_reload(
+                    false
+                );
+            }
+        }
 
     // Reset page data
     mime = MIME::UNDEFINED;
@@ -208,29 +241,7 @@ void Page::navigation_reload(
 
     action__update->activate();
 
-    if (NULL == uri || NULL == g_uri_get_scheme(uri))
-    {
-        // Scheme not found but host provided, redirect to gemini://
-        if (NULL != g_uri_get_host(uri))
-        {
-            pageNavigation->set_request_text(
-                "gemini://" + pageNavigation->get_request_text()
-            );
-
-            navigation_reload(
-                false
-            );
-        }
-
-        // Make search request
-        else
-        {
-            throw _("Search request not implemented yet"); // @TODO
-        }
-    }
-
-    // Connect scheme driver
-    else
+    // Route to protocol driver by scheme
     if (g_uri_get_scheme(uri) == Glib::ustring("file"))
     {
         // @TODO
