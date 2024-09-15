@@ -12,8 +12,8 @@ Page::Page(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_RELOAD
 ) {
     // Init meta
-    mime = MIME::UNDEFINED;
     title = _("New page");
+    mime = MIME::UNDEFINED;
     progress_fraction = 0;
 
     // Init database
