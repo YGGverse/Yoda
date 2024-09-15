@@ -193,38 +193,42 @@ void Page::navigation_reload(
         G_URI_FLAGS_NONE,
         NULL // @TODO GError *
     );
-        // Try auto prepend default scheme on fail
+        // On parse fail
         if (uri == NULL)
         {
-            uri = g_uri_parse(
-                Glib::ustring::sprintf(
-                    "gemini://%s",
-                    pageNavigation->get_request_text()
-                ).c_str(),
-                G_URI_FLAGS_NONE,
-                NULL // @TODO GError *
-            );
-
-            // Still not parsed, redirect to search provider
-            if (uri == NULL)
-            {
-                // @TODO
-            }
-
-            // URI parsed, redirect
-            else
-            {
-                // Redirect to fixed URI
+            // Request contain host substring
+            if (Glib::Regex::match_simple(
+                R"regex(^[^\/\s]+\.[\w]{2,})regex",
+                pageNavigation->get_request_text().c_str()
+            )) {
+                // Append default scheme
                 pageNavigation->set_request_text(
-                    g_uri_to_string(
-                        uri
+                    Glib::ustring::sprintf(
+                        "gemini://%s",
+                        pageNavigation->get_request_text()
                     )
                 );
+            }
 
-                navigation_reload(
-                    false
+            // Plain text given, build search request to default provider
+            else
+            {
+                pageNavigation->set_request_text(
+                    Glib::ustring::sprintf(
+                        "gemini://tlgs.one/search?%s", // @TODO settings
+                        g_uri_escape_string(
+                            pageNavigation->get_request_text().c_str(),
+                            NULL,
+                            true
+                        )
+                    ).c_str()
                 );
             }
+
+            // Redirect @TODO limit attempts
+            navigation_reload(
+                false
+            );
         }
 
     // Reset page data
