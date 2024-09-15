@@ -17,6 +17,9 @@ Request::Request(
     action__update = ACTION__UPDATE;
     action__reload = ACTION__RELOAD;
 
+    // Init extras
+    progress_fraction = 0;
+
     // Init widget
     set_placeholder_text(
         _("URL or search term...")
@@ -53,8 +56,14 @@ void Request::update(
     // Update progress
     progress_fraction = PROGRESS_FRACTION;
 
+    // Reset previous connection
+    if (progress_connection.connected())
+    {
+        progress_connection.disconnect();
+    }
+
     // Animate progress function
-    Glib::signal_timeout().connect(
+    progress_connection = Glib::signal_timeout().connect(
         [this]() -> bool
         {
             double current_progress_fraction = get_progress_fraction();

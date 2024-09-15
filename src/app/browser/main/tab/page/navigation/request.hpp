@@ -8,6 +8,7 @@
 #include <glibmm/regex.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/entry.h>
+#include <sigc++/connection.h>
 #include <sqlite3.h>
 
 namespace app::browser::main::tab::page::navigation
@@ -65,6 +66,7 @@ namespace app::browser::main::tab::page::navigation
 
             // Extras
             double progress_fraction;
+            sigc::connection progress_connection;
 
             // Defaults
             const bool HEXPAND = true;
