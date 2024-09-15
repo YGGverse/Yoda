@@ -119,15 +119,21 @@ Reader::Reader(
     signal_activate_link().connect(
         [this](const Glib::ustring & URI) -> bool
         {
-            // Open link URI
-            activate_action(
-                "win.open",
-                Glib::Variant<Glib::ustring>::create(
-                    URI
-                )
+            const char * SCHEME = g_uri_parse_scheme(
+                URI.c_str()
             );
 
-            return false;
+            if (SCHEME == NULL || SCHEME == Glib::ustring("gemini"))
+            {
+                return activate_action(
+                    "win.open",
+                    Glib::Variant<Glib::ustring>::create(
+                        URI
+                    )
+                );
+            }
+
+            return false; // delegate unsupported URI to external application
         },
         false // after
     );
