@@ -131,7 +131,7 @@ void Navigation::update(
 
     // Toggle update button sensibility
     navigationReload->update(
-        navigationRequest->get_text_length() > 0
+        REQUEST_TEXT.length() > 0
     );
 
     // Update request area (with progressbar)
