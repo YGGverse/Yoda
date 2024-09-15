@@ -126,7 +126,7 @@ Reader::Reader(
             if (SCHEME == NULL || SCHEME == Glib::ustring("gemini"))
             {
                 return activate_action(
-                    "win.open",
+                    "win.open", // @TODO
                     Glib::Variant<Glib::ustring>::create(
                         URI
                     )
