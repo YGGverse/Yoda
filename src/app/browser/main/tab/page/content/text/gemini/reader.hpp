@@ -67,7 +67,13 @@ namespace app::browser::main::tab::page::content::text::gemini
         /*
          * Internal members
          */
+
+        // Shared actions
         Glib::RefPtr<Gio::SimpleAction> action__open_link_variant;
+
+        // Defaults
+        const int MARGIN_START = 6;
+        const int MARGIN_END = 6;
 
         /*
          * Reader class API

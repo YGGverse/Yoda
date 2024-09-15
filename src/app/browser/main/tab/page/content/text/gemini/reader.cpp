@@ -91,6 +91,14 @@ Reader::Reader(
         Gtk::Align::START
     );
 
+    set_margin_start(
+        MARGIN_START
+    );
+
+    set_margin_end(
+        MARGIN_END
+    );
+
     set_wrap(
         true
     );
