@@ -69,9 +69,9 @@ namespace app::browser::main::tab::page::navigation
             sigc::connection progress_connection;
 
             // Defaults
-            const bool HEXPAND = true;
-            const double PROGRESS_PULSE_STEP = .1;
-            const int PROGRESS_ANIMATION_TIME = 10;
+            static const bool HEXPAND = true;
+            static const int PROGRESS_ANIMATION_TIME = 10;
+            const double PROGRESS_PULSE_STEP = .1; // @TODO static?
 
         /*
          * Class API

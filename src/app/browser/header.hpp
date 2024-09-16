@@ -24,7 +24,7 @@ namespace app::browser
         header::Tab * headerTab;
 
         // Defaults
-        const bool SHOW_TITLE_BUTTONS = true;
+        static const bool SHOW_TITLE_BUTTONS = true;
 
         public:
 

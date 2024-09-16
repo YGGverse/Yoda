@@ -71,9 +71,9 @@ namespace app
             app::browser::Main * browserMain;
 
             // Defaults
-            const int WIDTH = 640;
-            const int HEIGHT = 480;
-            const bool IS_FULLSCREEN = false;
+            static const int WIDTH = 640;
+            static const int HEIGHT = 480;
+            static const bool IS_FULLSCREEN = false;
 
         /*
          * Browser class API

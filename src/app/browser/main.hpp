@@ -66,7 +66,7 @@ namespace app::browser
             main::Tab * mainTab;
 
             // Defaults
-            const bool HOMOGENEOUS = true;
+            static const bool HOMOGENEOUS = true;
 
         /*
          * Main class API

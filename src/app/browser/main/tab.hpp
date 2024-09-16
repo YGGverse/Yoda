@@ -75,8 +75,8 @@ namespace app::browser::main
                                             action__update;
 
             // Defaults
-            const bool REORDERABLE = true;
-            const bool SCROLLABLE = true;
+            static const bool REORDERABLE = true;
+            static const bool SCROLLABLE = true;
 
         /*
          * Tab class API

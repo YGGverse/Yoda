@@ -72,8 +72,8 @@ namespace app::browser::main::tab::page::content::text::gemini
         Glib::RefPtr<Gio::SimpleAction> action__open_link_variant;
 
         // Defaults
-        const int MARGIN_START = 8;
-        const int MARGIN_END = 8;
+        static const int MARGIN_START = 8;
+        static const int MARGIN_END = 8;
 
         /*
          * Reader class API

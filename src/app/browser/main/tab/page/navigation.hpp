@@ -72,8 +72,8 @@ namespace app::browser::main::tab::page
             navigation::Request * navigationRequest;
 
             // Defaults
-            const int SPACING = 8;
-            const int MARGIN = 8;
+            static const int SPACING = 8;
+            static const int MARGIN = 8;
 
         /*
          * Class API

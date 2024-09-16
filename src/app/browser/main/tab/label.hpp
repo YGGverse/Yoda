@@ -64,7 +64,7 @@ namespace app::browser::main::tab
             Glib::RefPtr<Gio::SimpleAction> action__tab_close;
 
             // Defaults
-            int WIDTH_CHARS = 16;
+            static const int WIDTH_CHARS = 16;
 
         /*
          * Class API
