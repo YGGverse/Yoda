@@ -295,11 +295,11 @@ int Browser::session_restore()
             sqlite3_column_int(
                 statement,
                 DB::SESSION::IS_FULLSCREEN
-            ) ? fullscreen() : unfullscreen();
+            ) == 1 ? fullscreen() : unfullscreen();
 
             // Restore children components
             browserMain->session_restore(
-                sqlite3_column_int(
+                sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
                 )
