@@ -9,7 +9,7 @@ Request::Request(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -92,7 +92,7 @@ void Request::update(
 int Request::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -120,7 +120,7 @@ int Request::session_restore(
                 reinterpret_cast<const char*>(
                     sqlite3_column_text(
                         statement,
-                        DB::SESSION::TEXT
+                        Database::Session::TEXT
                     )
                 )
             );
@@ -138,13 +138,13 @@ int Request::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     // Delete previous records
-    DB::SESSION::clean(
+    Database::Session::clean(
         db,
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
 
     // Add new record
-    return DB::SESSION::add(
+    return Database::Session::add(
         db,
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
         get_text()
@@ -152,7 +152,7 @@ int Request::session_save(
 }
 
 // Database model
-int Request::DB::SESSION::init(
+int Request::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -173,7 +173,7 @@ int Request::DB::SESSION::init(
     );
 }
 
-int Request::DB::SESSION::clean(
+int Request::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
@@ -208,7 +208,7 @@ int Request::DB::SESSION::clean(
                     )SQL",
                     sqlite3_column_int64(
                         statement,
-                        DB::SESSION::ID
+                        Database::Session::ID
                     )
                 ).c_str(),
                 nullptr,
@@ -229,7 +229,7 @@ int Request::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Request::DB::SESSION::add(
+sqlite3_int64 Request::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
     const Glib::ustring & TEXT

@@ -22,10 +22,10 @@ namespace app::browser::main::tab::page::navigation
              *
              * Allowed parental access to enums and relationship methods
              */
-            struct DB
+            struct Database
             {
                 // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_REQUEST__*
-                struct SESSION
+                struct Session
                 {
                     enum
                     {

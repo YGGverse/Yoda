@@ -13,7 +13,7 @@ Main::Main(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -48,7 +48,7 @@ Main::Main(
 int Main::session_restore(
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -72,7 +72,7 @@ int Main::session_restore(
             mainTab->session_restore(
                 sqlite3_column_int64(
                     statement,
-                    DB::SESSION::ID
+                    Database::Session::ID
                 )
             );
         }
@@ -89,13 +89,13 @@ void Main::session_save(
     char * error; // @TODO
 
     // Delete previous data
-    DB::SESSION::clean(
+    Database::Session::clean(
         db,
         APP_BROWSER__SESSION__ID
     ); // @TODO run on background
 
     // Create new session
-    const sqlite3_int64 APP_BROWSER_MAIN__SESSION__ID = DB::SESSION::add(
+    const sqlite3_int64 APP_BROWSER_MAIN__SESSION__ID = Database::Session::add(
         db,
         APP_BROWSER__SESSION__ID
     );
@@ -184,7 +184,7 @@ Glib::ustring Main::get_tab_page_description()
 
 
 // Database
-int Main::DB::SESSION::init(
+int Main::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -204,7 +204,7 @@ int Main::DB::SESSION::init(
     );
 }
 
-int Main::DB::SESSION::clean(
+int Main::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
@@ -232,7 +232,7 @@ int Main::DB::SESSION::clean(
         {
             const sqlite3_int64 APP_BROWSER_MAIN__SESSION__ID = sqlite3_column_int64(
                 statement,
-                DB::SESSION::ID
+                Database::Session::ID
             );
 
             // Delete record
@@ -252,7 +252,7 @@ int Main::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                main::Tab::DB::SESSION::clean(
+                main::Tab::Database::Session::clean(
                     db,
                     APP_BROWSER_MAIN__SESSION__ID
                 );
@@ -265,7 +265,7 @@ int Main::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Main::DB::SESSION::add(
+sqlite3_int64 Main::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {

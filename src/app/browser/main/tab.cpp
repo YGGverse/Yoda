@@ -14,7 +14,7 @@ Tab::Tab(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -43,7 +43,7 @@ Tab::Tab(
 int Tab::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
 ) {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -69,7 +69,7 @@ int Tab::session_restore(
             const int PAGE_NUMBER = append(
                 sqlite3_column_int(
                     statement,
-                    DB::SESSION::IS_CURRENT
+                    Database::Session::IS_CURRENT
                 ) == 1
             );
 
@@ -79,7 +79,7 @@ int Tab::session_restore(
             )->session_restore(
                 sqlite3_column_int64(
                     statement,
-                    DB::SESSION::ID
+                    Database::Session::ID
                 )
             ); // maybe not much reasons to restore as page title in use @TODO
 
@@ -88,7 +88,7 @@ int Tab::session_restore(
             )->session_restore(
                 sqlite3_column_int64(
                     statement,
-                    DB::SESSION::ID
+                    Database::Session::ID
                 )
             );
         }
@@ -105,7 +105,7 @@ void Tab::session_save(
     char * error; // @TODO
 
     // Delete previous data
-    DB::SESSION::clean(
+    Database::Session::clean(
         db,
         APP_BROWSER_MAIN__SESSION__ID
     ); // @TODO run on background
@@ -114,7 +114,7 @@ void Tab::session_save(
     for (int page_number = 0; page_number < get_n_pages(); page_number++)
     {
         // Create new session
-        const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = DB::SESSION::add(
+        const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = Database::Session::add(
             db,
             APP_BROWSER_MAIN__SESSION__ID,
             page_number,
@@ -339,7 +339,7 @@ tab::Page * Tab::get_tabPage(
 }
 
 // Database
-int Tab::DB::SESSION::init(
+int Tab::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -361,7 +361,7 @@ int Tab::DB::SESSION::init(
     );
 }
 
-int Tab::DB::SESSION::clean(
+int Tab::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
 ) {
@@ -389,7 +389,7 @@ int Tab::DB::SESSION::clean(
         {
             const sqlite3_int64 APP_BROWSER_MAIN_TAB__SESSION__ID = sqlite3_column_int64(
                 statement,
-                DB::SESSION::ID
+                Database::Session::ID
             );
 
             // Delete record
@@ -409,12 +409,12 @@ int Tab::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                tab::Label::DB::SESSION::clean(
+                tab::Label::Database::Session::clean(
                     db,
                     APP_BROWSER_MAIN_TAB__SESSION__ID
                 );
 
-                tab::Page::DB::SESSION::clean(
+                tab::Page::Database::Session::clean(
                     db,
                     APP_BROWSER_MAIN_TAB__SESSION__ID
                 );
@@ -427,7 +427,7 @@ int Tab::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Tab::DB::SESSION::add(
+sqlite3_int64 Tab::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID,
     const int & PAGE_NUMBER,

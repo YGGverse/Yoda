@@ -10,7 +10,7 @@ History::History(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -59,7 +59,7 @@ void History::add(
 int History::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -94,17 +94,17 @@ int History::session_restore(
                     reinterpret_cast<const char*>(
                         sqlite3_column_text(
                             statement,
-                            DB::SESSION::REQUEST
+                            Database::Session::REQUEST
                         )
                     ),
                     sqlite3_column_int(
                         statement,
-                        DB::SESSION::TIME
+                        Database::Session::TIME
                     )
                 }
             );
 
-            if (sqlite3_column_int(statement, DB::SESSION::IS_CURRENT) == 1)
+            if (sqlite3_column_int(statement, Database::Session::IS_CURRENT) == 1)
             {
                 index = memory.size() - 1;
             }
@@ -128,7 +128,7 @@ void History::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     // Delete previous records for session
-    DB::SESSION::clean(
+    Database::Session::clean(
         db,
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
@@ -136,7 +136,7 @@ void History::session_save(
     // Add new records
     int offset = -1; for (const auto & MEMORY : memory)
     {
-        DB::SESSION::add(
+        Database::Session::add(
             db,
             APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
             MEMORY.time,
@@ -232,7 +232,7 @@ bool History::try_forward(
 }
 
 // Database model
-int History::DB::SESSION::init(
+int History::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -254,7 +254,7 @@ int History::DB::SESSION::init(
     );
 }
 
-int History::DB::SESSION::clean(
+int History::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
@@ -289,7 +289,7 @@ int History::DB::SESSION::clean(
                     )SQL",
                     sqlite3_column_int64(
                         statement,
-                        DB::SESSION::ID
+                        Database::Session::ID
                     )
                 ).c_str(),
                 nullptr,
@@ -310,7 +310,7 @@ int History::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 History::DB::SESSION::add(
+sqlite3_int64 History::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
     const int & TIME,

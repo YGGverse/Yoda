@@ -7,7 +7,7 @@ Label::Label(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -115,12 +115,12 @@ int Label::session_restore(
                 reinterpret_cast<const char*>(
                     sqlite3_column_text(
                         statement,
-                        DB::SESSION::TEXT
+                        Database::Session::TEXT
                     )
                 ),
                 sqlite3_column_int(
                     statement,
-                    DB::SESSION::IS_PINNED
+                    Database::Session::IS_PINNED
                 ) == 1
             );
 
@@ -139,7 +139,7 @@ int Label::session_save(
     // Delegate save action to child components (on available)
 
     // Save label session
-    return DB::SESSION::add(
+    return Database::Session::add(
         db,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
         is_pinned,
@@ -210,7 +210,7 @@ void Label::update(
 }
 
 // Database model
-int Label::DB::SESSION::init(
+int Label::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -232,7 +232,7 @@ int Label::DB::SESSION::init(
     );
 }
 
-int Label::DB::SESSION::clean(
+int Label::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
@@ -267,7 +267,7 @@ int Label::DB::SESSION::clean(
                     )SQL",
                     sqlite3_column_int64(
                         statement,
-                        DB::SESSION::ID
+                        Database::Session::ID
                     )
                 ).c_str(),
                 nullptr,
@@ -288,7 +288,7 @@ int Label::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Label::DB::SESSION::add(
+sqlite3_int64 Label::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
     const bool & IS_PINNED,

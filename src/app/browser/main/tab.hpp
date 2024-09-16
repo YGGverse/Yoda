@@ -25,10 +25,10 @@ namespace app::browser::main
              *
              * Allowed parental access to enums and relationship methods
              */
-            struct DB
+            struct Database
             {
                 // APP_BROWSER_MAIN_TAB__*
-                struct SESSION
+                struct Session
                 {
                     enum
                     {

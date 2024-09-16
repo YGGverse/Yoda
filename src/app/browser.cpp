@@ -8,7 +8,7 @@ Browser::Browser(
     sqlite3 * db
 ) {
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -243,7 +243,7 @@ Browser::Browser(
                 "<Primary>q"
             );
 
-            session_restore(); // last session from DB
+            session_restore(); // last session from Database
         }
     );
 
@@ -263,7 +263,7 @@ Browser::Browser(
 // Actions
 int Browser::session_restore()
 {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -284,24 +284,24 @@ int Browser::session_restore()
             set_default_size(
                 sqlite3_column_int(
                     statement,
-                    DB::SESSION::WIDTH
+                    Database::Session::WIDTH
                 ),
                 sqlite3_column_int(
                     statement,
-                    DB::SESSION::HEIGHT
+                    Database::Session::HEIGHT
                 )
             );
 
             sqlite3_column_int(
                 statement,
-                DB::SESSION::IS_FULLSCREEN
+                Database::Session::IS_FULLSCREEN
             ) == 1 ? fullscreen() : unfullscreen();
 
             // Restore children components
             browserMain->session_restore(
                 sqlite3_column_int64(
                     statement,
-                    DB::SESSION::ID
+                    Database::Session::ID
                 )
             );
         }
@@ -314,7 +314,7 @@ int Browser::session_restore()
 
 void Browser::session_clean()
 {
-    DB::SESSION::clean(
+    Database::Session::clean(
         db
     );
 
@@ -326,12 +326,12 @@ void Browser::session_save()
     char * error; // @TODO
 
     // Delete previous data
-    DB::SESSION::clean(
+    Database::Session::clean(
         db
     ); // @TODO run on background
 
     // Create new session
-    const sqlite3_int64 APP_BROWSER__SESSION__ID = DB::SESSION::add(
+    const sqlite3_int64 APP_BROWSER__SESSION__ID = Database::Session::add(
         db,
         get_width(),
         get_height(),
@@ -345,7 +345,7 @@ void Browser::session_save()
 }
 
 // Database
-int Browser::DB::SESSION::init(
+int Browser::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -368,7 +368,7 @@ int Browser::DB::SESSION::init(
     );
 }
 
-int Browser::DB::SESSION::clean(
+int Browser::Database::Session::clean(
     sqlite3 * db
 ) {
     char * error; // @TODO
@@ -391,7 +391,7 @@ int Browser::DB::SESSION::clean(
         {
             const sqlite3_int64 APP_BROWSER__SESSION__ID = sqlite3_column_int64(
                 statement,
-                DB::SESSION::ID
+                Database::Session::ID
             );
 
             // Delete record
@@ -411,7 +411,7 @@ int Browser::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                browser::Main::DB::SESSION::clean(
+                browser::Main::Database::Session::clean(
                     db,
                     APP_BROWSER__SESSION__ID
                 );
@@ -424,7 +424,7 @@ int Browser::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Browser::DB::SESSION::add(
+sqlite3_int64 Browser::Database::Session::add(
     sqlite3 * db,
     const int & WIDTH,
     const int & HEIGHT,

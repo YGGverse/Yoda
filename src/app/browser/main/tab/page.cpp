@@ -17,7 +17,7 @@ Page::Page(
     progress_fraction = 0;
 
     // Init database
-    DB::SESSION::init(
+    Database::Session::init(
         this->db = db
     );
 
@@ -93,7 +93,7 @@ Page::Page(
 int Page::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
-    sqlite3_stmt* statement; // @TODO move to the DB model namespace
+    sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
         db,
@@ -120,7 +120,7 @@ int Page::session_restore(
             switch (
                 sqlite3_column_int(
                     statement,
-                    DB::SESSION::MIME
+                    Database::Session::MIME
                 )
             ) {
                 case 0: mime = MIME::TEXT_PLAIN; break;
@@ -133,14 +133,14 @@ int Page::session_restore(
             title = reinterpret_cast<const char*>(
                 sqlite3_column_text(
                     statement,
-                    DB::SESSION::TITLE
+                    Database::Session::TITLE
                 )
             );
 
             description = reinterpret_cast<const char*>(
                 sqlite3_column_text(
                     statement,
-                    DB::SESSION::DESCRIPTION
+                    Database::Session::DESCRIPTION
                 )
             );
 
@@ -148,7 +148,7 @@ int Page::session_restore(
             pageNavigation->session_restore(
                 sqlite3_column_int64(
                     statement,
-                    DB::SESSION::ID
+                    Database::Session::ID
                 )
             );
         }
@@ -164,7 +164,7 @@ void Page::session_save(
 ) {
     // Delegate save action to child components
     pageNavigation->session_save(
-        DB::SESSION::add(
+        Database::Session::add(
             db,
             APP_BROWSER_MAIN_TAB__SESSION__ID,
             mime,
@@ -519,7 +519,7 @@ Glib::ustring Page::get_description()
 }
 
 // Database model
-int Page::DB::SESSION::init(
+int Page::Database::Session::init(
     sqlite3 * db
 ) {
     char * error;
@@ -542,7 +542,7 @@ int Page::DB::SESSION::init(
     );
 }
 
-int Page::DB::SESSION::clean(
+int Page::Database::Session::clean(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
@@ -569,7 +569,7 @@ int Page::DB::SESSION::clean(
         {
             const sqlite3_int64 APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID = sqlite3_column_int64(
                 statement,
-                DB::SESSION::ID
+                Database::Session::ID
             );
 
             // Delete record
@@ -589,7 +589,7 @@ int Page::DB::SESSION::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                page::Navigation::DB::SESSION::clean(
+                page::Navigation::Database::Session::clean(
                     db,
                     APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
                 );
@@ -602,7 +602,7 @@ int Page::DB::SESSION::clean(
     );
 }
 
-sqlite3_int64 Page::DB::SESSION::add(
+sqlite3_int64 Page::Database::Session::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
     const Page::MIME & MIME,

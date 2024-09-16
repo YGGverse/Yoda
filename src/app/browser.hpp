@@ -27,10 +27,10 @@ namespace app
              *
              * Allowed parental access to enums and relationship methods
              */
-            struct DB
+            struct Database
             {
                 // APP_BROWSER__*
-                struct SESSION
+                struct Session
                 {
                     enum
                     {
