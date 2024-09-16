@@ -99,6 +99,14 @@ Reader::Reader(
         MARGIN_END
     );
 
+    set_xalign(
+        XALIGN
+    );
+
+    set_yalign(
+        YALIGN
+    );
+
     set_wrap(
         true
     );
