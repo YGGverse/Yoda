@@ -688,7 +688,7 @@ bool Page::Socket::Connection::is_active(
 bool Page::Socket::Connection::close(
     Glib::RefPtr<Gio::SocketConnection> & connection
 ) {
-    if (Socket::Connection::is_active(connection))
+    if (is_active(connection))
     {
         if (connection->close())
         {
