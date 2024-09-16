@@ -32,6 +32,7 @@ namespace app::browser::main::tab
                         ID,
                         APP_BROWSER_MAIN_TAB__SESSION__ID,
                         TIME,
+                        IS_PINNED,
                         TEXT
                     }; // table fields index
 
@@ -47,6 +48,7 @@ namespace app::browser::main::tab
                     static sqlite3_int64 add(
                         sqlite3 * db,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
+                        const bool & IS_PINNED,
                         const Glib::ustring & TEXT
                     ); // return sqlite3_last_insert_rowid
                 };
@@ -62,6 +64,9 @@ namespace app::browser::main::tab
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__tab_close;
+
+            // Extras
+            bool is_pinned;
 
             // Defaults
             static const int WIDTH_CHARS = 16;
@@ -86,6 +91,11 @@ namespace app::browser::main::tab
             ); // return sqlite3_finalize status code
 
             void update(
+                const Glib::ustring & TEXT
+            );
+
+            void update(
+                const int & IS_PINNED,
                 const Glib::ustring & TEXT
             );
     };

@@ -14,6 +14,9 @@ Label::Label(
     // Init actions
     action__tab_close = ACTION__TAB_CLOSE;
 
+    // Init extras
+    is_pinned = false;
+
     // Setup label controller
     auto const EVENT__GESTURE_CLICK = Gtk::GestureClick::create();
 
@@ -88,6 +91,10 @@ int Label::session_restore(
         {
             // Restore widget data
             update(
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::IS_PINNED
+                ) == 1,
                 reinterpret_cast<const char*>(
                     sqlite3_column_text(
                         statement,
@@ -114,6 +121,7 @@ int Label::session_save(
     return DB::SESSION::add(
         db,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
+        is_pinned,
         get_text()
     );
 }
@@ -130,6 +138,17 @@ void Label::update(
     );
 }
 
+void Label::update(
+    const int & IS_PINNED,
+    const Glib::ustring & TEXT
+) {
+    is_pinned = IS_PINNED;
+
+    update(
+        TEXT
+    );
+}
+
 // Database model
 int Label::DB::SESSION::init(
     sqlite3 * db
@@ -141,9 +160,10 @@ int Label::DB::SESSION::init(
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_label__session`
             (
-                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session__id` INTEGER NOT NULL,
-                `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                `text` VARCHAR (1024) NOT NULL
+                `id`        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session__id` INTEGER NOT NULL,
+                `time`      INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `is_pinned` INTEGER NOT NULL,
+                `text`      VARCHAR (1024) NOT NULL
             )
         )SQL",
         nullptr,
@@ -211,6 +231,7 @@ int Label::DB::SESSION::clean(
 sqlite3_int64 Label::DB::SESSION::add(
     sqlite3 * db,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
+    const bool & IS_PINNED,
     const Glib::ustring & TEXT
 ) {
     char * error; // @TODO
@@ -221,13 +242,16 @@ sqlite3_int64 Label::DB::SESSION::add(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_label__session` (
                     `app_browser_main_tab__session__id`,
+                    `is_pinned`,
                     `text`
                 ) VALUES (
+                    '%d',
                     '%d',
                     '%s'
                 )
             )SQL",
             APP_BROWSER_MAIN_TAB__SESSION__ID,
+            IS_PINNED,
             TEXT
         ).c_str(),
         nullptr,
