@@ -125,6 +125,7 @@ namespace app::browser::main::tab
                                  */
                                 enum class Status
                                 {
+                                    INPUT,
                                     SUCCESS,
                                     REDIRECT,
                                     TEMPORARY_FAILURE,
