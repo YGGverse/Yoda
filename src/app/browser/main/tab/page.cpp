@@ -370,32 +370,20 @@ void Page::navigation_reload(
                                     action__update->activate();
 
                                     // Parse meta
-                                    Socket::Client::Gemini::Response::Status status;
-
+                                    Socket::Client::Gemini::Response::Status status; // @TODO make page global?
                                     Socket::Client::Gemini::Response::Match::meta(
                                         buffer,
                                         status,
                                         mime
                                     );
 
-                                    // Try detect mime by file extension on still undefined @TODO
+                                    // MIME type not detected
                                     if (mime == MIME::UNDEFINED)
                                     {
+                                        // Try detect by file extension
                                         if (Glib::str_has_suffix(g_uri_get_path(uri), ".gmi"))
                                         {
                                             mime = MIME::TEXT_GEMINI;
-                                        }
-
-                                        else
-                                        {
-                                            // Update
-                                            title = _("Oops");
-
-                                            description = _("MIME type not supported");
-
-                                            progress_fraction = 1;
-
-                                            action__update->activate();
                                         }
                                     }
 
@@ -404,29 +392,48 @@ void Page::navigation_reload(
                                     {
                                         case Socket::Client::Gemini::Response::Status::SUCCESS:
 
+                                            // Route by MIME
+                                            switch (mime)
+                                            {
+                                                case MIME::TEXT_GEMINI:
+
+                                                    progress_fraction = 1;
+
+                                                    // Set content driver
+                                                    pageContent->update(
+                                                        page::Content::TEXT_GEMINI,
+                                                        buffer,
+                                                        uri
+                                                    );
+
+                                                        // Update title on detected by document provider
+                                                        if (!pageContent->get_title().empty())
+                                                        {
+                                                            title = pageContent->get_title();
+                                                        }
+
+                                                    action__update->activate();
+
+                                                break;
+
+                                                default:
+
+                                                    // Update
+                                                    title = _("Oops");
+
+                                                    description = _("MIME type not supported");
+
+                                                    progress_fraction = 1;
+
+                                                    action__update->activate();
+                                            }
+
                                             // Update
                                             title = _("Done"); // @TODO page title
 
                                             description = g_uri_get_host(
                                                 uri
                                             );
-
-                                            progress_fraction = 1;
-
-                                            // Set content driver
-                                            pageContent->update(
-                                                page::Content::TEXT_GEMINI,
-                                                buffer,
-                                                uri
-                                            );
-
-                                                // Update title on detected by document provider
-                                                if (!pageContent->get_title().empty())
-                                                {
-                                                    title = pageContent->get_title();
-                                                }
-
-                                            action__update->activate();
 
                                         break;
 
