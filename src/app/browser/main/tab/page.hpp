@@ -94,6 +94,11 @@ namespace app::browser::main::tab
 
                     public:
 
+                        /*
+                         * Gemini protocol
+                         *
+                         * https://geminiprotocol.net
+                         */
                         struct Gemini
                         {
                             // Defaults
@@ -139,7 +144,7 @@ namespace app::browser::main::tab
                                     static bool meta(
                                         const Glib::ustring & RESPONSE,
                                         Status & status,
-                                        MIME & mime
+                                        MIME & mime // same to page global
                                     );
                                 };
                             };
