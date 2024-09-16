@@ -121,11 +121,11 @@ namespace app::browser::main::tab
             );
 
             // Actions
-            int restore(
+            int session_restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            void save(
+            void session_save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             );
 

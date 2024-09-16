@@ -90,7 +90,7 @@ Page::Page(
 }
 
 // Actions
-int Page::restore(
+int Page::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -145,7 +145,7 @@ int Page::restore(
             );
 
             // Restore children components
-            pageNavigation->restore(
+            pageNavigation->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
@@ -159,11 +159,11 @@ int Page::restore(
     );
 }
 
-void Page::save(
+void Page::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     // Delegate save action to child components
-    pageNavigation->save(
+    pageNavigation->session_save(
         DB::SESSION::add(
             db,
             APP_BROWSER_MAIN_TAB__SESSION__ID,

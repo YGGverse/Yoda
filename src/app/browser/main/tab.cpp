@@ -40,7 +40,7 @@ Tab::Tab(
     );
 }
 
-int Tab::restore(
+int Tab::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -76,7 +76,7 @@ int Tab::restore(
             // Restore children components
             get_tabLabel(
                 PAGE_NUMBER
-            )->restore(
+            )->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
@@ -85,7 +85,7 @@ int Tab::restore(
 
             get_tabPage(
                 PAGE_NUMBER
-            )->restore(
+            )->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
@@ -99,7 +99,7 @@ int Tab::restore(
     );
 }
 
-void Tab::save(
+void Tab::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN__SESSION__ID
 ) {
     char * error; // @TODO
@@ -124,13 +124,13 @@ void Tab::save(
         // Delegate save actions to children components
         get_tabLabel(
             page_number
-        )->save(
+        )->session_save(
             APP_BROWSER_MAIN_TAB__SESSION__ID
         );
 
         get_tabPage(
             page_number
-        )->save(
+        )->session_save(
             APP_BROWSER_MAIN_TAB__SESSION__ID
         );
     }

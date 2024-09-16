@@ -102,11 +102,11 @@ namespace app::browser::main::tab::page::navigation
                 const bool & UPDATE_MEMORY_INDEX
             );
 
-            int restore(
+            int session_restore(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            void save(
+            void session_save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
             );
 

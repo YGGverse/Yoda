@@ -85,11 +85,9 @@ namespace app
             );
 
             // Actions
-            int restore(); // return sqlite3_finalize status code
-
-            void clean();
-
-            void save();
+            int session_restore(); // return sqlite3_finalize status code
+            void session_clean();
+            void session_save();
     };
 }
 

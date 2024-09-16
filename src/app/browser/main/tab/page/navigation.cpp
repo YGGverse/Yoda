@@ -109,7 +109,7 @@ void Navigation::update(
     );
 }
 
-int Navigation::restore(
+int Navigation::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -136,14 +136,14 @@ int Navigation::restore(
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore children components
-            navigationHistory->restore(
+            navigationHistory->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
                 )
             );
 
-            navigationRequest->restore(
+            navigationRequest->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
@@ -157,7 +157,7 @@ int Navigation::restore(
     );
 }
 
-void Navigation::save(
+void Navigation::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE__SESSION__ID
 ) {
     // Delete previous session
@@ -173,11 +173,11 @@ void Navigation::save(
     );
 
     // Delegate save action to children components
-    navigationHistory->save(
+    navigationHistory->session_save(
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
 
-    navigationRequest->save(
+    navigationRequest->session_save(
         APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
     );
 }

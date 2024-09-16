@@ -44,7 +44,7 @@ Label::Label(
 }
 
 // Actions
-int Label::restore(
+int Label::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     sqlite3_stmt * statement;
@@ -89,7 +89,7 @@ int Label::restore(
     );
 }
 
-int Label::save(
+int Label::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     // Delegate save action to child components (on available)

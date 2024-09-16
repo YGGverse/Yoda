@@ -30,7 +30,7 @@ Browser::Browser(
         "session_clean",
         [this]
         {
-            clean();
+            session_clean();
         }
     );
 
@@ -38,7 +38,7 @@ Browser::Browser(
         "session_restore",
         [this]
         {
-            restore();
+            session_restore();
         }
     );
 
@@ -46,7 +46,7 @@ Browser::Browser(
         "session_save",
         [this]
         {
-            save();
+            session_save();
         }
     );
 
@@ -243,14 +243,14 @@ Browser::Browser(
                 "<Primary>q"
             );
 
-            restore(); // last session from DB
+            session_restore(); // last session from DB
         }
     );
 
     signal_close_request().connect(
         [this]
         {
-            save();
+            session_save();
 
             // @TODO sqlite3_close(db);
 
@@ -261,7 +261,7 @@ Browser::Browser(
 }
 
 // Actions
-int Browser::restore()
+int Browser::session_restore()
 {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
 
@@ -298,7 +298,7 @@ int Browser::restore()
             ) ? fullscreen() : unfullscreen();
 
             // Restore children components
-            browserMain->restore(
+            browserMain->session_restore(
                 sqlite3_column_int(
                     statement,
                     DB::SESSION::ID
@@ -312,7 +312,7 @@ int Browser::restore()
     );
 }
 
-void Browser::clean()
+void Browser::session_clean()
 {
     DB::SESSION::clean(
         db
@@ -321,7 +321,7 @@ void Browser::clean()
     browserMain->tab_close_all();
 }
 
-void Browser::save()
+void Browser::session_save()
 {
     char * error; // @TODO
 
@@ -339,7 +339,7 @@ void Browser::save()
     );
 
     // Delegate save actions to children components
-    browserMain->save(
+    browserMain->session_save(
         APP_BROWSER__SESSION__ID
     );
 }

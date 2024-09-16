@@ -45,7 +45,7 @@ Main::Main(
 // Actions
 
 /// Session
-int Main::restore(
+int Main::session_restore(
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -69,7 +69,7 @@ int Main::restore(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
-            mainTab->restore(
+            mainTab->session_restore(
                 sqlite3_column_int64(
                     statement,
                     DB::SESSION::ID
@@ -83,7 +83,7 @@ int Main::restore(
     );
 };
 
-void Main::save(
+void Main::session_save(
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
     char * error; // @TODO
@@ -101,7 +101,7 @@ void Main::save(
     );
 
     // Delegate save actions to children components
-    mainTab->save(
+    mainTab->session_save(
         APP_BROWSER_MAIN__SESSION__ID
     );
 };

@@ -56,7 +56,7 @@ void History::add(
     }
 }
 
-int History::restore(
+int History::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -124,7 +124,7 @@ int History::restore(
     );
 }
 
-void History::save(
+void History::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     // Delete previous records for session

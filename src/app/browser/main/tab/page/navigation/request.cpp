@@ -89,7 +89,7 @@ void Request::update(
     );
 }
 
-int Request::restore(
+int Request::session_restore(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     sqlite3_stmt* statement; // @TODO move to the DB model namespace
@@ -134,7 +134,7 @@ int Request::restore(
     );
 }
 
-int Request::save(
+int Request::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
 ) {
     // Delete previous records
