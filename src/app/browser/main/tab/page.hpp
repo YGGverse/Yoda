@@ -39,7 +39,7 @@ namespace app::browser::main::tab
             };
 
             /*
-             * Class database
+             * Page class database
              *
              * Allowed parental access to enums and relationship methods
              */
@@ -74,6 +74,41 @@ namespace app::browser::main::tab
                         const Glib::ustring & TITLE,
                         const Glib::ustring & DESCRIPTION
                     ); // return sqlite3_last_insert_rowid
+                };
+            };
+
+            /*
+             * Socket helpers
+             *
+             * Page works with multiple protocols and requires some extended features below
+             */
+            struct Socket
+            {
+                class Client
+                {
+                    private:
+
+                        static Glib::RefPtr<Gio::SocketClient> create(
+                            const int & TIMEOUT = 15
+                        );
+
+                    public:
+
+                        struct Gemini
+                        {
+                            static Glib::RefPtr<Gio::SocketClient> create();
+                        };
+                };
+
+                struct Connection
+                {
+                    static bool is_active(
+                        const Glib::RefPtr<Gio::SocketConnection> & CONNECTION
+                    );
+
+                    static bool close(
+                        Glib::RefPtr<Gio::SocketConnection> & connection
+                    );
                 };
             };
 

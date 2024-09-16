@@ -186,10 +186,9 @@ void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {
     // Close previous socket connection (on active)
-    if (socket__connection != nullptr && socket__connection->is_connected())
-    {
-        socket__connection->close();
-    }
+    Socket::Connection::close(
+        socket__connection
+    );
 
     // Update navigation history?
     if (ADD_HISTORY)
@@ -278,23 +277,7 @@ void Page::navigation_reload(
     if (g_uri_get_scheme(uri) == Glib::ustring("gemini"))
     {
         // Create new socket connection
-        socket__client = Gio::SocketClient::create();
-
-        socket__client->set_tls(
-            true
-        );
-
-        socket__client->set_tls_validation_flags(
-            Gio::TlsCertificateFlags::NO_FLAGS
-        );
-
-        socket__client->set_protocol(
-            Gio::Socket::Protocol::TCP
-        );
-
-        socket__client->set_timeout(
-            15 // @TODO
-        );
+        socket__client = Page::Socket::Client::Gemini::create();
 
         socket__client->connect_to_uri_async(
             g_uri_to_string(
@@ -455,7 +438,9 @@ void Page::navigation_reload(
                                         action__update->activate();
                                     }
 
-                                    socket__connection->close();
+                                    Socket::Connection::close(
+                                        socket__connection
+                                    );
                                 }
                             ); // read_all_async
                         }
@@ -641,4 +626,58 @@ sqlite3_int64 Page::DB::SESSION::add(
     return sqlite3_last_insert_rowid(
         db
     );
+}
+
+// Socket tools
+Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::create(
+    const int & TIMEOUT
+) {
+    const auto CLIENT = Gio::SocketClient::create();
+
+    CLIENT->set_timeout(
+        TIMEOUT
+    );
+
+    return CLIENT;
+}
+
+Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
+{
+    const auto GEMINI_CLIENT = Page::Socket::Client::create();
+
+    GEMINI_CLIENT->set_tls(
+        true
+    );
+
+    GEMINI_CLIENT->set_tls_validation_flags(
+        Gio::TlsCertificateFlags::NO_FLAGS
+    );
+
+    GEMINI_CLIENT->set_protocol(
+        Gio::Socket::Protocol::TCP
+    );
+
+    return GEMINI_CLIENT;
+}
+
+bool Page::Socket::Connection::is_active(
+    const Glib::RefPtr<Gio::SocketConnection> & CONNECTION
+) {
+    return CONNECTION != nullptr && CONNECTION->is_connected();
+}
+
+bool Page::Socket::Connection::close(
+    Glib::RefPtr<Gio::SocketConnection> & connection
+) {
+    if (Socket::Connection::is_active(connection))
+    {
+        if (connection->close())
+        {
+            connection = nullptr;
+
+            return true;
+        }
+    }
+
+    return false;
 }
