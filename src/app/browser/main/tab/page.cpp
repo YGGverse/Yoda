@@ -320,7 +320,7 @@ void Page::navigation_reload(
                 }
 
                 // Connection established, begin request
-                if (socket__connection != nullptr)
+                if (Socket::Connection::is_active(socket__connection)) // @TODO
                 {
                     // Build gemini protocol request
                     const Glib::ustring SOCKET__REQUEST = Glib::ustring::sprintf(
@@ -350,6 +350,7 @@ void Page::navigation_reload(
                             action__update->activate();
 
                             // Response
+                            // if (Socket::Connection::is_active(socket__connection)) // @TODO
                             socket__connection->get_input_stream()->read_all_async( // | read_async @TODO
                                 buffer,
                                 sizeof(
