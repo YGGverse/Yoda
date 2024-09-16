@@ -151,7 +151,7 @@ void Tab::update(
     // Update tab label component
     get_tabLabel(
         PAGE_NUMBER
-    )->set_label(
+    )->update(
         TAB_PAGE->get_title()
     );
 
