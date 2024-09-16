@@ -37,10 +37,26 @@ Label::Label(
         );
 
     // Init widget
-    /* not in use, overwritten by page init @TODO
-    set_text(
-        _("New page")
-    );*/
+    set_ellipsize(
+        Pango::EllipsizeMode::END
+    );
+
+    /* @TODO require als set_xalign(0)
+    set_halign(
+        Gtk::Align::START
+    ); */
+
+    set_has_tooltip(
+        true
+    );
+
+    set_single_line_mode(
+        true
+    );
+
+    set_width_chars(
+        WIDTH_CHARS
+    );
 }
 
 // Actions
@@ -71,7 +87,7 @@ int Label::session_restore(
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
             // Restore widget data
-            set_text(
+            update(
                 reinterpret_cast<const char*>(
                     sqlite3_column_text(
                         statement,
@@ -99,6 +115,18 @@ int Label::session_save(
         db,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
         get_text()
+    );
+}
+
+void Label::update(
+    const Glib::ustring & TEXT
+) {
+    set_text(
+        TEXT
+    );
+
+    set_tooltip_text(
+        TEXT // same value for tooltip (ellipsize mode)
     );
 }
 

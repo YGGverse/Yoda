@@ -5,8 +5,10 @@
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/label.h>
+#include <pangomm/layout.h>
 #include <sqlite3.h>
 
 namespace app::browser::main::tab
@@ -61,6 +63,9 @@ namespace app::browser::main::tab
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__tab_close;
 
+            // Defaults
+            int WIDTH_CHARS = 16;
+
         /*
          * Class API
          */
@@ -79,6 +84,10 @@ namespace app::browser::main::tab
             int session_save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
+
+            void update(
+                const Glib::ustring & TEXT
+            );
     };
 }
 
