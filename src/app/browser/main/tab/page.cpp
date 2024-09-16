@@ -629,6 +629,12 @@ sqlite3_int64 Page::DB::SESSION::add(
 }
 
 // Socket tools
+
+/*
+ * Private helper to build socket client connections
+ *
+ * Includes common preset used for all protocols in Page::Socket::Client class
+ */
 Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::create(
     const int & TIMEOUT
 ) {
@@ -641,9 +647,14 @@ Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::create(
     return CLIENT;
 }
 
+/*
+ * Create and return socket client for Gemini protocol
+ *
+ * https://geminiprotocol.net/docs/protocol-specification.gmi
+ */
 Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
 {
-    const auto GEMINI_CLIENT = Page::Socket::Client::create();
+    const auto GEMINI_CLIENT = create();
 
     GEMINI_CLIENT->set_tls(
         true
@@ -660,16 +671,24 @@ Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
     return GEMINI_CLIENT;
 }
 
+/*
+ * Check socket connection active according to page class implementation
+ */
 bool Page::Socket::Connection::is_active(
     const Glib::RefPtr<Gio::SocketConnection> & CONNECTION
 ) {
     return CONNECTION != nullptr && CONNECTION->is_connected();
 }
 
+/*
+ * Close socket, make &connection nullptr
+ *
+ * return true on success or false if connection not active
+ */
 bool Page::Socket::Connection::close(
     Glib::RefPtr<Gio::SocketConnection> & connection
 ) {
-    if (Socket::Connection::is_active(connection))
+    if (is_active(connection))
     {
         if (connection->close())
         {
