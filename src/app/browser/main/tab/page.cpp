@@ -248,7 +248,7 @@ void Page::navigation_reload(
             );
         }
 
-    // Reset page data
+    // Reset page meta data
     mime = MIME::UNDEFINED;
 
     title = _("Update");
@@ -272,23 +272,26 @@ void Page::navigation_reload(
     if (g_uri_get_scheme(uri) == Glib::ustring("gemini"))
     {
         // Create new socket connection
-        GioSocketClient = Gio::SocketClient::create();
+        socket__client = Gio::SocketClient::create();
 
-        GioSocketClient->set_tls(
+        socket__client->set_tls(
             true
         );
 
-        GioSocketClient->set_tls_validation_flags(
+        socket__client->set_tls_validation_flags(
             Gio::TlsCertificateFlags::NO_FLAGS
         );
 
-        GioSocketClient->set_timeout(
+        socket__client->set_timeout(
             15 // @TODO
         );
 
-        GioSocketClient->connect_to_uri_async(
-            pageNavigation->get_request_text(), 1965,
-            [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+        socket__client->connect_to_uri_async(
+            g_uri_to_string(
+                uri
+            ),
+            1965, // default port @TODO
+            [this](const Glib::RefPtr<Gio::AsyncResult> & RESULT)
             {
                 // Update
                 title = _("Connect");
@@ -306,8 +309,8 @@ void Page::navigation_reload(
 
                 try
                 {
-                    GioSocketConnection = GioSocketClient->connect_to_uri_finish(
-                        result
+                    socket__connection = socket__client->connect_to_uri_finish(
+                        RESULT
                     );
                 }
 
@@ -324,14 +327,20 @@ void Page::navigation_reload(
                 }
 
                 // Connection established, begin request
-                if (GioSocketConnection != nullptr)
+                if (socket__connection != nullptr)
                 {
-                    const Glib::ustring request = pageNavigation->get_request_text() + "\r\n";
+                    // Build gemini protocol request
+                    const Glib::ustring SOCKET__REQUEST = Glib::ustring::sprintf(
+                        "%s\r\n",
+                        g_uri_to_string(
+                            uri
+                        )
+                    );
 
-                    GioSocketConnection->get_output_stream()->write_async(
-                        request.data(),
-                        request.size(),
-                        [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                    socket__connection->get_output_stream()->write_async(
+                        SOCKET__REQUEST.data(),
+                        SOCKET__REQUEST.size(),
+                        [this](const Glib::RefPtr<Gio::AsyncResult>&)
                         {
                             // Update
                             title = _("Request");
@@ -348,10 +357,10 @@ void Page::navigation_reload(
                             action__update->activate();
 
                             // Response
-                            GioSocketConnection->get_input_stream()->read_all_async( // | read_async @TODO
+                            socket__connection->get_input_stream()->read_all_async( // | read_async @TODO
                                 buffer,
                                 sizeof(buffer) - 1,
-                                [this](const Glib::RefPtr<Gio::AsyncResult> & result)
+                                [this](const Glib::RefPtr<Gio::AsyncResult>&)
                                 {
                                     // Update
                                     title = _("Reading");
@@ -434,7 +443,7 @@ void Page::navigation_reload(
                                         action__update->activate();
                                     }
 
-                                    GioSocketConnection->close();
+                                    socket__connection->close();
                                 }
                             );
                         }

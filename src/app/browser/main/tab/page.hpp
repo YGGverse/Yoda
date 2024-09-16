@@ -100,8 +100,9 @@ namespace app::browser::main::tab
             // Socket
             char buffer[0xfffff]; // 1Mb
 
-            Glib::RefPtr<Gio::SocketClient> GioSocketClient;
-            Glib::RefPtr<Gio::SocketConnection> GioSocketConnection;
+            // Shared socket connectors (for async operations)
+            Glib::RefPtr<Gio::SocketClient> socket__client;
+            Glib::RefPtr<Gio::SocketConnection> socket__connection;
 
             // Components
             page::Content * pageContent;
