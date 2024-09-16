@@ -96,6 +96,8 @@ namespace app::browser::main::tab
 
                         struct Gemini
                         {
+                            static const int DEFAULT_PORT = 1965;
+
                             static Glib::RefPtr<Gio::SocketClient> create();
                         };
                 };

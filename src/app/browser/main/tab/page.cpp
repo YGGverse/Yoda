@@ -283,7 +283,7 @@ void Page::navigation_reload(
             g_uri_to_string(
                 uri
             ),
-            1965, // default port @TODO
+            Socket::Client::Gemini::DEFAULT_PORT,
             [this](const Glib::RefPtr<Gio::AsyncResult> & RESULT)
             {
                 // Update
