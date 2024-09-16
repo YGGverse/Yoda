@@ -268,13 +268,13 @@ void Page::navigation_reload(
     action__update->activate();
 
     // Route to protocol driver by scheme
-    if (g_uri_get_scheme(uri) == Glib::ustring("file"))
+    if (Glib::ustring("file").compare(g_uri_get_scheme(uri)) == 0)
     {
         // @TODO
     }
 
     else
-    if (g_uri_get_scheme(uri) == Glib::ustring("gemini"))
+    if (Glib::ustring("gemini").compare(g_uri_get_scheme(uri)) == 0)
     {
         // Create new socket connection
         socket__client = Page::Socket::Client::Gemini::create();
@@ -714,7 +714,7 @@ bool Page::Socket::Client::Gemini::Response::Match::meta(
     );
 
     // Detect status code @TODO
-    if (MATCH[1] == "20")
+    if (Glib::ustring("20").compare(MATCH[1]) == 0)
     {
         status = Status::SUCCESS;
     }
@@ -725,12 +725,12 @@ bool Page::Socket::Client::Gemini::Response::Match::meta(
     }
 
     // Detect MIME @TODO
-    if (MATCH[2] == "text/gemini")
+    if (Glib::ustring("text/gemini").compare(MATCH[2]) == 0)
     {
         mime = MIME::TEXT_GEMINI;
     }
 
-    else if (MATCH[2] == "text/plain")
+    else if (Glib::ustring("text/plain").compare(MATCH[2]) == 0)
     {
         mime = MIME::TEXT_PLAIN;
     }
