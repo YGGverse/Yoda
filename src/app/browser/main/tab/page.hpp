@@ -80,7 +80,7 @@ namespace app::browser::main::tab
             /*
              * Socket helpers
              *
-             * Page works with multiple protocols and requires some extended features below
+             * Page class works with multiple protocols and requires some extended features below
              */
             struct Socket
             {
