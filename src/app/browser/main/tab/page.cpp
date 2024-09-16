@@ -451,11 +451,11 @@ void Page::navigation_reload(
 
                                     socket__connection->close();
                                 }
-                            );
+                            ); // read_all_async
                         }
-                    );
+                    ); // write_async
                 }
-            }
+            } // connect_to_uri_async
         );
     }
 
