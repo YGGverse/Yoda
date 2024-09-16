@@ -239,6 +239,11 @@ Browser::Browser(
             );
 
             APP->set_accel_for_action(
+                "win.tools_debug",
+                "<Primary>i"
+            );
+
+            APP->set_accel_for_action(
                 "win.quit",
                 "<Primary>q"
             );
