@@ -36,16 +36,16 @@ namespace app::browser::main::tab::page::navigation
                     }; // table fields index
 
                     static int init(
-                        sqlite3 * db
+                        sqlite3 * database
                     ); // return sqlite3_exec status code
 
                     static int clean(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION__SESSION__ID,
                         const Glib::ustring & TEXT
                     ); // return sqlite3_last_insert_rowid
@@ -58,7 +58,7 @@ namespace app::browser::main::tab::page::navigation
         private:
 
             // Database
-            sqlite3 * db;
+            sqlite3 * database;
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__reload,
@@ -79,7 +79,7 @@ namespace app::browser::main::tab::page::navigation
         public:
 
             Request(
-                sqlite3 * db,
+                sqlite3 * database,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__UPDATE
             );

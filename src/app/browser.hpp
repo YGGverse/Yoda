@@ -42,15 +42,15 @@ namespace app
                     }; // table fields index
 
                     static int init(
-                        sqlite3 * db
+                        sqlite3 * database
                     ); // return sqlite3_exec status code
 
                     static int clean(
-                        sqlite3 * db
+                        sqlite3 * database
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const int & WIDTH,
                         const int & HEIGHT,
                         const bool & IS_FULLSCREEN
@@ -64,7 +64,7 @@ namespace app
         private:
 
             // Database
-            sqlite3 * db;
+            sqlite3 * database;
 
             // Components
             app::browser::Header * browserHeader;
@@ -81,7 +81,7 @@ namespace app
         public:
 
             Browser(
-                sqlite3 * db
+                sqlite3 * database
             );
 
             // Actions

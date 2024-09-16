@@ -6,11 +6,11 @@ int main(
     char * argv[]
 ) {
     // Init database
-    sqlite3 * db;
+    sqlite3 * database;
 
     sqlite3_open(
         "app.sqlite3",
-        &db
+        &database
     );
 
     // Init application
@@ -22,6 +22,6 @@ int main(
     return app->make_window_and_run<app::Browser>(
         argc,
         argv,
-        db
+        database
     );
 }

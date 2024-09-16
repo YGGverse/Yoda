@@ -3,12 +3,12 @@
 using namespace app::browser::main::tab;
 
 Label::Label(
-    sqlite3 * db,
+    sqlite3 * database,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE
 ) {
     // Init database
     Database::Session::init(
-        this->db = db
+        this->database = database
     );
 
     // Init actions
@@ -90,7 +90,7 @@ int Label::session_restore(
     sqlite3_stmt * statement;
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_label__session`
@@ -140,7 +140,7 @@ int Label::session_save(
 
     // Save label session
     return Database::Session::add(
-        db,
+        database,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
         is_pinned,
         text
@@ -211,12 +211,12 @@ void Label::update(
 
 // Database model
 int Label::Database::Session::init(
-    sqlite3 * db
+    sqlite3 * database
 ) {
     char * error;
 
     return sqlite3_exec(
-        db,
+        database,
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main_tab_label__session`
             (
@@ -233,14 +233,14 @@ int Label::Database::Session::init(
 }
 
 int Label::Database::Session::clean(
-    sqlite3 * db,
+    sqlite3 * database,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main_tab_label__session`
@@ -260,7 +260,7 @@ int Label::Database::Session::clean(
         {
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(
-                db,
+                database,
                 Glib::ustring::sprintf(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab_label__session` WHERE `id` = %d
@@ -289,7 +289,7 @@ int Label::Database::Session::clean(
 }
 
 sqlite3_int64 Label::Database::Session::add(
-    sqlite3 * db,
+    sqlite3 * database,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
     const bool & IS_PINNED,
     const Glib::ustring & TEXT
@@ -297,7 +297,7 @@ sqlite3_int64 Label::Database::Session::add(
     char * error; // @TODO
 
     sqlite3_exec(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_label__session` (
@@ -320,6 +320,6 @@ sqlite3_int64 Label::Database::Session::add(
     );
 
     return sqlite3_last_insert_rowid(
-        db
+        database
     );
 }

@@ -37,16 +37,16 @@ namespace app::browser::main::tab
                     }; // table fields index
 
                     static int init(
-                        sqlite3 * db
+                        sqlite3 * database
                     ); // return sqlite3_exec status code
 
                     static int clean(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
                         const bool & IS_PINNED,
                         const Glib::ustring & TEXT
@@ -60,7 +60,7 @@ namespace app::browser::main::tab
         private:
 
             // Database
-            sqlite3 * db;
+            sqlite3 * database;
 
             // Actions
             Glib::RefPtr<Gio::SimpleAction> action__tab_close;
@@ -78,7 +78,7 @@ namespace app::browser::main::tab
         public:
 
             Label(
-                sqlite3 * db,
+                sqlite3 * database,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE
             );
 

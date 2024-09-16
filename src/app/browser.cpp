@@ -5,11 +5,11 @@
 using namespace app;
 
 Browser::Browser(
-    sqlite3 * db
+    sqlite3 * database
 ) {
     // Init database
     Database::Session::init(
-        this->db = db
+        this->database = database
     );
 
     // Init window actions
@@ -189,7 +189,7 @@ Browser::Browser(
         );
 
     browserMain = Gtk::make_managed<browser::Main>(
-        db,
+        database,
         ACTION__TAB_CLOSE,
         ACTION__TAB_CLOSE_ALL,
         ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
@@ -252,7 +252,7 @@ Browser::Browser(
         {
             session_save();
 
-            // @TODO sqlite3_close(db);
+            // @TODO sqlite3_close(database);
 
             return false;
         },
@@ -266,7 +266,7 @@ int Browser::session_restore()
     sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         R"SQL(
             SELECT * FROM `app_browser__session`
         )SQL",
@@ -315,7 +315,7 @@ int Browser::session_restore()
 void Browser::session_clean()
 {
     Database::Session::clean(
-        db
+        database
     );
 
     browserMain->tab_close_all();
@@ -327,12 +327,12 @@ void Browser::session_save()
 
     // Delete previous data
     Database::Session::clean(
-        db
+        database
     ); // @TODO run on background
 
     // Create new session
     const sqlite3_int64 APP_BROWSER__SESSION__ID = Database::Session::add(
-        db,
+        database,
         get_width(),
         get_height(),
         is_fullscreen()
@@ -346,12 +346,12 @@ void Browser::session_save()
 
 // Database
 int Browser::Database::Session::init(
-    sqlite3 * db
+    sqlite3 * database
 ) {
     char * error;
 
     return sqlite3_exec(
-        db,
+        database,
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser__session`
             (
@@ -369,13 +369,13 @@ int Browser::Database::Session::init(
 }
 
 int Browser::Database::Session::clean(
-    sqlite3 * db
+    sqlite3 * database
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         R"SQL(
             SELECT * FROM `app_browser__session`
         )SQL",
@@ -396,7 +396,7 @@ int Browser::Database::Session::clean(
 
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(
-                db,
+                database,
                 Glib::ustring::sprintf(
                     R"SQL(
                         DELETE FROM `app_browser__session` WHERE `id` = %d
@@ -412,7 +412,7 @@ int Browser::Database::Session::clean(
             if (EXEC_STATUS == SQLITE_OK)
             {
                 browser::Main::Database::Session::clean(
-                    db,
+                    database,
                     APP_BROWSER__SESSION__ID
                 );
             }
@@ -425,7 +425,7 @@ int Browser::Database::Session::clean(
 }
 
 sqlite3_int64 Browser::Database::Session::add(
-    sqlite3 * db,
+    sqlite3 * database,
     const int & WIDTH,
     const int & HEIGHT,
     const bool & IS_FULLSCREEN
@@ -433,7 +433,7 @@ sqlite3_int64 Browser::Database::Session::add(
     char * error; // @TODO
 
     sqlite3_exec(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser__session` (
@@ -456,6 +456,6 @@ sqlite3_int64 Browser::Database::Session::add(
     );
 
     return sqlite3_last_insert_rowid(
-        db
+        database
     );
 }

@@ -4,7 +4,7 @@
 using namespace app::browser;
 
 Main::Main(
-    sqlite3 * db,
+    sqlite3 * database,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
@@ -14,7 +14,7 @@ Main::Main(
 ) {
     // Init database
     Database::Session::init(
-        this->db = db
+        this->database = database
     );
 
     // Init widget
@@ -28,7 +28,7 @@ Main::Main(
 
     // Init components
     mainTab = Gtk::make_managed<main::Tab>(
-        db,
+        database,
         ACTION__CLOSE,
         ACTION__CLOSE_ALL,
         ACTION__HISTORY_BACK,
@@ -51,7 +51,7 @@ int Main::session_restore(
     sqlite3_stmt* statement; // @TODO move to the Database model namespace
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main__session`
@@ -90,13 +90,13 @@ void Main::session_save(
 
     // Delete previous data
     Database::Session::clean(
-        db,
+        database,
         APP_BROWSER__SESSION__ID
     ); // @TODO run on background
 
     // Create new session
     const sqlite3_int64 APP_BROWSER_MAIN__SESSION__ID = Database::Session::add(
-        db,
+        database,
         APP_BROWSER__SESSION__ID
     );
 
@@ -185,12 +185,12 @@ Glib::ustring Main::get_tab_page_description()
 
 // Database
 int Main::Database::Session::init(
-    sqlite3 * db
+    sqlite3 * database
 ) {
     char * error;
 
     return sqlite3_exec(
-        db,
+        database,
         R"SQL(
             CREATE TABLE IF NOT EXISTS `app_browser_main__session`
             (
@@ -205,14 +205,14 @@ int Main::Database::Session::init(
 }
 
 int Main::Database::Session::clean(
-    sqlite3 * db,
+    sqlite3 * database,
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
     char * error; // @TODO
     sqlite3_stmt * statement;
 
     const int PREPARE_STATUS = sqlite3_prepare_v3(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 SELECT * FROM `app_browser_main__session`
@@ -237,7 +237,7 @@ int Main::Database::Session::clean(
 
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(
-                db,
+                database,
                 Glib::ustring::sprintf(
                     R"SQL(
                         DELETE FROM `app_browser_main__session` WHERE `id` = %d
@@ -253,7 +253,7 @@ int Main::Database::Session::clean(
             if (EXEC_STATUS == SQLITE_OK)
             {
                 main::Tab::Database::Session::clean(
-                    db,
+                    database,
                     APP_BROWSER_MAIN__SESSION__ID
                 );
             }
@@ -266,13 +266,13 @@ int Main::Database::Session::clean(
 }
 
 sqlite3_int64 Main::Database::Session::add(
-    sqlite3 * db,
+    sqlite3 * database,
     const sqlite3_int64 & APP_BROWSER__SESSION__ID
 ) {
     char * error; // @TODO
 
     sqlite3_exec(
-        db,
+        database,
         Glib::ustring::sprintf(
             R"SQL(
                 INSERT INTO `app_browser_main__session` (
@@ -289,6 +289,6 @@ sqlite3_int64 Main::Database::Session::add(
     );
 
     return sqlite3_last_insert_rowid(
-        db
+        database
     );
 }

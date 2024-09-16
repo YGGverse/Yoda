@@ -59,16 +59,16 @@ namespace app::browser::main::tab
                     }; // table fields index
 
                     static int init(
-                        sqlite3 * db
+                        sqlite3 * database
                     ); // return sqlite3_exec status code
 
                     static int clean(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
                     ); // return sqlite3_finalize status code
 
                     static sqlite3_int64 add(
-                        sqlite3 * db,
+                        sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
                         const Page::MIME & MIME,
                         const Glib::ustring & TITLE,
@@ -182,7 +182,7 @@ namespace app::browser::main::tab
             Glib::RefPtr<Gio::SimpleAction> action__update;
 
             // Database
-            sqlite3 * db;
+            sqlite3 * database;
 
             // Socket
             char buffer[0xfffff]; // 1Mb
@@ -201,7 +201,7 @@ namespace app::browser::main::tab
         public:
 
             Page(
-                sqlite3 * db,
+                sqlite3 * database,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_BACK,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__HISTORY_FORWARD,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__RELOAD,
