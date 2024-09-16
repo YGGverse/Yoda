@@ -185,6 +185,12 @@ void Page::update()
 void Page::navigation_reload(
     const bool & ADD_HISTORY
 ) {
+    // Close previous socket connection (on active)
+    if (socket__connection != nullptr && socket__connection->is_connected())
+    {
+        socket__connection->close();
+    }
+
     // Update navigation history?
     if (ADD_HISTORY)
     {
