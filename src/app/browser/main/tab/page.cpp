@@ -363,7 +363,9 @@ void Page::navigation_reload(
                             // Response
                             socket__connection->get_input_stream()->read_all_async( // | read_async @TODO
                                 buffer,
-                                sizeof(buffer) - 1,
+                                sizeof(
+                                    buffer
+                                ) - 1, // @TODO
                                 [this](const Glib::RefPtr<Gio::AsyncResult>&)
                                 {
                                     // Update
