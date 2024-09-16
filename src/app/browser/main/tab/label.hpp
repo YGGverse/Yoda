@@ -24,7 +24,7 @@ namespace app::browser::main::tab
              */
             struct Database
             {
-                // APP_BROWSER_MAIN_TAB_LABEL__*
+                // app_browser_main_tab_label__*
                 struct Session
                 {
                     enum

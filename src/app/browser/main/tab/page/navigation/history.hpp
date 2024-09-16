@@ -29,7 +29,7 @@ namespace app::browser::main::tab::page::navigation
              */
             struct Database
             {
-                // APP_BROWSER_MAIN_TAB_PAGE_NAVIGATION_HISTORY__*
+                // app_browser_main_tab_page_navigation_history__*
                 struct Session
                 {
                     enum

@@ -27,7 +27,7 @@ namespace app::browser
              */
             struct Database
             {
-                // APP_BROWSER_MAIN__*
+                // app_browser_main__*
                 struct Session
                 {
                     enum

@@ -29,7 +29,7 @@ namespace app
              */
             struct Database
             {
-                // APP_BROWSER__*
+                // app_browser__*
                 struct Session
                 {
                     enum
