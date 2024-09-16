@@ -654,7 +654,7 @@ Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::create(
  */
 Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
 {
-    const auto GEMINI_CLIENT = create();
+    const auto GEMINI_CLIENT = Socket::Client::create();
 
     GEMINI_CLIENT->set_tls(
         true
@@ -688,7 +688,7 @@ bool Page::Socket::Connection::is_active(
 bool Page::Socket::Connection::close(
     Glib::RefPtr<Gio::SocketConnection> & connection
 ) {
-    if (is_active(connection))
+    if (Socket::Connection::is_active(connection))
     {
         if (connection->close())
         {
