@@ -323,7 +323,7 @@ void Page::navigation_reload(
                 if (Socket::Connection::is_active(socket__connection)) // @TODO
                 {
                     // Build gemini protocol request
-                    const auto REQUEST = Socket::Client::Gemini::get_request_from_uri(
+                    const auto REQUEST = Socket::Client::Gemini::Request::create_from_uri(
                         uri
                     );
 
@@ -370,20 +370,41 @@ void Page::navigation_reload(
                                     action__update->activate();
 
                                     // Parse meta
-                                    auto meta = Glib::Regex::split_simple(
-                                        R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
-                                        buffer
+                                    Socket::Client::Gemini::Response::Status status;
+
+                                    Socket::Client::Gemini::Response::Match::meta(
+                                        buffer,
+                                        status,
+                                        mime
                                     );
 
-                                    // Route by status code
-                                    if (meta[1] == "20")
+                                    // Try detect mime by file extension on still undefined @TODO
+                                    if (mime == MIME::UNDEFINED)
                                     {
-                                        // Route by mime type or path extension
-                                        if (meta[2] == "text/gemini" || Glib::str_has_suffix(g_uri_get_path(uri), ".gmi"))
+                                        if (Glib::str_has_suffix(g_uri_get_path(uri), ".gmi"))
+                                        {
+                                            mime = MIME::TEXT_GEMINI;
+                                        }
+
+                                        else
                                         {
                                             // Update
-                                            mime = MIME::TEXT_GEMINI;
+                                            title = _("Oops");
 
+                                            description = _("MIME type not supported");
+
+                                            progress_fraction = 1;
+
+                                            action__update->activate();
+                                        }
+                                    }
+
+                                    // Route by status code
+                                    switch (status)
+                                    {
+                                        case Socket::Client::Gemini::Response::Status::SUCCESS:
+
+                                            // Update
                                             title = _("Done"); // @TODO page title
 
                                             description = g_uri_get_host(
@@ -406,36 +427,24 @@ void Page::navigation_reload(
                                                 }
 
                                             action__update->activate();
-                                        }
 
-                                        else
-                                        {
+                                        break;
+
+                                        // @TODO other statuses..
+
+                                        default:
+
                                             // Update
                                             title = _("Oops");
 
-                                            description = _("MIME type not supported");
+                                            description = _("Response code not supported");
 
                                             progress_fraction = 1;
 
                                             action__update->activate();
-                                        }
                                     }
 
-                                    else
-                                    {
-                                        // Update
-                                        title = _("Oops");
-
-                                        description = Glib::ustring::sprintf(
-                                            _("Response code %s not supported"),
-                                            meta[1]
-                                        );
-
-                                        progress_fraction = 1;
-
-                                        action__update->activate();
-                                    }
-
+                                    // Finalize request
                                     Socket::Connection::close(
                                         socket__connection
                                     );
@@ -672,7 +681,7 @@ Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
 /*
  * Build request string for Gemini protocol from GUri pointer
  */
-Glib::ustring Page::Socket::Client::Gemini::get_request_from_uri(
+Glib::ustring Page::Socket::Client::Gemini::Request::create_from_uri(
     GUri * uri
 ) {
     return Glib::ustring::sprintf(
@@ -681,6 +690,50 @@ Glib::ustring Page::Socket::Client::Gemini::get_request_from_uri(
             uri
         )
     );
+}
+
+/*
+ * Parse meta data from response buffer
+ */
+bool Page::Socket::Client::Gemini::Response::Match::meta(
+    const Glib::ustring & RESPONSE,
+    Status & status,
+    MIME & mime
+) {
+    // Parse response string
+    const auto MATCH = Glib::Regex::split_simple(
+        R"regex(^(\d+)?\s([\w]+\/[\w]+)?)regex",
+        RESPONSE
+    );
+
+    // Detect status code @TODO
+    if (MATCH[1] == "20")
+    {
+        status = Status::SUCCESS;
+    }
+
+    else
+    {
+        status = Status::UNDEFINED;
+    }
+
+    // Detect MIME @TODO
+    if (MATCH[2] == "text/gemini")
+    {
+        mime = MIME::TEXT_GEMINI;
+    }
+
+    else if (MATCH[2] == "text/plain")
+    {
+        mime = MIME::TEXT_PLAIN;
+    }
+
+    else
+    {
+        mime = MIME::UNDEFINED;
+    }
+
+    return true; // @TODO
 }
 
 /*

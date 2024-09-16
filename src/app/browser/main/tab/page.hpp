@@ -96,13 +96,52 @@ namespace app::browser::main::tab
 
                         struct Gemini
                         {
+                            // Defaults
                             static const int DEFAULT_PORT = 1965;
 
+                            // Actions
                             static Glib::RefPtr<Gio::SocketClient> create();
 
-                            static Glib::ustring get_request_from_uri(
-                                GUri * uri
-                            );
+                            struct Request
+                            {
+                                static Glib::ustring create_from_uri(
+                                    GUri * uri
+                                );
+                            };
+
+                            struct Response
+                            {
+                                /*
+                                 * Status codes
+                                 *
+                                 * 10-19 Input expected
+                                 * 20-29 Success
+                                 * 30-39 Redirection
+                                 * 40-49 Temporary failure
+                                 * 50-59 Permanent failure
+                                 * 60-69 Client certificates
+                                 *
+                                 * https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
+                                 */
+                                enum class Status
+                                {
+                                    SUCCESS,
+                                    REDIRECT,
+                                    TEMPORARY_FAILURE,
+                                    PERMANENT_FAILURE,
+                                    CERTIFICATE,
+                                    UNDEFINED
+                                }; // @TODO explain code groups
+
+                                struct Match
+                                {
+                                    static bool meta(
+                                        const Glib::ustring & RESPONSE,
+                                        Status & status,
+                                        MIME & mime
+                                    );
+                                };
+                            };
                         };
                 };
 
