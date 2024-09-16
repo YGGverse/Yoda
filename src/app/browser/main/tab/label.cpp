@@ -177,6 +177,13 @@ void Label::pin(
     }
 }
 
+void Label::pin()
+{
+    pin(
+        !is_pinned
+    );
+}
+
 void Label::update(
     const Glib::ustring & TEXT
 ) {

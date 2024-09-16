@@ -69,6 +69,14 @@ Browser::Browser(
         }
     );
 
+    const auto ACTION__TAB_PIN = add_action(
+        "tab_pin",
+        [this]
+        {
+            browserMain->tab_pin();
+        }
+    );
+
     const auto ACTION__TAB_CLOSE = add_action(
         "tab_close",
         [this]
@@ -177,6 +185,7 @@ Browser::Browser(
         ACTION__SESSION_RESTORE,
         ACTION__SESSION_SAVE,
         ACTION__TAB_APPEND,
+        ACTION__TAB_PIN,
         ACTION__TAB_CLOSE,
         ACTION__TAB_CLOSE_ALL,
         ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
@@ -216,6 +225,11 @@ Browser::Browser(
             APP->set_accel_for_action(
                 "win.tab_append",
                 "<Primary>t"
+            );
+
+            APP->set_accel_for_action(
+                "win.tab_pin",
+                "<Primary>p"
             );
 
             APP->set_accel_for_action(

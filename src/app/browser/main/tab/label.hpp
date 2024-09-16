@@ -95,6 +95,8 @@ namespace app::browser::main::tab
                 const bool & IS_PINNED
             );
 
+            void pin();
+
             void update(
                 const Glib::ustring & TEXT
             );

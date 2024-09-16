@@ -98,6 +98,10 @@ namespace app::browser::main
                 const bool & IS_CURRENT
             );
 
+            void pin(
+                const int & PAGE_NUMBER
+            );
+
             void close(
                 const int & PAGE_NUMBER
             );

@@ -85,6 +85,7 @@ namespace app::browser
 
             // Actions
             void tab_append();
+            void tab_pin();
 
             void tab_close_all();
             void tab_close_left();

@@ -24,6 +24,7 @@ namespace app::browser::header
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__SESSION_RESTORE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__SESSION_SAVE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_APPEND,
+                const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PIN,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
                 const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,

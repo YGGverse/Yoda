@@ -205,6 +205,14 @@ int Tab::append(
     return PAGE_NUMBER;
 };
 
+void Tab::pin(
+    const int & PAGE_NUMBER
+) {
+    get_tabLabel(
+        PAGE_NUMBER
+    )->pin();
+}
+
 void Tab::close(
     const int & PAGE_NUMBER
 ) {

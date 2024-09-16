@@ -114,6 +114,13 @@ void Main::tab_append()
     );
 };
 
+void Main::tab_pin()
+{
+    mainTab->pin(
+        mainTab->get_current_page()
+    );
+};
+
 void Main::tab_close()
 {
     mainTab->close(

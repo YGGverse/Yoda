@@ -9,6 +9,7 @@ Menu::Menu(
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__SESSION_RESTORE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__SESSION_SAVE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_APPEND,
+    const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PIN,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_CLOSE_ALL,
     const Glib::RefPtr<Gio::SimpleAction> & ACTION__TAB_PAGE_NAVIGATION_HISTORY_BACK,
@@ -57,6 +58,13 @@ Menu::Menu(
                 _("New.."),
                 get_action_detailed_name(
                     ACTION__TAB_APPEND
+                )
+            );
+
+            MENU__TAB->append(
+                _("Pin"),
+                get_action_detailed_name(
+                    ACTION__TAB_PIN
                 )
             );
 
