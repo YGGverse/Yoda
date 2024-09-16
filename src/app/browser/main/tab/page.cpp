@@ -323,16 +323,13 @@ void Page::navigation_reload(
                 if (Socket::Connection::is_active(socket__connection)) // @TODO
                 {
                     // Build gemini protocol request
-                    const Glib::ustring SOCKET__REQUEST = Glib::ustring::sprintf(
-                        "%s\r\n",
-                        g_uri_to_string(
-                            uri
-                        )
+                    const auto REQUEST = Socket::Client::Gemini::get_request_from_uri(
+                        uri
                     );
 
                     socket__connection->get_output_stream()->write_async(
-                        SOCKET__REQUEST.data(),
-                        SOCKET__REQUEST.size(),
+                        REQUEST.data(),
+                        REQUEST.size(),
                         [this](const Glib::RefPtr<Gio::AsyncResult>&)
                         {
                             // Update
@@ -670,6 +667,20 @@ Glib::RefPtr<Gio::SocketClient> Page::Socket::Client::Gemini::create()
     );
 
     return GEMINI_CLIENT;
+}
+
+/*
+ * Build request string for Gemini protocol from GUri pointer
+ */
+Glib::ustring Page::Socket::Client::Gemini::get_request_from_uri(
+    GUri * uri
+) {
+    return Glib::ustring::sprintf(
+        "%s\r\n",
+        g_uri_to_string(
+            uri
+        )
+    );
 }
 
 /*

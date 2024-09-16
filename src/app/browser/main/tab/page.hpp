@@ -99,6 +99,10 @@ namespace app::browser::main::tab
                             static const int DEFAULT_PORT = 1965;
 
                             static Glib::RefPtr<Gio::SocketClient> create();
+
+                            static Glib::ustring get_request_from_uri(
+                                GUri * uri
+                            );
                         };
                 };
 
