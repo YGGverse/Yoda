@@ -74,8 +74,6 @@ namespace app::browser::main::tab::page::content::text::gemini
         // Defaults
         const int MARGIN_START = 8;
         const int MARGIN_END = 8;
-        const int XALIGN = 0;
-        const int YALIGN = 0;
 
         /*
          * Reader class API

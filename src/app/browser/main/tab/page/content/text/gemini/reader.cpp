@@ -87,6 +87,10 @@ Reader::Reader(
     }
 
     // Init widget
+    set_halign(
+        Gtk::Align::START
+    );
+
     set_valign(
         Gtk::Align::START
     );
@@ -97,14 +101,6 @@ Reader::Reader(
 
     set_margin_end(
         MARGIN_END
-    );
-
-    set_xalign(
-        XALIGN
-    );
-
-    set_yalign(
-        YALIGN
     );
 
     set_wrap(
