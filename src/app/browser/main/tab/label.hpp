@@ -67,6 +67,7 @@ namespace app::browser::main::tab
 
             // Extras
             bool is_pinned;
+            Glib::ustring text;
 
             // Defaults
             static const int WIDTH_CHARS = 16;
@@ -90,13 +91,17 @@ namespace app::browser::main::tab
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
 
+            void pin(
+                const bool & IS_PINNED
+            );
+
             void update(
                 const Glib::ustring & TEXT
             );
 
             void update(
-                const int & IS_PINNED,
-                const Glib::ustring & TEXT
+                const Glib::ustring & TEXT,
+                const int & IS_PINNED
             );
     };
 }

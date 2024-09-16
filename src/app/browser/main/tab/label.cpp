@@ -15,39 +15,14 @@ Label::Label(
     action__tab_close = ACTION__TAB_CLOSE;
 
     // Init extras
+    text = _("New page");
+
     is_pinned = false;
-
-    // Setup label controller
-    auto const EVENT__GESTURE_CLICK = Gtk::GestureClick::create();
-
-        /* @TODO remove as default
-        controller->set_button(
-            GDK_BUTTON_PRIMARY
-        );*/
-
-        EVENT__GESTURE_CLICK->signal_pressed().connect(
-            [this](int n, double x, double y)
-            {
-                if (n == 2) // double click
-                {
-                    action__tab_close->activate();
-                }
-            }
-        );
-
-        add_controller(
-            EVENT__GESTURE_CLICK
-        );
 
     // Init widget
     set_ellipsize(
         Pango::EllipsizeMode::END
     );
-
-    /* @TODO require als set_xalign(0)
-    set_halign(
-        Gtk::Align::START
-    ); */
 
     set_has_tooltip(
         true
@@ -60,6 +35,52 @@ Label::Label(
     set_width_chars(
         WIDTH_CHARS
     );
+
+    // Init primary button controller
+    const auto EVENT__BUTTON_PRIMARY = Gtk::GestureClick::create();
+
+        EVENT__BUTTON_PRIMARY->set_button(
+            GDK_BUTTON_PRIMARY
+        );
+
+        add_controller(
+            EVENT__BUTTON_PRIMARY
+        );
+
+        // Connect events
+        EVENT__BUTTON_PRIMARY->signal_pressed().connect(
+            [this](int n, double x, double y)
+            {
+                if (n == 2) // double click
+                {
+                    pin(
+                        !is_pinned // toggle
+                    );
+                }
+            }
+        );
+
+    // Init middle button controller
+    const auto EVENT__BUTTON_MIDDLE = Gtk::GestureClick::create();
+
+        EVENT__BUTTON_MIDDLE->set_button(
+            GDK_BUTTON_MIDDLE
+        );
+
+        add_controller(
+            EVENT__BUTTON_MIDDLE
+        );
+
+        // Connect events
+        EVENT__BUTTON_MIDDLE->signal_pressed().connect(
+            [this](int n, double x, double y)
+            {
+                if (!is_pinned)
+                {
+                    action__tab_close->activate();
+                }
+            }
+        );
 }
 
 // Actions
@@ -91,16 +112,16 @@ int Label::session_restore(
         {
             // Restore widget data
             update(
-                sqlite3_column_int(
-                    statement,
-                    DB::SESSION::IS_PINNED
-                ) == 1,
                 reinterpret_cast<const char*>(
                     sqlite3_column_text(
                         statement,
                         DB::SESSION::TEXT
                     )
-                )
+                ),
+                sqlite3_column_int(
+                    statement,
+                    DB::SESSION::IS_PINNED
+                ) == 1
             );
 
             // Restore children components here (on available)
@@ -122,30 +143,69 @@ int Label::session_save(
         db,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
         is_pinned,
-        get_text()
+        text
     );
+}
+
+void Label::pin(
+    const bool & IS_PINNED
+) {
+    // Toggle status
+    is_pinned = IS_PINNED;
+
+    // Update widget
+    if (is_pinned)
+    {
+        set_width_chars(
+            1
+        );
+
+        set_text(
+            "★" // @TODO GTK icon
+        );
+    }
+
+    else
+    {
+        set_width_chars(
+            WIDTH_CHARS
+        );
+
+        set_text(
+            text
+        );
+    }
 }
 
 void Label::update(
     const Glib::ustring & TEXT
 ) {
-    set_text(
-        TEXT
-    );
+    // Keep new value in memory (used for pin actions)
+    text = TEXT;
 
+    // Update widget
     set_tooltip_text(
         TEXT // same value for tooltip (ellipsize mode)
     );
+
+    if (!is_pinned)
+    {
+        set_text(
+            TEXT
+        );
+    }
 }
 
 void Label::update(
-    const int & IS_PINNED,
-    const Glib::ustring & TEXT
+    const Glib::ustring & TEXT,
+    const int & IS_PINNED
 ) {
-    is_pinned = IS_PINNED;
-
     update(
         TEXT
+    );
+
+    pin(
+        IS_PINNED
     );
 }
 
