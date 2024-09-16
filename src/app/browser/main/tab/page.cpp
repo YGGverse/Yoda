@@ -282,6 +282,10 @@ void Page::navigation_reload(
             Gio::TlsCertificateFlags::NO_FLAGS
         );
 
+        socket__client->set_protocol(
+            Gio::Socket::Protocol::TCP
+        );
+
         socket__client->set_timeout(
             15 // @TODO
         );
