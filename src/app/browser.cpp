@@ -331,7 +331,7 @@ int Browser::session_restore()
     );
 }
 
-void Browser::session_clean()
+void Browser::session_clean() // @TODO transaction
 {
     Database::Session::clean(
         database
@@ -340,7 +340,7 @@ void Browser::session_clean()
     browserMain->tab_close_all();
 }
 
-void Browser::session_save()
+void Browser::session_save() // @TODO transaction
 {
     char * error; // @TODO
 
