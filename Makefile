@@ -31,7 +31,9 @@ SRCS =  src/app.cpp\
 		src/app/browser/main/tab/page/navigation/history/forward.cpp\
 		src/app/browser/main/tab/page/navigation/reload.cpp\
 		src/app/browser/main/tab/page/navigation/request.cpp\
-		src/app/browser/main/tab/label.cpp
+		src/app/browser/main/tab/label.cpp\
+		src/app/browser/main/tab/label/pin.cpp\
+		src/app/browser/main/tab/label/title.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

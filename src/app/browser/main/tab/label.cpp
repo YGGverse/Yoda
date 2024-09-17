@@ -1,4 +1,6 @@
 #include "label.hpp"
+#include "label/pin.hpp"
+#include "label/title.hpp"
 
 using namespace app::browser::main::tab;
 
@@ -15,26 +17,35 @@ Label::Label(
     action__tab_close = ACTION__TAB_CLOSE;
 
     // Init extras
-    text = _("New page");
-
     is_pinned = false;
 
     // Init widget
-    set_ellipsize(
-        Pango::EllipsizeMode::END
+    set_orientation(
+        Gtk::Orientation::HORIZONTAL
     );
 
-    set_has_tooltip(
-        true
+    set_halign(
+        Gtk::Align::CENTER
     );
 
-    set_single_line_mode(
-        true
-    );
+    // Init components
+    labelPin = Gtk::make_managed<label::Pin>();
 
-    set_width_chars(
-        WIDTH_CHARS
-    );
+        labelPin->hide();
+
+        append(
+            * labelPin
+        );
+
+    labelTitle = Gtk::make_managed<label::Title>();
+
+        set_tooltip_text(
+            labelTitle->get_text()
+        );
+
+        append(
+            * labelTitle
+        );
 
     // Init primary button controller
     const auto EVENT__BUTTON_PRIMARY = Gtk::GestureClick::create();
@@ -53,7 +64,7 @@ Label::Label(
             {
                 if (n == 2) // double click
                 {
-                    pin(
+                    update(
                         !is_pinned // toggle
                     );
                 }
@@ -112,12 +123,6 @@ int Label::session_restore(
         {
             // Restore widget data
             update(
-                reinterpret_cast<const char*>(
-                    sqlite3_column_text(
-                        statement,
-                        Database::Session::TEXT
-                    )
-                ),
                 sqlite3_column_int(
                     statement,
                     Database::Session::IS_PINNED
@@ -125,6 +130,7 @@ int Label::session_restore(
             );
 
             // Restore children components here (on available)
+            // @TODO
         }
     }
 
@@ -142,76 +148,57 @@ int Label::session_save(
     return Database::Session::add(
         database,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
-        is_pinned,
-        text
+        is_pinned
     );
-}
-
-void Label::pin(
-    const bool & IS_PINNED
-) {
-    // Toggle status
-    is_pinned = IS_PINNED;
-
-    // Update widget
-    if (is_pinned)
-    {
-        set_width_chars(
-            1
-        );
-
-        set_text(
-            "•" // @TODO GTK icon
-        );
-    }
-
-    else
-    {
-        set_width_chars(
-            WIDTH_CHARS
-        );
-
-        set_text(
-            text
-        );
-    }
 }
 
 void Label::pin()
 {
-    pin(
+    update(
         !is_pinned
     );
 }
 
 void Label::update(
-    const Glib::ustring & TEXT
+    const bool & IS_PINNED
 ) {
-    // Keep new value in memory (used for pin actions)
-    text = TEXT;
+    // Toggle status
+    is_pinned = IS_PINNED;
 
-    // Update widget
-    set_tooltip_text(
-        TEXT // same value for tooltip (ellipsize mode)
-    );
-
-    if (!is_pinned)
+    if (is_pinned)
     {
-        set_text(
-            TEXT
-        );
+        labelPin->show();
+        labelTitle->hide();
+    }
+
+    else
+    {
+        labelPin->hide();
+        labelTitle->show();
     }
 }
 
 void Label::update(
-    const Glib::ustring & TEXT,
+    const Glib::ustring & TITLE
+) {
+    set_tooltip_text(
+        TITLE
+    );
+
+    labelTitle->set_text(
+        TITLE
+    );
+}
+
+void Label::update(
+    const Glib::ustring & TITLE,
     const int & IS_PINNED
 ) {
     update(
-        TEXT
+        TITLE
     );
 
-    pin(
+    update(
         IS_PINNED
     );
 }
@@ -229,8 +216,7 @@ int Label::Database::Session::init(
             (
                 `id`        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_browser_main_tab__session__id` INTEGER NOT NULL,
                 `time`      INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                `is_pinned` INTEGER NOT NULL,
-                `text`      VARCHAR (1024) NOT NULL
+                `is_pinned` INTEGER NOT NULL
             )
         )SQL",
         nullptr,
@@ -298,8 +284,7 @@ int Label::Database::Session::clean(
 sqlite3_int64 Label::Database::Session::add(
     sqlite3 * database,
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
-    const bool & IS_PINNED,
-    const Glib::ustring & TEXT
+    const bool & IS_PINNED
 ) {
     char * error; // @TODO
 
@@ -309,17 +294,14 @@ sqlite3_int64 Label::Database::Session::add(
             R"SQL(
                 INSERT INTO `app_browser_main_tab_label__session` (
                     `app_browser_main_tab__session__id`,
-                    `is_pinned`,
-                    `text`
+                    `is_pinned`
                 ) VALUES (
-                    '%d',
-                    '%d',
-                    '%s'
+                    %d,
+                    %d
                 )
             )SQL",
             APP_BROWSER_MAIN_TAB__SESSION__ID,
-            IS_PINNED,
-            TEXT
+            IS_PINNED
         ).c_str(),
         nullptr,
         nullptr,

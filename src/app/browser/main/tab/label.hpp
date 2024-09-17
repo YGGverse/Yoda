@@ -5,15 +5,20 @@
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/box.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/gestureclick.h>
-#include <gtkmm/label.h>
-#include <pangomm/layout.h>
 #include <sqlite3.h>
 
 namespace app::browser::main::tab
 {
-    class Label : public Gtk::Label
+    namespace label
+    {
+        class Pin;
+        class Title;
+    }
+
+    class Label : public Gtk::Box
     {
         public:
 
@@ -32,8 +37,7 @@ namespace app::browser::main::tab
                         ID,
                         APP_BROWSER_MAIN_TAB__SESSION__ID,
                         TIME,
-                        IS_PINNED,
-                        TEXT
+                        IS_PINNED
                     }; // table fields index
 
                     static int init(
@@ -48,8 +52,7 @@ namespace app::browser::main::tab
                     static sqlite3_int64 add(
                         sqlite3 * database,
                         const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID,
-                        const bool & IS_PINNED,
-                        const Glib::ustring & TEXT
+                        const bool & IS_PINNED
                     ); // return sqlite3_last_insert_rowid
                 };
             };
@@ -67,10 +70,10 @@ namespace app::browser::main::tab
 
             // Extras
             bool is_pinned;
-            Glib::ustring text;
 
-            // Defaults
-            static const int WIDTH_CHARS = 16;
+            // Components
+            label::Pin * labelPin;
+            label::Title * labelTitle;
 
         /*
          * Class API
@@ -91,18 +94,18 @@ namespace app::browser::main::tab
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            void pin(
-                const bool & IS_PINNED
-            );
-
             void pin();
 
             void update(
-                const Glib::ustring & TEXT
+                const bool & IS_PINNED
             );
 
             void update(
-                const Glib::ustring & TEXT,
+                const Glib::ustring & TITLE
+            );
+
+            void update(
+                const Glib::ustring & TITLE,
                 const int & IS_PINNED
             );
     };
