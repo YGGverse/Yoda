@@ -37,7 +37,9 @@ Label::Label(
             * labelPin
         );
 
-    labelTitle = Gtk::make_managed<label::Title>();
+    labelTitle = Gtk::make_managed<label::Title>(
+        database
+    );
 
         set_tooltip_text(
             labelTitle->get_text()
@@ -129,8 +131,13 @@ int Label::session_restore(
                 ) == 1
             );
 
-            // Restore children components here (on available)
-            // @TODO
+            // Restore children components
+            labelTitle->session_restore(
+                sqlite3_column_int64(
+                    statement,
+                    Database::Session::ID
+                )
+            );
         }
     }
 
@@ -139,17 +146,23 @@ int Label::session_restore(
     );
 }
 
-int Label::session_save(
+sqlite3_int64 Label::session_save(
     const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
 ) {
-    // Delegate save action to child components (on available)
-
-    // Save label session
-    return Database::Session::add(
+    // Create new session
+    const sqlite3_int64 APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID = Database::Session::add(
         database,
         APP_BROWSER_MAIN_TAB__SESSION__ID,
         is_pinned
     );
+
+    // Delegate save action to child components
+    labelTitle->session_save(
+        APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID
+    );
+
+    // Return ID
+    return APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID;
 }
 
 void Label::pin()
@@ -185,7 +198,7 @@ void Label::update(
         TITLE
     );
 
-    labelTitle->set_text(
+    labelTitle->update(
         TITLE
     );
 }
@@ -251,6 +264,11 @@ int Label::Database::Session::clean(
     {
         while (sqlite3_step(statement) == SQLITE_ROW)
         {
+            const sqlite3_int64 APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID = sqlite3_column_int64(
+                statement,
+                Database::Session::ID
+            );
+
             // Delete record
             const int EXEC_STATUS = sqlite3_exec(
                 database,
@@ -258,10 +276,7 @@ int Label::Database::Session::clean(
                     R"SQL(
                         DELETE FROM `app_browser_main_tab_label__session` WHERE `id` = %d
                     )SQL",
-                    sqlite3_column_int64(
-                        statement,
-                        Database::Session::ID
-                    )
+                    APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID
                 ).c_str(),
                 nullptr,
                 nullptr,
@@ -271,7 +286,10 @@ int Label::Database::Session::clean(
             // Delegate children dependencies cleanup
             if (EXEC_STATUS == SQLITE_OK)
             {
-                // nothing here.
+                label::Title::Database::Session::clean(
+                    database,
+                    APP_BROWSER_MAIN_TAB_LABEL__SESSION__ID
+                );
             }
         }
     }

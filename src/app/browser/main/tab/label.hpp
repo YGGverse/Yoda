@@ -90,9 +90,9 @@ namespace app::browser::main::tab
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
             ); // return sqlite3_finalize status code
 
-            int session_save(
+            sqlite3_int64 session_save(
                 const sqlite3_int64 & APP_BROWSER_MAIN_TAB__SESSION__ID
-            ); // return sqlite3_finalize status code
+            ); // return sqlite3_last_insert_rowid
 
             void pin();
 
