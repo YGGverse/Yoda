@@ -88,9 +88,16 @@ Label::Label(
         EVENT__BUTTON_MIDDLE->signal_pressed().connect(
             [this](int n, double x, double y)
             {
-                if (!is_pinned) // @TODO match current tab condition
+                // @TODO activate tab
+            }
+        );
+
+        EVENT__BUTTON_MIDDLE->signal_released().connect(
+            [this](int n, double x, double y)
+            {
+                if (!is_pinned)
                 {
-                    action__tab_close->activate();
+                    // @TODO action__tab_close->activate();
                 }
             }
         );
