@@ -397,16 +397,23 @@ void Page::navigation_reload(
                                             {
                                                 case MIME::TEXT_GEMINI:
 
+                                                    // Update
+                                                    title = _("Done"); // @TODO
+
+                                                    description = g_uri_get_host(
+                                                        uri
+                                                    );
+
                                                     progress_fraction = 1;
 
-                                                    // Set content driver
+                                                    // Use content driver
                                                     pageContent->update(
                                                         page::Content::TEXT_GEMINI,
                                                         buffer,
                                                         uri
                                                     );
 
-                                                        // Update title on detected by document provider
+                                                        // Update title by document header (on detected)
                                                         if (!pageContent->get_title().empty())
                                                         {
                                                             title = pageContent->get_title();
@@ -427,13 +434,6 @@ void Page::navigation_reload(
 
                                                     action__update->activate();
                                             }
-
-                                            // Update
-                                            title = _("Done"); // @TODO page title
-
-                                            description = g_uri_get_host(
-                                                uri
-                                            );
 
                                         break;
 
