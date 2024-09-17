@@ -31,31 +31,7 @@ Tab::Tab(
         SCROLLABLE
     );
 
-    // Init additional controllers
-    const auto EVENT__BUTTON_PRIMARY = Gtk::GestureClick::create();
-
-        /* use defaults
-        EVENT__BUTTON_PRIMARY->set_button(
-            GDK_BUTTON_PRIMARY
-        );*/
-
-    add_controller(
-        EVENT__BUTTON_PRIMARY
-    );
-
     // Init events
-    EVENT__BUTTON_PRIMARY->signal_pressed().connect(
-        [this](int n, double x, double y)
-        {
-            if (n == 2) // double click
-            {
-                tabLabel(
-                    get_current_page()
-                )->pin();
-            }
-        }
-    );
-
     signal_switch_page().connect(
         [this](Gtk::Widget*, guint)
         {
@@ -223,6 +199,32 @@ int Tab::append(
         );
     }
 
+    // Init page controller
+    const auto EVENT__BUTTON_PRIMARY = Gtk::GestureClick::create();
+
+        /* use defaults
+        EVENT__BUTTON_PRIMARY->set_button(
+            GDK_BUTTON_PRIMARY
+        );*/
+
+    TAB_LABEL->get_parent()->add_controller(
+        EVENT__BUTTON_PRIMARY
+    );
+
+    // Init events
+    EVENT__BUTTON_PRIMARY->signal_pressed().connect(
+        [this](int n, double x, double y)
+        {
+            if (n == 2) // double click
+            {
+                tabLabel(
+                    get_current_page()
+                )->pin();
+            }
+        }
+    );
+
+    // Refresh window
     update(
         PAGE_NUMBER
     );
