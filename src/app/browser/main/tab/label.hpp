@@ -7,7 +7,6 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/box.h>
 #include <gtkmm/enums.h>
-#include <gtkmm/gestureclick.h>
 #include <sqlite3.h>
 
 namespace app::browser::main::tab

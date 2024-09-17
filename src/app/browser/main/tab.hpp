@@ -5,6 +5,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/gestureclick.h>
 #include <gtkmm/notebook.h>
 #include <sqlite3.h>
 

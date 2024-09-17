@@ -48,59 +48,6 @@ Label::Label(
         append(
             * labelTitle
         );
-
-    // Init primary button controller
-    const auto EVENT__BUTTON_PRIMARY = Gtk::GestureClick::create();
-
-        EVENT__BUTTON_PRIMARY->set_button(
-            GDK_BUTTON_PRIMARY
-        );
-
-        add_controller(
-            EVENT__BUTTON_PRIMARY
-        );
-
-        // Connect events
-        EVENT__BUTTON_PRIMARY->signal_pressed().connect(
-            [this](int n, double x, double y)
-            {
-                if (n == 2) // double click
-                {
-                    update(
-                        !is_pinned // toggle
-                    );
-                }
-            }
-        );
-
-    // Init middle button controller
-    const auto EVENT__BUTTON_MIDDLE = Gtk::GestureClick::create();
-
-        EVENT__BUTTON_MIDDLE->set_button(
-            GDK_BUTTON_MIDDLE
-        );
-
-        add_controller(
-            EVENT__BUTTON_MIDDLE
-        );
-
-        // Connect events
-        EVENT__BUTTON_MIDDLE->signal_pressed().connect(
-            [this](int n, double x, double y)
-            {
-                // @TODO activate tab
-            }
-        );
-
-        EVENT__BUTTON_MIDDLE->signal_released().connect(
-            [this](int n, double x, double y)
-            {
-                if (!is_pinned)
-                {
-                    // @TODO action__tab_close->activate();
-                }
-            }
-        );
 }
 
 // Actions
