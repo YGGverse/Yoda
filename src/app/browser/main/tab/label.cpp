@@ -161,7 +161,7 @@ void Label::pin(
         );
 
         set_text(
-            "★" // @TODO GTK icon
+            "•" // @TODO GTK icon
         );
     }
 
