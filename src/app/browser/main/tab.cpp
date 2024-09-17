@@ -49,7 +49,7 @@ Tab::Tab(
         {
             if (n == 2) // double click
             {
-                get_tabLabel(
+                tabLabel(
                     get_current_page()
                 )->pin();
             }
@@ -99,7 +99,7 @@ int Tab::session_restore(
             );
 
             // Restore children components
-            get_tabLabel(
+            tabLabel(
                 PAGE_NUMBER
             )->session_restore(
                 sqlite3_column_int64(
@@ -108,7 +108,7 @@ int Tab::session_restore(
                 )
             ); // maybe not much reasons to restore as page title in use @TODO
 
-            get_tabPage(
+            tabPage(
                 PAGE_NUMBER
             )->session_restore(
                 sqlite3_column_int64(
@@ -147,13 +147,13 @@ void Tab::session_save(
         );
 
         // Delegate save actions to children components
-        get_tabLabel(
+        tabLabel(
             page_number
         )->session_save(
             APP_BROWSER_MAIN_TAB__SESSION__ID
         );
 
-        get_tabPage(
+        tabPage(
             page_number
         )->session_save(
             APP_BROWSER_MAIN_TAB__SESSION__ID
@@ -166,7 +166,7 @@ void Tab::update(
     const int & PAGE_NUMBER
 ) {
     // Get tab page
-    const auto TAB_PAGE = get_tabPage(
+    const auto TAB_PAGE = tabPage(
         PAGE_NUMBER
     );
 
@@ -174,7 +174,7 @@ void Tab::update(
     TAB_PAGE->update();
 
     // Update tab label component
-    get_tabLabel(
+    tabLabel(
         PAGE_NUMBER
     )->update(
         TAB_PAGE->get_title()
@@ -233,7 +233,7 @@ int Tab::append(
 void Tab::pin(
     const int & PAGE_NUMBER
 ) {
-    get_tabLabel(
+    tabLabel(
         PAGE_NUMBER
     )->pin();
 }
@@ -269,7 +269,7 @@ void Tab::page_navigation_reload(
     const int & PAGE_NUMBER,
     const bool & ADD_HISTORY
 ) {
-    get_tabPage(
+    tabPage(
         PAGE_NUMBER
     )->navigation_reload(
         ADD_HISTORY
@@ -279,7 +279,7 @@ void Tab::page_navigation_reload(
 void Tab::page_navigation_history_back(
     const int & PAGE_NUMBER
 ) {
-    get_tabPage(
+    tabPage(
         PAGE_NUMBER
     )->navigation_history_back();
 }
@@ -287,7 +287,7 @@ void Tab::page_navigation_history_back(
 void Tab::page_navigation_history_forward(
     const int & PAGE_NUMBER
 ) {
-    get_tabPage(
+    tabPage(
         PAGE_NUMBER
     )->navigation_history_forward();
 }
@@ -296,7 +296,7 @@ void Tab::page_navigation_history_forward(
 Glib::ustring Tab::get_page_title(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(
+    return tabPage(
         PAGE_NUMBER
     )->get_title();
 };
@@ -304,12 +304,12 @@ Glib::ustring Tab::get_page_title(
 Glib::ustring Tab::get_page_description(
     const int & PAGE_NUMBER
 ) {
-    return get_tabPage(
+    return tabPage(
         PAGE_NUMBER
     )->get_description();
 };
 
-tab::Label * Tab::get_tabLabel(
+tab::Label * Tab::tabLabel(
     const int & PAGE_NUMBER
 ) {
     // Get page pointer to find label widget
@@ -345,7 +345,7 @@ tab::Label * Tab::get_tabLabel(
     return TAB_LABEL;
 }
 
-tab::Page * Tab::get_tabPage(
+tab::Page * Tab::tabPage(
     const int & PAGE_NUMBER
 ) {
     // Get page widget

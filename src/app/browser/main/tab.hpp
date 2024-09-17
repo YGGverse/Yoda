@@ -145,11 +145,12 @@ namespace app::browser::main
                 const int & PAGE_NUMBER
             );
 
-            tab::Label * get_tabLabel(
+            // Downcast
+            tab::Label * tabLabel(
                 const int & PAGE_NUMBER
             );
 
-            tab::Page * get_tabPage(
+            tab::Page * tabPage(
                 const int & PAGE_NUMBER
             );
     };
