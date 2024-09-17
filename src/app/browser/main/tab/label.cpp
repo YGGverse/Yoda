@@ -148,10 +148,30 @@ void Label::update(
 void Label::update(
     const Glib::ustring & TITLE
 ) {
-    set_tooltip_text(
-        TITLE
-    );
+    // Update tooltip
+    const auto PARENT = get_parent(); // Parent GtkNotebook widget contain default CSS paddings,
+                                      // update tooltip text at one level up instead of this widget, for better UI responsibility on mouse hover.
+                                      // @TODO solution does not follow common encapsulation principles, alternative implementation wanted!
 
+    if (PARENT != NULL)
+    {
+        set_tooltip_text(
+            Glib::ustring()
+        );
+
+        PARENT->set_tooltip_text(
+            TITLE
+        );
+    }
+
+    else
+    {
+        set_tooltip_text(
+            TITLE
+        );
+    }
+
+    // Update children components
     labelTitle->update(
         TITLE
     );
