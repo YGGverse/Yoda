@@ -53,6 +53,12 @@ Request::Request(
 void Request::update(
     const double & PROGRESS_FRACTION
 ) {
+    // Auto grab focus on empty (currently for new tabs)
+    if (get_text().empty())
+    {
+        grab_focus();
+    }
+
     // Update progress
     progress_fraction = PROGRESS_FRACTION;
 
