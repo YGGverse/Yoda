@@ -50,8 +50,8 @@ Browser::Browser(
         }
     );
 
-    const auto ACTION__TOOLS_DEBUG = add_action(
-        "tools_debug",
+    const auto ACTION__TOOL_DEBUG = add_action(
+        "tool_debug",
         [this]
         {
             // @TODO https://gitlab.gnome.org/GNOME/gtkmm/-/commit/5f3b82537d3daad7bda59dd01e719788070f4b6c
@@ -179,7 +179,7 @@ Browser::Browser(
 
     // Init components
     browserHeader = Gtk::make_managed<browser::Header>(
-        ACTION__TOOLS_DEBUG,
+        ACTION__TOOL_DEBUG,
         ACTION__QUIT,
         ACTION__SESSION_CLEAN,
         ACTION__SESSION_RESTORE,
@@ -253,7 +253,7 @@ Browser::Browser(
             );
 
             APP->set_accel_for_action(
-                "win.tools_debug",
+                "win.tool_debug",
                 "<Primary>i"
             );
 

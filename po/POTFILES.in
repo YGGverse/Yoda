@@ -6,7 +6,7 @@ src/app/browser/header/main/subtitle.cpp
 src/app/browser/header/main/title.cpp
 src/app/browser/header/menu.cpp
 src/app/browser/header/menu/tab.cpp
-src/app/browser/header/menu/tools.cpp
+src/app/browser/header/menu/tool.cpp
 src/app/browser/header/tab.cpp
 src/app/browser/main.cpp
 src/app/browser/main/tab.cpp

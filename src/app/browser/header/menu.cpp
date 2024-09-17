@@ -152,9 +152,9 @@ Menu::Menu(
             MENU__TAB
         );
 
-        const auto MENU__TOOLS = Gio::Menu::create();
+        const auto MENU__TOOL = Gio::Menu::create();
 
-            MENU__TOOLS->append(
+            MENU__TOOL->append(
                 _("Debug"),
                 get_action_detailed_name(
                     ACTION__DEBUG
@@ -162,8 +162,8 @@ Menu::Menu(
             );
 
         MENU->append_submenu(
-            _("Tools"),
-            MENU__TOOLS
+            _("Tool"),
+            MENU__TOOL
         );
 
         MENU->append(
