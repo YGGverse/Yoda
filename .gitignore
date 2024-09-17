@@ -2,7 +2,6 @@
 *.cache
 *.log
 *.status
-*.sqlite3
-configure
-configure~
-Makefile
+*.sqlite3*
+*configure
+*configure~
