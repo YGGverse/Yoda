@@ -15,7 +15,7 @@ pub fn new() -> Notebook
 
     // Add test tab @TODO restore from session
     append(
-        tab.clone(),
+        &tab,
         true
     );
 
@@ -23,7 +23,7 @@ pub fn new() -> Notebook
 }
 
 pub fn append(
-    tab: Notebook,
+    tab: &Notebook,
     current: bool
 ) -> u32
 {
