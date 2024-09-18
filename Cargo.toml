@@ -3,7 +3,6 @@ name = "Yoda"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-license-file = "LICENSE"
 readme = "README.md"
 description = "Yoda - Browser for Gemini protocol"
 keywords = ["gemini", "gemini-protocol", "browser", "client", "1965"]
