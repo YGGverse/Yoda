@@ -5,12 +5,19 @@ use gtk::Notebook;
 
 pub fn new() -> Notebook
 {
-    return Notebook::builder().scrollable(true).build();
+    let tab = Notebook::builder().scrollable(true).build();
+
+    append(
+        tab.clone(),
+        true
+    ); // @TODO
+
+    return tab;
 }
 
 pub fn append(
     tab : Notebook,
-    is_current : bool
+    current : bool
 ) -> u32
 {
     let page = page::new();
@@ -27,7 +34,7 @@ pub fn append(
         true
     );
 
-    if is_current
+    if current
     {
         tab.set_current_page(
             Some(
