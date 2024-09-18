@@ -1,7 +1,6 @@
 #[path = "browser/header.rs"] mod header;
 #[path = "browser/main.rs"] mod main;
 
-use gtk4 as gtk;
 use gtk::{Application, ApplicationWindow};
 
 pub fn new(app: &Application) -> ApplicationWindow

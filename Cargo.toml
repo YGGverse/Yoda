@@ -9,5 +9,7 @@ keywords = ["gemini", "gemini-protocol", "browser", "client", "1965"]
 repository = "https://github.com/YGGverse/Yoda/tree/Rust-GTK4"
 homepage = "https://yggverse.github.io"
 
-[dependencies]
-gtk4 = { version = "0.9.1", features = ["v4_8"] }
+[dependencies.gtk]
+package = "gtk4"
+version = "0.9.1"
+features = ["v4_8"]

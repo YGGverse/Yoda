@@ -1,6 +1,5 @@
 #[path = "app/browser.rs"] mod browser;
 
-use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{glib, Application};
 
