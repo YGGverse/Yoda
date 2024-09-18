@@ -14,5 +14,5 @@ cargo install Yoda
 
 ## See also
 
-* [CPP-GTK4](https://github.com/YGGverse/Yoda/tree/CPP-GTK4)
-* [PHP-GTK3](https://github.com/YGGverse/Yoda/tree/PHP-GTK3)
+* [CPP-GTK4](https://github.com/YGGverse/Yoda/tree/CPP-GTK4) - C++ / GTK 4 implementation
+* [PHP-GTK3](https://github.com/YGGverse/Yoda/tree/PHP-GTK3) - PHP / GTK 3 experimental branch
