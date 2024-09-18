@@ -4,9 +4,9 @@
 use gtk::{Application, ApplicationWindow};
 
 pub fn new(
-    app : &Application,
-    width : i32,
-    height : i32
+    app: &Application,
+    width: i32,
+    height: i32
 ) -> ApplicationWindow
 {
     return ApplicationWindow::builder()

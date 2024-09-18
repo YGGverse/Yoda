@@ -16,8 +16,8 @@ pub fn new() -> Notebook
 }
 
 pub fn append(
-    tab : Notebook,
-    current : bool
+    tab: Notebook,
+    current: bool
 ) -> u32
 {
     let page = page::new();
