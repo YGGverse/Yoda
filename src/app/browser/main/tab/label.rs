@@ -6,17 +6,25 @@ use gtk::prelude::BoxExt;
 
 pub fn new() -> Box
 {
-    let label = Box::builder().orientation(
-        gtk::Orientation::Horizontal
-    ).build();
+    let label = Box::builder()
 
-    label.append(
-        &pin::new()
-    );
+        // Tuneup
+        .orientation(
+            gtk::Orientation::Horizontal
+        )
 
-    label.append(
-        &title::new()
-    );
+        .build();
+
+        // Components
+        label.append(
+            &pin::new(
+                false
+            )
+        );
+
+        label.append(
+            &title::new()
+        );
 
     return label;
 }

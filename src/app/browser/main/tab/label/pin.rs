@@ -1,10 +1,18 @@
 use gtk::Image;
 
-pub fn new() -> Image
+pub fn new(
+    visible : bool
+) -> Image
 {
-    let pin = Image::builder().icon_name(
-        "view-pin-symbolic"
-    ).build();
+    return Image::builder()
 
-    return pin;
+        .icon_name(
+            "view-pin-symbolic"
+        )
+
+        .visible(
+            visible
+        )
+
+        .build();
 }
