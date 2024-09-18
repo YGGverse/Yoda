@@ -2,6 +2,13 @@
 name = "Yoda"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+license-file = "LICENSE"
+readme = "README.md"
+description = "Yoda - Browser for Gemini protocol"
+keywords = ["gemini", "gemini-protocol", "browser", "client", "1965"]
+repository = "https://github.com/YGGverse/Yoda/tree/Rust-GTK4"
+homepage = "https://yggverse.github.io"
 
 [dependencies]
 gtk4 = { version = "0.9.1", features = ["v4_6"] }
