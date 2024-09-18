@@ -5,12 +5,19 @@ use gtk::Notebook;
 
 pub fn new() -> Notebook
 {
-    let tab = Notebook::builder().scrollable(true).build();
+    let tab = Notebook::builder()
 
+        .scrollable(
+            true
+        )
+
+        .build();
+
+    // Add test tab @TODO restore from session
     append(
         tab.clone(),
         true
-    ); // @TODO
+    );
 
     return tab;
 }
