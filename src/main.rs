@@ -1,7 +1,15 @@
 #[path = "app/browser.rs"] mod browser;
 
-use gtk::prelude::*;
-use gtk::{glib, Application};
+use gtk::prelude::{
+    ApplicationExt,
+    ApplicationExtManual,
+    GtkWindowExt
+};
+
+use gtk::{
+    Application,
+    glib
+};
 
 fn main() -> glib::ExitCode
 {
@@ -13,7 +21,9 @@ fn main() -> glib::ExitCode
         |app|
         {
             browser::new(
-                app
+                app,
+                640,
+                480
             ).present();
         }
     );
