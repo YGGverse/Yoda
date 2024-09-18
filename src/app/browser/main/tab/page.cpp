@@ -190,6 +190,9 @@ void Page::navigation_reload(
         socket__connection
     );
 
+    // Cleanup previous stream data
+    buffer.clean();
+
     // Update navigation history?
     if (ADD_HISTORY)
     {
@@ -349,10 +352,8 @@ void Page::navigation_reload(
                             // Response
                             // if (Socket::Connection::is_active(socket__connection)) // @TODO
                             socket__connection->get_input_stream()->read_all_async( // | read_async @TODO
-                                buffer,
-                                sizeof(
-                                    buffer
-                                ) - 1, // @TODO
+                                buffer.data,
+                                buffer.capacity(),
                                 [this](const Glib::RefPtr<Gio::AsyncResult>&)
                                 {
                                     // Update
@@ -372,7 +373,7 @@ void Page::navigation_reload(
                                     // Parse meta
                                     Socket::Client::Gemini::Response::Status status; // @TODO make page global?
                                     Socket::Client::Gemini::Response::Match::meta(
-                                        buffer,
+                                        buffer.data,
                                         status,
                                         mime
                                     );
@@ -409,7 +410,7 @@ void Page::navigation_reload(
                                                     // Use content driver
                                                     pageContent->update(
                                                         page::Content::TEXT_GEMINI,
-                                                        buffer,
+                                                        buffer.data,
                                                         uri
                                                     );
 
@@ -643,6 +644,25 @@ sqlite3_int64 Page::Database::Session::add(
 }
 
 // Socket tools
+
+/*
+ * Buffer helpers
+ */
+unsigned long Page::Socket::Buffer::capacity()
+{
+    return sizeof(
+        data
+    ) - 1;
+}
+
+void Page::Socket::Buffer::clean()
+{
+    memset(
+        data,
+        0,
+        DEFAULT_SIZE
+    );
+}
 
 /*
  * Private helper to build socket client connections

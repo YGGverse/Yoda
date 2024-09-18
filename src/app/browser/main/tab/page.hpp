@@ -84,6 +84,19 @@ namespace app::browser::main::tab
              */
             struct Socket
             {
+                struct Buffer
+                {
+                    // Defaults
+                    static const size_t DEFAULT_SIZE = 0xfffff; // 1Mb
+
+                    // Stream
+                    char data[DEFAULT_SIZE];
+
+                    // Tools
+                    unsigned long capacity();
+                    void clean();
+                };
+
                 class Client
                 {
                     private:
@@ -185,7 +198,7 @@ namespace app::browser::main::tab
             sqlite3 * database;
 
             // Socket
-            char buffer[0xfffff]; // 1Mb
+            Socket::Buffer buffer;
 
             // Shared socket connectors (for async operations)
             Glib::RefPtr<Gio::SocketClient> socket__client;
