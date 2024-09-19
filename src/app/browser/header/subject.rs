@@ -19,14 +19,15 @@ pub fn new() -> Box
 
         .build();
 
-    // Compose childs
-    subject.append(
-        &title::new()
-    );
+        // Compose childs
+        subject.append(
+            &title::new()
+        );
 
-    subject.append(
-        &description::new()
-    );
+        subject.append(
+            &description::new()
+        );
 
-    return subject;
+    // Done
+    subject
 }

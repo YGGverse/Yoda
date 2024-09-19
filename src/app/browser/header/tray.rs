@@ -15,16 +15,17 @@ pub fn new() -> Box
 
         .spacing(8)
 
+        // Make
         .build();
 
-    // Compose childs
-    tray.append(
-        &menu::new()
-    );
+        // Compose childs
+        tray.append(
+            &menu::new()
+        );
 
-    tray.append(
-        &tab::new()
-    );
+        tray.append(
+            &tab::new()
+        );
 
-    return tray;
+    tray
 }

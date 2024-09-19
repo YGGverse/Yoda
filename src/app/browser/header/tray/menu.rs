@@ -1,4 +1,7 @@
-use gtk::MenuButton;
+use gtk::{
+    gio,
+    MenuButton
+};
 
 pub fn new() -> MenuButton
 {
@@ -10,5 +13,21 @@ pub fn new() -> MenuButton
 
         .build();
 
-    return menu;
+    let model = gio::Menu::new();
+
+        model.append(
+            Some("Debug"),
+            Some("win.debug")
+        );
+
+        model.append(
+            Some("Quit"),
+            Some("win.quit")
+        );
+
+    menu.set_menu_model(
+        Some(&model)
+    );
+
+    menu
 }

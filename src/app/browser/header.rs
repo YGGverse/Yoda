@@ -7,16 +7,15 @@ pub fn new() -> HeaderBar
 {
     let header = HeaderBar::builder().build();
 
-    // Compose childs
-    header.pack_start(
-        &tray::new()
-    );
+        header.pack_start(
+            &tray::new()
+        );
 
-    header.set_title_widget(
-        Some(
-            &subject::new()
-        )
-    );
+        header.set_title_widget(
+            Some(
+                &subject::new()
+            )
+        );
 
-    return header;
+    header
 }
