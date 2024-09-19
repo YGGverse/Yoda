@@ -8,6 +8,17 @@ Rust / GTK 4 implementation
 
 ## Install
 
+### Development
+
+``` bash
+git clone https://github.com/YGGverse/Yoda.git
+cd Yoda
+git checkout Rust-GTK4
+cargo build
+```
+
+### Stable
+
 ``` bash
 cargo install Yoda
 ```
