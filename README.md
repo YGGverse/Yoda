@@ -1,7 +1,7 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
 > [!IMPORTANT]
-> This is experimental PHP / GTK3 branch, see also [Rust-GTK4](https://github.com/YGGverse/Yoda/tree/Rust-GTK4) and [CPP-GTK4](https://github.com/YGGverse/Yoda/tree/CPP-GTK4) implementations
+> This is experimental PHP / GTK3 branch, see also [Rust-GTK4](https://github.com/YGGverse/Yoda/tree/Rust-GTK4) and [CPP-GTK4](https://github.com/YGGverse/Yoda/tree/CPP-GTK4) implementation
 >
 
 ## Install
