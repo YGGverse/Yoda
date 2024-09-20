@@ -1,6 +1,4 @@
-#[path = "subject/description.rs"]
 mod description;
-#[path = "subject/title.rs"]
 mod title;
 
 use gtk::prelude::BoxExt;

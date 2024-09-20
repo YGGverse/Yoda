@@ -1,4 +1,3 @@
-#[path = "main/tab.rs"]
 mod tab;
 
 use gtk::prelude::BoxExt;

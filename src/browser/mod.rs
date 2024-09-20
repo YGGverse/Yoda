@@ -1,6 +1,4 @@
-#[path = "browser/header.rs"]
 mod header;
-#[path = "browser/main.rs"]
 mod main;
 
 use gtk::{

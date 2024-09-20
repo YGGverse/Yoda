@@ -1,12 +1,7 @@
-#[path = "navigation/base.rs"]
 mod base;
-#[path = "navigation/bookmark.rs"]
 mod bookmark;
-#[path = "navigation/history.rs"]
 mod history;
-#[path = "navigation/reload.rs"]
 mod reload;
-#[path = "navigation/request.rs"]
 mod request;
 
 use gtk::prelude::BoxExt;

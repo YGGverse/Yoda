@@ -1,4 +1,3 @@
-#[path = "app/browser.rs"]
 mod browser;
 
 use gtk::prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt};

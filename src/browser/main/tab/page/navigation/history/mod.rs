@@ -1,6 +1,4 @@
-#[path = "history/back.rs"]
 mod back;
-#[path = "history/forward.rs"]
 mod forward;
 
 use gtk::prelude::BoxExt;

@@ -1,6 +1,4 @@
-#[path = "page/content.rs"]
 mod content;
-#[path = "page/navigation.rs"]
 mod navigation;
 
 use gtk::prelude::BoxExt;

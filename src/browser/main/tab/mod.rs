@@ -1,6 +1,4 @@
-#[path = "tab/label.rs"]
 mod label;
-#[path = "tab/page.rs"]
 mod page;
 
 use gtk::Notebook;

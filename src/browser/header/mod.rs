@@ -1,6 +1,4 @@
-#[path = "header/subject.rs"]
 mod subject;
-#[path = "header/tray.rs"]
 mod tray;
 
 use gtk::HeaderBar;

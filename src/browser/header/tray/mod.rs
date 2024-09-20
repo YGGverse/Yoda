@@ -1,6 +1,4 @@
-#[path = "tray/menu.rs"]
 mod menu;
-#[path = "tray/tab.rs"]
 mod tab;
 
 use gtk::prelude::BoxExt;

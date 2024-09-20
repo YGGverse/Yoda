@@ -1,6 +1,4 @@
-#[path = "label/pin.rs"]
 mod pin;
-#[path = "label/title.rs"]
 mod title;
 
 use gtk::prelude::BoxExt;
