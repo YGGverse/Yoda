@@ -1,17 +1,15 @@
-#[path = "main/tab.rs"] mod tab;
+#[path = "main/tab.rs"]
+mod tab;
 
-use gtk::Box;
 use gtk::prelude::BoxExt;
+use gtk::Box;
 
-pub fn new() -> Box
-{
-    let main = Box::builder().orientation(
-        gtk::Orientation::Vertical
-    ).build();
+pub fn new() -> Box {
+    let main = Box::builder()
+        .orientation(gtk::Orientation::Vertical)
+        .build();
 
-    main.append(
-        &tab::new()
-    );
+    main.append(&tab::new());
 
-    return main;
+    main
 }

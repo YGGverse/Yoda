@@ -1,31 +1,20 @@
-#[path = "tray/menu.rs"] mod menu;
-#[path = "tray/tab.rs"] mod tab;
+#[path = "tray/menu.rs"]
+mod menu;
+#[path = "tray/tab.rs"]
+mod tab;
 
-use gtk::Box;
 use gtk::prelude::BoxExt;
+use gtk::Box;
 
-pub fn new() -> Box
-{
+pub fn new() -> Box {
     let tray = Box::builder()
-
-        // Tuneup
-        .orientation(
-            gtk::Orientation::Horizontal
-        )
-
+        .orientation(gtk::Orientation::Horizontal)
         .spacing(8)
-
-        // Make
         .build();
 
-        // Compose childs
-        tray.append(
-            &menu::new()
-        );
-
-        tray.append(
-            &tab::new()
-        );
+    // Compose childs
+    tray.append(&menu::new());
+    tray.append(&tab::new());
 
     tray
 }

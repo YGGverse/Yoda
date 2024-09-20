@@ -1,22 +1,18 @@
-#[path = "page/navigation.rs"] mod navigation;
-#[path = "page/content.rs"] mod content;
+#[path = "page/content.rs"]
+mod content;
+#[path = "page/navigation.rs"]
+mod navigation;
 
-use gtk::Box;
 use gtk::prelude::BoxExt;
+use gtk::Box;
 
-pub fn new() -> Box
-{
-    let page = Box::builder().orientation(
-        gtk::Orientation::Vertical
-    ).build();
+pub fn new() -> Box {
+    let page = Box::builder()
+        .orientation(gtk::Orientation::Vertical)
+        .build();
 
-    page.append(
-        &navigation::new()
-    );
+    page.append(&navigation::new());
+    page.append(&content::new());
 
-    page.append(
-        &content::new()
-    );
-
-    return page;
+    page
 }

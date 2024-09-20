@@ -1,34 +1,22 @@
-#[path = "history/back.rs"] mod back;
-#[path = "history/forward.rs"] mod forward;
+#[path = "history/back.rs"]
+mod back;
+#[path = "history/forward.rs"]
+mod forward;
 
-use gtk::Box;
 use gtk::prelude::BoxExt;
+use gtk::Box;
 
-pub fn new() -> Box
-{
+pub fn new() -> Box {
     let history = Box::builder()
-
-        // Tuneup
-        .orientation(
-            gtk::Orientation::Horizontal
-        )
-
-        .css_classes(
-            [
-                "linked" // merge childs
-            ]
-        )
-
+        .orientation(gtk::Orientation::Horizontal)
+        .css_classes([
+            "linked", // merge childs
+        ])
         .build();
 
     // Compose childs
-    history.append(
-        &back::new()
-    );
+    history.append(&back::new());
+    history.append(&forward::new());
 
-    history.append(
-        &forward::new()
-    );
-
-    return history;
+    history
 }
