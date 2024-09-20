@@ -21,7 +21,7 @@ git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
 git checkout Rust-GTK4
 git checkout -b 'contribution-name'
-cargo fmt
+cargo fmt --check
 cargo build
 ```
 
