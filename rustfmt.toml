@@ -1,0 +1,6 @@
+# https://rust-lang.github.io/rustfmt/
+
+# unstable_features = true
+# brace_style = "AlwaysNextLine"
+
+# ignore = []
