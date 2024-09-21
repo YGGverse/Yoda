@@ -1,14 +1,26 @@
 mod browser;
 
+use std::fs;
+
 use gtk::prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt};
 
 use gtk::{glib, Application};
 
 fn main() -> glib::ExitCode {
+    // Init meta
+    const APP_ID: &str = "io.github.yggverse.Yoda";
+
+    // Init config location
+    let mut config = gtk::glib::user_config_dir();
+
+    config.push(APP_ID);
+
+    if fs::create_dir_all(config).is_err() {
+        panic!("Could not create profile directory")
+    }
+
     // Init app
-    let app = Application::builder()
-        .application_id("io.github.yggverse.Yoda.app")
-        .build();
+    let app = Application::builder().application_id(APP_ID).build();
 
     // Init accels
     app.set_accels_for_action("win.tab_append", &["<Ctrl>t"]);
