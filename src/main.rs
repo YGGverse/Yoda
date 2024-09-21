@@ -40,7 +40,7 @@ fn main() -> glib::ExitCode {
         };
 
         move |this| {
-            browser::new(&this, &db, 640, 480).present();
+            browser::new(&this, &db, 640, 480).widget.present();
         }
     });
 
