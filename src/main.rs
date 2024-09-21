@@ -15,8 +15,8 @@ fn main() -> glib::ExitCode {
 
     config.push(APP_ID);
 
-    if let Err(explain) = fs::create_dir_all(config) {
-        panic!("Failed to create profile directory: {explain}")
+    if let Err(e) = fs::create_dir_all(config) {
+        panic!("Failed to create profile directory: {e}")
     }
 
     // Init app
