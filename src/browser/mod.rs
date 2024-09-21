@@ -11,7 +11,7 @@ use gtk::{
 
 use sqlite::Connection;
 pub struct Browser {
-    pub widget: Arc<ApplicationWindow>,
+    pub widget: Arc<gtk::ApplicationWindow>,
     pub main: Arc<main::Main>,
 }
 
