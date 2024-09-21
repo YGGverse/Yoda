@@ -21,7 +21,7 @@ fn main() -> glib::ExitCode {
     // Create new window
     app.connect_activate({
         // Init profile directory
-        let mut fs = gtk::glib::user_config_dir();
+        let mut fs = glib::user_config_dir();
 
         fs.push(APP_ID);
 
