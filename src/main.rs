@@ -16,7 +16,7 @@ fn main() -> glib::ExitCode {
     config.push(APP_ID);
 
     if fs::create_dir_all(config).is_err() {
-        panic!("Could not create profile directory")
+        panic!("Failed to create profile directory")
     }
 
     // Init app
