@@ -7,7 +7,9 @@ use gtk::{
     Application, ApplicationWindow,
 };
 
-pub fn new(app: &Application, width: i32, height: i32) -> ApplicationWindow {
+use sqlite::Connection;
+
+pub fn new(app: &Application, db: &Connection, width: i32, height: i32) -> ApplicationWindow {
     // Init browser window
     let browser = ApplicationWindow::builder()
         .default_width(width)
