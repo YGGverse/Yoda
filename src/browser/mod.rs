@@ -3,6 +3,8 @@ mod header;
 mod main;
 mod widget;
 
+use gtk::gio::ActionEntry;
+use gtk::{Application, ApplicationWindow};
 use std::sync::Arc;
 
 use gtk::prelude::{ActionMapExtManual, GtkWindowExt};
@@ -17,8 +19,8 @@ pub struct Browser {
 impl Browser {
     // Construct new browser
     pub fn new(
-        app: &gtk::Application,
-        connection: std::sync::Arc<sqlite::Connection>, // @TODO glib clone macro?
+        app: &Application,
+        connection: Arc<sqlite::Connection>, // @TODO glib clone macro?
         default_width: i32,
         default_height: i32,
     ) -> Browser {
@@ -37,17 +39,17 @@ impl Browser {
 
         // Init actions @TODO separated module
         widget.gtk().add_action_entries([
-            gtk::gio::ActionEntry::builder("debug")
-                .activate(|this: &gtk::ApplicationWindow, _, _| {
+            ActionEntry::builder("debug")
+                .activate(|this: &ApplicationWindow, _, _| {
                     this.emit_enable_debugging(true);
                 })
                 .build(),
-            gtk::gio::ActionEntry::builder("quit")
-                .activate(|this: &gtk::ApplicationWindow, _, _| {
+            ActionEntry::builder("quit")
+                .activate(|this: &ApplicationWindow, _, _| {
                     this.close();
                 })
                 .build(),
-            gtk::gio::ActionEntry::builder("tab_append")
+            ActionEntry::builder("tab_append")
                 .activate({
                     let main = main.clone();
                     move |_, _, _| {
