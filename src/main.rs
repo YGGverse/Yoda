@@ -41,7 +41,10 @@ fn main() -> glib::ExitCode {
         };
 
         move |this| {
-            browser::new(&this, db.clone(), 640, 480).widget.present();
+            browser::Browser::new(&this, db.clone(), 640, 480)
+                .widget()
+                .gtk()
+                .present();
         }
     });
 

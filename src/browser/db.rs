@@ -5,13 +5,19 @@ pub struct Browser {
 }
 
 impl Browser {
-    fn init(&self) {}
-    fn save(&self) {}
-    fn restore(&self) {}
-}
+    // Construct new browser DB (connection)
+    pub fn new(connection: Arc<sqlite::Connection>) -> Browser {
+        let this = Self { connection };
+        this.init();
+        this
+    }
 
-pub fn new(connection: Arc<sqlite::Connection>) -> Browser {
-    let this = Browser { connection };
-    this.init();
-    this
+    // Create browser table in DB if not exist yet
+    fn init(&self) {}
+
+    // Save active browser session to DB
+    fn save(&self) {}
+
+    // Restore previous browser session from DB
+    fn restore(&self) {}
 }
