@@ -1,3 +1,4 @@
+mod database;
 mod header;
 mod main;
 
@@ -10,13 +11,18 @@ use gtk::{
 };
 
 pub struct Browser {
-    db: Arc<sqlite::Connection>,
+    database: database::Database,
     pub widget: Arc<gtk::ApplicationWindow>,
     pub header: Arc<header::Header>,
     pub main: Arc<main::Main>,
 }
 
-pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i32) -> Browser {
+pub fn new(
+    app: &Application,
+    connection: Arc<sqlite::Connection>,
+    width: i32,
+    height: i32,
+) -> Browser {
     // Init components
     let header = Arc::new(header::new());
     let main = Arc::new(main::new());
@@ -58,7 +64,7 @@ pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i
 
     // Done
     Browser {
-        db,
+        database: database::Database { connection },
         widget,
         header,
         main,
