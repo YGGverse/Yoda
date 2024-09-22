@@ -4,26 +4,27 @@ mod history;
 mod reload;
 mod request;
 
-use gtk::prelude::BoxExt;
-use gtk::Box;
+mod widget;
 
-pub fn new() -> Box {
-    let navigation = Box::builder()
-        // Tuneup
-        .orientation(gtk::Orientation::Horizontal)
-        .spacing(8)
-        .margin_top(8)
-        .margin_start(8)
-        .margin_end(8)
-        .margin_bottom(8)
-        .build();
+pub struct Navigation {
+    widget: widget::Navigation,
+}
 
-    // Compose childs
-    navigation.append(&base::new());
-    navigation.append(&history::new());
-    navigation.append(&reload::new());
-    navigation.append(&request::new());
-    navigation.append(&bookmark::new());
+impl Navigation {
+    pub fn new() -> Navigation {
+        Self {
+            widget: widget::Navigation::new(
+                base::Base::new().widget().gtk(),
+                history::History::new().widget().gtk(),
+                reload::Reload::new().widget().gtk(),
+                request::Request::new().widget().gtk(),
+                bookmark::Bookmark::new().widget().gtk(),
+            ),
+        }
+    }
 
-    navigation
+    // Getters
+    pub fn widget(&self) -> &widget::Navigation {
+        &self.widget
+    }
 }

@@ -1,16 +1,23 @@
 mod content;
 mod navigation;
+mod widget;
 
-use gtk::prelude::BoxExt;
-use gtk::Box;
+pub struct Page {
+    widget: widget::Page,
+}
 
-pub fn new() -> Box {
-    let page = Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .build();
+impl Page {
+    pub fn new() -> Page {
+        Self {
+            widget: widget::Page::new(
+                navigation::Navigation::new().widget().gtk(),
+                content::Content::new().widget().gtk(),
+            ),
+        }
+    }
 
-    page.append(&navigation::new());
-    page.append(&content::new());
-
-    page
+    // Getters
+    pub fn widget(&self) -> &widget::Page {
+        &self.widget
+    }
 }

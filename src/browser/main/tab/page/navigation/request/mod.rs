@@ -1,9 +1,19 @@
-use gtk::Entry;
+mod widget;
 
-pub fn new() -> Entry {
-    Entry::builder()
-        .placeholder_text("URL or search term...")
-        .hexpand(true)
-        .progress_pulse_step(0.1)
-        .build()
+pub struct Request {
+    widget: widget::Request,
+}
+
+impl Request {
+    // Construct
+    pub fn new() -> Request {
+        Self {
+            widget: widget::Request::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Request {
+        &self.widget
+    }
 }

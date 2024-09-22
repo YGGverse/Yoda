@@ -1,9 +1,19 @@
-use gtk::Button;
+mod widget;
 
-pub fn new() -> Button {
-    Button::builder()
-        .icon_name("starred-symbolic")
-        .tooltip_text("Toggle bookmark")
-        .sensitive(false)
-        .build()
+pub struct Bookmark {
+    widget: widget::Bookmark,
+}
+
+impl Bookmark {
+    // Construct
+    pub fn new() -> Bookmark {
+        Self {
+            widget: widget::Bookmark::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Bookmark {
+        &self.widget
+    }
 }

@@ -10,11 +10,11 @@ impl Main {
     // Construct
     pub fn new() -> Main {
         // Init components
-        let tab = tab::new();
+        let tab = tab::Tab::new();
 
         // Init struct
         Self {
-            widget: widget::Main::new(tab.widget.as_ref()), // @TODO
+            widget: widget::Main::new(tab.widget().gtk()), // @TODO
             tab,
         }
     }

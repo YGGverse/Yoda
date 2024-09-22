@@ -1,10 +1,19 @@
-use gtk::Label;
+mod widget;
 
-pub fn new() -> Label {
-    Label::builder()
-        .label("New page")
-        .ellipsize(gtk::pango::EllipsizeMode::End)
-        .width_chars(16)
-        .single_line_mode(true)
-        .build()
+pub struct Title {
+    widget: widget::Title,
+}
+
+impl Title {
+    // Construct
+    pub fn new() -> Title {
+        Self {
+            widget: widget::Title::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Title {
+        &self.widget
+    }
 }

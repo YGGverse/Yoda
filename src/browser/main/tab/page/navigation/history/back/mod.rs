@@ -1,9 +1,19 @@
-use gtk::Button;
+mod widget;
 
-pub fn new() -> Button {
-    Button::builder()
-        .icon_name("go-previous-symbolic")
-        .tooltip_text("Back")
-        .sensitive(false)
-        .build()
+pub struct Back {
+    widget: widget::Back,
+}
+
+impl Back {
+    // Construct
+    pub fn new() -> Back {
+        Self {
+            widget: widget::Back::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Back {
+        &self.widget
+    }
 }

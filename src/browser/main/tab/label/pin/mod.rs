@@ -1,8 +1,19 @@
-use gtk::Image;
+mod widget;
 
-pub fn new(visible: bool) -> Image {
-    Image::builder()
-        .icon_name("view-pin-symbolic")
-        .visible(visible)
-        .build()
+pub struct Pin {
+    widget: widget::Pin,
+}
+
+impl Pin {
+    // Construct
+    pub fn new() -> Pin {
+        Self {
+            widget: widget::Pin::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Pin {
+        &self.widget
+    }
 }

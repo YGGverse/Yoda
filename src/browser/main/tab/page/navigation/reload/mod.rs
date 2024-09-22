@@ -1,9 +1,19 @@
-use gtk::Button;
+mod widget;
 
-pub fn new() -> Button {
-    return Button::builder()
-        .icon_name("view-refresh-symbolic")
-        .tooltip_text("Reload")
-        .sensitive(false)
-        .build();
+pub struct Reload {
+    widget: widget::Reload,
+}
+
+impl Reload {
+    // Construct
+    pub fn new() -> Reload {
+        Self {
+            widget: widget::Reload::new(),
+        }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Reload {
+        &self.widget
+    }
 }

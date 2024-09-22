@@ -1,20 +1,24 @@
 mod back;
 mod forward;
+mod widget;
 
-use gtk::prelude::BoxExt;
-use gtk::Box;
+pub struct History {
+    widget: widget::History,
+}
 
-pub fn new() -> Box {
-    let history = Box::builder()
-        .orientation(gtk::Orientation::Horizontal)
-        .css_classes([
-            "linked", // merge childs
-        ])
-        .build();
+impl History {
+    // Construct
+    pub fn new() -> History {
+        Self {
+            widget: widget::History::new(
+                back::Back::new().widget().gtk(),
+                forward::Forward::new().widget().gtk(),
+            ),
+        }
+    }
 
-    // Compose childs
-    history.append(&back::new());
-    history.append(&forward::new());
-
-    history
+    // Getters
+    pub fn widget(&self) -> &widget::History {
+        &self.widget
+    }
 }

@@ -1,31 +1,30 @@
 mod label;
 mod page;
+mod widget;
 
-use std::sync::Arc;
-
-use gtk::Notebook;
 pub struct Tab {
-    pub widget: Arc<gtk::Notebook>,
+    widget: widget::Tab,
 }
 
 impl Tab {
-    pub fn append(&self, current: bool) -> u32 {
-        let page = page::new();
+    // Construct
+    pub fn new() -> Tab {
+        let widget = widget::Tab::new();
 
-        let page_number = self.widget.append_page(&page, Some(&label::new()));
-
-        self.widget.set_tab_reorderable(&page, true);
-
-        if current {
-            self.widget.set_current_page(Some(page_number));
-        }
-
-        page_number
+        Self { widget }
     }
-}
 
-pub fn new() -> Tab {
-    let widget = Arc::new(Notebook::builder().scrollable(true).build());
+    // Actions
+    pub fn append(&self, current: bool) -> u32 {
+        self.widget.append(
+            label::Label::new().widget().gtk(),
+            page::Page::new().widget().gtk(),
+            true,
+        )
+    }
 
-    Tab { widget }
+    // Getters
+    pub fn widget(&self) -> &widget::Tab {
+        &self.widget
+    }
 }
