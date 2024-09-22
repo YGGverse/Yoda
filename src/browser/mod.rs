@@ -1,4 +1,4 @@
-mod database;
+mod db;
 mod header;
 mod main;
 
@@ -11,7 +11,7 @@ use gtk::{
 };
 
 pub struct Browser {
-    database: database::Database,
+    db: db::Browser,
     pub widget: Arc<gtk::ApplicationWindow>,
     pub header: Arc<header::Header>,
     pub main: Arc<main::Main>,
@@ -64,7 +64,7 @@ pub fn new(
 
     // Done
     Browser {
-        database: database::Database { connection },
+        db: db::Browser { connection },
         widget,
         header,
         main,

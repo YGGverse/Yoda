@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-pub struct Database {
+pub struct Browser {
     pub connection: Arc<sqlite::Connection>,
 }
 
-impl Database {
+impl Browser {
     fn init(&self) {}
     fn save(&self) {}
     fn restore(&self) {}
