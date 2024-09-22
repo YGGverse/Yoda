@@ -11,7 +11,11 @@ impl Tab {
     pub fn new() -> Tab {
         let widget = widget::Tab::new();
 
-        Self { widget }
+        let this = Self { widget };
+
+        this.append(true); // @TODO test
+
+        this
     }
 
     // Actions
