@@ -17,6 +17,7 @@ pub struct Browser {
 
 pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i32) -> Browser {
     // Init components
+    let header = Arc::new(header::new());
     let main = Arc::new(main::new());
 
     // Init widget
@@ -25,7 +26,7 @@ pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i
             .default_width(width)
             .default_height(height)
             .application(app)
-            .titlebar(&header::new())
+            .titlebar(header.widget.as_ref())
             .child(main.widget.as_ref())
             .build(),
     );
