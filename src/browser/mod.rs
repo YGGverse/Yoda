@@ -23,7 +23,7 @@ impl Browser {
         let widget = widget::Browser::new(
             app,
             header::Header::new().widget().gtk(),
-            main::new().widget.as_ref(), // @TODO
+            main::Main::new().widget().gtk(),
             default_width,
             default_height,
         );

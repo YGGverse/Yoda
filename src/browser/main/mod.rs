@@ -1,34 +1,31 @@
 mod tab;
-
-use std::sync::Arc;
-
-use gtk::prelude::BoxExt;
-use gtk::Box;
+mod widget;
 
 pub struct Main {
-    pub widget: Arc<gtk::Box>,
-    pub tab: Arc<tab::Tab>,
+    widget: widget::Main,
+    tab: tab::Tab,
 }
 
 impl Main {
+    // Construct
+    pub fn new() -> Main {
+        // Init components
+        let tab = tab::new();
+
+        // Init struct
+        Self {
+            widget: widget::Main::new(tab.widget.as_ref()), // @TODO
+            tab,
+        }
+    }
+
+    // Actions
     pub fn tab_append(&self) {
         self.tab.append(true);
     }
-}
 
-pub fn new() -> Main {
-    // Init components
-    let tab = Arc::new(tab::new());
-
-    // Init widget
-    let widget = Arc::new(
-        Box::builder()
-            .orientation(gtk::Orientation::Vertical)
-            .build(),
-    );
-
-    widget.append(tab.widget.as_ref());
-
-    // Init struct
-    Main { widget, tab }
+    // Getters
+    pub fn widget(&self) -> &widget::Main {
+        &self.widget
+    }
 }
