@@ -23,7 +23,7 @@ impl Tab {
         self.widget.append(
             label::Label::new().widget().gtk(),
             page::Page::new().widget().gtk(),
-            true,
+            current,
         )
     }
 
