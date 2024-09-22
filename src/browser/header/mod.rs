@@ -1,12 +1,19 @@
 mod subject;
 mod tray;
 
+use std::sync::Arc;
+
 use gtk::HeaderBar;
 
-pub fn new() -> HeaderBar {
-    let header = HeaderBar::builder().build();
+pub struct Header {
+    pub widget: Arc<gtk::HeaderBar>,
+}
 
-    header.pack_start(&tray::new());
-    header.set_title_widget(Some(&subject::new()));
-    header
+pub fn new() -> Header {
+    let widget = Arc::new(HeaderBar::builder().build());
+
+    widget.pack_start(&tray::new());
+    widget.set_title_widget(Some(&subject::new()));
+
+    Header { widget }
 }
