@@ -1,6 +1,8 @@
 mod tab;
 mod widget;
 
+use std::sync::Arc;
+
 pub struct Main {
     widget: widget::Main,
     tab: tab::Tab,
@@ -8,15 +10,15 @@ pub struct Main {
 
 impl Main {
     // Construct
-    pub fn new() -> Main {
+    pub fn new() -> Arc<Main> {
         // Init components
         let tab = tab::Tab::new();
 
         // Init struct
-        Self {
+        Arc::new(Self {
             widget: widget::Main::new(tab.widget().gtk()), // @TODO
             tab,
-        }
+        })
     }
 
     // Actions
