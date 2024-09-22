@@ -1,17 +1,19 @@
+use gtk::{Application, ApplicationWindow, Box, HeaderBar};
+
 pub struct Browser {
-    gtk: gtk::ApplicationWindow,
+    gtk: ApplicationWindow,
 }
 
 impl Browser {
     pub fn new(
-        application: &gtk::Application,
-        titlebar: &gtk::HeaderBar,
-        child: &gtk::Box,
+        application: &Application,
+        titlebar: &HeaderBar,
+        child: &Box,
         default_width: i32,
         default_height: i32,
     ) -> Browser {
         Self {
-            gtk: gtk::ApplicationWindow::builder()
+            gtk: ApplicationWindow::builder()
                 .application(application)
                 .default_width(default_width)
                 .default_height(default_height)
@@ -21,7 +23,7 @@ impl Browser {
         }
     }
 
-    pub fn gtk(&self) -> &gtk::ApplicationWindow {
+    pub fn gtk(&self) -> &ApplicationWindow {
         &self.gtk
     }
 }
