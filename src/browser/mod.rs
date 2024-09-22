@@ -64,7 +64,7 @@ pub fn new(
 
     // Done
     Browser {
-        db: db::Browser { connection },
+        db: db::new(connection),
         widget,
         header,
         main,
