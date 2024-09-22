@@ -1,6 +1,7 @@
 mod browser;
 
 use std::fs;
+use std::sync::Arc;
 
 use gtk::prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt};
 
@@ -35,12 +36,12 @@ fn main() -> glib::ExitCode {
         db.push("database.sqlite3");
 
         let db = match sqlite::open(db) {
-            Ok(db) => db,
+            Ok(db) => Arc::new(db),
             Err(e) => panic!("Failed to connect profile database: {e}"),
         };
 
         move |this| {
-            browser::new(&this, &db, 640, 480).widget.present();
+            browser::new(&this, db.clone(), 640, 480).widget.present();
         }
     });
 

@@ -9,13 +9,13 @@ use gtk::{
     Application, ApplicationWindow,
 };
 
-use sqlite::Connection;
 pub struct Browser {
+    db: Arc<sqlite::Connection>,
     pub widget: Arc<gtk::ApplicationWindow>,
     pub main: Arc<main::Main>,
 }
 
-pub fn new(app: &Application, db: &Connection, width: i32, height: i32) -> Browser {
+pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i32) -> Browser {
     // Init components
     let main = Arc::new(main::new());
 
@@ -55,5 +55,5 @@ pub fn new(app: &Application, db: &Connection, width: i32, height: i32) -> Brows
     widget.add_action_entries([action_tab_append, action_debug, action_quit]);
 
     // Done
-    Browser { widget, main }
+    Browser { db, widget, main }
 }
