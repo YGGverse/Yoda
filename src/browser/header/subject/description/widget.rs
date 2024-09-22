@@ -11,20 +11,15 @@ impl Description {
             .css_classes(["subtitle"])
             .single_line_mode(true)
             .ellipsize(gtk::pango::EllipsizeMode::End)
+            .visible(false)
             .build();
 
         Self { gtk }
     }
 
     // Actions
-    pub fn update(&self, text: &str) {
-        self.gtk.set_text(text);
-
-        if text.is_empty() {
-            self.gtk.hide();
-        } else {
-            self.gtk.show();
-        }
+    pub fn update(&self) {
+        self.gtk.set_visible(self.gtk.text().is_empty());
     }
 
     // Getters

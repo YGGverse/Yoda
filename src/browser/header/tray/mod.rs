@@ -1,22 +1,23 @@
 mod menu;
 mod tab;
+mod widget;
 
-use gtk::prelude::BoxExt;
-use gtk::Box;
+pub struct Tray {
+    widget: widget::Tray,
+}
 
-pub fn new() -> Box {
-    // Init components
-    let tab = tab::new();
+impl Tray {
+    pub fn new() -> Tray {
+        Self {
+            widget: widget::Tray::new(
+                menu::Menu::new().widget().gtk(),
+                tab::Tab::new().widget().gtk(),
+            ),
+        }
+    }
 
-    // Init widget
-    let tray = Box::builder()
-        .orientation(gtk::Orientation::Horizontal)
-        .spacing(8)
-        .build();
-
-    // Compose childs
-    tray.append(&menu::new()); // @TODO
-    tray.append(tab.widget.as_ref());
-
-    tray // @TODO struct
+    // Getters
+    pub fn widget(&self) -> &widget::Tray {
+        &self.widget
+    }
 }

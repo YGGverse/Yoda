@@ -8,6 +8,7 @@ impl Subject {
     pub fn new(title: &gtk::Label, description: &gtk::Label) -> Subject {
         let gtk = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
+            .valign(gtk::Align::Center)
             .build();
 
         gtk.append(title);

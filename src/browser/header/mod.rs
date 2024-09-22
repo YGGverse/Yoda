@@ -8,10 +8,11 @@ pub struct Header {
 
 impl Header {
     pub fn new() -> Header {
-        let subject = subject::Subject::new();
-        let tray = tray::new();
         Self {
-            widget: widget::Header::new(&tray, subject.widget().gtk()), // @TODO
+            widget: widget::Header::new(
+                tray::Tray::new().widget().gtk(),
+                subject::Subject::new().widget().gtk(),
+            ),
         }
     }
 

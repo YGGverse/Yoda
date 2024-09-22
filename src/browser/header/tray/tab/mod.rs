@@ -1,27 +1,27 @@
-use std::sync::Arc;
-
-use gtk::prelude::{ButtonExt, WidgetExt};
-use gtk::Button;
+mod widget;
 
 pub struct Tab {
-    pub widget: Arc<gtk::Button>,
+    pub widget: widget::Tab,
 }
 
-pub fn new() -> Tab {
-    // Init widget
-    let widget = Arc::new(
-        Button::builder()
-            .icon_name("tab-new-symbolic")
-            .tooltip_text("New tab")
-            .build(),
-    );
+impl Tab {
+    pub fn new() -> Tab {
+        // Init widget
+        let widget = widget::Tab::new();
 
-    // Init events
-    widget.connect_clicked(|this| {
-        this.activate_action("win.tab_append", None)
-            .expect("The action does not exist");
-    });
+        // Init events
+        /* @TODO
+        widget.connect_clicked(|this| {
+            this.activate_action("win.tab_append", None)
+                .expect("The action does not exist");
+        }); */
 
-    // Result
-    Tab { widget }
+        // Result
+        Self { widget }
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Tab {
+        &self.widget
+    }
 }

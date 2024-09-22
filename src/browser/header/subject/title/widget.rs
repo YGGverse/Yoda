@@ -1,3 +1,5 @@
+const DEFAULT_TEXT: &str = "Yoda";
+
 pub struct Title {
     gtk: gtk::Label,
 }
@@ -9,6 +11,7 @@ impl Title {
             .css_classes(["title"])
             .single_line_mode(true)
             .ellipsize(gtk::pango::EllipsizeMode::End)
+            .label(DEFAULT_TEXT)
             .build();
 
         Self { gtk }
@@ -16,12 +19,10 @@ impl Title {
 
     // Actions
     pub fn update(&self, text: &str) {
-        let default_text = "Yoda"; // @TODO
-
         if text.is_empty() {
-            self.gtk.set_text(default_text);
+            self.gtk.set_text(DEFAULT_TEXT);
         } else {
-            self.gtk.set_text(&format!("{} - {}", text, default_text));
+            self.gtk.set_text(&format!("{} - {}", text, DEFAULT_TEXT));
         }
     }
 

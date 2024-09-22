@@ -1,17 +1,19 @@
-use gtk::{gio, MenuButton};
+mod model;
+mod widget;
 
-pub fn new() -> MenuButton {
-    let menu = MenuButton::builder().tooltip_text("Menu").build();
+pub struct Menu {
+    widget: widget::Menu,
+}
 
-    let model = gio::Menu::new();
-    let model_tab = gio::Menu::new();
+impl Menu {
+    pub fn new() -> Menu {
+        Self {
+            widget: widget::Menu::new(model::Menu::new().model()),
+        }
+    }
 
-    model_tab.append(Some("Append"), Some("win.tab_append"));
-    model.append_submenu(Some("Tab"), &model_tab);
-    model.append(Some("Debug"), Some("win.debug"));
-    model.append(Some("Quit"), Some("win.quit"));
-
-    menu.set_menu_model(Some(&model));
-
-    menu
+    // Getters
+    pub fn widget(&self) -> &widget::Menu {
+        &self.widget
+    }
 }

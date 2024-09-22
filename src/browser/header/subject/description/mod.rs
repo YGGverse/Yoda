@@ -13,8 +13,12 @@ impl Description {
     }
 
     // Actions
-    pub fn update(&self, text: &str) {
-        self.widget.update(text);
+    pub fn set_text(&self, text: &str) {
+        self.widget.gtk().set_text(text);
+    }
+
+    pub fn update(&self) {
+        self.widget.update();
     }
 
     // Getters

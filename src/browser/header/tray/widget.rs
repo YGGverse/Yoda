@@ -1,16 +1,18 @@
 use gtk::prelude::BoxExt;
 
-pub struct Main {
+pub struct Tray {
     gtk: gtk::Box,
 }
 
-impl Main {
-    // Construct new object
-    pub fn new(tab: &gtk::Notebook) -> Main {
+impl Tray {
+    // Construct
+    pub fn new(menu: &gtk::MenuButton, tab: &gtk::Button) -> Tray {
         let gtk = gtk::Box::builder()
-            .orientation(gtk::Orientation::Vertical)
+            .orientation(gtk::Orientation::Horizontal)
+            .spacing(8)
             .build();
 
+        gtk.append(menu);
         gtk.append(tab);
 
         Self { gtk }
