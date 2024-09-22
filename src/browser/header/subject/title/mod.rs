@@ -1,23 +1,24 @@
-use gtk::Label;
+mod widget;
 
-pub fn new() -> Label {
-    let title = Label::builder()
-        .css_classes(["title"])
-        .single_line_mode(true)
-        .ellipsize(gtk::pango::EllipsizeMode::End)
-        .build();
-
-    update(&title, "Welcome");
-
-    return title;
+pub struct Title {
+    widget: widget::Title,
 }
 
-pub fn update(title: &Label, text: &str) {
-    let default_text = "Yoda"; // @TODO
+impl Title {
+    // Construct
+    pub fn new() -> Title {
+        Self {
+            widget: widget::Title::new(),
+        }
+    }
 
-    if text.is_empty() {
-        title.set_text(default_text);
-    } else {
-        title.set_text(&format!("{} - {}", text, default_text));
+    // Actions
+    pub fn update(&self, text: &str) {
+        self.widget.update(text);
+    }
+
+    // Getters
+    pub fn widget(&self) -> &widget::Title {
+        &self.widget
     }
 }
