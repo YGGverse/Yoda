@@ -16,16 +16,16 @@ impl Browser {
     pub fn new(
         app: &gtk::Application,
         connection: std::sync::Arc<sqlite::Connection>,
-        width: i32,
-        height: i32,
+        default_width: i32,
+        default_height: i32,
     ) -> Browser {
         // Init widget
         let widget = widget::Browser::new(
             app,
             header::new().widget.as_ref(), // @TODO
             main::new().widget.as_ref(),   // @TODO
-            width,
-            height,
+            default_width,
+            default_height,
         );
 
         // Connect actions
