@@ -12,6 +12,7 @@ use gtk::{
 pub struct Browser {
     db: Arc<sqlite::Connection>,
     pub widget: Arc<gtk::ApplicationWindow>,
+    pub header: Arc<header::Header>,
     pub main: Arc<main::Main>,
 }
 
@@ -56,5 +57,10 @@ pub fn new(app: &Application, db: Arc<sqlite::Connection>, width: i32, height: i
     widget.add_action_entries([action_tab_append, action_debug, action_quit]);
 
     // Done
-    Browser { db, widget, main }
+    Browser {
+        db,
+        widget,
+        header,
+        main,
+    }
 }
