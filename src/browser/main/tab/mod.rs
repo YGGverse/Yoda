@@ -17,8 +17,8 @@ impl Tab {
     // Actions
     pub fn append(&self, current: bool) -> u32 {
         self.widget.append(
-            label::Label::new().widget().gtk(),
-            page::Page::new().widget().gtk(),
+            label::Label::new().widget().container(),
+            page::Page::new().widget().container(),
             current,
         )
     }
