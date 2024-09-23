@@ -25,8 +25,16 @@ impl Tab {
         )
     }
 
+    pub fn close(&self) {
+        todo!()
+    }
+
+    pub fn close_all(&self) {
+        todo!()
+    }
+
     pub fn pin(&self) -> bool {
-        false // @TODO
+        todo!()
     }
 
     // Getters

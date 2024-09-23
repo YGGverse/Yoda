@@ -59,6 +59,22 @@ impl Browser {
                     }
                 })
                 .build(),
+            ActionEntry::builder("tab_close")
+                .activate({
+                    let main = main.clone();
+                    move |_, _, _| {
+                        main.tab_close();
+                    }
+                })
+                .build(),
+            ActionEntry::builder("tab_close_all")
+                .activate({
+                    let main = main.clone();
+                    move |_, _, _| {
+                        main.tab_close_all();
+                    }
+                })
+                .build(),
             ActionEntry::builder("tab_pin")
                 .activate({
                     let main = main.clone();

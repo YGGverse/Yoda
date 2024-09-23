@@ -13,6 +13,7 @@ impl Menu {
 
         let model_tab_close = gio::Menu::new();
         model_tab_close.append(Some("Current"), Some("win.tab_close"));
+        model_tab_close.append(Some("All"), Some("win.tab_close_all"));
         model_tab.append_submenu(Some("Close"), &model_tab_close);
 
         let model = gio::Menu::new();

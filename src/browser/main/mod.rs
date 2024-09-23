@@ -29,6 +29,14 @@ impl Main {
         self.tab.append(true);
     }
 
+    pub fn tab_close(&self) {
+        self.tab.close();
+    }
+
+    pub fn tab_close_all(&self) {
+        self.tab.close();
+    }
+
     pub fn tab_pin(&self) {
         self.tab.pin();
     }
