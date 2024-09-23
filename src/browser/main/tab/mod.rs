@@ -59,6 +59,7 @@ impl Tab {
     }
 
     pub fn close_all(&self) {
+        // @TODO skip pinned or make confirmation alert (GTK>=4.10)
         while let Some(page_number) = self.widget.current_page() {
             self.widget.remove_page(Some(page_number));
         }
