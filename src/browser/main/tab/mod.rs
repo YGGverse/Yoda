@@ -21,7 +21,7 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(&self, is_active: bool) -> u32 {
+    pub fn append(&self, is_current_page: bool) -> u32 {
         // Init new tab components
         let label = Arc::new(Label::new(false));
         let page = Page::new();
@@ -47,7 +47,7 @@ impl Tab {
         self.widget.set_tab_reorderable(page.widget(), true);
 
         // Follow?
-        if is_active {
+        if is_current_page {
             self.widget.set_current_page(Some(page_number));
         }
 
