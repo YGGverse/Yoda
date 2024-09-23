@@ -58,10 +58,11 @@ impl Tab {
         self.widget.remove_page(self.widget.current_page());
     }
 
-    /* @TODO
     pub fn close_all(&self) {
-        todo!()
-    }*/
+        while let Some(page_number) = self.widget.current_page() {
+            self.widget.remove_page(Some(page_number));
+        }
+    }
 
     pub fn pin(&self) -> bool {
         todo!()

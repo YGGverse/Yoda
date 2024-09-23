@@ -35,7 +35,7 @@ impl Main {
     }
 
     pub fn tab_close_all(&self) {
-        self.tab.close();
+        self.tab.close_all();
     }
 
     pub fn tab_pin(&self) {
