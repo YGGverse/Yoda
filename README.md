@@ -31,13 +31,11 @@ This guide in process
 
 #### `browser`
 
-* Main file must have `mod.rs` name because it may include additional submodules in same location like database, template, etc
 * The codebase of module must be as minimal as possible: separate different tasks to submodules
 * Every module or it helper must contain and implement only one `struct`
 * Composition modules (like box for window) stored in sub-folders and following same principles as parent
 * Every mod access 1 level of child API, never parents (e.g.`super`)
 * One mod = one widget. Create new mod for new widget implementation
-* Mod constructor must return [Arc pointer](https://doc.rust-lang.org/std/sync/struct.Arc.html) for new object created (to support async operations)
 
 ### Contribution
 
