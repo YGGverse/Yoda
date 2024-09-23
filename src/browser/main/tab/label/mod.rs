@@ -11,8 +11,8 @@ impl Label {
     pub fn new() -> Label {
         Self {
             widget: widget::Label::new(
-                pin::Pin::new().widget().gtk(),
-                title::Title::new().widget().gtk(),
+                pin::Pin::new().widget().image(),
+                title::Title::new().widget().label(),
             ),
         }
     }
