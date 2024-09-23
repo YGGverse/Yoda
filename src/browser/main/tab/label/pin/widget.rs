@@ -4,10 +4,10 @@ pub struct Pin {
 
 impl Pin {
     // Construct
-    pub fn new() -> Pin {
+    pub fn new(is_pinned: bool) -> Pin {
         let image = gtk::Image::builder()
             .icon_name("view-pin-symbolic")
-            .visible(false) //@TODO
+            .visible(is_pinned)
             .build();
 
         Self { image }

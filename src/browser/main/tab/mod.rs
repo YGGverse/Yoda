@@ -15,12 +15,16 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(&self, current: bool) -> u32 {
+    pub fn append(&self, is_active: bool) -> u32 {
         self.widget.append(
-            label::Label::new().widget().container(),
+            label::Label::new(false).widget().container(),
             page::Page::new().widget().container(),
-            current,
+            is_active,
         )
+    }
+
+    pub fn pin(&self) -> bool {
+        false // @TODO
     }
 
     // Getters

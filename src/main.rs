@@ -15,6 +15,7 @@ fn main() -> glib::ExitCode {
 
     // Init accels
     app.set_accels_for_action("win.tab_append", &["<Ctrl>t"]);
+    app.set_accels_for_action("win.tab_pin", &["<Ctrl>p"]);
     app.set_accels_for_action("win.tab_close", &["<Ctrl>q"]);
     app.set_accels_for_action("win.debug", &["<Ctrl>i"]);
     app.set_accels_for_action("win.quit", &["<Ctrl>Escape"]);

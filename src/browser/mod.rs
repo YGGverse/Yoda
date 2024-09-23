@@ -59,6 +59,14 @@ impl Browser {
                     }
                 })
                 .build(),
+            ActionEntry::builder("tab_pin")
+                .activate({
+                    let main = main.clone();
+                    move |_, _, _| {
+                        main.tab_pin();
+                    }
+                })
+                .build(),
         ]);
 
         // Return

@@ -16,7 +16,7 @@ impl Main {
 
         // Init struct
         Arc::new(Self {
-            widget: widget::Main::new(tab.widget().gtk()), // @TODO
+            widget: widget::Main::new(tab.widget().tab()), // @TODO
             tab,
         })
     }
@@ -24,6 +24,10 @@ impl Main {
     // Actions
     pub fn tab_append(&self) {
         self.tab.append(true);
+    }
+
+    pub fn tab_pin(&self) {
+        self.tab.pin();
     }
 
     // Getters

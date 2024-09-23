@@ -10,21 +10,33 @@ pub struct Label {
     title: Arc<title::Title>,
 
     // Extras
+    is_pinned: bool,
     widget: widget::Label,
 }
 
 impl Label {
     // Construct
-    pub fn new() -> Arc<Label> {
-        // Init components
-        let pin = pin::Pin::new();
+    pub fn new(is_pinned: bool) -> Arc<Label> {
+        // Components
+        let pin = pin::Pin::new(is_pinned);
         let title = title::Title::new();
 
-        // Init extras
+        // Extras
         let widget = widget::Label::new(pin.widget().image(), title.widget().label());
 
         // Result
-        Arc::new(Self { pin, title, widget })
+        Arc::new(Self {
+            pin,
+            title,
+            is_pinned,
+            widget,
+        })
+    }
+
+    // Actions
+    pub fn pin(&mut self) {
+        self.is_pinned = !self.is_pinned; // toggle
+                                          // @TODO
     }
 
     // Getters
