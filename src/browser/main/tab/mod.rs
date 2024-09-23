@@ -9,13 +9,9 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new() -> Tab {
-        let widget = widget::Tab::new();
-
-        let this = Self { widget };
-
-        this.append(true); // @TODO test
-
-        this
+        Self {
+            widget: widget::Tab::new(),
+        }
     }
 
     // Actions
