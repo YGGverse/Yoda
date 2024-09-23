@@ -1,7 +1,10 @@
 mod label;
 mod page;
 
-use gtk::Notebook;
+use std::sync::Arc;
+
+use gtk::prelude::WidgetExt;
+use gtk::{GestureClick, Notebook};
 use label::Label;
 use page::Page;
 
@@ -19,17 +22,36 @@ impl Tab {
 
     // Actions
     pub fn append(&self, is_active: bool) -> u32 {
-        let label = Label::new(false);
+        // Init new tab components
+        let label = Arc::new(Label::new(false));
         let page = Page::new();
 
+        // Init additional label actions
+        let controller = GestureClick::new();
+
+        controller.connect_pressed({
+            let label = label.clone();
+            move |_, n: i32, _, _| {
+                // double click
+                if n == 2 {
+                    label.pin();
+                }
+            }
+        });
+
+        label.widget().add_controller(controller);
+
+        // Append new page
         let page_number = self.widget.append_page(page.widget(), Some(label.widget()));
 
         self.widget.set_tab_reorderable(page.widget(), true);
 
+        // Follow?
         if is_active {
             self.widget.set_current_page(Some(page_number));
         }
 
+        // Result
         page_number
     }
 
