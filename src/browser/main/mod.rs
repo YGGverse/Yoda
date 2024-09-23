@@ -4,8 +4,11 @@ mod widget;
 use std::sync::Arc;
 
 pub struct Main {
+    // Components
+    tab: Arc<tab::Tab>,
+
+    // Extras
     widget: widget::Main,
-    tab: tab::Tab,
 }
 
 impl Main {
@@ -14,11 +17,11 @@ impl Main {
         // Init components
         let tab = tab::Tab::new();
 
+        // Extras
+        let widget = widget::Main::new(tab.widget().tab());
+
         // Init struct
-        Arc::new(Self {
-            widget: widget::Main::new(tab.widget().tab()), // @TODO
-            tab,
-        })
+        Arc::new(Self { tab, widget })
     }
 
     // Actions

@@ -2,16 +2,18 @@ mod label;
 mod page;
 mod widget;
 
+use std::sync::Arc;
+
 pub struct Tab {
     widget: widget::Tab,
 }
 
 impl Tab {
     // Construct
-    pub fn new() -> Tab {
-        Self {
+    pub fn new() -> Arc<Tab> {
+        Arc::new(Self {
             widget: widget::Tab::new(),
-        }
+        })
     }
 
     // Actions
