@@ -18,7 +18,7 @@ impl Main {
         let tab = tab::Tab::new();
 
         // Extras
-        let widget = widget::Main::new(tab.widget().tab());
+        let widget = widget::Main::new(tab.widget().notebook());
 
         // Init struct
         Arc::new(Self { tab, widget })

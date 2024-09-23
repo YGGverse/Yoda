@@ -1,30 +1,30 @@
 pub struct Tab {
-    tab: gtk::Notebook,
+    notebook: gtk::Notebook,
 }
 
 impl Tab {
     // Construct new object
     pub fn new() -> Tab {
         Self {
-            tab: gtk::Notebook::builder().scrollable(true).build(),
+            notebook: gtk::Notebook::builder().scrollable(true).build(),
         }
     }
 
     // Actions
     pub fn append(&self, label: &gtk::Box, page: &gtk::Box, current: bool) -> u32 {
-        let page_number = self.tab.append_page(page, Some(label));
+        let page_number = self.notebook.append_page(page, Some(label));
 
-        self.tab.set_tab_reorderable(page, true);
+        self.notebook.set_tab_reorderable(page, true);
 
         if current {
-            self.tab.set_current_page(Some(page_number));
+            self.notebook.set_current_page(Some(page_number));
         }
 
         page_number
     }
 
     // Getters
-    pub fn tab(&self) -> &gtk::Notebook {
-        &self.tab
+    pub fn notebook(&self) -> &gtk::Notebook {
+        &self.notebook
     }
 }
