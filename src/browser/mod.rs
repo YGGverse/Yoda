@@ -19,13 +19,13 @@ pub struct Browser {
 }
 
 impl Browser {
-    // Construct new browser
+    // Construct
     pub fn new(
         app: &Application,
-        connection: Arc<sqlite::Connection>, // @TODO glib clone macro?
+        connection: Arc<sqlite::Connection>,
         default_width: i32,
         default_height: i32,
-    ) -> Browser {
+    ) -> Arc<Browser> {
         // Init components
         let db = db::Browser::new(connection);
         let header = header::Header::new();
@@ -62,12 +62,12 @@ impl Browser {
         ]);
 
         // Return
-        Self {
+        Arc::new(Self {
             db,
             widget,
             header,
             main,
-        }
+        })
     }
 
     // Getters
