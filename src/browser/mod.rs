@@ -10,10 +10,12 @@ use std::sync::Arc;
 use gtk::prelude::{ActionMapExtManual, GtkWindowExt};
 
 pub struct Browser {
+    // Extras
     db: db::Browser,
-    header: header::Header,
-    main: Arc<main::Main>,
     widget: widget::Browser,
+    // Components
+    header: Arc<header::Header>,
+    main: Arc<main::Main>,
 }
 
 impl Browser {
@@ -62,9 +64,9 @@ impl Browser {
         // Return
         Self {
             db,
+            widget,
             header,
             main,
-            widget,
         }
     }
 

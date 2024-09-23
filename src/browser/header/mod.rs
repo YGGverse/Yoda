@@ -2,18 +2,21 @@ mod subject;
 mod tray;
 mod widget;
 
+use std::sync::Arc;
+
 pub struct Header {
     widget: widget::Header,
 }
 
 impl Header {
-    pub fn new() -> Header {
-        Self {
+    // Construct
+    pub fn new() -> Arc<Header> {
+        Arc::new(Self {
             widget: widget::Header::new(
                 tray::Tray::new().widget().gtk(),
                 subject::Subject::new().widget().gtk(),
             ),
-        }
+        })
     }
 
     // Getters
