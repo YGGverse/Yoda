@@ -2,7 +2,7 @@ mod pin;
 mod title;
 
 use gtk::prelude::{BoxExt, WidgetExt};
-use gtk::{Box, Orientation};
+use gtk::{Align, Box, Orientation};
 use pin::Pin;
 use title::Title;
 
@@ -23,7 +23,10 @@ impl Label {
         let title = Title::new();
 
         // GTK
-        let widget = Box::builder().orientation(Orientation::Horizontal).build();
+        let widget = Box::builder()
+            .orientation(Orientation::Horizontal)
+            .halign(Align::Center)
+            .build();
 
         widget.append(pin.widget());
         widget.append(title.widget());
