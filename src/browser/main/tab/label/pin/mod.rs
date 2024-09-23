@@ -4,6 +4,7 @@ use gtk::prelude::WidgetExt;
 use std::sync::Arc;
 
 pub struct Pin {
+    // Extras
     is_pinned: bool,
     widget: widget::Pin,
 }
