@@ -46,7 +46,6 @@ impl Tab {
 
         self.widget.set_tab_reorderable(page.widget(), true);
 
-        // Follow?
         if is_current_page {
             self.widget.set_current_page(Some(page_number));
         }
