@@ -36,7 +36,7 @@ This guide in process
 * Every module or it helper must contain and implement only one `struct`
 * Composition modules (like box for window) stored in sub-folders and following same principles as parent
 * Every mod access 1 level of child API, never parents (e.g.`super`)
-* Mod constructor must return [Arc pointer](https://doc.rust-lang.org/std/sync/struct.Arc.html) for new object created
+* Mod constructor must return [Arc pointer](https://doc.rust-lang.org/std/sync/struct.Arc.html) for new object created (to support async operations)
 
 ### Contribution
 
