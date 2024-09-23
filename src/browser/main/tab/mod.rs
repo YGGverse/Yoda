@@ -55,7 +55,7 @@ impl Tab {
     }
 
     pub fn close(&self) {
-        todo!()
+        self.widget.remove_page(self.widget.current_page());
     }
 
     /* @TODO
