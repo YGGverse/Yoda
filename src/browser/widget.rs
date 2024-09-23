@@ -1,7 +1,7 @@
 use gtk::{Application, ApplicationWindow, Box, HeaderBar};
 
 pub struct Browser {
-    gtk: ApplicationWindow,
+    window: ApplicationWindow,
 }
 
 impl Browser {
@@ -13,7 +13,7 @@ impl Browser {
         default_height: i32,
     ) -> Browser {
         Self {
-            gtk: ApplicationWindow::builder()
+            window: ApplicationWindow::builder()
                 .application(application)
                 .default_width(default_width)
                 .default_height(default_height)
@@ -23,7 +23,7 @@ impl Browser {
         }
     }
 
-    pub fn gtk(&self) -> &ApplicationWindow {
-        &self.gtk
+    pub fn window(&self) -> &ApplicationWindow {
+        &self.window
     }
 }

@@ -40,7 +40,7 @@ impl Browser {
         );
 
         // Init actions @TODO separated module
-        widget.gtk().add_action_entries([
+        widget.window().add_action_entries([
             ActionEntry::builder("debug")
                 .activate(|this: &ApplicationWindow, _, _| {
                     this.emit_enable_debugging(true);
