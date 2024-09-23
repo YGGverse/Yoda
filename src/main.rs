@@ -40,8 +40,8 @@ fn main() -> glib::ExitCode {
             Err(e) => panic!("Failed to connect profile database: {e}"),
         };
 
-        move |this| {
-            browser::Browser::new(&this, db.clone(), 640, 480)
+        move |this: &Application| {
+            browser::Browser::new(this, db.clone(), 640, 480)
                 .widget()
                 .gtk()
                 .present();
