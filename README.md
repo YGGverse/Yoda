@@ -14,16 +14,35 @@ Rust / GTK 4 implementation
 cargo install Yoda
 ```
 
-### Development
+### Repository
 
 ``` bash
 git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
 git checkout Rust-GTK4
-git checkout -b 'contribution-name'
-cargo fmt --check
-cargo build
+cargo run
 ```
+
+## Development
+
+This guide in process
+
+### Modules
+
+#### `browser`
+
+* Main file must have `mod.rs` name because it may include additional submodules in same location like database, template, etc
+* The codebase of module must be as minimal as possible: separate different tasks to submodules in same folder
+* Every module or it helper must contain and implement only one `struct`
+* Composition modules (like box for window) stored in sub-folders and following same principles as parent
+* Every mod access 1 level of child API, never parents (e.g.`super`)
+* Mod constructor must return [Arc pointer](https://doc.rust-lang.org/std/sync/struct.Arc.html) for new object created
+
+### Contribution
+
+* before commit, make sure:
+  * new branch created for every new PR `git checkout -b 'contribution-name'`
+  * new code follows common [rustfmt](https://rust-lang.github.io/rustfmt/) style `cargo fmt --check`
 
 ## See also
 
