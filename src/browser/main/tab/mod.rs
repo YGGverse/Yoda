@@ -34,7 +34,7 @@ impl Tab {
             move |_, n: i32, _, _| {
                 // double click
                 if n == 2 {
-                    label.pin();
+                    label.pin(!label.is_pinned()); // toggle
                 }
             }
         });
