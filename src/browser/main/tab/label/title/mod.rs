@@ -1,21 +1,24 @@
-mod widget;
-
-use std::sync::Arc;
+use gtk::{pango::EllipsizeMode, Label};
 
 pub struct Title {
-    widget: widget::Title,
+    widget: Label,
 }
 
 impl Title {
     // Construct
-    pub fn new() -> Arc<Title> {
-        Arc::new(Self {
-            widget: widget::Title::new(),
-        })
+    pub fn new() -> Title {
+        Self {
+            widget: Label::builder()
+                .label("New page")
+                .ellipsize(EllipsizeMode::End)
+                .width_chars(16)
+                .single_line_mode(true)
+                .build(),
+        }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Title {
+    pub fn widget(&self) -> &Label {
         &self.widget
     }
 }

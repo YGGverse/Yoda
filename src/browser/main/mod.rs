@@ -1,27 +1,28 @@
 mod tab;
-mod widget;
 
-use std::sync::Arc;
+use gtk::{Box, Orientation};
+use tab::Tab;
+
+use gtk::prelude::BoxExt;
 
 pub struct Main {
-    // Components
-    tab: Arc<tab::Tab>,
-
-    // Extras
-    widget: widget::Main,
+    tab: Tab,
+    widget: Box,
 }
 
 impl Main {
     // Construct
-    pub fn new() -> Arc<Main> {
+    pub fn new() -> Main {
         // Init components
-        let tab = tab::Tab::new();
+        let tab = Tab::new();
 
         // Extras
-        let widget = widget::Main::new(tab.widget().notebook());
+        let widget = Box::builder().orientation(Orientation::Vertical).build();
+
+        widget.append(tab.widget());
 
         // Init struct
-        Arc::new(Self { tab, widget })
+        Self { tab, widget }
     }
 
     // Actions
@@ -42,7 +43,7 @@ impl Main {
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Main {
+    pub fn widget(&self) -> &Box {
         &self.widget
     }
 }

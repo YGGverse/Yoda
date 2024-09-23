@@ -1,46 +1,47 @@
 mod pin;
 mod title;
-mod widget;
 
-use std::sync::Arc;
+use gtk::prelude::{BoxExt, WidgetExt};
+use gtk::{Box, Orientation};
+use pin::Pin;
+use title::Title;
 
 pub struct Label {
     // Components
-    pin: Arc<pin::Pin>,
-    title: Arc<title::Title>,
+    pin: Pin,
+    title: Title,
 
-    // Extras
-    is_pinned: bool,
-    widget: widget::Label,
+    // GTK
+    widget: Box,
 }
 
 impl Label {
     // Construct
-    pub fn new(is_pinned: bool) -> Arc<Label> {
+    pub fn new(is_pinned: bool) -> Label {
         // Components
-        let pin = pin::Pin::new(is_pinned);
-        let title = title::Title::new();
+        let pin = Pin::new(is_pinned);
+        let title = Title::new();
 
-        // Extras
-        let widget = widget::Label::new(pin.widget().image(), title.widget().label());
+        // GTK
+        let widget = Box::builder().orientation(Orientation::Horizontal).build();
+
+        widget.append(pin.widget());
+        widget.append(title.widget());
 
         // Result
-        Arc::new(Self {
-            pin,
-            title,
-            is_pinned,
-            widget,
-        })
+        Self { pin, title, widget }
     }
 
     // Actions
-    pub fn pin(&mut self) {
-        self.is_pinned = !self.is_pinned; // toggle
-                                          // @TODO
+    pub fn pin(&self) -> bool {
+        self.pin
+            .widget()
+            .set_visible(!self.pin.widget().is_visible());
+        self.pin.widget().is_visible()
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Label {
+    pub fn widget(&self) -> &Box {
         &self.widget
     }
 }

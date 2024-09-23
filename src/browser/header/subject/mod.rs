@@ -1,24 +1,34 @@
 mod description;
 mod title;
-mod widget;
+
+use description::Description;
+use gtk::prelude::BoxExt;
+use gtk::{Align, Box, Orientation};
+use title::Title;
 
 pub struct Subject {
-    widget: widget::Subject,
+    widget: Box,
 }
 
 impl Subject {
     // Construct
     pub fn new() -> Subject {
-        Self {
-            widget: widget::Subject::new(
-                title::Title::new().widget().gtk(),
-                description::Description::new().widget().gtk(),
-            ),
-        }
+        let title = Title::new();
+        let description = Description::new();
+
+        let widget = Box::builder()
+            .orientation(Orientation::Vertical)
+            .valign(Align::Center)
+            .build();
+
+        widget.append(title.widget());
+        widget.append(description.widget());
+
+        Self { widget }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Subject {
+    pub fn widget(&self) -> &Box {
         &self.widget
     }
 }

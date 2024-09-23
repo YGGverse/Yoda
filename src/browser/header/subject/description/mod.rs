@@ -1,28 +1,30 @@
-mod widget;
+use gtk::prelude::WidgetExt;
+use gtk::{pango::EllipsizeMode, Label};
 
 pub struct Description {
-    widget: widget::Description,
+    widget: Label,
 }
 
 impl Description {
     // Construct
     pub fn new() -> Description {
-        Self {
-            widget: widget::Description::new(),
-        }
+        let widget = Label::builder()
+            .css_classes(["subtitle"])
+            .single_line_mode(true)
+            .ellipsize(EllipsizeMode::End)
+            .visible(false)
+            .build();
+
+        Self { widget }
     }
 
     // Actions
-    pub fn set_text(&self, text: &str) {
-        self.widget.gtk().set_text(text);
-    }
-
     pub fn update(&self) {
-        self.widget.update();
+        self.widget.set_visible(self.widget.text().is_empty());
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Description {
+    pub fn widget(&self) -> &Label {
         &self.widget
     }
 }

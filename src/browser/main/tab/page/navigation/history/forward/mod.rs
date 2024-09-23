@@ -1,19 +1,23 @@
-mod widget;
+use gtk::Button;
 
 pub struct Forward {
-    widget: widget::Forward,
+    widget: Button,
 }
 
 impl Forward {
     // Construct
     pub fn new() -> Forward {
         Self {
-            widget: widget::Forward::new(),
+            widget: Button::builder()
+                .icon_name("go-next-symbolic")
+                .tooltip_text("Forward")
+                .sensitive(false)
+                .build(),
         }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Forward {
+    pub fn widget(&self) -> &Button {
         &self.widget
     }
 }

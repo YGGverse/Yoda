@@ -1,23 +1,33 @@
 mod menu;
 mod tab;
-mod widget;
+
+use gtk::prelude::BoxExt;
+use gtk::{Box, Orientation};
+use menu::Menu;
+use tab::Tab;
 
 pub struct Tray {
-    widget: widget::Tray,
+    widget: Box,
 }
 
 impl Tray {
     pub fn new() -> Tray {
-        Self {
-            widget: widget::Tray::new(
-                menu::Menu::new().widget().gtk(),
-                tab::Tab::new().widget().gtk(),
-            ),
-        }
+        let menu = Menu::new();
+        let tab = Tab::new();
+
+        let widget = Box::builder()
+            .orientation(Orientation::Horizontal)
+            .spacing(8)
+            .build();
+
+        widget.append(menu.widget());
+        widget.append(tab.widget());
+
+        Self { widget }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Tray {
+    pub fn widget(&self) -> &Box {
         &self.widget
     }
 }

@@ -1,37 +1,22 @@
-mod widget;
-
-use gtk::prelude::WidgetExt;
-use std::sync::Arc;
+use gtk::Image;
 
 pub struct Pin {
-    // Extras
-    is_pinned: bool,
-    widget: widget::Pin,
+    widget: Image,
 }
 
 impl Pin {
     // Construct
-    pub fn new(is_pinned: bool) -> Arc<Pin> {
-        Arc::new(Self {
-            is_pinned,
-            widget: widget::Pin::new(is_pinned),
-        })
-    }
+    pub fn new(visible: bool) -> Pin {
+        let widget = Image::builder()
+            .icon_name("view-pin-symbolic")
+            .visible(visible)
+            .build();
 
-    // Actions
-    pub fn toggle(&mut self) -> bool {
-        // Toggle state
-        self.is_pinned = !self.widget().image().is_visible();
-
-        // Update widget
-        self.widget().image().set_visible(self.is_pinned); // @TODO delegate?
-
-        // Return state
-        self.is_pinned
+        Self { widget }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Pin {
+    pub fn widget(&self) -> &Image {
         &self.widget
     }
 }

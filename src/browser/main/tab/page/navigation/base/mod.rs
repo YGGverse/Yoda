@@ -1,19 +1,23 @@
-mod widget;
+use gtk::Button;
 
 pub struct Base {
-    widget: widget::Base,
+    widget: Button,
 }
 
 impl Base {
     // Construct
     pub fn new() -> Base {
         Self {
-            widget: widget::Base::new(),
+            widget: Button::builder()
+                .icon_name("go-home-symbolic")
+                .tooltip_text("Base")
+                .sensitive(false)
+                .build(),
         }
     }
 
     // Getters
-    pub fn widget(&self) -> &widget::Base {
+    pub fn widget(&self) -> &Button {
         &self.widget
     }
 }
