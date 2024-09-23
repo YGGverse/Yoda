@@ -34,10 +34,17 @@ impl Label {
 
     // Actions
     pub fn pin(&self) -> bool {
-        self.pin
-            .widget()
-            .set_visible(!self.pin.widget().is_visible());
-        self.pin.widget().is_visible()
+        // Toggle status
+        let is_pinned = !self.pin.widget().is_visible();
+
+        // Update pin widget
+        self.pin.widget().set_visible(is_pinned);
+
+        // Update label widget
+        self.title.widget().set_visible(!is_pinned);
+
+        // Result
+        is_pinned
     }
 
     // Getters
