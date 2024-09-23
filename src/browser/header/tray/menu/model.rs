@@ -7,10 +7,15 @@ pub struct Menu {
 impl Menu {
     // Construct
     pub fn new() -> Menu {
-        let model = gio::Menu::new();
         let model_tab = gio::Menu::new();
+        model_tab.append(Some("New"), Some("win.tab_append"));
+        model_tab.append(Some("Pin"), Some("win.tab_pin"));
 
-        model_tab.append(Some("Append"), Some("win.tab_append"));
+        let model_tab_close = gio::Menu::new();
+        model_tab_close.append(Some("Current"), Some("win.tab_close"));
+        model_tab.append_submenu(Some("Close"), &model_tab_close);
+
+        let model = gio::Menu::new();
         model.append_submenu(Some("Tab"), &model_tab);
         model.append(Some("Debug"), Some("win.debug"));
         model.append(Some("Quit"), Some("win.quit"));
