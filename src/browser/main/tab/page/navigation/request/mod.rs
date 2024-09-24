@@ -14,12 +14,13 @@ impl Request {
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
             .hexpand(true)
+            .progress_fraction(0.0)
             .progress_pulse_step(0.1)
             .build();
 
         // Connect events
         widget.connect_changed(|entry| {
-            let _ = entry.activate_action("win.update", None); // @TODO
+            let _ = entry.activate_action("win.update", None);
         });
 
         widget.connect_activate(|entry| {
@@ -31,7 +32,9 @@ impl Request {
     }
 
     // Actions
-    pub fn update(&self) {}
+    pub fn update(&self) {
+        // @TODO animate progress fraction
+    }
 
     // Getters
     pub fn widget(&self) -> &Entry {
