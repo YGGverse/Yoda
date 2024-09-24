@@ -10,7 +10,7 @@ impl Bookmark {
         Self {
             widget: Button::builder()
                 .icon_name("starred-symbolic")
-                .tooltip_text("Toggle bookmark")
+                .tooltip_text("Bookmark")
                 .sensitive(false)
                 .build(),
         }
