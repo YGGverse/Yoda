@@ -72,9 +72,11 @@ impl Page {
                     }
                 } else {
                     // Plain text given, make search request to default provider
-                    Uri::escape_string(&request_text, None, false);
                     self.navigation.set_request_text(
-                        &GString::from(format!("gemini://tlgs.one/search?{request_text}")),
+                        &GString::from(format!(
+                            "gemini://tlgs.one/search?{}",
+                            Uri::escape_string(&request_text, None, false)
+                        )),
                         true, // activate (page reload)
                     );
                 }
