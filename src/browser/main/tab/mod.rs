@@ -42,8 +42,9 @@ impl Tab {
             // Begin async action
             move |_, widget: &Widget, _| {
                 // Cleanup HashMap index
-                tab.labels.borrow_mut().remove(&widget.widget_name());
-                tab.pages.borrow_mut().remove(&widget.widget_name());
+                let id = &widget.widget_name();
+                tab.labels.borrow_mut().remove(id);
+                tab.pages.borrow_mut().remove(id);
             }
         });
 
