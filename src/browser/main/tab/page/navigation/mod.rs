@@ -13,7 +13,14 @@ use request::Request;
 use gtk::{prelude::BoxExt, Box, Orientation};
 
 pub struct Navigation {
+    // GTK
     widget: Box,
+    // Components
+    base: Base,
+    history: History,
+    reload: Reload,
+    request: Request,
+    bookmark: Bookmark,
 }
 
 impl Navigation {
@@ -42,7 +49,23 @@ impl Navigation {
         widget.append(bookmark.widget());
 
         // Result
-        Self { widget }
+        Self {
+            widget,
+            base,
+            history,
+            reload,
+            request,
+            bookmark,
+        }
+    }
+
+    // Actions
+    pub fn update(&self) {
+        self.base.update();
+        self.history.update();
+        self.reload.update();
+        self.request.update();
+        self.bookmark.update();
     }
 
     // Getters

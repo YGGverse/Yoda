@@ -16,6 +16,11 @@ impl Request {
         }
     }
 
+    // Actions
+    pub fn update(&self) {
+        todo!()
+    }
+
     // Getters
     pub fn widget(&self) -> &Entry {
         &self.widget

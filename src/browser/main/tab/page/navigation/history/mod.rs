@@ -8,6 +8,8 @@ use gtk::{Box, Orientation};
 
 pub struct History {
     widget: Box,
+    back: Back,
+    forward: Forward,
 }
 
 impl History {
@@ -28,7 +30,17 @@ impl History {
         widget.append(back.widget());
         widget.append(forward.widget());
 
-        Self { widget }
+        Self {
+            widget,
+            back,
+            forward,
+        }
+    }
+
+    // Actions
+    pub fn update(&self) {
+        self.back.update();
+        self.forward.update();
     }
 
     // Getters

@@ -17,6 +17,11 @@ impl Back {
         }
     }
 
+    // Actions
+    pub fn update(&self) {
+        todo!()
+    }
+
     // Getters
     pub fn widget(&self) -> &Button {
         &self.widget
