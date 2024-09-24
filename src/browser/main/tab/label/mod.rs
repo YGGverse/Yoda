@@ -1,10 +1,14 @@
 mod pin;
 mod title;
 
-use gtk::prelude::{BoxExt, WidgetExt};
-use gtk::{Align, Box, Orientation};
 use pin::Pin;
 use title::Title;
+
+use gtk::{
+    glib::GString,
+    prelude::{BoxExt, WidgetExt},
+    Align, Box, Orientation,
+};
 
 pub struct Label {
     // Components
@@ -17,7 +21,7 @@ pub struct Label {
 
 impl Label {
     // Construct
-    pub fn new(is_pinned: bool) -> Label {
+    pub fn new(name: GString, is_pinned: bool) -> Label {
         // Components
         let pin = Pin::new(is_pinned);
         let title = Title::new();
@@ -26,6 +30,7 @@ impl Label {
         let widget = Box::builder()
             .orientation(Orientation::Horizontal)
             .halign(Align::Center)
+            .name(name)
             .build();
 
         widget.append(pin.widget());
