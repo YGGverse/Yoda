@@ -13,6 +13,7 @@ use gtk::{
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 pub struct Tab {
+    // GTK
     widget: Arc<Notebook>,
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
