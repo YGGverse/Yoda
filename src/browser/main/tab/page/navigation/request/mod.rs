@@ -1,4 +1,4 @@
-use gtk::Entry;
+use gtk::{prelude::EntryExt, Entry};
 
 pub struct Request {
     widget: Entry,
@@ -24,5 +24,9 @@ impl Request {
     // Getters
     pub fn widget(&self) -> &Entry {
         &self.widget
+    }
+
+    pub fn is_empty(&self) -> bool {
+        0 == self.widget.text_length()
     }
 }

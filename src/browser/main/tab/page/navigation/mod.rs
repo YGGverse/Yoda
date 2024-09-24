@@ -66,7 +66,7 @@ impl Navigation {
     pub fn update(&self) {
         self.base.update();
         self.history.update();
-        self.reload.update();
+        self.reload.update(!self.request.is_empty());
         self.request.update();
         self.bookmark.update();
     }

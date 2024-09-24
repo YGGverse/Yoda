@@ -1,4 +1,4 @@
-use gtk::Button;
+use gtk::{prelude::WidgetExt, Button};
 
 pub struct Reload {
     widget: Button,
@@ -18,8 +18,8 @@ impl Reload {
     }
 
     // Actions
-    pub fn update(&self) {
-        // @TODO
+    pub fn update(&self, is_enabled: bool) {
+        self.widget.set_sensitive(is_enabled);
     }
 
     // Getters
