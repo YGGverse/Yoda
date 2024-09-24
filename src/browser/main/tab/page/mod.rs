@@ -51,7 +51,7 @@ impl Page {
             Err(_) => {
                 // Try interpret host manually
                 if Regex::match_simple(
-                    r"regex(^[^\/\s]+\.[\w]{2,})regex",
+                    r"^[^\/\s]+\.[\w]{2,}",
                     request_text.clone(),
                     RegexCompileFlags::DEFAULT,
                     RegexMatchFlags::DEFAULT,
