@@ -56,11 +56,20 @@ impl Page {
                     RegexCompileFlags::DEFAULT,
                     RegexMatchFlags::DEFAULT,
                 ) {
-                    // Seems request contain some host substring
-                    self.navigation.set_request_text(
-                        &GString::from(format!("gemini://{request_text}")),
-                        true, // activate (page reload) @TODO validate new uri instead?
-                    );
+                    // Seems request contain some host, try append default scheme
+                    let request_text = GString::from(format!("gemini://{request_text}"));
+                    // Make sure new request conversible to valid URI
+                    match Uri::parse(&request_text, UriFlags::NONE) {
+                        Ok(_) => {
+                            self.navigation.set_request_text(
+                                &request_text,
+                                true, // activate (page reload)
+                            );
+                        }
+                        Err(_) => {
+                            // @TODO any action here?
+                        }
+                    }
                 } else {
                     // Plain text given, make search request to default provider
                     Uri::escape_string(&request_text, None, false);
