@@ -68,6 +68,11 @@ impl Navigation {
         self.bookmark.update();
     }
 
+    // Setters
+    pub fn set_request_text(&self, value: &GString, activate: bool) {
+        self.request.set_text(value, activate);
+    }
+
     // Getters
     pub fn widget(&self) -> &Box {
         &self.widget

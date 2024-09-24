@@ -49,19 +49,25 @@ impl Page {
                 println!("Parsed URI: {}", uri); // @TODO
             }
             Err(_) => {
-                // Request contain host substring
+                // Try interpret host manually
                 if Regex::match_simple(
                     r"regex(^[^\/\s]+\.[\w]{2,})regex",
                     request_text.clone(),
                     RegexCompileFlags::DEFAULT,
                     RegexMatchFlags::DEFAULT,
                 ) {
-                    let request_text = format!("gemini://{request_text}");
-                    // @TODO reload
+                    // Seems request contain some host substring
+                    self.navigation.set_request_text(
+                        &GString::from(format!("gemini://{request_text}")),
+                        true, // activate (page reload) @TODO validate new uri instead?
+                    );
                 } else {
+                    // Plain text given, make search request to default provider
                     Uri::escape_string(&request_text, None, false);
-                    let request_text = format!("gemini://tlgs.one/search?{request_text}");
-                    // @TODO reload
+                    self.navigation.set_request_text(
+                        &GString::from(format!("gemini://tlgs.one/search?{request_text}")),
+                        true, // activate (page reload)
+                    );
                 }
             }
         };

@@ -37,6 +37,15 @@ impl Request {
         // @TODO animate progress fraction
     }
 
+    // Setters
+    pub fn set_text(&self, value: &GString, activate: bool) {
+        self.widget.set_text(value);
+
+        if activate {
+            self.widget.activate();
+        }
+    }
+
     // Getters
     pub fn widget(&self) -> &Entry {
         &self.widget
