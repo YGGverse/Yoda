@@ -23,7 +23,7 @@ impl Request {
         });
 
         widget.connect_activate(|entry| {
-            // @TODO
+            let _ = entry.activate_action("win.tab_page_reload", None); // @TODO variant
         });
 
         // Result
