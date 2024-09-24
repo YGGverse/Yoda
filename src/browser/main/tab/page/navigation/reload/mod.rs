@@ -19,7 +19,7 @@ impl Reload {
 
     // Actions
     pub fn update(&self) {
-        todo!()
+        // @TODO
     }
 
     // Getters

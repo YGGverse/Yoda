@@ -12,7 +12,7 @@ pub struct Main {
 
 impl Main {
     // Construct
-    pub fn new() -> Main {
+    pub fn new() -> Arc<Main> {
         // Init components
         let tab = Tab::new();
 
@@ -22,7 +22,7 @@ impl Main {
         widget.append(tab.widget());
 
         // Init struct
-        Self { tab, widget }
+        Arc::new(Self { tab, widget })
     }
 
     // Actions
@@ -40,6 +40,10 @@ impl Main {
 
     pub fn tab_pin(&self) {
         self.tab.pin();
+    }
+
+    pub fn update(&self) {
+        self.tab.update();
     }
 
     // Getters

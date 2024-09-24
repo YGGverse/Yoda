@@ -22,6 +22,7 @@ fn main() -> glib::ExitCode {
     app.set_accels_for_action("win.tab_page_reload", &["<Primary>r"]);
     app.set_accels_for_action("win.tab_page_bookmark", &["<Primary>b"]);
     app.set_accels_for_action("win.debug", &["<Primary>i"]);
+    app.set_accels_for_action("win.update", &["<Primary>u"]);
     app.set_accels_for_action("win.quit", &["<Primary>Escape"]);
 
     // Create new window

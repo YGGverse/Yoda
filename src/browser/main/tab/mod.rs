@@ -120,6 +120,27 @@ impl Tab {
         }
     }
 
+    pub fn update(&self) {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get widget ID
+                let id = &widget.widget_name();
+
+                // Get label by widget ID
+                if let Some(label) = self.labels.borrow().get(id) {
+                    label.update();
+                }
+
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(id) {
+                    page.update();
+                }
+            }
+        }
+    }
+
     // Getters
     pub fn widget(&self) -> &Notebook {
         self.widget.as_ref()

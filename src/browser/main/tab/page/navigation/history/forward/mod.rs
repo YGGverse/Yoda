@@ -18,7 +18,7 @@ impl Forward {
 
     // Actions
     pub fn update(&self) {
-        todo!()
+        // @TODO
     }
 
     // Getters

@@ -2,9 +2,14 @@ mod db;
 mod header;
 mod main;
 
-use gtk::gio::ActionEntry;
-use gtk::prelude::{ActionMapExtManual, GtkWindowExt};
-use gtk::{Application, ApplicationWindow};
+use header::Header;
+use main::Main;
+
+use gtk::{
+    gio::ActionEntry,
+    prelude::{ActionMapExtManual, GtkWindowExt},
+    Application, ApplicationWindow,
+};
 use std::sync::Arc;
 
 pub struct Browser {
@@ -12,8 +17,8 @@ pub struct Browser {
     // db: db::Browser,
     widget: ApplicationWindow,
     // Components
-    // header: Arc<header::Header>,
-    // main: main::Main,
+    header: Arc<Header>,
+    main: Arc<Main>,
 }
 
 impl Browser {
@@ -38,9 +43,16 @@ impl Browser {
             .build();
 
         // Init actions
-        let main_ref = Arc::new(main); // @TODO
-
         widget.add_action_entries([
+            ActionEntry::builder("update")
+                .activate({
+                    let main = main.clone();
+                    move |this: &ApplicationWindow, _, _| {
+                        // header.update(); @TODO
+                        main.update();
+                    }
+                })
+                .build(),
             ActionEntry::builder("debug")
                 .activate(|this: &ApplicationWindow, _, _| {
                     this.emit_enable_debugging(true);
@@ -53,7 +65,7 @@ impl Browser {
                 .build(),
             ActionEntry::builder("tab_append")
                 .activate({
-                    let main = main_ref.clone();
+                    let main = main.clone();
                     move |_, _, _| {
                         main.tab_append();
                     }
@@ -61,7 +73,7 @@ impl Browser {
                 .build(),
             ActionEntry::builder("tab_close")
                 .activate({
-                    let main = main_ref.clone();
+                    let main = main.clone();
                     move |_, _, _| {
                         main.tab_close();
                     }
@@ -69,7 +81,7 @@ impl Browser {
                 .build(),
             ActionEntry::builder("tab_close_all")
                 .activate({
-                    let main = main_ref.clone();
+                    let main = main.clone();
                     move |_, _, _| {
                         main.tab_close_all();
                     }
@@ -77,7 +89,7 @@ impl Browser {
                 .build(),
             ActionEntry::builder("tab_pin")
                 .activate({
-                    let main = main_ref.clone();
+                    let main = main.clone();
                     move |_, _, _| {
                         main.tab_pin();
                     }
@@ -89,8 +101,8 @@ impl Browser {
         Self {
             // db,
             widget,
-            // header,
-            // main,
+            header,
+            main,
         }
     }
 

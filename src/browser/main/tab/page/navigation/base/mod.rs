@@ -19,7 +19,7 @@ impl Base {
 
     // Actions
     pub fn update(&self) {
-        todo!()
+        // @TODO
     }
 
     // Getters

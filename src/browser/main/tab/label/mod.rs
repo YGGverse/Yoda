@@ -40,6 +40,11 @@ impl Label {
         Self { pin, title, widget }
     }
 
+    // Actions
+    pub fn update(&self) {
+        // @TODO
+    }
+
     // Setters
     pub fn pin(&self, is_pinned: bool) {
         self.pin.widget().set_visible(is_pinned);

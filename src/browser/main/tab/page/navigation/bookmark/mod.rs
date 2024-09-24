@@ -19,7 +19,7 @@ impl Bookmark {
 
     // Actions
     pub fn update(&self) {
-        todo!()
+        // @TODO
     }
 
     // Getters
