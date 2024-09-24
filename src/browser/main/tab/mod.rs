@@ -9,10 +9,11 @@ use gtk::{
     prelude::WidgetExt,
     GestureClick, Notebook, Widget,
 };
+
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 pub struct Tab {
-    widget: Notebook,
+    widget: Arc<Notebook>,
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
     pages: RefCell<HashMap<GString, Arc<Page>>>,
@@ -20,19 +21,32 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new() -> Tab {
-        // Init widget
-        let widget = Notebook::builder().scrollable(true).build();
+    pub fn new() -> Arc<Tab> {
+        // Init GTK component
+        let notebook = Arc::new(Notebook::builder().scrollable(true).build());
 
-        // Connect actions
-        widget.connect_page_reordered(|this: &Notebook, widget: &Widget, page_number: u32| todo!());
-
-        Self {
-            widget,
-            // Init empty hashmap as no tabs yet
+        // Init new Tab struct
+        let tab = Arc::new(Self {
+            // Reference wanted for async events, create new smart pointer
+            widget: notebook.clone(),
+            // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
             pages: RefCell::new(HashMap::new()),
-        }
+        });
+
+        // Connect events
+        notebook.connect_page_removed({
+            // Make new local ref
+            let tab = tab.clone();
+            // Begin async action
+            move |_, widget: &Widget, _| {
+                // Cleanup HashMap index
+                tab.labels.borrow_mut().remove(&widget.widget_name());
+                tab.pages.borrow_mut().remove(&widget.widget_name());
+            }
+        });
+
+        tab // return Arc pointer to the new Tab constructed
     }
 
     // Actions
@@ -45,7 +59,6 @@ impl Tab {
         let page = Arc::new(Page::new(id.clone()));
 
         // Register dynamically created tab components in the HashMap index
-        // @TODO cleanup on tab remove
         self.labels.borrow_mut().insert(id.clone(), label.clone());
         self.pages.borrow_mut().insert(id.clone(), page.clone());
 
@@ -107,6 +120,6 @@ impl Tab {
 
     // Getters
     pub fn widget(&self) -> &Notebook {
-        &self.widget
+        self.widget.as_ref()
     }
 }

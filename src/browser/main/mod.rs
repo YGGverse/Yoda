@@ -1,12 +1,12 @@
 mod tab;
 
-use gtk::{Box, Orientation};
 use tab::Tab;
 
-use gtk::prelude::BoxExt;
+use gtk::{prelude::BoxExt, Box, Orientation};
+use std::sync::Arc;
 
 pub struct Main {
-    tab: Tab,
+    tab: Arc<Tab>,
     widget: Box,
 }
 
