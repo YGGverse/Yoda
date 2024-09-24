@@ -48,9 +48,6 @@ impl Navigation {
         widget.append(request.widget());
         widget.append(bookmark.widget());
 
-        // Connect events
-        // request.widget().connect_changed({ |_, _, _| {} });
-
         // Result
         Self {
             widget,
