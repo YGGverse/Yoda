@@ -10,6 +10,7 @@ impl Forward {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_page_history_forward")
+                .icon_name("go-next-symbolic")
                 .tooltip_text("Forward")
                 .sensitive(false)
                 .build(),
