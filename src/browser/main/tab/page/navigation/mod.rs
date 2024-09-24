@@ -10,7 +10,7 @@ use history::History;
 use reload::Reload;
 use request::Request;
 
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
 
 pub struct Navigation {
     // GTK
@@ -71,5 +71,9 @@ impl Navigation {
     // Getters
     pub fn widget(&self) -> &Box {
         &self.widget
+    }
+
+    pub fn request_text(&self) -> GString {
+        self.request.text()
     }
 }

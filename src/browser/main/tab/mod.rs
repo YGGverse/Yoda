@@ -120,6 +120,19 @@ impl Tab {
         }
     }
 
+    pub fn page_reload(&self) {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
+                    page.reload();
+                }
+            }
+        }
+    }
+
     pub fn update(&self) {
         // Get current page
         if let Some(page_number) = self.widget.current_page() {

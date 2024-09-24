@@ -37,6 +37,10 @@ impl Page {
     }
 
     // Actions
+    pub fn reload(&self) {
+        self.content.reload(self.navigation.request_text());
+    }
+
     pub fn update(&self) {
         self.navigation.update();
         // @TODO self.content.update();

@@ -1,4 +1,4 @@
-use gtk::{Box, Orientation};
+use gtk::{glib::GString, Box, Orientation};
 
 pub struct Content {
     widget: Box,
@@ -10,6 +10,11 @@ impl Content {
         Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
         }
+    }
+
+    // Actions
+    pub fn reload(&self, request_text: GString) {
+        // @TODO
     }
 
     // Getters

@@ -1,4 +1,5 @@
 use gtk::{
+    glib::GString,
     prelude::{EditableExt, EntryExt, WidgetExt},
     Entry,
 };
@@ -43,5 +44,9 @@ impl Request {
 
     pub fn is_empty(&self) -> bool {
         0 == self.widget.text_length()
+    }
+
+    pub fn text(&self) -> GString {
+        self.widget.text()
     }
 }

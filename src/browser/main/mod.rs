@@ -30,6 +30,10 @@ impl Main {
         self.tab.append(true);
     }
 
+    pub fn tab_page_reload(&self) {
+        self.tab.page_reload();
+    }
+
     pub fn tab_close(&self) {
         self.tab.close();
     }

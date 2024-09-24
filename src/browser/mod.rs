@@ -71,6 +71,14 @@ impl Browser {
                     }
                 })
                 .build(),
+            ActionEntry::builder("tab_page_reload")
+                .activate({
+                    let main = main.clone();
+                    move |_, _, _| {
+                        main.tab_page_reload();
+                    }
+                })
+                .build(),
             ActionEntry::builder("tab_close")
                 .activate({
                     let main = main.clone();
