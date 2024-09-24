@@ -13,11 +13,16 @@ fn main() -> glib::ExitCode {
     let app = Application::builder().application_id(APP_ID).build();
 
     // Init accels
-    app.set_accels_for_action("win.tab_append", &["<Ctrl>t"]);
-    app.set_accels_for_action("win.tab_pin", &["<Ctrl>p"]);
-    app.set_accels_for_action("win.tab_close", &["<Ctrl>q"]);
-    app.set_accels_for_action("win.debug", &["<Ctrl>i"]);
-    app.set_accels_for_action("win.quit", &["<Ctrl>Escape"]);
+    app.set_accels_for_action("win.tab_append", &["<Primary>t"]);
+    app.set_accels_for_action("win.tab_pin", &["<Primary>p"]);
+    app.set_accels_for_action("win.tab_close", &["<Primary>q"]);
+    app.set_accels_for_action("win.tab_page_base", &["<Primary>h"]);
+    app.set_accels_for_action("win.tab_page_history_back", &["<Primary>Left"]);
+    app.set_accels_for_action("win.tab_page_history_forward", &["<Primary>Right"]);
+    app.set_accels_for_action("win.tab_page_reload", &["<Primary>r"]);
+    app.set_accels_for_action("win.tab_page_bookmark", &["<Primary>b"]);
+    app.set_accels_for_action("win.debug", &["<Primary>i"]);
+    app.set_accels_for_action("win.quit", &["<Primary>Escape"]);
 
     // Create new window
     app.connect_activate({
