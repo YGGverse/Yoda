@@ -46,10 +46,24 @@ impl Page {
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
             Ok(uri) => {
-                println!("Parsed URI: {}", uri); // @TODO
+                // Route request by scheme
+                match uri.scheme().as_str() {
+                    "file" => {
+                        todo!()
+                    }
+                    "gemini" => {
+                        todo!()
+                    }
+                    "nex" => {
+                        todo!()
+                    }
+                    scheme => {
+                        println!("Protocol {scheme} not supported");
+                    }
+                }
             }
             Err(_) => {
-                // Try interpret host manually
+                // Try interpret URI manually
                 if Regex::match_simple(
                     r"^[^\/\s]+\.[\w]{2,}",
                     request_text.clone(),
