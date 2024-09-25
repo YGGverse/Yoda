@@ -5,8 +5,9 @@ use content::Content;
 use navigation::Navigation;
 
 use gtk::{
-    glib::{GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
-    prelude::BoxExt,
+    gio::{Cancellable, SocketClient, SocketProtocol, TlsCertificateFlags},
+    glib::{GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
+    prelude::{BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt},
     Box, Orientation,
 };
 
@@ -52,7 +53,62 @@ impl Page {
                         todo!()
                     }
                     "gemini" => {
-                        todo!()
+                        let client = SocketClient::new();
+
+                        client.set_tls(true);
+                        client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
+                        client.set_protocol(SocketProtocol::Tcp);
+
+                        client.connect_to_uri_async(
+                            "gemini://geminiprotocol.net:1965/", // @TODO &uri.to_str(),
+                            1965,
+                            Some(&Cancellable::new()),
+                            move |result| match result {
+                                Ok(connection) => {
+                                    connection.output_stream().write_all_async(
+                                        "gemini://geminiprotocol.net:1965/\r\n", // @TODO
+                                        Priority::DEFAULT,
+                                        Some(&Cancellable::new()),
+                                        move |result| match result {
+                                            Ok(request) => {
+                                                println!(
+                                                    "Request sent successfully: {:?}",
+                                                    request
+                                                ); // @TODO remove
+
+                                                connection.input_stream().read_all_async(
+                                                    Vec::new(),
+                                                    Priority::DEFAULT,
+                                                    Some(&Cancellable::new()),
+                                                    {
+                                                        |result| match result {
+                                                            Ok(response) => {
+                                                                println!("Result: {:?}", response);
+
+                                                                // @TODO connection.close(cancellable);
+                                                            }
+                                                            Err(e) => {
+                                                                eprintln!(
+                                                                    "Failed to read response: {:?}",
+                                                                    e
+                                                                );
+                                                            }
+                                                        }
+                                                    },
+                                                );
+                                                // @TODO
+                                            }
+                                            Err(e) => {
+                                                eprintln!("Failed to write request: {:?}", e);
+                                            }
+                                        },
+                                    );
+                                }
+                                Err(e) => {
+                                    eprintln!("Failed to connect: {e}"); // @TODO
+                                }
+                            },
+                        );
                     }
                     "nex" => {
                         todo!()
