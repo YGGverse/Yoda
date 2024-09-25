@@ -7,7 +7,10 @@ use navigation::Navigation;
 use gtk::{
     gio::{Cancellable, SocketClient, SocketProtocol, TlsCertificateFlags},
     glib::{GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
-    prelude::{BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt},
+    prelude::{
+        BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
+        WidgetExt,
+    },
     Box, Orientation,
 };
 use std::{cell::RefCell, sync::Arc};
@@ -80,6 +83,8 @@ impl Page {
         self.meta.borrow_mut().description = request_text.clone();
         self.meta.borrow_mut().mime = Mime::Undefined;
         self.meta.borrow_mut().progress_fraction = 0.0;
+
+        let _ = self.widget.activate_action("win.update", None);
 
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
