@@ -186,44 +186,70 @@ impl Page {
                                                                     );
                                                                 }
                                                                 Err(e) => {
-                                                                    eprintln!(
-                                                                        "Failed to read buffer: {e}"
-                                                                    )
+                                                                    meta.borrow_mut().title = GString::from("Oops");
+                                                                    meta.borrow_mut().description = GString::from(format!("Failed to read buffer data: {e}"));
+                                                                    meta.borrow_mut().progress_fraction = 1.0;
+
+                                                                    let _ = widget.activate_action(
+                                                                        "win.update",
+                                                                        None,
+                                                                    );
                                                                 }
                                                             }
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                eprintln!("Error closing connection: {:?}", e);
+                                                                panic!("Error closing connection: {:?}", e);
                                                             }
                                                         }
                                                         Err(e) => {
-                                                            eprintln!(
-                                                                "Failed to read response: {:?}",
-                                                                e
+                                                            // Update
+                                                            meta.borrow_mut().title = GString::from("Oops");
+                                                            meta.borrow_mut().description = GString::from(format!("Failed to read response: {:?}", e));
+                                                            meta.borrow_mut().progress_fraction = 1.0;
+
+                                                            let _ = widget.activate_action(
+                                                                "win.update",
+                                                                None,
                                                             );
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                eprintln!("Error closing connection: {:?}", e);
+                                                                panic!("Error closing response connection: {:?}", e);
                                                             }
                                                         }
                                                     },
                                                 );
                                             }
                                             Err(e) => {
-                                                eprintln!("Failed to write request: {:?}", e);
+                                                // Update
+                                                meta.borrow_mut().title = GString::from("Oops");
+                                                meta.borrow_mut().description = GString::from(format!("Failed to read request: {:?}", e));
+                                                meta.borrow_mut().progress_fraction = 1.0;
+
+                                                let _ = widget.activate_action(
+                                                    "win.update",
+                                                    None,
+                                                );
 
                                                 // Close connection
                                                 if let Err(e) = connection.close(Some(&cancellable)) {
-                                                    eprintln!("Error closing connection: {:?}", e);
+                                                    panic!("Error closing request connection: {:?}", e);
                                                 }
                                             }
                                         },
                                     );
                                 }
                                 Err(e) => {
-                                    eprintln!("Failed to connect: {e}"); // @TODO
+                                    // Update
+                                    meta.borrow_mut().title = GString::from("Oops");
+                                    meta.borrow_mut().description = GString::from(format!("Failed to connect: {:?}", e));
+                                    meta.borrow_mut().progress_fraction = 1.0;
+
+                                    let _ = widget.activate_action(
+                                        "win.update",
+                                        None,
+                                    );
                                 }
                             },
                         );
