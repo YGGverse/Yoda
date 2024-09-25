@@ -94,7 +94,11 @@ impl Page {
                                                                     //println!("{:?}", meta);
                                                                     //println!("Result: {}", data);
                                                                 }
-                                                                Err(_) => todo!(),
+                                                                Err(e) => {
+                                                                    eprintln!(
+                                                                        "Failed to read buffer: {e}"
+                                                                    )
+                                                                }
                                                             }
 
                                                             // @TODO connection.close(cancellable);
