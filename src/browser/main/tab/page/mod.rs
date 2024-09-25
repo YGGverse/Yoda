@@ -254,11 +254,17 @@ impl Page {
                             },
                         );
                     }
-                    "nex" => {
-                        todo!()
-                    }
+                    /* @TODO
+                    "nex" => {}
+                    */
                     scheme => {
-                        println!("Protocol {scheme} not supported");
+                        // Update
+                        meta.borrow_mut().title = GString::from("Oops");
+                        meta.borrow_mut().description =
+                            GString::from(format!("Protocol {scheme} not supported"));
+                        meta.borrow_mut().progress_fraction = 1.0;
+
+                        let _ = widget.activate_action("win.update", None);
                     }
                 }
             }
