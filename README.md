@@ -38,13 +38,15 @@ This guide in process
 
 ##### Codebase
 
-* The codebase of module must be as minimal as possible: separate different tasks to submodules
+* The codebase of module must be as minimal as possible: separate different tasks to sub-modules
 * Every module must:
+  * access 1 level of child API, never parents (e.g.`super`)
   * implement only one `struct` (same as one file for one class)
-  * provide at least:
+    * `struct` is public, where members - private
+  * contain `struct` implementation:
     * one constructor that must:
       * return raw `struct` without cover to any kind of smart `std` or `glib` pointers
-  * access 1 level of child API, never parents (e.g.`super`)
+    * one link getter for widget implementation (`widget -> &Gtk`) because it's private
 
 ### Contribution
 
