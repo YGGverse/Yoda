@@ -10,11 +10,12 @@ use gtk::{
     prelude::{BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt},
     Box, Orientation,
 };
+use std::sync::Arc;
 
 pub struct Page {
     widget: Box,
     navigation: Navigation,
-    content: Content,
+    content: Arc<Content>,
 }
 
 impl Page {
@@ -76,23 +77,33 @@ impl Page {
                                                     vec![0; 0xfffff], // 1Mb @TODO
                                                     Priority::DEFAULT,
                                                     Some(&Cancellable::new()),
-                                                    {
-                                                        move |result| match result {
-                                                            Ok(response) => {
-                                                                println!(
-                                                                    "Result: {:?}",
-                                                                    GString::from_utf8_until_nul(
-                                                                        response.0
-                                                                    )
-                                                                ); // @TODO
-                                                                   // @TODO connection.close(cancellable);
+                                                    move |result| match result {
+                                                        Ok(response) => {
+                                                            match GString::from_utf8_until_nul(
+                                                                response.0,
+                                                            ) {
+                                                                Ok(data) => {
+                                                                    // Detect page meta
+                                                                    let meta = Regex::split_simple(
+                                                                        r"^(\d+)?\s([\w]+\/[\w]+)?",
+                                                                        data,
+                                                                        RegexCompileFlags::DEFAULT,
+                                                                        RegexMatchFlags::DEFAULT,
+                                                                    );
+
+                                                                    //println!("{:?}", meta);
+                                                                    //println!("Result: {}", data);
+                                                                }
+                                                                Err(_) => todo!(),
                                                             }
-                                                            Err(e) => {
-                                                                eprintln!(
-                                                                    "Failed to read response: {:?}",
-                                                                    e
-                                                                );
-                                                            }
+
+                                                            // @TODO connection.close(cancellable);
+                                                        }
+                                                        Err(e) => {
+                                                            eprintln!(
+                                                                "Failed to read response: {:?}",
+                                                                e
+                                                            );
                                                         }
                                                     },
                                                 );
