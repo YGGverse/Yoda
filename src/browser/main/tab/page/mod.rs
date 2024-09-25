@@ -10,12 +10,31 @@ use gtk::{
     prelude::{BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt},
     Box, Orientation,
 };
-use std::sync::Arc;
+use std::{cell::RefCell, sync::Arc};
 
+// Extras
+enum Mime {
+    Undefined,
+    TextGemini,
+    TextPlain,
+}
+
+struct Meta {
+    title: GString,
+    description: GString,
+    mime: Mime,
+    progress_fraction: f32,
+}
+
+// Main
 pub struct Page {
+    // GTK
     widget: Box,
+    // Components
     navigation: Navigation,
     content: Arc<Content>,
+    // Extras
+    meta: RefCell<Meta>,
 }
 
 impl Page {
@@ -34,17 +53,34 @@ impl Page {
         widget.append(navigation.widget());
         widget.append(content.widget());
 
+        // Init meta
+        let meta = RefCell::new(Meta {
+            title: GString::new(),
+            description: GString::new(),
+            mime: Mime::Undefined,
+            progress_fraction: 0.0,
+        });
+
         // Result
         Self {
             widget,
             content,
             navigation,
+            meta,
         }
     }
 
     // Actions
     pub fn reload(&self) {
+        // Init globals
         let request_text = self.navigation.request_text();
+
+        // Update
+        self.meta.borrow_mut().title = GString::from("Reload");
+        self.meta.borrow_mut().description = request_text.clone();
+        self.meta.borrow_mut().mime = Mime::Undefined;
+        self.meta.borrow_mut().progress_fraction = 0.0;
+
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
             Ok(uri) => {
@@ -174,6 +210,14 @@ impl Page {
     }
 
     // Getters
+    pub fn title(&self) -> GString {
+        self.meta.borrow().title.clone()
+    }
+
+    pub fn description(&self) -> GString {
+        self.meta.borrow().description.clone()
+    }
+
     pub fn widget(&self) -> &Box {
         &self.widget
     }
