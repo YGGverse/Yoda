@@ -14,7 +14,7 @@ use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 pub struct Tab {
     // GTK
-    widget: Arc<Notebook>,
+    widget: Notebook,
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
     pages: RefCell<HashMap<GString, Arc<Page>>>,
@@ -22,37 +22,27 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new() -> Tab {
-        // Init GTK component
-        let notebook = Arc::new(Notebook::builder().scrollable(true).build());
-
-        // Init new Tab struct
-        let tab = Self {
-            // Reference wanted for async events, create new smart pointer
-            widget: notebook.clone(),
+    pub fn new() -> Self {
+        Self {
+            widget: Notebook::builder().scrollable(true).build(),
             // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
             pages: RefCell::new(HashMap::new()),
-        };
+        }
+    }
 
-        // Connect events
-        /* @TODO move outside
-        notebook.connect_page_removed({
-            // Make new local ref
-            let tab = tab.clone();
-            // Begin async action
+    // Actions
+    pub fn activate(&self, tab: Arc<Self>) {
+        self.widget.connect_page_removed({
             move |_, widget: &Widget, _| {
                 // Cleanup HashMap index
                 let id = &widget.widget_name();
                 tab.labels.borrow_mut().remove(id);
                 tab.pages.borrow_mut().remove(id);
             }
-        });*/
-
-        tab // return Arc pointer to the new Tab constructed
+        });
     }
 
-    // Actions
     pub fn append(&self, is_current_page: bool) -> u32 {
         // Generate unique ID for new page components
         let id = uuid_string_random();

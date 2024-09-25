@@ -1,11 +1,13 @@
 mod tab;
 
+use std::sync::Arc;
+
 use tab::Tab;
 
 use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
 
 pub struct Main {
-    tab: Tab,
+    tab: Arc<Tab>,
     widget: Box,
 }
 
@@ -13,7 +15,9 @@ impl Main {
     // Construct
     pub fn new() -> Main {
         // Init components
-        let tab = Tab::new();
+        let tab = Arc::new(Tab::new());
+
+        tab.activate(tab.clone());
 
         // Extras
         let widget = Box::builder().orientation(Orientation::Vertical).build();
