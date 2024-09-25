@@ -1,7 +1,9 @@
 mod content;
+mod meta;
 mod navigation;
 
 use content::Content;
+use meta::{Meta, Mime};
 use navigation::Navigation;
 
 use gtk::{
@@ -16,18 +18,6 @@ use gtk::{
 use std::{cell::RefCell, sync::Arc};
 
 // Extras
-enum Mime {
-    Undefined,
-    TextGemini,
-    TextPlain,
-}
-
-struct Meta {
-    title: GString,
-    description: GString,
-    mime: Mime,
-    progress_fraction: f32,
-}
 
 // Main
 pub struct Page {
@@ -57,12 +47,7 @@ impl Page {
         widget.append(content.widget());
 
         // Init meta
-        let meta = RefCell::new(Meta {
-            title: GString::new(),
-            description: GString::new(),
-            mime: Mime::Undefined,
-            progress_fraction: 0.0,
-        });
+        let meta = Meta::new();
 
         // Result
         Arc::new(Self {
