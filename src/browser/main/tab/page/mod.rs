@@ -42,7 +42,7 @@ pub struct Page {
 
 impl Page {
     // Construct
-    pub fn new(name: GString) -> Page {
+    pub fn new(name: GString) -> Arc<Page> {
         // Init components
         let content = Content::new();
         let navigation = Navigation::new();
@@ -65,12 +65,12 @@ impl Page {
         });
 
         // Result
-        Self {
+        Arc::new(Self {
             widget,
             content,
             navigation,
             meta,
-        }
+        })
     }
 
     // Actions
@@ -95,6 +95,14 @@ impl Page {
                         todo!()
                     }
                     "gemini" => {
+                        // Update
+                        self.meta.borrow_mut().title = GString::from("Connect");
+                        //self.meta.borrow_mut().description = uri.host();
+                        self.meta.borrow_mut().progress_fraction = 0.25;
+
+                        let _ = self.widget.activate_action("win.update", None);
+
+                        // Create new connection
                         let client = SocketClient::new();
 
                         client.set_timeout(10);
@@ -108,12 +116,26 @@ impl Page {
                             Some(&Cancellable::new()),
                             move |result| match result {
                                 Ok(connection) => {
+                                    // Update
+                                    //self.meta.borrow_mut().title = GString::from("Request");
+                                    //self.meta.borrow_mut().progress_fraction = 0.50;
+
+                                    //let _ = self.widget.activate_action("win.update", None);
+
+                                    // Send request
                                     connection.output_stream().write_all_async(
                                         "gemini://geminiprotocol.net:1965/\r\n", // @TODO
                                         Priority::DEFAULT,
                                         Some(&Cancellable::new()),
                                         move |result| match result {
                                             Ok(_) => {
+                                                // Update
+                                                //self.meta.borrow_mut().title = GString::from("Response");
+                                                //self.meta.borrow_mut().progress_fraction = 0.75;
+
+                                                //let _ = self.widget.activate_action("win.update", None);
+
+                                                // Read response
                                                 connection.input_stream().read_all_async(
                                                     vec![0; 0xfffff], // 1Mb @TODO
                                                     Priority::DEFAULT,
@@ -124,6 +146,12 @@ impl Page {
                                                                 response.0,
                                                             ) {
                                                                 Ok(data) => {
+                                                                    // Update
+                                                                    //self.meta.borrow_mut().title = GString::from("Done"); // @TODO
+                                                                    //self.meta.borrow_mut().progress_fraction = 1.0;
+
+                                                                    //let _ = self.widget.activate_action("win.update", None);
+
                                                                     // Detect page meta
                                                                     let meta = Regex::split_simple(
                                                                         r"^(\d+)?\s([\w]+\/[\w]+)?",
