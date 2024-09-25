@@ -92,6 +92,7 @@ impl Page {
                         let _ = widget.activate_action("win.update", None);
 
                         // Create new connection
+                        let cancellable = Cancellable::new();
                         let client = SocketClient::new();
 
                         client.set_timeout(10);
@@ -102,7 +103,7 @@ impl Page {
                         client.connect_to_uri_async(
                             "gemini://geminiprotocol.net:1965/", // @TODO &uri.to_str(),
                             1965,
-                            Some(&Cancellable::new()),
+                            Some(&cancellable.clone()),
                             move |result| match result {
                                 Ok(connection) => {
                                     // Update
@@ -115,7 +116,7 @@ impl Page {
                                     connection.output_stream().write_all_async(
                                         "gemini://geminiprotocol.net:1965/\r\n", // @TODO
                                         Priority::DEFAULT,
-                                        Some(&Cancellable::new()),
+                                        Some(&cancellable.clone()),
                                         move |result| match result {
                                             Ok(_) => {
                                                 // Update
@@ -128,7 +129,7 @@ impl Page {
                                                 connection.input_stream().read_all_async(
                                                     vec![0; 0xfffff], // 1Mb @TODO
                                                     Priority::DEFAULT,
-                                                    Some(&Cancellable::new()),
+                                                    Some(&cancellable.clone()),
                                                     move |result| match result {
                                                         Ok(response) => {
                                                             match GString::from_utf8_until_nul(
@@ -191,19 +192,32 @@ impl Page {
                                                                 }
                                                             }
 
-                                                            // @TODO connection.close(cancellable);
+                                                            // Close connection
+                                                            if let Err(e) = connection.close(Some(&cancellable)) {
+                                                                eprintln!("Error closing connection: {:?}", e);
+                                                            }
                                                         }
                                                         Err(e) => {
                                                             eprintln!(
                                                                 "Failed to read response: {:?}",
                                                                 e
                                                             );
+
+                                                            // Close connection
+                                                            if let Err(e) = connection.close(Some(&cancellable)) {
+                                                                eprintln!("Error closing connection: {:?}", e);
+                                                            }
                                                         }
                                                     },
                                                 );
                                             }
                                             Err(e) => {
                                                 eprintln!("Failed to write request: {:?}", e);
+
+                                                // Close connection
+                                                if let Err(e) = connection.close(Some(&cancellable)) {
+                                                    eprintln!("Error closing connection: {:?}", e);
+                                                }
                                             }
                                         },
                                     );
