@@ -31,11 +31,20 @@ This guide in process
 
 #### `browser`
 
-* The codebase of module must be as minimal as possible: separate different tasks to submodules
-* Every module must implement only one `struct` (same as one file for one class)
-* Composition modules (like box for window) stored in sub-folders and following same principles as parent
-* Every mod access 1 level of child API, never parents (e.g.`super`)
+##### Filesystem
+
+* Composition pattern, using standard `mod.rs` model
 * One mod = one widget. Create new mod for new widget implementation
+
+##### Codebase
+
+* The codebase of module must be as minimal as possible: separate different tasks to submodules
+* Every module must:
+  * implement only one `struct` (same as one file for one class)
+  * provide at least:
+    * one constructor that must:
+      * return raw `struct` without cover to any kind of smart `std` or `glib` pointers
+  * access 1 level of child API, never parents (e.g.`super`)
 
 ### Contribution
 
