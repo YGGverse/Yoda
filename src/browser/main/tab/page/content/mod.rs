@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use gtk::{Box, Orientation};
 
 pub struct Content {
@@ -8,10 +6,10 @@ pub struct Content {
 
 impl Content {
     // Construct
-    pub fn new() -> Arc<Content> {
-        Arc::new(Self {
+    pub fn new() -> Content {
+        Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
-        })
+        }
     }
 
     // Getters

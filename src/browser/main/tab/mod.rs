@@ -22,20 +22,21 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new() -> Arc<Tab> {
+    pub fn new() -> Tab {
         // Init GTK component
         let notebook = Arc::new(Notebook::builder().scrollable(true).build());
 
         // Init new Tab struct
-        let tab = Arc::new(Self {
+        let tab = Self {
             // Reference wanted for async events, create new smart pointer
             widget: notebook.clone(),
             // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
             pages: RefCell::new(HashMap::new()),
-        });
+        };
 
         // Connect events
+        /* @TODO move outside
         notebook.connect_page_removed({
             // Make new local ref
             let tab = tab.clone();
@@ -46,7 +47,7 @@ impl Tab {
                 tab.labels.borrow_mut().remove(id);
                 tab.pages.borrow_mut().remove(id);
             }
-        });
+        });*/
 
         tab // return Arc pointer to the new Tab constructed
     }
@@ -57,8 +58,8 @@ impl Tab {
         let id = uuid_string_random();
 
         // Init new tab components
-        let label = Label::new(id.clone(), false);
-        let page = Page::new(id.clone());
+        let label = Arc::new(Label::new(id.clone(), false));
+        let page = Arc::new(Page::new(id.clone()));
 
         // Register dynamically created tab components in the HashMap index
         self.labels.borrow_mut().insert(id.clone(), label.clone());

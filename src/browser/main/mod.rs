@@ -3,16 +3,15 @@ mod tab;
 use tab::Tab;
 
 use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
-use std::sync::Arc;
 
 pub struct Main {
-    tab: Arc<Tab>,
+    tab: Tab,
     widget: Box,
 }
 
 impl Main {
     // Construct
-    pub fn new() -> Arc<Main> {
+    pub fn new() -> Main {
         // Init components
         let tab = Tab::new();
 
@@ -22,7 +21,7 @@ impl Main {
         widget.append(tab.widget());
 
         // Init struct
-        Arc::new(Self { tab, widget })
+        Self { tab, widget }
     }
 
     // Actions

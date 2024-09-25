@@ -5,7 +5,6 @@ use subject::Subject;
 use tray::Tray;
 
 use gtk::{glib::GString, HeaderBar};
-use std::sync::Arc;
 
 pub struct Header {
     widget: HeaderBar,
@@ -14,7 +13,7 @@ pub struct Header {
 
 impl Header {
     // Construct
-    pub fn new() -> Arc<Header> {
+    pub fn new() -> Header {
         let tray = Tray::new();
         let subject = Subject::new();
 
@@ -22,7 +21,7 @@ impl Header {
         widget.pack_start(tray.widget());
         widget.set_title_widget(Some(subject.widget()));
 
-        Arc::new(Self { widget, subject })
+        Self { widget, subject }
     }
 
     // Actions

@@ -21,7 +21,7 @@ pub struct Page {
     // GTK
     widget: Box,
     // Components
-    navigation: Navigation,
+    navigation: Arc<Navigation>,
     content: Arc<Content>,
     // Extras
     meta: Arc<RefCell<Meta>>,
@@ -29,10 +29,10 @@ pub struct Page {
 
 impl Page {
     // Construct
-    pub fn new(name: GString) -> Arc<Page> {
+    pub fn new(name: GString) -> Page {
         // Init components
-        let content = Content::new();
-        let navigation = Navigation::new();
+        let content = Arc::new(Content::new());
+        let navigation = Arc::new(Navigation::new());
 
         // Init widget
         let widget = Box::builder()
@@ -47,12 +47,12 @@ impl Page {
         let meta = Arc::new(RefCell::new(Meta::new()));
 
         // Result
-        Arc::new(Self {
+        Self {
             widget,
             content,
             navigation,
             meta,
-        })
+        }
     }
 
     // Actions

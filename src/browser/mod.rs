@@ -31,8 +31,8 @@ impl Browser {
     ) -> Browser {
         // Init components
         // let db = db::Browser::new(connection);
-        let header = header::Header::new();
-        let main = main::Main::new();
+        let header = Arc::new(header::Header::new());
+        let main = Arc::new(main::Main::new());
 
         let widget = ApplicationWindow::builder()
             .application(app)
