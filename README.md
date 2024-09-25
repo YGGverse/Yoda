@@ -31,13 +31,8 @@ This guide in process
 
 #### `browser`
 
-##### Filesystem
-
 * Composition pattern, using standard `mod.rs` model
 * One mod = one widget. Create new mod for new widget implementation
-
-##### Codebase
-
 * The codebase of module must be as minimal as possible: separate different tasks to sub-modules
 * Every module must:
   * access 1 level of child API, never parents (e.g.`super`)
