@@ -57,8 +57,8 @@ impl Tab {
         let id = uuid_string_random();
 
         // Init new tab components
-        let label = Arc::new(Label::new(id.clone(), false));
-        let page = Arc::new(Page::new(id.clone()));
+        let label = Label::new(id.clone(), false);
+        let page = Page::new(id.clone());
 
         // Register dynamically created tab components in the HashMap index
         self.labels.borrow_mut().insert(id.clone(), label.clone());

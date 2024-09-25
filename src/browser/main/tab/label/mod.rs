@@ -10,6 +10,8 @@ use gtk::{
     Align, Box, Orientation,
 };
 
+use std::sync::Arc;
+
 pub struct Label {
     // Components
     pin: Pin,
@@ -21,7 +23,7 @@ pub struct Label {
 
 impl Label {
     // Construct
-    pub fn new(name: GString, is_pinned: bool) -> Label {
+    pub fn new(name: GString, is_pinned: bool) -> Arc<Label> {
         // Components
         let pin = Pin::new(is_pinned);
         let title = Title::new();
@@ -37,7 +39,7 @@ impl Label {
         widget.append(title.widget());
 
         // Result
-        Self { pin, title, widget }
+        Arc::new(Self { pin, title, widget })
     }
 
     // Actions
