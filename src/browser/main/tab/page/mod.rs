@@ -17,9 +17,6 @@ use gtk::{
 };
 use std::{cell::RefCell, sync::Arc};
 
-// Extras
-
-// Main
 pub struct Page {
     // GTK
     widget: Box,
