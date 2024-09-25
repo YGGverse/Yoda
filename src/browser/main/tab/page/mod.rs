@@ -135,27 +135,54 @@ impl Page {
                                                                 response.0,
                                                             ) {
                                                                 Ok(data) => {
-                                                                    // Update
-                                                                    meta.borrow_mut().title =
-                                                                        GString::from("Done"); // @TODO
-                                                                    meta.borrow_mut()
-                                                                        .progress_fraction = 1.0;
+                                                                    // Format response
+                                                                    meta.borrow_mut().title = GString::from("Done"); // @TODO
+                                                                    meta.borrow_mut().progress_fraction = 1.0;
 
-                                                                    let _ = widget.activate_action(
-                                                                        "win.update",
-                                                                        None,
-                                                                    );
-
-                                                                    // Detect page meta
-                                                                    let meta = Regex::split_simple(
-                                                                        r"^(\d+)?\s([\w]+\/[\w]+)?",
+                                                                    // Parse response @TODO read bytes
+                                                                    let parts = Regex::split_simple(
+                                                                        r"^(\d+)?\s([\w]+\/[\w]+)?(.*)?",
                                                                         &data,
                                                                         RegexCompileFlags::DEFAULT,
                                                                         RegexMatchFlags::DEFAULT,
                                                                     );
 
-                                                                    //println!("{:?}", meta);
-                                                                    //println!("Result: {}", data);
+                                                                    // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
+                                                                    match parts.get(1) {
+                                                                        Some(code) => match code.as_str() {
+                                                                            "20" => {
+                                                                                match parts.get(2) {
+                                                                                    Some(mime) => match mime.as_str() {
+                                                                                        "text/gemini" => {
+                                                                                            meta.borrow_mut().mime = Mime::TextGemini;
+                                                                                            // @TODO
+                                                                                        },
+                                                                                        "text/plain" => {
+                                                                                            meta.borrow_mut().mime = Mime::TextPlain;
+                                                                                            // @TODO
+                                                                                        },
+                                                                                        _ => {
+                                                                                            meta.borrow_mut().title = GString::from("Oops");
+                                                                                            meta.borrow_mut().description = GString::from(format!("Content {mime} not supported"));
+                                                                                        },
+                                                                                    }
+                                                                                    None => todo!(),
+                                                                                };
+                                                                                // @TODO
+                                                                            },
+                                                                            _ => {
+                                                                                meta.borrow_mut().title = GString::from("Oops");
+                                                                                meta.borrow_mut().description = GString::from(format!("Status {code} not supported"));
+                                                                            },
+                                                                        }
+                                                                        None => todo!(),
+                                                                    };
+
+                                                                    // Update
+                                                                    let _ = widget.activate_action(
+                                                                        "win.update",
+                                                                        None,
+                                                                    );
                                                                 }
                                                                 Err(e) => {
                                                                     eprintln!(
