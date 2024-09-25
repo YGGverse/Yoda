@@ -83,7 +83,10 @@ impl Page {
                     "gemini" => {
                         // Update
                         meta.borrow_mut().title = GString::from("Connect");
-                        //meta.borrow_mut().description = uri.host();
+                        meta.borrow_mut().description = match uri.host() {
+                            Some(host) => host,
+                            None => panic!(),
+                        };
                         meta.borrow_mut().progress_fraction = 0.25;
 
                         let _ = widget.activate_action("win.update", None);
