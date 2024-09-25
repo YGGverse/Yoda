@@ -24,7 +24,7 @@ pub struct Page {
     navigation: Navigation,
     content: Arc<Content>,
     // Extras
-    meta: RefCell<Meta>,
+    meta: Arc<RefCell<Meta>>,
 }
 
 impl Page {
@@ -44,7 +44,7 @@ impl Page {
         widget.append(content.widget());
 
         // Init meta
-        let meta = Meta::new();
+        let meta = Arc::new(Meta::new());
 
         // Result
         Arc::new(Self {
@@ -60,13 +60,17 @@ impl Page {
         // Init globals
         let request_text = self.navigation.request_text();
 
-        // Update
-        self.meta.borrow_mut().title = GString::from("Reload");
-        self.meta.borrow_mut().description = request_text.clone();
-        self.meta.borrow_mut().mime = Mime::Undefined;
-        self.meta.borrow_mut().progress_fraction = 0.0;
+        // Init shared objects for async access
+        let meta = self.meta.clone();
+        let widget = self.widget.clone();
 
-        let _ = self.widget.activate_action("win.update", None);
+        // Update
+        meta.borrow_mut().title = GString::from("Reload");
+        meta.borrow_mut().description = request_text.clone();
+        meta.borrow_mut().mime = Mime::Undefined;
+        meta.borrow_mut().progress_fraction = 0.0;
+
+        let _ = widget.activate_action("win.update", None);
 
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
@@ -99,10 +103,10 @@ impl Page {
                             move |result| match result {
                                 Ok(connection) => {
                                     // Update
-                                    //self.meta.borrow_mut().title = GString::from("Request");
-                                    //self.meta.borrow_mut().progress_fraction = 0.50;
+                                    meta.borrow_mut().title = GString::from("Request");
+                                    meta.borrow_mut().progress_fraction = 0.50;
 
-                                    //let _ = self.widget.activate_action("win.update", None);
+                                    let _ = widget.activate_action("win.update", None);
 
                                     // Send request
                                     connection.output_stream().write_all_async(
@@ -112,10 +116,10 @@ impl Page {
                                         move |result| match result {
                                             Ok(_) => {
                                                 // Update
-                                                //self.meta.borrow_mut().title = GString::from("Response");
-                                                //self.meta.borrow_mut().progress_fraction = 0.75;
+                                                meta.borrow_mut().title = GString::from("Response");
+                                                meta.borrow_mut().progress_fraction = 0.75;
 
-                                                //let _ = self.widget.activate_action("win.update", None);
+                                                let _ = widget.activate_action("win.update", None);
 
                                                 // Read response
                                                 connection.input_stream().read_all_async(
@@ -129,10 +133,15 @@ impl Page {
                                                             ) {
                                                                 Ok(data) => {
                                                                     // Update
-                                                                    //self.meta.borrow_mut().title = GString::from("Done"); // @TODO
-                                                                    //self.meta.borrow_mut().progress_fraction = 1.0;
+                                                                    meta.borrow_mut().title =
+                                                                        GString::from("Done"); // @TODO
+                                                                    meta.borrow_mut()
+                                                                        .progress_fraction = 1.0;
 
-                                                                    //let _ = self.widget.activate_action("win.update", None);
+                                                                    let _ = widget.activate_action(
+                                                                        "win.update",
+                                                                        None,
+                                                                    );
 
                                                                     // Detect page meta
                                                                     let meta = Regex::split_simple(
