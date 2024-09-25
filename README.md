@@ -39,8 +39,8 @@ This guide in process
   * implement only one `struct` (same as one file for one class)
     * `struct` is public, where members - private
   * contain `struct` implementation:
-    * one constructor that must return:
-      * raw `struct` without cover to any kind of smart `std` or `glib` pointers
+    * at least one constructor that must return:
+      * raw `struct` (`new() -> Self`) without cover to any kind of smart `std` or `glib` pointers
       * ownership to new object created
     * one link getter for widget implementation (`widget -> &Gtk`) because it's private
 
