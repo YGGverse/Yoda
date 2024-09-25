@@ -8,7 +8,7 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new() -> Title {
+    pub fn new() -> Self {
         let widget = gtk::Label::builder()
             .css_classes(["title"])
             .single_line_mode(true)

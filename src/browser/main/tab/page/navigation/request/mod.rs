@@ -10,7 +10,7 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new() -> Request {
+    pub fn new() -> Self {
         // GTK
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")

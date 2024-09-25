@@ -14,7 +14,7 @@ pub struct History {
 
 impl History {
     // Construct
-    pub fn new() -> History {
+    pub fn new() -> Self {
         // init components
         let back = Back::new();
         let forward = Forward::new();

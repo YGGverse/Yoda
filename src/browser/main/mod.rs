@@ -13,7 +13,7 @@ pub struct Main {
 
 impl Main {
     // Construct
-    pub fn new() -> Main {
+    pub fn new() -> Self {
         // Init components
         let tab = Arc::new(Tab::new());
 

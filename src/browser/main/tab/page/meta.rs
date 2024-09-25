@@ -14,7 +14,7 @@ pub struct Meta {
 }
 
 impl Meta {
-    pub fn new() -> Meta {
+    pub fn new() -> Self {
         Self {
             title: GString::new(),
             description: GString::new(),

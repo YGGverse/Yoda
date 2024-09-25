@@ -14,7 +14,7 @@ pub struct Subject {
 
 impl Subject {
     // Construct
-    pub fn new() -> Subject {
+    pub fn new() -> Self {
         let title = Title::new();
         let description = Description::new();
 

@@ -24,7 +24,7 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new() -> Navigation {
+    pub fn new() -> Self {
         // Init components
         let base = Base::new();
         let history = History::new();

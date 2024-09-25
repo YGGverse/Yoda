@@ -6,7 +6,7 @@ pub struct Back {
 
 impl Back {
     // Construct
-    pub fn new() -> Back {
+    pub fn new() -> Self {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_page_history_back")

@@ -6,7 +6,7 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new() -> Reader {
+    pub fn new() -> Self {
         Self {
             widget: Label::builder()
                 .halign(Align::Start)

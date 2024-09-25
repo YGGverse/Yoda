@@ -6,7 +6,7 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new() -> Title {
+    pub fn new() -> Self {
         Self {
             widget: Label::builder()
                 .label("New page")

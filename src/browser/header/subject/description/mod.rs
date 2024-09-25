@@ -7,7 +7,7 @@ pub struct Description {
 
 impl Description {
     // Construct
-    pub fn new() -> Description {
+    pub fn new() -> Self {
         let widget = Label::builder()
             .css_classes(["subtitle"])
             .single_line_mode(true)

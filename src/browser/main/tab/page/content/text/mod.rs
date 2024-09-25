@@ -6,7 +6,7 @@ pub struct Text {
 
 impl Text {
     // Construct
-    pub fn new() -> Text {
+    pub fn new() -> Self {
         Self {
             widget: ScrolledWindow::builder().build(),
         }

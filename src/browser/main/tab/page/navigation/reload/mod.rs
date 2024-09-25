@@ -6,7 +6,7 @@ pub struct Reload {
 
 impl Reload {
     // Construct
-    pub fn new() -> Reload {
+    pub fn new() -> Self {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_page_reload")

@@ -6,7 +6,7 @@ pub struct Bookmark {
 
 impl Bookmark {
     // Construct
-    pub fn new() -> Bookmark {
+    pub fn new() -> Self {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_page_bookmark")

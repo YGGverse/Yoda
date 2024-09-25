@@ -5,7 +5,7 @@ pub struct Menu {
 }
 
 impl Menu {
-    pub fn new() -> Menu {
+    pub fn new() -> Self {
         // Init model
         let model_tab = gio::Menu::new();
         model_tab.append(Some("New"), Some("win.tab_append"));

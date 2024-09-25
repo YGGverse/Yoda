@@ -6,7 +6,7 @@ pub struct Content {
 
 impl Content {
     // Construct
-    pub fn new() -> Content {
+    pub fn new() -> Self {
         Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
         }

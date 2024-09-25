@@ -11,7 +11,7 @@ pub struct Tray {
 }
 
 impl Tray {
-    pub fn new() -> Tray {
+    pub fn new() -> Self {
         let menu = Menu::new();
         let tab = Tab::new();
 

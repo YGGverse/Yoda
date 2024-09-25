@@ -6,7 +6,7 @@ pub struct Base {
 
 impl Base {
     // Construct
-    pub fn new() -> Base {
+    pub fn new() -> Self {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_page_base")

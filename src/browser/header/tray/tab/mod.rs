@@ -6,7 +6,7 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new() -> Tab {
+    pub fn new() -> Self {
         Self {
             widget: Button::builder()
                 .action_name("win.tab_append")

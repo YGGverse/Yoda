@@ -13,7 +13,7 @@ pub struct Header {
 
 impl Header {
     // Construct
-    pub fn new() -> Header {
+    pub fn new() -> Self {
         let tray = Tray::new();
         let subject = Subject::new();
 
