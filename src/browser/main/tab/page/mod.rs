@@ -71,22 +71,21 @@ impl Page {
                                         Priority::DEFAULT,
                                         Some(&Cancellable::new()),
                                         move |result| match result {
-                                            Ok(request) => {
-                                                println!(
-                                                    "Request sent successfully: {:?}",
-                                                    request
-                                                ); // @TODO remove
-
+                                            Ok(_) => {
                                                 connection.input_stream().read_all_async(
-                                                    Vec::new(),
+                                                    vec![0; 0xfffff], // 1Mb @TODO
                                                     Priority::DEFAULT,
                                                     Some(&Cancellable::new()),
                                                     {
-                                                        |result| match result {
+                                                        move |result| match result {
                                                             Ok(response) => {
-                                                                println!("Result: {:?}", response);
-
-                                                                // @TODO connection.close(cancellable);
+                                                                println!(
+                                                                    "Result: {:?}",
+                                                                    GString::from_utf8_until_nul(
+                                                                        response.0
+                                                                    )
+                                                                ); // @TODO
+                                                                   // @TODO connection.close(cancellable);
                                                             }
                                                             Err(e) => {
                                                                 eprintln!(
@@ -97,7 +96,6 @@ impl Page {
                                                         }
                                                     },
                                                 );
-                                                // @TODO
                                             }
                                             Err(e) => {
                                                 eprintln!("Failed to write request: {:?}", e);
