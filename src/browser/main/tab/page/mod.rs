@@ -86,7 +86,7 @@ impl Page {
                                                                     // Detect page meta
                                                                     let meta = Regex::split_simple(
                                                                         r"^(\d+)?\s([\w]+\/[\w]+)?",
-                                                                        data,
+                                                                        &data,
                                                                         RegexCompileFlags::DEFAULT,
                                                                         RegexMatchFlags::DEFAULT,
                                                                     );
