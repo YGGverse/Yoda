@@ -155,6 +155,40 @@ impl Tab {
     }
 
     // Getters
+    pub fn page_title(&self) -> GString {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get widget ID
+                let id = &widget.widget_name();
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(id) {
+                    return page.title();
+                }
+            }
+        }
+
+        GString::new() // @TODO
+    }
+
+    pub fn page_description(&self) -> GString {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get widget ID
+                let id = &widget.widget_name();
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(id) {
+                    return page.description();
+                }
+            }
+        }
+
+        GString::new() // @TODO
+    }
+
     pub fn widget(&self) -> &Notebook {
         self.widget.as_ref()
     }

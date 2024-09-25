@@ -2,7 +2,7 @@ mod tab;
 
 use tab::Tab;
 
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
 use std::sync::Arc;
 
 pub struct Main {
@@ -51,6 +51,14 @@ impl Main {
     }
 
     // Getters
+    pub fn tab_page_title(&self) -> GString {
+        self.tab.page_title()
+    }
+
+    pub fn tab_page_description(&self) -> GString {
+        self.tab.page_description()
+    }
+
     pub fn widget(&self) -> &Box {
         &self.widget
     }

@@ -4,11 +4,12 @@ mod tray;
 use subject::Subject;
 use tray::Tray;
 
-use gtk::HeaderBar;
+use gtk::{glib::GString, HeaderBar};
 use std::sync::Arc;
 
 pub struct Header {
     widget: HeaderBar,
+    subject: Subject,
 }
 
 impl Header {
@@ -21,7 +22,12 @@ impl Header {
         widget.pack_start(tray.widget());
         widget.set_title_widget(Some(subject.widget()));
 
-        Arc::new(Self { widget })
+        Arc::new(Self { widget, subject })
+    }
+
+    // Actions
+    pub fn update(&self, title: GString, description: GString) {
+        self.subject.update(title, description);
     }
 
     // Getters

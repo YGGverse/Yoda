@@ -19,8 +19,9 @@ impl Description {
     }
 
     // Actions
-    pub fn update(&self) {
-        self.widget.set_visible(self.widget.text().is_empty());
+    pub fn update(&self, text: &str) {
+        self.widget.set_text(text);
+        self.widget.set_visible(!text.is_empty());
     }
 
     // Getters

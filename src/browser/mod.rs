@@ -46,10 +46,11 @@ impl Browser {
         widget.add_action_entries([
             ActionEntry::builder("update")
                 .activate({
+                    let header = header.clone();
                     let main = main.clone();
-                    move |this: &ApplicationWindow, _, _| {
-                        // header.update(); @TODO
+                    move |_, _, _| {
                         main.update();
+                        header.update(main.tab_page_title(), main.tab_page_description());
                     }
                 })
                 .build(),
