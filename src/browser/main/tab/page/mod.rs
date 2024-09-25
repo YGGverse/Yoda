@@ -43,8 +43,8 @@ impl Page {
         widget.append(navigation.widget());
         widget.append(content.widget());
 
-        // Init meta
-        let meta = Arc::new(Meta::new());
+        // Init async mutable Meta object
+        let meta = Arc::new(RefCell::new(Meta::new()));
 
         // Result
         Arc::new(Self {
