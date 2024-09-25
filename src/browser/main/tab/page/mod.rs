@@ -82,11 +82,11 @@ impl Page {
                     }
                     "gemini" => {
                         // Update
-                        self.meta.borrow_mut().title = GString::from("Connect");
-                        //self.meta.borrow_mut().description = uri.host();
-                        self.meta.borrow_mut().progress_fraction = 0.25;
+                        meta.borrow_mut().title = GString::from("Connect");
+                        //meta.borrow_mut().description = uri.host();
+                        meta.borrow_mut().progress_fraction = 0.25;
 
-                        let _ = self.widget.activate_action("win.update", None);
+                        let _ = widget.activate_action("win.update", None);
 
                         // Create new connection
                         let client = SocketClient::new();
