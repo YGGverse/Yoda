@@ -55,6 +55,7 @@ impl Page {
                     "gemini" => {
                         let client = SocketClient::new();
 
+                        client.set_timeout(10);
                         client.set_tls(true);
                         client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
                         client.set_protocol(SocketProtocol::Tcp);
