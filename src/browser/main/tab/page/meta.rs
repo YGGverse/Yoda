@@ -1,5 +1,4 @@
 use gtk::glib::GString;
-use std::cell::RefCell;
 
 pub enum Mime {
     Undefined,
@@ -15,12 +14,12 @@ pub struct Meta {
 }
 
 impl Meta {
-    pub fn new() -> RefCell<Meta> {
-        RefCell::new(Self {
+    pub fn new() -> Meta {
+        Self {
             title: GString::new(),
             description: GString::new(),
             mime: Mime::Undefined,
             progress_fraction: 0.0,
-        })
+        }
     }
 }
