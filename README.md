@@ -32,7 +32,7 @@ This guide in process
 #### `browser`
 
 * The codebase of module must be as minimal as possible: separate different tasks to submodules
-* Every module or it helper must contain and implement only one `struct`
+* Every module must implement only one `struct` (same as one file for one class)
 * Composition modules (like box for window) stored in sub-folders and following same principles as parent
 * Every mod access 1 level of child API, never parents (e.g.`super`)
 * One mod = one widget. Create new mod for new widget implementation
