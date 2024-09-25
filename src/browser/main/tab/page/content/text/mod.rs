@@ -1,4 +1,4 @@
-use gtk::{Orientation, ScrolledWindow};
+use gtk::ScrolledWindow;
 
 pub struct Text {
     widget: ScrolledWindow,
