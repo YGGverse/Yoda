@@ -13,7 +13,7 @@ impl Text {
     }
 
     // Getters
-    pub fn widget(&self) -> &Box {
+    pub fn widget(&self) -> &ScrolledWindow {
         &self.widget
     }
 }
