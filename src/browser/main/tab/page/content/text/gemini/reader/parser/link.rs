@@ -20,8 +20,8 @@ impl Link {
     // returns new Link struct or None
     pub fn from(line: &str, base: &Uri) -> Option<Link> {
         // Init struct members
-        let alt: Option<GString> = None;
-        let date: Option<GString> = None;
+        let mut alt: Option<GString> = None;
+        let mut date: Option<GString> = None;
         let external: bool;
         let link: GString;
         let markup: GString;
@@ -29,7 +29,7 @@ impl Link {
 
         // Parse line
         let parsed = Regex::split_simple(
-            r"^=>\s*([^\s]+)(\s(\d{4}-\d{2}-\d{2}))?(\s(.+))?$",
+            r"^=>\s*([^\s]+)\s+(\d{4}-\d{2}-\d{2})?\s*(.+)?$",
             line,
             RegexCompileFlags::DEFAULT,
             RegexMatchFlags::DEFAULT,
@@ -48,7 +48,7 @@ impl Link {
                         match Uri::parse(&resolved, UriFlags::NONE) {
                             Ok(object) => {
                                 // Set external status
-                                external = object.host() == base.host();
+                                external = object.host() != base.host();
 
                                 // Set struct URI
                                 uri = object;
@@ -62,14 +62,23 @@ impl Link {
             None => return None,
         }
 
+        // Create link name based on external status, date and alt values
+        let mut name = Vec::new();
+
+        if external {
+            name.push("⇖".to_string());
+        }
+
         // Date
-        if let Some(date) = parsed.get(2) {
-            // date = date.as_str();
+        if let Some(this) = parsed.get(2) {
+            date = Some(GString::from(this.to_string()));
+            name.push(this.to_string());
         }
 
         // Alt
-        if let Some(alt) = parsed.get(3) {
-            // alt = alt.as_str();
+        if let Some(this) = parsed.get(3) {
+            alt = Some(GString::from(this.to_string()));
+            name.push(this.to_string());
         }
 
         // Markup
@@ -77,7 +86,7 @@ impl Link {
             "<a href=\"{}\" title=\"{}\"><span underline=\"none\">{}</span></a>\n",
             markup_escape_text(&uri.to_str()), // use resolved address for href
             markup_escape_text(&link),         // show original address for title
-            markup_escape_text(&link),         // @TODO
+            markup_escape_text(&name.join(" ")),
         ));
 
         Some(Self {
