@@ -61,6 +61,7 @@ impl Page {
         let request_text = self.navigation.request_text();
 
         // Init shared objects for async access
+        let content = self.content.clone();
         let meta = self.meta.clone();
         let widget = self.widget.clone();
 
@@ -148,6 +149,8 @@ impl Page {
                                                                         RegexMatchFlags::DEFAULT,
                                                                     );
 
+                                                                    println!("{:?}",parts);
+
                                                                     // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
                                                                     match parts.get(1) {
                                                                         Some(code) => match code.as_str() {
@@ -155,12 +158,17 @@ impl Page {
                                                                                 match parts.get(2) {
                                                                                     Some(mime) => match mime.as_str() {
                                                                                         "text/gemini" => {
+                                                                                            // Update meta
                                                                                             meta.borrow_mut().mime = Mime::TextGemini;
-                                                                                            // @TODO
+                                                                                            // Select widget
+                                                                                            match parts.get(4) {
+                                                                                                Some(source) => content.reset(content::Mime::TextGemini, source),
+                                                                                                None => todo!(),
+                                                                                            }
                                                                                         },
                                                                                         "text/plain" => {
                                                                                             meta.borrow_mut().mime = Mime::TextPlain;
-                                                                                            // @TODO
+                                                                                            todo!()
                                                                                         },
                                                                                         _ => {
                                                                                             meta.borrow_mut().title = GString::from("Oops");

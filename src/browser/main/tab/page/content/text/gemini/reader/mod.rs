@@ -6,16 +6,18 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(gemtext: &str) -> Self {
         Self {
             widget: Label::builder()
                 .halign(Align::Start)
                 .valign(Align::Start)
+                .vexpand(true)
                 .margin_start(8)
                 .margin_end(8)
                 .wrap(true)
                 .selectable(true)
                 .use_markup(true)
+                .label(gemtext) // @TODO
                 .build(),
         }
     }
