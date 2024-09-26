@@ -48,7 +48,8 @@ impl Link {
                         match Uri::parse(&resolved, UriFlags::NONE) {
                             Ok(object) => {
                                 // Set external status
-                                external = object.host() != base.host();
+                                external =
+                                    object.host() != base.host() || object.port() != base.port();
 
                                 // Set struct URI
                                 uri = object;
