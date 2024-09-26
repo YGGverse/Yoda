@@ -1,6 +1,7 @@
 mod parser;
 
 use parser::header::Header;
+use parser::plain::Plain;
 
 use gtk::{
     prelude::{StyleContextExt, WidgetExt},
@@ -19,10 +20,16 @@ impl Reader {
         let mut markup = String::new();
 
         for line in gemtext.lines() {
+            // Is header
             if let Some(header) = Header::from(line) {
                 markup.push_str(header.markup());
                 continue;
             }
+
+            // Is link @TODO
+
+            // Nothing match, escape string just
+            markup.push_str(Plain::from(line).markup())
         }
 
         // Init CSS
