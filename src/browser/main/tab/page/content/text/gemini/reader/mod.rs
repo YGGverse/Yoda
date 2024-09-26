@@ -1,3 +1,7 @@
+mod parser;
+
+use parser::header::Header;
+
 use gtk::{
     prelude::{StyleContextExt, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
@@ -11,6 +15,16 @@ pub struct Reader {
 impl Reader {
     // Construct
     pub fn new(gemtext: &str) -> Self {
+        // Init markup
+        let mut markup = String::new();
+
+        for line in gemtext.lines() {
+            if let Some(header) = Header::from(line) {
+                markup.push_str(header.markup());
+                continue;
+            }
+        }
+
         // Init CSS
         let css = CssProvider::new();
 
@@ -22,13 +36,14 @@ impl Reader {
         let widget = Label::builder()
             .halign(Align::Start)
             .valign(Align::Start)
+            .hexpand(true) // @TODO
             .vexpand(true)
             .margin_start(8)
             .margin_end(8)
             .wrap(true)
             .selectable(true)
             .use_markup(true)
-            .label(gemtext) // @TODO
+            .label(markup)
             .build();
 
         widget
