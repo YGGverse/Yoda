@@ -1,5 +1,5 @@
 use gtk::glib::{
-    markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
+    gformat, markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
 };
 
 pub struct Link {
@@ -83,12 +83,12 @@ impl Link {
         }
 
         // Markup
-        markup = GString::from(format!(
+        markup = gformat!(
             "<a href=\"{}\" title=\"{}\"><span underline=\"none\">{}</span></a>\n",
             markup_escape_text(&uri.to_str()), // use resolved address for href
             markup_escape_text(&link),         // show original address for title
             markup_escape_text(&name.join(" ")),
-        ));
+        );
 
         Some(Self {
             alt,

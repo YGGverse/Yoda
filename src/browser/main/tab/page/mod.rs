@@ -8,7 +8,7 @@ use navigation::Navigation;
 
 use gtk::{
     gio::{Cancellable, SocketClient, SocketProtocol, TlsCertificateFlags},
-    glib::{GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
+    glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
         BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
         WidgetExt,
@@ -170,7 +170,7 @@ impl Page {
                                                                                         },
                                                                                         _ => {
                                                                                             meta.borrow_mut().title = GString::from("Oops");
-                                                                                            meta.borrow_mut().description = GString::from(format!("Content {mime} not supported"));
+                                                                                            meta.borrow_mut().description = gformat!("Content {mime} not supported");
                                                                                         },
                                                                                     }
                                                                                     None => todo!(),
@@ -179,7 +179,7 @@ impl Page {
                                                                             },
                                                                             _ => {
                                                                                 meta.borrow_mut().title = GString::from("Oops");
-                                                                                meta.borrow_mut().description = GString::from(format!("Status {code} not supported"));
+                                                                                meta.borrow_mut().description = gformat!("Status {code} not supported");
                                                                             },
                                                                         }
                                                                         None => todo!(),
@@ -193,7 +193,7 @@ impl Page {
                                                                 }
                                                                 Err(e) => {
                                                                     meta.borrow_mut().title = GString::from("Oops");
-                                                                    meta.borrow_mut().description = GString::from(format!("Failed to read buffer data: {e}"));
+                                                                    meta.borrow_mut().description = gformat!("Failed to read buffer data: {e}");
                                                                     meta.borrow_mut().progress_fraction = 1.0;
 
                                                                     let _ = widget.activate_action(
@@ -211,7 +211,7 @@ impl Page {
                                                         Err(e) => {
                                                             // Update
                                                             meta.borrow_mut().title = GString::from("Oops");
-                                                            meta.borrow_mut().description = GString::from(format!("Failed to read response: {:?}", e));
+                                                            meta.borrow_mut().description = gformat!("Failed to read response: {:?}", e);
                                                             meta.borrow_mut().progress_fraction = 1.0;
 
                                                             let _ = widget.activate_action(
@@ -230,7 +230,7 @@ impl Page {
                                             Err(e) => {
                                                 // Update
                                                 meta.borrow_mut().title = GString::from("Oops");
-                                                meta.borrow_mut().description = GString::from(format!("Failed to read request: {:?}", e));
+                                                meta.borrow_mut().description = gformat!("Failed to read request: {:?}", e);
                                                 meta.borrow_mut().progress_fraction = 1.0;
 
                                                 let _ = widget.activate_action(
@@ -249,7 +249,7 @@ impl Page {
                                 Err(e) => {
                                     // Update
                                     meta.borrow_mut().title = GString::from("Oops");
-                                    meta.borrow_mut().description = GString::from(format!("Failed to connect: {:?}", e));
+                                    meta.borrow_mut().description = gformat!("Failed to connect: {:?}", e);
                                     meta.borrow_mut().progress_fraction = 1.0;
 
                                     let _ = widget.activate_action(
@@ -266,8 +266,7 @@ impl Page {
                     scheme => {
                         // Update
                         meta.borrow_mut().title = GString::from("Oops");
-                        meta.borrow_mut().description =
-                            GString::from(format!("Protocol {scheme} not supported"));
+                        meta.borrow_mut().description = gformat!("Protocol {scheme} not supported");
                         meta.borrow_mut().progress_fraction = 1.0;
 
                         let _ = widget.activate_action("win.update", None);
@@ -283,7 +282,7 @@ impl Page {
                     RegexMatchFlags::DEFAULT,
                 ) {
                     // Seems request contain some host, try append default scheme
-                    let request_text = GString::from(format!("gemini://{request_text}"));
+                    let request_text = gformat!("gemini://{request_text}");
                     // Make sure new request conversible to valid URI
                     match Uri::parse(&request_text, UriFlags::NONE) {
                         Ok(_) => {
@@ -299,10 +298,10 @@ impl Page {
                 } else {
                     // Plain text given, make search request to default provider
                     self.navigation.set_request_text(
-                        &GString::from(format!(
+                        &gformat!(
                             "gemini://tlgs.one/search?{}",
                             Uri::escape_string(&request_text, None, false)
-                        )),
+                        ),
                         true, // activate (page reload)
                     );
                 }

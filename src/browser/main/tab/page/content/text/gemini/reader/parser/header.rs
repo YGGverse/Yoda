@@ -1,4 +1,4 @@
-use gtk::glib::{markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags};
+use gtk::glib::{gformat, markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags};
 
 pub enum Level {
     H1,
@@ -42,18 +42,18 @@ impl Header {
 
                 // Init markup
                 let markup = match level {
-                    Level::H1 => GString::from(format!(
+                    Level::H1 => gformat!(
                         "<span size=\"xx-large\">{}</span>\n",
                         markup_escape_text(&text)
-                    )),
-                    Level::H2 => GString::from(format!(
+                    ),
+                    Level::H2 => gformat!(
                         "<span size=\"x-large\">{}</span>\n",
                         markup_escape_text(&text)
-                    )),
-                    Level::H3 => GString::from(format!(
+                    ),
+                    Level::H3 => gformat!(
                         "<span size=\"large\">{}</span>\n",
                         markup_escape_text(&text)
-                    )),
+                    ),
                     _ => return None,
                 };
 
