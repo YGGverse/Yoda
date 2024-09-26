@@ -3,7 +3,10 @@ mod text;
 
 use text::Text;
 
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{
+    prelude::{BoxExt, WidgetExt},
+    Box, Orientation,
+};
 
 pub enum Mime {
     Undefined,
@@ -27,7 +30,12 @@ impl Content {
 
     // Actions
     pub fn reset(&self, mime: Mime, data: &str) {
-        //self.widget.remove(self.child.widget());
+        // Cleanup
+        while let Some(child) = self.widget.last_child() {
+            self.widget.remove(&child)
+        }
+
+        // Compose
         match mime {
             Mime::TextGemini => {
                 let child = Text::gemini(data);
