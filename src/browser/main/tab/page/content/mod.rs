@@ -38,8 +38,7 @@ impl Content {
         // Compose
         match mime {
             Mime::TextGemini => {
-                let child = Text::gemini(data);
-                self.widget.append(child.widget());
+                self.widget.append(Text::gemini(data).widget());
             }
             Mime::TextPlain => {
                 todo!()
