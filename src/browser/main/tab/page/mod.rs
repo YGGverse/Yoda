@@ -149,8 +149,6 @@ impl Page {
                                                                         RegexMatchFlags::DEFAULT,
                                                                     );
 
-                                                                    println!("{:?}",parts);
-
                                                                     // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
                                                                     match parts.get(1) {
                                                                         Some(code) => match code.as_str() {
