@@ -4,11 +4,13 @@ use parser::header::Header;
 use parser::plain::Plain;
 
 use gtk::{
+    glib::GString,
     prelude::{StyleContextExt, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
 
 pub struct Reader {
+    title: Option<GString>,
     css: CssProvider,
     widget: Label,
 }
@@ -16,13 +18,23 @@ pub struct Reader {
 impl Reader {
     // Construct
     pub fn new(gemtext: &str) -> Self {
+        // Init title
+        let mut title = None;
+
         // Init markup
         let mut markup = String::new();
 
         for line in gemtext.lines() {
             // Is header
             if let Some(header) = Header::from(line) {
+                // Format
                 markup.push_str(header.markup());
+
+                // Set title from first document header tag
+                if title == None {
+                    title = Some(header.text().clone());
+                }
+
                 continue;
             }
 
@@ -58,10 +70,14 @@ impl Reader {
             .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // Result
-        Self { css, widget }
+        Self { title, css, widget }
     }
 
     // Getters
+    pub fn title(&self) -> &Option<GString> {
+        &self.title
+    }
+
     pub fn widget(&self) -> &Label {
         &self.widget
     }
