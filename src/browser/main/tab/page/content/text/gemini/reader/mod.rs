@@ -1,10 +1,11 @@
 mod parser;
 
 use parser::header::Header;
+use parser::link::Link;
 use parser::plain::Plain;
 
 use gtk::{
-    glib::GString,
+    glib::{GString, Uri},
     prelude::{StyleContextExt, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
@@ -17,7 +18,7 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new(gemtext: &str) -> Self {
+    pub fn new(gemtext: &str, base: &Uri) -> Self {
         // Init title
         let mut title = None;
 
@@ -38,7 +39,13 @@ impl Reader {
                 continue;
             }
 
-            // Is link @TODO
+            // Is link
+            if let Some(link) = Link::from(line, base) {
+                // Format
+                markup.push_str(link.markup());
+
+                continue;
+            }
 
             // Nothing match, escape string just
             markup.push_str(Plain::from(line).markup())

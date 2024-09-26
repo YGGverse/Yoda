@@ -2,7 +2,7 @@ mod gemini;
 
 use gemini::Gemini;
 
-use gtk::ScrolledWindow;
+use gtk::{glib::Uri, ScrolledWindow};
 
 pub struct Text {
     widget: ScrolledWindow,
@@ -10,9 +10,9 @@ pub struct Text {
 
 impl Text {
     // Construct
-    pub fn gemini(gemtext: &str) -> Self {
+    pub fn gemini(gemtext: &str, base: &Uri) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext);
+        let gemini = Gemini::new(gemtext, base);
 
         // Init widget
         let widget = ScrolledWindow::builder().build();

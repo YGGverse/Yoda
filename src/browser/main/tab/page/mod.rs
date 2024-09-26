@@ -160,7 +160,7 @@ impl Page {
                                                                                             meta.borrow_mut().mime = Mime::TextGemini;
                                                                                             // Select widget
                                                                                             match parts.get(4) {
-                                                                                                Some(source) => content.reset(content::Mime::TextGemini, source),
+                                                                                                Some(source) => content.reset(content::Mime::TextGemini, &uri, &source),
                                                                                                 None => todo!(),
                                                                                             }
                                                                                         },

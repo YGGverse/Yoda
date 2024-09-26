@@ -4,6 +4,7 @@ mod text;
 use text::Text;
 
 use gtk::{
+    glib::Uri,
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
@@ -29,7 +30,7 @@ impl Content {
     }
 
     // Actions
-    pub fn reset(&self, mime: Mime, data: &str) {
+    pub fn reset(&self, mime: Mime, base: &Uri, data: &str) {
         // Cleanup
         while let Some(child) = self.widget.last_child() {
             self.widget.remove(&child)
@@ -38,7 +39,7 @@ impl Content {
         // Compose
         match mime {
             Mime::TextGemini => {
-                self.widget.append(Text::gemini(data).widget());
+                self.widget.append(Text::gemini(data, base).widget());
             }
             Mime::TextPlain => {
                 todo!()
