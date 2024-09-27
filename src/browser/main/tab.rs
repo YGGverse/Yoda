@@ -34,7 +34,7 @@ impl Tab {
     // Actions
     pub fn activate(&self, tab: Arc<Self>) {
         self.widget.connect_page_removed({
-            move |_, widget: &Widget, _| {
+            move |_, widget, _| {
                 // Cleanup HashMap index
                 let id = &widget.widget_name();
                 tab.labels.borrow_mut().remove(id);
