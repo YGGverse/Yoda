@@ -34,9 +34,23 @@ impl Browser {
         let action_quit = SimpleAction::new("quit", None);
         let action_update = SimpleAction::new("update", None);
 
+        let action_tab_append = SimpleAction::new("tab_append", None);
+        let action_tab_close = SimpleAction::new("tab_close", None);
+        let action_tab_close_all = SimpleAction::new("tab_close_all", None);
+        let action_tab_page_reload = SimpleAction::new("tab_page_reload", None);
+        let action_tab_pin = SimpleAction::new("tab_pin", None);
+
         // Init components
         // let db = db::Browser::new(connection);
-        let header = Arc::new(Header::new(&action_debug, &action_quit));
+        let header = Arc::new(Header::new(
+            &action_debug,
+            &action_quit,
+            &action_tab_append,
+            &action_tab_close,
+            &action_tab_close_all,
+            &action_tab_page_reload,
+            &action_tab_pin,
+        ));
 
         let main = Arc::new(Main::new(&action_debug, &action_quit, &action_update));
 
@@ -55,16 +69,16 @@ impl Browser {
 
         // Init events
         action_debug.connect_activate({
-            let target = widget.clone();
+            let widget = widget.clone();
             move |_, _| {
-                target.emit_enable_debugging(true);
+                widget.emit_enable_debugging(true);
             }
         });
 
         action_quit.connect_activate({
-            let target = widget.clone();
+            let widget = widget.clone();
             move |_, _| {
-                target.close();
+                widget.close();
             }
         });
 
@@ -77,51 +91,42 @@ impl Browser {
             }
         });
 
-        // Init actions @TODO
-        widget.add_action_entries([
-            ActionEntry::builder("tab_append")
-                .activate({
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.tab_append(None);
-                    }
-                })
-                .build(),
-            ActionEntry::builder("tab_page_reload")
-                .activate({
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.tab_page_reload();
-                    }
-                })
-                .build(),
-            ActionEntry::builder("tab_close")
-                .activate({
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.tab_close();
-                    }
-                })
-                .build(),
-            ActionEntry::builder("tab_close_all")
-                .activate({
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.tab_close_all();
-                    }
-                })
-                .build(),
-            ActionEntry::builder("tab_pin")
-                .activate({
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.tab_pin();
-                    }
-                })
-                .build(),
-        ]);
+        action_tab_append.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                main.tab_append(None);
+            }
+        });
 
-        // Return
+        action_tab_close.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                main.tab_close();
+            }
+        });
+
+        action_tab_close_all.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                main.tab_close_all();
+            }
+        });
+
+        action_tab_page_reload.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                main.tab_page_reload();
+            }
+        });
+
+        action_tab_pin.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                main.tab_pin();
+            }
+        });
+
+        // Return activated browser struct
         Self {
             // db,
             widget,

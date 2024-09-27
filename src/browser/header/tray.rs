@@ -12,9 +12,25 @@ pub struct Tray {
 }
 
 impl Tray {
-    pub fn new(action_debug: &SimpleAction, action_quit: &SimpleAction) -> Self {
+    pub fn new(
+        action_debug: &SimpleAction,
+        action_quit: &SimpleAction,
+        action_tab_append: &SimpleAction,
+        action_tab_close: &SimpleAction,
+        action_tab_close_all: &SimpleAction,
+        action_tab_page_reload: &SimpleAction,
+        action_tab_pin: &SimpleAction,
+    ) -> Self {
         // Init components
-        let menu = Menu::new(action_debug, action_quit);
+        let menu = Menu::new(
+            action_debug,
+            action_quit,
+            action_tab_append,
+            action_tab_close,
+            action_tab_close_all,
+            action_tab_page_reload,
+            action_tab_pin,
+        );
         let tab = Tab::new();
 
         // Init widget
