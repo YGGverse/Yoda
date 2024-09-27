@@ -60,10 +60,12 @@ impl Reader {
 
         // Init widget
         let widget = Label::builder()
-            .halign(Align::Start)
-            .valign(Align::Start)
-            .hexpand(true) // @TODO
+            .halign(Align::Fill)
+            .valign(Align::Fill)
+            .hexpand(true)
             .vexpand(true)
+            .xalign(0.0)
+            .yalign(0.0)
             .margin_start(8)
             .margin_end(8)
             .wrap(true)
