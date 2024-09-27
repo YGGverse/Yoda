@@ -21,12 +21,17 @@ impl Title {
 
     // Actions
     pub fn update(&self, text: Option<GString>) {
-        match text {
-            Some(value) => self
-                .widget
-                .set_text(&format!("{} - {}", value, DEFAULT_TEXT)),
-            None => self.widget.set_text(DEFAULT_TEXT),
-        };
+        let mut name = Vec::new();
+
+        if let Some(value) = text {
+            if !value.is_empty() {
+                name.push(value);
+            }
+        }
+
+        name.push(GString::from(DEFAULT_TEXT));
+
+        self.widget.set_text(&name.join(" - "));
     }
 
     // Getters

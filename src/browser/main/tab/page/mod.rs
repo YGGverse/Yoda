@@ -93,12 +93,13 @@ impl Page {
         let widget = self.widget.clone();
 
         // Update
-        meta.borrow_mut().title = GString::from("Reload");
-        meta.borrow_mut().description = request_text.clone();
         meta.borrow_mut().mime = Mime::Undefined;
+        meta.borrow_mut().description = gformat!("Loading..");
         meta.borrow_mut().progress_fraction = 0.0;
 
-        let _ = widget.activate_action("win.update", None);
+        widget
+            .activate_action("win.update", None)
+            .expect("Action `win.update` not found");
 
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
@@ -109,15 +110,19 @@ impl Page {
                         todo!()
                     }
                     "gemini" => {
-                        // Update
-                        meta.borrow_mut().title = GString::from("Connect");
-                        meta.borrow_mut().description = match uri.host() {
+                        // Get host
+                        let host = match uri.host() {
                             Some(host) => host,
                             None => panic!(),
                         };
-                        meta.borrow_mut().progress_fraction = 0.25;
 
-                        let _ = widget.activate_action("win.update", None);
+                        // Update
+                        meta.borrow_mut().progress_fraction = 0.25;
+                        meta.borrow_mut().description = gformat!("Connect {host}..");
+
+                        widget
+                            .activate_action("win.update", None)
+                            .expect("Action `win.update` not found");
 
                         // Create new connection
                         let cancellable = Cancellable::new();
@@ -135,10 +140,10 @@ impl Page {
                             move |result| match result {
                                 Ok(connection) => {
                                     // Update
-                                    meta.borrow_mut().title = GString::from("Request");
                                     meta.borrow_mut().progress_fraction = 0.50;
+                                    meta.borrow_mut().description = gformat!("Connected to {host}..");
 
-                                    let _ = widget.activate_action("win.update", None);
+                                    widget.activate_action("win.update", None).expect("Action `win.update` not found");
 
                                     // Send request
                                     connection.output_stream().write_all_async(
@@ -148,10 +153,10 @@ impl Page {
                                         move |result| match result {
                                             Ok(_) => {
                                                 // Update
-                                                meta.borrow_mut().title = GString::from("Response");
                                                 meta.borrow_mut().progress_fraction = 0.75;
+                                                meta.borrow_mut().description = gformat!("Request data from {host}..");
 
-                                                let _ = widget.activate_action("win.update", None);
+                                                widget.activate_action("win.update", None).expect("Action `win.update` not found");
 
                                                 // Read response
                                                 connection.input_stream().read_all_async(
@@ -165,8 +170,8 @@ impl Page {
                                                             ) {
                                                                 Ok(data) => {
                                                                     // Format response
-                                                                    meta.borrow_mut().title = GString::from("Done"); // @TODO
                                                                     meta.borrow_mut().progress_fraction = 1.0;
+                                                                    meta.borrow_mut().description = host;
 
                                                                     // Parse response @TODO read bytes
                                                                     let parts = Regex::split_simple(
@@ -296,7 +301,9 @@ impl Page {
                         meta.borrow_mut().description = gformat!("Protocol {scheme} not supported");
                         meta.borrow_mut().progress_fraction = 1.0;
 
-                        let _ = widget.activate_action("win.update", None);
+                        widget
+                            .activate_action("win.update", None)
+                            .expect("Action `win.update` not found");
                     }
                 }
             }
