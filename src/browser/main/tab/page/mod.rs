@@ -7,11 +7,14 @@ use meta::{Meta, Mime};
 use navigation::Navigation;
 
 use gtk::{
-    gio::{Cancellable, SocketClient, SocketProtocol, TlsCertificateFlags},
+    gio::{
+        ActionEntry, Cancellable, SimpleActionGroup, SocketClient, SocketProtocol,
+        TlsCertificateFlags,
+    },
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
-        BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
-        WidgetExt,
+        ActionMapExtManual, BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
+        SocketClientExt, StaticVariantType, WidgetExt,
     },
     Box, Orientation,
 };
@@ -42,6 +45,30 @@ impl Page {
 
         widget.append(navigation.widget());
         widget.append(content.widget());
+
+        // Init actions @TODO move actions init outside
+        let action_open = ActionEntry::builder("open")
+            .parameter_type(Some(&String::static_variant_type()))
+            .activate({
+                let navigation = navigation.clone();
+                move |_, _, request| {
+                    let uri = request
+                        .expect("Parameter required for `page.open` action")
+                        .get::<String>()
+                        .expect("Parameter does not match `String`");
+
+                    navigation.set_request_text(
+                        &GString::from(uri),
+                        true, // activate (page reload)
+                    );
+                }
+            })
+            .build();
+
+        // Init action group
+        let actions = SimpleActionGroup::new();
+        actions.add_action_entries([action_open]);
+        widget.insert_action_group("page", Some(&actions));
 
         // Init async mutable Meta object
         let meta = Arc::new(RefCell::new(Meta::new()));

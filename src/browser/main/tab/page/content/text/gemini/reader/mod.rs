@@ -5,8 +5,8 @@ use parser::link::Link;
 use parser::plain::Plain;
 
 use gtk::{
-    glib::{GString, Uri},
-    prelude::{StyleContextExt, WidgetExt},
+    glib::{GString, Propagation, Uri},
+    prelude::{StyleContextExt, ToVariant, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
 
@@ -75,6 +75,12 @@ impl Reader {
         widget
             .style_context()
             .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+        // Connect actions @TODO move actions init outside
+        widget.connect_activate_link(|label, uri| {
+            let _ = label.activate_action("page.open", Some(&uri.to_variant()));
+            Propagation::Stop // |Proceed @TODO parse external scheme
+        });
 
         // Result
         Self { title, css, widget }
