@@ -21,11 +21,15 @@ impl Request {
 
         // Connect events
         widget.connect_changed(|entry| {
-            let _ = entry.activate_action("win.update", None);
+            entry
+                .activate_action("win.update", None)
+                .expect("Action `win.update` not found")
         });
 
         widget.connect_activate(|entry| {
-            let _ = entry.activate_action("win.tab_page_reload", None); // @TODO variant
+            entry
+                .activate_action("win.tab_page_reload", None)
+                .expect("Action `win.tab_page_reload` not found")
         });
 
         // Result
@@ -42,7 +46,7 @@ impl Request {
         self.widget.set_text(value);
 
         if activate {
-            self.widget.activate();
+            self.widget.emit_activate();
         }
     }
 
