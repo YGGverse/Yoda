@@ -10,13 +10,11 @@ use gtk::{
 };
 
 pub enum Mime {
-    Undefined,
     TextGemini,
     TextPlain,
 }
 
 pub struct Content {
-    mime: Mime,
     widget: Box,
 }
 
@@ -24,7 +22,6 @@ impl Content {
     // Construct
     pub fn new() -> Self {
         Self {
-            mime: Mime::Undefined,
             widget: Box::builder().orientation(Orientation::Vertical).build(),
         }
     }
@@ -42,9 +39,6 @@ impl Content {
                 self.widget.append(Text::gemini(data, base).widget());
             }
             Mime::TextPlain => {
-                todo!()
-            }
-            Mime::Undefined => {
                 todo!()
             }
         }

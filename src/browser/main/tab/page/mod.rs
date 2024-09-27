@@ -93,9 +93,9 @@ impl Page {
         let widget = self.widget.clone();
 
         // Update
-        meta.borrow_mut().mime = Mime::Undefined;
-        meta.borrow_mut().title = gformat!("Loading..");
-        meta.borrow_mut().description = gformat!("Loading..");
+        meta.borrow_mut().mime = None;
+        meta.borrow_mut().title = Some(gformat!("Loading.."));
+        meta.borrow_mut().description = None;
         meta.borrow_mut().progress_fraction = 0.0;
 
         widget
@@ -119,7 +119,7 @@ impl Page {
 
                         // Update
                         meta.borrow_mut().progress_fraction = 0.25;
-                        meta.borrow_mut().description = gformat!("Connect {host}..");
+                        meta.borrow_mut().description = Some(gformat!("Connect {host}.."));
 
                         widget
                             .activate_action("win.update", None)
@@ -142,7 +142,7 @@ impl Page {
                                 Ok(connection) => {
                                     // Update
                                     meta.borrow_mut().progress_fraction = 0.50;
-                                    meta.borrow_mut().description = gformat!("Connected to {host}..");
+                                    meta.borrow_mut().description = Some(gformat!("Connected to {host}.."));
 
                                     widget.activate_action("win.update", None).expect("Action `win.update` not found");
 
@@ -155,7 +155,7 @@ impl Page {
                                             Ok(_) => {
                                                 // Update
                                                 meta.borrow_mut().progress_fraction = 0.75;
-                                                meta.borrow_mut().description = gformat!("Request data from {host}..");
+                                                meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
 
                                                 widget.activate_action("win.update", None).expect("Action `win.update` not found");
 
@@ -172,15 +172,15 @@ impl Page {
                                                                 Ok(data) => {
                                                                     // Format response
                                                                     meta.borrow_mut().progress_fraction = 1.0;
-                                                                    meta.borrow_mut().description = host;
-                                                                    meta.borrow_mut().title = uri.path();
+                                                                    meta.borrow_mut().description = Some(host);
+                                                                    meta.borrow_mut().title = Some(uri.path());
 
                                                                     // Try create short base for title
                                                                     let path = uri.path();
                                                                     let path = Path::new(&path);
                                                                     if let Some(base) = path.file_name() {
                                                                         if let Some(base_str) = base.to_str() {
-                                                                            meta.borrow_mut().title = GString::from(base_str);
+                                                                            meta.borrow_mut().title = Some(GString::from(base_str));
                                                                         }
                                                                     }
 
@@ -200,7 +200,7 @@ impl Page {
                                                                                     Some(mime) => match mime.as_str() {
                                                                                         "text/gemini" => {
                                                                                             // Update meta
-                                                                                            meta.borrow_mut().mime = Mime::TextGemini;
+                                                                                            meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                             // Select widget
                                                                                             match parts.get(4) {
                                                                                                 Some(source) => content.reset(content::Mime::TextGemini, &uri, &source),
@@ -208,12 +208,12 @@ impl Page {
                                                                                             }
                                                                                         },
                                                                                         "text/plain" => {
-                                                                                            meta.borrow_mut().mime = Mime::TextPlain;
+                                                                                            meta.borrow_mut().mime = Some(Mime::TextPlain);
                                                                                             todo!()
                                                                                         },
                                                                                         _ => {
-                                                                                            meta.borrow_mut().title = GString::from("Oops");
-                                                                                            meta.borrow_mut().description = gformat!("Content {mime} not supported");
+                                                                                            meta.borrow_mut().title = Some(gformat!("Oops"));
+                                                                                            meta.borrow_mut().description = Some(gformat!("Content {mime} not supported"));
                                                                                         },
                                                                                     }
                                                                                     None => todo!(),
@@ -221,8 +221,8 @@ impl Page {
                                                                                 // @TODO
                                                                             },
                                                                             _ => {
-                                                                                meta.borrow_mut().title = GString::from("Oops");
-                                                                                meta.borrow_mut().description = gformat!("Status {code} not supported");
+                                                                                meta.borrow_mut().title = Some(gformat!("Oops"));
+                                                                                meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
                                                                             },
                                                                         }
                                                                         None => todo!(),
@@ -235,8 +235,8 @@ impl Page {
                                                                     );
                                                                 }
                                                                 Err(e) => {
-                                                                    meta.borrow_mut().title = GString::from("Oops");
-                                                                    meta.borrow_mut().description = gformat!("Failed to read buffer data: {e}");
+                                                                    meta.borrow_mut().title = Some(gformat!("Oops"));
+                                                                    meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
                                                                     meta.borrow_mut().progress_fraction = 1.0;
 
                                                                     let _ = widget.activate_action(
@@ -253,8 +253,8 @@ impl Page {
                                                         }
                                                         Err(e) => {
                                                             // Update
-                                                            meta.borrow_mut().title = GString::from("Oops");
-                                                            meta.borrow_mut().description = gformat!("Failed to read response: {:?}", e);
+                                                            meta.borrow_mut().title = Some(gformat!("Oops"));
+                                                            meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
                                                             meta.borrow_mut().progress_fraction = 1.0;
 
                                                             let _ = widget.activate_action(
@@ -272,8 +272,8 @@ impl Page {
                                             }
                                             Err(e) => {
                                                 // Update
-                                                meta.borrow_mut().title = GString::from("Oops");
-                                                meta.borrow_mut().description = gformat!("Failed to read request: {:?}", e);
+                                                meta.borrow_mut().title = Some(gformat!("Oops"));
+                                                meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
                                                 meta.borrow_mut().progress_fraction = 1.0;
 
                                                 let _ = widget.activate_action(
@@ -291,8 +291,8 @@ impl Page {
                                 }
                                 Err(e) => {
                                     // Update
-                                    meta.borrow_mut().title = GString::from("Oops");
-                                    meta.borrow_mut().description = gformat!("Failed to connect: {:?}", e);
+                                    meta.borrow_mut().title = Some(gformat!("Oops"));
+                                    meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
                                     meta.borrow_mut().progress_fraction = 1.0;
 
                                     let _ = widget.activate_action(
@@ -308,8 +308,9 @@ impl Page {
                     */
                     scheme => {
                         // Update
-                        meta.borrow_mut().title = GString::from("Oops");
-                        meta.borrow_mut().description = gformat!("Protocol {scheme} not supported");
+                        meta.borrow_mut().title = Some(gformat!("Oops"));
+                        meta.borrow_mut().description =
+                            Some(gformat!("Protocol {scheme} not supported"));
                         meta.borrow_mut().progress_fraction = 1.0;
 
                         widget
@@ -360,11 +361,11 @@ impl Page {
     }
 
     // Getters
-    pub fn title(&self) -> GString {
+    pub fn title(&self) -> Option<GString> {
         self.meta.borrow().title.clone()
     }
 
-    pub fn description(&self) -> GString {
+    pub fn description(&self) -> Option<GString> {
         self.meta.borrow().description.clone()
     }
 

@@ -18,8 +18,11 @@ impl Title {
     }
 
     // Actions
-    pub fn update(&self, title: &GString) {
-        self.widget.set_text(title);
+    pub fn update(&self, title: Option<&GString>) {
+        match title {
+            Some(title) => self.widget.set_text(title),
+            None => self.widget.set_text(""), // @TODO None/false option
+        }
     }
 
     // Getters

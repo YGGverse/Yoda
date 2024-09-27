@@ -142,7 +142,11 @@ impl Tab {
 
                     // Get label by widget ID
                     if let Some(label) = self.labels.borrow().get(id) {
-                        label.update(&page.title());
+                        if let Some(title) = page.title() {
+                            label.update(Some(&title));
+                        } else {
+                            label.update(None);
+                        }
                     }
                 }
             }
@@ -159,7 +163,7 @@ impl Tab {
                 let id = &widget.widget_name();
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(id) {
-                    return Some(page.title());
+                    return page.title();
                 }
             }
         }
@@ -176,7 +180,7 @@ impl Tab {
                 let id = &widget.widget_name();
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(id) {
-                    return Some(page.description());
+                    return page.description();
                 }
             }
         }

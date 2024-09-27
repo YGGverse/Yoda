@@ -42,8 +42,12 @@ impl Label {
     }
 
     // Actions
-    pub fn update(&self, title: &GString) {
-        self.widget.set_tooltip_text(Some(title));
+    pub fn update(&self, title: Option<&GString>) {
+        match title {
+            Some(tooltip_text) => self.widget.set_tooltip_text(Some(tooltip_text)),
+            None => self.widget.set_tooltip_text(None),
+        }
+
         self.title.update(title);
     }
 
