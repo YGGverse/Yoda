@@ -94,6 +94,7 @@ impl Page {
 
         // Update
         meta.borrow_mut().mime = Mime::Undefined;
+        meta.borrow_mut().title = gformat!("Loading..");
         meta.borrow_mut().description = gformat!("Loading..");
         meta.borrow_mut().progress_fraction = 0.0;
 
