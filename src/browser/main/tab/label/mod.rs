@@ -41,8 +41,8 @@ impl Label {
     }
 
     // Actions
-    pub fn update(&self) {
-        // @TODO
+    pub fn update(&self, title: &GString) {
+        self.title.update(title);
     }
 
     // Setters

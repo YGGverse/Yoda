@@ -136,14 +136,14 @@ impl Tab {
                 // Get widget ID
                 let id = &widget.widget_name();
 
-                // Get label by widget ID
-                if let Some(label) = self.labels.borrow().get(id) {
-                    label.update();
-                }
-
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(id) {
                     page.update();
+
+                    // Get label by widget ID
+                    if let Some(label) = self.labels.borrow().get(id) {
+                        label.update(&page.title());
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-use gtk::{pango::EllipsizeMode, Label};
+use gtk::{glib::GString, pango::EllipsizeMode, Label};
 
 pub struct Title {
     widget: Label,
@@ -15,6 +15,11 @@ impl Title {
                 .single_line_mode(true)
                 .build(),
         }
+    }
+
+    // Actions
+    pub fn update(&self, title: &GString) {
+        self.widget.set_text(title);
     }
 
     // Getters
