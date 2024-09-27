@@ -31,11 +31,16 @@ This guide in process
 
 #### `browser`
 
-* Composition pattern, using standard `mod.rs` model
-* One mod = one widget. Create new mod for new widget implementation
-* The codebase of module must be as minimal as possible: separate different tasks to sub-modules
+* Use [modern path pattern](https://doc.rust-lang.org/edition-guide/rust-2018/path-changes.html#no-more-modrs)
+* One module implements one GTK widget, it may include additional helper files in same location (like template, CSS or DB API)
+* For children widget - create children module, located according to it hierarchy
+* The codebase of module must be as minimal as possible, separate to sub-modules:
+  * different tasks
+  * massive structures
+  * structures with implementation
 * Every module must:
-  * access 1 level of child API, never parents (e.g.`super`)
+  * encapsulate: compose childs and stay composable for parents
+  * access 1 level of child API, never parents (e.g. through `super`)
   * implement only one `struct` (same as one file for one class)
     * `struct` is public, where members - private
   * contain main `struct` implementation:
