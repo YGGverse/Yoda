@@ -6,8 +6,8 @@ use header::Header;
 use main::Main;
 
 use gtk::{
-    gio::{ActionEntry, SimpleAction},
-    prelude::{ActionMapExt, ActionMapExtManual, GtkWindowExt},
+    gio::SimpleAction,
+    prelude::{ActionMapExt, GtkWindowExt},
     Application, ApplicationWindow,
 };
 use std::sync::Arc;
