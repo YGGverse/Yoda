@@ -57,11 +57,11 @@ impl Main {
     }
 
     // Getters
-    pub fn tab_page_title(&self) -> GString {
+    pub fn tab_page_title(&self) -> Option<GString> {
         self.tab.page_title()
     }
 
-    pub fn tab_page_description(&self) -> GString {
+    pub fn tab_page_description(&self) -> Option<GString> {
         self.tab.page_description()
     }
 

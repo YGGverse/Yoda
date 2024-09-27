@@ -34,9 +34,9 @@ impl Subject {
     }
 
     // Actions
-    pub fn update(&self, title: GString, description: GString) {
-        self.title.update(&title);
-        self.description.update(&description);
+    pub fn update(&self, title: Option<GString>, description: Option<GString>) {
+        self.title.update(title);
+        self.description.update(description);
     }
 
     // Getters

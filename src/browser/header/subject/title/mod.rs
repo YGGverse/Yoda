@@ -1,4 +1,4 @@
-use gtk::{pango::EllipsizeMode, Label};
+use gtk::{glib::GString, pango::EllipsizeMode, Label};
 
 const DEFAULT_TEXT: &str = "Yoda"; // @TODO
 
@@ -20,13 +20,13 @@ impl Title {
     }
 
     // Actions
-    pub fn update(&self, text: &str) {
-        if text.is_empty() {
-            self.widget.set_text(DEFAULT_TEXT);
-        } else {
-            self.widget
-                .set_text(&format!("{} - {}", text, DEFAULT_TEXT));
-        }
+    pub fn update(&self, text: Option<GString>) {
+        match text {
+            Some(value) => self
+                .widget
+                .set_text(&format!("{} - {}", value, DEFAULT_TEXT)),
+            None => self.widget.set_text(DEFAULT_TEXT),
+        };
     }
 
     // Getters

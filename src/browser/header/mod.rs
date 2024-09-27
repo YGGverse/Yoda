@@ -25,7 +25,7 @@ impl Header {
     }
 
     // Actions
-    pub fn update(&self, title: GString, description: GString) {
+    pub fn update(&self, title: Option<GString>, description: Option<GString>) {
         self.subject.update(title, description);
     }
 

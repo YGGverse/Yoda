@@ -1,3 +1,4 @@
+use gtk::glib::GString;
 use gtk::prelude::WidgetExt;
 use gtk::{pango::EllipsizeMode, Label};
 
@@ -19,9 +20,12 @@ impl Description {
     }
 
     // Actions
-    pub fn update(&self, text: &str) {
-        self.widget.set_text(text);
-        self.widget.set_visible(!text.is_empty());
+    pub fn update(&self, text: Option<GString>) {
+        match text {
+            Some(value) => self.widget.set_text(&value),
+            None => self.widget.set_text(""), // @TODO
+        };
+        self.widget.set_visible(!self.widget.text().is_empty());
     }
 
     // Getters

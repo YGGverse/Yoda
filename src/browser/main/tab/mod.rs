@@ -150,7 +150,7 @@ impl Tab {
     }
 
     // Getters
-    pub fn page_title(&self) -> GString {
+    pub fn page_title(&self) -> Option<GString> {
         // Get current page
         if let Some(page_number) = self.widget.current_page() {
             // Get default widget to extract it name as the ID for childs
@@ -159,15 +159,15 @@ impl Tab {
                 let id = &widget.widget_name();
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(id) {
-                    return page.title();
+                    return Some(page.title());
                 }
             }
         }
 
-        GString::new() // @TODO
+        None
     }
 
-    pub fn page_description(&self) -> GString {
+    pub fn page_description(&self) -> Option<GString> {
         // Get current page
         if let Some(page_number) = self.widget.current_page() {
             // Get default widget to extract it name as the ID for childs
@@ -176,12 +176,12 @@ impl Tab {
                 let id = &widget.widget_name();
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(id) {
-                    return page.description();
+                    return Some(page.description());
                 }
             }
         }
 
-        GString::new() // @TODO
+        None
     }
 
     pub fn widget(&self) -> &Notebook {
