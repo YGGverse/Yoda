@@ -10,7 +10,11 @@ use history::History;
 use reload::Reload;
 use request::Request;
 
-use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
+use gtk::{
+    glib::GString,
+    prelude::{BoxExt, WidgetExt},
+    Box, DirectionType, Orientation,
+};
 
 pub struct Navigation {
     // GTK
@@ -70,6 +74,11 @@ impl Navigation {
 
     // Setters
     pub fn set_request_text(&self, value: &GString, activate: bool) {
+        if activate {
+            // Focus out from content area on activate the link @TODO
+            self.widget.child_focus(DirectionType::Right);
+        }
+
         self.request.set_text(value, activate);
     }
 
