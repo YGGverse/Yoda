@@ -5,7 +5,7 @@ use parser::link::Link;
 use parser::plain::Plain;
 
 use gtk::{
-    glib::{GString, Propagation, Uri},
+    glib::{GString, Propagation, Uri, UriFlags},
     prelude::{StyleContextExt, ToVariant, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
@@ -78,10 +78,26 @@ impl Reader {
             .style_context()
             .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        // Connect actions @TODO move actions init outside
-        widget.connect_activate_link(|label, uri| {
-            let _ = label.activate_action("page.open", Some(&uri.to_variant()));
-            Propagation::Stop // |Proceed @TODO parse external scheme
+        // Connect actions
+        widget.connect_activate_link(|label, href| {
+            // Detect requested protocol
+            if let Ok(uri) = Uri::parse(&href, UriFlags::NONE) {
+                return match uri.scheme().as_str() {
+                    "gemini" => {
+                        label
+                            .activate_action("page.open", Some(&uri.to_str().to_variant()))
+                            .expect("Action `page.open` not found");
+
+                        // Prevent link open in external application
+                        Propagation::Stop
+                    }
+                    // Protocol not supported
+                    _ => Propagation::Proceed,
+                };
+            }
+
+            // Delegate unparsable
+            Propagation::Proceed
         });
 
         // Result
