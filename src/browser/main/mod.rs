@@ -19,6 +19,9 @@ impl Main {
 
         tab.activate(tab.clone());
 
+        // Append demo tab @TODO
+        tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true);
+
         // Extras
         let widget = Box::builder().orientation(Orientation::Vertical).build();
 
