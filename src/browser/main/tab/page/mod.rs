@@ -129,7 +129,7 @@ impl Page {
                         client.set_protocol(SocketProtocol::Tcp);
 
                         client.connect_to_uri_async(
-                            "gemini://geminiprotocol.net:1965/", // @TODO &uri.to_str(),
+                            &uri.to_str(),
                             1965,
                             Some(&cancellable.clone()),
                             move |result| match result {
@@ -142,7 +142,7 @@ impl Page {
 
                                     // Send request
                                     connection.output_stream().write_all_async(
-                                        "gemini://geminiprotocol.net:1965/\r\n", // @TODO
+                                        gformat!("{}\r\n", &uri.to_str()),
                                         Priority::DEFAULT,
                                         Some(&cancellable.clone()),
                                         move |result| match result {
