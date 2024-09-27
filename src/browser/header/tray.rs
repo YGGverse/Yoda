@@ -31,7 +31,8 @@ impl Tray {
             action_tab_page_reload,
             action_tab_pin,
         );
-        let tab = Tab::new();
+
+        let tab = Tab::new(action_tab_append);
 
         // Init widget
         let widget = Box::builder()
