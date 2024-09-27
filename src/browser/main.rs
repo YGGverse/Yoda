@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use tab::Tab;
 
-use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
+use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
 
 pub struct Main {
     tab: Arc<Tab>,
@@ -13,7 +13,11 @@ pub struct Main {
 
 impl Main {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(
+        action_debug: &SimpleAction,
+        action_quit: &SimpleAction,
+        action_update: &SimpleAction,
+    ) -> Self {
         // Init components
         let tab = Arc::new(Tab::new());
 

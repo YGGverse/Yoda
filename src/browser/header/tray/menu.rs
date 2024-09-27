@@ -1,11 +1,16 @@
-use gtk::{gio, MenuButton};
+use gtk::{
+    gio::{self, MenuItem, SimpleAction},
+    glib::{gformat, GString},
+    prelude::ActionExt,
+    MenuButton,
+};
 
 pub struct Menu {
     widget: MenuButton,
 }
 
 impl Menu {
-    pub fn new() -> Self {
+    pub fn new(action_debug: &SimpleAction, action_quit: &SimpleAction) -> Self {
         // Init model
         let model_tab = gio::Menu::new();
         model_tab.append(Some("New"), Some("win.tab_append"));
@@ -30,9 +35,10 @@ impl Menu {
         model_tab.append_submenu(Some("Close"), &model_tab_close);
 
         let model = gio::Menu::new();
+
         model.append_submenu(Some("Tab"), &model_tab);
-        model.append(Some("Debug"), Some("win.debug"));
-        model.append(Some("Quit"), Some("win.quit"));
+        model.append(Some("Debug"), Some(&detailed_action_name(action_debug)));
+        model.append(Some("Quit"), Some(&detailed_action_name(action_quit)));
 
         // Init widget
         let widget = MenuButton::builder().tooltip_text("Menu").build();
@@ -46,4 +52,9 @@ impl Menu {
     pub fn widget(&self) -> &MenuButton {
         &self.widget
     }
+}
+
+// Private helpers
+fn detailed_action_name(action: &SimpleAction) -> GString {
+    gformat!("win.{}", action.name()) // @TODO
 }

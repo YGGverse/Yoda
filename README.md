@@ -51,6 +51,11 @@ Guide and protocol draft
       * unwrapped main `Self` structure
       * granted ownership for new object created
     * public link getter for privately constructed widget
+* Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
+
+#### GTK
+
+* Operate with [action objects](https://docs.gtk.org/gio/class.SimpleAction.html) instead of names like `win.action`. This allows to follow encapsulation, because by the goal, module must know nothing about parent presets - for example, define some action in parent, then delegate object created as argument
 
 ### Contribution
 

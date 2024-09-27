@@ -4,7 +4,7 @@ mod tray;
 use subject::Subject;
 use tray::Tray;
 
-use gtk::{glib::GString, HeaderBar};
+use gtk::{gio::SimpleAction, glib::GString, HeaderBar};
 
 pub struct Header {
     widget: HeaderBar,
@@ -13,14 +13,18 @@ pub struct Header {
 
 impl Header {
     // Construct
-    pub fn new() -> Self {
-        let tray = Tray::new();
+    pub fn new(action_debug: &SimpleAction, action_quit: &SimpleAction) -> Self {
+        // Init components
+        let tray = Tray::new(action_debug, action_quit);
+
         let subject = Subject::new();
 
+        // Init widget
         let widget = HeaderBar::builder().build();
         widget.pack_start(tray.widget());
         widget.set_title_widget(Some(subject.widget()));
 
+        // Return new struct
         Self { widget, subject }
     }
 

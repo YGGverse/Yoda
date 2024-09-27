@@ -1,6 +1,7 @@
 mod menu;
 mod tab;
 
+use gtk::gio::SimpleAction;
 use gtk::prelude::BoxExt;
 use gtk::{Box, Orientation};
 use menu::Menu;
@@ -11,10 +12,12 @@ pub struct Tray {
 }
 
 impl Tray {
-    pub fn new() -> Self {
-        let menu = Menu::new();
+    pub fn new(action_debug: &SimpleAction, action_quit: &SimpleAction) -> Self {
+        // Init components
+        let menu = Menu::new(action_debug, action_quit);
         let tab = Tab::new();
 
+        // Init widget
         let widget = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(8)
@@ -23,6 +26,7 @@ impl Tray {
         widget.append(menu.widget());
         widget.append(tab.widget());
 
+        // Return new struct
         Self { widget }
     }
 

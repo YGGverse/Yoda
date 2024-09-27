@@ -6,8 +6,8 @@ use header::Header;
 use main::Main;
 
 use gtk::{
-    gio::ActionEntry,
-    prelude::{ActionMapExtManual, GtkWindowExt},
+    gio::{ActionEntry, SimpleAction},
+    prelude::{ActionMapExt, ActionMapExtManual, GtkWindowExt},
     Application, ApplicationWindow,
 };
 use std::sync::Arc;
@@ -17,8 +17,8 @@ pub struct Browser {
     // db: db::Browser,
     widget: ApplicationWindow,
     // Components
-    header: Arc<Header>,
-    main: Arc<Main>,
+    // header: Arc<Header>,
+    // main: Arc<Main>,
 }
 
 impl Browser {
@@ -29,11 +29,18 @@ impl Browser {
         default_width: i32,
         default_height: i32,
     ) -> Browser {
+        // Init window actions
+        let action_debug = SimpleAction::new("debug", None);
+        let action_quit = SimpleAction::new("quit", None);
+        let action_update = SimpleAction::new("update", None);
+
         // Init components
         // let db = db::Browser::new(connection);
-        let header = Arc::new(header::Header::new());
-        let main = Arc::new(main::Main::new());
+        let header = Arc::new(Header::new(&action_debug, &action_quit));
 
+        let main = Arc::new(Main::new(&action_debug, &action_quit, &action_update));
+
+        // Init widget
         let widget = ApplicationWindow::builder()
             .application(app)
             .default_width(default_width)
@@ -42,28 +49,36 @@ impl Browser {
             .child(main.widget())
             .build();
 
-        // Init actions
+        widget.add_action(&action_debug);
+        widget.add_action(&action_quit);
+        widget.add_action(&action_update);
+
+        // Init events
+        action_debug.connect_activate({
+            let target = widget.clone();
+            move |_, _| {
+                target.emit_enable_debugging(true);
+            }
+        });
+
+        action_quit.connect_activate({
+            let target = widget.clone();
+            move |_, _| {
+                target.close();
+            }
+        });
+
+        action_update.connect_activate({
+            let header = header.clone();
+            let main = main.clone();
+            move |_, _| {
+                main.update();
+                header.update(main.tab_page_title(), main.tab_page_description());
+            }
+        });
+
+        // Init actions @TODO
         widget.add_action_entries([
-            ActionEntry::builder("update")
-                .activate({
-                    let header = header.clone();
-                    let main = main.clone();
-                    move |_, _, _| {
-                        main.update();
-                        header.update(main.tab_page_title(), main.tab_page_description());
-                    }
-                })
-                .build(),
-            ActionEntry::builder("debug")
-                .activate(|this: &ApplicationWindow, _, _| {
-                    this.emit_enable_debugging(true);
-                })
-                .build(),
-            ActionEntry::builder("quit")
-                .activate(|this: &ApplicationWindow, _, _| {
-                    this.close();
-                })
-                .build(),
             ActionEntry::builder("tab_append")
                 .activate({
                     let main = main.clone();
@@ -110,8 +125,8 @@ impl Browser {
         Self {
             // db,
             widget,
-            header,
-            main,
+            // header,
+            // main,
         }
     }
 
