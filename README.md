@@ -55,7 +55,7 @@ Guide and protocol draft
 
 #### GTK
 
-* Operate with [action objects](https://docs.gtk.org/gio/class.SimpleAction.html) instead of names like `win.action`. This allows to follow encapsulation, because by the goal, module must know nothing about parent presets - for example, define some action in parent, then delegate object created as argument
+* Operate with [action objects](https://docs.gtk.org/gio/class.SimpleAction.html) instead of names like `win.action`. This allows to follow encapsulation, by the our goal, module must know nothing about parent presets. For example, define some action in parent, then delegate object created as construction argument
 
 ### Contribution
 
