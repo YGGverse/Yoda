@@ -33,7 +33,7 @@ This guide in process
 
 * Use [modern path pattern](https://doc.rust-lang.org/edition-guide/rust-2018/path-changes.html#no-more-modrs)
 * One module implements one GTK widget, it may include additional helper files in same location (like template, CSS or DB API)
-* For children widget - create children module, located according to it hierarchy
+* For children widget - create children module, located according to hierarchy
 * The codebase of module must be as minimal as possible, separate to sub-modules:
   * different tasks
   * massive structures
