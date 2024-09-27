@@ -13,20 +13,13 @@ pub struct Main {
 
 impl Main {
     // Construct
-    pub fn new(
-        action_debug: &SimpleAction,
-        action_quit: &SimpleAction,
-        action_update: &SimpleAction,
-    ) -> Self {
+    pub fn new(action_tab_page_reload: &SimpleAction, action_update: &SimpleAction) -> Self {
         // Init components
         let tab = Arc::new(Tab::new());
-
         tab.activate(tab.clone());
+        tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true); // demo tab @TODO replace with session restore feature
 
-        // Append demo tab @TODO
-        tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true);
-
-        // Extras
+        // GTK
         let widget = Box::builder().orientation(Orientation::Vertical).build();
 
         widget.append(tab.widget());

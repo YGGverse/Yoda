@@ -52,7 +52,7 @@ impl Browser {
             &action_tab_pin,
         ));
 
-        let main = Arc::new(Main::new(&action_debug, &action_quit, &action_update));
+        let main = Arc::new(Main::new(&action_tab_page_reload, &action_update));
 
         // Init widget
         let widget = ApplicationWindow::builder()
