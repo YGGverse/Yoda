@@ -203,7 +203,13 @@ impl Page {
                                                                                             meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                             // Select widget
                                                                                             match parts.get(4) {
-                                                                                                Some(source) => content.reset(content::Mime::TextGemini, &uri, &source),
+                                                                                                Some(source) => {
+                                                                                                    // Update component
+                                                                                                    let result = content.reset(content::Mime::TextGemini, &uri, &source);
+
+                                                                                                    // This content type may return parsed title
+                                                                                                    meta.borrow_mut().title = result.title.clone();
+                                                                                                },
                                                                                                 None => todo!(),
                                                                                             }
                                                                                         },
@@ -229,20 +235,20 @@ impl Page {
                                                                     };
 
                                                                     // Update
-                                                                    let _ = widget.activate_action(
+                                                                    widget.activate_action(
                                                                         "win.update",
                                                                         None,
-                                                                    );
+                                                                    ).expect("Action `win.update` not found");
                                                                 }
                                                                 Err(e) => {
                                                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                     meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
                                                                     meta.borrow_mut().progress_fraction = 1.0;
 
-                                                                    let _ = widget.activate_action(
+                                                                    widget.activate_action(
                                                                         "win.update",
                                                                         None,
-                                                                    );
+                                                                    ).expect("Action `win.update` not found");
                                                                 }
                                                             }
 
@@ -257,10 +263,10 @@ impl Page {
                                                             meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
                                                             meta.borrow_mut().progress_fraction = 1.0;
 
-                                                            let _ = widget.activate_action(
+                                                            widget.activate_action(
                                                                 "win.update",
                                                                 None,
-                                                            );
+                                                            ).expect("Action `win.update` not found");
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
@@ -276,10 +282,10 @@ impl Page {
                                                 meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
                                                 meta.borrow_mut().progress_fraction = 1.0;
 
-                                                let _ = widget.activate_action(
+                                                widget.activate_action(
                                                     "win.update",
                                                     None,
-                                                );
+                                                ).expect("Action `win.update` not found");
 
                                                 // Close connection
                                                 if let Err(e) = connection.close(Some(&cancellable)) {
@@ -295,10 +301,10 @@ impl Page {
                                     meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
                                     meta.borrow_mut().progress_fraction = 1.0;
 
-                                    let _ = widget.activate_action(
+                                    widget.activate_action(
                                         "win.update",
                                         None,
-                                    );
+                                    ).expect("Action `win.update` not found");
                                 }
                             },
                         );

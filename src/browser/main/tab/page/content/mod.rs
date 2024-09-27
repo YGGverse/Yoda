@@ -4,7 +4,7 @@ mod text;
 use text::Text;
 
 use gtk::{
-    glib::Uri,
+    glib::{GString, Uri},
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
@@ -12,6 +12,10 @@ use gtk::{
 pub enum Mime {
     TextGemini,
     TextPlain,
+}
+
+pub struct ResetResult {
+    pub title: Option<GString>,
 }
 
 pub struct Content {
@@ -27,16 +31,22 @@ impl Content {
     }
 
     // Actions
-    pub fn reset(&self, mime: Mime, base: &Uri, data: &str) {
+    pub fn reset(&self, mime: Mime, base: &Uri, data: &str) -> ResetResult {
         // Cleanup
         while let Some(child) = self.widget.last_child() {
             self.widget.remove(&child)
         }
 
-        // Compose
+        // Re-compose
         match mime {
             Mime::TextGemini => {
-                self.widget.append(Text::gemini(data, base).widget());
+                let child = Text::gemini(data, base);
+
+                self.widget.append(child.widget());
+
+                ResetResult {
+                    title: child.meta_title().clone(),
+                }
             }
             Mime::TextPlain => {
                 todo!()
