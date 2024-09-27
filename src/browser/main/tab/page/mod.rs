@@ -18,7 +18,7 @@ use gtk::{
     },
     Box, Orientation,
 };
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
     // GTK
@@ -172,6 +172,16 @@ impl Page {
                                                                     // Format response
                                                                     meta.borrow_mut().progress_fraction = 1.0;
                                                                     meta.borrow_mut().description = host;
+                                                                    meta.borrow_mut().title = uri.path();
+
+                                                                    // Try create short base for title
+                                                                    let path = uri.path();
+                                                                    let path = Path::new(&path);
+                                                                    if let Some(base) = path.file_name() {
+                                                                        if let Some(base_str) = base.to_str() {
+                                                                            meta.borrow_mut().title = GString::from(base_str);
+                                                                        }
+                                                                    }
 
                                                                     // Parse response @TODO read bytes
                                                                     let parts = Regex::split_simple(
