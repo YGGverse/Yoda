@@ -67,6 +67,12 @@ impl Browser {
         widget.add_action(&action_quit);
         widget.add_action(&action_update);
 
+        widget.add_action(&action_tab_append);
+        widget.add_action(&action_tab_close);
+        widget.add_action(&action_tab_close_all);
+        widget.add_action(&action_tab_page_reload);
+        widget.add_action(&action_tab_pin);
+
         // Init events
         action_debug.connect_activate({
             let widget = widget.clone();
