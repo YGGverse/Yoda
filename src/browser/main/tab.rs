@@ -7,7 +7,7 @@ use page::Page;
 use gtk::{
     glib::{uuid_string_random, GString},
     prelude::WidgetExt,
-    GestureClick, Notebook, Widget,
+    GestureClick, Notebook,
 };
 
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
