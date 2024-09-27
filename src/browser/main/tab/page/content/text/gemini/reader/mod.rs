@@ -84,6 +84,7 @@ impl Reader {
             if let Ok(uri) = Uri::parse(&href, UriFlags::NONE) {
                 return match uri.scheme().as_str() {
                     "gemini" => {
+                        // Open new page
                         label
                             .activate_action("page.open", Some(&uri.to_str().to_variant()))
                             .expect("Action `page.open` not found");
