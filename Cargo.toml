@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 readme = "README.md"
 description = "Yoda - Browser for Gemini protocol"
-keywords = ["gemini", "gemini-protocol", "browser", "client", "1965"]
+keywords = ["gemini", "gemini-protocol", "gtk", "browser", "client", "1965"]
 repository = "https://github.com/YGGverse/Yoda/tree/Rust-GTK4"
 # homepage = "https://yggverse.github.io"
 
