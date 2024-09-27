@@ -32,10 +32,10 @@ pub struct Page {
 
 impl Page {
     // Construct
-    pub fn new(name: GString) -> Page {
+    pub fn new(name: GString, navigation_request_text: Option<GString>) -> Page {
         // Init components
         let content = Arc::new(Content::new());
-        let navigation = Arc::new(Navigation::new());
+        let navigation = Arc::new(Navigation::new(navigation_request_text));
 
         // Init widget
         let widget = Box::builder()

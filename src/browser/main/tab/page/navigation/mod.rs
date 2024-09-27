@@ -24,12 +24,12 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new() -> Self {
+    pub fn new(request_text: Option<GString>) -> Self {
         // Init components
         let base = Base::new();
         let history = History::new();
         let reload = Reload::new();
-        let request = Request::new();
+        let request = Request::new(request_text);
         let bookmark = Bookmark::new();
 
         // Init widget

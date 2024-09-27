@@ -10,13 +10,17 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(text: Option<GString>) -> Self {
         // GTK
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
             .hexpand(true)
             .progress_fraction(0.0)
             .progress_pulse_step(0.1)
+            .text(match text {
+                Some(text) => text,
+                None => GString::new(),
+            })
             .build();
 
         // Connect events

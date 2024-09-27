@@ -43,13 +43,17 @@ impl Tab {
         });
     }
 
-    pub fn append(&self, is_current_page: bool) -> u32 {
+    pub fn append(
+        &self,
+        page_navigation_request_text: Option<GString>,
+        is_current_page: bool,
+    ) -> u32 {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
         // Init new tab components
         let label = Arc::new(Label::new(id.clone(), false));
-        let page = Arc::new(Page::new(id.clone()));
+        let page = Arc::new(Page::new(id.clone(), page_navigation_request_text));
 
         // Register dynamically created tab components in the HashMap index
         self.labels.borrow_mut().insert(id.clone(), label.clone());

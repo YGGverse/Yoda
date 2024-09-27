@@ -68,7 +68,7 @@ impl Browser {
                 .activate({
                     let main = main.clone();
                     move |_, _, _| {
-                        main.tab_append();
+                        main.tab_append(None);
                     }
                 })
                 .build(),
