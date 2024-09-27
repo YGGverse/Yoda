@@ -1,4 +1,4 @@
-use gtk::Button;
+use gtk::{glib::Uri, prelude::WidgetExt, Button};
 
 pub struct Base {
     widget: Button,
@@ -18,8 +18,11 @@ impl Base {
     }
 
     // Actions
-    pub fn update(&self) {
-        // @TODO
+    pub fn update(&self, uri: Option<Uri>) {
+        self.widget.set_sensitive(match uri {
+            Some(uri) => "/" != uri.path(),
+            None => false,
+        });
     }
 
     // Getters

@@ -1,5 +1,5 @@
 use gtk::{
-    glib::GString,
+    glib::{GString, Uri, UriFlags},
     prelude::{EditableExt, EntryExt, WidgetExt},
     Entry,
 };
@@ -65,5 +65,12 @@ impl Request {
 
     pub fn text(&self) -> GString {
         self.widget.text()
+    }
+
+    pub fn uri(&self) -> Option<Uri> {
+        match Uri::parse(&self.widget.text(), UriFlags::NONE) {
+            Ok(uri) => Some(uri),
+            _ => None,
+        }
     }
 }
