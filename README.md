@@ -38,11 +38,11 @@ This guide in process
   * access 1 level of child API, never parents (e.g.`super`)
   * implement only one `struct` (same as one file for one class)
     * `struct` is public, where members - private
-  * contain `struct` implementation:
+  * contain main `struct` implementation:
     * at least one constructor that must return:
-      * raw `struct` (`new() -> Self`) without cover to any kind of smart `std` or `glib` pointers
-      * ownership to new object created
-    * one public link getter for privately constructed widget (`widget -> &Gtk`)
+      * unwrapped main `Self` structure
+      * granted ownership for new object created
+    * public link getter for privately constructed widget
 
 ### Contribution
 
