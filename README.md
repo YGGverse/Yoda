@@ -42,7 +42,7 @@ This guide in process
   * encapsulate: compose childs and stay composable for parents
   * access 1 level of child API, never parents (e.g. through `super`)
   * implement only one `struct` (same as one file for one class)
-    * `struct` is public, where members - private
+    * implementable `struct` is public, where members - private
   * contain main `struct` implementation:
     * at least one constructor that must return:
       * unwrapped main `Self` structure
