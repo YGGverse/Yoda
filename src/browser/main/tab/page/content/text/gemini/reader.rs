@@ -12,7 +12,7 @@ use gtk::{
 
 pub struct Reader {
     title: Option<GString>,
-    css: CssProvider,
+    // css: CssProvider, @TODO
     widget: Label,
 }
 
@@ -52,11 +52,12 @@ impl Reader {
         }
 
         // Init CSS
+        /* @TODO Theme parser error: <broken file>
         let css = CssProvider::new();
 
         css.load_from_path(
             "src/browser/main/tab/page/content/text/gemini/reader/default.css", // @TODO
-        );
+        ); */
 
         // Init widget
         let widget = Label::builder()
@@ -74,9 +75,10 @@ impl Reader {
             .label(markup)
             .build();
 
+        /* @TODO
         widget
             .style_context()
-            .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
+            .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION); */
 
         // Connect actions
         widget.connect_activate_link(|label, href| {
@@ -102,7 +104,11 @@ impl Reader {
         });
 
         // Result
-        Self { title, css, widget }
+        Self {
+            title,
+            // css, @TODO
+            widget,
+        }
     }
 
     // Getters
