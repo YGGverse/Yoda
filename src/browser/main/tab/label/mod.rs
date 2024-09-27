@@ -31,6 +31,7 @@ impl Label {
             .orientation(Orientation::Horizontal)
             .halign(Align::Center)
             .name(name)
+            .tooltip_text(title.widget().text())
             .build();
 
         widget.append(pin.widget());
@@ -42,6 +43,7 @@ impl Label {
 
     // Actions
     pub fn update(&self, title: &GString) {
+        self.widget.set_tooltip_text(Some(title));
         self.title.update(title);
     }
 
