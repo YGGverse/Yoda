@@ -56,7 +56,7 @@ impl Reader {
 
         /* @TODO Theme parser error: <broken file>
         css.load_from_path(
-            "src/browser/main/tab/page/content/text/gemini/reader/default.css", // @TODO
+            "src/browser/main/tab/page/content/text/gemini/reader/default.css"
         ); */
 
         css.load_from_data("label{caret-color: transparent}");
