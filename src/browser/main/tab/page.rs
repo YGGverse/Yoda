@@ -13,8 +13,8 @@ use gtk::{
     },
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
-        ActionMapExtManual, BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
-        SocketClientExt, StaticVariantType, WidgetExt,
+        ActionExt, ActionMapExtManual, BoxExt, IOStreamExt, InputStreamExtManual,
+        OutputStreamExtManual, SocketClientExt, StaticVariantType, WidgetExt,
     },
     Box, Orientation,
 };
@@ -23,6 +23,9 @@ use std::{cell::RefCell, path::Path, sync::Arc};
 pub struct Page {
     // GTK
     widget: Box,
+    // Actions
+    // action_tab_page_reload: Arc<SimpleAction>,
+    action_update: Arc<SimpleAction>,
     // Components
     navigation: Arc<Navigation>,
     content: Arc<Content>,
@@ -42,8 +45,8 @@ impl Page {
         let content = Arc::new(Content::new());
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
-            action_tab_page_reload,
-            action_update,
+            action_tab_page_reload.clone(),
+            action_update.clone(),
         ));
 
         // Init widget
@@ -55,7 +58,7 @@ impl Page {
         widget.append(navigation.widget());
         widget.append(content.widget());
 
-        // Init actions @TODO move actions init outside
+        // Init actions @TODO use object container
         let action_open = ActionEntry::builder("open")
             .parameter_type(Some(&String::static_variant_type()))
             .activate({
@@ -84,9 +87,15 @@ impl Page {
 
         // Result
         Self {
+            // GTK
             widget,
+            // Actions
+            // action_tab_page_reload,
+            action_update,
+            // Components
             content,
             navigation,
+            // Extras
             meta,
         }
     }
@@ -99,7 +108,7 @@ impl Page {
         // Init shared objects for async access
         let content = self.content.clone();
         let meta = self.meta.clone();
-        let widget = self.widget.clone();
+        let action_update = self.action_update.clone();
 
         // Update
         meta.borrow_mut().mime = None;
@@ -107,9 +116,7 @@ impl Page {
         meta.borrow_mut().description = None;
         meta.borrow_mut().progress_fraction = 0.0;
 
-        widget
-            .activate_action("win.update", None)
-            .expect("Action `win.update` not found");
+        action_update.activate(None);
 
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
@@ -130,9 +137,7 @@ impl Page {
                         meta.borrow_mut().progress_fraction = 0.25;
                         meta.borrow_mut().description = Some(gformat!("Connect {host}.."));
 
-                        widget
-                            .activate_action("win.update", None)
-                            .expect("Action `win.update` not found");
+                        action_update.activate(None);
 
                         // Create new connection
                         let cancellable = Cancellable::new();
@@ -153,7 +158,7 @@ impl Page {
                                     meta.borrow_mut().progress_fraction = 0.50;
                                     meta.borrow_mut().description = Some(gformat!("Connected to {host}.."));
 
-                                    widget.activate_action("win.update", None).expect("Action `win.update` not found");
+                                    action_update.activate(None);
 
                                     // Send request
                                     connection.output_stream().write_all_async(
@@ -166,7 +171,7 @@ impl Page {
                                                 meta.borrow_mut().progress_fraction = 0.75;
                                                 meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
 
-                                                widget.activate_action("win.update", None).expect("Action `win.update` not found");
+                                                action_update.activate(None);
 
                                                 // Read response
                                                 connection.input_stream().read_all_async(
@@ -244,20 +249,14 @@ impl Page {
                                                                     };
 
                                                                     // Update
-                                                                    widget.activate_action(
-                                                                        "win.update",
-                                                                        None,
-                                                                    ).expect("Action `win.update` not found");
+                                                                    action_update.activate(None);
                                                                 }
                                                                 Err(e) => {
                                                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                     meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
                                                                     meta.borrow_mut().progress_fraction = 1.0;
 
-                                                                    widget.activate_action(
-                                                                        "win.update",
-                                                                        None,
-                                                                    ).expect("Action `win.update` not found");
+                                                                    action_update.activate(None);
                                                                 }
                                                             }
 
@@ -272,10 +271,7 @@ impl Page {
                                                             meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
                                                             meta.borrow_mut().progress_fraction = 1.0;
 
-                                                            widget.activate_action(
-                                                                "win.update",
-                                                                None,
-                                                            ).expect("Action `win.update` not found");
+                                                            action_update.activate(None);
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
@@ -291,10 +287,7 @@ impl Page {
                                                 meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
                                                 meta.borrow_mut().progress_fraction = 1.0;
 
-                                                widget.activate_action(
-                                                    "win.update",
-                                                    None,
-                                                ).expect("Action `win.update` not found");
+                                                action_update.activate(None);
 
                                                 // Close connection
                                                 if let Err(e) = connection.close(Some(&cancellable)) {
@@ -310,10 +303,7 @@ impl Page {
                                     meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
                                     meta.borrow_mut().progress_fraction = 1.0;
 
-                                    widget.activate_action(
-                                        "win.update",
-                                        None,
-                                    ).expect("Action `win.update` not found");
+                                    action_update.activate(None);
                                 }
                             },
                         );
@@ -328,9 +318,7 @@ impl Page {
                             Some(gformat!("Protocol {scheme} not supported"));
                         meta.borrow_mut().progress_fraction = 1.0;
 
-                        widget
-                            .activate_action("win.update", None)
-                            .expect("Action `win.update` not found");
+                        action_update.activate(None);
                     }
                 }
             }
