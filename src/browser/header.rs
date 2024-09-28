@@ -6,6 +6,8 @@ use tray::Tray;
 
 use gtk::{gio::SimpleAction, glib::GString, HeaderBar};
 
+use std::sync::Arc;
+
 pub struct Header {
     widget: HeaderBar,
     subject: Subject,
@@ -14,13 +16,13 @@ pub struct Header {
 impl Header {
     // Construct
     pub fn new(
-        action_debug: &SimpleAction,
-        action_quit: &SimpleAction,
-        action_tab_append: &SimpleAction,
-        action_tab_close: &SimpleAction,
-        action_tab_close_all: &SimpleAction,
-        action_tab_page_reload: &SimpleAction,
-        action_tab_pin: &SimpleAction,
+        action_debug: Arc<SimpleAction>,
+        action_quit: Arc<SimpleAction>,
+        action_tab_append: Arc<SimpleAction>,
+        action_tab_close: Arc<SimpleAction>,
+        action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
         // Init components
         let tray = Tray::new(

@@ -8,7 +8,7 @@ use navigation::Navigation;
 
 use gtk::{
     gio::{
-        ActionEntry, Cancellable, SimpleActionGroup, SocketClient, SocketProtocol,
+        ActionEntry, Cancellable, SimpleAction, SimpleActionGroup, SocketClient, SocketProtocol,
         TlsCertificateFlags,
     },
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
@@ -32,10 +32,19 @@ pub struct Page {
 
 impl Page {
     // Construct
-    pub fn new(name: GString, navigation_request_text: Option<GString>) -> Page {
+    pub fn new(
+        name: GString,
+        navigation_request_text: Option<GString>,
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_update: Arc<SimpleAction>,
+    ) -> Page {
         // Init components
         let content = Arc::new(Content::new());
-        let navigation = Arc::new(Navigation::new(navigation_request_text));
+        let navigation = Arc::new(Navigation::new(
+            navigation_request_text,
+            action_tab_page_reload,
+            action_update,
+        ));
 
         // Init widget
         let widget = Box::builder()

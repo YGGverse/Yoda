@@ -5,6 +5,7 @@ use label::Label;
 use page::Page;
 
 use gtk::{
+    gio::SimpleAction,
     glib::{uuid_string_random, GString},
     prelude::WidgetExt,
     GestureClick, Notebook,
@@ -15,6 +16,9 @@ use std::{cell::RefCell, collections::HashMap, sync::Arc};
 pub struct Tab {
     // GTK
     widget: Notebook,
+    // Keep action links in memory to not require them on every tab append
+    action_tab_page_reload: Arc<SimpleAction>,
+    action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
     pages: RefCell<HashMap<GString, Arc<Page>>>,
@@ -22,9 +26,20 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_update: Arc<SimpleAction>,
+    ) -> Self {
+        // Init widget
+        let widget = Notebook::builder().scrollable(true).build();
+
+        // Return non activated struct
         Self {
-            widget: Notebook::builder().scrollable(true).build(),
+            // GTK
+            widget,
+            // Define action links
+            action_tab_page_reload,
+            action_update,
             // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
             pages: RefCell::new(HashMap::new()),
@@ -53,7 +68,12 @@ impl Tab {
 
         // Init new tab components
         let label = Arc::new(Label::new(id.clone(), false));
-        let page = Arc::new(Page::new(id.clone(), page_navigation_request_text));
+        let page = Arc::new(Page::new(
+            id.clone(),
+            page_navigation_request_text,
+            self.action_tab_page_reload.clone(),
+            self.action_update.clone(),
+        ));
 
         // Register dynamically created tab components in the HashMap index
         self.labels.borrow_mut().insert(id.clone(), label.clone());

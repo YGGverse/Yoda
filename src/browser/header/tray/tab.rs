@@ -1,4 +1,5 @@
 use gtk::{gio::SimpleAction, prelude::ActionExt, prelude::ButtonExt, Button};
+use std::sync::Arc;
 
 pub struct Tab {
     pub widget: Button,
@@ -6,7 +7,7 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new(action_tab_append: &SimpleAction) -> Self {
+    pub fn new(action_tab_append: Arc<SimpleAction>) -> Self {
         // Init widget
         let widget = Button::builder()
             .icon_name("tab-new-symbolic")
@@ -14,11 +15,8 @@ impl Tab {
             .build();
 
         // Init events
-        widget.connect_clicked({
-            let action_tab_append = action_tab_append.clone();
-            move |_| {
-                action_tab_append.activate(None);
-            }
+        widget.connect_clicked(move |_| {
+            action_tab_append.activate(None);
         });
 
         // Return activated struct

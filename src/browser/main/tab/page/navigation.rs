@@ -11,10 +11,13 @@ use reload::Reload;
 use request::Request;
 
 use gtk::{
+    gio::SimpleAction,
     glib::GString,
     prelude::{BoxExt, WidgetExt},
     Box, DirectionType, Orientation,
 };
+
+use std::sync::Arc;
 
 pub struct Navigation {
     // GTK
@@ -28,11 +31,15 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new(request_text: Option<GString>) -> Self {
+    pub fn new(
+        request_text: Option<GString>,
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_update: Arc<SimpleAction>,
+    ) -> Self {
         // Init components
         let base = Base::new();
         let history = History::new();
-        let reload = Reload::new();
+        let reload = Reload::new(action_tab_page_reload);
         let request = Request::new(request_text);
         let bookmark = Bookmark::new();
 

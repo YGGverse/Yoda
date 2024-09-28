@@ -5,19 +5,21 @@ use gtk::{
     MenuButton,
 };
 
+use std::sync::Arc;
+
 pub struct Menu {
     widget: MenuButton,
 }
 
 impl Menu {
     pub fn new(
-        action_debug: &SimpleAction,
-        action_quit: &SimpleAction,
-        action_tab_append: &SimpleAction,
-        action_tab_close: &SimpleAction,
-        action_tab_close_all: &SimpleAction,
-        action_tab_page_reload: &SimpleAction,
-        action_tab_pin: &SimpleAction,
+        action_debug: Arc<SimpleAction>,
+        action_quit: Arc<SimpleAction>,
+        action_tab_append: Arc<SimpleAction>,
+        action_tab_close: Arc<SimpleAction>,
+        action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
         // Init model
         let model_tab = gio::Menu::new();
@@ -72,7 +74,7 @@ impl Menu {
 }
 
 // Private helpers
-fn detailed_action_name(action: &SimpleAction) -> GString {
+fn detailed_action_name(action: Arc<SimpleAction>) -> GString {
     gformat!("win.{}", action.name()) // @TODO find the way to ident parent group
                                       // without application-wide dependencies import
 }
