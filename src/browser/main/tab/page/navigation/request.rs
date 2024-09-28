@@ -1,7 +1,7 @@
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri, UriFlags},
-    prelude::{ActionExt, EditableExt, EntryExt, WidgetExt},
+    prelude::{ActionExt, EditableExt, EntryExt},
     Entry,
 };
 
@@ -13,7 +13,11 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new(text: Option<GString>, action_update: Arc<SimpleAction>) -> Self {
+    pub fn new(
+        text: Option<GString>,
+        action_update: Arc<SimpleAction>,
+        tab_page_reload: Arc<SimpleAction>,
+    ) -> Self {
         // GTK
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
@@ -31,10 +35,8 @@ impl Request {
             action_update.activate(None);
         });
 
-        widget.connect_activate(|entry| {
-            entry
-                .activate_action("win.tab_page_reload", None) // @TODO
-                .expect("Action `win.tab_page_reload` not found")
+        widget.connect_activate(move |_| {
+            tab_page_reload.activate(None);
         });
 
         // Result

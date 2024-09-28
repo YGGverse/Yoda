@@ -39,8 +39,12 @@ impl Navigation {
         // Init components
         let base = Base::new();
         let history = History::new();
-        let reload = Reload::new(action_tab_page_reload);
-        let request = Request::new(request_text, action_update);
+        let reload = Reload::new(action_tab_page_reload.clone());
+        let request = Request::new(
+            request_text,
+            action_update.clone(),
+            action_tab_page_reload.clone(),
+        );
         let bookmark = Bookmark::new();
 
         // Init widget
