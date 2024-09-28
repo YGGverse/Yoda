@@ -388,8 +388,16 @@ impl Page {
 
     pub fn update(&self) {
         // Interpret status to progress fraction
-        // @TODO
-        self.navigation.update();
+        let progress_fraction = match self.meta.borrow().status {
+            Some(Status::Prepare) => 0.25,
+            Some(Status::Connect) => 0.50,
+            Some(Status::Request) => 0.75,
+            Some(Status::Response) => 1.0,
+            _ => 0.0,
+        };
+
+        // Update components
+        self.navigation.update(progress_fraction);
         // @TODO self.content.update();
     }
 

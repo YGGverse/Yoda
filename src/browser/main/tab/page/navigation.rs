@@ -71,11 +71,11 @@ impl Navigation {
     }
 
     // Actions
-    pub fn update(&self) {
+    pub fn update(&self, progress_fraction: f64) {
         self.base.update(self.request.uri());
         self.history.update();
         self.reload.update(!self.request.is_empty());
-        self.request.update();
+        self.request.update(progress_fraction);
         self.bookmark.update();
     }
 

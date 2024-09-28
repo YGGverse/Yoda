@@ -41,7 +41,8 @@ impl Request {
     }
 
     // Actions
-    pub fn update(&self) {
+    pub fn update(&self, progress_fraction: f64) {
+        self.widget.set_progress_fraction(progress_fraction);
         // @TODO animate progress fraction
     }
 
