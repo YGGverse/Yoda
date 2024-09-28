@@ -26,6 +26,7 @@ pub struct Meta {
     pub status: Option<Status>,
     // Useful to compose other widgets
     // (e.g. navigation bar listen for this value update)
+    // @TODO deprecated, calculate by Status enum
     pub progress_fraction: f32,
 }
 
