@@ -42,17 +42,17 @@ impl Page {
         action_update: Arc<SimpleAction>,
     ) -> Page {
         // Init actions
-        let action_open = Arc::new(SimpleAction::new(
+        let action_page_open = Arc::new(SimpleAction::new(
             "open",
             Some(&String::static_variant_type()),
         ));
 
         // Init action group
         let action_group = SimpleActionGroup::new();
-        action_group.add_action(action_open.as_ref());
+        action_group.add_action(action_page_open.as_ref());
 
         // Init components
-        let content = Arc::new(Content::new(action_open.clone()));
+        let content = Arc::new(Content::new(action_page_open.clone()));
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
             action_tab_page_reload.clone(),
@@ -74,7 +74,7 @@ impl Page {
         let meta = Arc::new(RefCell::new(Meta::new()));
 
         // Init events
-        action_open.connect_activate({
+        action_page_open.connect_activate({
             let navigation = navigation.clone();
             move |_, request| {
                 let uri = request

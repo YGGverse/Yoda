@@ -17,9 +17,9 @@ pub struct Gemini {
 
 impl Gemini {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, action_open: Arc<SimpleAction>) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
         // Init components
-        let reader = Reader::new(gemtext, base, action_open);
+        let reader = Reader::new(gemtext, base, action_page_open);
 
         // Init widget
         let widget = Viewport::builder().scroll_to_focus(false).build();

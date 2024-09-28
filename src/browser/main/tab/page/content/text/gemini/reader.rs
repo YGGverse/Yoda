@@ -21,7 +21,7 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, action_open: Arc<SimpleAction>) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
         // Init title
         let mut title = None;
 
@@ -91,7 +91,7 @@ impl Reader {
                 return match uri.scheme().as_str() {
                     "gemini" => {
                         // Open new page
-                        action_open.activate(Some(&uri.to_str().to_variant()));
+                        action_page_open.activate(Some(&uri.to_str().to_variant()));
 
                         // Prevent link open in external application
                         Propagation::Stop
