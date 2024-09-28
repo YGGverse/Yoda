@@ -7,7 +7,7 @@ use page::Page;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, GString},
-    prelude::WidgetExt,
+    prelude::{ActionExt, WidgetExt},
     GestureClick, Notebook,
 };
 
@@ -48,13 +48,17 @@ impl Tab {
 
     // Actions
     pub fn activate(&self, tab: Arc<Self>) {
-        self.widget.connect_page_removed({
-            move |_, widget, _| {
-                // Cleanup HashMap index
-                let id = &widget.widget_name();
-                tab.labels.borrow_mut().remove(id);
-                tab.pages.borrow_mut().remove(id);
-            }
+        self.widget.connect_page_removed(move |_, widget, _| {
+            // Cleanup HashMap index
+            let id = &widget.widget_name();
+            tab.labels.borrow_mut().remove(id);
+            tab.pages.borrow_mut().remove(id);
+        });
+
+        self.widget.connect_switch_page({
+            let action_update = self.action_update.clone();
+            // Update window header with current page title
+            move |_, _, _| action_update.activate(None)
         });
     }
 
