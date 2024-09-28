@@ -16,7 +16,7 @@ impl Request {
     pub fn new(
         text: Option<GString>,
         action_update: Arc<SimpleAction>,
-        tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_reload: Arc<SimpleAction>,
     ) -> Self {
         // GTK
         let widget = Entry::builder()
@@ -36,7 +36,7 @@ impl Request {
         });
 
         widget.connect_activate(move |_| {
-            tab_page_reload.activate(None);
+            action_tab_page_reload.activate(None);
         });
 
         // Result
