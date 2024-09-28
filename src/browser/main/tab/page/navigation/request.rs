@@ -1,8 +1,11 @@
 use gtk::{
+    gio::SimpleAction,
     glib::{GString, Uri, UriFlags},
-    prelude::{EditableExt, EntryExt, WidgetExt},
+    prelude::{ActionExt, EditableExt, EntryExt, WidgetExt},
     Entry,
 };
+
+use std::sync::Arc;
 
 pub struct Request {
     widget: Entry,
@@ -10,7 +13,7 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new(text: Option<GString>) -> Self {
+    pub fn new(text: Option<GString>, action_update: Arc<SimpleAction>) -> Self {
         // GTK
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
@@ -24,15 +27,13 @@ impl Request {
             .build();
 
         // Connect events
-        widget.connect_changed(|entry| {
-            entry
-                .activate_action("win.update", None)
-                .expect("Action `win.update` not found")
+        widget.connect_changed(move |_| {
+            action_update.activate(None);
         });
 
         widget.connect_activate(|entry| {
             entry
-                .activate_action("win.tab_page_reload", None)
+                .activate_action("win.tab_page_reload", None) // @TODO
                 .expect("Action `win.tab_page_reload` not found")
         });
 

@@ -40,7 +40,7 @@ impl Navigation {
         let base = Base::new();
         let history = History::new();
         let reload = Reload::new(action_tab_page_reload);
-        let request = Request::new(request_text);
+        let request = Request::new(request_text, action_update);
         let bookmark = Bookmark::new();
 
         // Init widget
