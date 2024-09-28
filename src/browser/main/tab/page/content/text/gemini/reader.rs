@@ -62,7 +62,7 @@ impl Reader {
             "src/browser/main/tab/page/content/text/gemini/reader/default.css"
         ); */
 
-        css.load_from_data("label{caret-color: transparent}");
+        css.load_from_data("label{caret-color: transparent;}");
 
         // Init widget
         let widget = Label::builder()
