@@ -55,10 +55,11 @@ impl Tab {
             tab.pages.borrow_mut().remove(id);
         });
 
-        self.widget.connect_switch_page({
+        // Switch page post-event (`connect_switch_page` activates before `page_number` get updated)
+        self.widget.connect_page_notify({
             let action_update = self.action_update.clone();
             // Update window header with current page title
-            move |_, _, _| action_update.activate(None)
+            move |_| action_update.activate(None)
         });
     }
 
