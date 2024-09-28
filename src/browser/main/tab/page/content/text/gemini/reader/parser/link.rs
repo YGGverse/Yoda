@@ -29,7 +29,7 @@ impl Link {
 
         // Parse line
         let parsed = Regex::split_simple(
-            r"^=>\s*([^\s]+)\s+(\d{4}-\d{2}-\d{2})?\s*(.+)?$",
+            r"^=>\s*([^\s]+)\s*(\d{4}-\d{2}-\d{2})?\s*(.+)?$",
             line,
             RegexCompileFlags::DEFAULT,
             RegexMatchFlags::DEFAULT,
@@ -77,10 +77,15 @@ impl Link {
         }
 
         // Alt
-        if let Some(this) = parsed.get(3) {
-            alt = Some(GString::from(this.to_string()));
-            name.push(this.to_string());
-        }
+        match parsed.get(3) {
+            // Not empty
+            Some(this) => {
+                alt = Some(GString::from(this.to_string()));
+                name.push(this.to_string());
+            }
+            // Empty, use resolved address
+            None => name.push(link.to_string()),
+        };
 
         // Markup
         markup = gformat!(
