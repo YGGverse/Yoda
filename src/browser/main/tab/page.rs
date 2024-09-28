@@ -8,13 +8,13 @@ use navigation::Navigation;
 
 use gtk::{
     gio::{
-        ActionEntry, Cancellable, SimpleAction, SimpleActionGroup, SocketClient, SocketProtocol,
+        Cancellable, SimpleAction, SimpleActionGroup, SocketClient, SocketProtocol,
         TlsCertificateFlags,
     },
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
-        ActionExt, ActionMapExtManual, BoxExt, IOStreamExt, InputStreamExtManual,
-        OutputStreamExtManual, SocketClientExt, StaticVariantType, WidgetExt,
+        ActionExt, ActionMapExt, BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
+        SocketClientExt, StaticVariantType, WidgetExt,
     },
     Box, Orientation,
 };
@@ -41,6 +41,16 @@ impl Page {
         action_tab_page_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Page {
+        // Init actions
+        let action_open = Arc::new(SimpleAction::new(
+            "open",
+            Some(&String::static_variant_type()),
+        ));
+
+        // Init action group
+        let action_group = SimpleActionGroup::new();
+        action_group.add_action(action_open.as_ref());
+
         // Init components
         let content = Arc::new(Content::new());
         let navigation = Arc::new(Navigation::new(
@@ -58,34 +68,28 @@ impl Page {
         widget.append(navigation.widget());
         widget.append(content.widget());
 
-        // Init actions @TODO use object container
-        let action_open = ActionEntry::builder("open")
-            .parameter_type(Some(&String::static_variant_type()))
-            .activate({
-                let navigation = navigation.clone();
-                move |_, _, request| {
-                    let uri = request
-                        .expect("Parameter required for `page.open` action")
-                        .get::<String>()
-                        .expect("Parameter does not match `String`");
-
-                    navigation.set_request_text(
-                        &GString::from(uri),
-                        true, // activate (page reload)
-                    );
-                }
-            })
-            .build();
-
-        // Init action group
-        let actions = SimpleActionGroup::new();
-        actions.add_action_entries([action_open]);
-        widget.insert_action_group("page", Some(&actions));
+        widget.insert_action_group("page", Some(&action_group));
 
         // Init async mutable Meta object
         let meta = Arc::new(RefCell::new(Meta::new()));
 
-        // Result
+        // Init events
+        action_open.connect_activate({
+            let navigation = navigation.clone();
+            move |_, request| {
+                let uri = request
+                    .expect("Parameter required for `page.open` action")
+                    .get::<String>()
+                    .expect("Parameter does not match `String`");
+
+                navigation.set_request_text(
+                    &GString::from(uri),
+                    true, // activate (page reload)
+                );
+            }
+        });
+
+        // Return activated structure
         Self {
             // GTK
             widget,
