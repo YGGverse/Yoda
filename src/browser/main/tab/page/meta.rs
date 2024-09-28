@@ -12,6 +12,7 @@ pub enum Mime {
 pub enum Status {
     Failure,
     Redirect,
+    Reload,
     Success,
 }
 
