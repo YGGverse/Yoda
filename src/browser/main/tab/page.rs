@@ -261,7 +261,8 @@ impl Page {
                                                                                         let _ = content.reset(
                                                                                             content::Mime::TextGemini,
                                                                                             &uri,
-                                                                                            &gformat!("# Redirect\n\n=> {source}")
+                                                                                            // @TODO use template file
+                                                                                            &gformat!("# Redirect\n\nAuto-follow disabled, click on link below to continue\n\n=> {source}")
                                                                                         );
                                                                                     },
                                                                                     None => todo!(),
