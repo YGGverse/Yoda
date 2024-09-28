@@ -3,9 +3,12 @@ mod reader;
 use reader::Reader;
 
 use gtk::{
+    gio::SimpleAction,
     glib::{GString, Uri},
     Viewport,
 };
+
+use std::sync::Arc;
 
 pub struct Gemini {
     reader: Reader,
@@ -14,9 +17,9 @@ pub struct Gemini {
 
 impl Gemini {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, action_open: Arc<SimpleAction>) -> Self {
         // Init components
-        let reader = Reader::new(gemtext, base);
+        let reader = Reader::new(gemtext, base, action_open);
 
         // Init widget
         let widget = Viewport::builder().scroll_to_focus(false).build();

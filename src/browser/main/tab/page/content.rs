@@ -4,14 +4,17 @@ mod text;
 use text::Text;
 
 use gtk::{
+    gio::SimpleAction,
     glib::{GString, Uri},
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
 
+use std::sync::Arc;
+
 pub enum Mime {
     TextGemini,
-    TextPlain,
+    // TextPlain,
 }
 
 pub struct ResetResult {
@@ -19,14 +22,18 @@ pub struct ResetResult {
 }
 
 pub struct Content {
+    // GTK
     widget: Box,
+    // Actions
+    action_open: Arc<SimpleAction>,
 }
 
 impl Content {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(action_open: Arc<SimpleAction>) -> Self {
         Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
+            action_open,
         }
     }
 
@@ -40,17 +47,17 @@ impl Content {
         // Re-compose
         match mime {
             Mime::TextGemini => {
-                let child = Text::gemini(data, base);
+                let child = Text::gemini(data, base, self.action_open.clone());
 
                 self.widget.append(child.widget());
 
                 ResetResult {
                     title: child.meta_title().clone(),
                 }
-            }
-            Mime::TextPlain => {
-                todo!()
-            }
+            } /* @TODO
+              Mime::TextPlain => {
+                  todo!()
+              } */
         }
     }
 

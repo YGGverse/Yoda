@@ -5,20 +5,23 @@ use parser::link::Link;
 use parser::plain::Plain;
 
 use gtk::{
+    gio::SimpleAction,
     glib::{GString, Propagation, Uri, UriFlags},
-    prelude::{StyleContextExt, ToVariant, WidgetExt},
+    prelude::{ActionExt, StyleContextExt, ToVariant, WidgetExt},
     Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
 
+use std::sync::Arc;
+
 pub struct Reader {
     title: Option<GString>,
-    css: CssProvider,
+    // css: CssProvider,
     widget: Label,
 }
 
 impl Reader {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, action_open: Arc<SimpleAction>) -> Self {
         // Init title
         let mut title = None;
 
@@ -82,15 +85,13 @@ impl Reader {
             .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // Connect actions
-        widget.connect_activate_link(|label, href| {
+        widget.connect_activate_link(move |_, href| {
             // Detect requested protocol
             if let Ok(uri) = Uri::parse(&href, UriFlags::NONE) {
                 return match uri.scheme().as_str() {
                     "gemini" => {
                         // Open new page
-                        label
-                            .activate_action("page.open", Some(&uri.to_str().to_variant()))
-                            .expect("Action `page.open` not found");
+                        action_open.activate(Some(&uri.to_str().to_variant()));
 
                         // Prevent link open in external application
                         Propagation::Stop
@@ -105,7 +106,11 @@ impl Reader {
         });
 
         // Result
-        Self { title, css, widget }
+        Self {
+            title,
+            // css,
+            widget,
+        }
     }
 
     // Getters

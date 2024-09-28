@@ -52,7 +52,7 @@ impl Page {
         action_group.add_action(action_open.as_ref());
 
         // Init components
-        let content = Arc::new(Content::new());
+        let content = Arc::new(Content::new(action_open.clone()));
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
             action_tab_page_reload.clone(),
