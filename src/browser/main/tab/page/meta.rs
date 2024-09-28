@@ -10,9 +10,13 @@ pub enum Mime {
 // Internal page status (not related with gemini status code)
 // Useful for widgets composition
 pub enum Status {
+    Connect,
     Failure,
+    Prepare,
     Redirect,
     Reload,
+    Request,
+    Response,
     Success,
 }
 
@@ -24,10 +28,6 @@ pub struct Meta {
     // Enums
     pub mime: Option<Mime>,
     pub status: Option<Status>,
-    // Useful to compose other widgets
-    // (e.g. navigation bar listen for this value update)
-    // @TODO deprecated, calculate by Status enum
-    pub progress_fraction: f32,
 }
 
 impl Meta {
@@ -37,7 +37,6 @@ impl Meta {
             description: None,
             mime: None,
             status: None,
-            progress_fraction: 0.0,
         }
     }
 }

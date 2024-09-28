@@ -119,7 +119,6 @@ impl Page {
         meta.borrow_mut().status = Some(Status::Reload);
         meta.borrow_mut().title = Some(gformat!("Loading.."));
         meta.borrow_mut().description = None;
-        meta.borrow_mut().progress_fraction = 0.0;
 
         action_update.activate(None);
 
@@ -139,7 +138,7 @@ impl Page {
                         };
 
                         // Update
-                        meta.borrow_mut().progress_fraction = 0.25;
+                        meta.borrow_mut().status = Some(Status::Prepare);
                         meta.borrow_mut().description = Some(gformat!("Connect {host}.."));
 
                         action_update.activate(None);
@@ -160,7 +159,7 @@ impl Page {
                             move |result| match result {
                                 Ok(connection) => {
                                     // Update
-                                    meta.borrow_mut().progress_fraction = 0.50;
+                                    meta.borrow_mut().status = Some(Status::Connect);
                                     meta.borrow_mut().description = Some(gformat!("Connected to {host}.."));
 
                                     action_update.activate(None);
@@ -173,7 +172,7 @@ impl Page {
                                         move |result| match result {
                                             Ok(_) => {
                                                 // Update
-                                                meta.borrow_mut().progress_fraction = 0.75;
+                                                meta.borrow_mut().status = Some(Status::Request);
                                                 meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
 
                                                 action_update.activate(None);
@@ -190,7 +189,7 @@ impl Page {
                                                             ) {
                                                                 Ok(data) => {
                                                                     // Format response
-                                                                    meta.borrow_mut().progress_fraction = 1.0;
+                                                                    meta.borrow_mut().status = Some(Status::Response);
                                                                     meta.borrow_mut().description = Some(host);
                                                                     meta.borrow_mut().title = Some(uri.path());
 
@@ -250,10 +249,9 @@ impl Page {
                                                                             // Redirect (@TODO implement limits to auto-redirect)
                                                                             "31" => {
                                                                                 // Update meta
-                                                                                meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                 meta.borrow_mut().status = Some(Status::Redirect);
+                                                                                meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                 meta.borrow_mut().title = Some(gformat!("Redirect"));
-                                                                                meta.borrow_mut().progress_fraction = 1.0;
 
                                                                                 // Select widget
                                                                                 match parts.get(3) {
@@ -273,7 +271,6 @@ impl Page {
                                                                                 meta.borrow_mut().status = Some(Status::Failure);
                                                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                 meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
-                                                                                meta.borrow_mut().progress_fraction = 1.0;
                                                                             },
                                                                         }
                                                                         None => todo!(),
@@ -286,7 +283,6 @@ impl Page {
                                                                     meta.borrow_mut().status = Some(Status::Failure);
                                                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                     meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
-                                                                    meta.borrow_mut().progress_fraction = 1.0;
 
                                                                     action_update.activate(None);
                                                                 }
@@ -302,7 +298,6 @@ impl Page {
                                                             meta.borrow_mut().status = Some(Status::Failure);
                                                             meta.borrow_mut().title = Some(gformat!("Oops"));
                                                             meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
-                                                            meta.borrow_mut().progress_fraction = 1.0;
 
                                                             action_update.activate(None);
 
@@ -319,7 +314,6 @@ impl Page {
                                                 meta.borrow_mut().status = Some(Status::Failure);
                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                 meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
-                                                meta.borrow_mut().progress_fraction = 1.0;
 
                                                 action_update.activate(None);
 
@@ -336,7 +330,6 @@ impl Page {
                                     meta.borrow_mut().status = Some(Status::Failure);
                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                     meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
-                                    meta.borrow_mut().progress_fraction = 1.0;
 
                                     action_update.activate(None);
                                 }
@@ -348,10 +341,10 @@ impl Page {
                     */
                     scheme => {
                         // Update
+                        meta.borrow_mut().status = Some(Status::Failure);
                         meta.borrow_mut().title = Some(gformat!("Oops"));
                         meta.borrow_mut().description =
                             Some(gformat!("Protocol {scheme} not supported"));
-                        meta.borrow_mut().progress_fraction = 1.0;
 
                         action_update.activate(None);
                     }
@@ -394,6 +387,8 @@ impl Page {
     }
 
     pub fn update(&self) {
+        // Interpret status to progress fraction
+        // @TODO
         self.navigation.update();
         // @TODO self.content.update();
     }
