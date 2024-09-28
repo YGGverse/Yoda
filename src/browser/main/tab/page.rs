@@ -261,7 +261,7 @@ impl Page {
                                                                                         let _ = content.reset(
                                                                                             content::Mime::TextGemini,
                                                                                             &uri,
-                                                                                            &gformat!("# Redirect\n=> {source}")
+                                                                                            &gformat!("# Redirect\n\n=> {source}")
                                                                                         );
                                                                                     },
                                                                                     None => todo!(),
