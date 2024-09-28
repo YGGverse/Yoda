@@ -242,8 +242,26 @@ impl Page {
                                                                                     }
                                                                                     None => todo!(),
                                                                                 };
-                                                                                // @TODO
                                                                             },
+                                                                            // Redirect (@TODO implement limits to auto-redirect)
+                                                                            "31" => {
+                                                                                // Update meta
+                                                                                meta.borrow_mut().mime = Some(Mime::TextGemini);
+                                                                                meta.borrow_mut().title = Some(gformat!("Redirect"));
+
+                                                                                // Select widget
+                                                                                match parts.get(3) {
+                                                                                    Some(source) => {
+                                                                                        let _ = content.reset(
+                                                                                            content::Mime::TextGemini,
+                                                                                            &uri,
+                                                                                            &gformat!("# Redirect\nConfirm:\n=> {source}")
+                                                                                        );
+                                                                                    },
+                                                                                    None => todo!(),
+                                                                                }
+                                                                            },
+                                                                            // @TODO
                                                                             _ => {
                                                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                 meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
