@@ -402,7 +402,7 @@ impl Page {
             Some(Status::Prepare) => 0.25,
             Some(Status::Connect) => 0.50,
             Some(Status::Request) => 0.75,
-            Some(Status::Response) => 1.0,
+            Some(Status::Response | Status::Success) => 1.0,
             _ => 0.0,
         };
 

@@ -1,16 +1,24 @@
 use gtk::{
     gio::SimpleAction,
-    glib::{timeout_add_local, ControlFlow, GString, Uri, UriFlags},
+    glib::{timeout_add_local, ControlFlow, GString, SourceId, Uri, UriFlags},
     prelude::{ActionExt, EditableExt, EntryExt},
     Entry,
 };
 
-use std::{sync::Arc, time::Duration};
+use std::{cell::RefCell, sync::Arc, time::Duration};
 
-const PROGRESS_ANIMATION_STEP: f64 = 0.2;
-const PROGRESS_ANIMATION_TIME: u64 = 25;
+// Progressbar animation setup
+const PROGRESS_ANIMATION_STEP: f64 = 0.05;
+const PROGRESS_ANIMATION_TIME: u64 = 25; //ms
 
+struct Progress {
+    fraction: RefCell<f64>,
+    source_id: RefCell<Option<SourceId>>,
+}
+
+// Main
 pub struct Request {
+    progress: Arc<Progress>,
     widget: Entry,
 }
 
@@ -41,26 +49,53 @@ impl Request {
             action_tab_page_reload.activate(None);
         });
 
+        // Init animated progressbar state
+        let progress = Arc::new(Progress {
+            fraction: RefCell::new(0.0),
+            source_id: RefCell::new(None),
+        });
+
         // Result
-        Self { widget }
+        Self { progress, widget }
     }
 
     // Actions
     pub fn update(&self, progress_fraction: f64) {
-        // Animate progress fraction update
-        timeout_add_local(Duration::from_millis(PROGRESS_ANIMATION_TIME), {
-            let widget = self.widget.clone();
-            move || {
-                if progress_fraction > widget.progress_fraction() {
-                    widget.set_progress_fraction(
-                        widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
-                    );
-                    return ControlFlow::Continue;
-                }
-                widget.set_progress_fraction(progress_fraction);
-                ControlFlow::Break
-            }
-        });
+        // Update shared fraction value for async progressbar animation
+        self.progress.fraction.replace(progress_fraction);
+
+        // Start new frame on previous process completed only (`source_id` is None)
+        // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
+        if self.progress.source_id.borrow().is_none() {
+            // Start new animation frame iterator, update `source_id`
+            self.progress.source_id.replace(Some(timeout_add_local(
+                Duration::from_millis(PROGRESS_ANIMATION_TIME),
+                {
+                    // Clone async pointers dependency
+                    let widget = self.widget.clone();
+                    let progress = self.progress.clone();
+
+                    // Frame
+                    move || {
+                        // Animate
+                        if *progress.fraction.borrow() > widget.progress_fraction() {
+                            widget.set_progress_fraction(
+                                widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
+                            );
+                            return ControlFlow::Continue;
+                        }
+                        // Deactivate
+                        progress.source_id.replace(None);
+
+                        // Reset
+                        widget.set_progress_fraction(0.0);
+
+                        // Stop iteration
+                        ControlFlow::Break
+                    }
+                },
+            )));
+        }
     }
 
     // Setters
