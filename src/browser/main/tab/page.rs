@@ -193,6 +193,8 @@ impl Page {
                                                                     meta.borrow_mut().description = Some(host);
                                                                     meta.borrow_mut().title = Some(uri.path());
 
+                                                                    action_update.activate(None);
+
                                                                     // Try create short base for title
                                                                     let path = uri.path();
                                                                     let path = Path::new(&path);
@@ -219,28 +221,34 @@ impl Page {
                                                                                         "text/gemini" => {
                                                                                             // Update meta
                                                                                             meta.borrow_mut().mime = Some(Mime::TextGemini);
-                                                                                            // Select widget
+
+                                                                                            // Update data
                                                                                             match parts.get(4) {
                                                                                                 Some(source) => {
-                                                                                                    // Update content
-                                                                                                    let result = content.reset(content::Mime::TextGemini, &uri, &source);
+                                                                                                    meta.borrow_mut().status = Some(Status::Success);
 
                                                                                                     // This content type may return parsed title
+                                                                                                    let result = content.reset(content::Mime::TextGemini, &uri, &source);
                                                                                                     meta.borrow_mut().title = result.title.clone();
 
-                                                                                                    // Update status
-                                                                                                    meta.borrow_mut().status = Some(Status::Success);
+                                                                                                    action_update.activate(None);
                                                                                                 },
                                                                                                 None => todo!(),
                                                                                             }
                                                                                         },
                                                                                         "text/plain" => {
+                                                                                            meta.borrow_mut().status = Some(Status::Success);
                                                                                             meta.borrow_mut().mime = Some(Mime::TextPlain);
+
+                                                                                            action_update.activate(None);
                                                                                             todo!()
                                                                                         },
                                                                                         _ => {
+                                                                                            meta.borrow_mut().status = Some(Status::Failure);
                                                                                             meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                             meta.borrow_mut().description = Some(gformat!("Content {mime} not supported"));
+
+                                                                                            action_update.activate(None);
                                                                                         },
                                                                                     }
                                                                                     None => todo!(),
@@ -252,6 +260,8 @@ impl Page {
                                                                                 meta.borrow_mut().status = Some(Status::Redirect);
                                                                                 meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                 meta.borrow_mut().title = Some(gformat!("Redirect"));
+
+                                                                                action_update.activate(None);
 
                                                                                 // Select widget
                                                                                 match parts.get(3) {
@@ -268,16 +278,16 @@ impl Page {
                                                                             },
                                                                             // @TODO
                                                                             _ => {
+                                                                                // Update
                                                                                 meta.borrow_mut().status = Some(Status::Failure);
                                                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                 meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
+
+                                                                                action_update.activate(None);
                                                                             },
                                                                         }
                                                                         None => todo!(),
                                                                     };
-
-                                                                    // Update
-                                                                    action_update.activate(None);
                                                                 }
                                                                 Err(e) => {
                                                                     meta.borrow_mut().status = Some(Status::Failure);
