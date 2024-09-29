@@ -7,7 +7,7 @@ use main::Main;
 
 use gtk::{
     gio::SimpleAction,
-    prelude::{ActionMapExt, GtkWindowExt},
+    prelude::{ActionExt, ActionMapExt, GtkWindowExt},
     Application, ApplicationWindow,
 };
 use std::sync::Arc;
@@ -134,6 +134,9 @@ impl Browser {
                 main.tab_pin();
             }
         });
+
+        // Make initial update @TODO move to the app init level
+        action_update.activate(None);
 
         // Return activated browser struct
         Self {
