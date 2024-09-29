@@ -89,7 +89,7 @@ impl Request {
                                 // Deactivate
                                 progress.source_id.replace(None);
 
-                                // Reset
+                                // Reset (to hide progress widget)
                                 widget.set_progress_fraction(0.0);
 
                                 // Stop iteration
