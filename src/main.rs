@@ -1,14 +1,18 @@
 mod browser;
 
-use std::fs;
+use browser::Browser;
 
-use gtk::prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt};
+use gtk::{
+    glib::{user_config_dir, ExitCode},
+    prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
+    Application,
+};
 
-use gtk::{glib, Application};
+use std::fs::create_dir_all;
 
 const APP_ID: &str = "io.github.yggverse.Yoda";
 
-fn main() -> glib::ExitCode {
+fn main() -> ExitCode {
     // Init app
     let app = Application::builder().application_id(APP_ID).build();
 
@@ -28,11 +32,11 @@ fn main() -> glib::ExitCode {
     // Create new window
     app.connect_activate({
         // Init profile directory
-        let mut fs = glib::user_config_dir();
+        let mut fs = user_config_dir();
 
         fs.push(APP_ID);
 
-        if let Err(e) = fs::create_dir_all(&fs) {
+        if let Err(e) = create_dir_all(&fs) {
             panic!("Failed to create profile directory: {e}")
         }
 
@@ -48,7 +52,7 @@ fn main() -> glib::ExitCode {
         };*/
 
         move |this: &Application| {
-            browser::Browser::new(this, /*db.clone(),*/ 640, 480)
+            Browser::new(this, /*db.clone(),*/ 640, 480)
                 .widget()
                 .present();
         }
