@@ -7,7 +7,7 @@ pub enum Level {
 }
 
 pub struct Header {
-    level: Level,
+    // level: Level,
     text: GString,
     markup: GString,
 }
@@ -54,12 +54,11 @@ impl Header {
                         "<span size=\"large\">{}</span>\n",
                         markup_escape_text(&text)
                     ),
-                    _ => return None,
                 };
 
                 // Result
                 return Some(Header {
-                    level,
+                    // level,
                     text,
                     markup,
                 });

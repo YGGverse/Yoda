@@ -1,3 +1,4 @@
+/* @TODO
 use std::sync::Arc;
 
 pub struct Browser {
@@ -20,4 +21,4 @@ impl Browser {
 
     // Restore previous browser session from DB
     fn restore(&self) {}
-}
+}*/

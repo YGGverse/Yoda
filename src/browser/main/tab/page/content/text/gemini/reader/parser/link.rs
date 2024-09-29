@@ -3,12 +3,12 @@ use gtk::glib::{
 };
 
 pub struct Link {
-    alt: Option<GString>,  // [optional] alternative text
-    date: Option<GString>, // [optional] date @TODO store in UnixTime?
-    external: bool,        // external link indicator
-    link: GString,         // original link, wanted for title tooltip
-    markup: GString,       // pango markup with escaped special chars
-    uri: Uri,              // parsed link object (currently not in use)
+    //  alt: Option<GString>,  // [optional] alternative text
+    //  date: Option<GString>, // [optional] date @TODO store in UnixTime?
+    //  external: bool,        // external link indicator
+    //  link: GString,         // original link, wanted for title tooltip
+    markup: GString, // pango markup with escaped special chars
+                     //  uri: Uri,              // parsed link object (currently not in use)
 }
 
 impl Link {
@@ -20,8 +20,8 @@ impl Link {
     // returns new Link struct or None
     pub fn from(line: &str, base: &Uri) -> Option<Link> {
         // Init struct members
-        let mut alt: Option<GString> = None;
-        let mut date: Option<GString> = None;
+        // let mut alt: Option<GString> = None;
+        // let mut date: Option<GString> = None;
         let external: bool;
         let link: GString;
         let markup: GString;
@@ -72,7 +72,7 @@ impl Link {
 
         // Date
         if let Some(this) = parsed.get(2) {
-            date = Some(GString::from(this.to_string()));
+            // date = Some(GString::from(this.to_string()));
             name.push(this.to_string());
         }
 
@@ -80,7 +80,7 @@ impl Link {
         match parsed.get(3) {
             // Not empty
             Some(this) => {
-                alt = Some(GString::from(this.to_string()));
+                // alt = Some(GString::from(this.to_string()));
                 name.push(this.to_string());
             }
             // Empty, use resolved address
@@ -96,16 +96,17 @@ impl Link {
         );
 
         Some(Self {
-            alt,
-            date,
-            external,
-            link,
+            // alt,
+            // date,
+            // external,
+            // link,
             markup,
-            uri,
+            // uri,
         })
     }
 
     // Getters
+    /* @TODO
     pub fn alt(&self) -> &Option<GString> {
         &self.alt
     }
@@ -122,11 +123,11 @@ impl Link {
         &self.link
     }
 
-    pub fn markup(&self) -> &GString {
-        &self.markup
-    }
-
     pub fn uri(&self) -> &Uri {
         &self.uri
+    }*/
+
+    pub fn markup(&self) -> &GString {
+        &self.markup
     }
 }
