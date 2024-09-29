@@ -75,7 +75,7 @@ impl Tab {
         let label = Arc::new(Label::new(id.clone(), false));
         let page = Arc::new(Page::new(
             id.clone(),
-            page_navigation_request_text,
+            page_navigation_request_text.clone(),
             self.action_tab_page_reload.clone(),
             self.action_update.clone(),
         ));
@@ -107,6 +107,10 @@ impl Tab {
 
         if is_current_page {
             self.widget.set_current_page(Some(page_number));
+        }
+
+        if page_navigation_request_text.is_none() {
+            page.grab_navigation_request_focus();
         }
 
         // Result

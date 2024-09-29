@@ -75,6 +75,10 @@ impl Navigation {
     }
 
     // Actions
+    pub fn grab_request_focus(&self) {
+        self.request.widget().grab_focus();
+    }
+
     pub fn update(&self, progress_fraction: Option<f64>) {
         self.base.update(self.request.uri());
         self.history.update();

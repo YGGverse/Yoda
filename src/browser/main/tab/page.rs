@@ -105,6 +105,10 @@ impl Page {
     }
 
     // Actions
+    pub fn grab_navigation_request_focus(&self) {
+        self.navigation.grab_request_focus();
+    }
+
     pub fn reload(&self) {
         // Init globals
         let request_text = self.navigation.request_text();
