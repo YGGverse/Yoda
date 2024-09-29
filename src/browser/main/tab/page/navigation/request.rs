@@ -80,6 +80,7 @@ impl Request {
                         // Animate
                         if *progress.fraction.borrow() > widget.progress_fraction() {
                             widget.set_progress_fraction(
+                                // Currently, here is no outrange validation, seems that wrapper make this work @TODO
                                 widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
                             );
                             return ControlFlow::Continue;
