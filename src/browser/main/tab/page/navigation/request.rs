@@ -9,7 +9,7 @@ use std::{cell::RefCell, sync::Arc, time::Duration};
 
 // Progressbar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
-const PROGRESS_ANIMATION_TIME: u64 = 25; //ms
+const PROGRESS_ANIMATION_TIME: u64 = 20; //ms
 
 struct Progress {
     fraction: RefCell<f64>,
