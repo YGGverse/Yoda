@@ -399,10 +399,11 @@ impl Page {
     pub fn update(&self) {
         // Interpret status to progress fraction
         let progress_fraction = match self.meta.borrow().status {
-            Some(Status::Prepare) => Some(0.25),
-            Some(Status::Connect) => Some(0.50),
-            Some(Status::Request) => Some(0.75),
-            Some(Status::Response) => Some(1.0),
+            Some(Status::Prepare | Status::Reload) => Some(0.0),
+            Some(Status::Connect) => Some(0.25),
+            Some(Status::Request) => Some(0.50),
+            Some(Status::Response) => Some(0.75),
+            Some(Status::Failure | Status::Redirect | Status::Success) => Some(1.0),
             _ => None,
         };
 
