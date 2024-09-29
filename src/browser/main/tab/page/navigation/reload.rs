@@ -6,6 +6,7 @@ use gtk::{
 use std::sync::Arc;
 
 pub struct Reload {
+    action_tab_page_reload: Arc<SimpleAction>,
     widget: Button,
 }
 
@@ -20,18 +21,24 @@ impl Reload {
             .build();
 
         // Init events
-        widget.connect_clicked(move |_| {
-            action_tab_page_reload.activate(None);
+        widget.connect_clicked({
+            let action_tab_page_reload = action_tab_page_reload.clone();
+            move |_| {
+                action_tab_page_reload.activate(None);
+            }
         });
 
         // Return activated struct
-        Self { widget }
+        Self {
+            action_tab_page_reload,
+            widget,
+        }
     }
 
     // Actions
     pub fn update(&self, is_enabled: bool) {
+        self.action_tab_page_reload.set_enabled(is_enabled);
         self.widget.set_sensitive(is_enabled);
-        // @TODO deactivate action
     }
 
     // Getters
