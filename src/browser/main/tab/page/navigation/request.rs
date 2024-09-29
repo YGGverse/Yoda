@@ -56,9 +56,8 @@ impl Request {
                         widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
                     );
                     return ControlFlow::Continue;
-                } else {
-                    widget.set_progress_fraction(progress_fraction);
                 }
+                widget.set_progress_fraction(progress_fraction);
                 ControlFlow::Break
             }
         });
