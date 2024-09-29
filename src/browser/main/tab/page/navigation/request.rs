@@ -26,8 +26,6 @@ impl Request {
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
             .hexpand(true)
-            .progress_fraction(0.0)
-            .progress_pulse_step(0.1)
             .text(match text {
                 Some(text) => text,
                 None => GString::new(),
