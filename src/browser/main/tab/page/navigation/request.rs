@@ -61,43 +61,43 @@ impl Request {
 
     // Actions
     pub fn update(&self, progress_fraction: Option<f64>) {
-        // Skip Non value
+        // Skip update animation for Non value
         if let Some(value) = progress_fraction {
-            // Update shared fraction value for async progressbar animation
-            self.progress.fraction.replace(value);
+            // Update shared fraction value for async progressbar function, animate on changed only
+            if value != self.progress.fraction.replace(value) {
+                // Start new frame on previous process function completed (`source_id` changed to None)
+                // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
+                if self.progress.source_id.borrow().is_none() {
+                    // Start new animation frame iterator, update `source_id`
+                    self.progress.source_id.replace(Some(timeout_add_local(
+                        Duration::from_millis(PROGRESS_ANIMATION_TIME),
+                        {
+                            // Clone async pointers dependency
+                            let widget = self.widget.clone();
+                            let progress = self.progress.clone();
 
-            // Start new frame on previous process completed only (`source_id` is None)
-            // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
-            if self.progress.source_id.borrow().is_none() {
-                // Start new animation frame iterator, update `source_id`
-                self.progress.source_id.replace(Some(timeout_add_local(
-                    Duration::from_millis(PROGRESS_ANIMATION_TIME),
-                    {
-                        // Clone async pointers dependency
-                        let widget = self.widget.clone();
-                        let progress = self.progress.clone();
+                            // Frame
+                            move || {
+                                // Animate
+                                if *progress.fraction.borrow() > widget.progress_fraction() {
+                                    widget.set_progress_fraction(
+                                        // Currently, here is no outrange validation, seems that wrapper make this work @TODO
+                                        widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
+                                    );
+                                    return ControlFlow::Continue;
+                                }
+                                // Deactivate
+                                progress.source_id.replace(None);
 
-                        // Frame
-                        move || {
-                            // Animate
-                            if *progress.fraction.borrow() > widget.progress_fraction() {
-                                widget.set_progress_fraction(
-                                    // Currently, here is no outrange validation, seems that wrapper make this work @TODO
-                                    widget.progress_fraction() + PROGRESS_ANIMATION_STEP,
-                                );
-                                return ControlFlow::Continue;
+                                // Reset
+                                widget.set_progress_fraction(0.0);
+
+                                // Stop iteration
+                                ControlFlow::Break
                             }
-                            // Deactivate
-                            progress.source_id.replace(None);
-
-                            // Reset
-                            widget.set_progress_fraction(0.0);
-
-                            // Stop iteration
-                            ControlFlow::Break
-                        }
-                    },
-                )));
+                        },
+                    )));
+                }
             }
         }
     }
