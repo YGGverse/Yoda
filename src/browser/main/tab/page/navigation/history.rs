@@ -77,7 +77,7 @@ impl History {
     }
 
     pub fn try_back(&self, follow_to_index: bool) -> Option<GString> {
-        if let Some(index) = self.index.take() {
+        if let Some(index) = self.index.borrow().as_ref() {
             if let Some(memory) = self.memory.borrow().get(index - 1) {
                 if follow_to_index {
                     self.index.replace(Some(index - 1));
@@ -94,7 +94,7 @@ impl History {
     } */
 
     pub fn try_forward(&self, follow_to_index: bool) -> Option<GString> {
-        if let Some(index) = self.index.take() {
+        if let Some(index) = self.index.borrow().as_ref() {
             if let Some(memory) = self.memory.borrow().get(index + 1) {
                 if follow_to_index {
                     self.index.replace(Some(index + 1));
