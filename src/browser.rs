@@ -7,10 +7,13 @@ use main::Main;
 
 use gtk::{
     gio::SimpleAction,
-    prelude::{ActionExt, ActionMapExt, GtkWindowExt},
+    prelude::{ActionMapExt, GtkWindowExt},
     Application, ApplicationWindow,
 };
 use std::sync::Arc;
+
+const DEFAULT_HEIGHT: i32 = 480;
+const DEFAULT_WIDTH: i32 = 640;
 
 pub struct Browser {
     // Extras
@@ -26,22 +29,20 @@ impl Browser {
     pub fn new(
         app: &Application,
         // connection: Arc<sqlite::Connection>,
-        default_width: i32,
-        default_height: i32,
+        // Actions
+        action_debug: Arc<SimpleAction>,
+        action_quit: Arc<SimpleAction>,
+        action_update: Arc<SimpleAction>,
+        action_tab_append: Arc<SimpleAction>,
+        action_tab_close: Arc<SimpleAction>,
+        action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
-        // Init window actions
-        let action_debug = Arc::new(SimpleAction::new("debug", None));
-        let action_quit = Arc::new(SimpleAction::new("quit", None));
-        let action_update = Arc::new(SimpleAction::new("update", None));
-
-        let action_tab_append = Arc::new(SimpleAction::new("tab_append", None));
-        let action_tab_close = Arc::new(SimpleAction::new("tab_close", None));
-        let action_tab_close_all = Arc::new(SimpleAction::new("tab_close_all", None));
-        let action_tab_page_reload = Arc::new(SimpleAction::new("tab_page_reload", None));
-        let action_tab_pin = Arc::new(SimpleAction::new("tab_pin", None));
+        // Init database
+        // let db = db::Browser::new(connection); @TODO
 
         // Init components
-        // let db = db::Browser::new(connection);
         let header = Arc::new(Header::new(
             action_debug.clone(),
             action_quit.clone(),
@@ -60,10 +61,10 @@ impl Browser {
         // Init widget
         let widget = ApplicationWindow::builder()
             .application(app)
-            .default_width(default_width)
-            .default_height(default_height)
             .titlebar(header.widget())
             .child(main.widget())
+            .default_height(DEFAULT_HEIGHT)
+            .default_width(DEFAULT_WIDTH)
             .build();
 
         widget.add_action(action_debug.as_ref());
@@ -134,9 +135,6 @@ impl Browser {
                 main.tab_pin();
             }
         });
-
-        // Make initial update @TODO move to the app init level
-        action_update.activate(None);
 
         // Return activated browser struct
         Self {
