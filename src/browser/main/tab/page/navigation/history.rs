@@ -4,13 +4,23 @@ mod forward;
 use back::Back;
 use forward::Forward;
 
-use gtk::{gio::SimpleAction, prelude::BoxExt, Box, Orientation};
-use std::sync::Arc;
+use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
+use std::{cell::RefCell, sync::Arc};
+
+struct Memory {
+    request: GString,
+    time: i32, // @TODO
+}
 
 pub struct History {
-    widget: Box,
+    // Components
     back: Back,
     forward: Forward,
+    // Extras
+    memory: Vec<Memory>,
+    index: RefCell<i32>,
+    // GTK
+    widget: Box,
 }
 
 impl History {
@@ -34,10 +44,21 @@ impl History {
         widget.append(back.widget());
         widget.append(forward.widget());
 
+        // Init memory
+        let memory = Vec::new();
+
+        // Init index
+        let index = RefCell::new(-1);
+
         Self {
-            widget,
+            // Actions
             back,
             forward,
+            // Extras
+            memory,
+            index,
+            // GTK
+            widget,
         }
     }
 
