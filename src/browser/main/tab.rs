@@ -17,6 +17,7 @@ pub struct Tab {
     // GTK
     widget: Notebook,
     // Keep action links in memory to not require them on every tab append
+    action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
@@ -27,6 +28,7 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new(
+        action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
@@ -38,6 +40,7 @@ impl Tab {
             // GTK
             widget,
             // Define action links
+            action_tab_page_navigation_base,
             action_tab_page_navigation_reload,
             action_update,
             // Init empty HashMap index as no tabs appended yet
@@ -76,6 +79,7 @@ impl Tab {
         let page = Arc::new(Page::new(
             id.clone(),
             page_navigation_request_text.clone(),
+            self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
         ));
@@ -144,14 +148,27 @@ impl Tab {
         }
     }
 
-    pub fn page_reload(&self) {
+    pub fn page_navigation_base(&self) {
         // Get current page
         if let Some(page_number) = self.widget.current_page() {
             // Get default widget to extract it name as the ID for childs
             if let Some(widget) = self.widget.nth_page(Some(page_number)) {
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
-                    page.reload();
+                    page.navigation_base();
+                }
+            }
+        }
+    }
+
+    pub fn page_navigation_reload(&self) {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
+                    page.navigation_reload();
                 }
             }
         }

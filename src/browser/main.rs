@@ -14,11 +14,16 @@ pub struct Main {
 impl Main {
     // Construct
     pub fn new(
+        action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init components
-        let tab = Arc::new(Tab::new(action_tab_page_navigation_reload, action_update));
+        let tab = Arc::new(Tab::new(
+            action_tab_page_navigation_base,
+            action_tab_page_navigation_reload,
+            action_update,
+        ));
         tab.activate(tab.clone());
         tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true); // demo tab @TODO replace with session restore feature
 
@@ -36,8 +41,12 @@ impl Main {
         self.tab.append(tab_page_navigation_request_text, true);
     }
 
-    pub fn tab_page_reload(&self) {
-        self.tab.page_reload();
+    pub fn tab_page_navigation_base(&self) {
+        self.tab.page_navigation_base();
+    }
+
+    pub fn tab_page_navigation_reload(&self) {
+        self.tab.page_navigation_reload();
     }
 
     pub fn tab_close(&self) {

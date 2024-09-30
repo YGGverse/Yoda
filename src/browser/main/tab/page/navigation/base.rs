@@ -1,35 +1,75 @@
-use gtk::{glib::Uri, prelude::WidgetExt, Button};
+use gtk::{
+    gio::SimpleAction,
+    glib::{gformat, GString, Uri},
+    prelude::{ActionExt, ButtonExt, WidgetExt},
+    Button,
+};
+use std::{cell::RefCell, sync::Arc};
 
 pub struct Base {
+    action_tab_page_navigation_base: Arc<SimpleAction>,
+    uri: RefCell<Option<Uri>>,
     widget: Button,
 }
 
 impl Base {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(action_tab_page_navigation_base: Arc<SimpleAction>) -> Self {
+        // Init widget
         let widget = Button::builder()
-            .action_name("win.tab_page_base")
             .icon_name("go-home-symbolic")
             .tooltip_text("Base")
             .sensitive(false)
             .build();
 
-        Self { widget }
+        // Init events
+        widget.connect_clicked({
+            let action_tab_page_navigation_base = action_tab_page_navigation_base.clone();
+            move |_| {
+                action_tab_page_navigation_base.activate(None);
+            }
+        });
+
+        // Return activated struct
+        Self {
+            action_tab_page_navigation_base,
+            uri: RefCell::new(None),
+            widget,
+        }
     }
 
     // Actions
     pub fn update(&self, uri: Option<Uri>) {
-        let status = match uri {
+        // Update sensitivity
+        let status = match &uri {
             Some(uri) => "/" != uri.path(),
             None => false,
         };
 
-        self.widget.action_set_enabled("win.tab_page_base", status);
+        self.action_tab_page_navigation_base.set_enabled(status);
         self.widget.set_sensitive(status);
+
+        // Update parsed cache
+        self.uri.replace(uri);
     }
 
     // Getters
     pub fn widget(&self) -> &Button {
         &self.widget
+    }
+
+    pub fn address(&self) -> Option<GString> {
+        if let Some(uri) = self.uri.take() {
+            let scheme = uri.scheme();
+            let port = uri.port();
+            if let Some(host) = uri.host() {
+                if port.is_positive() {
+                    return Some(gformat!("{scheme}://{host}:{port}/"));
+                } else {
+                    return Some(gformat!("{scheme}://{host}/"));
+                }
+            }
+        }
+        None
     }
 }

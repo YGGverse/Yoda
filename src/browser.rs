@@ -60,6 +60,7 @@ impl Browser {
         ));
 
         let main = Arc::new(Main::new(
+            action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
@@ -134,19 +135,19 @@ impl Browser {
         action_tab_page_navigation_base.connect_activate({
             let main = main.clone();
             move |_, _| {
-                // @TODO
+                main.tab_page_navigation_base();
             }
         });
 
         action_tab_page_navigation_history_back.connect_activate({
-            let main = main.clone();
+            // let main = main.clone();
             move |_, _| {
                 // @TODO
             }
         });
 
         action_tab_page_navigation_history_forward.connect_activate({
-            let main = main.clone();
+            // let main = main.clone();
             move |_, _| {
                 // @TODO
             }
@@ -155,7 +156,7 @@ impl Browser {
         action_tab_page_navigation_reload.connect_activate({
             let main = main.clone();
             move |_, _| {
-                main.tab_page_reload();
+                main.tab_page_navigation_reload();
             }
         });
 

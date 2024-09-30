@@ -33,11 +33,12 @@ pub struct Navigation {
 impl Navigation {
     pub fn new(
         request_text: Option<GString>,
+        action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init components
-        let base = Base::new();
+        let base = Base::new(action_tab_page_navigation_base);
         let history = History::new();
         let reload = Reload::new(action_tab_page_navigation_reload.clone());
         let request = Request::new(
@@ -100,6 +101,10 @@ impl Navigation {
     // Getters
     pub fn widget(&self) -> &Box {
         &self.widget
+    }
+
+    pub fn base_address(&self) -> Option<GString> {
+        self.base.address()
     }
 
     pub fn request_text(&self) -> GString {

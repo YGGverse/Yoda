@@ -14,7 +14,7 @@ use gtk::{
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
         ActionExt, ActionMapExt, BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
-        SocketClientExt, StaticVariantType, WidgetExt,
+        SocketClientExt, StaticVariantType, ToVariant, WidgetExt,
     },
     Box, Orientation,
 };
@@ -24,6 +24,7 @@ pub struct Page {
     // GTK
     widget: Box,
     // Actions
+    action_page_open: Arc<SimpleAction>,
     // action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Components
@@ -38,6 +39,7 @@ impl Page {
     pub fn new(
         name: GString,
         navigation_request_text: Option<GString>,
+        action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Page {
@@ -55,6 +57,7 @@ impl Page {
         let content = Arc::new(Content::new(action_page_open.clone()));
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
+            action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
@@ -94,6 +97,7 @@ impl Page {
             // GTK
             widget,
             // Actions
+            action_page_open,
             // action_tab_page_navigation_reload,
             action_update,
             // Components
@@ -109,7 +113,13 @@ impl Page {
         self.navigation.grab_request_focus();
     }
 
-    pub fn reload(&self) {
+    pub fn navigation_base(&self) {
+        if let Some(address) = self.navigation.base_address() {
+            self.action_page_open.activate(Some(&address.to_variant()));
+        }
+    }
+
+    pub fn navigation_reload(&self) {
         // Init globals
         let request_text = self.navigation.request_text();
 
