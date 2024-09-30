@@ -25,14 +25,21 @@ fn main() -> ExitCode {
     let action_tab_append = Arc::new(SimpleAction::new("tab_append", None));
     let action_tab_close = Arc::new(SimpleAction::new("tab_close", None));
     let action_tab_close_all = Arc::new(SimpleAction::new("tab_close_all", None));
+
     let action_tab_page_navigation_base =
         Arc::new(SimpleAction::new("tab_page_navigation_base", None));
+    action_tab_page_navigation_base.set_enabled(false);
+
     let action_tab_page_navigation_history_back =
         Arc::new(SimpleAction::new("tab_page_navigation_history_back", None));
+    action_tab_page_navigation_history_back.set_enabled(false);
+
     let action_tab_page_navigation_history_forward = Arc::new(SimpleAction::new(
         "tab_page_navigation_history_forward",
         None,
     ));
+    action_tab_page_navigation_history_forward.set_enabled(false);
+
     let action_tab_page_navigation_reload =
         Arc::new(SimpleAction::new("tab_page_navigation_reload", None));
     let action_tab_pin = Arc::new(SimpleAction::new("tab_pin", None));
