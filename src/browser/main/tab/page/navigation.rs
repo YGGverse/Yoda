@@ -34,12 +34,17 @@ impl Navigation {
     pub fn new(
         request_text: Option<GString>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init components
         let base = Base::new(action_tab_page_navigation_base);
-        let history = History::new();
+        let history = History::new(
+            action_tab_page_navigation_history_back,
+            action_tab_page_navigation_history_forward,
+        );
         let reload = Reload::new(action_tab_page_navigation_reload.clone());
         let request = Request::new(
             request_text,

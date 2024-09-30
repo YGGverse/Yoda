@@ -1,4 +1,5 @@
-use gtk::Button;
+use gtk::{gio::SimpleAction, Button};
+use std::sync::Arc;
 
 pub struct Forward {
     widget: Button,
@@ -6,10 +7,9 @@ pub struct Forward {
 
 impl Forward {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(action_tab_page_navigation_history_forward: Arc<SimpleAction>) -> Self {
         Self {
             widget: Button::builder()
-                .action_name("win.tab_page_history_forward")
                 .icon_name("go-next-symbolic")
                 .tooltip_text("Forward")
                 .sensitive(false)

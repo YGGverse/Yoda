@@ -18,6 +18,8 @@ pub struct Tab {
     widget: Notebook,
     // Keep action links in memory to not require them on every tab append
     action_tab_page_navigation_base: Arc<SimpleAction>,
+    action_tab_page_navigation_history_back: Arc<SimpleAction>,
+    action_tab_page_navigation_history_forward: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
@@ -29,6 +31,8 @@ impl Tab {
     // Construct
     pub fn new(
         action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
@@ -41,6 +45,8 @@ impl Tab {
             widget,
             // Define action links
             action_tab_page_navigation_base,
+            action_tab_page_navigation_history_back,
+            action_tab_page_navigation_history_forward,
             action_tab_page_navigation_reload,
             action_update,
             // Init empty HashMap index as no tabs appended yet
@@ -80,6 +86,8 @@ impl Tab {
             id.clone(),
             page_navigation_request_text.clone(),
             self.action_tab_page_navigation_base.clone(),
+            self.action_tab_page_navigation_history_back.clone(),
+            self.action_tab_page_navigation_history_forward.clone(),
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
         ));

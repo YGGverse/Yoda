@@ -15,12 +15,16 @@ impl Main {
     // Construct
     pub fn new(
         action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init components
         let tab = Arc::new(Tab::new(
             action_tab_page_navigation_base,
+            action_tab_page_navigation_history_back,
+            action_tab_page_navigation_history_forward,
             action_tab_page_navigation_reload,
             action_update,
         ));

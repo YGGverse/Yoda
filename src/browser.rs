@@ -61,6 +61,8 @@ impl Browser {
 
         let main = Arc::new(Main::new(
             action_tab_page_navigation_base.clone(),
+            action_tab_page_navigation_history_back.clone(),
+            action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));

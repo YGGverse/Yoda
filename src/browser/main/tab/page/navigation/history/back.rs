@@ -1,4 +1,5 @@
-use gtk::Button;
+use gtk::{gio::SimpleAction, Button};
+use std::sync::Arc;
 
 pub struct Back {
     widget: Button,
@@ -6,10 +7,9 @@ pub struct Back {
 
 impl Back {
     // Construct
-    pub fn new() -> Self {
+    pub fn new(action_tab_page_navigation_history_back: Arc<SimpleAction>) -> Self {
         Self {
             widget: Button::builder()
-                .action_name("win.tab_page_history_back")
                 .icon_name("go-previous-symbolic")
                 .tooltip_text("Back")
                 .sensitive(false)

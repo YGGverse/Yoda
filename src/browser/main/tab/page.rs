@@ -40,6 +40,8 @@ impl Page {
         name: GString,
         navigation_request_text: Option<GString>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Page {
@@ -58,6 +60,8 @@ impl Page {
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
             action_tab_page_navigation_base.clone(),
+            action_tab_page_navigation_history_back.clone(),
+            action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
