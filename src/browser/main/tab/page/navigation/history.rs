@@ -17,8 +17,8 @@ pub struct History {
     back: Back,
     forward: Forward,
     // Extras
-    memory: Vec<Memory>,
-    index: RefCell<i32>,
+    memory: RefCell<Vec<Memory>>,
+    index: RefCell<Option<usize>>,
     // GTK
     widget: Box,
 }
@@ -45,10 +45,10 @@ impl History {
         widget.append(forward.widget());
 
         // Init memory
-        let memory = Vec::new();
+        let memory = RefCell::new(Vec::new());
 
         // Init index
-        let index = RefCell::new(-1);
+        let index = RefCell::new(None);
 
         Self {
             // Actions
@@ -63,9 +63,55 @@ impl History {
     }
 
     // Actions
+    pub fn add(&self, request: GString, follow_to_index: bool) {
+        // Append new Memory record
+        self.memory.borrow_mut().push(Memory { request, time: 0 });
+
+        if follow_to_index {
+            // Navigate to the last record appended
+            self.index.replace(Some(self.memory.borrow().len()));
+        }
+    }
+
+    pub fn try_back(&self, follow_to_index: bool) -> Option<GString> {
+        if let Some(index) = self.index.take() {
+            if let Some(memory) = self.memory.borrow().get(index - 1) {
+                if follow_to_index {
+                    self.index.replace(Some(index - 1));
+                }
+                return Some(memory.request.clone());
+            }
+        }
+        None
+    }
+
+    /* @TODO
+    pub fn try_current(&self) -> bool {
+        true
+    } */
+
+    pub fn try_forward(&self, follow_to_index: bool) -> Option<GString> {
+        if let Some(index) = self.index.take() {
+            if let Some(memory) = self.memory.borrow().get(index + 1) {
+                if follow_to_index {
+                    self.index.replace(Some(index + 1));
+                }
+                return Some(memory.request.clone());
+            }
+        }
+        None
+    }
+
     pub fn update(&self) {
-        self.back.update();
-        self.forward.update();
+        match self.try_back(false) {
+            Some(_) => self.back.update(true),
+            None => self.back.update(false),
+        };
+
+        match self.try_forward(false) {
+            Some(_) => self.forward.update(true),
+            None => self.forward.update(false),
+        };
     }
 
     // Getters

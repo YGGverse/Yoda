@@ -89,10 +89,13 @@ impl Page {
                     .get::<String>()
                     .expect("Parameter does not match `String`");
 
+                let request = GString::from(uri);
+
                 navigation.set_request_text(
-                    &GString::from(uri),
-                    true, // activate (page reload)
+                    &request, true, // activate (page reload)
                 );
+
+                navigation.add_history(request);
             }
         });
 

@@ -1,5 +1,5 @@
 use gtk::{
-    prelude::{ActionExt, ButtonExt},
+    prelude::{ActionExt, ButtonExt, WidgetExt},
     {gio::SimpleAction, Button},
 };
 use std::sync::Arc;
@@ -36,8 +36,10 @@ impl Forward {
     }
 
     // Actions
-    pub fn update(&self) {
-        // @TODO
+    pub fn update(&self, status: bool) {
+        self.action_tab_page_navigation_history_forward
+            .set_enabled(status);
+        self.widget.set_sensitive(status);
     }
 
     // Getters
