@@ -77,22 +77,27 @@ impl History {
     }
 
     pub fn back(&self, follow_to_index: bool) -> Option<GString> {
-        if let Some(index) = self.index.borrow().as_ref() {
-            if let Some(memory) = self.memory.borrow().get(index - 1) {
-                if follow_to_index {
-                    self.index.replace(Some(index - 1));
+        let index = self.index.borrow().clone(); // keep outside as borrow
+        if let Some(usize) = index {
+            // Make sure value positive to prevent panic
+            if usize > 0 {
+                if let Some(memory) = self.memory.borrow().get(usize - 1) {
+                    if follow_to_index {
+                        self.index.replace(Some(usize - 1));
+                    }
+                    return Some(memory.request.clone());
                 }
-                return Some(memory.request.clone());
             }
         }
         None
     }
 
     pub fn forward(&self, follow_to_index: bool) -> Option<GString> {
-        if let Some(index) = self.index.borrow().as_ref() {
-            if let Some(memory) = self.memory.borrow().get(index + 1) {
+        let index = self.index.borrow().clone(); // keep outside as borrow
+        if let Some(usize) = index {
+            if let Some(memory) = self.memory.borrow().get(usize + 1) {
                 if follow_to_index {
-                    self.index.replace(Some(index + 1));
+                    self.index.replace(Some(usize + 1));
                 }
                 return Some(memory.request.clone());
             }
