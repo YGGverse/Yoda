@@ -5,11 +5,11 @@ use back::Back;
 use forward::Forward;
 
 use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
-use std::{cell::RefCell, sync::Arc, time::SystemTime};
+use std::{cell::RefCell, sync::Arc};
 
 struct Memory {
     request: GString,
-    time: SystemTime,
+    // time: SystemTime,
 }
 
 pub struct History {
@@ -67,7 +67,7 @@ impl History {
         // Append new Memory record
         self.memory.borrow_mut().push(Memory {
             request,
-            time: SystemTime::now(),
+            //time: SystemTime::now(),
         });
 
         if follow_to_index {
@@ -87,11 +87,6 @@ impl History {
         }
         None
     }
-
-    /* @TODO
-    pub fn try_current(&self) -> bool {
-        true
-    } */
 
     pub fn try_forward(&self, follow_to_index: bool) -> Option<GString> {
         if let Some(index) = self.index.borrow().as_ref() {

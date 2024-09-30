@@ -85,8 +85,16 @@ impl Navigation {
         self.request.widget().grab_focus();
     }
 
-    pub fn add_history(&self, request: GString) {
+    pub fn history_add(&self, request: GString) {
         self.history.add(request, true);
+    }
+
+    pub fn history_try_back(&self) -> Option<GString> {
+        self.history.try_back(true)
+    }
+
+    pub fn history_try_forward(&self) -> Option<GString> {
+        self.history.try_forward(true)
     }
 
     pub fn update(&self, progress_fraction: Option<f64>) {

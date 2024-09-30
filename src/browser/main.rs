@@ -49,6 +49,14 @@ impl Main {
         self.tab.page_navigation_base();
     }
 
+    pub fn tab_page_navigation_history_back(&self) {
+        self.tab.page_navigation_history_back();
+    }
+
+    pub fn tab_page_navigation_history_forward(&self) {
+        self.tab.page_navigation_history_forward();
+    }
+
     pub fn tab_page_navigation_reload(&self) {
         self.tab.page_navigation_reload();
     }

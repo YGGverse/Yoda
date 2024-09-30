@@ -169,6 +169,32 @@ impl Tab {
         }
     }
 
+    pub fn page_navigation_history_back(&self) {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
+                    page.navigation_history_back();
+                }
+            }
+        }
+    }
+
+    pub fn page_navigation_history_forward(&self) {
+        // Get current page
+        if let Some(page_number) = self.widget.current_page() {
+            // Get default widget to extract it name as the ID for childs
+            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+                // Get page by widget ID
+                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
+                    page.navigation_history_forward();
+                }
+            }
+        }
+    }
+
     pub fn page_navigation_reload(&self) {
         // Get current page
         if let Some(page_number) = self.widget.current_page() {

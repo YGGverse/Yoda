@@ -142,16 +142,16 @@ impl Browser {
         });
 
         action_tab_page_navigation_history_back.connect_activate({
-            // let main = main.clone();
+            let main = main.clone();
             move |_, _| {
-                // @TODO
+                main.tab_page_navigation_history_back();
             }
         });
 
         action_tab_page_navigation_history_forward.connect_activate({
-            // let main = main.clone();
+            let main = main.clone();
             move |_, _| {
-                // @TODO
+                main.tab_page_navigation_history_forward();
             }
         });
 

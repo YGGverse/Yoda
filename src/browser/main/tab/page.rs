@@ -95,7 +95,7 @@ impl Page {
                     &request, true, // activate (page reload)
                 );
 
-                navigation.add_history(request);
+                navigation.history_add(request);
             }
         });
 
@@ -122,6 +122,18 @@ impl Page {
 
     pub fn navigation_base(&self) {
         if let Some(url) = self.navigation.base_url() {
+            self.action_page_open.activate(Some(&url.to_variant()));
+        }
+    }
+
+    pub fn navigation_history_back(&self) {
+        if let Some(url) = self.navigation.history_try_back() {
+            self.action_page_open.activate(Some(&url.to_variant()));
+        }
+    }
+
+    pub fn navigation_history_forward(&self) {
+        if let Some(url) = self.navigation.history_try_forward() {
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
