@@ -5,11 +5,11 @@ use back::Back;
 use forward::Forward;
 
 use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, sync::Arc, time::SystemTime};
 
 struct Memory {
     request: GString,
-    time: i32, // @TODO
+    time: SystemTime,
 }
 
 pub struct History {
@@ -65,7 +65,10 @@ impl History {
     // Actions
     pub fn add(&self, request: GString, follow_to_index: bool) {
         // Append new Memory record
-        self.memory.borrow_mut().push(Memory { request, time: 0 });
+        self.memory.borrow_mut().push(Memory {
+            request,
+            time: SystemTime::now(),
+        });
 
         if follow_to_index {
             // Navigate to the last record appended
