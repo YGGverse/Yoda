@@ -81,7 +81,7 @@ impl Navigation {
     }
 
     // Actions
-    pub fn grab_request_focus(&self) {
+    pub fn request_grab_focus(&self) {
         self.request.widget().grab_focus();
     }
 
@@ -89,12 +89,12 @@ impl Navigation {
         self.history.add(request, true);
     }
 
-    pub fn history_try_back(&self) -> Option<GString> {
-        self.history.try_back(true)
+    pub fn history_back(&self) -> Option<GString> {
+        self.history.back(true)
     }
 
-    pub fn history_try_forward(&self) -> Option<GString> {
-        self.history.try_forward(true)
+    pub fn history_forward(&self) -> Option<GString> {
+        self.history.forward(true)
     }
 
     pub fn update(&self, progress_fraction: Option<f64>) {

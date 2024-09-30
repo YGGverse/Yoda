@@ -122,7 +122,7 @@ impl Tab {
         }
 
         if page_navigation_request_text.is_none() {
-            page.grab_navigation_request_focus();
+            page.navigation_request_grab_focus();
         }
 
         // Result

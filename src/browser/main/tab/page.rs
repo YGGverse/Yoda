@@ -116,8 +116,8 @@ impl Page {
     }
 
     // Actions
-    pub fn grab_navigation_request_focus(&self) {
-        self.navigation.grab_request_focus();
+    pub fn navigation_request_grab_focus(&self) {
+        self.navigation.request_grab_focus();
     }
 
     pub fn navigation_base(&self) {
@@ -127,13 +127,13 @@ impl Page {
     }
 
     pub fn navigation_history_back(&self) {
-        if let Some(url) = self.navigation.history_try_back() {
+        if let Some(url) = self.navigation.history_back() {
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
 
     pub fn navigation_history_forward(&self) {
-        if let Some(url) = self.navigation.history_try_forward() {
+        if let Some(url) = self.navigation.history_forward() {
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }

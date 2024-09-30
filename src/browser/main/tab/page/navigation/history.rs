@@ -76,7 +76,7 @@ impl History {
         }
     }
 
-    pub fn try_back(&self, follow_to_index: bool) -> Option<GString> {
+    pub fn back(&self, follow_to_index: bool) -> Option<GString> {
         if let Some(index) = self.index.borrow().as_ref() {
             if let Some(memory) = self.memory.borrow().get(index - 1) {
                 if follow_to_index {
@@ -88,7 +88,7 @@ impl History {
         None
     }
 
-    pub fn try_forward(&self, follow_to_index: bool) -> Option<GString> {
+    pub fn forward(&self, follow_to_index: bool) -> Option<GString> {
         if let Some(index) = self.index.borrow().as_ref() {
             if let Some(memory) = self.memory.borrow().get(index + 1) {
                 if follow_to_index {
@@ -101,12 +101,12 @@ impl History {
     }
 
     pub fn update(&self) {
-        match self.try_back(false) {
+        match self.back(false) {
             Some(_) => self.back.update(true),
             None => self.back.update(false),
         };
 
-        match self.try_forward(false) {
+        match self.forward(false) {
             Some(_) => self.forward.update(true),
             None => self.forward.update(false),
         };
