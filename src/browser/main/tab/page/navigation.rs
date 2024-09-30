@@ -103,8 +103,8 @@ impl Navigation {
         &self.widget
     }
 
-    pub fn base_address(&self) -> Option<GString> {
-        self.base.address()
+    pub fn base_url(&self) -> Option<GString> {
+        self.base.url()
     }
 
     pub fn request_text(&self) -> GString {

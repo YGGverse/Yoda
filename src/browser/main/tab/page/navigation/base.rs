@@ -7,8 +7,11 @@ use gtk::{
 use std::{cell::RefCell, sync::Arc};
 
 pub struct Base {
+    // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
+    // Mutable URI cache (parsed on update)
     uri: RefCell<Option<Uri>>,
+    // GTK
     widget: Button,
 }
 
@@ -58,7 +61,8 @@ impl Base {
         &self.widget
     }
 
-    pub fn address(&self) -> Option<GString> {
+    pub fn url(&self) -> Option<GString> {
+        // Build URL from parsed URI cache
         if let Some(uri) = self.uri.take() {
             let scheme = uri.scheme();
             let port = uri.port();
@@ -67,7 +71,7 @@ impl Base {
                     return Some(gformat!("{scheme}://{host}:{port}/"));
                 } else {
                     return Some(gformat!("{scheme}://{host}/"));
-                }
+                } // @TODO auth params
             }
         }
         None

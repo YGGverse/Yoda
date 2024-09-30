@@ -114,8 +114,8 @@ impl Page {
     }
 
     pub fn navigation_base(&self) {
-        if let Some(address) = self.navigation.base_address() {
-            self.action_page_open.activate(Some(&address.to_variant()));
+        if let Some(url) = self.navigation.base_url() {
+            self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
 
