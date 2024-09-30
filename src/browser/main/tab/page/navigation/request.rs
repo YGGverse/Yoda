@@ -28,7 +28,7 @@ impl Request {
         text: Option<GString>,
         // Actions
         action_update: Arc<SimpleAction>,
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
     ) -> Self {
         // GTK
         let widget = Entry::builder()
@@ -46,7 +46,7 @@ impl Request {
         });
 
         widget.connect_activate(move |_| {
-            action_tab_page_reload.activate(None);
+            action_tab_page_navigation_reload.activate(None);
         });
 
         // Init animated progressbar state

@@ -17,7 +17,7 @@ pub struct Tab {
     // GTK
     widget: Notebook,
     // Keep action links in memory to not require them on every tab append
-    action_tab_page_reload: Arc<SimpleAction>,
+    action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
@@ -27,7 +27,7 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new(
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init widget
@@ -38,7 +38,7 @@ impl Tab {
             // GTK
             widget,
             // Define action links
-            action_tab_page_reload,
+            action_tab_page_navigation_reload,
             action_update,
             // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
@@ -76,7 +76,7 @@ impl Tab {
         let page = Arc::new(Page::new(
             id.clone(),
             page_navigation_request_text.clone(),
-            self.action_tab_page_reload.clone(),
+            self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
         ));
 

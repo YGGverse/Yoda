@@ -36,7 +36,7 @@ impl Browser {
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
         action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
         // Init database
@@ -49,12 +49,12 @@ impl Browser {
             action_tab_append.clone(),
             action_tab_close.clone(),
             action_tab_close_all.clone(),
-            action_tab_page_reload.clone(),
+            action_tab_page_navigation_reload.clone(),
             action_tab_pin.clone(),
         ));
 
         let main = Arc::new(Main::new(
-            action_tab_page_reload.clone(),
+            action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
 
@@ -74,7 +74,7 @@ impl Browser {
         widget.add_action(action_tab_append.as_ref());
         widget.add_action(action_tab_close.as_ref());
         widget.add_action(action_tab_close_all.as_ref());
-        widget.add_action(action_tab_page_reload.as_ref());
+        widget.add_action(action_tab_page_navigation_reload.as_ref());
         widget.add_action(action_tab_pin.as_ref());
 
         // Init events
@@ -122,7 +122,7 @@ impl Browser {
             }
         });
 
-        action_tab_page_reload.connect_activate({
+        action_tab_page_navigation_reload.connect_activate({
             let main = main.clone();
             move |_, _| {
                 main.tab_page_reload();

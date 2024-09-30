@@ -21,7 +21,7 @@ impl Header {
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
         action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
         // Init components
@@ -31,7 +31,7 @@ impl Header {
             action_tab_append,
             action_tab_close,
             action_tab_close_all,
-            action_tab_page_reload,
+            action_tab_page_navigation_reload,
             action_tab_pin,
         );
 

@@ -25,7 +25,7 @@ fn main() -> ExitCode {
     let action_tab_append = Arc::new(SimpleAction::new("tab_append", None));
     let action_tab_close = Arc::new(SimpleAction::new("tab_close", None));
     let action_tab_close_all = Arc::new(SimpleAction::new("tab_close_all", None));
-    let action_tab_page_reload = Arc::new(SimpleAction::new("tab_page_reload", None));
+    let action_tab_page_navigation_reload = Arc::new(SimpleAction::new("tab_page_reload", None));
     let action_tab_pin = Arc::new(SimpleAction::new("tab_pin", None));
 
     // Init accels
@@ -74,7 +74,7 @@ fn main() -> ExitCode {
                 action_tab_append.clone(),
                 action_tab_close.clone(),
                 action_tab_close_all.clone(),
-                action_tab_page_reload.clone(),
+                action_tab_page_navigation_reload.clone(),
                 action_tab_pin.clone(),
             )
             .widget()

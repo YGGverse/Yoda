@@ -33,17 +33,17 @@ pub struct Navigation {
 impl Navigation {
     pub fn new(
         request_text: Option<GString>,
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init components
         let base = Base::new();
         let history = History::new();
-        let reload = Reload::new(action_tab_page_reload.clone());
+        let reload = Reload::new(action_tab_page_navigation_reload.clone());
         let request = Request::new(
             request_text,
             action_update.clone(),
-            action_tab_page_reload.clone(),
+            action_tab_page_navigation_reload.clone(),
         );
         let bookmark = Bookmark::new();
 

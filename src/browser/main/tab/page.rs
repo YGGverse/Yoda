@@ -24,7 +24,7 @@ pub struct Page {
     // GTK
     widget: Box,
     // Actions
-    // action_tab_page_reload: Arc<SimpleAction>,
+    // action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Components
     navigation: Arc<Navigation>,
@@ -38,7 +38,7 @@ impl Page {
     pub fn new(
         name: GString,
         navigation_request_text: Option<GString>,
-        action_tab_page_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Page {
         // Init actions
@@ -55,7 +55,7 @@ impl Page {
         let content = Arc::new(Content::new(action_page_open.clone()));
         let navigation = Arc::new(Navigation::new(
             navigation_request_text,
-            action_tab_page_reload.clone(),
+            action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
 
@@ -94,7 +94,7 @@ impl Page {
             // GTK
             widget,
             // Actions
-            // action_tab_page_reload,
+            // action_tab_page_navigation_reload,
             action_update,
             // Components
             content,
