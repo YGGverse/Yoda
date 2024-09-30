@@ -18,6 +18,9 @@ impl Menu {
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
         action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
@@ -31,15 +34,15 @@ impl Menu {
                 let model_tab_page = gio::Menu::new();
 
                     let model_tab_page_navigation = gio::Menu::new();
-                        model_tab_page_navigation.append(Some("Base"), Some("win.tab_page_base")); // @TODO
+                        model_tab_page_navigation.append(Some("Base"), Some(&detailed_action_name(action_tab_page_navigation_base)));
 
                         let model_tab_page_navigation_history = gio::Menu::new();
-                            model_tab_page_navigation_history.append(Some("Back"), Some("win.tab_page_history_back")); // @TODO
-                            model_tab_page_navigation_history.append(Some("Forward"), Some("win.tab_page_history_forward")); // @TODO
+                            model_tab_page_navigation_history.append(Some("Back"), Some(&detailed_action_name(action_tab_page_navigation_history_back)));
+                            model_tab_page_navigation_history.append(Some("Forward"), Some(&detailed_action_name(action_tab_page_navigation_history_forward)));
 
                         model_tab_page_navigation.append_submenu(Some("History"), &model_tab_page_navigation_history);
                         model_tab_page_navigation.append(Some("Reload"), Some(&detailed_action_name(action_tab_page_navigation_reload)));
-                        model_tab_page_navigation.append(Some("Bookmark"), Some("win.tab_page_bookmark")); // @TODO
+                         // @TODO model_tab_page_navigation.append(Some("Bookmark"), Some("win.tab_page_bookmark"));
 
                     model_tab_page.append_submenu(Some("Navigation"), &model_tab_page_navigation);
 

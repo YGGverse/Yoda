@@ -25,7 +25,16 @@ fn main() -> ExitCode {
     let action_tab_append = Arc::new(SimpleAction::new("tab_append", None));
     let action_tab_close = Arc::new(SimpleAction::new("tab_close", None));
     let action_tab_close_all = Arc::new(SimpleAction::new("tab_close_all", None));
-    let action_tab_page_navigation_reload = Arc::new(SimpleAction::new("tab_page_reload", None));
+    let action_tab_page_navigation_base =
+        Arc::new(SimpleAction::new("tab_page_navigation_base", None));
+    let action_tab_page_navigation_history_back =
+        Arc::new(SimpleAction::new("tab_page_navigation_history_back", None));
+    let action_tab_page_navigation_history_forward = Arc::new(SimpleAction::new(
+        "tab_page_navigation_history_forward",
+        None,
+    ));
+    let action_tab_page_navigation_reload =
+        Arc::new(SimpleAction::new("tab_page_navigation_reload", None));
     let action_tab_pin = Arc::new(SimpleAction::new("tab_pin", None));
 
     // Init accels
@@ -36,11 +45,14 @@ fn main() -> ExitCode {
     app.set_accels_for_action("win.tab_append", &["<Primary>t"]);
     app.set_accels_for_action("win.tab_pin", &["<Primary>p"]);
     app.set_accels_for_action("win.tab_close", &["<Primary>q"]);
-    app.set_accels_for_action("win.tab_page_base", &["<Primary>h"]);
-    app.set_accels_for_action("win.tab_page_history_back", &["<Primary>Left"]);
-    app.set_accels_for_action("win.tab_page_history_forward", &["<Primary>Right"]);
-    app.set_accels_for_action("win.tab_page_reload", &["<Primary>r"]);
-    app.set_accels_for_action("win.tab_page_bookmark", &["<Primary>b"]);
+    app.set_accels_for_action("win.tab_page_navigation_base", &["<Primary>h"]);
+    app.set_accels_for_action("win.tab_page_navigation_history_back", &["<Primary>Left"]);
+    app.set_accels_for_action(
+        "win.tab_page_navigation_history_forward",
+        &["<Primary>Right"],
+    );
+    app.set_accels_for_action("win.tab_page_navigation_reload", &["<Primary>r"]);
+    //app.set_accels_for_action("win.tab_page_bookmark", &["<Primary>b"]);
 
     // Create new window
     app.connect_activate({
@@ -74,6 +86,9 @@ fn main() -> ExitCode {
                 action_tab_append.clone(),
                 action_tab_close.clone(),
                 action_tab_close_all.clone(),
+                action_tab_page_navigation_base.clone(),
+                action_tab_page_navigation_history_back.clone(),
+                action_tab_page_navigation_history_forward.clone(),
                 action_tab_page_navigation_reload.clone(),
                 action_tab_pin.clone(),
             )

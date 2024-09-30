@@ -36,6 +36,9 @@ impl Browser {
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
         action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
@@ -49,6 +52,9 @@ impl Browser {
             action_tab_append.clone(),
             action_tab_close.clone(),
             action_tab_close_all.clone(),
+            action_tab_page_navigation_base.clone(),
+            action_tab_page_navigation_history_back.clone(),
+            action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_tab_pin.clone(),
         ));
@@ -74,6 +80,9 @@ impl Browser {
         widget.add_action(action_tab_append.as_ref());
         widget.add_action(action_tab_close.as_ref());
         widget.add_action(action_tab_close_all.as_ref());
+        widget.add_action(action_tab_page_navigation_base.as_ref());
+        widget.add_action(action_tab_page_navigation_history_back.as_ref());
+        widget.add_action(action_tab_page_navigation_history_forward.as_ref());
         widget.add_action(action_tab_page_navigation_reload.as_ref());
         widget.add_action(action_tab_pin.as_ref());
 
@@ -119,6 +128,27 @@ impl Browser {
             let main = main.clone();
             move |_, _| {
                 main.tab_close_all();
+            }
+        });
+
+        action_tab_page_navigation_base.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                // @TODO
+            }
+        });
+
+        action_tab_page_navigation_history_back.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                // @TODO
+            }
+        });
+
+        action_tab_page_navigation_history_forward.connect_activate({
+            let main = main.clone();
+            move |_, _| {
+                // @TODO
             }
         });
 

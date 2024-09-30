@@ -23,6 +23,9 @@ impl Tray {
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
         action_tab_close_all: Arc<SimpleAction>,
+        action_tab_page_navigation_base: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: Arc<SimpleAction>,
+        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
@@ -35,6 +38,9 @@ impl Tray {
             action_tab_append,
             action_tab_close,
             action_tab_close_all,
+            action_tab_page_navigation_base,
+            action_tab_page_navigation_history_back,
+            action_tab_page_navigation_history_forward,
             action_tab_page_navigation_reload,
             action_tab_pin,
         );
