@@ -127,13 +127,13 @@ impl Page {
     }
 
     pub fn navigation_history_back(&self) {
-        if let Some(url) = self.navigation.history_back() {
+        if let Some(url) = self.navigation.history_back(true) {
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
 
     pub fn navigation_history_forward(&self) {
-        if let Some(url) = self.navigation.history_forward() {
+        if let Some(url) = self.navigation.history_forward(true) {
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }

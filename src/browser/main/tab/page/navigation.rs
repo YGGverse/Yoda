@@ -89,12 +89,12 @@ impl Navigation {
         self.history.add(request, true);
     }
 
-    pub fn history_back(&self) -> Option<GString> {
-        self.history.back(true)
+    pub fn history_back(&self, follow_to_index: bool) -> Option<GString> {
+        self.history.back(follow_to_index)
     }
 
-    pub fn history_forward(&self) -> Option<GString> {
-        self.history.forward(true)
+    pub fn history_forward(&self, follow_to_index: bool) -> Option<GString> {
+        self.history.forward(follow_to_index)
     }
 
     pub fn update(&self, progress_fraction: Option<f64>) {
