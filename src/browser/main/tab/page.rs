@@ -93,16 +93,6 @@ impl Page {
                         .expect("Parameter does not match `String`"),
                 );
 
-                // Add new history record on request change
-                match navigation.history_current() {
-                    Some(current) => {
-                        if current != request {
-                            navigation.history_add(request.clone());
-                        }
-                    }
-                    None => navigation.history_add(request.clone()),
-                }
-
                 // Update
                 navigation.set_request_text(&request);
 
@@ -164,6 +154,7 @@ impl Page {
         let request_text = self.navigation.request_text();
 
         // Init shared objects for async access
+        let navigation = self.navigation.clone();
         let content = self.content.clone();
         let meta = self.meta.clone();
         let action_update = self.action_update.clone();
@@ -285,6 +276,19 @@ impl Page {
                                                                                                     let result = content.reset(content::Mime::TextGemini, &uri, &source);
                                                                                                     meta.borrow_mut().title = result.title.clone();
 
+                                                                                                    // Add new history record
+                                                                                                    let request = uri.to_str();
+
+                                                                                                    match navigation.history_current() {
+                                                                                                        Some(current) => {
+                                                                                                            if current != request {
+                                                                                                                navigation.history_add(request);
+                                                                                                            }
+                                                                                                        }
+                                                                                                        None => navigation.history_add(request),
+                                                                                                    }
+
+                                                                                                    // Update window components
                                                                                                     action_update.activate(None);
                                                                                                 },
                                                                                                 None => todo!(),
