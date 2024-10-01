@@ -132,19 +132,26 @@ impl Page {
 
     pub fn navigation_base(&self) {
         if let Some(url) = self.navigation.base_url() {
+            // Update with history record
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
 
     pub fn navigation_history_back(&self) {
-        if let Some(url) = self.navigation.history_back(true) {
-            self.action_page_open.activate(Some(&url.to_variant()));
+        if let Some(request) = self.navigation.history_back(true) {
+            // Update without history record
+            self.navigation.set_request_text(
+                &request, true, // activate (page reload)
+            );
         }
     }
 
     pub fn navigation_history_forward(&self) {
-        if let Some(url) = self.navigation.history_forward(true) {
-            self.action_page_open.activate(Some(&url.to_variant()));
+        if let Some(request) = self.navigation.history_forward(true) {
+            // Update without history record
+            self.navigation.set_request_text(
+                &request, true, // activate (page reload)
+            );
         }
     }
 
