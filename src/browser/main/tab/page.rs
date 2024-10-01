@@ -84,26 +84,28 @@ impl Page {
         action_page_open.connect_activate({
             let navigation = navigation.clone();
             move |_, request| {
-                let uri = request
-                    .expect("Parameter required for `page.open` action")
-                    .get::<String>()
-                    .expect("Parameter does not match `String`");
-
-                let request = GString::from(uri);
-
-                navigation.set_request_text(
-                    &request, true, // activate (page reload)
+                // Convert to GString
+                let request = GString::from(
+                    request
+                        .expect("Parameter required for `page.open` action")
+                        .get::<String>()
+                        .expect("Parameter does not match `String`"),
                 );
 
                 // Add new history record on request change
                 match navigation.history_current() {
                     Some(current) => {
                         if current != request {
-                            navigation.history_add(request);
+                            navigation.history_add(request.clone());
                         }
                     }
-                    None => navigation.history_add(request),
+                    None => navigation.history_add(request.clone()),
                 }
+
+                // Update
+                navigation.set_request_text(
+                    &request, true, // activate (page reload)
+                );
             }
         });
 
