@@ -25,7 +25,7 @@ pub struct Page {
     widget: Box,
     // Actions
     action_page_open: Arc<SimpleAction>,
-    // action_tab_page_navigation_reload: Arc<SimpleAction>,
+    action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Components
     navigation: Arc<Navigation>,
@@ -83,6 +83,7 @@ impl Page {
         // Init events
         action_page_open.connect_activate({
             let navigation = navigation.clone();
+            let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
             move |_, request| {
                 // Convert to GString
                 let request = GString::from(
@@ -103,9 +104,10 @@ impl Page {
                 }
 
                 // Update
-                navigation.set_request_text(
-                    &request, true, // activate (page reload)
-                );
+                navigation.set_request_text(&request);
+
+                // Reload page
+                action_tab_page_navigation_reload.activate(None);
             }
         });
 
@@ -115,7 +117,7 @@ impl Page {
             widget,
             // Actions
             action_page_open,
-            // action_tab_page_navigation_reload,
+            action_tab_page_navigation_reload,
             action_update,
             // Components
             content,
@@ -139,19 +141,21 @@ impl Page {
 
     pub fn navigation_history_back(&self) {
         if let Some(request) = self.navigation.history_back(true) {
-            // Update without history record
-            self.navigation.set_request_text(
-                &request, true, // activate (page reload)
-            );
+            // Update
+            self.navigation.set_request_text(&request);
+
+            // Reload page
+            self.action_tab_page_navigation_reload.activate(None);
         }
     }
 
     pub fn navigation_history_forward(&self) {
         if let Some(request) = self.navigation.history_forward(true) {
-            // Update without history record
-            self.navigation.set_request_text(
-                &request, true, // activate (page reload)
-            );
+            // Update
+            self.navigation.set_request_text(&request);
+
+            // Reload page
+            self.action_tab_page_navigation_reload.activate(None);
         }
     }
 
@@ -423,10 +427,11 @@ impl Page {
                     // Make sure new request conversible to valid URI
                     match Uri::parse(&request_text, UriFlags::NONE) {
                         Ok(_) => {
-                            self.navigation.set_request_text(
-                                &request_text,
-                                true, // activate (page reload)
-                            );
+                            // Update
+                            self.navigation.set_request_text(&request_text);
+
+                            // Reload page
+                            self.action_tab_page_navigation_reload.activate(None);
                         }
                         Err(_) => {
                             // @TODO any action here?
@@ -434,13 +439,16 @@ impl Page {
                     }
                 } else {
                     // Plain text given, make search request to default provider
-                    self.navigation.set_request_text(
-                        &gformat!(
-                            "gemini://tlgs.one/search?{}",
-                            Uri::escape_string(&request_text, None, false)
-                        ),
-                        true, // activate (page reload)
+                    let request_text = gformat!(
+                        "gemini://tlgs.one/search?{}",
+                        Uri::escape_string(&request_text, None, false)
                     );
+
+                    // Update
+                    self.navigation.set_request_text(&request_text);
+
+                    // Reload page
+                    self.action_tab_page_navigation_reload.activate(None);
                 }
             }
         };

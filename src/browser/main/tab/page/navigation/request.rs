@@ -103,12 +103,8 @@ impl Request {
     }
 
     // Setters
-    pub fn set_text(&self, value: &GString, activate: bool) {
+    pub fn set_text(&self, value: &GString) {
         self.widget.set_text(value);
-
-        if activate {
-            self.widget.emit_activate();
-        }
     }
 
     // Getters

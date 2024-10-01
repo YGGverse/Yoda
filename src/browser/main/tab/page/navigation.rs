@@ -110,13 +110,11 @@ impl Navigation {
     }
 
     // Setters
-    pub fn set_request_text(&self, value: &GString, activate: bool) {
-        if activate {
-            // Focus out from content area on activate the link @TODO
-            self.widget.child_focus(DirectionType::Right);
-        }
+    pub fn set_request_text(&self, value: &GString) {
+        // Focus out from content area on activate the link @TODO
+        self.widget.child_focus(DirectionType::Right);
 
-        self.request.set_text(value, activate);
+        self.request.set_text(value);
     }
 
     // Getters
