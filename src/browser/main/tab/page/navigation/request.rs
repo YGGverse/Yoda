@@ -28,7 +28,7 @@ impl Request {
         text: Option<GString>,
         // Actions
         action_update: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
+        action_tab_page_navigation_reload: Arc<SimpleAction>, // @TODO local `action_page_open`?
     ) -> Self {
         // GTK
         let widget = Entry::builder()
