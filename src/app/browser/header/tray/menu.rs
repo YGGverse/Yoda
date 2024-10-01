@@ -76,4 +76,5 @@ impl Menu {
 fn detailed_action_name(action: Arc<SimpleAction>) -> GString {
     gformat!("win.{}", action.name()) // @TODO find the way to ident parent group
                                       // without application-wide dependencies import
+                                      // see also src/app/action.rs
 }

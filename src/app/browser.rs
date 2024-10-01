@@ -1,4 +1,3 @@
-mod db;
 mod header;
 mod main;
 
@@ -27,7 +26,9 @@ pub struct Browser {
 impl Browser {
     // Construct
     pub fn new(
-        app: &Application,
+        // Dependencies
+        application: &Application,
+        // Extras
         // connection: Arc<sqlite::Connection>,
         // Actions
         action_debug: Arc<SimpleAction>,
@@ -69,7 +70,7 @@ impl Browser {
 
         // Init widget
         let widget = ApplicationWindow::builder()
-            .application(app)
+            .application(application)
             .titlebar(header.widget())
             .child(main.widget())
             .default_height(DEFAULT_HEIGHT)
