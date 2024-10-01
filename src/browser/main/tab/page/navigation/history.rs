@@ -66,13 +66,18 @@ impl History {
     pub fn add(&self, request: GString, follow_to_index: bool) {
         // Append new Memory record
         self.memory.borrow_mut().push(Memory {
-            request,
+            request: request.clone(),
             //time: SystemTime::now(),
         });
 
         if follow_to_index {
-            // Navigate to the last record appended
-            self.index.replace(Some(self.memory.borrow().len()));
+            // Even push action make positive len value, make sure twice
+            if !self.memory.borrow().is_empty() {
+                // Navigate to the last record appended
+                self.index.replace(Some(self.memory.borrow().len() - 1));
+            } else {
+                self.index.replace(None);
+            }
         }
     }
 
