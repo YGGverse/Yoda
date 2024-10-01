@@ -44,7 +44,7 @@ Guide and protocol draft
 * Every module must:
   * encapsulate it members: compose childs and stay composable for parents
   * access 1 level of childs, never parents (e.g. through `super`)
-  * implement only one `struct` (same as one file for one class)
+  * implement only one public `struct` per file (same as one file for one class)
     * implementable `struct` is public, where members - private
   * contain main `struct` implementation:
     * at least one constructor that must return:
