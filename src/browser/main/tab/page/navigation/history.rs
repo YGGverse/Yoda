@@ -92,6 +92,16 @@ impl History {
         None
     }
 
+    pub fn current(&self) -> Option<GString> {
+        let index = self.index.borrow().clone(); // keep outside as borrow
+        if let Some(usize) = index {
+            if let Some(memory) = self.memory.borrow().get(usize) {
+                return Some(memory.request.clone());
+            }
+        }
+        None
+    }
+
     pub fn forward(&self, follow_to_index: bool) -> Option<GString> {
         let index = self.index.borrow().clone(); // keep outside as borrow
         if let Some(usize) = index {

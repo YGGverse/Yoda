@@ -95,7 +95,15 @@ impl Page {
                     &request, true, // activate (page reload)
                 );
 
-                navigation.history_add(request);
+                // Add new history record on request change
+                match navigation.history_current() {
+                    Some(current) => {
+                        if current != request {
+                            navigation.history_add(request);
+                        }
+                    }
+                    None => navigation.history_add(request),
+                }
             }
         });
 

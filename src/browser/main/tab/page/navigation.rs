@@ -93,6 +93,10 @@ impl Navigation {
         self.history.back(follow_to_index)
     }
 
+    pub fn history_current(&self) -> Option<GString> {
+        self.history.current()
+    }
+
     pub fn history_forward(&self, follow_to_index: bool) -> Option<GString> {
         self.history.forward(follow_to_index)
     }
