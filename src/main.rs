@@ -27,5 +27,5 @@ fn main() -> ExitCode {
     };
 
     // Start application
-    App::new(profile_database_connection).run()
+    App::new(profile_database_connection).activate().run()
 }

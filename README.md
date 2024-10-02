@@ -47,9 +47,10 @@ Guide and protocol draft
   * implement only one public `struct` per file (same as one file for one class)
     * implementable `struct` is public, where it members - private
   * contain main `struct` implementation:
-    * at least one constructor that must return:
-      * unwrapped main `Self` structure
-      * granted ownership for new object created
+    * at least one constructor that must:
+      * return unwrapped, non activated (_todo_) new `Self` object
+      * grant ownership for new `Self` object created
+    * public `activate` action (_todo_)
     * public link getter for privately constructed widget
 * Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
 

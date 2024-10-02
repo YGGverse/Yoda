@@ -7,6 +7,7 @@ use browser::Browser;
 use database::Database;
 
 use gtk::{
+    gio::SimpleAction,
     glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
     Application,
@@ -23,6 +24,18 @@ pub struct App {
     // Components
     //browser: Arc<Browser>,
     database: Arc<Database>,
+    // Actions
+    action_debug: Arc<SimpleAction>,
+    action_quit: Arc<SimpleAction>,
+    action_update: Arc<SimpleAction>,
+    action_tab_append: Arc<SimpleAction>,
+    action_tab_close: Arc<SimpleAction>,
+    action_tab_close_all: Arc<SimpleAction>,
+    action_tab_page_navigation_base: Arc<SimpleAction>,
+    action_tab_page_navigation_history_back: Arc<SimpleAction>,
+    action_tab_page_navigation_history_forward: Arc<SimpleAction>,
+    action_tab_page_navigation_reload: Arc<SimpleAction>,
+    action_tab_pin: Arc<SimpleAction>,
 }
 
 impl App {
@@ -73,9 +86,47 @@ impl App {
             &["<Primary>r"],
         );
 
+        // Return app struct
+        Self {
+            // Actions (SimpleAction)
+            action_debug: action_debug.simple(),
+            action_quit: action_quit.simple(),
+            action_update: action_update.simple(),
+            action_tab_append: action_tab_append.simple(),
+            action_tab_close: action_tab_close.simple(),
+            action_tab_close_all: action_tab_close_all.simple(),
+            action_tab_page_navigation_base: action_tab_page_navigation_base.simple(),
+            action_tab_page_navigation_history_back: action_tab_page_navigation_history_back
+                .simple(),
+            action_tab_page_navigation_history_forward: action_tab_page_navigation_history_forward
+                .simple(),
+            action_tab_page_navigation_reload: action_tab_page_navigation_reload.simple(),
+            action_tab_pin: action_tab_pin.simple(),
+            // Extras
+            database,
+            // GTK
+            app,
+        }
+    }
+
+    // Actions
+    pub fn activate(&self) -> &Self {
         // Init events
-        app.connect_activate({
+        self.app.connect_activate({
             // let database = database.clone();
+            let action_debug = self.action_debug.clone();
+            let action_quit = self.action_quit.clone();
+            let action_update = self.action_update.clone();
+            let action_tab_append = self.action_tab_append.clone();
+            let action_tab_close = self.action_tab_close.clone();
+            let action_tab_close_all = self.action_tab_close_all.clone();
+            let action_tab_page_navigation_base = self.action_tab_page_navigation_base.clone();
+            let action_tab_page_navigation_history_back =
+                self.action_tab_page_navigation_history_back.clone();
+            let action_tab_page_navigation_history_forward =
+                self.action_tab_page_navigation_history_forward.clone();
+            let action_tab_page_navigation_reload = self.action_tab_page_navigation_reload.clone();
+            let action_tab_pin = self.action_tab_pin.clone();
             move |application| {
                 // Restore previous session
                 // @TODO
@@ -84,32 +135,33 @@ impl App {
                 let browser = Arc::new(Browser::new(
                     &application,
                     /*db.clone(),*/
-                    action_debug.simple(),
-                    action_quit.simple(),
-                    action_update.simple(),
-                    action_tab_append.simple(),
-                    action_tab_close.simple(),
-                    action_tab_close_all.simple(),
-                    action_tab_page_navigation_base.simple(),
-                    action_tab_page_navigation_history_back.simple(),
-                    action_tab_page_navigation_history_forward.simple(),
-                    action_tab_page_navigation_reload.simple(),
-                    action_tab_pin.simple(),
+                    action_debug.clone(),
+                    action_quit.clone(),
+                    action_update.clone(),
+                    action_tab_append.clone(),
+                    action_tab_close.clone(),
+                    action_tab_close_all.clone(),
+                    action_tab_page_navigation_base.clone(),
+                    action_tab_page_navigation_history_back.clone(),
+                    action_tab_page_navigation_history_forward.clone(),
+                    action_tab_page_navigation_reload.clone(),
+                    action_tab_pin.clone(),
                 ));
+
+                // Activate events
+                browser.activate();
 
                 // Show main widget
                 browser.widget().present();
 
                 // Make initial update
-                action_update.simple().activate(None);
+                action_update.activate(None);
             }
         });
 
-        // Return activated struct
-        Self { app, database }
+        &self
     }
 
-    // Actions
     pub fn run(&self) -> ExitCode {
         self.app.run()
     }
