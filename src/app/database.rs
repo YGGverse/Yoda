@@ -3,12 +3,12 @@ use std::sync::Arc;
 pub struct Database {
     connection: Arc<sqlite::Connection>,
     // Autostart migrate feature on app and db versions mismatch
-    version: String,
+    version: i32,
 }
 
 impl Database {
     // Construct new application DB
-    pub fn init(connection: Arc<sqlite::Connection>, version: &str) -> Database {
+    pub fn init(connection: Arc<sqlite::Connection>) -> Database {
         // Create app table if not exist yet
         /*
         connection
@@ -27,7 +27,7 @@ impl Database {
         // Return struct
         Self {
             connection,
-            version: String::from(version),
+            version: 1, // @TODO
         }
     }
 

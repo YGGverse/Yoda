@@ -47,7 +47,7 @@ impl App {
         };
 
         // Init database model
-        let database = Arc::new(Database::init(connection, env!("CARGO_PKG_VERSION")));
+        let database = Arc::new(Database::init(connection));
 
         // Init actions
         let action_debug = Action::new("win", true);
