@@ -1,7 +1,7 @@
 use sqlite::Connection;
 use std::sync::Arc;
 
-enum Field {
+enum Table {
     Id,
     Time,
 }
