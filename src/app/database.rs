@@ -10,13 +10,12 @@ impl Database {
     pub fn init(connection: Arc<Connection>) -> Database {
         // Init app table
         if let Err(error) = connection.execute(
-            r"
-                CREATE TABLE IF NOT EXISTS `app`
-                (
-                    `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
-                )
-            ",
+            "CREATE TABLE IF NOT EXISTS `app`
+            (
+                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )",
+            [],
         ) {
             panic!("{error}");
         }
@@ -25,13 +24,11 @@ impl Database {
         Self { connection }
     }
 
-    // Restore previous browser session from DB
-    pub fn restore(&self) {
-        // @TODO migration test
-    }
+    pub fn add(&self) -> i64 {
+        if let Err(error) = self.connection.execute("INSERT INTO `app`", []) {
+            panic!("{error}");
+        }
 
-    // Save browser session to DB
-    pub fn save(&self) {
-        // @TODO migration test
+        self.connection.last_insert_rowid()
     }
 }

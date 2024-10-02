@@ -2,6 +2,7 @@ mod app;
 
 use app::App;
 use gtk::glib::{user_config_dir, ExitCode};
+use sqlite::Connection;
 use std::{fs::create_dir_all, sync::Arc};
 
 fn main() -> ExitCode {
@@ -20,8 +21,8 @@ fn main() -> ExitCode {
     profile_database_path.push("database.sqlite3");
 
     // Init database connection
-    let profile_database_connection = match sqlite::open(profile_database_path) {
-        Ok(profile_database_connection) => Arc::new(profile_database_connection),
+    let profile_database_connection = match Connection::open(profile_database_path) {
+        Ok(connection) => Arc::new(connection),
         Err(error) => panic!("Failed to connect profile database: {error}"),
     };
 

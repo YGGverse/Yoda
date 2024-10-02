@@ -10,8 +10,9 @@ categories = ["network-programming", "gui"]
 repository = "https://github.com/YGGverse/Yoda/tree/Rust-GTK4"
 # homepage = "https://yggverse.github.io"
 
-[dependencies]
-sqlite = "0.36.1"
+[dependencies.sqlite]
+package = "rusqlite"
+version = "0.32.1"
 
 [dependencies.gtk]
 package = "gtk4"

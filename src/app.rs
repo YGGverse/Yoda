@@ -75,10 +75,10 @@ impl App {
 
         // Init events
         app.connect_activate({
-            let database = database.clone();
+            // let database = database.clone();
             move |application| {
                 // Restore previous session
-                database.restore();
+                // @TODO
 
                 // Init components
                 let browser = Arc::new(Browser::new(
