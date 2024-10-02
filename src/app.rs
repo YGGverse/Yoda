@@ -7,12 +7,13 @@ use browser::Browser;
 use database::Database;
 
 use gtk::{
-    glib::{user_config_dir, ExitCode},
+    glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
     Application,
 };
+use sqlite::Connection;
 
-use std::{fs::create_dir_all, sync::Arc};
+use std::sync::Arc;
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
@@ -26,28 +27,9 @@ pub struct App {
 
 impl App {
     // Construct
-    pub fn new() -> Self {
-        // Init profile directory path
-        let mut profile_path = user_config_dir();
-
-        profile_path.push(APPLICATION_ID);
-
-        if let Err(e) = create_dir_all(&profile_path) {
-            panic!("Failed to create profile directory: {e}")
-        }
-
-        // Init profile database path
-        let mut database_path = profile_path.clone();
-
-        database_path.push("database.sqlite3");
-
-        let connection = match sqlite::open(database_path) {
-            Ok(connection) => Arc::new(connection),
-            Err(e) => panic!("Failed to connect profile database: {e}"),
-        };
-
-        // Init database model
-        let database = Arc::new(Database::init(connection));
+    pub fn new(profile_database_connection: Arc<Connection>) -> Self {
+        // Init app database model
+        let database = Arc::new(Database::init(profile_database_connection));
 
         // Init actions
         let action_debug = Action::new("win", true);
