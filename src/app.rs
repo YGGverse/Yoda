@@ -1,8 +1,10 @@
 mod action;
 mod browser;
+mod database;
 
 use action::Action;
 use browser::Browser;
+use database::Database;
 
 use gtk::{
     glib::{user_config_dir, ExitCode},
@@ -19,30 +21,33 @@ pub struct App {
     app: Application,
     // Components
     //browser: Arc<Browser>,
+    database: Arc<Database>,
 }
 
 impl App {
     // Construct
     pub fn new() -> Self {
-        // Init profile directory
-        let mut fs = user_config_dir();
+        // Init profile directory path
+        let mut profile_path = user_config_dir();
 
-        fs.push(APPLICATION_ID);
+        profile_path.push(APPLICATION_ID);
 
-        if let Err(e) = create_dir_all(&fs) {
+        if let Err(e) = create_dir_all(&profile_path) {
             panic!("Failed to create profile directory: {e}")
         }
 
-        // Init profile database
-        /* @TODO
-        let mut db = fs.clone();
+        // Init profile database path
+        let mut database_path = profile_path.clone();
 
-        db.push("database.sqlite3");
+        database_path.push("database.sqlite3");
 
-        let db = match sqlite::open(db) {
-            Ok(db) => Arc::new(db),
+        let connection = match sqlite::open(database_path) {
+            Ok(connection) => Arc::new(connection),
             Err(e) => panic!("Failed to connect profile database: {e}"),
-        };*/
+        };
+
+        // Init database model
+        let database = Arc::new(Database::init(connection, env!("CARGO_PKG_VERSION")));
 
         // Init actions
         let action_debug = Action::new("win", true);
@@ -88,7 +93,11 @@ impl App {
 
         // Init events
         app.connect_activate({
+            let database = database.clone();
             move |application| {
+                // Restore previous session
+                database.restore();
+
                 // Init components
                 let browser = Arc::new(Browser::new(
                     &application,
@@ -115,7 +124,7 @@ impl App {
         });
 
         // Return activated struct
-        Self { app }
+        Self { app, database }
     }
 
     // Actions
