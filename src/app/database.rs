@@ -1,6 +1,11 @@
 use sqlite::Connection;
 use std::sync::Arc;
 
+enum Field {
+    Id,
+    Time,
+}
+
 pub struct Database {
     connection: Arc<sqlite::Connection>,
 }
