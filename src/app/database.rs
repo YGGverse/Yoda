@@ -1,17 +1,18 @@
 use sqlite::Connection;
 use std::sync::Arc;
 
+const DEBUG: bool = true; // @TODO
+
 enum Table {
     Id,
     Time,
 }
 
 pub struct Database {
-    connection: Arc<sqlite::Connection>,
+    connection: Arc<Connection>,
 }
 
 impl Database {
-    // Construct new application DB
     pub fn init(connection: Arc<Connection>) -> Database {
         // Init app table
         if let Err(error) = connection.execute(
@@ -22,18 +23,38 @@ impl Database {
             )",
             [],
         ) {
-            panic!("{error}");
+            panic!("{error}"); // @TODO
         }
 
         // Return struct
         Self { connection }
     }
 
-    pub fn add(&self) -> i64 {
-        if let Err(error) = self.connection.execute("INSERT INTO `app`", []) {
-            panic!("{error}");
-        }
+    pub fn add(&self) -> Result<usize, String> {
+        return match self.connection.execute("INSERT INTO `app`", []) {
+            Ok(total) => {
+                if DEBUG {
+                    println!("Inserted {total} row to `app` table");
+                }
+                Ok(total)
+            }
+            Err(error) => Err(error.to_string()),
+        };
+    }
 
+    pub fn clean(&self) -> Result<usize, String> {
+        return match self.connection.execute("DELETE FROM `app`", []) {
+            Ok(total) => {
+                if DEBUG {
+                    println!("Deleted {total} rows from `app` table");
+                }
+                Ok(total)
+            }
+            Err(error) => Err(error.to_string()),
+        };
+    }
+
+    pub fn last_insert_id(&self) -> i64 {
         self.connection.last_insert_rowid()
     }
 }
