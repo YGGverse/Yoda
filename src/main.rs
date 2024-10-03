@@ -6,7 +6,8 @@ use sqlite::Connection;
 use std::{fs::create_dir_all, sync::Arc};
 
 const VENDOR: &str = "YGGverse";
-const APP_ID: &str = env!("CARGO_PKG_NAME");
+const APP_ID: &str = "Yoda"; // env!("CARGO_PKG_NAME");
+const BRANCH: &str = "Rust-GTK4";
 
 fn main() -> ExitCode {
     // Init profile path
@@ -14,6 +15,7 @@ fn main() -> ExitCode {
 
     profile_path.push(VENDOR);
     profile_path.push(APP_ID);
+    profile_path.push(BRANCH);
 
     if let Err(error) = create_dir_all(&profile_path) {
         panic!("Failed to create profile directory: {error}")
