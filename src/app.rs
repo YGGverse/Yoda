@@ -31,8 +31,11 @@ pub struct App {
 impl App {
     // Construct
     pub fn new(profile_database_connection: Arc<Connection>) -> Self {
-        // Init app database model
-        let database = Arc::new(Database::init(profile_database_connection));
+        // Init database model
+        let database = match Database::init(profile_database_connection) {
+            Ok(database) => Arc::new(database),
+            Err(e) => panic!("{e}"), // @TODO
+        };
 
         // Init actions
         let action_debug = Action::new("win", true);

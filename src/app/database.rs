@@ -1,8 +1,6 @@
 use sqlite::{Connection, Error};
 use std::sync::Arc;
 
-const DEBUG: bool = true; // @TODO
-
 pub struct Table {
     pub id: i64,
     pub time: i64,
@@ -13,33 +11,21 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn init(connection: Arc<Connection>) -> Database {
-        // Init app table
-        if let Err(error) = connection.execute(
+    pub fn init(connection: Arc<Connection>) -> Result<Database, Error> {
+        connection.execute(
             "CREATE TABLE IF NOT EXISTS `app`
             (
                 `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
             )",
             [],
-        ) {
-            panic!("{error}"); // @TODO
-        }
+        )?;
 
-        // Return struct
-        Self { connection }
+        Ok(Self { connection })
     }
 
-    pub fn add(&self) -> Result<usize, String> {
-        return match self.connection.execute("INSERT INTO `app`", []) {
-            Ok(total) => {
-                if DEBUG {
-                    println!("Inserted {total} row to `app` table");
-                }
-                Ok(total)
-            }
-            Err(error) => Err(error.to_string()),
-        };
+    pub fn add(&self) -> Result<usize, Error> {
+        self.connection.execute("INSERT INTO `app`", [])
     }
 
     pub fn records(&self) -> Result<Vec<Table>, Error> {
@@ -57,19 +43,9 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, id: i64) -> Result<usize, String> {
-        return match self
-            .connection
+    pub fn delete(&self, id: i64) -> Result<usize, Error> {
+        self.connection
             .execute("DELETE FROM `app` WHERE `id` = ?", [id])
-        {
-            Ok(total) => {
-                if DEBUG {
-                    println!("Deleted {total} row(s) from `app` table");
-                }
-                Ok(total)
-            }
-            Err(error) => Err(error.to_string()),
-        };
     }
 
     pub fn last_insert_id(&self) -> i64 {
