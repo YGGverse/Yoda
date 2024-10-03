@@ -24,7 +24,7 @@ fn main() -> ExitCode {
     // Init profile database path
     let mut profile_database_path = profile_path.clone();
 
-    profile_database_path.push("database.sqlite3");
+    profile_database_path.push("profile.sqlite3");
 
     // Init database connection
     let profile_database_connection = match Connection::open(profile_database_path) {
