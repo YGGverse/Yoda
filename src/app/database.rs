@@ -1,11 +1,11 @@
-use sqlite::Connection;
+use sqlite::{Connection, Error};
 use std::sync::Arc;
 
 const DEBUG: bool = true; // @TODO
 
-enum Table {
-    Id,
-    Time,
+pub struct Table {
+    pub id: i64,
+    pub time: i64,
 }
 
 pub struct Database {
@@ -42,11 +42,29 @@ impl Database {
         };
     }
 
-    pub fn clean(&self) -> Result<usize, String> {
-        return match self.connection.execute("DELETE FROM `app`", []) {
+    pub fn records(&self) -> Result<Vec<Table>, Error> {
+        let mut records: Vec<Table> = Vec::new();
+
+        let mut statement = self.connection.prepare("SELECT `id`, `time` FROM `app`")?;
+        let _ = statement.query_map([], |row| {
+            records.push(Table {
+                id: row.get(0)?,
+                time: row.get(1)?,
+            });
+            Ok(())
+        });
+
+        Ok(records)
+    }
+
+    pub fn delete(&self, id: i64) -> Result<usize, String> {
+        return match self
+            .connection
+            .execute("DELETE FROM `app` WHERE `id` = ?", [id])
+        {
             Ok(total) => {
                 if DEBUG {
-                    println!("Deleted {total} rows from `app` table");
+                    println!("Deleted {total} row(s) from `app` table");
                 }
                 Ok(total)
             }
