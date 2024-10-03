@@ -26,6 +26,9 @@ fn main() -> ExitCode {
         Err(error) => panic!("Failed to connect profile database: {error}"),
     };
 
-    // Start application
-    App::new(profile_database_connection).activate().run()
+    // Init GTK, start application
+    match gtk::init() {
+        Ok(_) => App::new(profile_database_connection).activate().run(),
+        Err(_) => ExitCode::FAILURE,
+    }
 }

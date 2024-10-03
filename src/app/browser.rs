@@ -7,7 +7,7 @@ use main::Main;
 use gtk::{
     gio::SimpleAction,
     prelude::{ActionMapExt, GtkWindowExt},
-    Application, ApplicationWindow,
+    ApplicationWindow,
 };
 use std::sync::Arc;
 
@@ -38,8 +38,6 @@ pub struct Browser {
 impl Browser {
     // Construct
     pub fn new(
-        // Dependencies
-        application: &Application,
         // Extras
         // connection: Arc<sqlite::Connection>,
         // Actions
@@ -82,7 +80,6 @@ impl Browser {
 
         // Init widget
         let widget = ApplicationWindow::builder()
-            .application(application)
             .titlebar(header.widget())
             .child(main.widget())
             .default_height(DEFAULT_HEIGHT)
@@ -112,7 +109,7 @@ impl Browser {
     }
 
     // Actions
-    pub fn activate(&self) {
+    pub fn activate(&self) -> &Self {
         // Assign actions
         self.widget.add_action(self.action_debug.as_ref());
         self.widget.add_action(self.action_quit.as_ref());
@@ -211,6 +208,8 @@ impl Browser {
                 main.tab_pin();
             }
         });
+
+        &self
     }
 
     // Getters
