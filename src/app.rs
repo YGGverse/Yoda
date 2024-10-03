@@ -7,7 +7,6 @@ use browser::Browser;
 use database::Database;
 
 use gtk::{
-    // gio::SimpleAction,
     glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
     Application,
@@ -24,7 +23,7 @@ pub struct App {
     // Components
     // browser: Arc<Browser>,
     // Extras
-    database: Arc<Database>,
+    // database: Arc<Database>,
     // GTK
     app: Application,
 }
@@ -100,6 +99,14 @@ impl App {
             let browser = browser.clone();
             move |this| {
                 // @TODO restore previous session from DB
+                match database.records() {
+                    Ok(records) => {
+                        for record in records {
+                            println!("{:?}", record.id) // @TODO
+                        }
+                    }
+                    Err(e) => panic!("{e}"),
+                }
 
                 // Activate events
                 browser.widget().set_application(Some(this));
@@ -112,8 +119,35 @@ impl App {
             }
         });
 
-        // @TODO save session to DB
-        // self.app.connect_window_removed(|_, _| todo!());
+        // Save current session to DB
+        // app.connect_window_added()
+        /*
+        app.connect_window_removed({
+            let database = database.clone();
+            move |_, _| {
+                // Cleanup previous record
+                match database.records() {
+                    Ok(_) => {
+                        // Delegate clean action to children components
+                        // self.browser.clean(app_id) @TODO
+                        // ..
+
+                        // Create new record
+                        match database.add() {
+                            Ok(_) => {
+                                // let app_id = self.database.last_insert_id();
+
+                                // Delegate save action to children components
+                                // self.browser.save(app_id) @TODO
+                                // ..
+                            }
+                            Err(error) => panic!("{error}"), // @TODO
+                        }
+                    }
+                    Err(error) => panic!("{error}"), // @TODO
+                }
+            }
+        });*/
 
         // Return activated App struct
         Self {
@@ -122,7 +156,7 @@ impl App {
             // Components
             // browser,
             // Extras
-            database,
+            // database,
             // GTK
             app,
         }
@@ -131,29 +165,5 @@ impl App {
     // Actions
     pub fn run(&self) -> ExitCode {
         self.app.run()
-    }
-
-    pub fn save(&self) {
-        // Cleanup previous record
-        match self.database.clean() {
-            Ok(_) => {
-                // Delegate clean action to children components
-                // self.browser.clean(app_id) @TODO
-                // ..
-
-                // Create new record
-                match self.database.add() {
-                    Ok(_) => {
-                        // let app_id = self.database.last_insert_id();
-
-                        // Delegate save action to children components
-                        // self.browser.save(app_id) @TODO
-                        // ..
-                    }
-                    Err(error) => panic!("{error}"), // @TODO
-                }
-            }
-            Err(error) => panic!("{error}"), // @TODO
-        }
     }
 }
