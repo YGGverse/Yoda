@@ -5,11 +5,15 @@ use gtk::glib::{user_config_dir, ExitCode};
 use sqlite::Connection;
 use std::{fs::create_dir_all, sync::Arc};
 
+const VENDOR: &str = "YGGverse";
+const APP_ID: &str = env!("CARGO_PKG_NAME");
+
 fn main() -> ExitCode {
     // Init profile path
     let mut profile_path = user_config_dir();
 
-    profile_path.push(env!("CARGO_PKG_NAME"));
+    profile_path.push(VENDOR);
+    profile_path.push(APP_ID);
 
     if let Err(error) = create_dir_all(&profile_path) {
         panic!("Failed to create profile directory: {error}")
