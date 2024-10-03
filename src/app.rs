@@ -7,7 +7,7 @@ use browser::Browser;
 use database::Database;
 
 use gtk::{
-    gio::SimpleAction,
+    // gio::SimpleAction,
     glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
     Application,
@@ -20,9 +20,9 @@ const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
     // Actions
-    action_update: Arc<SimpleAction>,
+    // action_update: Arc<SimpleAction>,
     // Components
-    browser: Arc<Browser>,
+    // browser: Arc<Browser>,
     // Extras
     database: Arc<Database>,
     // GTK
@@ -93,30 +93,16 @@ impl App {
             action_tab_pin.simple(),
         ));
 
-        // Return app struct
-        Self {
-            // Actions (SimpleAction)
-            action_update: action_update.simple(),
-            // Components
-            browser,
-            // Extras
-            database,
-            // GTK
-            app,
-        }
-    }
-
-    // Actions
-    pub fn activate(&self) -> &Self {
-        self.app.connect_activate({
+        // Init events
+        app.connect_activate({
             // let database = database.clone();
-            let action_update = self.action_update.clone();
-            let browser = self.browser.clone();
+            let action_update = action_update.simple();
+            let browser = browser.clone();
             move |this| {
                 // @TODO restore previous session from DB
 
                 // Activate events
-                browser.activate().widget().set_application(Some(this));
+                browser.widget().set_application(Some(this));
 
                 // Show main widget
                 browser.widget().present();
@@ -129,9 +115,20 @@ impl App {
         // @TODO save session to DB
         // self.app.connect_window_removed(|_, _| todo!());
 
-        &self
+        // Return activated App struct
+        Self {
+            // Actions (SimpleAction)
+            // action_update: action_update.simple(),
+            // Components
+            // browser,
+            // Extras
+            database,
+            // GTK
+            app,
+        }
     }
 
+    // Actions
     pub fn run(&self) -> ExitCode {
         self.app.run()
     }
