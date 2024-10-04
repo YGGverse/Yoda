@@ -1,12 +1,14 @@
+mod database;
 mod header;
 mod main;
 
+use database::Database;
 use header::Header;
 use main::Main;
 
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
-    prelude::{ActionMapExt, GtkWindowExt},
+    prelude::{ActionMapExt, GtkWindowExt, WidgetExt},
     ApplicationWindow,
 };
 use std::{path::PathBuf, sync::Arc};
@@ -16,18 +18,19 @@ const DEFAULT_WIDTH: i32 = 640;
 
 pub struct Browser {
     // Extras
-    // db: db::Browser,
-    widget: ApplicationWindow,
+    database: Arc<Database>,
     // Components
     // header: Arc<Header>,
     // main: Arc<Main>,
+    // GTK
+    widget: ApplicationWindow,
 }
 
 impl Browser {
     // Construct
     pub fn new(
         // Extras
-        // connection: Arc<sqlite::Connection>,
+        profile_database_connection: Arc<sqlite::Connection>,
         profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,
@@ -44,7 +47,10 @@ impl Browser {
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
         // Init database
-        // let db = db::Browser::new(connection); @TODO
+        let database = match Database::init(profile_database_connection) {
+            Ok(database) => Arc::new(database),
+            Err(error) => panic!("{error}"), // @TODO
+        };
 
         // Init components
         let header = Arc::new(Header::new(
@@ -183,18 +189,52 @@ impl Browser {
 
         // Return new activated Browser struct
         Self {
-            // db,
+            database,
             widget,
-            // Components
             // header,
             // main,
         }
     }
 
     // Actions
-    pub fn clean(&self, app_id: i64) {}
-    pub fn restore(&self, app_id: i64) {}
-    pub fn save(&self, app_id: i64) {}
+    pub fn clean(&self, app_id: i64) {
+        match self.database.records(app_id) {
+            Ok(records) => {
+                for record in records {
+                    match self.database.delete(record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to childs
+                            // self.header.clean(record.id);
+                            // self.main.clean(record.id);
+                        }
+                        Err(error) => panic!("{error}"), // @TODO
+                    }
+                }
+            }
+            Err(error) => panic!("{error}"), // @TODO
+        }
+    }
+
+    pub fn restore(&self, app_id: i64) {
+        // @TODO
+    }
+
+    pub fn save(&self, app_id: i64) {
+        match self.database.add(
+            app_id,
+            self.widget.width(),
+            self.widget.height(),
+            self.widget.is_fullscreen(),
+        ) {
+            Ok(_) => {
+                // Delegate save action to childs
+                // let id = self.database.last_insert_id();
+                // self.header.save(id);
+                // self.main.save(id);
+            }
+            Err(error) => panic!("{error}"), // @TODO
+        }
+    }
 
     // Getters
     pub fn widget(&self) -> &ApplicationWindow {

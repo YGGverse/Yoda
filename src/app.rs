@@ -31,8 +31,8 @@ pub struct App {
 impl App {
     // Construct
     pub fn new(profile_database_connection: Arc<Connection>, profile_path: PathBuf) -> Self {
-        // Init database model
-        let database = match Database::init(profile_database_connection) {
+        // Init database
+        let database = match Database::init(profile_database_connection.clone()) {
             Ok(database) => Arc::new(database),
             Err(error) => panic!("{error}"), // @TODO
         };
@@ -82,7 +82,7 @@ impl App {
 
         // Init components
         let browser = Arc::new(Browser::new(
-            /*db.clone(),*/
+            profile_database_connection,
             profile_path,
             action_tool_debug.simple(),
             action_tool_profile_directory.simple(),
@@ -140,7 +140,7 @@ impl App {
                         for record in records {
                             match database.delete(record.id) {
                                 Ok(_) => {
-                                    // Delegate clean action to children components
+                                    // Delegate clean action to childs
                                     browser.clean(record.id);
                                 }
                                 Err(error) => panic!("{error}"), // @TODO
@@ -150,10 +150,8 @@ impl App {
                         // Save current session to DB
                         match database.add() {
                             Ok(_) => {
-                                let app_id = database.last_insert_id();
-
-                                // Delegate save action to children components
-                                browser.save(app_id);
+                                // Delegate save action to childs
+                                browser.save(database.last_insert_id());
                             }
                             Err(error) => panic!("{error}"), // @TODO
                         }
