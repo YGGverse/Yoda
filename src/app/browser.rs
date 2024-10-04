@@ -15,6 +15,7 @@ use std::{path::PathBuf, sync::Arc};
 
 const DEFAULT_HEIGHT: i32 = 480;
 const DEFAULT_WIDTH: i32 = 640;
+const MAXIMIZED: bool = false;
 
 pub struct Browser {
     // Extras
@@ -81,6 +82,7 @@ impl Browser {
             .child(main.widget())
             .default_height(DEFAULT_HEIGHT)
             .default_width(DEFAULT_WIDTH)
+            .maximized(MAXIMIZED)
             .build();
 
         // Assign actions
@@ -222,9 +224,9 @@ impl Browser {
     pub fn save(&self, app_id: i64) {
         match self.database.add(
             app_id,
-            self.widget.width(),
-            self.widget.height(),
-            self.widget.is_fullscreen(),
+            self.widget.default_width(),
+            self.widget.default_height(),
+            self.widget.is_maximized(),
         ) {
             Ok(_) => {
                 // Delegate save action to childs

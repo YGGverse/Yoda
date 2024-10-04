@@ -5,9 +5,9 @@ pub struct Table {
     pub id: i64,
     pub app_id: i64,
     // pub time: i64,
-    pub width: i32,
-    pub height: i32,
-    pub is_fullscreen: bool,
+    pub default_width: i32,
+    pub default_height: i32,
+    pub is_maximized: bool,
 }
 
 pub struct Database {
@@ -22,9 +22,9 @@ impl Database {
                 `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT (UNIXEPOCH('NOW')),
                 `app_id` INTEGER NOT NULL,
-                `width` INTEGER NOT NULL,
-                `height` INTEGER NOT NULL,
-                `is_fullscreen` INTEGER NOT NULL
+                `default_width` INTEGER NOT NULL,
+                `default_height` INTEGER NOT NULL,
+                `is_maximized` INTEGER NOT NULL
             )",
             [],
         )?;
@@ -35,22 +35,22 @@ impl Database {
     pub fn add(
         &self,
         app_id: i64,
-        width: i32,
-        height: i32,
-        is_fullscreen: bool,
+        default_width: i32,
+        default_height: i32,
+        is_maximized: bool,
     ) -> Result<usize, Error> {
         self.connection.execute(
             "INSERT INTO `app_browser` (
                 `app_id`,
-                `width`,
-                `height`,
-                `is_fullscreen`
+                `default_width`,
+                `default_height`,
+                `is_maximized`
             ) VALUES (?, ?, ?, ?)",
             [
                 app_id,
-                width as i64,
-                height as i64,
-                match is_fullscreen {
+                default_width as i64,
+                default_height as i64,
+                match is_maximized {
                     true => 1,
                     false => 0,
                 },
@@ -62,18 +62,18 @@ impl Database {
         let mut statement = self.connection.prepare(
             "SELECT `id`,
                     `app_id`,
-                    `width`,
-                    `height`,
-                    `is_fullscreen` FROM `app_browser` WHERE `app_id` = ?",
+                    `default_width`,
+                    `default_height`,
+                    `is_maximized` FROM `app_browser` WHERE `app_id` = ?",
         )?;
 
         let result = statement.query_map([app_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
                 app_id: row.get(1)?,
-                width: row.get(2)?,
-                height: row.get(3)?,
-                is_fullscreen: row.get(4)?,
+                default_width: row.get(2)?,
+                default_height: row.get(3)?,
+                is_maximized: row.get(4)?,
             })
         })?;
 
