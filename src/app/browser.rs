@@ -191,6 +191,11 @@ impl Browser {
         }
     }
 
+    // Actions
+    pub fn clean(&self, app_id: i64) {}
+    pub fn restore(&self, app_id: i64) {}
+    pub fn save(&self, app_id: i64) {}
+
     // Getters
     pub fn widget(&self) -> &ApplicationWindow {
         &self.widget

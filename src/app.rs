@@ -115,13 +115,13 @@ impl App {
                 match database.records() {
                     Ok(records) => {
                         for record in records {
-                            println!("{:?}", record.id) // @TODO
+                            browser.restore(record.id);
                         }
                     }
                     Err(error) => panic!("{error}"), // @TODO
                 }
 
-                // Activate events
+                // Assign browser window to this application
                 browser.widget().set_application(Some(this));
 
                 // Show main widget
@@ -133,15 +133,15 @@ impl App {
             // let browser = browser.clone();
             let database = database.clone();
             move |_| {
+                // @TODO transaction?
                 match database.records() {
                     Ok(records) => {
                         // Cleanup previous session records
                         for record in records {
                             match database.delete(record.id) {
                                 Ok(_) => {
-
                                     // Delegate clean action to children components
-                                    // browser.clean(app_id); @TODO
+                                    browser.clean(record.id);
                                 }
                                 Err(error) => panic!("{error}"), // @TODO
                             }
@@ -150,11 +150,10 @@ impl App {
                         // Save current session to DB
                         match database.add() {
                             Ok(_) => {
-                                // let app_id = database.last_insert_id();
+                                let app_id = database.last_insert_id();
 
                                 // Delegate save action to children components
-                                // self.browser.save(app_id) @TODO
-                                // ..
+                                browser.save(app_id);
                             }
                             Err(error) => panic!("{error}"), // @TODO
                         }
