@@ -52,7 +52,7 @@ Guide and protocol draft
       * return unwrapped (except `Option`, `Result`), activated new `Self` object
       * grant ownership for new `Self` object created
     * public `activate` action if the new object can not be activated on construct
-    * public link getter for privately constructed `widget`
+    * public `link` getter for GTK `widget` (required for parental composition)
 * Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
 
 #### GTK
