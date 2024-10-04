@@ -37,7 +37,7 @@ Guide and protocol draft
 
 #### Codebase
 
-* The codebase must be as minimal as possible, separate:
+* Every module should be as minimal as possible, separate:
   * different tasks
   * massive structures
   * structures with implementation
