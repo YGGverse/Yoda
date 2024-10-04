@@ -30,16 +30,21 @@ impl Database {
     }
 
     pub fn records(&self) -> Result<Vec<Table>, Error> {
-        let mut records: Vec<Table> = Vec::new();
-
         let mut statement = self.connection.prepare("SELECT `id`, `time` FROM `app`")?;
-        let _ = statement.query_map([], |row| {
-            records.push(Table {
+
+        let result = statement.query_map([], |row| {
+            Ok(Table {
                 id: row.get(0)?,
                 time: row.get(1)?,
-            });
-            Ok(())
-        });
+            })
+        })?;
+
+        let mut records: Vec<Table> = Vec::new();
+
+        for record in result {
+            let table = record?;
+            records.push(table);
+        }
 
         Ok(records)
     }
