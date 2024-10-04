@@ -44,14 +44,15 @@ Guide and protocol draft
 * Every module must:
   * encapsulate it members: compose childs and stay composable for parents
   * access 1 level of childs, never parents (e.g. through `super`)
-  * implement only one public `struct` per file (same as one file for one class)
+  * implement only one public API `struct` per file (same as one file for one class)
     * implementable `struct` is public, where it members - private
   * contain main `struct` implementation:
     * at least one constructor that must:
-      * return unwrapped, non activated (_todo_) new `Self` object
+      * have common for application name: `new` (for widget) or/and `init` (for database)
+      * return unwrapped (except `Option`, `Result`), activated new `Self` object
       * grant ownership for new `Self` object created
-    * public `activate` action (_todo_)
-    * public link getter for privately constructed widget
+    * public `activate` action if the new object can not be activated on construct
+    * public link getter for privately constructed `widget`
 * Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
 
 #### GTK
