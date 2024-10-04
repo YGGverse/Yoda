@@ -101,6 +101,13 @@ impl App {
         // Init events
         app.connect_activate({
             let action_update = action_update.simple();
+            move |_| {
+                // Make initial update
+                action_update.activate(None);
+            }
+        });
+
+        app.connect_startup({
             let browser = browser.clone();
             let database = database.clone();
             move |this| {
@@ -119,23 +126,20 @@ impl App {
 
                 // Show main widget
                 browser.widget().present();
-
-                // Make initial update
-                action_update.activate(None);
             }
         });
 
-        // Save current session to DB
-        app.connect_window_removed({
+        app.connect_shutdown({
             // let browser = browser.clone();
             let database = database.clone();
-            move |_, _| {
+            move |_| {
                 match database.records() {
                     Ok(records) => {
-                        // Cleanup previous records
+                        // Cleanup previous session records
                         for record in records {
                             match database.delete(record.id) {
                                 Ok(_) => {
+
                                     // Delegate clean action to children components
                                     // browser.clean(app_id); @TODO
                                 }
@@ -143,7 +147,7 @@ impl App {
                             }
                         }
 
-                        // Create new record
+                        // Save current session to DB
                         match database.add() {
                             Ok(_) => {
                                 // let app_id = database.last_insert_id();
