@@ -104,7 +104,7 @@ impl App {
             let browser = browser.clone();
             let database = database.clone();
             move |this| {
-                // @TODO restore previous session from DB
+                // Restore previous session from DB
                 match database.records() {
                     Ok(records) => {
                         for record in records {
@@ -127,14 +127,21 @@ impl App {
 
         // Save current session to DB
         app.connect_window_removed({
+            // let browser = browser.clone();
             let database = database.clone();
             move |_, _| {
-                // Cleanup previous record
                 match database.records() {
                     Ok(records) => {
-                        // Delegate clean action to children components
-                        // self.browser.clean(app_id) @TODO
-                        // ..
+                        // Cleanup previous records
+                        for record in records {
+                            match database.delete(record.id) {
+                                Ok(_) => {
+                                    // Delegate clean action to children components
+                                    // browser.clean(app_id); @TODO
+                                }
+                                Err(error) => panic!("{error}"), // @TODO
+                            }
+                        }
 
                         // Create new record
                         match database.add() {
