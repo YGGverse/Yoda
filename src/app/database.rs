@@ -39,7 +39,7 @@ impl Database {
             })
         })?;
 
-        let mut records: Vec<Table> = Vec::new();
+        let mut records = Vec::new();
 
         for record in result {
             let table = record?;
