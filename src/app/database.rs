@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 pub struct Table {
     pub id: i64,
-    pub time: i64,
+    // pub time: i64,
 }
 
 pub struct Database {
@@ -30,14 +30,9 @@ impl Database {
     }
 
     pub fn records(&self) -> Result<Vec<Table>, Error> {
-        let mut statement = self.connection.prepare("SELECT `id`, `time` FROM `app`")?;
+        let mut statement = self.connection.prepare("SELECT `id` FROM `app`")?;
 
-        let result = statement.query_map([], |row| {
-            Ok(Table {
-                id: row.get(0)?,
-                time: row.get(1)?,
-            })
-        })?;
+        let result = statement.query_map([], |row| Ok(Table { id: row.get(0)? }))?;
 
         let mut records = Vec::new();
 
