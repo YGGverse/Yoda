@@ -34,7 +34,7 @@ fn main() -> ExitCode {
 
     // Init GTK, start application
     match gtk::init() {
-        Ok(_) => App::new(profile_database_connection).run(),
+        Ok(_) => App::new(profile_database_connection, profile_path).run(),
         Err(_) => ExitCode::FAILURE,
     }
 }

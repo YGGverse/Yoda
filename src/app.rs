@@ -13,7 +13,7 @@ use gtk::{
 };
 use sqlite::Connection;
 
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
@@ -30,7 +30,7 @@ pub struct App {
 
 impl App {
     // Construct
-    pub fn new(profile_database_connection: Arc<Connection>) -> Self {
+    pub fn new(profile_database_connection: Arc<Connection>, profile_path: PathBuf) -> Self {
         // Init database model
         let database = match Database::init(profile_database_connection) {
             Ok(database) => Arc::new(database),
@@ -83,6 +83,7 @@ impl App {
         // Init components
         let browser = Arc::new(Browser::new(
             /*db.clone(),*/
+            profile_path,
             action_tool_debug.simple(),
             action_tool_profile_directory.simple(),
             action_quit.simple(),

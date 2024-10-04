@@ -5,11 +5,11 @@ use header::Header;
 use main::Main;
 
 use gtk::{
-    gio::SimpleAction,
+    gio::{AppInfo, AppLaunchContext, SimpleAction},
     prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 const DEFAULT_HEIGHT: i32 = 480;
 const DEFAULT_WIDTH: i32 = 640;
@@ -28,6 +28,7 @@ impl Browser {
     pub fn new(
         // Extras
         // connection: Arc<sqlite::Connection>,
+        profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,
         action_tool_profile_directory: Arc<SimpleAction>,
@@ -100,7 +101,11 @@ impl Browser {
 
         action_tool_profile_directory.connect_activate({
             move |_, _| {
-                // @TODO
+                // @TODO [4_10] https://docs.gtk.org/gtk4/class.FileLauncher.html
+                let _ = AppInfo::launch_default_for_uri(
+                    &format!("file://{}", profile_path.to_string_lossy()),
+                    Some(&AppLaunchContext::new()),
+                );
             }
         });
 
