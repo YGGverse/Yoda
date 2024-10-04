@@ -16,7 +16,7 @@ impl Database {
             "CREATE TABLE IF NOT EXISTS `app`
             (
                 `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+                `time` INTEGER NOT NULL DEFAULT (UNIXEPOCH('NOW'))
             )",
             [],
         )?;
