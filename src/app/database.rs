@@ -25,7 +25,8 @@ impl Database {
     }
 
     pub fn add(&self) -> Result<usize, Error> {
-        self.connection.execute("INSERT INTO `app`", [])
+        self.connection
+            .execute("INSERT INTO `app` DEFAULT VALUES", [])
     }
 
     pub fn records(&self) -> Result<Vec<Table>, Error> {
