@@ -29,7 +29,8 @@ impl Browser {
         // Extras
         // connection: Arc<sqlite::Connection>,
         // Actions
-        action_debug: Arc<SimpleAction>,
+        action_tool_debug: Arc<SimpleAction>,
+        action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
@@ -46,7 +47,8 @@ impl Browser {
 
         // Init components
         let header = Arc::new(Header::new(
-            action_debug.clone(),
+            action_tool_debug.clone(),
+            action_tool_profile_directory.clone(),
             action_quit.clone(),
             action_tab_append.clone(),
             action_tab_close.clone(),
@@ -75,7 +77,8 @@ impl Browser {
             .build();
 
         // Assign actions
-        widget.add_action(action_debug.as_ref());
+        widget.add_action(action_tool_debug.as_ref());
+        widget.add_action(action_tool_profile_directory.as_ref());
         widget.add_action(action_quit.as_ref());
         widget.add_action(action_update.as_ref());
         widget.add_action(action_tab_append.as_ref());
@@ -88,10 +91,16 @@ impl Browser {
         widget.add_action(action_tab_pin.as_ref());
 
         // Init events
-        action_debug.connect_activate({
+        action_tool_debug.connect_activate({
             let widget = widget.clone();
             move |_, _| {
                 widget.emit_enable_debugging(true);
+            }
+        });
+
+        action_tool_profile_directory.connect_activate({
+            move |_, _| {
+                // @TODO
             }
         });
 

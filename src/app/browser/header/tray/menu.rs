@@ -13,7 +13,8 @@ pub struct Menu {
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new(
-        action_debug: Arc<SimpleAction>,
+        action_tool_debug: Arc<SimpleAction>,
+        action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
@@ -55,7 +56,13 @@ impl Menu {
                 model_tab.append_submenu(Some("Close"), &model_tab_close);
 
             model.append_submenu(Some("Tab"), &model_tab);
-            model.append(Some("Debug"), Some(&detailed_action_name(action_debug)));
+
+            let model_tool = gio::Menu::new();
+                model_tool.append(Some("Debug"), Some(&detailed_action_name(action_tool_debug)));
+                model_tool.append(Some("Profile directory"), Some(&detailed_action_name(action_tool_profile_directory)));
+
+            model.append_submenu(Some("Tool"), &model_tool);
+
             model.append(Some("Quit"), Some(&detailed_action_name(action_quit)));
 
         // Init widget

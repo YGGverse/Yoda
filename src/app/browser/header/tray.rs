@@ -18,7 +18,8 @@ pub struct Tray {
 
 impl Tray {
     pub fn new(
-        action_debug: Arc<SimpleAction>,
+        action_tool_debug: Arc<SimpleAction>,
+        action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
@@ -33,7 +34,8 @@ impl Tray {
         let tab = Tab::new(action_tab_append.clone());
 
         let menu = Menu::new(
-            action_debug,
+            action_tool_debug,
+            action_tool_profile_directory,
             action_quit,
             action_tab_append,
             action_tab_close,

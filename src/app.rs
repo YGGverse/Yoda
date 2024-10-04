@@ -34,11 +34,12 @@ impl App {
         // Init database model
         let database = match Database::init(profile_database_connection) {
             Ok(database) => Arc::new(database),
-            Err(e) => panic!("{e}"), // @TODO
+            Err(error) => panic!("{error}"), // @TODO
         };
 
         // Init actions
-        let action_debug = Action::new("win", true);
+        let action_tool_debug = Action::new("win", true);
+        let action_tool_profile_directory = Action::new("win", true);
         let action_quit = Action::new("win", true);
         let action_update = Action::new("win", true);
         let action_tab_append = Action::new("win", true);
@@ -56,7 +57,7 @@ impl App {
             .build();
 
         // Init accels
-        app.set_accels_for_action(&action_debug.detailed_name(), &["<Primary>i"]);
+        app.set_accels_for_action(&action_tool_debug.detailed_name(), &["<Primary>i"]);
         app.set_accels_for_action(&action_update.detailed_name(), &["<Primary>u"]);
         app.set_accels_for_action(&action_quit.detailed_name(), &["<Primary>Escape"]);
         app.set_accels_for_action(&action_tab_append.detailed_name(), &["<Primary>t"]);
@@ -82,7 +83,8 @@ impl App {
         // Init components
         let browser = Arc::new(Browser::new(
             /*db.clone(),*/
-            action_debug.simple(),
+            action_tool_debug.simple(),
+            action_tool_profile_directory.simple(),
             action_quit.simple(),
             action_update.simple(),
             action_tab_append.simple(),
@@ -97,9 +99,9 @@ impl App {
 
         // Init events
         app.connect_activate({
-            // let database = database.clone();
             let action_update = action_update.simple();
             let browser = browser.clone();
+            let database = database.clone();
             move |this| {
                 // @TODO restore previous session from DB
                 match database.records() {
@@ -108,7 +110,7 @@ impl App {
                             println!("{:?}", record.id) // @TODO
                         }
                     }
-                    Err(e) => panic!("{e}"),
+                    Err(error) => panic!("{error}"), // @TODO
                 }
 
                 // Activate events
@@ -123,14 +125,12 @@ impl App {
         });
 
         // Save current session to DB
-        // app.connect_window_added()
-        /*
         app.connect_window_removed({
             let database = database.clone();
             move |_, _| {
                 // Cleanup previous record
                 match database.records() {
-                    Ok(_) => {
+                    Ok(records) => {
                         // Delegate clean action to children components
                         // self.browser.clean(app_id) @TODO
                         // ..
@@ -138,7 +138,7 @@ impl App {
                         // Create new record
                         match database.add() {
                             Ok(_) => {
-                                // let app_id = self.database.last_insert_id();
+                                // let app_id = database.last_insert_id();
 
                                 // Delegate save action to children components
                                 // self.browser.save(app_id) @TODO
@@ -150,7 +150,7 @@ impl App {
                     Err(error) => panic!("{error}"), // @TODO
                 }
             }
-        });*/
+        });
 
         // Return activated App struct
         Self {

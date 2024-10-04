@@ -16,7 +16,8 @@ pub struct Header {
 impl Header {
     // Construct
     pub fn new(
-        action_debug: Arc<SimpleAction>,
+        action_tool_debug: Arc<SimpleAction>,
+        action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
@@ -29,7 +30,8 @@ impl Header {
     ) -> Self {
         // Init components
         let tray = Tray::new(
-            action_debug,
+            action_tool_debug,
+            action_tool_profile_directory,
             action_quit,
             action_tab_append,
             action_tab_close,
