@@ -1,12 +1,12 @@
 mod database;
 mod header;
 mod widget;
-mod wrapper;
+mod window;
 
 use database::Database;
 use header::Header;
 use widget::Widget;
-use wrapper::Wrapper;
+use window::Window;
 
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
@@ -20,7 +20,7 @@ pub struct Browser {
     database: Arc<Database>,
     // Components
     // header: Arc<Header>,
-    // wrapper: Arc<Wrapper>,
+    // window: Arc<Window>,
     widget: Arc<Widget>,
 }
 
@@ -65,7 +65,7 @@ impl Browser {
             action_tab_pin.clone(),
         ));
 
-        let main = Arc::new(Wrapper::new(
+        let main = Arc::new(Window::new(
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -254,7 +254,7 @@ impl Browser {
                     // Delegate restore action to childs
                     // @TODO
                     // self.header.restore(record.id);
-                    // self.main.restore(record.id);
+                    // self.window.restore(record.id);
                     self.widget.restore(&record.id);
                 }
             }
@@ -269,7 +269,7 @@ impl Browser {
                 let id = self.database.last_insert_id();
                 // @TODO
                 // self.header.save(id);
-                // self.main.save(id);
+                // self.window.save(id);
                 self.widget.save(&id);
             }
             Err(error) => panic!("{error}"), // @TODO
