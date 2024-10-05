@@ -4,7 +4,6 @@ use std::sync::Arc;
 pub struct Table {
     pub id: i64,
     pub app_id: i64,
-    // pub time: i64,
 }
 
 pub struct Database {
@@ -16,8 +15,7 @@ impl Database {
         connection.execute(
             "CREATE TABLE IF NOT EXISTS `app_browser`
             (
-                `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `time` INTEGER NOT NULL DEFAULT (UNIXEPOCH('NOW')),
+                `id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `app_id` INTEGER NOT NULL
             )",
             [],
