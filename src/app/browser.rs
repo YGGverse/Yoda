@@ -1,21 +1,19 @@
 mod database;
 mod header;
 mod main;
+mod widget;
 
 use database::Database;
 use header::Header;
 use main::Main;
+use widget::Widget;
 
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
-    prelude::{ActionMapExt, GtkWindowExt, WidgetExt},
+    prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
 use std::{path::PathBuf, sync::Arc};
-
-const DEFAULT_HEIGHT: i32 = 480;
-const DEFAULT_WIDTH: i32 = 640;
-const MAXIMIZED: bool = false;
 
 pub struct Browser {
     // Extras
@@ -23,8 +21,7 @@ pub struct Browser {
     // Components
     // header: Arc<Header>,
     // main: Arc<Main>,
-    // GTK
-    widget: ApplicationWindow,
+    widget: Arc<Widget>,
 }
 
 impl Browser {
@@ -48,7 +45,7 @@ impl Browser {
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
         // Init database
-        let database = match Database::init(profile_database_connection) {
+        let database = match Database::init(profile_database_connection.clone()) {
             Ok(database) => Arc::new(database),
             Err(error) => panic!("{error}"), // @TODO
         };
@@ -77,33 +74,64 @@ impl Browser {
         ));
 
         // Init widget
-        let widget = ApplicationWindow::builder()
-            .titlebar(header.widget())
-            .child(main.widget())
-            .default_height(DEFAULT_HEIGHT)
-            .default_width(DEFAULT_WIDTH)
-            .maximized(MAXIMIZED)
-            .build();
+        let widget = Arc::new(Widget::new(
+            profile_database_connection.clone(),
+            header.widget(),
+            main.widget(),
+        ));
 
         // Assign actions
-        widget.add_action(action_tool_debug.as_ref());
-        widget.add_action(action_tool_profile_directory.as_ref());
-        widget.add_action(action_quit.as_ref());
-        widget.add_action(action_update.as_ref());
-        widget.add_action(action_tab_append.as_ref());
-        widget.add_action(action_tab_close.as_ref());
-        widget.add_action(action_tab_close_all.as_ref());
-        widget.add_action(action_tab_page_navigation_base.as_ref());
-        widget.add_action(action_tab_page_navigation_history_back.as_ref());
-        widget.add_action(action_tab_page_navigation_history_forward.as_ref());
-        widget.add_action(action_tab_page_navigation_reload.as_ref());
-        widget.add_action(action_tab_pin.as_ref());
+        widget
+            .application_window()
+            .add_action(action_tool_debug.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tool_profile_directory.as_ref());
+
+        widget.application_window().add_action(action_quit.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_update.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_append.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_close.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_close_all.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_page_navigation_base.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_page_navigation_history_back.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_page_navigation_history_forward.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_page_navigation_reload.as_ref());
+
+        widget
+            .application_window()
+            .add_action(action_tab_pin.as_ref());
 
         // Init events
         action_tool_debug.connect_activate({
             let widget = widget.clone();
             move |_, _| {
-                widget.emit_enable_debugging(true);
+                widget.application_window().emit_enable_debugging(true);
             }
         });
 
@@ -120,7 +148,7 @@ impl Browser {
         action_quit.connect_activate({
             let widget = widget.clone();
             move |_, _| {
-                widget.close();
+                widget.application_window().close();
             }
         });
 
@@ -206,8 +234,10 @@ impl Browser {
                     match self.database.delete(record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
+                            // @TODO
                             // self.header.clean(record.id);
                             // self.main.clean(record.id);
+                            self.widget.clean(record.id);
                         }
                         Err(error) => panic!("{error}"), // @TODO
                     }
@@ -222,17 +252,14 @@ impl Browser {
     }
 
     pub fn save(&self, app_id: i64) {
-        match self.database.add(
-            app_id,
-            self.widget.default_width(),
-            self.widget.default_height(),
-            self.widget.is_maximized(),
-        ) {
+        match self.database.add(app_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                // let id = self.database.last_insert_id();
+                let id = self.database.last_insert_id();
+                // @TODO
                 // self.header.save(id);
                 // self.main.save(id);
+                self.widget.save(id);
             }
             Err(error) => panic!("{error}"), // @TODO
         }
@@ -240,6 +267,6 @@ impl Browser {
 
     // Getters
     pub fn widget(&self) -> &ApplicationWindow {
-        &self.widget
+        &self.widget.application_window()
     }
 }

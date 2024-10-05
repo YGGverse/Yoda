@@ -5,9 +5,6 @@ pub struct Table {
     pub id: i64,
     pub app_id: i64,
     // pub time: i64,
-    pub default_width: i32,
-    pub default_height: i32,
-    pub is_maximized: bool,
 }
 
 pub struct Database {
@@ -21,10 +18,7 @@ impl Database {
             (
                 `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time` INTEGER NOT NULL DEFAULT (UNIXEPOCH('NOW')),
-                `app_id` INTEGER NOT NULL,
-                `default_width` INTEGER NOT NULL,
-                `default_height` INTEGER NOT NULL,
-                `is_maximized` INTEGER NOT NULL
+                `app_id` INTEGER NOT NULL
             )",
             [],
         )?;
@@ -32,48 +26,20 @@ impl Database {
         Ok(Self { connection })
     }
 
-    pub fn add(
-        &self,
-        app_id: i64,
-        default_width: i32,
-        default_height: i32,
-        is_maximized: bool,
-    ) -> Result<usize, Error> {
-        self.connection.execute(
-            "INSERT INTO `app_browser` (
-                `app_id`,
-                `default_width`,
-                `default_height`,
-                `is_maximized`
-            ) VALUES (?, ?, ?, ?)",
-            [
-                app_id,
-                default_width as i64,
-                default_height as i64,
-                match is_maximized {
-                    true => 1,
-                    false => 0,
-                },
-            ],
-        )
+    pub fn add(&self, app_id: i64) -> Result<usize, Error> {
+        self.connection
+            .execute("INSERT INTO `app_browser` (`app_id`) VALUES (?)", [app_id])
     }
 
     pub fn records(&self, app_id: i64) -> Result<Vec<Table>, Error> {
-        let mut statement = self.connection.prepare(
-            "SELECT `id`,
-                    `app_id`,
-                    `default_width`,
-                    `default_height`,
-                    `is_maximized` FROM `app_browser` WHERE `app_id` = ?",
-        )?;
+        let mut statement = self
+            .connection
+            .prepare("SELECT `id`, `app_id` WHERE `app_id` = ?")?;
 
         let result = statement.query_map([app_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
                 app_id: row.get(1)?,
-                default_width: row.get(2)?,
-                default_height: row.get(3)?,
-                is_maximized: row.get(4)?,
             })
         })?;
 
