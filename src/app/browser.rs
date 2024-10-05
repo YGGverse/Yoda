@@ -53,22 +53,22 @@ impl Browser {
             // Init writable database connection
             let mut connection = match profile_database_connection.write() {
                 Ok(connection) => connection,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init new transaction
             let transaction = match connection.transaction() {
                 Ok(transaction) => transaction,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init database structure
             match Database::init(&transaction) {
                 Ok(database) => match transaction.commit() {
                     Ok(_) => Arc::new(database),
-                    Err(error) => todo!("{error}"),
+                    Err(e) => todo!("{e}"),
                 },
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             }
         };
 
@@ -262,11 +262,11 @@ impl Browser {
 
                             self.widget.clean(tx, &record.id);
                         }
-                        Err(error) => todo!("{error}"),
+                        Err(e) => todo!("{e}"),
                     }
                 }
             }
-            Err(error) => todo!("{error}"),
+            Err(e) => todo!("{e}"),
         }
     }
 
@@ -282,7 +282,7 @@ impl Browser {
                     self.widget.restore(tx, &record.id);
                 }
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(e) => todo!("{e}"),
         }
     }
 
@@ -298,7 +298,7 @@ impl Browser {
 
                 self.widget.save(tx, &id);
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(e) => todo!("{e}"),
         }
     }
 

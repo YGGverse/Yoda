@@ -28,22 +28,22 @@ impl Widget {
             // Init writable database connection
             let mut connection = match profile_database_connection.write() {
                 Ok(connection) => connection,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init new transaction
             let transaction = match connection.transaction() {
                 Ok(transaction) => transaction,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init database structure
             match Database::init(&transaction) {
                 Ok(database) => match transaction.commit() {
                     Ok(_) => Arc::new(database),
-                    Err(error) => todo!("{error}"),
+                    Err(e) => todo!("{e}"),
                 },
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             }
         };
 
@@ -73,11 +73,11 @@ impl Widget {
                             // Delegate clean action to childs
                             // nothing yet..
                         }
-                        Err(error) => panic!("{error}"), // @TODO
+                        Err(e) => todo!("{e}"),
                     }
                 }
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(e) => todo!("{e}"),
         }
     }
 
@@ -94,7 +94,7 @@ impl Widget {
                     // nothing yet..
                 }
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(e) => todo!("{e}"),
         }
     }
 
@@ -111,7 +111,7 @@ impl Widget {
                 // let id = self.database.last_insert_id();
                 // nothing yet..
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(e) => todo!("{e}"),
         }
     }
 

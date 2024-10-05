@@ -20,8 +20,8 @@ fn main() -> ExitCode {
     profile_path.push(APP_ID);
     profile_path.push(BRANCH);
 
-    if let Err(error) = create_dir_all(&profile_path) {
-        panic!("Failed to create profile directory: {error}")
+    if let Err(e) = create_dir_all(&profile_path) {
+        panic!("Failed to create profile directory: {e}")
     }
 
     // Init profile database path
@@ -32,7 +32,7 @@ fn main() -> ExitCode {
     // Init database connection
     let profile_database_connection = match Connection::open(profile_database_path) {
         Ok(connection) => Arc::new(RwLock::new(connection)),
-        Err(error) => panic!("Failed to connect profile database: {error}"),
+        Err(e) => panic!("Failed to connect profile database: {e}"),
     };
 
     // Init GTK, start application

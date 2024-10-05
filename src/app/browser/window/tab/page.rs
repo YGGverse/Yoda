@@ -179,7 +179,7 @@ impl Page {
                         // Get host
                         let host = match uri.host() {
                             Some(host) => host,
-                            None => panic!(),
+                            None => todo!(),
                         };
 
                         // Update
@@ -358,7 +358,7 @@ impl Page {
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                panic!("Error closing connection: {:?}", e);
+                                                                todo!("Error closing connection: {:?}", e);
                                                             }
                                                         }
                                                         Err(e) => {
@@ -371,7 +371,7 @@ impl Page {
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                panic!("Error closing response connection: {:?}", e);
+                                                                todo!("Error closing response connection: {:?}", e);
                                                             }
                                                         }
                                                     },
@@ -387,7 +387,7 @@ impl Page {
 
                                                 // Close connection
                                                 if let Err(e) = connection.close(Some(&cancellable)) {
-                                                    panic!("Error closing request connection: {:?}", e);
+                                                    todo!("Error closing request connection: {:?}", e);
                                                 }
                                             }
                                         },

@@ -42,22 +42,22 @@ impl App {
             // Init writable database connection
             let mut connection = match profile_database_connection.write() {
                 Ok(connection) => connection,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init new transaction
             let transaction = match connection.transaction() {
                 Ok(transaction) => transaction,
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             };
 
             // Init database structure
             match Database::init(&transaction) {
                 Ok(database) => match transaction.commit() {
                     Ok(_) => Arc::new(database),
-                    Err(error) => todo!("{error}"),
+                    Err(e) => todo!("{e}"),
                 },
-                Err(error) => todo!("{error}"),
+                Err(e) => todo!("{e}"),
             }
         };
 
@@ -149,13 +149,13 @@ impl App {
                                             browser.restore(&transaction, &record.id);
                                         }
                                     }
-                                    Err(error) => todo!("{error}"),
+                                    Err(e) => todo!("{e}"),
                                 }
                             }
-                            Err(error) => todo!("{error}"),
+                            Err(e) => todo!("{e}"),
                         }
                     }
-                    Err(error) => todo!("{error}"),
+                    Err(e) => todo!("{e}"),
                 }
 
                 // Assign browser window to this application
@@ -186,7 +186,7 @@ impl App {
                                                     // Delegate clean action to childs
                                                     browser.clean(&transaction, &record.id);
                                                 }
-                                                Err(error) => todo!("{error}"),
+                                                Err(e) => todo!("{e}"),
                                             }
                                         }
 
@@ -199,21 +199,21 @@ impl App {
                                                     &database.last_insert_id(&transaction),
                                                 );
                                             }
-                                            Err(error) => todo!("{error}"),
+                                            Err(e) => todo!("{e}"),
                                         }
                                     }
-                                    Err(error) => todo!("{error}"),
+                                    Err(e) => todo!("{e}"),
                                 }
 
                                 // Confirm changes
-                                if let Err(error) = transaction.commit() {
-                                    todo!("{error}")
+                                if let Err(e) = transaction.commit() {
+                                    todo!("{e}")
                                 }
                             }
-                            Err(error) => todo!("{error}"),
+                            Err(e) => todo!("{e}"),
                         }
                     }
-                    Err(error) => todo!("{error}"),
+                    Err(e) => todo!("{e}"),
                 }
             }
         });
