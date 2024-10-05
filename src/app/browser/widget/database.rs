@@ -1,5 +1,4 @@
-use sqlite::{Connection, Error};
-use std::sync::Arc;
+use sqlite::{Error, Transaction};
 
 pub struct Table {
     pub id: i64,
@@ -10,12 +9,12 @@ pub struct Table {
 }
 
 pub struct Database {
-    connection: Arc<Connection>,
+    // nothing yet..
 }
 
 impl Database {
-    pub fn init(connection: Arc<Connection>) -> Result<Database, Error> {
-        connection.execute(
+    pub fn init(tx: &Transaction) -> Result<Database, Error> {
+        tx.execute(
             "CREATE TABLE IF NOT EXISTS `app_browser_widget`
             (
                 `id`             INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -27,17 +26,18 @@ impl Database {
             [],
         )?;
 
-        Ok(Self { connection })
+        Ok(Self {})
     }
 
     pub fn add(
         &self,
+        tx: &Transaction,
         app_browser_id: &i64,
         default_width: &i32,
         default_height: &i32,
         is_maximized: &bool,
     ) -> Result<usize, Error> {
-        self.connection.execute(
+        tx.execute(
             "INSERT INTO `app_browser_widget` (
                 `app_browser_id`,
                 `default_width`,
@@ -56,8 +56,8 @@ impl Database {
         )
     }
 
-    pub fn records(&self, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
-        let mut statement = self.connection.prepare(
+    pub fn records(&self, tx: &Transaction, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
+        let mut stmt = tx.prepare(
             "SELECT `id`,
                     `app_browser_id`,
                     `default_width`,
@@ -65,7 +65,7 @@ impl Database {
                     `is_maximized` FROM `app_browser_widget` WHERE `app_browser_id` = ?",
         )?;
 
-        let result = statement.query_map([app_browser_id], |row| {
+        let result = stmt.query_map([app_browser_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
                 // app_browser_id: row.get(1)?, not in use
@@ -85,13 +85,12 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, id: &i64) -> Result<usize, Error> {
-        self.connection
-            .execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
+    pub fn delete(&self, tx: &Transaction, id: &i64) -> Result<usize, Error> {
+        tx.execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
     }
 
     /* not in use
-    pub fn last_insert_id(&self) -> i64 {
-        self.connection.last_insert_rowid()
+    pub fn last_insert_id(&self, tx: &Transaction) -> i64 {
+        tx.last_insert_rowid()
     } */
 }

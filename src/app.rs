@@ -13,7 +13,10 @@ use gtk::{
 };
 use sqlite::Connection;
 
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    path::PathBuf,
+    sync::{Arc, RwLock},
+};
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
@@ -30,11 +33,32 @@ pub struct App {
 
 impl App {
     // Construct
-    pub fn new(profile_database_connection: Arc<Connection>, profile_path: PathBuf) -> Self {
+    pub fn new(
+        profile_database_connection: Arc<RwLock<Connection>>,
+        profile_path: PathBuf,
+    ) -> Self {
         // Init database
-        let database = match Database::init(profile_database_connection.clone()) {
-            Ok(database) => Arc::new(database),
-            Err(error) => panic!("{error}"), // @TODO
+        let database = {
+            // Init writable database connection
+            let mut connection = match profile_database_connection.write() {
+                Ok(connection) => connection,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init database structure
+            match Database::init(&transaction) {
+                Ok(database) => match transaction.commit() {
+                    Ok(_) => Arc::new(database),
+                    Err(error) => todo!("{error}"),
+                },
+                Err(error) => todo!("{error}"),
+            }
         };
 
         // Init actions
@@ -82,7 +106,7 @@ impl App {
 
         // Init components
         let browser = Arc::new(Browser::new(
-            profile_database_connection,
+            profile_database_connection.clone(),
             profile_path,
             action_tool_debug.simple(),
             action_tool_profile_directory.simple(),
@@ -110,15 +134,28 @@ impl App {
         application.connect_startup({
             let browser = browser.clone();
             let database = database.clone();
+            let profile_database_connection = profile_database_connection.clone();
             move |this| {
-                // Restore previous session from DB
-                match database.records() {
-                    Ok(records) => {
-                        for record in records {
-                            browser.restore(&record.id);
+                // Init readable connection
+                match profile_database_connection.read() {
+                    Ok(connection) => {
+                        // Create transaction
+                        match connection.unchecked_transaction() {
+                            Ok(transaction) => {
+                                // Restore previous session from DB
+                                match database.records(&transaction) {
+                                    Ok(records) => {
+                                        for record in records {
+                                            browser.restore(&transaction, &record.id);
+                                        }
+                                    }
+                                    Err(error) => todo!("{error}"),
+                                }
+                            }
+                            Err(error) => todo!("{error}"),
                         }
                     }
-                    Err(error) => panic!("{error}"), // @TODO
+                    Err(error) => todo!("{error}"),
                 }
 
                 // Assign browser window to this application
@@ -131,32 +168,52 @@ impl App {
 
         application.connect_shutdown({
             // let browser = browser.clone();
+            let profile_database_connection = profile_database_connection.clone();
             let database = database.clone();
             move |_| {
-                // @TODO transaction?
-                match database.records() {
-                    Ok(records) => {
-                        // Cleanup previous session records
-                        for record in records {
-                            match database.delete(&record.id) {
-                                Ok(_) => {
-                                    // Delegate clean action to childs
-                                    browser.clean(&record.id);
-                                }
-                                Err(error) => panic!("{error}"), // @TODO
-                            }
-                        }
+                // Init writable connection
+                match profile_database_connection.write() {
+                    Ok(mut connection) => {
+                        // Create transaction
+                        match connection.transaction() {
+                            Ok(transaction) => {
+                                match database.records(&transaction) {
+                                    Ok(records) => {
+                                        // Cleanup previous session records
+                                        for record in records {
+                                            match database.delete(&transaction, &record.id) {
+                                                Ok(_) => {
+                                                    // Delegate clean action to childs
+                                                    browser.clean(&transaction, &record.id);
+                                                }
+                                                Err(error) => todo!("{error}"),
+                                            }
+                                        }
 
-                        // Save current session to DB
-                        match database.add() {
-                            Ok(_) => {
-                                // Delegate save action to childs
-                                browser.save(&database.last_insert_id());
+                                        // Save current session to DB
+                                        match database.add(&transaction) {
+                                            Ok(_) => {
+                                                // Delegate save action to childs
+                                                browser.save(
+                                                    &transaction,
+                                                    &database.last_insert_id(&transaction),
+                                                );
+                                            }
+                                            Err(error) => todo!("{error}"),
+                                        }
+                                    }
+                                    Err(error) => todo!("{error}"),
+                                }
+
+                                // Confirm changes
+                                if let Err(error) = transaction.commit() {
+                                    todo!("{error}")
+                                }
                             }
-                            Err(error) => panic!("{error}"), // @TODO
+                            Err(error) => todo!("{error}"),
                         }
                     }
-                    Err(error) => panic!("{error}"), // @TODO
+                    Err(error) => todo!("{error}"),
                 }
             }
         });

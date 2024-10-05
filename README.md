@@ -65,7 +65,7 @@ Guide and protocol draft
     * column name for parental ID must have absolute namespace prefix, for example `app_browser_id` column for `app_browser_widget` table. For example, if the table has few parental keys, column set could be `id`, `parent_one_id`, `parent_two_id`, `some_data`
 * _todo_
   * [ ] version control for auto-migrations
-  * [ ] transactions support for update operations
+  * [x] transactions support for update operations
 
 #### GTK
 

@@ -3,7 +3,8 @@ mod database;
 use database::Database;
 
 use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box, HeaderBar};
-use std::sync::Arc;
+use sqlite::Transaction;
+use std::sync::{Arc, RwLock};
 
 // Default options
 const DEFAULT_HEIGHT: i32 = 480;
@@ -18,14 +19,32 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new(
-        profile_database_connection: Arc<sqlite::Connection>,
+        profile_database_connection: Arc<RwLock<sqlite::Connection>>,
         titlebar: &HeaderBar,
         child: &Box,
     ) -> Self {
         // Init database
-        let database = match Database::init(profile_database_connection) {
-            Ok(database) => Arc::new(database),
-            Err(error) => panic!("{error}"), // @TODO
+        let database = {
+            // Init writable database connection
+            let mut connection = match profile_database_connection.write() {
+                Ok(connection) => connection,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init database structure
+            match Database::init(&transaction) {
+                Ok(database) => match transaction.commit() {
+                    Ok(_) => Arc::new(database),
+                    Err(error) => todo!("{error}"),
+                },
+                Err(error) => todo!("{error}"),
+            }
         };
 
         // Init GTK
@@ -45,11 +64,11 @@ impl Widget {
     }
 
     // Actions
-    pub fn clean(&self, app_browser_id: &i64) {
-        match self.database.records(app_browser_id) {
+    pub fn clean(&self, tx: &Transaction, app_browser_id: &i64) {
+        match self.database.records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(&record.id) {
+                    match self.database.delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -62,8 +81,8 @@ impl Widget {
         }
     }
 
-    pub fn restore(&self, app_browser_id: &i64) {
-        match self.database.records(app_browser_id) {
+    pub fn restore(&self, tx: &Transaction, app_browser_id: &i64) {
+        match self.database.records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Restore widget
@@ -79,8 +98,9 @@ impl Widget {
         }
     }
 
-    pub fn save(&self, app_browser_id: &i64) {
+    pub fn save(&self, tx: &Transaction, app_browser_id: &i64) {
         match self.database.add(
+            tx,
             app_browser_id,
             &self.application_window.default_width(),
             &self.application_window.default_height(),

@@ -5,6 +5,7 @@ mod window;
 
 use database::Database;
 use header::Header;
+use sqlite::Transaction;
 use widget::Widget;
 use window::Window;
 
@@ -13,7 +14,10 @@ use gtk::{
     prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    path::PathBuf,
+    sync::{Arc, RwLock},
+};
 
 pub struct Browser {
     // Extras
@@ -28,7 +32,7 @@ impl Browser {
     // Construct
     pub fn new(
         // Extras
-        profile_database_connection: Arc<sqlite::Connection>,
+        profile_database_connection: Arc<RwLock<sqlite::Connection>>,
         profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,
@@ -45,9 +49,27 @@ impl Browser {
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
         // Init database
-        let database = match Database::init(profile_database_connection.clone()) {
-            Ok(database) => Arc::new(database),
-            Err(error) => panic!("{error}"), // @TODO
+        let database = {
+            // Init writable database connection
+            let mut connection = match profile_database_connection.write() {
+                Ok(connection) => connection,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(error) => todo!("{error}"),
+            };
+
+            // Init database structure
+            match Database::init(&transaction) {
+                Ok(database) => match transaction.commit() {
+                    Ok(_) => Arc::new(database),
+                    Err(error) => todo!("{error}"),
+                },
+                Err(error) => todo!("{error}"),
+            }
         };
 
         // Init components
@@ -227,50 +249,54 @@ impl Browser {
     }
 
     // Actions
-    pub fn clean(&self, app_id: &i64) {
-        match self.database.records(app_id) {
+    pub fn clean(&self, tx: &Transaction, app_id: &i64) {
+        match self.database.records(tx, app_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(&record.id) {
+                    match self.database.delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // @TODO
                             // self.header.clean(record.id);
                             // self.main.clean(record.id);
-                            self.widget.clean(&record.id);
+
+                            self.widget.clean(tx, &record.id);
                         }
-                        Err(error) => panic!("{error}"), // @TODO
+                        Err(error) => todo!("{error}"),
                     }
                 }
             }
-            Err(error) => panic!("{error}"), // @TODO
+            Err(error) => todo!("{error}"),
         }
     }
 
-    pub fn restore(&self, app_id: &i64) {
-        match self.database.records(app_id) {
+    pub fn restore(&self, tx: &Transaction, app_id: &i64) {
+        match self.database.records(tx, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
                     // @TODO
                     // self.header.restore(record.id);
                     // self.window.restore(record.id);
-                    self.widget.restore(&record.id);
+
+                    self.widget.restore(tx, &record.id);
                 }
             }
             Err(error) => panic!("{error}"), // @TODO
         }
     }
 
-    pub fn save(&self, app_id: &i64) {
-        match self.database.add(app_id) {
+    pub fn save(&self, tx: &Transaction, app_id: &i64) {
+        match self.database.add(tx, app_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                let id = self.database.last_insert_id();
+                let id = self.database.last_insert_id(tx);
+
                 // @TODO
                 // self.header.save(id);
                 // self.window.save(id);
-                self.widget.save(&id);
+
+                self.widget.save(tx, &id);
             }
             Err(error) => panic!("{error}"), // @TODO
         }
