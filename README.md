@@ -57,7 +57,7 @@ Guide and protocol draft
 
 #### Database
 
-* SQLite used to operate with user profile - for example restore and save widget sessions, manage auth, history, bookmarks, etc
+* SQLite used to operate with user profile: for example, restore and save widget sessions, manage auth, history, bookmarks, etc
 * Database stored in system config directory (could be detected / accessed simply using browser tools menu)
 * Every `browser` mod may have own table, where table must:
   * contain same name as mod location, for example `app_browser_widget` for `src/app/browser/widget.rs`
