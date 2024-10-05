@@ -108,7 +108,7 @@ impl Widget {
         ) {
             Ok(_) => {
                 // Delegate save action to childs
-                // let id = self.database.last_insert_id();
+                // let id = self.database.last_insert_id(tx);
                 // nothing yet..
             }
             Err(e) => todo!("{e}"),
