@@ -32,7 +32,7 @@ impl Database {
     pub fn records(&self, app_id: &i64) -> Result<Vec<Table>, Error> {
         let mut statement = self
             .connection
-            .prepare("SELECT `id`, `app_id` WHERE `app_id` = ?")?;
+            .prepare("SELECT `id`, `app_id` FROM `app_browser` WHERE `app_id` = ?")?;
 
         let result = statement.query_map([app_id], |row| {
             Ok(Table {
