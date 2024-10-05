@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 pub struct Table {
     pub id: i64,
-    pub app_id: i64,
+    // pub app_id: i64, not in use
 }
 
 pub struct Database {
@@ -37,7 +37,7 @@ impl Database {
         let result = statement.query_map([app_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
-                app_id: row.get(1)?,
+                // app_id: row.get(1)?, not in use
             })
         })?;
 

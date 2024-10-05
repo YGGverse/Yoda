@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 pub struct Table {
     pub id: i64,
-    pub app_browser_id: i64,
+    // pub app_browser_id: i64, not in use
     pub default_width: i32,
     pub default_height: i32,
     pub is_maximized: bool,
@@ -68,7 +68,7 @@ impl Database {
         let result = statement.query_map([app_browser_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
-                app_browser_id: row.get(1)?,
+                // app_browser_id: row.get(1)?, not in use
                 default_width: row.get(2)?,
                 default_height: row.get(3)?,
                 is_maximized: row.get(4)?,
@@ -90,7 +90,8 @@ impl Database {
             .execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
     }
 
+    /* not in use
     pub fn last_insert_id(&self) -> i64 {
         self.connection.last_insert_rowid()
-    }
+    } */
 }
