@@ -25,7 +25,7 @@ pub struct App {
     // Extras
     // database: Arc<Database>,
     // GTK
-    app: Application,
+    application: Application,
 }
 
 impl App {
@@ -52,30 +52,30 @@ impl App {
         let action_tab_pin = Action::new("win", true);
 
         // Init GTK
-        let app = Application::builder()
+        let application = Application::builder()
             .application_id(APPLICATION_ID)
             .build();
 
         // Init accels
-        app.set_accels_for_action(&action_tool_debug.detailed_name(), &["<Primary>i"]);
-        app.set_accels_for_action(&action_update.detailed_name(), &["<Primary>u"]);
-        app.set_accels_for_action(&action_quit.detailed_name(), &["<Primary>Escape"]);
-        app.set_accels_for_action(&action_tab_append.detailed_name(), &["<Primary>t"]);
-        app.set_accels_for_action(&action_tab_pin.detailed_name(), &["<Primary>p"]);
-        app.set_accels_for_action(&action_tab_close.detailed_name(), &["<Primary>q"]);
-        app.set_accels_for_action(
+        application.set_accels_for_action(&action_tool_debug.detailed_name(), &["<Primary>i"]);
+        application.set_accels_for_action(&action_update.detailed_name(), &["<Primary>u"]);
+        application.set_accels_for_action(&action_quit.detailed_name(), &["<Primary>Escape"]);
+        application.set_accels_for_action(&action_tab_append.detailed_name(), &["<Primary>t"]);
+        application.set_accels_for_action(&action_tab_pin.detailed_name(), &["<Primary>p"]);
+        application.set_accels_for_action(&action_tab_close.detailed_name(), &["<Primary>q"]);
+        application.set_accels_for_action(
             &action_tab_page_navigation_base.detailed_name(),
             &["<Primary>h"],
         );
-        app.set_accels_for_action(
+        application.set_accels_for_action(
             &action_tab_page_navigation_history_back.detailed_name(),
             &["<Primary>Left"],
         );
-        app.set_accels_for_action(
+        application.set_accels_for_action(
             &action_tab_page_navigation_history_forward.detailed_name(),
             &["<Primary>Right"],
         );
-        app.set_accels_for_action(
+        application.set_accels_for_action(
             &action_tab_page_navigation_reload.detailed_name(),
             &["<Primary>r"],
         );
@@ -99,7 +99,7 @@ impl App {
         ));
 
         // Init events
-        app.connect_activate({
+        application.connect_activate({
             let action_update = action_update.simple();
             move |_| {
                 // Make initial update
@@ -107,7 +107,7 @@ impl App {
             }
         });
 
-        app.connect_startup({
+        application.connect_startup({
             let browser = browser.clone();
             let database = database.clone();
             move |this| {
@@ -129,7 +129,7 @@ impl App {
             }
         });
 
-        app.connect_shutdown({
+        application.connect_shutdown({
             // let browser = browser.clone();
             let database = database.clone();
             move |_| {
@@ -170,12 +170,12 @@ impl App {
             // Extras
             // database,
             // GTK
-            app,
+            application,
         }
     }
 
     // Actions
     pub fn run(&self) -> ExitCode {
-        self.app.run()
+        self.application.run()
     }
 }
