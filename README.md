@@ -55,6 +55,15 @@ Guide and protocol draft
     * public `link` getter for GTK `widget` (parental composition)
 * Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
 
+#### Database
+
+* SQLite used to operate with user profile - for example restore and save widget sessions, manage auth, history, bookmarks, etc
+* Database stored in system config directory (could be detected / accessed simply using browser tools menu)
+* Every `browser` mod may have own table, where table must:
+  * contain same name as mod location, for example `app_browser_widget` for `src/app/browser/widget.rs`
+  * every table include autoincrement `id` column and parental primary ID if exist
+    * column name for parental ID must have absolute namespace prefix, for example `app_browser_id` column for `app_browser_widget` table. For example, if the table has few parental keys, column set could be `id`, `parent_one_id`, `parent_two_id`, `some_data`
+
 #### GTK
 
 * Operate with [action objects](https://docs.gtk.org/gio/class.SimpleAction.html) instead of names like `win.action`. This allows to follow encapsulation, by the our goal, module must know nothing about parent presets. For example, define some action in parent, then delegate object created as construction argument
