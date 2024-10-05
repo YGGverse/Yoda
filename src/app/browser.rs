@@ -5,7 +5,6 @@ mod window;
 
 use database::Database;
 use header::Header;
-use sqlite::Transaction;
 use widget::Widget;
 use window::Window;
 
@@ -14,6 +13,7 @@ use gtk::{
     prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
+use sqlite::{Connection, Transaction};
 use std::{
     path::PathBuf,
     sync::{Arc, RwLock},
@@ -32,7 +32,7 @@ impl Browser {
     // Construct
     pub fn new(
         // Extras
-        profile_database_connection: Arc<RwLock<sqlite::Connection>>,
+        profile_database_connection: Arc<RwLock<Connection>>,
         profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,

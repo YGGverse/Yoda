@@ -3,7 +3,7 @@ mod database;
 use database::Database;
 
 use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box, HeaderBar};
-use sqlite::Transaction;
+use sqlite::{Connection, Transaction};
 use std::sync::{Arc, RwLock};
 
 // Default options
@@ -19,7 +19,7 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new(
-        profile_database_connection: Arc<RwLock<sqlite::Connection>>,
+        profile_database_connection: Arc<RwLock<Connection>>,
         titlebar: &HeaderBar,
         child: &Box,
     ) -> Self {
