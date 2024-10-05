@@ -248,7 +248,18 @@ impl Browser {
     }
 
     pub fn restore(&self, app_id: &i64) {
-        // @TODO
+        match self.database.records(app_id) {
+            Ok(records) => {
+                for record in records {
+                    // Delegate restore action to childs
+                    // @TODO
+                    // self.header.restore(record.id);
+                    // self.main.restore(record.id);
+                    self.widget.restore(&record.id);
+                }
+            }
+            Err(error) => panic!("{error}"), // @TODO
+        }
     }
 
     pub fn save(&self, app_id: &i64) {

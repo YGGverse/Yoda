@@ -62,8 +62,21 @@ impl Widget {
         }
     }
 
-    pub fn restore(&self) {
-        // @TODO
+    pub fn restore(&self, app_browser_id: &i64) {
+        match self.database.records(app_browser_id) {
+            Ok(records) => {
+                for record in records {
+                    // Restore widget
+                    self.application_window.set_maximized(record.is_maximized);
+                    self.application_window
+                        .set_default_size(record.default_width, record.default_height);
+
+                    // Delegate restore action to childs
+                    // nothing yet..
+                }
+            }
+            Err(error) => panic!("{error}"), // @TODO
+        }
     }
 
     pub fn save(&self, app_browser_id: &i64) {
