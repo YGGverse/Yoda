@@ -44,7 +44,7 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, id: i64) -> Result<usize, Error> {
+    pub fn delete(&self, id: &i64) -> Result<usize, Error> {
         self.connection
             .execute("DELETE FROM `app` WHERE `id` = ?", [id])
     }

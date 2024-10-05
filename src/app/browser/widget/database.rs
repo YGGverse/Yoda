@@ -32,10 +32,10 @@ impl Database {
 
     pub fn add(
         &self,
-        app_browser_id: i64,
-        default_width: i32,
-        default_height: i32,
-        is_maximized: bool,
+        app_browser_id: &i64,
+        default_width: &i32,
+        default_height: &i32,
+        is_maximized: &bool,
     ) -> Result<usize, Error> {
         self.connection.execute(
             "INSERT INTO `app_browser_widget` (
@@ -46,17 +46,17 @@ impl Database {
             ) VALUES (?, ?, ?, ?)",
             [
                 app_browser_id,
-                default_width as i64,
-                default_height as i64,
+                &(*default_width as i64),
+                &(*default_height as i64),
                 match is_maximized {
-                    true => 1,
-                    false => 0,
+                    true => &1,
+                    false => &0,
                 },
             ],
         )
     }
 
-    pub fn records(&self, app_browser_id: i64) -> Result<Vec<Table>, Error> {
+    pub fn records(&self, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
         let mut statement = self.connection.prepare(
             "SELECT `id`,
                     `app_browser_id`,
@@ -85,7 +85,7 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, id: i64) -> Result<usize, Error> {
+    pub fn delete(&self, id: &i64) -> Result<usize, Error> {
         self.connection
             .execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
     }

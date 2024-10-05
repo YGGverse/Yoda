@@ -227,17 +227,17 @@ impl Browser {
     }
 
     // Actions
-    pub fn clean(&self, app_id: i64) {
+    pub fn clean(&self, app_id: &i64) {
         match self.database.records(app_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(record.id) {
+                    match self.database.delete(&record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // @TODO
                             // self.header.clean(record.id);
                             // self.main.clean(record.id);
-                            self.widget.clean(record.id);
+                            self.widget.clean(&record.id);
                         }
                         Err(error) => panic!("{error}"), // @TODO
                     }
@@ -247,11 +247,11 @@ impl Browser {
         }
     }
 
-    pub fn restore(&self, app_id: i64) {
+    pub fn restore(&self, app_id: &i64) {
         // @TODO
     }
 
-    pub fn save(&self, app_id: i64) {
+    pub fn save(&self, app_id: &i64) {
         match self.database.add(app_id) {
             Ok(_) => {
                 // Delegate save action to childs
@@ -259,7 +259,7 @@ impl Browser {
                 // @TODO
                 // self.header.save(id);
                 // self.main.save(id);
-                self.widget.save(id);
+                self.widget.save(&id);
             }
             Err(error) => panic!("{error}"), // @TODO
         }

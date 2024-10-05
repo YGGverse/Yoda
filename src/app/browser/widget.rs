@@ -45,11 +45,11 @@ impl Widget {
     }
 
     // Actions
-    pub fn clean(&self, app_browser_id: i64) {
+    pub fn clean(&self, app_browser_id: &i64) {
         match self.database.records(app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(record.id) {
+                    match self.database.delete(&record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -66,12 +66,12 @@ impl Widget {
         // @TODO
     }
 
-    pub fn save(&self, app_browser_id: i64) {
+    pub fn save(&self, app_browser_id: &i64) {
         match self.database.add(
             app_browser_id,
-            self.application_window.default_width(),
-            self.application_window.default_height(),
-            self.application_window.is_maximized(),
+            &self.application_window.default_width(),
+            &self.application_window.default_height(),
+            &self.application_window.is_maximized(),
         ) {
             Ok(_) => {
                 // Delegate save action to childs

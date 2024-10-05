@@ -115,7 +115,7 @@ impl App {
                 match database.records() {
                     Ok(records) => {
                         for record in records {
-                            browser.restore(record.id);
+                            browser.restore(&record.id);
                         }
                     }
                     Err(error) => panic!("{error}"), // @TODO
@@ -138,10 +138,10 @@ impl App {
                     Ok(records) => {
                         // Cleanup previous session records
                         for record in records {
-                            match database.delete(record.id) {
+                            match database.delete(&record.id) {
                                 Ok(_) => {
                                     // Delegate clean action to childs
-                                    browser.clean(record.id);
+                                    browser.clean(&record.id);
                                 }
                                 Err(error) => panic!("{error}"), // @TODO
                             }
@@ -151,7 +151,7 @@ impl App {
                         match database.add() {
                             Ok(_) => {
                                 // Delegate save action to childs
-                                browser.save(database.last_insert_id());
+                                browser.save(&database.last_insert_id());
                             }
                             Err(error) => panic!("{error}"), // @TODO
                         }

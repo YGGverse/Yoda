@@ -24,12 +24,12 @@ impl Database {
         Ok(Self { connection })
     }
 
-    pub fn add(&self, app_id: i64) -> Result<usize, Error> {
+    pub fn add(&self, app_id: &i64) -> Result<usize, Error> {
         self.connection
             .execute("INSERT INTO `app_browser` (`app_id`) VALUES (?)", [app_id])
     }
 
-    pub fn records(&self, app_id: i64) -> Result<Vec<Table>, Error> {
+    pub fn records(&self, app_id: &i64) -> Result<Vec<Table>, Error> {
         let mut statement = self
             .connection
             .prepare("SELECT `id`, `app_id` WHERE `app_id` = ?")?;
@@ -51,7 +51,7 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, id: i64) -> Result<usize, Error> {
+    pub fn delete(&self, id: &i64) -> Result<usize, Error> {
         self.connection
             .execute("DELETE FROM `app_browser` WHERE `id` = ?", [id])
     }
