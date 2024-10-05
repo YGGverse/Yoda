@@ -1,12 +1,12 @@
 mod database;
 mod header;
-mod main;
 mod widget;
+mod wrapper;
 
 use database::Database;
 use header::Header;
-use main::Main;
 use widget::Widget;
+use wrapper::Wrapper;
 
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
@@ -20,7 +20,7 @@ pub struct Browser {
     database: Arc<Database>,
     // Components
     // header: Arc<Header>,
-    // main: Arc<Main>,
+    // wrapper: Arc<Wrapper>,
     widget: Arc<Widget>,
 }
 
@@ -65,7 +65,7 @@ impl Browser {
             action_tab_pin.clone(),
         ));
 
-        let main = Arc::new(Main::new(
+        let main = Arc::new(Wrapper::new(
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),

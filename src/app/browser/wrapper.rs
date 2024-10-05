@@ -6,12 +6,12 @@ use tab::Tab;
 
 use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
 
-pub struct Main {
+pub struct Wrapper {
     tab: Arc<Tab>,
     widget: Box,
 }
 
-impl Main {
+impl Wrapper {
     // Construct
     pub fn new(
         action_tab_page_navigation_base: Arc<SimpleAction>,
