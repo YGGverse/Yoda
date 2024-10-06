@@ -253,7 +253,7 @@ impl Tab {
     pub fn restore(&self, tx: &Transaction, app_browser_window_id: &i64) {
         match self.database.records(tx, app_browser_window_id) {
             Ok(records) => {
-                for record in records {
+                for _ in records {
                     // Delegate restore action to childs
                     // nothing yet..
                 }

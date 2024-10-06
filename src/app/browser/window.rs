@@ -120,10 +120,7 @@ impl Window {
                     match self.database.delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            // @TODO
                             self.tab.clean(tx, &record.id);
-
-                            // self.widget.clean(tx, &record.id);
                         }
                         Err(e) => todo!("{e}"),
                     }
@@ -138,11 +135,7 @@ impl Window {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    // @TODO
-                    // self.header.restore(record.id);
-                    // self.window.restore(record.id);
-
-                    // self.widget.restore(tx, &record.id);
+                    self.tab.restore(tx, &record.id);
                 }
             }
             Err(e) => todo!("{e}"),
@@ -153,13 +146,7 @@ impl Window {
         match self.database.add(tx, app_browser_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                let id = self.database.last_insert_id(tx);
-
-                // @TODO
-                // self.header.save(id);
-                // self.window.save(id);
-
-                // self.widget.save(tx, &id);
+                self.tab.save(tx, &self.database.last_insert_id(tx));
             }
             Err(e) => todo!("{e}"),
         }
