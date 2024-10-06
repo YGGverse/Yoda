@@ -83,11 +83,7 @@ impl Tab {
         });
     }
 
-    pub fn append(
-        &self,
-        page_navigation_request_text: Option<GString>,
-        is_current_page: bool,
-    ) -> u32 {
+    pub fn append(&self, page_navigation_request_text: Option<GString>, is_current_page: bool) {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
@@ -128,26 +124,12 @@ impl Tab {
         label.gobject().add_controller(controller);
 
         // Append new Notebook page
-        let page_number = self
-            .widget
-            .gobject()
-            .append_page(page.widget(), Some(label.gobject()));
-
-        // Additional setup for Notebook tab created
         self.widget
-            .gobject()
-            .set_tab_reorderable(page.widget(), true);
-
-        if is_current_page {
-            self.widget.gobject().set_current_page(Some(page_number));
-        }
+            .append(label.gobject(), page.widget(), is_current_page, true);
 
         if page_navigation_request_text.is_none() {
             page.navigation_request_grab_focus();
         }
-
-        // Result
-        page_number
     }
 
     // Close active tab
