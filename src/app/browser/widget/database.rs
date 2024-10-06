@@ -48,10 +48,7 @@ impl Database {
                 app_browser_id,
                 &(*default_width as i64),
                 &(*default_height as i64),
-                match is_maximized {
-                    true => &1,
-                    false => &0,
-                },
+                &(*is_maximized as i64),
             ],
         )
     }

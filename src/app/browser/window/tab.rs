@@ -80,6 +80,12 @@ impl Tab {
             }
         };
 
+        // Init empty HashMap index as no tabs appended yet
+        let index = RefCell::new(HashMap::new());
+
+        // Init widget
+        let widget = Arc::new(Widget::new());
+
         // Return non activated struct
         Self {
             database,
@@ -90,9 +96,9 @@ impl Tab {
             action_tab_page_navigation_reload,
             action_update,
             // Init empty HashMap index as no tabs appended yet
-            index: RefCell::new(HashMap::new()),
+            index,
             // GTK
-            widget: Arc::new(Widget::new()),
+            widget,
         }
     }
 
@@ -254,7 +260,7 @@ impl Tab {
         match self.database.records(tx, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    self.append(None, true /*@ TODO record.is_current_page */);
+                    self.append(None, record.is_current);
                     // Delegate restore action to childs
                     // nothing yet..
                 }
@@ -264,16 +270,29 @@ impl Tab {
     }
 
     pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        for (id, item) in self.index.take().iter() {
-            match self.database.add(tx, app_browser_window_id) {
+        let mut page_number = 0;
+
+        for (_, _) in self.index.take().iter() {
+            match self.database.add(
+                tx,
+                app_browser_window_id,
+                &match self.widget.gobject().current_page() {
+                    Some(number) => number == page_number,
+                    None => false,
+                },
+            ) {
                 Ok(_) => {
                     // Delegate save action to childs
-                    let id = self.database.last_insert_id(tx);
+                    // let id = self.database.last_insert_id(tx);
+
+                    // @TODO
                     // item.label.save()
                     // item.page.save()
                 }
                 Err(e) => todo!("{e}"),
             }
+
+            page_number += 1;
         }
     }
 

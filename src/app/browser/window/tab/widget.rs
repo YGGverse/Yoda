@@ -7,9 +7,9 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new() -> Self {
-        let gobject = Notebook::builder().scrollable(true).build();
-
-        Self { gobject }
+        Self {
+            gobject: Notebook::builder().scrollable(true).build(),
+        }
     }
 
     // Actions
