@@ -1,14 +1,16 @@
 mod tab;
+mod widget;
+
+use tab::Tab;
+use widget::Widget;
 
 use std::sync::Arc;
 
-use tab::Tab;
-
-use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
+use gtk::{gio::SimpleAction, glib::GString, Box};
 
 pub struct Window {
     tab: Arc<Tab>,
-    widget: Box,
+    widget: Arc<Widget>,
 }
 
 impl Window {
@@ -32,9 +34,7 @@ impl Window {
         tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true); // demo tab @TODO replace with session restore feature
 
         // GTK
-        let widget = Box::builder().orientation(Orientation::Vertical).build();
-
-        widget.append(tab.widget());
+        let widget = Arc::new(Widget::new(tab.widget()));
 
         // Init struct
         Self { tab, widget }
@@ -86,7 +86,7 @@ impl Window {
         self.tab.page_description()
     }
 
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn widget_gobject(&self) -> &Box {
+        &self.widget.gobject()
     }
 }

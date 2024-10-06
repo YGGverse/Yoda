@@ -159,10 +159,10 @@ impl App {
                 }
 
                 // Assign browser window to this application
-                browser.widget().set_application(Some(this));
+                browser.widget_gobject().set_application(Some(this));
 
                 // Show main widget
-                browser.widget().present();
+                browser.widget_gobject().present();
             }
         });
 

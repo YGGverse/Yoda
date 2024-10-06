@@ -99,61 +99,38 @@ impl Browser {
         let widget = Arc::new(Widget::new(
             profile_database_connection.clone(),
             header.widget(),
-            window.widget(),
+            window.widget_gobject(),
         ));
 
         // Assign actions
+        widget.gobject().add_action(action_tool_debug.as_ref());
         widget
-            .application_window()
-            .add_action(action_tool_debug.as_ref());
-
-        widget
-            .application_window()
+            .gobject()
             .add_action(action_tool_profile_directory.as_ref());
-
-        widget.application_window().add_action(action_quit.as_ref());
-
+        widget.gobject().add_action(action_quit.as_ref());
+        widget.gobject().add_action(action_update.as_ref());
+        widget.gobject().add_action(action_tab_append.as_ref());
+        widget.gobject().add_action(action_tab_close.as_ref());
+        widget.gobject().add_action(action_tab_close_all.as_ref());
         widget
-            .application_window()
-            .add_action(action_update.as_ref());
-
-        widget
-            .application_window()
-            .add_action(action_tab_append.as_ref());
-
-        widget
-            .application_window()
-            .add_action(action_tab_close.as_ref());
-
-        widget
-            .application_window()
-            .add_action(action_tab_close_all.as_ref());
-
-        widget
-            .application_window()
+            .gobject()
             .add_action(action_tab_page_navigation_base.as_ref());
-
         widget
-            .application_window()
+            .gobject()
             .add_action(action_tab_page_navigation_history_back.as_ref());
-
         widget
-            .application_window()
+            .gobject()
             .add_action(action_tab_page_navigation_history_forward.as_ref());
-
         widget
-            .application_window()
+            .gobject()
             .add_action(action_tab_page_navigation_reload.as_ref());
-
-        widget
-            .application_window()
-            .add_action(action_tab_pin.as_ref());
+        widget.gobject().add_action(action_tab_pin.as_ref());
 
         // Init events
         action_tool_debug.connect_activate({
             let widget = widget.clone();
             move |_, _| {
-                widget.application_window().emit_enable_debugging(true);
+                widget.gobject().emit_enable_debugging(true);
             }
         });
 
@@ -170,7 +147,7 @@ impl Browser {
         action_quit.connect_activate({
             let widget = widget.clone();
             move |_, _| {
-                widget.application_window().close();
+                widget.gobject().close();
             }
         });
 
@@ -303,7 +280,7 @@ impl Browser {
     }
 
     // Getters
-    pub fn widget(&self) -> &ApplicationWindow {
-        &self.widget.application_window()
+    pub fn widget_gobject(&self) -> &ApplicationWindow {
+        &self.widget.gobject()
     }
 }

@@ -13,7 +13,7 @@ const MAXIMIZED: bool = false;
 
 pub struct Widget {
     database: Arc<Database>,
-    application_window: ApplicationWindow,
+    gobject: ApplicationWindow,
 }
 
 impl Widget {
@@ -48,7 +48,7 @@ impl Widget {
         };
 
         // Init GTK
-        let application_window = ApplicationWindow::builder()
+        let gobject = ApplicationWindow::builder()
             .titlebar(titlebar)
             .child(child)
             .default_height(DEFAULT_HEIGHT)
@@ -57,10 +57,7 @@ impl Widget {
             .build();
 
         // Return new struct
-        Self {
-            database,
-            application_window,
-        }
+        Self { database, gobject }
     }
 
     // Actions
@@ -86,8 +83,8 @@ impl Widget {
             Ok(records) => {
                 for record in records {
                     // Restore widget
-                    self.application_window.set_maximized(record.is_maximized);
-                    self.application_window
+                    self.gobject.set_maximized(record.is_maximized);
+                    self.gobject
                         .set_default_size(record.default_width, record.default_height);
 
                     // Delegate restore action to childs
@@ -102,9 +99,9 @@ impl Widget {
         match self.database.add(
             tx,
             app_browser_id,
-            &self.application_window.default_width(),
-            &self.application_window.default_height(),
-            &self.application_window.is_maximized(),
+            &self.gobject.default_width(),
+            &self.gobject.default_height(),
+            &self.gobject.is_maximized(),
         ) {
             Ok(_) => {
                 // Delegate save action to childs
@@ -116,7 +113,7 @@ impl Widget {
     }
 
     // Getters
-    pub fn application_window(&self) -> &ApplicationWindow {
-        &self.application_window
+    pub fn gobject(&self) -> &ApplicationWindow {
+        &self.gobject
     }
 }
