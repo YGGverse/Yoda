@@ -8,7 +8,7 @@ use gtk::{
 use std::sync::Arc;
 
 pub struct Menu {
-    widget: MenuButton,
+    gobject: MenuButton,
 }
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
@@ -66,16 +66,16 @@ impl Menu {
             model.append(Some("Quit"), Some(&detailed_action_name(action_quit)));
 
         // Init widget
-        let widget = MenuButton::builder().tooltip_text("Menu").build();
-            widget.set_menu_model(Some(&model));
+        let gobject = MenuButton::builder().tooltip_text("Menu").build();
+        gobject.set_menu_model(Some(&model));
 
         // Result
-        Self { widget }
+        Self { gobject }
     }
 
     // Getters
-    pub fn widget(&self) -> &MenuButton {
-        &self.widget
+    pub fn gobject(&self) -> &MenuButton {
+        &self.gobject
     }
 }
 

@@ -3,33 +3,33 @@ use gtk::prelude::WidgetExt;
 use gtk::{pango::EllipsizeMode, Label};
 
 pub struct Description {
-    widget: Label,
+    gobject: Label,
 }
 
 impl Description {
     // Construct
     pub fn new() -> Self {
-        let widget = Label::builder()
+        let gobject = Label::builder()
             .css_classes(["subtitle"])
             .single_line_mode(true)
             .ellipsize(EllipsizeMode::End)
             .visible(false)
             .build();
 
-        Self { widget }
+        Self { gobject }
     }
 
     // Actions
     pub fn update(&self, text: Option<GString>) {
         match text {
-            Some(value) => self.widget.set_text(&value),
-            None => self.widget.set_text(""), // @TODO
+            Some(value) => self.gobject.set_text(&value),
+            None => self.gobject.set_text(""), // @TODO
         };
-        self.widget.set_visible(!self.widget.text().is_empty());
+        self.gobject.set_visible(!self.gobject.text().is_empty());
     }
 
     // Getters
-    pub fn widget(&self) -> &Label {
-        &self.widget
+    pub fn gobject(&self) -> &Label {
+        &self.gobject
     }
 }

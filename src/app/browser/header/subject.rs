@@ -7,7 +7,7 @@ use title::Title;
 use gtk::{glib::GString, prelude::BoxExt, Align, Box, Orientation};
 
 pub struct Subject {
-    widget: Box,
+    gobject: Box,
     title: Title,
     description: Description,
 }
@@ -18,16 +18,16 @@ impl Subject {
         let title = Title::new();
         let description = Description::new();
 
-        let widget = Box::builder()
+        let gobject = Box::builder()
             .orientation(Orientation::Vertical)
             .valign(Align::Center)
             .build();
 
-        widget.append(title.widget());
-        widget.append(description.widget());
+        gobject.append(title.gobject());
+        gobject.append(description.gobject());
 
         Self {
-            widget,
+            gobject,
             title,
             description,
         }
@@ -40,7 +40,7 @@ impl Subject {
     }
 
     // Getters
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn gobject(&self) -> &Box {
+        &self.gobject
     }
 }

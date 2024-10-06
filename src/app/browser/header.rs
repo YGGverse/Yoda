@@ -9,7 +9,7 @@ use gtk::{gio::SimpleAction, glib::GString, HeaderBar};
 use std::sync::Arc;
 
 pub struct Header {
-    widget: HeaderBar,
+    gobject: HeaderBar,
     subject: Subject,
 }
 
@@ -46,12 +46,12 @@ impl Header {
         let subject = Subject::new();
 
         // Init widget
-        let widget = HeaderBar::builder().build();
-        widget.pack_start(tray.widget());
-        widget.set_title_widget(Some(subject.widget()));
+        let gobject = HeaderBar::builder().build();
+        gobject.pack_start(tray.gobject());
+        gobject.set_title_widget(Some(subject.gobject()));
 
         // Return new struct
-        Self { widget, subject }
+        Self { gobject, subject }
     }
 
     // Actions
@@ -60,7 +60,7 @@ impl Header {
     }
 
     // Getters
-    pub fn widget(&self) -> &HeaderBar {
-        &self.widget
+    pub fn gobject(&self) -> &HeaderBar {
+        &self.gobject
     }
 }

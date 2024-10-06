@@ -13,7 +13,7 @@ use gtk::{
 use std::sync::Arc;
 
 pub struct Tray {
-    widget: Box,
+    gobject: Box,
 }
 
 impl Tray {
@@ -48,20 +48,20 @@ impl Tray {
         );
 
         // Init widget
-        let widget = Box::builder()
+        let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(8)
             .build();
 
-        widget.append(menu.widget());
-        widget.append(tab.widget());
+        gobject.append(menu.gobject());
+        gobject.append(tab.gobject());
 
         // Return new struct
-        Self { widget }
+        Self { gobject }
     }
 
     // Getters
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn gobject(&self) -> &Box {
+        &self.gobject
     }
 }

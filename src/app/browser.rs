@@ -98,7 +98,7 @@ impl Browser {
         // Init widget
         let widget = Arc::new(Widget::new(
             profile_database_connection.clone(),
-            header.widget(),
+            header.gobject(),
             window.gobject(),
         ));
 
