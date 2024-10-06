@@ -1,41 +1,31 @@
 mod pin;
 mod title;
+mod widget;
 
 use pin::Pin;
 use title::Title;
+use widget::Widget;
 
-use gtk::{
-    glib::GString,
-    prelude::{BoxExt, WidgetExt},
-    Align, Box, Orientation,
-};
+use gtk::{glib::GString, Box};
+use std::sync::Arc;
 
 pub struct Label {
     // Components
-    pin: Pin,
-    title: Title,
-
+    pin: Arc<Pin>,
+    title: Arc<Title>,
     // GTK
-    widget: Box,
+    widget: Arc<Widget>,
 }
 
 impl Label {
     // Construct
     pub fn new(name: GString, is_pinned: bool) -> Label {
         // Components
-        let pin = Pin::new(is_pinned);
-        let title = Title::new();
+        let pin = Arc::new(Pin::new(is_pinned));
+        let title = Arc::new(Title::new());
 
         // GTK
-        let widget = Box::builder()
-            .orientation(Orientation::Horizontal)
-            .halign(Align::Center)
-            .name(name)
-            .tooltip_text(title.widget().text())
-            .build();
-
-        widget.append(pin.widget());
-        widget.append(title.widget());
+        let widget = Arc::new(Widget::new(name, pin.gobject(), title.gobject()));
 
         // Result
         Self { pin, title, widget }
@@ -43,26 +33,22 @@ impl Label {
 
     // Actions
     pub fn update(&self, title: Option<&GString>) {
-        match title {
-            Some(tooltip_text) => self.widget.set_tooltip_text(Some(tooltip_text)),
-            None => self.widget.set_tooltip_text(None),
-        }
-
         self.title.update(title);
+        self.widget.update(title);
     }
 
     // Setters
     pub fn pin(&self, is_pinned: bool) {
-        self.pin.widget().set_visible(is_pinned);
-        self.title.widget().set_visible(!is_pinned);
+        self.pin.pin(is_pinned);
+        self.title.pin(is_pinned);
     }
 
     // Getters
     pub fn is_pinned(&self) -> bool {
-        self.pin.widget().is_visible()
+        self.pin.is_pinned()
     }
 
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn gobject(&self) -> &Box {
+        &self.widget.gobject()
     }
 }

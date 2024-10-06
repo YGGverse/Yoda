@@ -1,16 +1,16 @@
-use gtk::{glib::GString, pango::EllipsizeMode, Label};
+use gtk::{glib::GString, pango::EllipsizeMode, prelude::WidgetExt, Label};
 
 const DEFAULT_LABEL_TEXT: &str = "New page";
 
 pub struct Title {
-    widget: Label,
+    gobject: Label,
 }
 
 impl Title {
     // Construct
     pub fn new() -> Self {
         Self {
-            widget: Label::builder()
+            gobject: Label::builder()
                 .label(DEFAULT_LABEL_TEXT)
                 .ellipsize(EllipsizeMode::End)
                 .width_chars(16)
@@ -22,13 +22,17 @@ impl Title {
     // Actions
     pub fn update(&self, title: Option<&GString>) {
         match title {
-            Some(title) => self.widget.set_text(title),
-            None => self.widget.set_text(DEFAULT_LABEL_TEXT),
+            Some(title) => self.gobject.set_text(title),
+            None => self.gobject.set_text(DEFAULT_LABEL_TEXT),
         }
     }
 
+    pub fn pin(&self, is_pinned: bool) {
+        self.gobject.set_visible(!is_pinned);
+    }
+
     // Getters
-    pub fn widget(&self) -> &Label {
-        &self.widget
+    pub fn gobject(&self) -> &Label {
+        &self.gobject
     }
 }
