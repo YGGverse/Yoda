@@ -15,6 +15,7 @@ use gtk::{
 
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
+// Common struct for HashMap index
 struct TabItem {
     label: Arc<Label>,
     page: Arc<Page>,
