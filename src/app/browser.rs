@@ -87,7 +87,7 @@ impl Browser {
             action_tab_pin.clone(),
         ));
 
-        let main = Arc::new(Window::new(
+        let window = Arc::new(Window::new(
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -99,7 +99,7 @@ impl Browser {
         let widget = Arc::new(Widget::new(
             profile_database_connection.clone(),
             header.widget(),
-            main.widget(),
+            window.widget(),
         ));
 
         // Assign actions
@@ -176,66 +176,66 @@ impl Browser {
 
         action_update.connect_activate({
             let header = header.clone();
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.update();
-                header.update(main.tab_page_title(), main.tab_page_description());
+                window.update();
+                header.update(window.tab_page_title(), window.tab_page_description());
             }
         });
 
         action_tab_append.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_append(None);
+                window.tab_append(None);
             }
         });
 
         action_tab_close.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_close();
+                window.tab_close();
             }
         });
 
         action_tab_close_all.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_close_all();
+                window.tab_close_all();
             }
         });
 
         action_tab_page_navigation_base.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_page_navigation_base();
+                window.tab_page_navigation_base();
             }
         });
 
         action_tab_page_navigation_history_back.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_page_navigation_history_back();
+                window.tab_page_navigation_history_back();
             }
         });
 
         action_tab_page_navigation_history_forward.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_page_navigation_history_forward();
+                window.tab_page_navigation_history_forward();
             }
         });
 
         action_tab_page_navigation_reload.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_page_navigation_reload();
+                window.tab_page_navigation_reload();
             }
         });
 
         action_tab_pin.connect_activate({
-            let main = main.clone();
+            let window = window.clone();
             move |_, _| {
-                main.tab_pin();
+                window.tab_pin();
             }
         });
 
@@ -244,7 +244,7 @@ impl Browser {
             database,
             widget,
             // header,
-            // main,
+            // window,
         }
     }
 
@@ -258,7 +258,7 @@ impl Browser {
                             // Delegate clean action to childs
                             // @TODO
                             // self.header.clean(record.id);
-                            // self.main.clean(record.id);
+                            // self.window.clean(record.id);
 
                             self.widget.clean(tx, &record.id);
                         }
