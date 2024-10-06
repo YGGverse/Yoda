@@ -24,7 +24,7 @@ pub struct Browser {
     database: Arc<Database>,
     // Components
     // header: Arc<Header>,
-    // window: Arc<Window>,
+    window: Arc<Window>,
     widget: Arc<Widget>,
 }
 
@@ -88,6 +88,7 @@ impl Browser {
         ));
 
         let window = Arc::new(Window::new(
+            profile_database_connection.clone(),
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -221,7 +222,7 @@ impl Browser {
             database,
             widget,
             // header,
-            // window,
+            window,
         }
     }
 
@@ -235,8 +236,7 @@ impl Browser {
                             // Delegate clean action to childs
                             // @TODO
                             // self.header.clean(record.id);
-                            // self.window.clean(record.id);
-
+                            self.window.clean(tx, &record.id);
                             self.widget.clean(tx, &record.id);
                         }
                         Err(e) => todo!("{e}"),
@@ -254,8 +254,7 @@ impl Browser {
                     // Delegate restore action to childs
                     // @TODO
                     // self.header.restore(record.id);
-                    // self.window.restore(record.id);
-
+                    self.window.restore(tx, &record.id);
                     self.widget.restore(tx, &record.id);
                 }
             }
@@ -271,8 +270,7 @@ impl Browser {
 
                 // @TODO
                 // self.header.save(id);
-                // self.window.save(id);
-
+                self.window.save(tx, &id);
                 self.widget.save(tx, &id);
             }
             Err(e) => todo!("{e}"),

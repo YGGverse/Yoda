@@ -1,9 +1,12 @@
+mod database;
 mod label;
 mod page;
 mod widget;
 
+use database::Database;
 use label::Label;
 use page::Page;
+use sqlite::{Connection, Transaction};
 use widget::Widget;
 
 use gtk::{
@@ -13,7 +16,11 @@ use gtk::{
     GestureClick, Notebook,
 };
 
-use std::{cell::RefCell, collections::HashMap, sync::Arc};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
 
 // Common struct for HashMap index
 struct TabItem {
@@ -23,7 +30,9 @@ struct TabItem {
 
 // Main
 pub struct Tab {
-    // Keep action links in memory to not require them on every tab append
+    // Extras
+    database: Arc<Database>,
+    // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
     action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -38,14 +47,42 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new(
+        // Extras
+        profile_database_connection: Arc<RwLock<Connection>>,
+        // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
+        // Init database
+        let database = {
+            // Init writable database connection
+            let mut connection = match profile_database_connection.write() {
+                Ok(connection) => connection,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Init database structure
+            match Database::init(&transaction) {
+                Ok(database) => match transaction.commit() {
+                    Ok(_) => Arc::new(database),
+                    Err(e) => todo!("{e}"),
+                },
+                Err(e) => todo!("{e}"),
+            }
+        };
+
         // Return non activated struct
         Self {
+            database,
             // Define action links
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
@@ -196,6 +233,46 @@ impl Tab {
         }
     }
 
+    pub fn clean(&self, tx: &Transaction, app_browser_window_id: &i64) {
+        match self.database.records(tx, app_browser_window_id) {
+            Ok(records) => {
+                for record in records {
+                    match self.database.delete(tx, &record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to childs
+                            // nothing yet..
+                        }
+                        Err(e) => todo!("{e}"),
+                    }
+                }
+            }
+            Err(e) => todo!("{e}"),
+        }
+    }
+
+    pub fn restore(&self, tx: &Transaction, app_browser_window_id: &i64) {
+        match self.database.records(tx, app_browser_window_id) {
+            Ok(records) => {
+                for record in records {
+                    // Delegate restore action to childs
+                    // nothing yet..
+                }
+            }
+            Err(e) => todo!("{e}"),
+        }
+    }
+
+    pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
+        match self.database.add(tx, app_browser_window_id) {
+            Ok(_) => {
+                // Delegate save action to childs
+                // let id = self.database.last_insert_id(tx);
+                // nothing yet..
+            }
+            Err(e) => todo!("{e}"),
+        }
+    }
+
     // Getters
     pub fn page_title(&self) -> Option<GString> {
         if let Some(id) = self.widget.current_name() {
@@ -203,7 +280,6 @@ impl Tab {
                 return item.page.title();
             }
         }
-
         None
     }
 
@@ -214,7 +290,6 @@ impl Tab {
                 return item.page.description();
             }
         }
-
         None
     }
 
