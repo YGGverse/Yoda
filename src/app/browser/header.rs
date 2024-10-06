@@ -1,16 +1,19 @@
 mod subject;
 mod tray;
+mod widget;
 
 use subject::Subject;
 use tray::Tray;
+use widget::Widget;
 
 use gtk::{gio::SimpleAction, glib::GString, HeaderBar};
 
 use std::sync::Arc;
 
 pub struct Header {
-    gobject: HeaderBar,
-    subject: Subject,
+    subject: Arc<Subject>,
+    // tray: Arc<Subject>,
+    widget: Arc<Widget>,
 }
 
 impl Header {
@@ -43,15 +46,13 @@ impl Header {
             action_tab_pin,
         );
 
-        let subject = Subject::new();
+        let subject = Arc::new(Subject::new());
 
         // Init widget
-        let gobject = HeaderBar::builder().build();
-        gobject.pack_start(tray.gobject());
-        gobject.set_title_widget(Some(subject.gobject()));
+        let widget = Arc::new(Widget::new(tray.gobject(), Some(subject.gobject())));
 
         // Return new struct
-        Self { gobject, subject }
+        Self { subject, widget }
     }
 
     // Actions
@@ -61,6 +62,6 @@ impl Header {
 
     // Getters
     pub fn gobject(&self) -> &HeaderBar {
-        &self.gobject
+        &self.widget.gobject()
     }
 }
