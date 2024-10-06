@@ -63,7 +63,6 @@ impl Window {
             action_update,
         ));
         tab.activate(tab.clone());
-        tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true); // demo tab @TODO replace with session restore feature
 
         // GTK
         let widget = Arc::new(Widget::new(tab.gobject()));
