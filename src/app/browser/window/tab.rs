@@ -102,9 +102,9 @@ impl Tab {
 
         controller.connect_pressed({
             let label = label.clone();
-            move |_, n: i32, _, _| {
+            move |_, count, _, _| {
                 // double click
-                if n == 2 {
+                if count == 2 {
                     label.pin(!label.is_pinned()); // toggle
                 }
             }
