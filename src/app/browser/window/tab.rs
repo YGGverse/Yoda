@@ -137,104 +137,65 @@ impl Tab {
 
     // Close active tab
     pub fn close(&self) {
-        self.widget
-            .gobject()
-            .remove_page(self.widget.gobject().current_page());
+        self.widget.close();
     }
 
     // Close all tabs
     pub fn close_all(&self) {
-        // @TODO skip pinned or make confirmation alert (GTK>=4.10)
-        while let Some(page_number) = self.widget.gobject().current_page() {
-            self.widget.gobject().remove_page(Some(page_number));
-        }
+        self.widget.close_all();
     }
 
     // Toggle pin status for active tab
     pub fn pin(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get label by ID
-                if let Some(label) = self.labels.borrow().get(&widget.widget_name()) {
-                    label.pin(!label.is_pinned()); // toggle
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(label) = self.labels.borrow().get(&id) {
+                label.pin(!label.is_pinned()); // toggle
             }
         }
     }
 
     pub fn page_navigation_base(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
-                    page.navigation_base();
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                page.navigation_base();
             }
         }
     }
 
     pub fn page_navigation_history_back(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
-                    page.navigation_history_back();
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                page.navigation_history_back();
             }
         }
     }
 
     pub fn page_navigation_history_forward(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
-                    page.navigation_history_forward();
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                page.navigation_history_forward();
             }
         }
     }
 
     pub fn page_navigation_reload(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
-                    page.navigation_reload();
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                page.navigation_reload();
             }
         }
     }
 
     pub fn update(&self) {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get widget ID
-                let id = &widget.widget_name();
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                page.update();
 
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(id) {
-                    page.update();
-
-                    // Get label by widget ID
-                    if let Some(label) = self.labels.borrow().get(id) {
-                        if let Some(title) = page.title() {
-                            label.update(Some(&title));
-                        } else {
-                            label.update(None);
-                        }
+                if let Some(label) = self.labels.borrow().get(&id) {
+                    if let Some(title) = page.title() {
+                        label.update(Some(&title));
+                    } else {
+                        label.update(None);
                     }
                 }
             }
@@ -243,16 +204,9 @@ impl Tab {
 
     // Getters
     pub fn page_title(&self) -> Option<GString> {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get widget ID
-                let id = &widget.widget_name();
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(id) {
-                    return page.title();
-                }
+        if let Some(id) = self.widget.current_name() {
+            if let Some(page) = self.pages.borrow().get(&id) {
+                return page.title();
             }
         }
 
@@ -260,16 +214,10 @@ impl Tab {
     }
 
     pub fn page_description(&self) -> Option<GString> {
-        // Get current page
-        if let Some(page_number) = self.widget.gobject().current_page() {
-            // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
-                // Get widget ID
-                let id = &widget.widget_name();
-                // Get page by widget ID
-                if let Some(page) = self.pages.borrow().get(id) {
-                    return page.description();
-                }
+        if let Some(id) = self.widget.current_name() {
+            // Get page by widget ID
+            if let Some(page) = self.pages.borrow().get(&id) {
+                return page.description();
             }
         }
 
