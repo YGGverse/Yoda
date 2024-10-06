@@ -21,6 +21,7 @@ struct TabItem {
     page: Arc<Page>,
 }
 
+// Main
 pub struct Tab {
     // Keep action links in memory to not require them on every tab append
     action_tab_page_navigation_base: Arc<SimpleAction>,
