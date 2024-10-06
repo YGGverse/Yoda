@@ -60,8 +60,7 @@ impl Database {
         tx.execute("DELETE FROM `app_browser_window_tab` WHERE `id` = ?", [id])
     }
 
-    /* not in use
     pub fn last_insert_id(&self, tx: &Transaction) -> i64 {
         tx.last_insert_rowid()
-    } */
+    }
 }

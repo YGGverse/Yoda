@@ -253,7 +253,8 @@ impl Tab {
     pub fn restore(&self, tx: &Transaction, app_browser_window_id: &i64) {
         match self.database.records(tx, app_browser_window_id) {
             Ok(records) => {
-                for _ in records {
+                for record in records {
+                    self.append(None, true /*@ TODO record.is_current_page */);
                     // Delegate restore action to childs
                     // nothing yet..
                 }
@@ -263,13 +264,16 @@ impl Tab {
     }
 
     pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        match self.database.add(tx, app_browser_window_id) {
-            Ok(_) => {
-                // Delegate save action to childs
-                // let id = self.database.last_insert_id(tx);
-                // nothing yet..
+        for (id, item) in self.index.take().iter() {
+            match self.database.add(tx, app_browser_window_id) {
+                Ok(_) => {
+                    // Delegate save action to childs
+                    let id = self.database.last_insert_id(tx);
+                    // item.label.save()
+                    // item.page.save()
+                }
+                Err(e) => todo!("{e}"),
             }
-            Err(e) => todo!("{e}"),
         }
     }
 
