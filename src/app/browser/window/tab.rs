@@ -1,8 +1,10 @@
 mod label;
 mod page;
+mod widget;
 
 use label::Label;
 use page::Page;
+use widget::Widget;
 
 use gtk::{
     gio::SimpleAction,
@@ -14,8 +16,6 @@ use gtk::{
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 pub struct Tab {
-    // GTK
-    widget: Notebook,
     // Keep action links in memory to not require them on every tab append
     action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -25,6 +25,8 @@ pub struct Tab {
     // Dynamically allocated reference index
     labels: RefCell<HashMap<GString, Arc<Label>>>,
     pages: RefCell<HashMap<GString, Arc<Page>>>,
+    // GTK
+    widget: Arc<Widget>,
 }
 
 impl Tab {
@@ -36,13 +38,8 @@ impl Tab {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
-        // Init widget
-        let widget = Notebook::builder().scrollable(true).build();
-
         // Return non activated struct
         Self {
-            // GTK
-            widget,
             // Define action links
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
@@ -52,20 +49,24 @@ impl Tab {
             // Init empty HashMap index as no tabs appended yet
             labels: RefCell::new(HashMap::new()),
             pages: RefCell::new(HashMap::new()),
+            // GTK
+            widget: Arc::new(Widget::new()),
         }
     }
 
     // Actions
     pub fn activate(&self, tab: Arc<Self>) {
-        self.widget.connect_page_removed(move |_, widget, _| {
-            // Cleanup HashMap index
-            let id = &widget.widget_name();
-            tab.labels.borrow_mut().remove(id);
-            tab.pages.borrow_mut().remove(id);
-        });
+        self.widget
+            .gobject()
+            .connect_page_removed(move |_, widget, _| {
+                // Cleanup HashMap index
+                let id = &widget.widget_name();
+                tab.labels.borrow_mut().remove(id);
+                tab.pages.borrow_mut().remove(id);
+            });
 
         // Switch page post-event (`connect_switch_page` activates before `page_number` get updated)
-        self.widget.connect_page_notify({
+        self.widget.gobject().connect_page_notify({
             let action_update = self.action_update.clone();
             // Update window header with current page title
             move |_| action_update.activate(None)
@@ -109,16 +110,21 @@ impl Tab {
             }
         });
 
-        label.widget().add_controller(controller);
+        label.gobject().add_controller(controller);
 
         // Append new Notebook page
-        let page_number = self.widget.append_page(page.widget(), Some(label.widget()));
+        let page_number = self
+            .widget
+            .gobject()
+            .append_page(page.widget(), Some(label.gobject()));
 
         // Additional setup for Notebook tab created
-        self.widget.set_tab_reorderable(page.widget(), true);
+        self.widget
+            .gobject()
+            .set_tab_reorderable(page.widget(), true);
 
         if is_current_page {
-            self.widget.set_current_page(Some(page_number));
+            self.widget.gobject().set_current_page(Some(page_number));
         }
 
         if page_navigation_request_text.is_none() {
@@ -131,23 +137,25 @@ impl Tab {
 
     // Close active tab
     pub fn close(&self) {
-        self.widget.remove_page(self.widget.current_page());
+        self.widget
+            .gobject()
+            .remove_page(self.widget.gobject().current_page());
     }
 
     // Close all tabs
     pub fn close_all(&self) {
         // @TODO skip pinned or make confirmation alert (GTK>=4.10)
-        while let Some(page_number) = self.widget.current_page() {
-            self.widget.remove_page(Some(page_number));
+        while let Some(page_number) = self.widget.gobject().current_page() {
+            self.widget.gobject().remove_page(Some(page_number));
         }
     }
 
     // Toggle pin status for active tab
     pub fn pin(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get label by ID
                 if let Some(label) = self.labels.borrow().get(&widget.widget_name()) {
                     label.pin(!label.is_pinned()); // toggle
@@ -158,9 +166,9 @@ impl Tab {
 
     pub fn page_navigation_base(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
                     page.navigation_base();
@@ -171,9 +179,9 @@ impl Tab {
 
     pub fn page_navigation_history_back(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
                     page.navigation_history_back();
@@ -184,9 +192,9 @@ impl Tab {
 
     pub fn page_navigation_history_forward(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
                     page.navigation_history_forward();
@@ -197,9 +205,9 @@ impl Tab {
 
     pub fn page_navigation_reload(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get page by widget ID
                 if let Some(page) = self.pages.borrow().get(&widget.widget_name()) {
                     page.navigation_reload();
@@ -210,9 +218,9 @@ impl Tab {
 
     pub fn update(&self) {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get widget ID
                 let id = &widget.widget_name();
 
@@ -236,9 +244,9 @@ impl Tab {
     // Getters
     pub fn page_title(&self) -> Option<GString> {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get widget ID
                 let id = &widget.widget_name();
                 // Get page by widget ID
@@ -253,9 +261,9 @@ impl Tab {
 
     pub fn page_description(&self) -> Option<GString> {
         // Get current page
-        if let Some(page_number) = self.widget.current_page() {
+        if let Some(page_number) = self.widget.gobject().current_page() {
             // Get default widget to extract it name as the ID for childs
-            if let Some(widget) = self.widget.nth_page(Some(page_number)) {
+            if let Some(widget) = self.widget.gobject().nth_page(Some(page_number)) {
                 // Get widget ID
                 let id = &widget.widget_name();
                 // Get page by widget ID
@@ -268,7 +276,7 @@ impl Tab {
         None
     }
 
-    pub fn widget(&self) -> &Notebook {
-        self.widget.as_ref()
+    pub fn gobject(&self) -> &Notebook {
+        self.widget.gobject()
     }
 }

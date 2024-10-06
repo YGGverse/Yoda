@@ -34,7 +34,7 @@ impl Window {
         tab.append(Some(GString::from("gemini://geminiprotocol.net/")), true); // demo tab @TODO replace with session restore feature
 
         // GTK
-        let widget = Arc::new(Widget::new(tab.widget()));
+        let widget = Arc::new(Widget::new(tab.gobject()));
 
         // Init struct
         Self { tab, widget }
