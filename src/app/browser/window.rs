@@ -86,7 +86,7 @@ impl Window {
         self.tab.page_description()
     }
 
-    pub fn widget_gobject(&self) -> &Box {
+    pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
     }
 }

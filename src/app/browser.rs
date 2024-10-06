@@ -99,7 +99,7 @@ impl Browser {
         let widget = Arc::new(Widget::new(
             profile_database_connection.clone(),
             header.widget(),
-            window.widget_gobject(),
+            window.gobject(),
         ));
 
         // Assign actions
@@ -280,7 +280,7 @@ impl Browser {
     }
 
     // Getters
-    pub fn widget_gobject(&self) -> &ApplicationWindow {
+    pub fn gobject(&self) -> &ApplicationWindow {
         &self.widget.gobject()
     }
 }
