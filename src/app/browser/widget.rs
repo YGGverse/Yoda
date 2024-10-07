@@ -4,7 +4,6 @@ use database::Database;
 
 use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box, HeaderBar};
 use sqlite::Transaction;
-use std::sync::Arc;
 
 // Default options
 const DEFAULT_HEIGHT: i32 = 480;
@@ -12,16 +11,12 @@ const DEFAULT_WIDTH: i32 = 640;
 const MAXIMIZED: bool = false;
 
 pub struct Widget {
-    database: Arc<Database>,
     gobject: ApplicationWindow,
 }
 
 impl Widget {
     // Construct
     pub fn new(titlebar: &HeaderBar, child: &Box) -> Self {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Init GTK
         let gobject = ApplicationWindow::builder()
             .titlebar(titlebar)
@@ -32,15 +27,15 @@ impl Widget {
             .build();
 
         // Return new struct
-        Self { database, gobject }
+        Self { gobject }
     }
 
     // Actions
     pub fn clean(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.records(tx, app_browser_id) {
+        match Database::records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(tx, &record.id) {
+                    match Database::delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -54,7 +49,7 @@ impl Widget {
     }
 
     pub fn restore(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.records(tx, app_browser_id) {
+        match Database::records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Restore widget
@@ -71,7 +66,7 @@ impl Widget {
     }
 
     pub fn save(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.add(
+        match Database::add(
             tx,
             app_browser_id,
             &self.gobject.default_width(),

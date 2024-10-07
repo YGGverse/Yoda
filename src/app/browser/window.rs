@@ -12,7 +12,6 @@ use std::sync::Arc;
 use gtk::{gio::SimpleAction, glib::GString, Box};
 
 pub struct Window {
-    database: Arc<Database>,
     tab: Arc<Tab>,
     widget: Arc<Widget>,
 }
@@ -27,9 +26,6 @@ impl Window {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Init components
         let tab = Arc::new(Tab::new(
             action_tab_page_navigation_base,
@@ -44,11 +40,7 @@ impl Window {
         let widget = Arc::new(Widget::new(tab.gobject()));
 
         // Init struct
-        Self {
-            database,
-            tab,
-            widget,
-        }
+        Self { tab, widget }
     }
 
     // Actions
@@ -89,10 +81,10 @@ impl Window {
     }
 
     pub fn clean(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.records(tx, app_browser_id) {
+        match Database::records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(tx, &record.id) {
+                    match Database::delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             self.tab.clean(tx, &record.id);
@@ -106,7 +98,7 @@ impl Window {
     }
 
     pub fn restore(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.records(tx, app_browser_id) {
+        match Database::records(tx, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
@@ -118,10 +110,10 @@ impl Window {
     }
 
     pub fn save(&self, tx: &Transaction, app_browser_id: &i64) {
-        match self.database.add(tx, app_browser_id) {
+        match Database::add(tx, app_browser_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                self.tab.save(tx, &self.database.last_insert_id(tx));
+                self.tab.save(tx, &Database::last_insert_id(tx));
             }
             Err(e) => todo!("{e}"),
         }

@@ -37,9 +37,6 @@ impl App {
         profile_database_connection: Arc<RwLock<Connection>>,
         profile_path: PathBuf,
     ) -> Self {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Init actions
         let action_tool_debug = Action::new("win", true);
         let action_tool_profile_directory = Action::new("win", true);
@@ -111,7 +108,6 @@ impl App {
 
         gobject.connect_startup({
             let browser = browser.clone();
-            let database = database.clone();
             let profile_database_connection = profile_database_connection.clone();
             move |this| {
                 // Init readable connection
@@ -121,7 +117,7 @@ impl App {
                         match connection.unchecked_transaction() {
                             Ok(transaction) => {
                                 // Restore previous session from DB
-                                match database.records(&transaction) {
+                                match Database::records(&transaction) {
                                     Ok(records) => {
                                         for record in records {
                                             browser.restore(&transaction, &record.id);
@@ -147,7 +143,6 @@ impl App {
         gobject.connect_shutdown({
             // let browser = browser.clone();
             let profile_database_connection = profile_database_connection.clone();
-            let database = database.clone();
             let browser = browser.clone();
             move |_| {
                 // Init writable connection
@@ -156,11 +151,11 @@ impl App {
                         // Create transaction
                         match connection.transaction() {
                             Ok(transaction) => {
-                                match database.records(&transaction) {
+                                match Database::records(&transaction) {
                                     Ok(records) => {
                                         // Cleanup previous session records
                                         for record in records {
-                                            match database.delete(&transaction, &record.id) {
+                                            match Database::delete(&transaction, &record.id) {
                                                 Ok(_) => {
                                                     // Delegate clean action to childs
                                                     browser.clean(&transaction, &record.id);
@@ -170,12 +165,12 @@ impl App {
                                         }
 
                                         // Save current session to DB
-                                        match database.add(&transaction) {
+                                        match Database::add(&transaction) {
                                             Ok(_) => {
                                                 // Delegate save action to childs
                                                 browser.save(
                                                     &transaction,
-                                                    &database.last_insert_id(&transaction),
+                                                    &Database::last_insert_id(&transaction),
                                                 );
                                             }
                                             Err(e) => todo!("{e}"),

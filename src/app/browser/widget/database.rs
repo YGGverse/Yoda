@@ -13,10 +13,6 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn new() -> Self {
-        Self {}
-    }
-
     pub fn init(tx: &Transaction) -> Result<usize, Error> {
         tx.execute(
             "CREATE TABLE IF NOT EXISTS `app_browser_widget`
@@ -32,7 +28,6 @@ impl Database {
     }
 
     pub fn add(
-        &self,
         tx: &Transaction,
         app_browser_id: &i64,
         default_width: &i32,
@@ -55,7 +50,7 @@ impl Database {
         )
     }
 
-    pub fn records(&self, tx: &Transaction, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
+    pub fn records(tx: &Transaction, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
         let mut stmt = tx.prepare(
             "SELECT `id`,
                     `app_browser_id`,
@@ -84,12 +79,12 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, tx: &Transaction, id: &i64) -> Result<usize, Error> {
+    pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
         tx.execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
     }
 
     /* not in use
-    pub fn last_insert_id(&self, tx: &Transaction) -> i64 {
+    pub fn last_insert_id(tx: &Transaction) -> i64 {
         tx.last_insert_rowid()
     } */
 }

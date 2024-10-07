@@ -13,7 +13,6 @@ use gtk::{glib::GString, Box};
 use std::sync::Arc;
 
 pub struct Label {
-    database: Arc<Database>,
     // Components
     pin: Arc<Pin>,
     title: Arc<Title>,
@@ -24,9 +23,6 @@ pub struct Label {
 impl Label {
     // Construct
     pub fn new(name: GString, is_pinned: bool) -> Label {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Components
         let pin = Arc::new(Pin::new(is_pinned));
         let title = Arc::new(Title::new());
@@ -35,20 +31,15 @@ impl Label {
         let widget = Arc::new(Widget::new(name, pin.gobject(), title.gobject()));
 
         // Result
-        Self {
-            database,
-            pin,
-            title,
-            widget,
-        }
+        Self { pin, title, widget }
     }
 
     // Actions
     pub fn clean(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match self.database.records(tx, app_browser_window_tab_id) {
+        match Database::records(tx, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(tx, &record.id) {
+                    match Database::delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -62,7 +53,7 @@ impl Label {
     }
 
     pub fn restore(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match self.database.records(tx, app_browser_window_tab_id) {
+        match Database::records(tx, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     self.pin(record.is_pinned);
@@ -76,10 +67,7 @@ impl Label {
     }
 
     pub fn save(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match self
-            .database
-            .add(tx, app_browser_window_tab_id, &self.is_pinned())
-        {
+        match Database::add(tx, app_browser_window_tab_id, &self.is_pinned()) {
             Ok(_) => {
                 // Delegate save action to childs
                 // nothing yet..

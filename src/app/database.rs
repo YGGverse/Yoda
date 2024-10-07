@@ -9,10 +9,6 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn new() -> Self {
-        Self {}
-    }
-
     pub fn init(tx: &Transaction) -> Result<usize, Error> {
         tx.execute(
             "CREATE TABLE IF NOT EXISTS `app`
@@ -23,11 +19,11 @@ impl Database {
         )
     }
 
-    pub fn add(&self, tx: &Transaction) -> Result<usize, Error> {
+    pub fn add(tx: &Transaction) -> Result<usize, Error> {
         tx.execute("INSERT INTO `app` DEFAULT VALUES", [])
     }
 
-    pub fn records(&self, tx: &Transaction) -> Result<Vec<Table>, Error> {
+    pub fn records(tx: &Transaction) -> Result<Vec<Table>, Error> {
         let mut stmt = tx.prepare("SELECT `id` FROM `app`")?;
         let result = stmt.query_map([], |row| Ok(Table { id: row.get(0)? }))?;
 
@@ -41,11 +37,11 @@ impl Database {
         Ok(records)
     }
 
-    pub fn delete(&self, tx: &Transaction, id: &i64) -> Result<usize, Error> {
+    pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
         tx.execute("DELETE FROM `app` WHERE `id` = ?", [id])
     }
 
-    pub fn last_insert_id(&self, tx: &Transaction) -> i64 {
+    pub fn last_insert_id(tx: &Transaction) -> i64 {
         tx.last_insert_rowid()
     }
 }

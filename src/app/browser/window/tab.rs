@@ -26,7 +26,6 @@ pub struct TabItem {
 
 // Main
 pub struct Tab {
-    database: Arc<Database>,
     // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -49,9 +48,6 @@ impl Tab {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Self {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Init empty HashMap index as no tabs appended yet
         let index = RefCell::new(HashMap::new());
 
@@ -60,7 +56,6 @@ impl Tab {
 
         // Return non activated struct
         Self {
-            database,
             // Define action links
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
@@ -219,10 +214,10 @@ impl Tab {
     }
 
     pub fn clean(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        match self.database.records(tx, app_browser_window_id) {
+        match Database::records(tx, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(tx, &record.id) {
+                    match Database::delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
@@ -239,7 +234,7 @@ impl Tab {
     }
 
     pub fn restore(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        match self.database.records(tx, app_browser_window_id) {
+        match Database::records(tx, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
                     let item = self.append(None, record.is_current);
@@ -256,7 +251,7 @@ impl Tab {
         let mut page_number = 0;
 
         for (_, item) in self.index.borrow().iter() {
-            match self.database.add(
+            match Database::add(
                 tx,
                 app_browser_window_id,
                 &match self.widget.gobject().current_page() {
@@ -266,7 +261,7 @@ impl Tab {
             ) {
                 Ok(_) => {
                     // Delegate save action to childs
-                    let id = self.database.last_insert_id(tx);
+                    let id = Database::last_insert_id(tx);
 
                     item.label.save(tx, &id);
 

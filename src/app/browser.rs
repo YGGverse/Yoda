@@ -17,8 +17,6 @@ use sqlite::Transaction;
 use std::{path::PathBuf, sync::Arc};
 
 pub struct Browser {
-    // Extras
-    database: Arc<Database>,
     // Components
     // header: Arc<Header>,
     window: Arc<Window>,
@@ -44,9 +42,6 @@ impl Browser {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
-        // Init database
-        let database = Arc::new(Database::new());
-
         // Init components
         let header = Arc::new(Header::new(
             action_tool_debug.clone(),
@@ -189,7 +184,6 @@ impl Browser {
 
         // Return new activated Browser struct
         Self {
-            database,
             widget,
             // header,
             window,
@@ -198,10 +192,10 @@ impl Browser {
 
     // Actions
     pub fn clean(&self, tx: &Transaction, app_id: &i64) {
-        match self.database.records(tx, app_id) {
+        match Database::records(tx, app_id) {
             Ok(records) => {
                 for record in records {
-                    match self.database.delete(tx, &record.id) {
+                    match Database::delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // @TODO
@@ -218,7 +212,7 @@ impl Browser {
     }
 
     pub fn restore(&self, tx: &Transaction, app_id: &i64) {
-        match self.database.records(tx, app_id) {
+        match Database::records(tx, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
@@ -233,10 +227,10 @@ impl Browser {
     }
 
     pub fn save(&self, tx: &Transaction, app_id: &i64) {
-        match self.database.add(tx, app_id) {
+        match Database::add(tx, app_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                let id = self.database.last_insert_id(tx);
+                let id = Database::last_insert_id(tx);
 
                 // @TODO
                 // self.header.save(id);
