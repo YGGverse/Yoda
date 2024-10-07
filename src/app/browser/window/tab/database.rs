@@ -11,7 +11,11 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn init(tx: &Transaction) -> Result<Database, Error> {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn init(tx: &Transaction) -> Result<usize, Error> {
         tx.execute(
             "CREATE TABLE IF NOT EXISTS `app_browser_window_tab`
             (
@@ -20,9 +24,7 @@ impl Database {
                 `is_current` INTEGER NOT NULL
             )",
             [],
-        )?;
-
-        Ok(Self {})
+        )
     }
 
     pub fn add(

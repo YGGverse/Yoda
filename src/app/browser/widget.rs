@@ -3,8 +3,8 @@ mod database;
 use database::Database;
 
 use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box, HeaderBar};
-use sqlite::{Connection, Transaction};
-use std::sync::{Arc, RwLock};
+use sqlite::Transaction;
+use std::sync::Arc;
 
 // Default options
 const DEFAULT_HEIGHT: i32 = 480;
@@ -18,34 +18,9 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(
-        profile_database_connection: Arc<RwLock<Connection>>,
-        titlebar: &HeaderBar,
-        child: &Box,
-    ) -> Self {
+    pub fn new(titlebar: &HeaderBar, child: &Box) -> Self {
         // Init database
-        let database = {
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            }
-        };
+        let database = Arc::new(Database::new());
 
         // Init GTK
         let gobject = ApplicationWindow::builder()
@@ -115,5 +90,19 @@ impl Widget {
     // Getters
     pub fn gobject(&self) -> &ApplicationWindow {
         &self.gobject
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }

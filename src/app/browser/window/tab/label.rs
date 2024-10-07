@@ -5,12 +5,12 @@ mod widget;
 
 use database::Database;
 use pin::Pin;
-use sqlite::{Connection, Transaction};
+use sqlite::Transaction;
 use title::Title;
 use widget::Widget;
 
 use gtk::{glib::GString, Box};
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 pub struct Label {
     database: Arc<Database>,
@@ -23,37 +23,9 @@ pub struct Label {
 
 impl Label {
     // Construct
-    pub fn new(
-        profile_database_connection: Arc<RwLock<Connection>>,
-        name: GString,
-        is_pinned: bool,
-    ) -> Label {
+    pub fn new(name: GString, is_pinned: bool) -> Label {
         // Init database
-        let database = {
-            /* @TODO init outside
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            } */
-
-            Arc::new(Database::new())
-        };
+        let database = Arc::new(Database::new());
 
         // Components
         let pin = Arc::new(Pin::new(is_pinned));
@@ -134,5 +106,19 @@ impl Label {
 
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }

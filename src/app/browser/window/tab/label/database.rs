@@ -15,7 +15,7 @@ impl Database {
         Self {}
     }
 
-    pub fn init(tx: &Transaction) -> Result<Database, Error> {
+    pub fn init(tx: &Transaction) -> Result<usize, Error> {
         tx.execute(
             "CREATE TABLE IF NOT EXISTS `app_browser_window_tab_label`
             (
@@ -24,9 +24,7 @@ impl Database {
                 `is_pinned` INTEGER NOT NULL
             )",
             [],
-        )?;
-
-        Ok(Self {})
+        )
     }
 
     pub fn add(

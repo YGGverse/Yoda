@@ -11,7 +11,7 @@ use gtk::{
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
     Application,
 };
-use sqlite::Connection;
+use sqlite::{Connection, Transaction};
 
 use std::{
     path::PathBuf,
@@ -21,12 +21,12 @@ use std::{
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
+    profile_database_connection: Arc<RwLock<Connection>>,
+    // database: Arc<Database>,
     // Actions
     // action_update: Arc<SimpleAction>,
     // Components
     // browser: Arc<Browser>,
-    // Extras
-    // database: Arc<Database>,
     // GTK
     gobject: Application,
 }
@@ -38,28 +38,7 @@ impl App {
         profile_path: PathBuf,
     ) -> Self {
         // Init database
-        let database = {
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            }
-        };
+        let database = Arc::new(Database::new());
 
         // Init actions
         let action_tool_debug = Action::new("win", true);
@@ -106,7 +85,6 @@ impl App {
 
         // Init components
         let browser = Arc::new(Browser::new(
-            profile_database_connection.clone(),
             profile_path,
             action_tool_debug.simple(),
             action_tool_profile_directory.simple(),
@@ -170,6 +148,7 @@ impl App {
             // let browser = browser.clone();
             let profile_database_connection = profile_database_connection.clone();
             let database = database.clone();
+            let browser = browser.clone();
             move |_| {
                 // Init writable connection
                 match profile_database_connection.write() {
@@ -220,12 +199,12 @@ impl App {
 
         // Return activated App struct
         Self {
+            // database,
+            profile_database_connection,
             // Actions (SimpleAction)
             // action_update: action_update.simple(),
             // Components
             // browser,
-            // Extras
-            // database,
             // GTK
             gobject,
         }
@@ -233,6 +212,50 @@ impl App {
 
     // Actions
     pub fn run(&self) -> ExitCode {
+        // Begin database migration @TODO
+        {
+            // Init writable connection
+            let mut connection = match self.profile_database_connection.try_write() {
+                Ok(connection) => connection,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Begin migration
+            match App::migrate(&transaction) {
+                Ok(_) => {
+                    // Confirm changes
+                    match transaction.commit() {
+                        Ok(_) => {} // @TODO
+                        Err(e) => todo!("{e}"),
+                    }
+                }
+                Err(e) => todo!("{e}"),
+            }
+        } // unlock database
+
+        // Start application
         self.gobject.run()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        if let Err(e) = Browser::migrate(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Success
+        Ok(())
     }
 }

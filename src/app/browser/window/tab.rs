@@ -6,7 +6,7 @@ mod widget;
 use database::Database;
 use label::Label;
 use page::Page;
-use sqlite::{Connection, Transaction};
+use sqlite::Transaction;
 use widget::Widget;
 
 use gtk::{
@@ -16,11 +16,7 @@ use gtk::{
     GestureClick, Notebook,
 };
 
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    sync::{Arc, RwLock},
-};
+use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 // Common struct for HashMap index
 pub struct TabItem {
@@ -30,7 +26,6 @@ pub struct TabItem {
 
 // Main
 pub struct Tab {
-    profile_database_connection: Arc<RwLock<Connection>>,
     database: Arc<Database>,
     // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
@@ -47,7 +42,6 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new(
-        profile_database_connection: Arc<RwLock<Connection>>,
         // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -56,28 +50,7 @@ impl Tab {
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init database
-        let database = {
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            }
-        };
+        let database = Arc::new(Database::new());
 
         // Init empty HashMap index as no tabs appended yet
         let index = RefCell::new(HashMap::new());
@@ -87,7 +60,6 @@ impl Tab {
 
         // Return non activated struct
         Self {
-            profile_database_connection,
             database,
             // Define action links
             action_tab_page_navigation_base,
@@ -135,11 +107,7 @@ impl Tab {
         let id = uuid_string_random();
 
         // Init new tab components
-        let label = Arc::new(Label::new(
-            self.profile_database_connection.clone(),
-            id.clone(),
-            false,
-        ));
+        let label = Arc::new(Label::new(id.clone(), false));
 
         let page = Arc::new(Page::new(
             id.clone(),
@@ -334,5 +302,26 @@ impl Tab {
 
     pub fn gobject(&self) -> &Notebook {
         self.widget.gobject()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        if let Err(e) = Label::migrate(&tx) {
+            return Err(e.to_string());
+        }
+
+        /* @TODO
+        if let Err(e) = Page::migrate(&tx) {
+            return Err(e.to_string());
+        } */
+
+        // Success
+        Ok(())
     }
 }

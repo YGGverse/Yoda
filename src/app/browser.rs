@@ -13,11 +13,8 @@ use gtk::{
     prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
-use sqlite::{Connection, Transaction};
-use std::{
-    path::PathBuf,
-    sync::{Arc, RwLock},
-};
+use sqlite::Transaction;
+use std::{path::PathBuf, sync::Arc};
 
 pub struct Browser {
     // Extras
@@ -32,7 +29,6 @@ impl Browser {
     // Construct
     pub fn new(
         // Extras
-        profile_database_connection: Arc<RwLock<Connection>>,
         profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,
@@ -49,28 +45,7 @@ impl Browser {
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
         // Init database
-        let database = {
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            }
-        };
+        let database = Arc::new(Database::new());
 
         // Init components
         let header = Arc::new(Header::new(
@@ -88,7 +63,6 @@ impl Browser {
         ));
 
         let window = Arc::new(Window::new(
-            profile_database_connection.clone(),
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -97,11 +71,7 @@ impl Browser {
         ));
 
         // Init widget
-        let widget = Arc::new(Widget::new(
-            profile_database_connection.clone(),
-            header.gobject(),
-            window.gobject(),
-        ));
+        let widget = Arc::new(Widget::new(header.gobject(), window.gobject()));
 
         // Assign actions
         widget.gobject().add_action(action_tool_debug.as_ref());
@@ -280,5 +250,30 @@ impl Browser {
     // Getters
     pub fn gobject(&self) -> &ApplicationWindow {
         &self.widget.gobject()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        /* @TODO
+        if let Err(e) = Header::migrate(&tx) {
+            return Err(e.to_string());
+        } */
+
+        if let Err(e) = Window::migrate(&tx) {
+            return Err(e.to_string());
+        }
+
+        if let Err(e) = Widget::migrate(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Success
+        Ok(())
     }
 }

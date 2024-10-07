@@ -3,11 +3,11 @@ mod tab;
 mod widget;
 
 use database::Database;
-use sqlite::{Connection, Transaction};
+use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
 
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use gtk::{gio::SimpleAction, glib::GString, Box};
 
@@ -20,8 +20,6 @@ pub struct Window {
 impl Window {
     // Construct
     pub fn new(
-        // Extras
-        profile_database_connection: Arc<RwLock<Connection>>,
         // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -30,32 +28,10 @@ impl Window {
         action_update: Arc<SimpleAction>,
     ) -> Self {
         // Init database
-        let database = {
-            // Init writable database connection
-            let mut connection = match profile_database_connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init database structure
-            match Database::init(&transaction) {
-                Ok(database) => match transaction.commit() {
-                    Ok(_) => Arc::new(database),
-                    Err(e) => todo!("{e}"),
-                },
-                Err(e) => todo!("{e}"),
-            }
-        };
+        let database = Arc::new(Database::new());
 
         // Init components
         let tab = Arc::new(Tab::new(
-            profile_database_connection,
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
             action_tab_page_navigation_history_forward,
@@ -162,5 +138,21 @@ impl Window {
 
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        if let Err(e) = Tab::migrate(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Success
+        Ok(())
     }
 }
