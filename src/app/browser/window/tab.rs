@@ -1,28 +1,20 @@
 mod database;
-mod label;
-mod page;
+mod item;
 mod widget;
 
 use database::Database;
-use label::Label;
-use page::Page;
+use item::Item;
 use sqlite::Transaction;
 use widget::Widget;
 
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, GString},
+    glib::GString,
     prelude::{ActionExt, WidgetExt},
-    GestureClick, Notebook,
+    Notebook,
 };
 
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
-
-// Common struct for HashMap index
-pub struct TabItem {
-    label: Arc<Label>,
-    page: Arc<Page>,
-}
 
 // Main
 pub struct Tab {
@@ -33,7 +25,7 @@ pub struct Tab {
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
-    index: RefCell<HashMap<GString, Arc<TabItem>>>,
+    index: RefCell<HashMap<GString, Arc<Item>>>,
     // GTK
     widget: Arc<Widget>,
 }
@@ -96,17 +88,13 @@ impl Tab {
     pub fn append(
         &self,
         page_navigation_request_text: Option<GString>,
-        is_current_page: bool,
-    ) -> Arc<TabItem> {
-        // Generate unique ID for new page components
-        let id = uuid_string_random();
-
-        // Init new tab components
-        let label = Arc::new(Label::new(id.clone(), false));
-
-        let page = Arc::new(Page::new(
-            id.clone(),
+        is_initially_current: bool,
+    ) -> Arc<Item> {
+        // Init new tab item
+        let item = Arc::new(Item::new(
             page_navigation_request_text.clone(),
+            is_initially_current,
+            // Actions
             self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_history_back.clone(),
             self.action_tab_page_navigation_history_forward.clone(),
@@ -114,36 +102,15 @@ impl Tab {
             self.action_update.clone(),
         ));
 
-        // Init new tab item
-        let item = Arc::new(TabItem {
-            label: label.clone(),
-            page: page.clone(),
-        });
-
         // Register dynamically created tab components in the HashMap index
-        self.index.borrow_mut().insert(id.clone(), item.clone());
-
-        // Init additional label actions
-        let controller = GestureClick::new();
-
-        controller.connect_pressed({
-            let label = label.clone();
-            move |_, count, _, _| {
-                // double click
-                if count == 2 {
-                    label.pin(!label.is_pinned()); // toggle
-                }
-            }
-        });
-
-        label.gobject().add_controller(controller);
+        self.index.borrow_mut().insert(item.id(), item.clone());
 
         // Append new Notebook page
         self.widget
-            .append(label.gobject(), page.widget(), is_current_page, true);
+            .append(item.label(), item.page(), is_initially_current, true);
 
         if page_navigation_request_text.is_none() {
-            page.navigation_request_grab_focus();
+            item.page_navigation_request_grab_focus(); // @TODO
         }
 
         item
@@ -163,7 +130,7 @@ impl Tab {
     pub fn pin(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.label.pin(!item.label.is_pinned()); // toggle
+                item.pin(); // toggle
             }
         }
     }
@@ -171,7 +138,7 @@ impl Tab {
     pub fn page_navigation_base(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page.navigation_base();
+                item.page_navigation_base();
             }
         }
     }
@@ -179,7 +146,7 @@ impl Tab {
     pub fn page_navigation_history_back(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page.navigation_history_back();
+                item.page_navigation_history_back();
             }
         }
     }
@@ -187,7 +154,7 @@ impl Tab {
     pub fn page_navigation_history_forward(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page.navigation_history_forward();
+                item.page_navigation_history_forward();
             }
         }
     }
@@ -195,7 +162,7 @@ impl Tab {
     pub fn page_navigation_reload(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page.navigation_reload();
+                item.page_navigation_reload();
             }
         }
     }
@@ -203,12 +170,7 @@ impl Tab {
     pub fn update(&self) {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page.update();
-                if let Some(title) = item.page.title() {
-                    item.label.update(Some(&title));
-                } else {
-                    item.label.update(None);
-                }
+                item.update();
             }
         }
     }
@@ -225,10 +187,9 @@ impl Tab {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
-                                if let Err(e) = item.label.clean(transaction, &record.id) {
+                                if let Err(e) = item.clean(transaction, &record.id) {
                                     return Err(e.to_string());
                                 }
-                                // @TODO item.page.clean(transaction, &record.id);
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -249,12 +210,31 @@ impl Tab {
         match Database::records(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    let item = self.append(None, record.is_current);
-                    // Delegate restore action to childs
-                    if let Err(e) = item.label.restore(transaction, &record.id) {
-                        return Err(e.to_string());
+                    match Item::restore(
+                        transaction,
+                        &record.id,
+                        self.action_tab_page_navigation_base.clone(),
+                        self.action_tab_page_navigation_history_back.clone(),
+                        self.action_tab_page_navigation_history_forward.clone(),
+                        self.action_tab_page_navigation_reload.clone(),
+                        self.action_update.clone(),
+                    ) {
+                        Ok(items) => {
+                            for item in items {
+                                // Register dynamically created tab item in the HashMap index
+                                self.index.borrow_mut().insert(item.id(), item.clone());
+
+                                // Append new Notebook page
+                                self.widget.append(
+                                    item.label(),
+                                    item.page(),
+                                    item.is_initially_current(),
+                                    true,
+                                );
+                            }
+                        }
+                        Err(e) => return Err(e.to_string()),
                     }
-                    // item.page.restore(transaction, record.id);
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -268,32 +248,30 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        let mut page_number = 0;
+        match Database::add(transaction, app_browser_window_id) {
+            Ok(_) => {
+                // Delegate save action to childs
+                let id = Database::last_insert_id(transaction);
 
-        for (_, item) in self.index.borrow().iter() {
-            match Database::add(
-                transaction,
-                app_browser_window_id,
-                &match self.widget.gobject().current_page() {
-                    Some(number) => number == page_number,
-                    None => false,
-                },
-            ) {
-                Ok(_) => {
-                    // Delegate save action to childs
-                    let id = Database::last_insert_id(transaction);
+                // Read HashMap index collected
+                let mut page_number = 0;
 
-                    if let Err(e) = item.label.save(transaction, &id) {
+                for (_, item) in self.index.borrow().iter() {
+                    if let Err(e) = item.save(
+                        transaction,
+                        &id,
+                        &match self.widget.gobject().current_page() {
+                            Some(number) => number == page_number,
+                            None => false,
+                        },
+                    ) {
                         return Err(e.to_string());
                     }
 
-                    // @TODO
-                    // item.page.save()
+                    page_number += 1;
                 }
-                Err(e) => return Err(e.to_string()),
             }
-
-            page_number += 1;
+            Err(e) => return Err(e.to_string()),
         }
 
         Ok(())
@@ -303,7 +281,7 @@ impl Tab {
     pub fn page_title(&self) -> Option<GString> {
         if let Some(id) = self.widget.current_name() {
             if let Some(item) = self.index.borrow().get(&id) {
-                return item.page.title();
+                return item.page_title();
             }
         }
         None
@@ -313,7 +291,7 @@ impl Tab {
         if let Some(id) = self.widget.current_name() {
             // Get page by widget ID
             if let Some(item) = self.index.borrow().get(&id) {
-                return item.page.description();
+                return item.page_description();
             }
         }
         None
@@ -331,7 +309,7 @@ impl Tab {
         }
 
         // Delegate migration to childs
-        if let Err(e) = Label::migrate(&tx) {
+        if let Err(e) = Item::migrate(&tx) {
             return Err(e.to_string());
         }
 

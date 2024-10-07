@@ -2,7 +2,7 @@ use sqlite::{Error, Transaction};
 
 pub struct Table {
     pub id: i64,
-    // pub app_browser_window_tab_id: i64, not in use
+    // pub app_browser_window_tab_item_id: i64, not in use
     pub is_pinned: bool,
 }
 
@@ -13,10 +13,10 @@ pub struct Database {
 impl Database {
     pub fn init(tx: &Transaction) -> Result<usize, Error> {
         tx.execute(
-            "CREATE TABLE IF NOT EXISTS `app_browser_window_tab_label`
+            "CREATE TABLE IF NOT EXISTS `app_browser_window_tab_item_label`
             (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `app_browser_window_tab_id` INTEGER NOT NULL,
+                `app_browser_window_tab_item_id` INTEGER NOT NULL,
                 `is_pinned` INTEGER NOT NULL
             )",
             [],
@@ -25,30 +25,33 @@ impl Database {
 
     pub fn add(
         tx: &Transaction,
-        app_browser_window_tab_id: &i64,
+        app_browser_window_tab_item_id: &i64,
         is_pinned: &bool,
     ) -> Result<usize, Error> {
         tx.execute(
-            "INSERT INTO `app_browser_window_tab_label` (
-                `app_browser_window_tab_id`,
+            "INSERT INTO `app_browser_window_tab_item_label` (
+                `app_browser_window_tab_item_id`,
                 `is_pinned`
             ) VALUES (?,?)",
-            [app_browser_window_tab_id, &(*is_pinned as i64)],
+            [app_browser_window_tab_item_id, &(*is_pinned as i64)],
         )
     }
 
-    pub fn records(tx: &Transaction, app_browser_window_tab_id: &i64) -> Result<Vec<Table>, Error> {
+    pub fn records(
+        tx: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<Vec<Table>, Error> {
         let mut stmt = tx.prepare(
             "SELECT `id`,
-                    `app_browser_window_tab_id`,
-                    `is_pinned` FROM  `app_browser_window_tab_label`
-                                WHERE `app_browser_window_tab_id` = ?",
+                    `app_browser_window_tab_item_id`,
+                    `is_pinned` FROM  `app_browser_window_tab_item_label`
+                                WHERE `app_browser_window_tab_item_id` = ?",
         )?;
 
-        let result = stmt.query_map([app_browser_window_tab_id], |row| {
+        let result = stmt.query_map([app_browser_window_tab_item_id], |row| {
             Ok(Table {
                 id: row.get(0)?,
-                // app_browser_window_tab_id: row.get(1)?, not in use
+                // app_browser_window_tab_item_id: row.get(1)?, not in use
                 is_pinned: row.get(2)?,
             })
         })?;
@@ -65,7 +68,7 @@ impl Database {
 
     pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
         tx.execute(
-            "DELETE FROM `app_browser_window_tab_label` WHERE `id` = ?",
+            "DELETE FROM `app_browser_window_tab_item_label` WHERE `id` = ?",
             [id],
         )
     }
