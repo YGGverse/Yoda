@@ -48,7 +48,7 @@ Guide and protocol draft
     * implementable `struct` is public, where it members - private
   * contain main `struct` implementation:
     * at least one constructor that must:
-      * have common for application name: `new` (for widget) or/and `init` (for database)
+      * have common for application name: `new`
       * return unwrapped (except `Option`, `Result`), activated new `Self` object
       * grant ownership for new `Self` object created
     * public `activate` action if the new object can not be activated on construct
