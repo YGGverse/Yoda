@@ -272,7 +272,7 @@ impl Tab {
     pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
         let mut page_number = 0;
 
-        for (_, _) in self.index.take().iter() {
+        for (_, _) in self.index.borrow().iter() {
             match self.database.add(
                 tx,
                 app_browser_window_id,
