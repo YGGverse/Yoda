@@ -213,46 +213,66 @@ impl Tab {
         }
     }
 
-    pub fn clean(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        match Database::records(tx, app_browser_window_id) {
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(tx, &record.id) {
+                    match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
-                                item.label.clean(tx, &record.id);
-                                // @TODO item.page.clean(tx, &record.id);
+                                if let Err(e) = item.label.clean(transaction, &record.id) {
+                                    return Err(e.to_string());
+                                }
+                                // @TODO item.page.clean(transaction, &record.id);
                             }
                         }
-                        Err(e) => todo!("{e}"),
+                        Err(e) => return Err(e.to_string()),
                     }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn restore(&self, tx: &Transaction, app_browser_window_id: &i64) {
-        match Database::records(tx, app_browser_window_id) {
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
                     let item = self.append(None, record.is_current);
                     // Delegate restore action to childs
-                    item.label.restore(tx, &record.id);
-                    // item.page.restore(tx, record.id);
+                    if let Err(e) = item.label.restore(transaction, &record.id) {
+                        return Err(e.to_string());
+                    }
+                    // item.page.restore(transaction, record.id);
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_id: &i64,
+    ) -> Result<(), String> {
         let mut page_number = 0;
 
         for (_, item) in self.index.borrow().iter() {
             match Database::add(
-                tx,
+                transaction,
                 app_browser_window_id,
                 &match self.widget.gobject().current_page() {
                     Some(number) => number == page_number,
@@ -261,18 +281,22 @@ impl Tab {
             ) {
                 Ok(_) => {
                     // Delegate save action to childs
-                    let id = Database::last_insert_id(tx);
+                    let id = Database::last_insert_id(transaction);
 
-                    item.label.save(tx, &id);
+                    if let Err(e) = item.label.save(transaction, &id) {
+                        return Err(e.to_string());
+                    }
 
                     // @TODO
                     // item.page.save()
                 }
-                Err(e) => todo!("{e}"),
+                Err(e) => return Err(e.to_string()),
             }
 
             page_number += 1;
         }
+
+        Ok(())
     }
 
     // Getters

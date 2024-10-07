@@ -191,54 +191,84 @@ impl Browser {
     }
 
     // Actions
-    pub fn clean(&self, tx: &Transaction, app_id: &i64) {
-        match Database::records(tx, app_id) {
+    pub fn clean(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(tx, &record.id) {
+                    match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            // @TODO
-                            // self.header.clean(record.id);
-                            self.window.clean(tx, &record.id);
-                            self.widget.clean(tx, &record.id);
+                            if let Err(e) = self.window.clean(transaction, &record.id) {
+                                return Err(e.to_string());
+                            }
+
+                            if let Err(e) = self.widget.clean(transaction, &record.id) {
+                                return Err(e.to_string());
+                            }
+
+                            /* @TODO
+                            if let Err(e) = self.header.clean(transaction, &record.id) {
+                                return Err(e.to_string());
+                            } */
                         }
-                        Err(e) => todo!("{e}"),
+                        Err(e) => return Err(e.to_string()),
                     }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn restore(&self, tx: &Transaction, app_id: &i64) {
-        match Database::records(tx, app_id) {
+    pub fn restore(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    // @TODO
-                    // self.header.restore(record.id);
-                    self.window.restore(tx, &record.id);
-                    self.widget.restore(tx, &record.id);
+                    if let Err(e) = self.widget.restore(transaction, &record.id) {
+                        return Err(e.to_string());
+                    }
+
+                    if let Err(e) = self.window.restore(transaction, &record.id) {
+                        return Err(e.to_string());
+                    }
+
+                    /* @TODO
+                    if let Err(e) = self.header.restore(transaction, &record.id) {
+                        return Err(e.to_string());
+                    } */
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn save(&self, tx: &Transaction, app_id: &i64) {
-        match Database::add(tx, app_id) {
+    pub fn save(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+        match Database::add(transaction, app_id) {
             Ok(_) => {
-                // Delegate save action to childs
-                let id = Database::last_insert_id(tx);
+                let id = Database::last_insert_id(transaction);
 
-                // @TODO
-                // self.header.save(id);
-                self.window.save(tx, &id);
-                self.widget.save(tx, &id);
+                // Delegate save action to childs
+                if let Err(e) = self.widget.save(transaction, &id) {
+                    return Err(e.to_string());
+                }
+
+                if let Err(e) = self.window.save(transaction, &id) {
+                    return Err(e.to_string());
+                }
+
+                /* @TODO
+                if let Err(e) = self.header.save(transaction, &id) {
+                    return Err(e.to_string());
+                } */
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
     // Getters

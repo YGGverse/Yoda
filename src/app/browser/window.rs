@@ -80,43 +80,58 @@ impl Window {
         self.tab.update();
     }
 
-    pub fn clean(&self, tx: &Transaction, app_browser_id: &i64) {
-        match Database::records(tx, app_browser_id) {
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(tx, &record.id) {
+                    match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            self.tab.clean(tx, &record.id);
+                            if let Err(e) = self.tab.clean(transaction, &record.id) {
+                                return Err(e.to_string());
+                            }
                         }
-                        Err(e) => todo!("{e}"),
+                        Err(e) => return Err(e.to_string()),
                     }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn restore(&self, tx: &Transaction, app_browser_id: &i64) {
-        match Database::records(tx, app_browser_id) {
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    self.tab.restore(tx, &record.id);
+                    if let Err(e) = self.tab.restore(transaction, &record.id) {
+                        return Err(e.to_string());
+                    }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn save(&self, tx: &Transaction, app_browser_id: &i64) {
-        match Database::add(tx, app_browser_id) {
+    pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+        match Database::add(transaction, app_browser_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                self.tab.save(tx, &Database::last_insert_id(tx));
+                if let Err(e) = self
+                    .tab
+                    .save(transaction, &Database::last_insert_id(transaction))
+                {
+                    return Err(e.to_string());
+                }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
     // Getters

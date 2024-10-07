@@ -31,25 +31,27 @@ impl Widget {
     }
 
     // Actions
-    pub fn clean(&self, tx: &Transaction, app_browser_id: &i64) {
-        match Database::records(tx, app_browser_id) {
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(tx, &record.id) {
+                    match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
                         }
-                        Err(e) => todo!("{e}"),
+                        Err(e) => return Err(e.to_string()),
                     }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn restore(&self, tx: &Transaction, app_browser_id: &i64) {
-        match Database::records(tx, app_browser_id) {
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+        match Database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Restore widget
@@ -61,13 +63,15 @@ impl Widget {
                     // nothing yet..
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn save(&self, tx: &Transaction, app_browser_id: &i64) {
+    pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
         match Database::add(
-            tx,
+            transaction,
             app_browser_id,
             &self.gobject.default_width(),
             &self.gobject.default_height(),
@@ -75,11 +79,13 @@ impl Widget {
         ) {
             Ok(_) => {
                 // Delegate save action to childs
-                // let id = self.database.last_insert_id(tx);
+                // let id = self.database.last_insert_id(transaction);
                 // nothing yet..
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
     // Getters

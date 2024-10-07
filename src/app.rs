@@ -120,7 +120,11 @@ impl App {
                                 match Database::records(&transaction) {
                                     Ok(records) => {
                                         for record in records {
-                                            browser.restore(&transaction, &record.id);
+                                            if let Err(e) =
+                                                browser.restore(&transaction, &record.id)
+                                            {
+                                                todo!("{e}")
+                                            }
                                         }
                                     }
                                     Err(e) => todo!("{e}"),
@@ -158,7 +162,11 @@ impl App {
                                             match Database::delete(&transaction, &record.id) {
                                                 Ok(_) => {
                                                     // Delegate clean action to childs
-                                                    browser.clean(&transaction, &record.id);
+                                                    if let Err(e) =
+                                                        browser.clean(&transaction, &record.id)
+                                                    {
+                                                        todo!("{e}")
+                                                    }
                                                 }
                                                 Err(e) => todo!("{e}"),
                                             }
@@ -168,10 +176,12 @@ impl App {
                                         match Database::add(&transaction) {
                                             Ok(_) => {
                                                 // Delegate save action to childs
-                                                browser.save(
+                                                if let Err(e) = browser.save(
                                                     &transaction,
                                                     &Database::last_insert_id(&transaction),
-                                                );
+                                                ) {
+                                                    todo!("{e}")
+                                                }
                                             }
                                             Err(e) => todo!("{e}"),
                                         }

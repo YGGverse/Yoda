@@ -35,25 +35,35 @@ impl Label {
     }
 
     // Actions
-    pub fn clean(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match Database::records(tx, app_browser_window_tab_id) {
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(tx, &record.id) {
+                    match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
                         }
-                        Err(e) => todo!("{e}"),
+                        Err(e) => return Err(e.to_string()),
                     }
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn restore(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match Database::records(tx, app_browser_window_tab_id) {
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     self.pin(record.is_pinned);
@@ -62,18 +72,26 @@ impl Label {
                     // nothing yet..
                 }
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
-    pub fn save(&self, tx: &Transaction, app_browser_window_tab_id: &i64) {
-        match Database::add(tx, app_browser_window_tab_id, &self.is_pinned()) {
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_id: &i64,
+    ) -> Result<(), String> {
+        match Database::add(transaction, app_browser_window_tab_id, &self.is_pinned()) {
             Ok(_) => {
                 // Delegate save action to childs
                 // nothing yet..
             }
-            Err(e) => todo!("{e}"),
+            Err(e) => return Err(e.to_string()),
         }
+
+        Ok(())
     }
 
     pub fn update(&self, title: Option<&GString>) {
