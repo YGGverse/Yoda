@@ -107,7 +107,7 @@ impl Tab {
 
         // Append new Notebook page
         self.widget
-            .append(item.label(), item.page(), is_initially_current, true);
+            .append(item.label(), item.page(), item.is_initially_current());
 
         if page_navigation_request_text.is_none() {
             item.page_navigation_request_grab_focus(); // @TODO
@@ -229,7 +229,6 @@ impl Tab {
                                     item.label(),
                                     item.page(),
                                     item.is_initially_current(),
-                                    true,
                                 );
                             }
                         }

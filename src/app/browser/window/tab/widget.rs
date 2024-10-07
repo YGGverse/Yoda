@@ -13,18 +13,12 @@ impl Widget {
     }
 
     // Actions
-    pub fn append(
-        &self,
-        label: &Box,
-        page: &Box,
-        is_current_page: bool,
-        is_reorderable: bool,
-    ) -> u32 {
+    pub fn append(&self, label: &Box, page: &Box, is_current_page: bool) -> u32 {
         // Append new Notebook page
         let page_number = self.gobject.append_page(page, Some(label));
 
         // Additional setup for Notebook tab created
-        self.gobject.set_tab_reorderable(page, is_reorderable);
+        self.gobject.set_tab_reorderable(page, true);
 
         if is_current_page {
             self.gobject.set_current_page(Some(page_number));
