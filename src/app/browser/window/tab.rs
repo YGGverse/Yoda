@@ -23,14 +23,14 @@ use std::{
 };
 
 // Common struct for HashMap index
-struct TabItem {
+pub struct TabItem {
     label: Arc<Label>,
     page: Arc<Page>,
 }
 
 // Main
 pub struct Tab {
-    // Extras
+    profile_database_connection: Arc<RwLock<Connection>>,
     database: Arc<Database>,
     // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
@@ -39,7 +39,7 @@ pub struct Tab {
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
-    index: RefCell<HashMap<GString, TabItem>>,
+    index: RefCell<HashMap<GString, Arc<TabItem>>>,
     // GTK
     widget: Arc<Widget>,
 }
@@ -47,7 +47,6 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new(
-        // Extras
         profile_database_connection: Arc<RwLock<Connection>>,
         // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
@@ -88,6 +87,7 @@ impl Tab {
 
         // Return non activated struct
         Self {
+            profile_database_connection,
             database,
             // Define action links
             action_tab_page_navigation_base,
@@ -126,12 +126,21 @@ impl Tab {
         });
     }
 
-    pub fn append(&self, page_navigation_request_text: Option<GString>, is_current_page: bool) {
+    pub fn append(
+        &self,
+        page_navigation_request_text: Option<GString>,
+        is_current_page: bool,
+    ) -> Arc<TabItem> {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
         // Init new tab components
-        let label = Arc::new(Label::new(id.clone(), false));
+        let label = Arc::new(Label::new(
+            self.profile_database_connection.clone(),
+            id.clone(),
+            false,
+        ));
+
         let page = Arc::new(Page::new(
             id.clone(),
             page_navigation_request_text.clone(),
@@ -142,14 +151,14 @@ impl Tab {
             self.action_update.clone(),
         ));
 
+        // Init new tab item
+        let item = Arc::new(TabItem {
+            label: label.clone(),
+            page: page.clone(),
+        });
+
         // Register dynamically created tab components in the HashMap index
-        self.index.borrow_mut().insert(
-            id.clone(),
-            TabItem {
-                label: label.clone(),
-                page: page.clone(),
-            },
-        );
+        self.index.borrow_mut().insert(id.clone(), item.clone());
 
         // Init additional label actions
         let controller = GestureClick::new();
@@ -173,6 +182,8 @@ impl Tab {
         if page_navigation_request_text.is_none() {
             page.navigation_request_grab_focus();
         }
+
+        item
     }
 
     // Close active tab
@@ -246,7 +257,10 @@ impl Tab {
                     match self.database.delete(tx, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            // nothing yet..
+                            for (_, item) in self.index.borrow().iter() {
+                                item.label.clean(tx, &record.id);
+                                // @TODO item.page.clean(tx, &record.id);
+                            }
                         }
                         Err(e) => todo!("{e}"),
                     }
@@ -260,9 +274,10 @@ impl Tab {
         match self.database.records(tx, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    self.append(None, record.is_current);
+                    let item = self.append(None, record.is_current);
                     // Delegate restore action to childs
-                    // nothing yet..
+                    item.label.restore(tx, &record.id);
+                    // item.page.restore(tx, record.id);
                 }
             }
             Err(e) => todo!("{e}"),
@@ -272,7 +287,7 @@ impl Tab {
     pub fn save(&self, tx: &Transaction, app_browser_window_id: &i64) {
         let mut page_number = 0;
 
-        for (_, _) in self.index.borrow().iter() {
+        for (_, item) in self.index.borrow().iter() {
             match self.database.add(
                 tx,
                 app_browser_window_id,
@@ -283,10 +298,11 @@ impl Tab {
             ) {
                 Ok(_) => {
                     // Delegate save action to childs
-                    // let id = self.database.last_insert_id(tx);
+                    let id = self.database.last_insert_id(tx);
+
+                    item.label.save(tx, &id);
 
                     // @TODO
-                    // item.label.save()
                     // item.page.save()
                 }
                 Err(e) => todo!("{e}"),
