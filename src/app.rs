@@ -249,7 +249,7 @@ impl App {
     }
 
     // Tools
-    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    fn migrate(tx: &Transaction) -> Result<(), String> {
         // Migrate self components
         if let Err(e) = Database::init(&tx) {
             return Err(e.to_string());
