@@ -9,7 +9,7 @@ use sqlite::Transaction;
 use title::Title;
 use widget::Widget;
 
-use gtk::{glib::GString, prelude::WidgetExt, Box, GestureClick};
+use gtk::{gdk, glib::GString, prelude::WidgetExt, Box, GestureClick};
 use std::sync::{Arc, Mutex};
 
 pub struct Label {
@@ -45,15 +45,31 @@ impl Label {
             let widget = widget.clone();
             let label = label.clone();
             move |_| {
-                // Init GestureClick listener
-                let controller = GestureClick::new();
+                // Init primary button listener
+                let primary_button_controller = GestureClick::new();
 
-                // Listen for double click
-                controller.connect_pressed({
+                // Listen for double primary button click
+                primary_button_controller.connect_pressed({
                     let label = label.clone();
                     move |_, count, _, _| {
                         if count == 2 {
                             label.pin(!label.is_pinned());
+                        }
+                    }
+                });
+
+                // Init middle button listener
+                let middle_button_controller =
+                    GestureClick::builder().button(gdk::BUTTON_MIDDLE).build();
+
+                // Listen for single middle button click
+                middle_button_controller.connect_pressed({
+                    let label = label.clone();
+                    move |_, _, _, _| {
+                        if label.is_pinned() {
+                            label.pin(false); // unpin
+                        } else {
+                            // @TODO close
                         }
                     }
                 });
@@ -63,11 +79,13 @@ impl Label {
                 match widget.gobject().parent() {
                     // @TODO check for GtkGizmo type?
                     Some(parent) => {
-                        parent.add_controller(controller);
+                        parent.add_controller(primary_button_controller);
+                        parent.add_controller(middle_button_controller);
                     }
                     // Assign controller to the current widget, drop notice
                     None => {
-                        widget.gobject().add_controller(controller);
+                        widget.gobject().add_controller(primary_button_controller);
+                        widget.gobject().add_controller(middle_button_controller);
                         println!("Could not assign action to destination, please report");
                         // @TODO
                     }
