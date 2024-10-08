@@ -29,7 +29,7 @@ pub struct Item {
 
 impl Item {
     // Construct
-    pub fn new(
+    pub fn new_arc(
         page_navigation_request_text: Option<GString>,
         is_initially_current: bool,
         // Actions
@@ -142,7 +142,7 @@ impl Item {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
-                    let item = Item::new(
+                    let item = Item::new_arc(
                         None,
                         record.is_initially_current,
                         // Actions

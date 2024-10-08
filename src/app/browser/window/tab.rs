@@ -91,7 +91,7 @@ impl Tab {
         is_initially_current: bool,
     ) -> Arc<Item> {
         // Init new tab item
-        let item = Item::new(
+        let item = Item::new_arc(
             page_navigation_request_text.clone(),
             is_initially_current,
             // Actions
