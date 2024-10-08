@@ -256,9 +256,7 @@ impl App {
         }
 
         // Delegate migration to childs
-        if let Err(e) = Browser::migrate(&tx) {
-            return Err(e.to_string());
-        }
+        Browser::migrate(&tx)?;
 
         // Success
         Ok(())

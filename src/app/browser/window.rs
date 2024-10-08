@@ -87,9 +87,7 @@ impl Window {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            if let Err(e) = self.tab.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            }
+                            self.tab.clean(transaction, &record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -106,9 +104,7 @@ impl Window {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    if let Err(e) = self.tab.restore(transaction, &record.id) {
-                        return Err(e.to_string());
-                    }
+                    self.tab.restore(transaction, &record.id)?;
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -155,9 +151,7 @@ impl Window {
         }
 
         // Delegate migration to childs
-        if let Err(e) = Tab::migrate(&tx) {
-            return Err(e.to_string());
-        }
+        Tab::migrate(&tx)?;
 
         // Success
         Ok(())

@@ -198,18 +198,11 @@ impl Browser {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            if let Err(e) = self.window.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            }
-
-                            if let Err(e) = self.widget.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            }
+                            self.window.clean(transaction, &record.id)?;
+                            self.widget.clean(transaction, &record.id)?;
 
                             /* @TODO
-                            if let Err(e) = self.header.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            } */
+                            self.header.clean(transaction, &record.id)?; */
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -226,18 +219,11 @@ impl Browser {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    if let Err(e) = self.widget.restore(transaction, &record.id) {
-                        return Err(e.to_string());
-                    }
-
-                    if let Err(e) = self.window.restore(transaction, &record.id) {
-                        return Err(e.to_string());
-                    }
+                    self.widget.restore(transaction, &record.id)?;
+                    self.window.restore(transaction, &record.id)?;
 
                     /* @TODO
-                    if let Err(e) = self.header.restore(transaction, &record.id) {
-                        return Err(e.to_string());
-                    } */
+                    self.header.restore(transaction, &record.id)?; */
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -252,18 +238,11 @@ impl Browser {
                 let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                if let Err(e) = self.widget.save(transaction, &id) {
-                    return Err(e.to_string());
-                }
-
-                if let Err(e) = self.window.save(transaction, &id) {
-                    return Err(e.to_string());
-                }
+                self.widget.save(transaction, &id)?;
+                self.window.save(transaction, &id)?;
 
                 /* @TODO
-                if let Err(e) = self.header.save(transaction, &id) {
-                    return Err(e.to_string());
-                } */
+                self.header.save(transaction, &id)?; */
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -285,17 +264,9 @@ impl Browser {
 
         // Delegate migration to childs
         /* @TODO
-        if let Err(e) = Header::migrate(&tx) {
-            return Err(e.to_string());
-        } */
-
-        if let Err(e) = Window::migrate(&tx) {
-            return Err(e.to_string());
-        }
-
-        if let Err(e) = Widget::migrate(&tx) {
-            return Err(e.to_string());
-        }
+        Header::migrate(&tx)?; */
+        Window::migrate(&tx)?;
+        Widget::migrate(&tx)?;
 
         // Success
         Ok(())

@@ -187,9 +187,7 @@ impl Tab {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
-                                if let Err(e) = item.clean(transaction, &record.id) {
-                                    return Err(e.to_string());
-                                }
+                                item.clean(transaction, &record.id)?
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -256,16 +254,14 @@ impl Tab {
                 let mut page_number = 0;
 
                 for (_, item) in self.index.borrow().iter() {
-                    if let Err(e) = item.save(
+                    item.save(
                         transaction,
                         &id,
                         &match self.widget.gobject().current_page() {
                             Some(number) => number == page_number,
                             None => false,
                         },
-                    ) {
-                        return Err(e.to_string());
-                    }
+                    )?;
 
                     page_number += 1;
                 }
@@ -308,14 +304,10 @@ impl Tab {
         }
 
         // Delegate migration to childs
-        if let Err(e) = Item::migrate(&tx) {
-            return Err(e.to_string());
-        }
+        Item::migrate(&tx)?;
 
         /* @TODO
-        if let Err(e) = Page::migrate(&tx) {
-            return Err(e.to_string());
-        } */
+        Page::migrate(&tx)?; */
 
         // Success
         Ok(())

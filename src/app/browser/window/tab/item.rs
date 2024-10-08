@@ -109,14 +109,10 @@ impl Item {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            if let Err(e) = self.label.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            }
+                            self.label.clean(transaction, &record.id)?;
 
                             /* @TODO
-                            if let Err(e) = self.page.clean(transaction, &record.id) {
-                                return Err(e.to_string());
-                            } */
+                            self.page.clean(transaction, &record.id)?;*/
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -158,9 +154,7 @@ impl Item {
                     ));
 
                     // Delegate restore action to the item childs
-                    if let Err(e) = item.label.restore(transaction, &record.id) {
-                        return Err(e.to_string());
-                    }
+                    item.label.restore(transaction, &record.id)?;
 
                     // Result
                     items.push(item);
@@ -183,14 +177,10 @@ impl Item {
                 let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                if let Err(e) = self.label.save(transaction, &id) {
-                    return Err(e.to_string());
-                }
+                self.label.save(transaction, &id)?;
 
                 /* @TODO
-                if let Err(e) = self.page.save(transaction, &id) {
-                    return Err(e.to_string());
-                } */
+                self.page.save(transaction, &id)?; */
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -231,14 +221,10 @@ impl Item {
         }
 
         // Delegate migration to childs
-        if let Err(e) = Label::migrate(&tx) {
-            return Err(e.to_string());
-        }
+        Label::migrate(&tx)?;
 
         /* @TODO
-        if let Err(e) = Page::migrate(&tx) {
-            return Err(e.to_string());
-        } */
+        Page::migrate(&tx)? */
 
         // Success
         Ok(())
