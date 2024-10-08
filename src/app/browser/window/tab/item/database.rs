@@ -17,6 +17,7 @@ impl Database {
             (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `app_browser_window_tab_id` INTEGER NOT NULL,
+                `page_number` INTEGER NOT NULL,
                 `is_initially_current` INTEGER NOT NULL
             )",
             [],
@@ -26,14 +27,20 @@ impl Database {
     pub fn add(
         tx: &Transaction,
         app_browser_window_tab_id: &i64,
+        page_number: &u32,
         is_initially_current: &bool,
     ) -> Result<usize, Error> {
         tx.execute(
             "INSERT INTO `app_browser_window_tab_item` (
                 `app_browser_window_tab_id`,
+                `page_number`,
                 `is_initially_current`
-            ) VALUES (?, ?)",
-            [app_browser_window_tab_id, &(*is_initially_current as i64)],
+            ) VALUES (?, ?, ?)",
+            [
+                app_browser_window_tab_id,
+                &(*page_number as i64),
+                &(*is_initially_current as i64),
+            ],
         )
     }
 
@@ -42,7 +49,8 @@ impl Database {
             "SELECT `id`,
                     `app_browser_window_tab_id`,
                     `is_initially_current` FROM  `app_browser_window_tab_item`
-                                           WHERE `app_browser_window_tab_id` = ?",
+                                           WHERE `app_browser_window_tab_id` = ?
+                                           ORDER BY `page_number` ASC", // just order by, no store in struct wanted
         )?;
 
         let result = stmt.query_map([app_browser_window_tab_id], |row| {

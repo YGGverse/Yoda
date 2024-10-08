@@ -250,22 +250,24 @@ impl Tab {
                 // Delegate save action to childs
                 let id = Database::last_insert_id(transaction);
 
-                // Read HashMap index collected
-                let mut page_number = 0;
-
-                // @TODO incorrect order
-                for (_, item) in self.index.borrow().iter() {
-                    item.save(
-                        transaction,
-                        &id,
-                        &match self.widget.gobject().current_page() {
-                            Some(number) => number == page_number,
-                            None => false,
-                        },
-                    )?;
-
-                    page_number += 1;
-                }
+                // At least one active page wanted to continue
+                if let Some(current_page) = self.widget.gobject().current_page() {
+                    // Read collected HashMap index
+                    for (_, item) in self.index.borrow().iter() {
+                        // Get page number as HashMap does not keep order, no page_reorder listener also
+                        match self.widget.gobject().page_num(item.page()) {
+                            Some(page_number) => {
+                                item.save(
+                                    transaction,
+                                    &id,
+                                    &page_number,
+                                    &(current_page == page_number),
+                                )?;
+                            }
+                            None => panic!(), // page number expected at this point @TODO Err?
+                        }
+                    }
+                };
             }
             Err(e) => return Err(e.to_string()),
         }

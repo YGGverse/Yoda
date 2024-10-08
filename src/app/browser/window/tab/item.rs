@@ -170,9 +170,15 @@ impl Item {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
+        page_number: &u32,
         is_initially_current: &bool,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_tab_id, is_initially_current) {
+        match Database::add(
+            transaction,
+            app_browser_window_tab_id,
+            page_number,
+            is_initially_current,
+        ) {
             Ok(_) => {
                 let id = Database::last_insert_id(transaction);
 
