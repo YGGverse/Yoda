@@ -73,9 +73,14 @@ Guide and protocol draft
 
 ### Contribution
 
-* before commit, make sure:
+* Before commit, please make sure:
   * new branch created for every new PR `git checkout -b 'contribution-name'`
   * new code follows common [rustfmt](https://rust-lang.github.io/rustfmt/) style `cargo fmt --check`
+
+### Releases
+
+* Package version should be increased immediately after release on [crates.io](https://crates.io/crates/yoda) and before apply any change in repository
+* Until project in development, profile data stored in separated sub-directory, for every new release version
 
 ## See also
 
