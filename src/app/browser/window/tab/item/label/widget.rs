@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use gtk::{
     glib::GString, prelude::BoxExt, prelude::WidgetExt, Align, Box, Image, Label, Orientation,
 };
@@ -8,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(name: GString, pin: &Image, title: &Label) -> Self {
+    pub fn new(name: GString, pin: &Image, title: &Label) -> Arc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
             .halign(Align::Center)
@@ -19,7 +21,7 @@ impl Widget {
         gobject.append(pin);
         gobject.append(title);
 
-        Self { gobject }
+        Arc::new(Self { gobject })
     }
 
     // Action

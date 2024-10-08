@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use gtk::{prelude::WidgetExt, Image};
 
 pub struct Pin {
@@ -6,13 +8,13 @@ pub struct Pin {
 
 impl Pin {
     // Construct
-    pub fn new(visible: bool) -> Pin {
+    pub fn new(visible: bool) -> Arc<Pin> {
         let gobject = Image::builder()
             .icon_name("view-pin-symbolic")
             .visible(visible)
             .build();
 
-        Self { gobject }
+        Arc::new(Self { gobject })
     }
 
     pub fn pin(&self, is_pinned: bool) {
@@ -20,10 +22,6 @@ impl Pin {
     }
 
     // Getters
-    pub fn is_pinned(&self) -> bool {
-        self.gobject.is_visible()
-    }
-
     pub fn gobject(&self) -> &Image {
         &self.gobject
     }

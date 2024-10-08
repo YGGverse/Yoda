@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use gtk::{glib::GString, pango::EllipsizeMode, prelude::WidgetExt, Label};
 
 const DEFAULT_LABEL_TEXT: &str = "New page";
@@ -8,15 +10,15 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> Arc<Self> {
+        Arc::new(Self {
             gobject: Label::builder()
                 .label(DEFAULT_LABEL_TEXT)
                 .ellipsize(EllipsizeMode::End)
                 .width_chars(16)
                 .single_line_mode(true)
                 .build(),
-        }
+        })
     }
 
     // Actions

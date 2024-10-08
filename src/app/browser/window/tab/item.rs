@@ -43,7 +43,7 @@ impl Item {
         let id = uuid_string_random();
 
         // Init components
-        let label = Arc::new(Label::new(id.clone(), false));
+        let label = Label::new(id.clone(), false);
 
         let page = Arc::new(Page::new(
             id.clone(),

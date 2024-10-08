@@ -49,7 +49,6 @@ Guide and protocol draft
   * contain main `struct` implementation:
     * at least one constructor that must:
       * have common for application name: `new`
-      * return unwrapped (except `Option`, `Result`), activated new `Self` object
       * grant ownership for new `Self` object created
     * public `activate` action if the new object can not be activated on construct
     * public `link` getter for GTK `widget` (parental composition)

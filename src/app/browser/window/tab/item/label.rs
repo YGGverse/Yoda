@@ -10,7 +10,7 @@ use title::Title;
 use widget::Widget;
 
 use gtk::{glib::GString, prelude::WidgetExt, Box, GestureClick};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 pub struct Label {
     // Components
@@ -18,39 +18,42 @@ pub struct Label {
     title: Arc<Title>,
     // GTK
     widget: Arc<Widget>,
+    // Extras
+    is_pinned: Mutex<bool>,
 }
 
 impl Label {
     // Construct
-    pub fn new(name: GString, is_pinned: bool) -> Label {
+    pub fn new(name: GString, is_pinned: bool) -> Arc<Self> {
         // Init components
-        let pin = Arc::new(Pin::new(is_pinned));
-        let title = Arc::new(Title::new());
+        let pin = Pin::new(is_pinned);
+        let title = Title::new();
+        let widget = Widget::new(name, pin.gobject(), title.gobject());
 
-        // Init GTK
-        let widget = Arc::new(Widget::new(name, pin.gobject(), title.gobject()));
+        // Init label struct
+        let label = Arc::new(Self {
+            pin: pin.clone(),
+            title: title.clone(),
+            widget: widget.clone(),
+            is_pinned: Mutex::new(is_pinned),
+        });
 
         // Init events:
 
         // Await for widget realize to continue this feature
         widget.gobject().connect_realize({
-            let pin = pin.clone();
-            let title = title.clone();
             let widget = widget.clone();
+            let label = label.clone();
             move |_| {
                 // Init GestureClick listener
                 let controller = GestureClick::new();
 
                 // Listen for double click
                 controller.connect_pressed({
-                    let pin = pin.clone();
-                    let title = title.clone();
+                    let label = label.clone();
                     move |_, count, _, _| {
                         if count == 2 {
-                            // Toggle pin @TODO use action?
-                            let is_pinned = !pin.is_pinned();
-                            pin.pin(is_pinned);
-                            title.pin(is_pinned);
+                            label.pin(!label.is_pinned());
                         }
                     }
                 });
@@ -73,7 +76,7 @@ impl Label {
         });
 
         // Result
-        Self { pin, title, widget }
+        label
     }
 
     // Actions
@@ -143,13 +146,17 @@ impl Label {
 
     // Setters
     pub fn pin(&self, is_pinned: bool) {
+        // Update Self
+        *self.is_pinned.lock().unwrap() = is_pinned;
+
+        // Update child components
         self.pin.pin(is_pinned);
         self.title.pin(is_pinned);
     }
 
     // Getters
     pub fn is_pinned(&self) -> bool {
-        self.pin.is_pinned() // @TODO
+        self.is_pinned.lock().unwrap().clone()
     }
 
     pub fn gobject(&self) -> &Box {
