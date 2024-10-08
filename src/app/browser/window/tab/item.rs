@@ -11,8 +11,7 @@ use sqlite::Transaction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, GString},
-    prelude::WidgetExt,
-    Box, GestureClick,
+    Box,
 };
 
 use std::sync::Arc;
@@ -55,21 +54,6 @@ impl Item {
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
-
-        // Init additional label actions @TODO move to Label?
-        let controller = GestureClick::new();
-
-        controller.connect_pressed({
-            let label = label.clone();
-            move |_, count, _, _| {
-                // double click
-                if count == 2 {
-                    label.pin(!label.is_pinned()); // toggle
-                }
-            }
-        });
-
-        label.gobject().add_controller(controller);
 
         // Return struct
         Self {
