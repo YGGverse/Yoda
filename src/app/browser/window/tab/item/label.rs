@@ -24,11 +24,11 @@ pub struct Label {
 
 impl Label {
     // Construct
-    pub fn new(name: GString, is_pinned: bool) -> Arc<Self> {
+    pub fn new_arc(name: GString, is_pinned: bool) -> Arc<Self> {
         // Init components
-        let pin = Pin::new(is_pinned);
-        let title = Title::new();
-        let widget = Widget::new(name, pin.gobject(), title.gobject());
+        let pin = Pin::new_arc(is_pinned);
+        let title = Title::new_arc();
+        let widget = Widget::new_arc(name, pin.gobject(), title.gobject());
 
         // Init label struct
         let label = Arc::new(Self {

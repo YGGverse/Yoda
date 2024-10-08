@@ -10,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(name: GString, pin: &Image, title: &Label) -> Arc<Self> {
+    pub fn new_arc(name: GString, pin: &Image, title: &Label) -> Arc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
             .halign(Align::Center)

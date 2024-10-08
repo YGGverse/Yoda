@@ -36,7 +36,7 @@ pub struct Page {
 
 impl Page {
     // Construct
-    pub fn new(
+    pub fn new_arc(
         name: GString,
         navigation_request_text: Option<GString>,
         action_tab_page_navigation_base: Arc<SimpleAction>,

@@ -10,7 +10,7 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new() -> Arc<Self> {
+    pub fn new_arc() -> Arc<Self> {
         Arc::new(Self {
             gobject: Label::builder()
                 .label(DEFAULT_LABEL_TEXT)

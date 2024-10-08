@@ -8,7 +8,7 @@ pub struct Pin {
 
 impl Pin {
     // Construct
-    pub fn new(visible: bool) -> Arc<Pin> {
+    pub fn new_arc(visible: bool) -> Arc<Pin> {
         let gobject = Image::builder()
             .icon_name("view-pin-symbolic")
             .visible(visible)

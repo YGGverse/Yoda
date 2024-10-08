@@ -43,9 +43,9 @@ impl Item {
         let id = uuid_string_random();
 
         // Init components
-        let label = Label::new(id.clone(), false);
+        let label = Label::new_arc(id.clone(), false);
 
-        let page = Page::new(
+        let page = Page::new_arc(
             id.clone(),
             page_navigation_request_text.clone(),
             action_tab_page_navigation_base.clone(),
