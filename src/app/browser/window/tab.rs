@@ -91,7 +91,7 @@ impl Tab {
         is_initially_current: bool,
     ) -> Arc<Item> {
         // Init new tab item
-        let item = Arc::new(Item::new(
+        let item = Item::new(
             page_navigation_request_text.clone(),
             is_initially_current,
             // Actions
@@ -100,7 +100,7 @@ impl Tab {
             self.action_tab_page_navigation_history_forward.clone(),
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
-        ));
+        );
 
         // Register dynamically created tab components in the HashMap index
         self.index.borrow_mut().insert(item.id(), item.clone());

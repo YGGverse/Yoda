@@ -38,14 +38,14 @@ impl Item {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
-    ) -> Self {
+    ) -> Arc<Self> {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
         // Init components
         let label = Label::new(id.clone(), false);
 
-        let page = Arc::new(Page::new(
+        let page = Page::new(
             id.clone(),
             page_navigation_request_text.clone(),
             action_tab_page_navigation_base.clone(),
@@ -53,15 +53,15 @@ impl Item {
             action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
-        ));
+        );
 
         // Return struct
-        Self {
+        Arc::new(Self {
             id,
             is_initially_current,
             label,
             page,
-        }
+        })
     }
 
     // Actions
@@ -142,7 +142,7 @@ impl Item {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
-                    let item = Arc::new(Item::new(
+                    let item = Item::new(
                         None,
                         record.is_initially_current,
                         // Actions
@@ -151,7 +151,7 @@ impl Item {
                         action_tab_page_navigation_history_forward.clone(),
                         action_tab_page_navigation_reload.clone(),
                         action_update.clone(),
-                    ));
+                    );
 
                     // Delegate restore action to the item childs
                     item.label.restore(transaction, &record.id)?;

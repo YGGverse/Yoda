@@ -44,7 +44,7 @@ impl Page {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
-    ) -> Page {
+    ) -> Arc<Self> {
         // Init actions
         let action_page_open = Arc::new(SimpleAction::new(
             "open",
@@ -102,7 +102,7 @@ impl Page {
         });
 
         // Return activated structure
-        Self {
+        Arc::new(Self {
             // GTK
             widget,
             // Actions
@@ -114,7 +114,7 @@ impl Page {
             navigation,
             // Extras
             meta,
-        }
+        })
     }
 
     // Actions
