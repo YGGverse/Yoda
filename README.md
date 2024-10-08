@@ -79,7 +79,7 @@ Guide and protocol draft
 
 ### Releases
 
-* Package version should be increased immediately after release on [crates.io](https://crates.io/crates/yoda) and before apply any change in repository
+* Package version in repository should be increased immediately after new release on [crates.io](https://crates.io/crates/yoda) and before apply new changes
 * Currently, profile data stored in separated sub-directory, for every new release version
 
 ## See also
