@@ -136,7 +136,7 @@ impl Browser {
                     None => GString::new(), // @TODO
                 };
 
-                header.update(Some(title.as_str()), Some(subtitle.as_str()));
+                header.update(title.as_str(), subtitle.as_str());
             }
         });
 

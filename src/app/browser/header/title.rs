@@ -16,25 +16,20 @@ impl Title {
     }
 
     // Actions
-    pub fn update(&self, title: Option<&str>, subtitle: Option<&str>) {
+    pub fn update(&self, title: &str, subtitle: &str) {
         // Update title
-        let mut name = Vec::new();
+        let mut parts = Vec::new();
 
-        if let Some(value) = title {
-            if !value.is_empty() {
-                name.push(value);
-            }
+        if !title.is_empty() {
+            parts.push(title);
         }
 
-        name.push(DEFAULT_TITLE);
+        parts.push(DEFAULT_TITLE);
 
-        self.gobject.set_title(&name.join(" - "));
+        self.gobject.set_title(&parts.join(" - "));
 
         // Update subtitle
-        self.gobject.set_subtitle(&match subtitle {
-            Some(value) => value,
-            None => "", // @TODO
-        });
+        self.gobject.set_subtitle(subtitle);
     }
 
     // Getters

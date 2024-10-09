@@ -56,7 +56,7 @@ impl Header {
     }
 
     // Actions
-    pub fn update(&self, title: Option<&str>, description: Option<&str>) {
+    pub fn update(&self, title: &str, description: &str) {
         self.title.update(title, description);
     }
 
