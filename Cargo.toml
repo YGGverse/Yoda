@@ -18,3 +18,7 @@ version = "0.32.1"
 package = "gtk4"
 version = "0.9.1"
 features = ["v4_8"]
+
+[dependencies.adw]
+package = "libadwaita"
+version = "0.7.0"
