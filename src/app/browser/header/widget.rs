@@ -1,4 +1,4 @@
-use adw::HeaderBar;
+use adw::{HeaderBar, WindowTitle};
 use gtk::Box;
 
 pub struct Widget {
@@ -7,7 +7,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(pack_start: &Box, title_widget: Option<&Box>) -> Self {
+    pub fn new(pack_start: &Box, title_widget: Option<&WindowTitle>) -> Self {
         let gobject = HeaderBar::builder().build();
 
         gobject.pack_start(pack_start);

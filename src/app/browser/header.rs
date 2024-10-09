@@ -1,17 +1,17 @@
-mod subject;
+mod title;
 mod tray;
 mod widget;
 
-use subject::Subject;
+use title::Title;
 use tray::Tray;
 use widget::Widget;
 
 use adw::HeaderBar;
-use gtk::{gio::SimpleAction, glib::GString};
+use gtk::gio::SimpleAction;
 use std::sync::Arc;
 
 pub struct Header {
-    subject: Arc<Subject>,
+    title: Arc<Title>,
     // tray: Arc<Subject>,
     widget: Arc<Widget>,
 }
@@ -46,18 +46,18 @@ impl Header {
             action_tab_pin,
         );
 
-        let subject = Arc::new(Subject::new());
+        let title = Arc::new(Title::new());
 
         // Init widget
-        let widget = Arc::new(Widget::new(tray.gobject(), Some(subject.gobject())));
+        let widget = Arc::new(Widget::new(tray.gobject(), Some(title.gobject())));
 
         // Return new struct
-        Self { subject, widget }
+        Self { title, widget }
     }
 
     // Actions
-    pub fn update(&self, title: Option<GString>, description: Option<GString>) {
-        self.subject.update(title, description);
+    pub fn update(&self, title: Option<&str>, description: Option<&str>) {
+        self.title.update(title, description);
     }
 
     // Getters

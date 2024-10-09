@@ -10,6 +10,7 @@ use window::Window;
 
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
+    glib::GString,
     prelude::{ActionMapExt, GtkWindowExt},
     ApplicationWindow,
 };
@@ -121,8 +122,21 @@ impl Browser {
             let header = header.clone();
             let window = window.clone();
             move |_, _| {
+                // Update window first
                 window.update();
-                header.update(window.tab_page_title(), window.tab_page_description());
+
+                // Update header
+                let title = match window.tab_page_title() {
+                    Some(value) => value,
+                    None => GString::new(), // @TODO
+                };
+
+                let subtitle = match window.tab_page_description() {
+                    Some(value) => value,
+                    None => GString::new(), // @TODO
+                };
+
+                header.update(Some(title.as_str()), Some(subtitle.as_str()));
             }
         });
 
