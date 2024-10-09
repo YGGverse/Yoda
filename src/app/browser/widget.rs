@@ -2,7 +2,8 @@ mod database;
 
 use database::Database;
 
-use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box, HeaderBar};
+use adw::HeaderBar;
+use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box};
 use sqlite::Transaction;
 
 // Default options

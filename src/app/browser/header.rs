@@ -6,8 +6,8 @@ use subject::Subject;
 use tray::Tray;
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, glib::GString, HeaderBar};
-
+use adw::HeaderBar;
+use gtk::{gio::SimpleAction, glib::GString};
 use std::sync::Arc;
 
 pub struct Header {

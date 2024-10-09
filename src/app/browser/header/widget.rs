@@ -1,4 +1,5 @@
-use gtk::{Box, HeaderBar};
+use adw::HeaderBar;
+use gtk::Box;
 
 pub struct Widget {
     gobject: HeaderBar,
