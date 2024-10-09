@@ -6,10 +6,10 @@ use action::Action;
 use browser::Browser;
 use database::Database;
 
+use adw::Application;
 use gtk::{
     glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
-    Application,
 };
 use sqlite::{Connection, Transaction};
 

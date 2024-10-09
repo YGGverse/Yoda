@@ -1,18 +1,15 @@
 mod database;
-mod header;
 mod widget;
 mod window;
 
 use database::Database;
-use header::Header;
 use widget::Widget;
 use window::Window;
 
+use adw::ApplicationWindow;
 use gtk::{
     gio::{AppInfo, AppLaunchContext, SimpleAction},
-    glib::GString,
     prelude::{ActionMapExt, GtkWindowExt},
-    ApplicationWindow,
 };
 use sqlite::Transaction;
 use std::{path::PathBuf, sync::Arc};
@@ -43,11 +40,11 @@ impl Browser {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Browser {
-        // Init components
-        let header = Arc::new(Header::new(
+        let window = Arc::new(Window::new(
             action_tool_debug.clone(),
             action_tool_profile_directory.clone(),
             action_quit.clone(),
+            action_update.clone(),
             action_tab_append.clone(),
             action_tab_close.clone(),
             action_tab_close_all.clone(),
@@ -58,16 +55,10 @@ impl Browser {
             action_tab_pin.clone(),
         ));
 
-        let window = Arc::new(Window::new(
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
-            action_update.clone(),
-        ));
+        //window.gobject().append(header.gobject());
 
         // Init widget
-        let widget = Arc::new(Widget::new(header.gobject(), window.gobject()));
+        let widget = Arc::new(Widget::new(window.gobject()));
 
         // Assign actions
         widget.gobject().add_action(action_tool_debug.as_ref());
@@ -119,24 +110,9 @@ impl Browser {
         });
 
         action_update.connect_activate({
-            let header = header.clone();
             let window = window.clone();
             move |_, _| {
-                // Update window first
                 window.update();
-
-                // Update header
-                let title = match window.tab_page_title() {
-                    Some(value) => value,
-                    None => GString::new(), // @TODO
-                };
-
-                let subtitle = match window.tab_page_description() {
-                    Some(value) => value,
-                    None => GString::new(), // @TODO
-                };
-
-                header.update(title.as_str(), subtitle.as_str());
             }
         });
 

@@ -1,8 +1,10 @@
 mod database;
+mod header;
 mod tab;
 mod widget;
 
 use database::Database;
+use header::Header;
 use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
@@ -12,6 +14,7 @@ use std::sync::Arc;
 use gtk::{gio::SimpleAction, glib::GString, Box};
 
 pub struct Window {
+    header: Arc<Header>,
     tab: Arc<Tab>,
     widget: Arc<Widget>,
 }
@@ -20,13 +23,34 @@ impl Window {
     // Construct
     pub fn new(
         // Actions
+        action_tool_debug: Arc<SimpleAction>,
+        action_tool_profile_directory: Arc<SimpleAction>,
+        action_quit: Arc<SimpleAction>,
+        action_update: Arc<SimpleAction>,
+        action_tab_append: Arc<SimpleAction>,
+        action_tab_close: Arc<SimpleAction>,
+        action_tab_close_all: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
         // Init components
+        let header = Arc::new(Header::new(
+            action_tool_debug.clone(),
+            action_tool_profile_directory.clone(),
+            action_quit.clone(),
+            action_tab_append.clone(),
+            action_tab_close.clone(),
+            action_tab_close_all.clone(),
+            action_tab_page_navigation_base.clone(),
+            action_tab_page_navigation_history_back.clone(),
+            action_tab_page_navigation_history_forward.clone(),
+            action_tab_page_navigation_reload.clone(),
+            action_tab_pin.clone(),
+        ));
+
         let tab = Arc::new(Tab::new(
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
@@ -37,10 +61,14 @@ impl Window {
         tab.activate(tab.clone());
 
         // GTK
-        let widget = Arc::new(Widget::new(tab.gobject()));
+        let widget = Arc::new(Widget::new(header.gobject(), tab.gobject()));
 
         // Init struct
-        Self { tab, widget }
+        Self {
+            header,
+            tab,
+            widget,
+        }
     }
 
     // Actions
@@ -77,6 +105,19 @@ impl Window {
     }
 
     pub fn update(&self) {
+        // Update header
+        let title = match self.tab.page_title() {
+            Some(value) => value,
+            None => GString::new(), // @TODO
+        };
+
+        let subtitle = match self.tab.page_description() {
+            Some(value) => value,
+            None => GString::new(), // @TODO
+        };
+
+        self.header.update(title.as_str(), subtitle.as_str());
+
         self.tab.update();
     }
 
@@ -131,14 +172,6 @@ impl Window {
     }
 
     // Getters
-    pub fn tab_page_title(&self) -> Option<GString> {
-        self.tab.page_title()
-    }
-
-    pub fn tab_page_description(&self) -> Option<GString> {
-        self.tab.page_description()
-    }
-
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
     }

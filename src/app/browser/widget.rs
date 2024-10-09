@@ -2,8 +2,8 @@ mod database;
 
 use database::Database;
 
-use adw::HeaderBar;
-use gtk::{prelude::GtkWindowExt, ApplicationWindow, Box};
+use adw::ApplicationWindow;
+use gtk::{prelude::GtkWindowExt, Box};
 use sqlite::Transaction;
 
 // Default options
@@ -17,11 +17,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(titlebar: &HeaderBar, child: &Box) -> Self {
+    pub fn new(content: &Box) -> Self {
         // Init GTK
         let gobject = ApplicationWindow::builder()
-            .titlebar(titlebar)
-            .child(child)
+            .content(content)
             .default_height(DEFAULT_HEIGHT)
             .default_width(DEFAULT_WIDTH)
             .maximized(MAXIMIZED)
