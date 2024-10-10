@@ -83,8 +83,8 @@ impl Window {
     }
 
     // Actions
-    pub fn tab_append(&self, tab_page_navigation_request_text: Option<GString>) {
-        self.tab.append(tab_page_navigation_request_text, true);
+    pub fn tab_append(&self) {
+        self.tab.append();
     }
 
     pub fn tab_page_navigation_base(&self) {

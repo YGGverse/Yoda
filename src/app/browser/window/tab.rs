@@ -76,16 +76,9 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(
-        &self,
-        page_navigation_request_text: Option<GString>,
-        is_initially_current: bool,
-    ) -> Arc<Item> {
+    pub fn append(&self) -> Arc<Item> {
         // Init new tab item
         let item = Item::new_arc(
-            page_navigation_request_text.clone(),
-            is_initially_current,
-            // Actions
             self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_history_back.clone(),
             self.action_tab_page_navigation_history_forward.clone(),
@@ -99,9 +92,7 @@ impl Tab {
         // Append new page
         self.widget.gobject().add_page(item.gobject(), None);
 
-        if page_navigation_request_text.is_none() {
-            item.page_navigation_request_grab_focus(); // @TODO
-        }
+        item.page_navigation_request_grab_focus(); // @TODO
 
         item
     }
@@ -215,9 +206,7 @@ impl Tab {
                                 // Append new Notebook page
                                 /* @TODO
                                 self.widget.append(
-                                    item.label(),
                                     item.page(),
-                                    item.is_initially_current(),
                                 ); */
                             }
                         }

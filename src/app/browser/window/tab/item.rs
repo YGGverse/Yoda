@@ -20,16 +20,11 @@ pub struct Item {
     id: GString,
     // Components
     page: Arc<Page>,
-    // Extras, useful for session restore
-    is_initially_current: bool,
 }
 
 impl Item {
     // Construct
     pub fn new_arc(
-        page_navigation_request_text: Option<GString>,
-        is_initially_current: bool,
-        // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -42,7 +37,6 @@ impl Item {
         // Init components
         let page = Page::new_arc(
             id.clone(),
-            page_navigation_request_text.clone(),
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -51,11 +45,7 @@ impl Item {
         );
 
         // Return struct
-        Arc::new(Self {
-            id,
-            is_initially_current,
-            page,
-        })
+        Arc::new(Self { id, page })
     }
 
     // Actions
@@ -131,9 +121,6 @@ impl Item {
                 for record in records {
                     // Construct new item object
                     let item = Item::new_arc(
-                        None,
-                        record.is_initially_current,
-                        // Actions
                         action_tab_page_navigation_base.clone(),
                         action_tab_page_navigation_history_back.clone(),
                         action_tab_page_navigation_history_forward.clone(),
@@ -161,14 +148,8 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         page_number: &u32,
-        is_initially_current: &bool,
     ) -> Result<(), String> {
-        match Database::add(
-            transaction,
-            app_browser_window_tab_id,
-            page_number,
-            is_initially_current,
-        ) {
+        match Database::add(transaction, app_browser_window_tab_id, page_number) {
             Ok(_) => {
                 let id = Database::last_insert_id(transaction);
 
@@ -186,10 +167,6 @@ impl Item {
     // Getters
     pub fn id(&self) -> GString {
         self.id.clone()
-    }
-
-    pub fn is_initially_current(&self) -> bool {
-        self.is_initially_current
     }
 
     pub fn gobject(&self) -> &Box {

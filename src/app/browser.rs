@@ -55,8 +55,6 @@ impl Browser {
             action_tab_pin.clone(),
         ));
 
-        //window.gobject().append(header.gobject());
-
         // Init widget
         let widget = Arc::new(Widget::new(window.gobject()));
 
@@ -119,7 +117,7 @@ impl Browser {
         action_tab_append.connect_activate({
             let window = window.clone();
             move |_, _| {
-                window.tab_append(None);
+                window.tab_append();
             }
         });
 

@@ -25,7 +25,6 @@ pub struct Request {
 impl Request {
     // Construct
     pub fn new(
-        text: Option<GString>,
         // Actions
         action_update: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>, // @TODO local `action_page_open`?
@@ -34,10 +33,6 @@ impl Request {
         let widget = Entry::builder()
             .placeholder_text("URL or search term...")
             .hexpand(true)
-            .text(match text {
-                Some(text) => text,
-                None => GString::new(),
-            })
             .build();
 
         // Connect events

@@ -32,7 +32,6 @@ pub struct Navigation {
 
 impl Navigation {
     pub fn new(
-        request_text: Option<GString>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -47,7 +46,6 @@ impl Navigation {
         );
         let reload = Reload::new(action_tab_page_navigation_reload.clone());
         let request = Request::new(
-            request_text,
             action_update.clone(),
             action_tab_page_navigation_reload.clone(),
         );
