@@ -32,14 +32,14 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new(
+    pub fn new_arc(
         // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
-    ) -> Self {
+    ) -> Arc<Self> {
         // Init empty HashMap index as no tabs appended yet
         let index = RefCell::new(HashMap::new());
 
@@ -47,7 +47,7 @@ impl Tab {
         let widget = Arc::new(Widget::new());
 
         // Return non activated struct
-        Self {
+        Arc::new(Self {
             // Define action links
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
@@ -58,7 +58,7 @@ impl Tab {
             index,
             // GTK
             widget,
-        }
+        })
     }
 
     // Actions
@@ -276,25 +276,6 @@ impl Tab {
     }
 
     // Getters
-    pub fn page_title(&self) -> Option<GString> {
-        if let Some(id) = self.widget.current_name() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                return item.page_title();
-            }
-        }
-        None
-    }
-
-    pub fn page_description(&self) -> Option<GString> {
-        if let Some(id) = self.widget.current_name() {
-            // Get page by widget ID
-            if let Some(item) = self.index.borrow().get(&id) {
-                return item.page_description();
-            }
-        }
-        None
-    }
-
     pub fn gobject(&self) -> &Notebook {
         self.widget.gobject()
     }

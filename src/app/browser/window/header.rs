@@ -1,24 +1,21 @@
-mod title;
-mod tray;
+mod bar;
 mod widget;
 
-use title::Title;
-use tray::Tray;
+use bar::Bar;
 use widget::Widget;
 
-use adw::HeaderBar;
+use adw::{TabView, ToolbarView};
 use gtk::gio::SimpleAction;
 use std::sync::Arc;
 
 pub struct Header {
-    title: Arc<Title>,
-    // tray: Arc<Subject>,
     widget: Arc<Widget>,
 }
 
 impl Header {
     // Construct
-    pub fn new(
+    pub fn new_arc(
+        // Actions
         action_tool_debug: Arc<SimpleAction>,
         action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
@@ -30,9 +27,11 @@ impl Header {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
-    ) -> Self {
+        // Widgets
+        tab_view: &TabView,
+    ) -> Arc<Self> {
         // Init components
-        let tray = Tray::new(
+        let bar = Bar::new_arc(
             action_tool_debug,
             action_tool_profile_directory,
             action_quit,
@@ -44,24 +43,17 @@ impl Header {
             action_tab_page_navigation_history_forward,
             action_tab_page_navigation_reload,
             action_tab_pin,
+            tab_view,
         );
 
-        let title = Arc::new(Title::new());
-
-        // Init widget
-        let widget = Arc::new(Widget::new(tray.gobject(), Some(title.gobject())));
-
         // Return new struct
-        Self { title, widget }
-    }
-
-    // Actions
-    pub fn update(&self, title: &str, description: &str) {
-        self.title.update(title, description);
+        Arc::new(Self {
+            widget: Widget::new_arc(bar.gobject()),
+        })
     }
 
     // Getters
-    pub fn gobject(&self) -> &HeaderBar {
+    pub fn gobject(&self) -> &ToolbarView {
         &self.widget.gobject()
     }
 }

@@ -1,23 +1,26 @@
+mod append;
+mod control;
 mod menu;
 mod tab;
+mod widget;
 
+use append::Append;
+use control::Control;
 use menu::Menu;
 use tab::Tab;
+use widget::Widget;
 
-use gtk::{
-    gio::SimpleAction,
-    prelude::BoxExt,
-    {Box, Orientation},
-};
-
+use adw::TabView;
+use gtk::{gio::SimpleAction, Box};
 use std::sync::Arc;
 
-pub struct Tray {
-    gobject: Box,
+pub struct Bar {
+    widget: Arc<Widget>,
 }
 
-impl Tray {
-    pub fn new(
+impl Bar {
+    // Construct
+    pub fn new_arc(
         action_tool_debug: Arc<SimpleAction>,
         action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
@@ -29,11 +32,13 @@ impl Tray {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
-    ) -> Self {
+        view: &TabView,
+    ) -> Arc<Self> {
         // Init components
-        let tab = Tab::new(action_tab_append.clone());
-
-        let menu = Menu::new(
+        let control = Control::new_arc();
+        let tab = Tab::new_arc(view);
+        let append = Append::new_arc(action_tab_append.clone());
+        let menu = Menu::new_arc(
             action_tool_debug,
             action_tool_profile_directory,
             action_quit,
@@ -47,21 +52,19 @@ impl Tray {
             action_tab_pin,
         );
 
-        // Init widget
-        let gobject = Box::builder()
-            .orientation(Orientation::Horizontal)
-            .spacing(8)
-            .build();
-
-        gobject.append(menu.gobject());
-        gobject.append(tab.gobject());
-
-        // Return new struct
-        Self { gobject }
+        // Build result
+        Arc::new(Self {
+            widget: Widget::new_arc(
+                control.gobject(),
+                append.gobject(),
+                menu.gobject(),
+                tab.gobject(),
+            ),
+        })
     }
 
     // Getters
     pub fn gobject(&self) -> &Box {
-        &self.gobject
+        &self.widget.gobject()
     }
 }

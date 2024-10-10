@@ -14,7 +14,7 @@ use std::sync::Arc;
 use gtk::{gio::SimpleAction, glib::GString, Box};
 
 pub struct Window {
-    header: Arc<Header>,
+    //header: Arc<Header>,
     tab: Arc<Tab>,
     widget: Arc<Widget>,
 }
@@ -36,8 +36,18 @@ impl Window {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
+        // @TODO testing
+        let tab_view = adw::TabView::new();
+
+        let p1 = tab_view.append(&gtk::Label::new(Some("test 1")));
+        let p2 = tab_view.append(&gtk::Label::new(Some("test 2")));
+
+        p1.set_title("title 1");
+        p2.set_title("title 2");
+
         // Init components
-        let header = Arc::new(Header::new(
+        let header = Header::new_arc(
+            // Actions
             action_tool_debug.clone(),
             action_tool_profile_directory.clone(),
             action_quit.clone(),
@@ -49,15 +59,17 @@ impl Window {
             action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_tab_pin.clone(),
-        ));
+            // Widgets
+            &tab_view,
+        );
 
-        let tab = Arc::new(Tab::new(
+        let tab = Tab::new_arc(
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
             action_tab_page_navigation_history_forward,
             action_tab_page_navigation_reload,
             action_update,
-        ));
+        );
         tab.activate(tab.clone());
 
         // GTK
@@ -65,7 +77,7 @@ impl Window {
 
         // Init struct
         Self {
-            header,
+            //header,
             tab,
             widget,
         }
@@ -105,19 +117,6 @@ impl Window {
     }
 
     pub fn update(&self) {
-        // Update header
-        let title = match self.tab.page_title() {
-            Some(value) => value,
-            None => GString::new(), // @TODO
-        };
-
-        let subtitle = match self.tab.page_description() {
-            Some(value) => value,
-            None => GString::new(), // @TODO
-        };
-
-        self.header.update(title.as_str(), subtitle.as_str());
-
         self.tab.update();
     }
 

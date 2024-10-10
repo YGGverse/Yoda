@@ -1,23 +1,23 @@
-use adw::{HeaderBar, WindowTitle};
+use adw::ToolbarView;
 use gtk::Box;
+use std::sync::Arc;
 
 pub struct Widget {
-    gobject: HeaderBar,
+    gobject: ToolbarView,
 }
 
 impl Widget {
     // Construct
-    pub fn new(pack_start: &Box, title_widget: Option<&WindowTitle>) -> Self {
-        let gobject = HeaderBar::builder().build();
+    pub fn new_arc(top_bar: &Box) -> Arc<Self> {
+        let gobject = ToolbarView::builder().build();
 
-        gobject.pack_start(pack_start);
-        gobject.set_title_widget(title_widget);
+        gobject.add_top_bar(top_bar);
 
-        Self { gobject }
+        Arc::new(Self { gobject })
     }
 
     // Getters
-    pub fn gobject(&self) -> &HeaderBar {
+    pub fn gobject(&self) -> &ToolbarView {
         &self.gobject
     }
 }

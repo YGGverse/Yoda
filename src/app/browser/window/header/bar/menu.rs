@@ -1,3 +1,7 @@
+mod widget;
+
+use widget::Widget;
+
 use gtk::{
     gio::{self, SimpleAction},
     glib::{gformat, GString},
@@ -8,11 +12,11 @@ use gtk::{
 use std::sync::Arc;
 
 pub struct Menu {
-    gobject: MenuButton,
+    widget: Arc<Widget>,
 }
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
-    pub fn new(
+    pub fn new_arc(
         action_tool_debug: Arc<SimpleAction>,
         action_tool_profile_directory: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
@@ -24,7 +28,7 @@ impl Menu {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
-    ) -> Self {
+    ) -> Arc<Self> {
         // Init model
         let model = gio::Menu::new();
 
@@ -65,17 +69,13 @@ impl Menu {
 
             model.append(Some("Quit"), Some(&detailed_action_name(action_quit)));
 
-        // Init widget
-        let gobject = MenuButton::builder().tooltip_text("Menu").build();
-        gobject.set_menu_model(Some(&model));
-
         // Result
-        Self { gobject }
+        Arc::new(Self { widget:Widget::new_arc(&model) })
     }
 
     // Getters
     pub fn gobject(&self) -> &MenuButton {
-        &self.gobject
+        &self.widget.gobject()
     }
 }
 

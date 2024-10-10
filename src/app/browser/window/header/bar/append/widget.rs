@@ -1,16 +1,22 @@
-use gtk::{gio::SimpleAction, prelude::ActionExt, prelude::ButtonExt, Button};
+use gtk::{
+    gio::SimpleAction,
+    prelude::{ActionExt, ButtonExt},
+    Align, Button,
+};
 use std::sync::Arc;
 
-pub struct Tab {
-    pub gobject: Button,
+pub struct Widget {
+    gobject: Button,
 }
 
-impl Tab {
+impl Widget {
     // Construct
-    pub fn new(action_tab_append: Arc<SimpleAction>) -> Self {
-        // Init widget
+    pub fn new_arc(action_tab_append: Arc<SimpleAction>) -> Arc<Self> {
+        // Init gobject
         let gobject = Button::builder()
             .icon_name("tab-new-symbolic")
+            .css_classes(["flat"])
+            .valign(Align::Center)
             .tooltip_text("New tab")
             .build();
 
@@ -19,8 +25,7 @@ impl Tab {
             action_tab_append.activate(None);
         });
 
-        // Return activated struct
-        Self { gobject }
+        Arc::new(Self { gobject })
     }
 
     // Getters

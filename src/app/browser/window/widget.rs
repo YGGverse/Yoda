@@ -1,4 +1,4 @@
-use adw::HeaderBar;
+use adw::ToolbarView;
 use gtk::{prelude::BoxExt, Box, Notebook, Orientation};
 
 pub struct Widget {
@@ -7,7 +7,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(header: &HeaderBar, tab: &Notebook) -> Self {
+    pub fn new(header: &ToolbarView, tab: &Notebook) -> Self {
         let gobject = Box::builder().orientation(Orientation::Vertical).build();
         gobject.append(header);
         gobject.append(tab);
