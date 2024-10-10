@@ -90,7 +90,7 @@ impl Tab {
         self.index.borrow_mut().insert(item.id(), item.clone());
 
         // Append new page
-        self.widget.gobject().add_page(item.gobject(), None);
+        self.widget.append(item.gobject());
 
         item.page_navigation_request_grab_focus(); // @TODO
 

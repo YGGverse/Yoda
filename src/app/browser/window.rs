@@ -36,16 +36,15 @@ impl Window {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_tab_pin: Arc<SimpleAction>,
     ) -> Self {
-        // @TODO testing
-        let tab_view = adw::TabView::new();
-
-        let p1 = tab_view.append(&gtk::Label::new(Some("test 1")));
-        let p2 = tab_view.append(&gtk::Label::new(Some("test 2")));
-
-        p1.set_title("title 1");
-        p2.set_title("title 2");
-
         // Init components
+        let tab = Tab::new_arc(
+            action_tab_page_navigation_base.clone(),
+            action_tab_page_navigation_history_back.clone(),
+            action_tab_page_navigation_history_forward.clone(),
+            action_tab_page_navigation_reload.clone(),
+            action_update.clone(),
+        );
+
         let header = Header::new_arc(
             // Actions
             action_tool_debug.clone(),
@@ -60,15 +59,7 @@ impl Window {
             action_tab_page_navigation_reload.clone(),
             action_tab_pin.clone(),
             // Widgets
-            &tab_view,
-        );
-
-        let tab = Tab::new_arc(
-            action_tab_page_navigation_base,
-            action_tab_page_navigation_history_back,
-            action_tab_page_navigation_history_forward,
-            action_tab_page_navigation_reload,
-            action_update,
+            tab.gobject(),
         );
 
         // GTK
