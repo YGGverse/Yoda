@@ -96,10 +96,8 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index.borrow_mut().insert(item.id(), item.clone());
 
-        // Append new Notebook page
-        /* @TODO
-        self.widget
-            .append(item.label(), item.page(), item.is_initially_current()); */
+        // Append new page
+        self.widget.gobject().add_page(item.gobject(), None);
 
         if page_navigation_request_text.is_none() {
             item.page_navigation_request_grab_focus(); // @TODO

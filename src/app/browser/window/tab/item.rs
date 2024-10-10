@@ -192,8 +192,8 @@ impl Item {
         self.is_initially_current
     }
 
-    pub fn page(&self) -> &Box {
-        &self.page.widget() // @TODO
+    pub fn gobject(&self) -> &Box {
+        &self.page.gobject()
     }
 
     pub fn page_title(&self) -> Option<GString> {

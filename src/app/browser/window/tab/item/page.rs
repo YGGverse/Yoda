@@ -22,7 +22,7 @@ use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
     // GTK
-    widget: Box,
+    gobject: Box,
     // Actions
     action_page_open: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
@@ -67,15 +67,15 @@ impl Page {
         ));
 
         // Init widget
-        let widget = Box::builder()
+        let gobject = Box::builder()
             .orientation(Orientation::Vertical)
             .name(name)
             .build();
 
-        widget.append(navigation.widget());
-        widget.append(content.widget());
+        gobject.append(navigation.widget());
+        gobject.append(content.widget());
 
-        widget.insert_action_group("page", Some(&action_group));
+        gobject.insert_action_group("page", Some(&action_group));
 
         // Init async mutable Meta object
         let meta = Arc::new(RefCell::new(Meta::new()));
@@ -104,7 +104,7 @@ impl Page {
         // Return activated structure
         Arc::new(Self {
             // GTK
-            widget,
+            gobject,
             // Actions
             action_page_open,
             action_tab_page_navigation_reload,
@@ -483,7 +483,7 @@ impl Page {
         self.meta.borrow().description.clone()
     }
 
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn gobject(&self) -> &Box {
+        &self.gobject
     }
 }
