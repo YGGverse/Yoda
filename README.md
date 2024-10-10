@@ -10,7 +10,12 @@ Rust / GTK 4 implementation
 
 ### Dependencies
 
-Use [rustup](https://rustup.rs) to install and setup latest Rust compiler and package manager:
+Make sure system support:
+
+* GTK 4.8+
+* Libadwaita 1.4+
+
+Use [rustup installer](https://rustup.rs) to setup latest Rust compiler and package manager:
 
 ``` bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
