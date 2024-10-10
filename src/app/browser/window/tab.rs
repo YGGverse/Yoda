@@ -45,7 +45,22 @@ impl Tab {
         // Init widget
         let widget = Arc::new(Widget::new());
 
-        // Return non activated struct
+        // Init events
+        widget.gobject().connect_close_page(move |_, tab_page| {
+            /* @TODO
+            // Cleanup HashMap index
+            let id = tab_page.widget_name();
+
+            // Check for required value as raw access to gobject @TODO
+            if id.is_empty() {
+                panic!("Undefined tab index!")
+            }
+
+            tab.index.borrow_mut().remove(&id); */
+            Propagation::Proceed
+        });
+
+        // Return activated struct
         Arc::new(Self {
             // Define action links
             action_tab_page_navigation_base,
@@ -61,24 +76,6 @@ impl Tab {
     }
 
     // Actions
-    pub fn activate(&self, tab: Arc<Self>) {
-        self.widget
-            .gobject()
-            .connect_close_page(move |_, tab_page| {
-                /* @TODO
-                // Cleanup HashMap index
-                let id = tab_page.widget_name();
-
-                // Check for required value as raw access to gobject @TODO
-                if id.is_empty() {
-                    panic!("Undefined tab index!")
-                }
-
-                tab.index.borrow_mut().remove(&id); */
-                Propagation::Proceed
-            });
-    }
-
     pub fn append(
         &self,
         page_navigation_request_text: Option<GString>,

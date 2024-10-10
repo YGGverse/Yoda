@@ -70,7 +70,6 @@ impl Window {
             action_tab_page_navigation_reload,
             action_update,
         );
-        tab.activate(tab.clone());
 
         // GTK
         let widget = Arc::new(Widget::new(header.gobject(), tab.gobject()));
