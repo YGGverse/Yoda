@@ -4,16 +4,15 @@ mod widget;
 
 use database::Database;
 use item::Item;
-use sqlite::Transaction;
 use widget::Widget;
 
+use adw::TabView;
 use gtk::{
     gio::SimpleAction,
-    glib::GString,
+    glib::{GString, Propagation},
     prelude::{ActionExt, WidgetExt},
-    Notebook,
 };
-
+use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 // Main
@@ -65,24 +64,19 @@ impl Tab {
     pub fn activate(&self, tab: Arc<Self>) {
         self.widget
             .gobject()
-            .connect_page_removed(move |_, widget, _| {
+            .connect_close_page(move |_, tab_page| {
+                /* @TODO
                 // Cleanup HashMap index
-                let id = widget.widget_name();
+                let id = tab_page.widget_name();
 
                 // Check for required value as raw access to gobject @TODO
                 if id.is_empty() {
                     panic!("Undefined tab index!")
                 }
 
-                tab.index.borrow_mut().remove(&id);
+                tab.index.borrow_mut().remove(&id); */
+                Propagation::Proceed
             });
-
-        // Switch page post-event (`connect_switch_page` activates before `page_number` get updated)
-        self.widget.gobject().connect_page_notify({
-            let action_update = self.action_update.clone();
-            // Update window header with current page title
-            move |_| action_update.activate(None)
-        });
     }
 
     pub fn append(
@@ -253,6 +247,7 @@ impl Tab {
                 let id = Database::last_insert_id(transaction);
 
                 // At least one active page wanted to continue
+                /* @TODO
                 if let Some(current_page) = self.widget.gobject().current_page() {
                     // Read collected HashMap index
                     for (_, item) in self.index.borrow().iter() {
@@ -269,7 +264,7 @@ impl Tab {
                             None => panic!(), // page number expected at this point @TODO Err?
                         }
                     }
-                };
+                }; */
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -278,7 +273,7 @@ impl Tab {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Notebook {
+    pub fn gobject(&self) -> &TabView {
         self.widget.gobject()
     }
 

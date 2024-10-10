@@ -1,58 +1,52 @@
-use gtk::{glib::GString, prelude::WidgetExt, Box, Notebook};
+use adw::{TabPage, TabView};
+use gtk::{glib::GString, Box};
 
 pub struct Widget {
-    gobject: Notebook,
+    gobject: TabView,
 }
 
 impl Widget {
     // Construct
     pub fn new() -> Self {
         Self {
-            gobject: Notebook::builder().scrollable(true).build(),
+            gobject: TabView::builder().build(),
         }
     }
 
     // Actions
-    pub fn append(&self, label: &Box, page: &Box, is_current_page: bool) -> u32 {
-        // Append new Notebook page
-        let page_number = self.gobject.append_page(page, Some(label));
-
-        // Additional setup for Notebook tab created
-        self.gobject.set_tab_reorderable(page, true);
-
-        if is_current_page {
-            self.gobject.set_current_page(Some(page_number));
-        }
-
-        // Result
-        page_number
+    pub fn append(&self, page: &Box) -> TabPage {
+        self.gobject.append(page)
     }
 
     pub fn close(&self) {
-        self.gobject.remove_page(self.gobject().current_page());
+        if let Some(selected_page) = self.gobject.selected_page() {
+            self.gobject.close_page(&selected_page);
+        }
     }
 
     pub fn close_all(&self) {
         // @TODO skip pinned or make confirmation alert (GTK>=4.10)
-        while let Some(page_number) = self.gobject.current_page() {
-            self.gobject.remove_page(Some(page_number));
+        if let Some(selected_page) = self.gobject.selected_page() {
+            self.gobject.close_other_pages(&selected_page);
+            self.close();
         }
     }
 
     // Getters
     pub fn current_name(&self) -> Option<GString> {
-        let page_number = self.gobject.current_page()?;
-        let nth_page = self.gobject.nth_page(Some(page_number))?;
+        let page = self.gobject.selected_page()?;
 
-        let widget_name = nth_page.widget_name();
+        /* @TODO
+        let widget_name = page.widget_name();
         if !widget_name.is_empty() {
             Some(widget_name)
         } else {
             None
-        }
+        } */
+        None
     }
 
-    pub fn gobject(&self) -> &Notebook {
+    pub fn gobject(&self) -> &TabView {
         &self.gobject
     }
 }
