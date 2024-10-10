@@ -1,9 +1,7 @@
 mod database;
-mod label;
 mod page;
 
 use database::Database;
-use label::Label;
 use page::Page;
 
 use sqlite::Transaction;
@@ -21,7 +19,6 @@ pub struct Item {
     // useful as widget name in GTK actions callback
     id: GString,
     // Components
-    label: Arc<Label>,
     page: Arc<Page>,
     // Extras, useful for session restore
     is_initially_current: bool,
@@ -43,8 +40,6 @@ impl Item {
         let id = uuid_string_random();
 
         // Init components
-        let label = Label::new_arc(id.clone(), false);
-
         let page = Page::new_arc(
             id.clone(),
             page_navigation_request_text.clone(),
@@ -59,14 +54,13 @@ impl Item {
         Arc::new(Self {
             id,
             is_initially_current,
-            label,
             page,
         })
     }
 
     // Actions
     pub fn pin(&self) {
-        self.label.pin(!self.label.is_pinned()) // toggle
+        //self.label.pin(!self.label.is_pinned()) // toggle
     }
 
     pub fn page_navigation_base(&self) {
@@ -91,11 +85,6 @@ impl Item {
 
     pub fn update(&self) {
         self.page.update();
-        if let Some(title) = self.page.title() {
-            self.label.update(Some(&title));
-        } else {
-            self.label.update(None);
-        }
     }
 
     pub fn clean(
@@ -109,7 +98,6 @@ impl Item {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            self.label.clean(transaction, &record.id)?;
 
                             /* @TODO
                             self.page.clean(transaction, &record.id)?;*/
@@ -154,7 +142,9 @@ impl Item {
                     );
 
                     // Delegate restore action to the item childs
-                    item.label.restore(transaction, &record.id)?;
+
+                    /* @TODO
+                    self.page.restore(transaction, &id)?; */
 
                     // Result
                     items.push(item);
@@ -183,7 +173,6 @@ impl Item {
                 let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                self.label.save(transaction, &id)?;
 
                 /* @TODO
                 self.page.save(transaction, &id)?; */
@@ -201,10 +190,6 @@ impl Item {
 
     pub fn is_initially_current(&self) -> bool {
         self.is_initially_current
-    }
-
-    pub fn label(&self) -> &Box {
-        &self.label.gobject()
     }
 
     pub fn page(&self) -> &Box {
@@ -227,7 +212,6 @@ impl Item {
         }
 
         // Delegate migration to childs
-        Label::migrate(&tx)?;
 
         /* @TODO
         Page::migrate(&tx)? */

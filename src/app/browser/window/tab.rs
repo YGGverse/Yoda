@@ -106,8 +106,9 @@ impl Tab {
         self.index.borrow_mut().insert(item.id(), item.clone());
 
         // Append new Notebook page
+        /* @TODO
         self.widget
-            .append(item.label(), item.page(), item.is_initially_current());
+            .append(item.label(), item.page(), item.is_initially_current()); */
 
         if page_navigation_request_text.is_none() {
             item.page_navigation_request_grab_focus(); // @TODO
@@ -223,11 +224,12 @@ impl Tab {
                                 self.index.borrow_mut().insert(item.id(), item.clone());
 
                                 // Append new Notebook page
+                                /* @TODO
                                 self.widget.append(
                                     item.label(),
                                     item.page(),
                                     item.is_initially_current(),
-                                );
+                                ); */
                             }
                         }
                         Err(e) => return Err(e.to_string()),
