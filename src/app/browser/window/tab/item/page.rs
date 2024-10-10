@@ -1,10 +1,12 @@
 mod content;
 mod meta;
 mod navigation;
+mod widget;
 
 use content::Content;
 use meta::{Meta, Mime, Status};
 use navigation::Navigation;
+use widget::Widget;
 
 use gtk::{
     gio::{
@@ -21,8 +23,6 @@ use gtk::{
 use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
-    // GTK
-    gobject: Box,
     // Actions
     action_page_open: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
@@ -32,6 +32,8 @@ pub struct Page {
     content: Arc<Content>,
     // Extras
     meta: Arc<RefCell<Meta>>,
+    // GTK
+    widget: Arc<Widget>,
 }
 
 impl Page {
@@ -45,15 +47,11 @@ impl Page {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Arc<Self> {
-        // Init actions
+        // Init local actions
         let action_page_open = Arc::new(SimpleAction::new(
-            "open",
+            "open", // @TODO
             Some(&String::static_variant_type()),
         ));
-
-        // Init action group
-        let action_group = SimpleActionGroup::new();
-        action_group.add_action(action_page_open.as_ref());
 
         // Init components
         let content = Arc::new(Content::new(action_page_open.clone()));
@@ -65,17 +63,12 @@ impl Page {
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         ));
-
-        // Init widget
-        let gobject = Box::builder()
-            .orientation(Orientation::Vertical)
-            .name(name)
-            .build();
-
-        gobject.append(navigation.widget());
-        gobject.append(content.widget());
-
-        gobject.insert_action_group("page", Some(&action_group));
+        let widget = Widget::new_arc(
+            action_page_open.clone(),
+            &name, // ID
+            navigation.gobject(),
+            content.gobject(),
+        );
 
         // Init async mutable Meta object
         let meta = Arc::new(RefCell::new(Meta::new()));
@@ -103,8 +96,6 @@ impl Page {
 
         // Return activated structure
         Arc::new(Self {
-            // GTK
-            gobject,
             // Actions
             action_page_open,
             action_tab_page_navigation_reload,
@@ -114,6 +105,8 @@ impl Page {
             navigation,
             // Extras
             meta,
+            // GTK
+            widget,
         })
     }
 
@@ -484,6 +477,6 @@ impl Page {
     }
 
     pub fn gobject(&self) -> &Box {
-        &self.gobject
+        &self.widget.gobject()
     }
 }

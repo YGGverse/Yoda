@@ -62,7 +62,7 @@ impl Content {
     }
 
     // Getters
-    pub fn widget(&self) -> &Box {
+    pub fn gobject(&self) -> &Box {
         &self.widget
     }
 }
