@@ -6,21 +6,43 @@ Rust / GTK 4 implementation
 > Project in development!
 >
 
-## Install
+## Build
 
-### Stable
+### Dependencies
+
+Use [rustup](https://rustup.rs) to install and setup latest Rust compiler and package manager:
+
+``` bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+#### Debian
+
+_todo_
+
+#### Fedora
+
+``` bash
+sudo dnf install git gcc\
+                 cairo-devel glib2-devel gtk4-devel libadwaita-devel pango-devel\
+                 sqlite-devel
+```
+
+### Install
+
+#### Stable
 
 ``` bash
 cargo install Yoda
 ```
 
-### Repository
+#### Repository
 
 ``` bash
 git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
 git checkout Rust-GTK4
-cargo run
+cargo build
 ```
 
 ## Development
