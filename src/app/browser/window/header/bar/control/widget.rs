@@ -9,7 +9,10 @@ impl Widget {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         Arc::new(Self {
-            gobject: WindowControls::new(PackType::End),
+            gobject: WindowControls::builder()
+                .side(PackType::End)
+                .margin_end(4)
+                .build(),
         })
     }
 
