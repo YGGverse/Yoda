@@ -86,6 +86,8 @@ impl Tab {
             self.action_tab_page_navigation_history_forward.clone(),
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
+            // Options
+            true,
         );
 
         // Register dynamically created tab components in the HashMap index

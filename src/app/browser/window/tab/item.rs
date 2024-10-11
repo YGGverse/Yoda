@@ -34,6 +34,8 @@ impl Item {
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
+        // Options
+        is_selected_page: bool,
     ) -> Arc<Self> {
         // Generate unique ID for new page components
         let id = uuid_string_random();
@@ -48,7 +50,7 @@ impl Item {
             action_update.clone(),
         );
 
-        let widget = Widget::new_arc(tab_view, page.gobject(), Some("New page")); // @TODO
+        let widget = Widget::new_arc(tab_view, page.gobject(), Some("New page"), is_selected_page); // @TODO
 
         // Return struct
         Arc::new(Self { id, page, widget })
@@ -129,11 +131,14 @@ impl Item {
                     // Construct new item object
                     let item = Item::new_arc(
                         tab_view,
+                        // Actions
                         action_tab_page_navigation_base.clone(),
                         action_tab_page_navigation_history_back.clone(),
                         action_tab_page_navigation_history_forward.clone(),
                         action_tab_page_navigation_reload.clone(),
                         action_update.clone(),
+                        // Options
+                        true,
                     );
 
                     // Delegate restore action to the item childs

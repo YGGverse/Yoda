@@ -14,10 +14,6 @@ impl Widget {
     }
 
     // Actions
-    pub fn append(&self, page: &Box) -> TabPage {
-        self.gobject.append(page)
-    }
-
     pub fn close(&self) {
         if let Some(selected_page) = self.gobject.selected_page() {
             self.gobject.close_page(&selected_page);
