@@ -463,6 +463,10 @@ impl Page {
     }
 
     // Getters
+    pub fn meta_title(&self) -> Option<GString> {
+        self.meta.borrow().title.clone()
+    }
+
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
     }

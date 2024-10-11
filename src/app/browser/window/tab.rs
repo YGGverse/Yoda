@@ -155,7 +155,16 @@ impl Tab {
     pub fn update(&self) {
         if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
+                // Update item components
                 item.update();
+
+                // Update tab title
+                let title = match item.page_meta_title() {
+                    Some(value) => value,
+                    None => GString::new(),
+                };
+
+                item.gobject().set_title(title.as_str());
             }
         }
     }

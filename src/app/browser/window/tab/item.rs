@@ -187,6 +187,10 @@ impl Item {
         self.id.clone()
     }
 
+    pub fn page_meta_title(&self) -> Option<GString> {
+        self.page.meta_title()
+    }
+
     pub fn gobject(&self) -> &TabPage {
         &self.widget.gobject()
     }
