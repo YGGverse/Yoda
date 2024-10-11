@@ -85,7 +85,11 @@ impl Item {
     }
 
     pub fn update(&self) {
+        // Update child components
         self.page.update();
+
+        // Update tab loading indicator
+        self.widget.gobject().set_loading(self.page.is_loading());
     }
 
     pub fn clean(

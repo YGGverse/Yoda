@@ -447,22 +447,31 @@ impl Page {
     }
 
     pub fn update(&self) {
+        // Update components
+        self.navigation.update(self.progress_fraction());
+        // @TODO self.content.update();
+    }
+
+    // Getters
+    pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
-        let progress_fraction = match self.meta.borrow().status {
+        match self.meta.borrow().status {
             Some(Status::Prepare | Status::Reload) => Some(0.0),
             Some(Status::Connect) => Some(0.25),
             Some(Status::Request) => Some(0.50),
             Some(Status::Response) => Some(0.75),
             Some(Status::Failure | Status::Redirect | Status::Success) => Some(1.0),
             _ => None,
-        };
-
-        // Update components
-        self.navigation.update(progress_fraction);
-        // @TODO self.content.update();
+        }
     }
 
-    // Getters
+    pub fn is_loading(&self) -> bool {
+        match self.progress_fraction() {
+            Some(progress_fraction) => progress_fraction < 1.0,
+            None => false,
+        }
+    }
+
     pub fn meta_title(&self) -> Option<GString> {
         self.meta.borrow().title.clone()
     }
