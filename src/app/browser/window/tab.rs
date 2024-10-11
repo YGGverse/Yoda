@@ -113,10 +113,10 @@ impl Tab {
 
     // Toggle pin status for active tab
     pub fn pin(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.pin(); // toggle
-            }
+        if let Some(page) = self.widget.gobject().selected_page() {
+            self.widget
+                .gobject()
+                .set_page_pinned(&page, !page.is_pinned()); // toggle
         }
     }
 

@@ -56,10 +56,6 @@ impl Item {
     }
 
     // Actions
-    pub fn pin(&self) {
-        //self.label.pin(!self.label.is_pinned()) // toggle
-    }
-
     pub fn page_navigation_base(&self) {
         self.page.navigation_base()
     }
@@ -169,7 +165,7 @@ impl Item {
             is_selected,
         ) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let _id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
 
