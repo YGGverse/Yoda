@@ -205,6 +205,11 @@ impl Tab {
                                 // Append new page
                                 self.append();
                             }
+
+                            // Append just one blank page if nothing to restore
+                            if self.index.borrow().is_empty() {
+                                self.append();
+                            }
                         }
                         Err(e) => return Err(e.to_string()),
                     }
