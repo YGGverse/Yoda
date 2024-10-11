@@ -1,17 +1,18 @@
 mod database;
 mod page;
+mod widget;
 
 use database::Database;
 use page::Page;
+use widget::Widget;
 
-use sqlite::Transaction;
-
+use adw::TabView;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, GString},
     Box,
 };
-
+use sqlite::Transaction;
 use std::sync::Arc;
 
 pub struct Item {
@@ -20,11 +21,14 @@ pub struct Item {
     id: GString,
     // Components
     page: Arc<Page>,
+    widget: Arc<Widget>,
 }
 
 impl Item {
     // Construct
     pub fn new_arc(
+        tab_view: &TabView,
+        // Actions
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -44,8 +48,10 @@ impl Item {
             action_update.clone(),
         );
 
+        let widget = Widget::new_arc(tab_view, page.gobject(), Some("New page")); // @TODO
+
         // Return struct
-        Arc::new(Self { id, page })
+        Arc::new(Self { id, page, widget })
     }
 
     // Actions
@@ -105,6 +111,7 @@ impl Item {
     // This method does not contain Self context,
     // because child items creating in the runtime (by parent component)
     pub fn restore(
+        tab_view: &TabView,
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         // Actions
@@ -121,6 +128,7 @@ impl Item {
                 for record in records {
                     // Construct new item object
                     let item = Item::new_arc(
+                        tab_view,
                         action_tab_page_navigation_base.clone(),
                         action_tab_page_navigation_history_back.clone(),
                         action_tab_page_navigation_history_forward.clone(),

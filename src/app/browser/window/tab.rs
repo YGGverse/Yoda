@@ -79,6 +79,8 @@ impl Tab {
     pub fn append(&self) -> Arc<Item> {
         // Init new tab item
         let item = Item::new_arc(
+            self.gobject(),
+            // Actions
             self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_history_back.clone(),
             self.action_tab_page_navigation_history_forward.clone(),
@@ -89,11 +91,7 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index.borrow_mut().insert(item.id(), item.clone());
 
-        // Append new page
-        self.widget.append(item.gobject());
-
         item.page_navigation_request_grab_focus(); // @TODO
-
         item
     }
 
@@ -190,6 +188,7 @@ impl Tab {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
+                        self.gobject(),
                         transaction,
                         &record.id,
                         self.action_tab_page_navigation_base.clone(),
