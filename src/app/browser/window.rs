@@ -160,6 +160,10 @@ impl Window {
         Ok(())
     }
 
+    pub fn init(&self) {
+        self.tab.init();
+    }
+
     // Getters
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()

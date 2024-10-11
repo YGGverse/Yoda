@@ -119,6 +119,7 @@ impl App {
                                 // Restore previous session from DB
                                 match Database::records(&transaction) {
                                     Ok(records) => {
+                                        // Restore child components
                                         for record in records {
                                             if let Err(e) =
                                                 browser.restore(&transaction, &record.id)
@@ -126,6 +127,9 @@ impl App {
                                                 todo!("{e}")
                                             }
                                         }
+
+                                        // Run initial features
+                                        browser.init();
                                     }
                                     Err(e) => todo!("{e}"),
                                 }

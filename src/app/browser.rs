@@ -236,6 +236,10 @@ impl Browser {
         Ok(())
     }
 
+    pub fn init(&self) {
+        self.window.init();
+    }
+
     // Getters
     pub fn gobject(&self) -> &ApplicationWindow {
         &self.widget.gobject()

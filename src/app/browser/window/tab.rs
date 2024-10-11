@@ -217,11 +217,6 @@ impl Tab {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index.borrow_mut().insert(item.id(), item.clone());
                             }
-
-                            // Append just one blank page if nothing to restore
-                            if self.index.borrow().is_empty() {
-                                self.append();
-                            }
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -258,6 +253,15 @@ impl Tab {
         }
 
         Ok(())
+    }
+
+    pub fn init(&self) {
+        // Append just one blank page if no tabs available after last session restore
+        if self.index.borrow().is_empty() {
+            self.append();
+        }
+
+        // @TODO other/child features..
     }
 
     // Getters
