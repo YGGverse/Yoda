@@ -10,7 +10,6 @@ use adw::TabView;
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Propagation},
-    prelude::{ActionExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
@@ -46,7 +45,7 @@ impl Tab {
         let widget = Arc::new(Widget::new());
 
         // Init events
-        widget.gobject().connect_close_page(move |_, tab_page| {
+        widget.gobject().connect_close_page(move |_, _| {
             /* @TODO
             // Cleanup HashMap index
             let id = tab_page.widget_name();
@@ -203,9 +202,6 @@ impl Tab {
                             for item in items {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index.borrow_mut().insert(item.id(), item.clone());
-
-                                // Append new page
-                                self.append();
                             }
 
                             // Append just one blank page if nothing to restore
@@ -233,25 +229,15 @@ impl Tab {
                 // Delegate save action to childs
                 let id = Database::last_insert_id(transaction);
 
-                // At least one active page wanted to continue
-                /* @TODO
-                if let Some(current_page) = self.widget.gobject().current_page() {
-                    // Read collected HashMap index
-                    for (_, item) in self.index.borrow().iter() {
-                        // Get page number as HashMap does not keep order, no page_reorder listener also
-                        match self.widget.gobject().page_num(item.page()) {
-                            Some(page_number) => {
-                                item.save(
-                                    transaction,
-                                    &id,
-                                    &page_number,
-                                    &(current_page == page_number),
-                                )?;
-                            }
-                            None => panic!(), // page number expected at this point @TODO Err?
-                        }
-                    }
-                }; */
+                // Read collected HashMap index
+                for (_, item) in self.index.borrow().iter() {
+                    item.save(
+                        transaction,
+                        &id,
+                        &self.widget.gobject().page_position(item.gobject()),
+                        &item.gobject().is_selected(),
+                    )?;
+                }
             }
             Err(e) => return Err(e.to_string()),
         }

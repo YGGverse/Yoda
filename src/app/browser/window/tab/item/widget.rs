@@ -2,6 +2,8 @@ use adw::{TabPage, TabView};
 use gtk::Box;
 use std::sync::Arc;
 
+const DEFAULT_TITLE: &str = "New page";
+
 pub struct Widget {
     gobject: TabPage,
 }
@@ -12,15 +14,16 @@ impl Widget {
         tab_view: &TabView,
         page: &Box,
         title: Option<&str>,
-        is_selected_page: bool,
+        is_selected: bool,
     ) -> Arc<Self> {
         let gobject = tab_view.append(page);
 
-        if let Some(value) = title {
-            gobject.set_title(value);
-        }
+        gobject.set_title(match title {
+            Some(value) => value,
+            None => DEFAULT_TITLE,
+        });
 
-        if is_selected_page {
+        if is_selected {
             tab_view.set_selected_page(&gobject);
         }
 

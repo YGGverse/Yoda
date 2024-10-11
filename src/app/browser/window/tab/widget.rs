@@ -1,5 +1,5 @@
-use adw::{TabPage, TabView};
-use gtk::{glib::GString, Box};
+use adw::TabView;
+use gtk::glib::GString;
 
 pub struct Widget {
     gobject: TabView,

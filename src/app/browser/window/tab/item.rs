@@ -6,11 +6,10 @@ use database::Database;
 use page::Page;
 use widget::Widget;
 
-use adw::TabView;
+use adw::{TabPage, TabView};
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, GString},
-    Box,
 };
 use sqlite::Transaction;
 use std::sync::Arc;
@@ -35,7 +34,7 @@ impl Item {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         // Options
-        is_selected_page: bool,
+        is_selected: bool,
     ) -> Arc<Self> {
         // Generate unique ID for new page components
         let id = uuid_string_random();
@@ -50,7 +49,7 @@ impl Item {
             action_update.clone(),
         );
 
-        let widget = Widget::new_arc(tab_view, page.gobject(), Some("New page"), is_selected_page); // @TODO
+        let widget = Widget::new_arc(tab_view, page.gobject(), None, is_selected); // @TODO
 
         // Return struct
         Arc::new(Self { id, page, widget })
@@ -138,7 +137,7 @@ impl Item {
                         action_tab_page_navigation_reload.clone(),
                         action_update.clone(),
                         // Options
-                        true,
+                        record.is_selected,
                     );
 
                     // Delegate restore action to the item childs
@@ -160,9 +159,15 @@ impl Item {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
-        page_number: &u32,
+        page_position: &i32,
+        is_selected: &bool,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_tab_id, page_number) {
+        match Database::add(
+            transaction,
+            app_browser_window_tab_id,
+            page_position,
+            is_selected,
+        ) {
             Ok(_) => {
                 let id = Database::last_insert_id(transaction);
 
@@ -182,16 +187,8 @@ impl Item {
         self.id.clone()
     }
 
-    pub fn gobject(&self) -> &Box {
-        &self.page.gobject()
-    }
-
-    pub fn page_title(&self) -> Option<GString> {
-        self.page.title()
-    }
-
-    pub fn page_description(&self) -> Option<GString> {
-        self.page.description()
+    pub fn gobject(&self) -> &TabPage {
+        &self.widget.gobject()
     }
 
     // Tools

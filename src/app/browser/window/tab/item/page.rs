@@ -9,16 +9,13 @@ use navigation::Navigation;
 use widget::Widget;
 
 use gtk::{
-    gio::{
-        Cancellable, SimpleAction, SimpleActionGroup, SocketClient, SocketProtocol,
-        TlsCertificateFlags,
-    },
+    gio::{Cancellable, SimpleAction, SocketClient, SocketProtocol, TlsCertificateFlags},
     glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
     prelude::{
-        ActionExt, ActionMapExt, BoxExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
-        SocketClientExt, StaticVariantType, ToVariant, WidgetExt,
+        ActionExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
+        StaticVariantType, ToVariant,
     },
-    Box, Orientation,
+    Box,
 };
 use std::{cell::RefCell, path::Path, sync::Arc};
 
@@ -466,14 +463,6 @@ impl Page {
     }
 
     // Getters
-    pub fn title(&self) -> Option<GString> {
-        self.meta.borrow().title.clone()
-    }
-
-    pub fn description(&self) -> Option<GString> {
-        self.meta.borrow().description.clone()
-    }
-
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
     }

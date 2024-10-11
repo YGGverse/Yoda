@@ -11,7 +11,7 @@ use widget::Widget;
 
 use std::sync::Arc;
 
-use gtk::{gio::SimpleAction, glib::GString, Box};
+use gtk::{gio::SimpleAction, Box};
 
 pub struct Window {
     //header: Arc<Header>,
