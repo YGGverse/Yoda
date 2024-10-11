@@ -467,7 +467,7 @@ impl Page {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            // nothing yet..
+                            self.navigation.clean(transaction, &record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -486,9 +486,9 @@ impl Page {
     ) -> Result<(), String> {
         match Database::records(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
-                for _record in records {
+                for record in records {
                     // Delegate restore action to the item childs
-                    // nothing yet..
+                    self.navigation.restore(transaction, &record.id)?;
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -504,10 +504,10 @@ impl Page {
     ) -> Result<(), String> {
         match Database::add(transaction, app_browser_window_tab_item_id) {
             Ok(_) => {
-                // let id = Database::last_insert_id(transaction);
+                let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                // nothing yet..
+                self.navigation.save(transaction, &id)?;
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -546,12 +546,12 @@ impl Page {
     // Tools
     pub fn migrate(tx: &Transaction) -> Result<(), String> {
         // Migrate self components
-        if let Err(e) = Database::init(&tx) {
+        if let Err(e) = Database::init(tx) {
             return Err(e.to_string());
         }
 
         // Delegate migration to childs
-        // nothing yet..
+        Navigation::migrate(tx)?;
 
         // Success
         Ok(())

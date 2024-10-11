@@ -65,8 +65,7 @@ impl Database {
         )
     }
 
-    /* not in use
     pub fn last_insert_id(tx: &Transaction) -> i64 {
         tx.last_insert_rowid()
-    } */
+    }
 }

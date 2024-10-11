@@ -1,11 +1,13 @@
 mod base;
 mod bookmark;
+mod database;
 mod history;
 mod reload;
 mod request;
 
 use base::Base;
 use bookmark::Bookmark;
+use database::Database;
 use history::History;
 use reload::Reload;
 use request::Request;
@@ -16,6 +18,7 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, DirectionType, Orientation,
 };
+use sqlite::Transaction;
 
 use std::sync::Arc;
 
@@ -106,6 +109,65 @@ impl Navigation {
         self.bookmark.update();
     }
 
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_page_id) {
+            Ok(records) => {
+                for record in records {
+                    match Database::delete(transaction, &record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to the item childs
+                            // nothing yet..
+                        }
+                        Err(e) => return Err(e.to_string()),
+                    }
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_page_id) {
+            Ok(records) => {
+                for _record in records {
+                    // Delegate restore action to the item childs
+                    // nothing yet..
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_id: &i64,
+    ) -> Result<(), String> {
+        match Database::add(transaction, app_browser_window_tab_item_page_id) {
+            Ok(_) => {
+                // let id = Database::last_insert_id(transaction);
+
+                // Delegate save action to childs
+                // nothing yet..
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
     // Setters
     pub fn set_request_text(&self, value: &GString) {
         // Focus out from content area on activate the link @TODO
@@ -125,5 +187,19 @@ impl Navigation {
 
     pub fn request_text(&self) -> GString {
         self.request.text()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }
