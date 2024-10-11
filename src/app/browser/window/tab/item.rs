@@ -103,6 +103,7 @@ impl Item {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
+                            self.widget.clean(transaction, &record.id)?;
 
                             /* @TODO
                             self.page.clean(transaction, &record.id)?;*/
@@ -150,6 +151,7 @@ impl Item {
                     );
 
                     // Delegate restore action to the item childs
+                    item.widget.restore(transaction, &record.id)?;
 
                     /* @TODO
                     self.page.restore(transaction, &id)?; */
@@ -180,9 +182,10 @@ impl Item {
             is_selected,
         ) {
             Ok(_) => {
-                let _id = Database::last_insert_id(transaction);
+                let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
+                self.widget.save(transaction, &id)?;
 
                 /* @TODO
                 self.page.save(transaction, &id)?; */
@@ -218,6 +221,7 @@ impl Item {
         }
 
         // Delegate migration to childs
+        Widget::migrate(&tx)?;
 
         /* @TODO
         Page::migrate(&tx)? */

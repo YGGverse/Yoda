@@ -1,5 +1,10 @@
+mod database;
+
+use database::Database;
+
 use adw::{TabPage, TabView};
 use gtk::Box;
+use sqlite::Transaction;
 use std::sync::Arc;
 
 const DEFAULT_TITLE: &str = "New page";
@@ -36,8 +41,92 @@ impl Widget {
         Arc::new(Self { gobject })
     }
 
+    // Actions
+
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_id) {
+            Ok(records) => {
+                for record in records {
+                    match Database::delete(transaction, &record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to the item childs
+                            // nothing yet..
+                        }
+                        Err(e) => return Err(e.to_string()),
+                    }
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_id) {
+            Ok(records) => {
+                for record in records {
+                    // Record value can be stored as NULL
+                    if let Some(title) = record.title {
+                        self.gobject.set_title(title.as_str());
+                    }
+
+                    // Delegate restore action to the item childs
+                    // nothing yet..
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::add(
+            transaction,
+            app_browser_window_tab_item_id,
+            Some(&self.gobject.title().to_string()),
+        ) {
+            Ok(_) => {
+                // let id = Database::last_insert_id(transaction);
+
+                // Delegate save action to childs
+                // nothing yet..
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
     // Getters
     pub fn gobject(&self) -> &TabPage {
         &self.gobject
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }
