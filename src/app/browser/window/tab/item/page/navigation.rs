@@ -29,7 +29,7 @@ pub struct Navigation {
     base: Base,
     history: History,
     reload: Reload,
-    request: Request,
+    request: Arc<Request>,
     bookmark: Bookmark,
 }
 
@@ -48,7 +48,7 @@ impl Navigation {
             action_tab_page_navigation_history_forward,
         );
         let reload = Reload::new(action_tab_page_navigation_reload.clone());
-        let request = Request::new(
+        let request = Request::new_arc(
             action_update.clone(),
             action_tab_page_navigation_reload.clone(),
         );
@@ -66,8 +66,8 @@ impl Navigation {
         widget.append(base.widget());
         widget.append(history.widget());
         widget.append(reload.widget());
-        widget.append(request.widget());
-        widget.append(bookmark.widget());
+        widget.append(request.gobject());
+        widget.append(bookmark.widget()); // @TODO update api to gobject
 
         // Result
         Self {
@@ -82,7 +82,7 @@ impl Navigation {
 
     // Actions
     pub fn request_grab_focus(&self) {
-        self.request.widget().grab_focus();
+        self.request.gobject().grab_focus();
     }
 
     pub fn history_add(&self, request: GString) {
