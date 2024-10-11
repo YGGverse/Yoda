@@ -6,6 +6,8 @@ Rust / GTK 4 implementation
 > Project in development!
 >
 
+![image](https://github.com/user-attachments/assets/cfbbc3fb-61d2-4afd-a21f-8e36ee329941)
+
 ## Build
 
 ### Dependencies
