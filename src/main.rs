@@ -19,7 +19,11 @@ fn main() -> ExitCode {
     profile_path.push(VENDOR);
     profile_path.push(APP_ID);
     profile_path.push(BRANCH);
-    profile_path.push(env!("CARGO_PKG_VERSION")); // @TODO remove after auto-migrate feature implementation
+    profile_path.push(format!(
+        "{}.{}",
+        env!("CARGO_PKG_VERSION_MAJOR"),
+        env!("CARGO_PKG_VERSION_MINOR")
+    )); // @TODO remove after auto-migrate feature implementation
 
     if let Err(e) = create_dir_all(&profile_path) {
         panic!("Failed to create profile directory: {e}")
