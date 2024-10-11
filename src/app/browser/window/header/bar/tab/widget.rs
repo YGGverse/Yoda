@@ -9,7 +9,11 @@ impl Widget {
     // Construct
     pub fn new_arc(view: &TabView) -> Arc<Self> {
         Arc::new(Self {
-            gobject: TabBar::builder().view(&view).autohide(false).build(),
+            gobject: TabBar::builder()
+                .autohide(false)
+                .expand_tabs(false)
+                .view(&view)
+                .build(),
         })
     }
 
