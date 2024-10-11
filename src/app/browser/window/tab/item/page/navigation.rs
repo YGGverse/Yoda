@@ -55,10 +55,8 @@ impl Navigation {
         let widget = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(8)
-            .margin_top(8)
-            .margin_start(8)
-            .margin_end(8)
-            .margin_bottom(8)
+            .margin_start(6)
+            .margin_end(6)
             .build();
 
         widget.append(base.widget());
