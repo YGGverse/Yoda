@@ -151,6 +151,7 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
+        // Keep value in memory until operation complete
         let text = self.widget.text();
 
         match Database::add(

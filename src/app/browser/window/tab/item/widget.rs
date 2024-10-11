@@ -93,10 +93,16 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
+        // Keep value in memory until operation complete
+        let title = self.gobject.title();
+
         match Database::add(
             transaction,
             app_browser_window_tab_item_id,
-            Some(&self.gobject.title().to_string()),
+            match title.is_empty() {
+                true => None,
+                false => Some(title.as_str()),
+            },
         ) {
             Ok(_) => {
                 // let id = Database::last_insert_id(transaction);

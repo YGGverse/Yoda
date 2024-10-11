@@ -3,7 +3,7 @@ use sqlite::{Error, Transaction};
 pub struct Table {
     pub id: i64,
     // pub app_browser_window_tab_item_id: i64, not in use
-    pub title: Option<String>,
+    pub title: Option<String>, // can be stored as NULL
 }
 
 pub struct Database {
@@ -17,7 +17,7 @@ impl Database {
             (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `app_browser_window_tab_item_id` INTEGER NOT NULL,
-                `title` TEXT
+                `title` VARCHAR(1024)
             )",
             [],
         )
@@ -26,7 +26,7 @@ impl Database {
     pub fn add(
         tx: &Transaction,
         app_browser_window_tab_item_id: &i64,
-        title: Option<&String>,
+        title: Option<&str>,
     ) -> Result<usize, Error> {
         tx.execute(
             "INSERT INTO `app_browser_window_tab_item_widget` (
