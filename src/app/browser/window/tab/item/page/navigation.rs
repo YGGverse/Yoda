@@ -120,7 +120,7 @@ impl Navigation {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            // nothing yet..
+                            self.request.clean(transaction, &record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -139,9 +139,9 @@ impl Navigation {
     ) -> Result<(), String> {
         match Database::records(transaction, app_browser_window_tab_item_page_id) {
             Ok(records) => {
-                for _record in records {
+                for record in records {
                     // Delegate restore action to the item childs
-                    // nothing yet..
+                    self.request.restore(transaction, &record.id)?;
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -157,10 +157,10 @@ impl Navigation {
     ) -> Result<(), String> {
         match Database::add(transaction, app_browser_window_tab_item_page_id) {
             Ok(_) => {
-                // let id = Database::last_insert_id(transaction);
+                let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                // nothing yet..
+                self.request.save(transaction, &id)?;
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -197,7 +197,7 @@ impl Navigation {
         }
 
         // Delegate migration to childs
-        // nothing yet..
+        Request::migrate(tx)?;
 
         // Success
         Ok(())

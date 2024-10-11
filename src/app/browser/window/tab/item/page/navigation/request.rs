@@ -1,10 +1,14 @@
+mod database;
+
+use database::Database;
+
 use gtk::{
     gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, GString, SourceId, Uri, UriFlags},
     prelude::{ActionExt, EditableExt, EntryExt},
     Entry,
 };
-
+use sqlite::Transaction;
 use std::{cell::RefCell, sync::Arc, time::Duration};
 
 // Progressbar animation setup
@@ -97,6 +101,78 @@ impl Request {
         }
     }
 
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+            Ok(records) => {
+                for record in records {
+                    match Database::delete(transaction, &record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to the item childs
+                            // nothing yet..
+                        }
+                        Err(e) => return Err(e.to_string()),
+                    }
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+            Ok(records) => {
+                for record in records {
+                    if let Some(text) = record.text {
+                        self.widget.set_text(&text);
+                    }
+
+                    // Delegate restore action to the item childs
+                    // nothing yet..
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String> {
+        let text = self.widget.text();
+
+        match Database::add(
+            transaction,
+            app_browser_window_tab_item_page_navigation_id,
+            match text.is_empty() {
+                true => None,
+                false => Some(text.as_str()),
+            },
+        ) {
+            Ok(_) => {
+                // let id = Database::last_insert_id(transaction);
+
+                // Delegate save action to childs
+                // nothing yet..
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
     // Setters
     pub fn set_text(&self, value: &GString) {
         self.widget.set_text(value);
@@ -120,5 +196,19 @@ impl Request {
             Ok(uri) => Some(uri),
             _ => None,
         }
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }
