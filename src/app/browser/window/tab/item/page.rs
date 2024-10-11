@@ -420,7 +420,7 @@ impl Page {
                 ) {
                     // Seems request contain some host, try append default scheme
                     let request_text = gformat!("gemini://{request_text}");
-                    // Make sure new request conversible to valid URI
+                    // Make sure new request conversable to valid URI
                     match Uri::parse(&request_text, UriFlags::NONE) {
                         Ok(_) => {
                             // Update
