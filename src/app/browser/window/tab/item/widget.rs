@@ -42,7 +42,6 @@ impl Widget {
     }
 
     // Actions
-
     pub fn clean(
         &self,
         transaction: &Transaction,
