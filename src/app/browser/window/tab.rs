@@ -202,11 +202,8 @@ impl Tab {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index.borrow_mut().insert(item.id(), item.clone());
 
-                                // Append new Notebook page
-                                /* @TODO
-                                self.widget.append(
-                                    item.page(),
-                                ); */
+                                // Append new page
+                                self.append();
                             }
                         }
                         Err(e) => return Err(e.to_string()),
