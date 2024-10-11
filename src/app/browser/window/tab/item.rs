@@ -103,10 +103,8 @@ impl Item {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
+                            self.page.clean(transaction, &record.id)?;
                             self.widget.clean(transaction, &record.id)?;
-
-                            /* @TODO
-                            self.page.clean(transaction, &record.id)?;*/
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -151,10 +149,8 @@ impl Item {
                     );
 
                     // Delegate restore action to the item childs
+                    item.page.restore(transaction, &record.id)?;
                     item.widget.restore(transaction, &record.id)?;
-
-                    /* @TODO
-                    self.page.restore(transaction, &id)?; */
 
                     // Result
                     items.push(item);
@@ -185,10 +181,8 @@ impl Item {
                 let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
+                self.page.save(transaction, &id)?;
                 self.widget.save(transaction, &id)?;
-
-                /* @TODO
-                self.page.save(transaction, &id)?; */
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -221,10 +215,8 @@ impl Item {
         }
 
         // Delegate migration to childs
+        Page::migrate(&tx)?;
         Widget::migrate(&tx)?;
-
-        /* @TODO
-        Page::migrate(&tx)? */
 
         // Success
         Ok(())

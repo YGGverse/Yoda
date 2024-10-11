@@ -1,12 +1,15 @@
 mod content;
+mod database;
 mod meta;
 mod navigation;
 mod widget;
 
 use content::Content;
-use meta::{Meta, Mime, Status};
+use database::Database;
 use navigation::Navigation;
 use widget::Widget;
+
+use meta::{Meta, Mime, Status};
 
 use gtk::{
     gio::{Cancellable, SimpleAction, SocketClient, SocketProtocol, TlsCertificateFlags},
@@ -17,6 +20,7 @@ use gtk::{
     },
     Box,
 };
+use sqlite::Transaction;
 use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
@@ -452,6 +456,65 @@ impl Page {
         // @TODO self.content.update();
     }
 
+    pub fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_id) {
+            Ok(records) => {
+                for record in records {
+                    match Database::delete(transaction, &record.id) {
+                        Ok(_) => {
+                            // Delegate clean action to the item childs
+                            // nothing yet..
+                        }
+                        Err(e) => return Err(e.to_string()),
+                    }
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::records(transaction, app_browser_window_tab_item_id) {
+            Ok(records) => {
+                for _record in records {
+                    // Delegate restore action to the item childs
+                    // nothing yet..
+                }
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
+    pub fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_id: &i64,
+    ) -> Result<(), String> {
+        match Database::add(transaction, app_browser_window_tab_item_id) {
+            Ok(_) => {
+                // let id = Database::last_insert_id(transaction);
+
+                // Delegate save action to childs
+                // nothing yet..
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+
+        Ok(())
+    }
+
     // Getters
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
@@ -478,5 +541,19 @@ impl Page {
 
     pub fn gobject(&self) -> &Box {
         &self.widget.gobject()
+    }
+
+    // Tools
+    pub fn migrate(tx: &Transaction) -> Result<(), String> {
+        // Migrate self components
+        if let Err(e) = Database::init(&tx) {
+            return Err(e.to_string());
+        }
+
+        // Delegate migration to childs
+        // nothing yet..
+
+        // Success
+        Ok(())
     }
 }
