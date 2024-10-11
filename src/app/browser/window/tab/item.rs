@@ -34,6 +34,7 @@ impl Item {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         // Options
+        is_pinned: bool,
         is_selected: bool,
     ) -> Arc<Self> {
         // Generate unique ID for new page components
@@ -49,7 +50,14 @@ impl Item {
             action_update.clone(),
         );
 
-        let widget = Widget::new_arc(id.as_str(), tab_view, page.gobject(), None, is_selected); // @TODO
+        let widget = Widget::new_arc(
+            id.as_str(),
+            tab_view,
+            page.gobject(),
+            None,
+            is_pinned,
+            is_selected,
+        ); // @TODO
 
         // Return struct
         Arc::new(Self { id, page, widget })
@@ -133,6 +141,7 @@ impl Item {
                         action_tab_page_navigation_reload.clone(),
                         action_update.clone(),
                         // Options
+                        record.is_pinned,
                         record.is_selected,
                     );
 
@@ -156,12 +165,14 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         page_position: &i32,
+        is_pinned: &bool,
         is_selected: &bool,
     ) -> Result<(), String> {
         match Database::add(
             transaction,
             app_browser_window_tab_id,
             page_position,
+            is_pinned,
             is_selected,
         ) {
             Ok(_) => {

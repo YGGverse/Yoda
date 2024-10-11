@@ -15,6 +15,7 @@ impl Widget {
         tab_view: &TabView,
         page: &Box,
         title: Option<&str>,
+        is_pinned: bool,
         is_selected: bool,
     ) -> Arc<Self> {
         let gobject = tab_view.append(page);
@@ -25,6 +26,8 @@ impl Widget {
             Some(value) => value,
             None => DEFAULT_TITLE,
         });
+
+        tab_view.set_page_pinned(&gobject, is_pinned);
 
         if is_selected {
             tab_view.set_selected_page(&gobject);

@@ -3,6 +3,7 @@ use sqlite::{Error, Transaction};
 pub struct Table {
     pub id: i64,
     // pub app_browser_window_tab_id: i64, not in use
+    pub is_pinned: bool,
     pub is_selected: bool,
 }
 
@@ -18,6 +19,7 @@ impl Database {
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `app_browser_window_tab_id` INTEGER NOT NULL,
                 `page_position` INTEGER NOT NULL,
+                `is_pinned` INTEGER NOT NULL,
                 `is_selected` INTEGER NOT NULL
             )",
             [],
@@ -28,17 +30,20 @@ impl Database {
         tx: &Transaction,
         app_browser_window_tab_id: &i64,
         page_position: &i32,
+        is_pinned: &bool,
         is_selected: &bool,
     ) -> Result<usize, Error> {
         tx.execute(
             "INSERT INTO `app_browser_window_tab_item` (
                 `app_browser_window_tab_id`,
                 `page_position`,
+                `is_pinned`,
                 `is_selected`
-            ) VALUES (?, ?, ?)",
+            ) VALUES (?, ?, ?, ?)",
             [
                 app_browser_window_tab_id,
                 &(*page_position as i64),
+                &(*is_pinned as i64),
                 &(*is_selected as i64),
             ],
         )
@@ -48,6 +53,7 @@ impl Database {
         let mut stmt = tx.prepare(
             "SELECT `id`,
                     `app_browser_window_tab_id`,
+                    `is_pinned`,
                     `is_selected`
                     FROM `app_browser_window_tab_item`
                     WHERE `app_browser_window_tab_id` = ?
@@ -58,7 +64,8 @@ impl Database {
             Ok(Table {
                 id: row.get(0)?,
                 // app_browser_window_tab_id: row.get(1)?, not in use
-                is_selected: row.get(2)?,
+                is_pinned: row.get(2)?,
+                is_selected: row.get(3)?,
             })
         })?;
 

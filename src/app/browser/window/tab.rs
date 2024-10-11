@@ -91,6 +91,7 @@ impl Tab {
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
             // Options
+            false,
             true,
         );
 
@@ -246,6 +247,7 @@ impl Tab {
                         transaction,
                         &id,
                         &self.widget.gobject().page_position(item.gobject()),
+                        &item.gobject().is_pinned(),
                         &item.gobject().is_selected(),
                     )?;
                 }
