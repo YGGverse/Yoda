@@ -29,17 +29,10 @@ impl Widget {
     }
 
     // Getters
-    pub fn current_name(&self) -> Option<GString> {
+    pub fn current_page_keyword(&self) -> Option<GString> {
         let page = self.gobject.selected_page()?;
-
-        /* @TODO
-        let widget_name = page.widget_name();
-        if !widget_name.is_empty() {
-            Some(widget_name)
-        } else {
-            None
-        } */
-        None
+        let id = page.keyword()?;
+        Some(id)
     }
 
     pub fn gobject(&self) -> &TabView {

@@ -49,7 +49,7 @@ impl Item {
             action_update.clone(),
         );
 
-        let widget = Widget::new_arc(tab_view, page.gobject(), None, is_selected); // @TODO
+        let widget = Widget::new_arc(id.as_str(), tab_view, page.gobject(), None, is_selected); // @TODO
 
         // Return struct
         Arc::new(Self { id, page, widget })

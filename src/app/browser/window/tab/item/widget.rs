@@ -11,12 +11,15 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc(
+        keyword: &str, // ID
         tab_view: &TabView,
         page: &Box,
         title: Option<&str>,
         is_selected: bool,
     ) -> Arc<Self> {
         let gobject = tab_view.append(page);
+
+        gobject.set_keyword(keyword);
 
         gobject.set_title(match title {
             Some(value) => value,

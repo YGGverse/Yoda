@@ -23,7 +23,7 @@ pub struct Tab {
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
-    index: RefCell<HashMap<GString, Arc<Item>>>,
+    index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
     // GTK
     widget: Arc<Widget>,
 }
@@ -39,24 +39,29 @@ impl Tab {
         action_update: Arc<SimpleAction>,
     ) -> Arc<Self> {
         // Init empty HashMap index as no tabs appended yet
-        let index = RefCell::new(HashMap::new());
+        let index = Arc::new(RefCell::new(HashMap::new()));
 
         // Init widget
         let widget = Arc::new(Widget::new());
 
         // Init events
-        widget.gobject().connect_close_page(move |_, _| {
-            /* @TODO
-            // Cleanup HashMap index
-            let id = tab_page.widget_name();
+        widget.gobject().connect_close_page({
+            let index = index.clone();
+            move |_, item| {
+                // Get index ID by keyword saved
+                match item.keyword() {
+                    Some(id) => {
+                        if id.is_empty() {
+                            panic!("Tab index can not be empty!")
+                        }
+                        // Cleanup HashMap index
+                        index.borrow_mut().remove(&id);
+                    }
+                    None => panic!("Undefined tab index!"),
+                }
 
-            // Check for required value as raw access to gobject @TODO
-            if id.is_empty() {
-                panic!("Undefined tab index!")
+                Propagation::Proceed
             }
-
-            tab.index.borrow_mut().remove(&id); */
-            Propagation::Proceed
         });
 
         // Return activated struct
@@ -108,7 +113,7 @@ impl Tab {
 
     // Toggle pin status for active tab
     pub fn pin(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.pin(); // toggle
             }
@@ -116,7 +121,7 @@ impl Tab {
     }
 
     pub fn page_navigation_base(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_base();
             }
@@ -124,7 +129,7 @@ impl Tab {
     }
 
     pub fn page_navigation_history_back(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_history_back();
             }
@@ -132,7 +137,7 @@ impl Tab {
     }
 
     pub fn page_navigation_history_forward(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_history_forward();
             }
@@ -140,7 +145,7 @@ impl Tab {
     }
 
     pub fn page_navigation_reload(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_reload();
             }
@@ -148,7 +153,7 @@ impl Tab {
     }
 
     pub fn update(&self) {
-        if let Some(id) = self.widget.current_name() {
+        if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.update();
             }
