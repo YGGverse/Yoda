@@ -24,7 +24,7 @@ impl Window {
     pub fn new(
         // Actions
         action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile_directory: Arc<SimpleAction>,
+        action_tool_profile: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
@@ -48,7 +48,7 @@ impl Window {
         let header = Header::new_arc(
             // Actions
             action_tool_debug.clone(),
-            action_tool_profile_directory.clone(),
+            action_tool_profile.clone(),
             action_quit.clone(),
             action_tab_append.clone(),
             action_tab_close.clone(),

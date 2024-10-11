@@ -39,7 +39,7 @@ impl App {
     ) -> Self {
         // Init actions
         let action_tool_debug = Action::new("win", true);
-        let action_tool_profile_directory = Action::new("win", true);
+        let action_tool_profile = Action::new("win", true);
         let action_quit = Action::new("win", true);
         let action_update = Action::new("win", true);
         let action_tab_append = Action::new("win", true);
@@ -84,7 +84,7 @@ impl App {
         let browser = Arc::new(Browser::new(
             profile_path,
             action_tool_debug.simple(),
-            action_tool_profile_directory.simple(),
+            action_tool_profile.simple(),
             action_quit.simple(),
             action_update.simple(),
             action_tab_append.simple(),

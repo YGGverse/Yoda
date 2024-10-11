@@ -28,7 +28,7 @@ impl Browser {
         profile_path: PathBuf,
         // Actions
         action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile_directory: Arc<SimpleAction>,
+        action_tool_profile: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
@@ -42,7 +42,7 @@ impl Browser {
     ) -> Browser {
         let window = Arc::new(Window::new(
             action_tool_debug.clone(),
-            action_tool_profile_directory.clone(),
+            action_tool_profile.clone(),
             action_quit.clone(),
             action_update.clone(),
             action_tab_append.clone(),
@@ -60,9 +60,7 @@ impl Browser {
 
         // Assign actions
         widget.gobject().add_action(action_tool_debug.as_ref());
-        widget
-            .gobject()
-            .add_action(action_tool_profile_directory.as_ref());
+        widget.gobject().add_action(action_tool_profile.as_ref());
         widget.gobject().add_action(action_quit.as_ref());
         widget.gobject().add_action(action_update.as_ref());
         widget.gobject().add_action(action_tab_append.as_ref());
@@ -90,7 +88,7 @@ impl Browser {
             }
         });
 
-        action_tool_profile_directory.connect_activate({
+        action_tool_profile.connect_activate({
             move |_, _| {
                 // @TODO [4_10] https://docs.gtk.org/gtk4/class.FileLauncher.html
                 let _ = AppInfo::launch_default_for_uri(

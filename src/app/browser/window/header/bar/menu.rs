@@ -18,7 +18,7 @@ pub struct Menu {
 impl Menu {
     pub fn new_arc(
         action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile_directory: Arc<SimpleAction>,
+        action_tool_profile: Arc<SimpleAction>,
         action_quit: Arc<SimpleAction>,
         action_tab_append: Arc<SimpleAction>,
         action_tab_close: Arc<SimpleAction>,
@@ -63,7 +63,7 @@ impl Menu {
 
             let model_tool = gio::Menu::new();
                 model_tool.append(Some("Debug"), Some(&detailed_action_name(action_tool_debug)));
-                model_tool.append(Some("Profile directory"), Some(&detailed_action_name(action_tool_profile_directory)));
+                model_tool.append(Some("Profile"), Some(&detailed_action_name(action_tool_profile)));
 
             model.append_submenu(Some("Tool"), &model_tool);
 
