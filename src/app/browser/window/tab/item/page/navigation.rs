@@ -57,6 +57,7 @@ impl Navigation {
             .spacing(8)
             .margin_start(6)
             .margin_end(6)
+            .margin_bottom(6)
             .build();
 
         widget.append(base.widget());
