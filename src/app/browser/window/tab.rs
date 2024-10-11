@@ -159,12 +159,9 @@ impl Tab {
                 item.update();
 
                 // Update tab title
-                let title = match item.page_meta_title() {
-                    Some(value) => value,
-                    None => GString::new(),
+                if let Some(title) = item.page_meta_title() {
+                    item.gobject().set_title(title.as_str())
                 };
-
-                item.gobject().set_title(title.as_str());
             }
         }
     }
