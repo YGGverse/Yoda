@@ -48,7 +48,6 @@ cargo install Yoda
 ``` bash
 git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
-git checkout Rust-GTK4
 cargo build
 ```
 

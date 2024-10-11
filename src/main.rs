@@ -10,7 +10,7 @@ use std::{
 
 const VENDOR: &str = "YGGverse";
 const APP_ID: &str = "Yoda"; // env!("CARGO_PKG_NAME");
-const BRANCH: &str = "Rust-GTK4";
+const BRANCH: &str = "master";
 
 fn main() -> ExitCode {
     // Init profile path
