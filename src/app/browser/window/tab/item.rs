@@ -89,7 +89,7 @@ impl Item {
         self.page.update();
 
         // Update tab loading indicator
-        self.widget.gobject().set_loading(self.page.is_loading());
+        self.widget.gobject().set_loading(self.page_is_loading());
     }
 
     pub fn clean(
@@ -196,6 +196,10 @@ impl Item {
     // Getters
     pub fn id(&self) -> GString {
         self.id.clone()
+    }
+
+    pub fn page_is_loading(&self) -> bool {
+        self.page.is_loading()
     }
 
     pub fn page_meta_title(&self) -> Option<GString> {

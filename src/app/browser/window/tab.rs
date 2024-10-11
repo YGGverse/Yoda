@@ -159,10 +159,12 @@ impl Tab {
                 // Update item components
                 item.update();
 
-                // Update tab title
-                if let Some(title) = item.page_meta_title() {
-                    item.gobject().set_title(title.as_str())
-                };
+                // Update tab title on loading indicator inactive
+                if !item.page_is_loading() {
+                    if let Some(title) = item.page_meta_title() {
+                        item.gobject().set_title(title.as_str())
+                    };
+                }
             }
         }
     }
