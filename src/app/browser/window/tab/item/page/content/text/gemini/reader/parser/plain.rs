@@ -1,11 +1,19 @@
 use gtk::glib::{gformat, GString};
 
 pub struct Plain {
-    // nothing yet..
+    line: GString,
 }
 
 impl Plain {
-    pub fn from(line: &str) -> GString {
-        gformat!("{}\n", line)
+    // Construct
+    pub fn from(line: &str) -> Self {
+        Self {
+            line: gformat!("{}\n", line),
+        }
+    }
+
+    // Getters
+    pub fn as_str(&self) -> &str {
+        self.line.as_str()
     }
 }

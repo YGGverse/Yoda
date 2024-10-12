@@ -57,7 +57,7 @@ impl Reader {
             markup.push_str(Plain::from(line).markup())
             */
 
-            buffer.insert(&mut buffer.end_iter(), &Plain::from(line));
+            buffer.insert(&mut buffer.end_iter(), Plain::from(line).as_str());
         }
 
         // Init widget
