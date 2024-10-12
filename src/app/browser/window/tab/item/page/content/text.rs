@@ -33,7 +33,7 @@ impl Text {
         // Init widget
         let widget = ScrolledWindow::builder().build();
 
-        widget.set_child(Some(gemini.widget()));
+        widget.set_child(Some(gemini.gobject()));
 
         // Result
         Self { meta, widget }

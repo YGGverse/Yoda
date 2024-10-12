@@ -1,14 +1,16 @@
 mod parser;
+mod widget;
 
 use parser::header::Header;
 use parser::link::Link;
 use parser::plain::Plain;
+use widget::Widget;
 
 use gtk::{
     gio::SimpleAction,
-    glib::{GString, Propagation, Uri, UriFlags},
-    prelude::{ActionExt, StyleContextExt, ToVariant, WidgetExt},
-    Align, CssProvider, Label, STYLE_PROVIDER_PRIORITY_APPLICATION,
+    glib::{GString, Uri},
+    prelude::TextBufferExt,
+    TextBuffer, TextView,
 };
 
 use std::sync::Arc;
@@ -16,12 +18,12 @@ use std::sync::Arc;
 pub struct Reader {
     title: Option<GString>,
     // css: CssProvider,
-    widget: Label,
+    widget: Arc<Widget>,
 }
 
 impl Reader {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn new_arc(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Arc<Self> {
         // Init title
         let mut title = None;
 
@@ -54,37 +56,15 @@ impl Reader {
             markup.push_str(Plain::from(line).markup())
         }
 
-        // Init CSS
-        let css = CssProvider::new();
-
-        /* @TODO Theme parser error: <broken file>
-        css.load_from_path(
-            "src/browser/main/tab/page/content/text/gemini/reader/default.css"
-        ); */
-
-        css.load_from_data("label{caret-color: transparent;}");
+        // Init buffer @TODO
+        let buffer = TextBuffer::new(None);
+        buffer.set_text(&markup);
 
         // Init widget
-        let widget = Label::builder()
-            .halign(Align::Fill)
-            .valign(Align::Fill)
-            .hexpand(true)
-            .vexpand(true)
-            .xalign(0.0)
-            .yalign(0.0)
-            .margin_start(8)
-            .margin_end(8)
-            .wrap(true)
-            .selectable(true)
-            .use_markup(true)
-            .label(markup)
-            .build();
-
-        widget
-            .style_context()
-            .add_provider(&css, STYLE_PROVIDER_PRIORITY_APPLICATION);
+        let widget = Widget::new_arc(&buffer);
 
         // Connect actions
+        /* @TODO
         widget.connect_activate_link(move |_, href| {
             // Detect requested protocol
             if let Ok(uri) = Uri::parse(&href, UriFlags::NONE) {
@@ -103,14 +83,10 @@ impl Reader {
 
             // Delegate unparsable
             Propagation::Proceed
-        });
+        }); */
 
         // Result
-        Self {
-            title,
-            // css,
-            widget,
-        }
+        Arc::new(Self { title, widget })
     }
 
     // Getters
@@ -118,7 +94,7 @@ impl Reader {
         &self.title
     }
 
-    pub fn widget(&self) -> &Label {
-        &self.widget
+    pub fn gobject(&self) -> &TextView {
+        &self.widget.gobject()
     }
 }

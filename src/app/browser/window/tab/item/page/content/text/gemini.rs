@@ -1,30 +1,30 @@
 mod reader;
+mod widget;
 
 use reader::Reader;
+use widget::Widget;
 
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri},
-    Viewport,
 };
+
+use adw::ClampScrollable;
 
 use std::sync::Arc;
 
 pub struct Gemini {
-    reader: Reader,
-    widget: Viewport,
+    reader: Arc<Reader>,
+    widget: Arc<Widget>,
 }
 
 impl Gemini {
     // Construct
     pub fn new(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
         // Init components
-        let reader = Reader::new(gemtext, base, action_page_open);
+        let reader = Reader::new_arc(gemtext, base, action_page_open);
 
-        // Init widget
-        let widget = Viewport::builder().scroll_to_focus(false).build();
-
-        widget.set_child(Some(reader.widget()));
+        let widget = Widget::new_arc(&reader.gobject());
 
         // Result
         Self { reader, widget }
@@ -35,7 +35,7 @@ impl Gemini {
         &self.reader.title()
     }
 
-    pub fn widget(&self) -> &Viewport {
-        &self.widget
+    pub fn gobject(&self) -> &ClampScrollable {
+        &self.widget.gobject()
     }
 }
