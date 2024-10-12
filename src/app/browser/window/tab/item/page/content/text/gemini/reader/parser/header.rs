@@ -1,4 +1,4 @@
-use gtk::glib::{Regex, RegexCompileFlags, RegexMatchFlags};
+use gtk::glib::{GString, Regex, RegexCompileFlags, RegexMatchFlags};
 
 pub enum Level {
     H1,
@@ -7,7 +7,7 @@ pub enum Level {
 }
 
 pub struct Header {
-    value: String,
+    value: GString,
     level: Level,
 }
 
@@ -41,7 +41,7 @@ impl Header {
         // Result
         Some(Header {
             level,
-            value: String::from(value.as_str()),
+            value: GString::from(value.as_str()),
         })
     }
 
