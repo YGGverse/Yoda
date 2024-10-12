@@ -8,7 +8,7 @@ pub struct Link {
 }
 
 impl Link {
-    pub fn from(line: &str, to_base: Option<&Uri>) -> Option<Link> {
+    pub fn from(line: &str, to_base: Option<&Uri>) -> Option<Self> {
         // Define initial values
         let mut alt = None;
         let mut date = None;
