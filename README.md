@@ -17,7 +17,7 @@ Make sure your system support:
 * GTK 4.8+
 * Libadwaita 1.4+
 
-Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and package manager:
+Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
 
 ``` bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
