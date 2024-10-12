@@ -14,7 +14,7 @@ pub struct Header {
 impl Header {
     pub fn from(line: &str) -> Option<Self> {
         // Parse line
-        let parsed = Regex::split_simple(
+        let regex = Regex::split_simple(
             r"^(#{1,3})\s*(.+)$",
             line,
             RegexCompileFlags::DEFAULT,
@@ -22,7 +22,7 @@ impl Header {
         );
 
         // Detect header level
-        let level = parsed.get(1)?;
+        let level = regex.get(1)?;
 
         let level = match level.len() {
             1 => Level::H1,
@@ -32,7 +32,7 @@ impl Header {
         };
 
         // Detect header value
-        let value = parsed.get(2)?;
+        let value = regex.get(2)?;
 
         if value.trim().is_empty() {
             return None;
