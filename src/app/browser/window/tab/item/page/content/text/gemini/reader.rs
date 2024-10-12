@@ -8,11 +8,13 @@ use widget::Widget;
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri},
-    prelude::TextBufferExt,
-    TextBuffer, TextView,
+    prelude::{TextBufferExt, TextBufferExtManual},
+    TextBuffer, TextTag, TextTagTable, TextView, WrapMode,
 };
 
 use std::sync::Arc;
+
+const NEW_LINE: &str = "\n";
 
 pub struct Reader {
     title: Option<GString>,
@@ -26,37 +28,109 @@ impl Reader {
         // Init title
         let mut title = None;
 
-        // Init markup
-        let buffer = TextBuffer::new(None);
+        // Init tag table
+        let tags = TextTagTable::new();
+
+        // Init header tags
+        let h1 = TextTag::builder()
+            .name("h1")
+            .scale(1.6)
+            .weight(500)
+            .wrap_mode(gtk::WrapMode::Word)
+            .build();
+
+        tags.add(&h1);
+
+        let h2 = TextTag::builder()
+            .name("h2")
+            .scale(1.4)
+            .weight(400)
+            .wrap_mode(gtk::WrapMode::Word)
+            .build();
+
+        tags.add(&h2);
+
+        let h3 = TextTag::builder()
+            .name("h3")
+            .scale(1.2)
+            .weight(400)
+            .wrap_mode(WrapMode::Word)
+            .build();
+
+        tags.add(&h3);
+
+        // Init link tag
+        let link = TextTag::builder()
+            .name("link")
+            .wrap_mode(WrapMode::Word)
+            .build();
+
+        tags.add(&link);
 
         // Parse lines
+
+        let buffer = TextBuffer::new(Some(&tags));
+
         for line in gemtext.lines() {
-            /*
             // Is header
             if let Some(header) = Header::from(line) {
-                // Format
-                buffer.insert_markup(&mut buffer.end_iter(), header.markup());
+                // Detect level
+                let tag = match header.level {
+                    parser::header::Level::H1 => "h1",
+                    parser::header::Level::H2 => "h2",
+                    parser::header::Level::H3 => "h3",
+                };
 
-                // Set title from first document header tag
+                // Insert tag line
+                buffer.insert_with_tags_by_name(
+                    &mut buffer.end_iter(),
+                    header.value.as_str(),
+                    &[tag],
+                );
+
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+
+                // Set title if empty, on first document header match
+                // this feature wanted to update parent elements like tab title
                 if title == None {
-                    title = Some(header.text().clone());
+                    title = Some(header.value.clone());
                 }
 
                 continue;
             }
 
             // Is link
-            if let Some(link) = Link::from(line, base) {
-                // Format
-                buffer.insert_markup(&mut buffer.end_iter(), link.markup());
+            if let Some(link) = Link::from(line, Some(base)) {
+                // Build link alt from optional values
+                let mut alt = Vec::new();
+
+                // Append external indicator on exist
+                if let Some(is_external) = link.is_external {
+                    if is_external {
+                        alt.push("⇖".to_string());
+                    }
+                }
+
+                // Append date on exist
+                if let Some(date) = link.date {
+                    alt.push(date.to_string());
+                }
+
+                // Append alt on exist or use URL
+                alt.push(match link.alt {
+                    Some(alt) => alt.to_string(),
+                    None => link.uri.to_string(),
+                });
+
+                buffer.insert_with_tags_by_name(&mut buffer.end_iter(), &alt.join(" "), &["link"]);
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 continue;
             }
 
-            // Nothing match, escape string just
-            buffer.insert_markup(&mut buffer.end_iter(), Plain::from(line).markup()) */
-
-            buffer.insert(&mut buffer.end_iter(), format!("{line}\n").as_str()) // @TODO
+            // Nothing match, use plain text @TODO
+            buffer.insert(&mut buffer.end_iter(), line);
+            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 
         // Init widget
