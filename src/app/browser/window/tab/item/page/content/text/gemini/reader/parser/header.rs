@@ -7,8 +7,8 @@ pub enum Level {
 }
 
 pub struct Header {
-    value: GString,
-    level: Level,
+    pub value: GString,
+    pub level: Level,
 }
 
 impl Header {
@@ -43,13 +43,5 @@ impl Header {
             level,
             value: GString::from(value.as_str()),
         })
-    }
-
-    pub fn level(&self) -> &Level {
-        &self.level
-    }
-
-    pub fn value(&self) -> &str {
-        self.value.as_str()
     }
 }
