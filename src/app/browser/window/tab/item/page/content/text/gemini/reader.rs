@@ -3,7 +3,6 @@ mod widget;
 
 use parser::header::Header;
 use parser::link::Link;
-use parser::plain::Plain;
 use widget::Widget;
 
 use gtk::{
@@ -30,12 +29,13 @@ impl Reader {
         // Init markup
         let buffer = TextBuffer::new(None);
 
+        // Parse lines
         for line in gemtext.lines() {
             /*
             // Is header
             if let Some(header) = Header::from(line) {
                 // Format
-                markup.push_str(header.markup());
+                buffer.insert_markup(&mut buffer.end_iter(), header.markup());
 
                 // Set title from first document header tag
                 if title == None {
@@ -48,16 +48,15 @@ impl Reader {
             // Is link
             if let Some(link) = Link::from(line, base) {
                 // Format
-                markup.push_str(link.markup());
+                buffer.insert_markup(&mut buffer.end_iter(), link.markup());
 
                 continue;
             }
 
             // Nothing match, escape string just
-            markup.push_str(Plain::from(line).markup())
-            */
+            buffer.insert_markup(&mut buffer.end_iter(), Plain::from(line).markup()) */
 
-            buffer.insert(&mut buffer.end_iter(), Plain::from(line).as_str());
+            buffer.insert(&mut buffer.end_iter(), format!("{line}\n").as_str()) // @TODO
         }
 
         // Init widget
