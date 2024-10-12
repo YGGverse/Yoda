@@ -4,6 +4,7 @@ mod database;
 mod history;
 mod reload;
 mod request;
+mod widget;
 
 use base::Base;
 use bookmark::Bookmark;
@@ -11,73 +12,61 @@ use database::Database;
 use history::History;
 use reload::Reload;
 use request::Request;
+use widget::Widget;
 
-use gtk::{
-    gio::SimpleAction,
-    glib::GString,
-    prelude::{BoxExt, WidgetExt},
-    Box, DirectionType, Orientation,
-};
+use gtk::{gio::SimpleAction, glib::GString, prelude::WidgetExt, Box};
 use sqlite::Transaction;
 
 use std::sync::Arc;
 
 pub struct Navigation {
-    // GTK
-    widget: Box,
-    // Components
-    base: Base,
-    history: History,
-    reload: Reload,
+    base: Arc<Base>,
+    bookmark: Arc<Bookmark>,
+    history: Arc<History>,
+    reload: Arc<Reload>,
     request: Arc<Request>,
-    bookmark: Bookmark,
+    widget: Arc<Widget>,
 }
 
 impl Navigation {
-    pub fn new(
+    pub fn new_arc(
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
-    ) -> Self {
+    ) -> Arc<Self> {
         // Init components
-        let base = Base::new(action_tab_page_navigation_base);
-        let history = History::new(
+        let base = Base::new_arc(action_tab_page_navigation_base);
+        let history = History::new_arc(
             action_tab_page_navigation_history_back,
             action_tab_page_navigation_history_forward,
         );
-        let reload = Reload::new(action_tab_page_navigation_reload.clone());
+        let reload = Reload::new_arc(action_tab_page_navigation_reload.clone());
         let request = Request::new_arc(
             action_update.clone(),
             action_tab_page_navigation_reload.clone(),
         );
-        let bookmark = Bookmark::new();
+        let bookmark = Bookmark::new_arc();
 
         // Init widget
-        let widget = Box::builder()
-            .orientation(Orientation::Horizontal)
-            .spacing(8)
-            .margin_start(6)
-            .margin_end(6)
-            .margin_bottom(6)
-            .build();
-
-        widget.append(base.widget());
-        widget.append(history.widget());
-        widget.append(reload.widget());
-        widget.append(request.gobject());
-        widget.append(bookmark.widget()); // @TODO update api to gobject
+        let widget = Widget::new_arc(
+            base.gobject(),
+            history.gobject(),
+            reload.gobject(),
+            request.gobject(),
+            bookmark.gobject(),
+        );
 
         // Result
-        Self {
+        Arc::new(Self {
             widget,
             base,
             history,
             reload,
             request,
             bookmark,
-        }
+        })
     }
 
     // Actions
@@ -171,14 +160,14 @@ impl Navigation {
     // Setters
     pub fn set_request_text(&self, value: &GString) {
         // Focus out from content area on activate the link @TODO
-        self.widget.child_focus(DirectionType::Right);
+        self.widget.focus();
 
         self.request.set_text(value);
     }
 
     // Getters
     pub fn gobject(&self) -> &Box {
-        &self.widget
+        &self.widget.gobject()
     }
 
     pub fn base_url(&self) -> Option<GString> {

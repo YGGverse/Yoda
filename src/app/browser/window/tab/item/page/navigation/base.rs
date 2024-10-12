@@ -1,64 +1,51 @@
+mod widget;
+
+use widget::Widget;
+
 use gtk::{
     gio::SimpleAction,
     glib::{gformat, GString, Uri},
-    prelude::{ActionExt, ButtonExt, WidgetExt},
     Button,
 };
 use std::{cell::RefCell, sync::Arc};
 
 pub struct Base {
-    // Actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
-    // Mutable URI cache (parsed on update)
     uri: RefCell<Option<Uri>>,
-    // GTK
-    widget: Button,
+    widget: Arc<Widget>,
 }
 
 impl Base {
     // Construct
-    pub fn new(action_tab_page_navigation_base: Arc<SimpleAction>) -> Self {
-        // Init widget
-        let widget = Button::builder()
-            .icon_name("go-home-symbolic")
-            .tooltip_text("Base")
-            .sensitive(false)
-            .build();
-
-        // Init events
-        widget.connect_clicked({
-            let action_tab_page_navigation_base = action_tab_page_navigation_base.clone();
-            move |_| {
-                action_tab_page_navigation_base.activate(None);
-            }
-        });
-
-        // Return activated struct
-        Self {
-            action_tab_page_navigation_base,
+    pub fn new_arc(action_tab_page_navigation_base: Arc<SimpleAction>) -> Arc<Self> {
+        Arc::new(Self {
+            action_tab_page_navigation_base: action_tab_page_navigation_base.clone(),
             uri: RefCell::new(None),
-            widget,
-        }
+            widget: Widget::new_arc(action_tab_page_navigation_base),
+        })
     }
 
     // Actions
     pub fn update(&self, uri: Option<Uri>) {
-        // Update sensitivity
+        // Detect sensitivity value
         let status = match &uri {
             Some(uri) => "/" != uri.path(),
             None => false,
         };
 
-        self.action_tab_page_navigation_base.set_enabled(status);
-        self.widget.set_sensitive(status);
-
         // Update parsed cache
         self.uri.replace(uri);
+
+        // Update action status
+        self.action_tab_page_navigation_base.set_enabled(status);
+
+        // Update child components
+        self.widget.update(status);
     }
 
     // Getters
-    pub fn widget(&self) -> &Button {
-        &self.widget
+    pub fn gobject(&self) -> &Button {
+        &self.widget.gobject()
     }
 
     pub fn url(&self) -> Option<GString> {

@@ -1,49 +1,38 @@
-use gtk::{
-    prelude::{ActionExt, ButtonExt, WidgetExt},
-    {gio::SimpleAction, Button},
-};
+mod widget;
+
+use widget::Widget;
+
+use gtk::{gio::SimpleAction, Button};
 use std::sync::Arc;
 
 pub struct Forward {
     action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-    widget: Button,
+    widget: Arc<Widget>,
 }
 
 impl Forward {
     // Construct
-    pub fn new(action_tab_page_navigation_history_forward: Arc<SimpleAction>) -> Self {
-        // Init widget
-        let widget = Button::builder()
-            .icon_name("go-next-symbolic")
-            .tooltip_text("Forward")
-            .sensitive(false)
-            .build();
-
-        // Init events
-        widget.connect_clicked({
-            let action_tab_page_navigation_history_forward =
-                action_tab_page_navigation_history_forward.clone();
-            move |_| {
-                action_tab_page_navigation_history_forward.activate(None);
-            }
-        });
-
+    pub fn new_arc(action_tab_page_navigation_history_forward: Arc<SimpleAction>) -> Arc<Self> {
         // Return activated struct
-        Self {
-            action_tab_page_navigation_history_forward,
-            widget,
-        }
+        Arc::new(Self {
+            action_tab_page_navigation_history_forward: action_tab_page_navigation_history_forward
+                .clone(),
+            widget: Widget::new_arc(action_tab_page_navigation_history_forward),
+        })
     }
 
     // Actions
     pub fn update(&self, status: bool) {
+        // Update actions
         self.action_tab_page_navigation_history_forward
             .set_enabled(status);
-        self.widget.set_sensitive(status);
+
+        // Update child components
+        self.widget.update(status);
     }
 
     // Getters
-    pub fn widget(&self) -> &Button {
-        &self.widget
+    pub fn gobject(&self) -> &Button {
+        &self.widget.gobject()
     }
 }

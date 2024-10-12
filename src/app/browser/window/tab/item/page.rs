@@ -55,13 +55,13 @@ impl Page {
 
         // Init components
         let content = Arc::new(Content::new(action_page_open.clone()));
-        let navigation = Arc::new(Navigation::new(
+        let navigation = Navigation::new_arc(
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
-        ));
+        );
         let widget = Widget::new_arc(
             action_page_open.clone(),
             &name, // ID

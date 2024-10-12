@@ -1,19 +1,20 @@
+mod widget;
+
+use widget::Widget;
+
 use gtk::Button;
+use std::sync::Arc;
 
 pub struct Bookmark {
-    widget: Button,
+    widget: Arc<Widget>,
 }
 
 impl Bookmark {
     // Construct
-    pub fn new() -> Self {
-        Self {
-            widget: Button::builder()
-                .icon_name("starred-symbolic")
-                .tooltip_text("Bookmark")
-                .sensitive(false)
-                .build(),
-        }
+    pub fn new_arc() -> Arc<Self> {
+        Arc::new(Self {
+            widget: Widget::new_arc(),
+        })
     }
 
     // Actions
@@ -22,7 +23,7 @@ impl Bookmark {
     }
 
     // Getters
-    pub fn widget(&self) -> &Button {
-        &self.widget
+    pub fn gobject(&self) -> &Button {
+        &self.widget.gobject()
     }
 }

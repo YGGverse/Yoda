@@ -1,50 +1,38 @@
-use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionExt, ButtonExt, WidgetExt},
-    Button,
-};
+mod widget;
+
+use widget::Widget;
+
+use gtk::{gio::SimpleAction, Button};
 use std::sync::Arc;
 
 pub struct Back {
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
-    widget: Button,
+    widget: Arc<Widget>,
 }
 
 impl Back {
     // Construct
-    pub fn new(action_tab_page_navigation_history_back: Arc<SimpleAction>) -> Self {
-        // Init widget
-        let widget = Button::builder()
-            .icon_name("go-previous-symbolic")
-            .tooltip_text("Back")
-            .sensitive(false)
-            .build();
-
-        // Init events
-        widget.connect_clicked({
-            let action_tab_page_navigation_history_back =
-                action_tab_page_navigation_history_back.clone();
-            move |_| {
-                action_tab_page_navigation_history_back.activate(None);
-            }
-        });
-
+    pub fn new_arc(action_tab_page_navigation_history_back: Arc<SimpleAction>) -> Arc<Self> {
         // Return activated struct
-        Self {
-            action_tab_page_navigation_history_back,
-            widget,
-        }
+        Arc::new(Self {
+            action_tab_page_navigation_history_back: action_tab_page_navigation_history_back
+                .clone(),
+            widget: Widget::new_arc(action_tab_page_navigation_history_back),
+        })
     }
 
     // Actions
     pub fn update(&self, status: bool) {
+        // Update actions
         self.action_tab_page_navigation_history_back
             .set_enabled(status);
-        self.widget.set_sensitive(status);
+
+        // Update child components
+        self.widget.update(status);
     }
 
     // Getters
-    pub fn widget(&self) -> &Button {
-        &self.widget
+    pub fn gobject(&self) -> &Button {
+        &self.widget.gobject()
     }
 }

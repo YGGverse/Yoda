@@ -1,10 +1,12 @@
 mod back;
 mod forward;
+mod widget;
 
 use back::Back;
 use forward::Forward;
+use widget::Widget;
 
-use gtk::{gio::SimpleAction, glib::GString, prelude::BoxExt, Box, Orientation};
+use gtk::{gio::SimpleAction, glib::GString, Box};
 use std::{cell::RefCell, sync::Arc};
 
 struct Memory {
@@ -14,35 +16,27 @@ struct Memory {
 
 pub struct History {
     // Components
-    back: Back,
-    forward: Forward,
+    back: Arc<Back>,
+    forward: Arc<Forward>,
     // Extras
     memory: RefCell<Vec<Memory>>,
     index: RefCell<Option<usize>>,
     // GTK
-    widget: Box,
+    widget: Arc<Widget>,
 }
 
 impl History {
     // Construct
-    pub fn new(
+    pub fn new_arc(
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-    ) -> Self {
+    ) -> Arc<Self> {
         // init components
-        let back = Back::new(action_tab_page_navigation_history_back);
-        let forward = Forward::new(action_tab_page_navigation_history_forward);
+        let back = Back::new_arc(action_tab_page_navigation_history_back);
+        let forward = Forward::new_arc(action_tab_page_navigation_history_forward);
 
         // Init widget
-        let widget = Box::builder()
-            .orientation(Orientation::Horizontal)
-            .css_classes([
-                "linked", // merge childs
-            ])
-            .build();
-
-        widget.append(back.widget());
-        widget.append(forward.widget());
+        let widget = Widget::new_arc(back.gobject(), forward.gobject());
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -50,16 +44,13 @@ impl History {
         // Init index
         let index = RefCell::new(None);
 
-        Self {
-            // Actions
+        Arc::new(Self {
             back,
             forward,
-            // Extras
             memory,
             index,
-            // GTK
             widget,
-        }
+        })
     }
 
     // Actions
@@ -133,7 +124,7 @@ impl History {
     }
 
     // Getters
-    pub fn widget(&self) -> &Box {
-        &self.widget
+    pub fn gobject(&self) -> &Box {
+        &self.widget.gobject()
     }
 }
