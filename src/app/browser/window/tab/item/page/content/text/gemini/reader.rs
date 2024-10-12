@@ -7,14 +7,12 @@ use widget::Widget;
 
 use gtk::{
     gio::SimpleAction,
-    glib::{GString, Uri},
+    glib::{GString, TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual},
     TextBuffer, TextTag, TextTagTable, TextView, WrapMode,
 };
 
 use std::sync::Arc;
-
-const NEW_LINE: &str = "\n";
 
 pub struct Reader {
     title: Option<GString>,
@@ -68,7 +66,6 @@ impl Reader {
         tags.add(&link);
 
         // Parse lines
-
         let buffer = TextBuffer::new(Some(&tags));
 
         for line in gemtext.lines() {
@@ -88,7 +85,7 @@ impl Reader {
                     &[tag],
                 );
 
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Set title if empty, on first document header match
                 // this feature wanted to update parent elements like tab title
@@ -100,7 +97,7 @@ impl Reader {
             }
 
             // Is link
-            if let Some(link) = Link::from(line, Some(base)) {
+            if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
                 // Build link alt from optional values
                 let mut alt = Vec::new();
 
@@ -112,8 +109,11 @@ impl Reader {
                 }
 
                 // Append date on exist
-                if let Some(date) = link.date {
-                    alt.push(date.to_string());
+                if let Some(timestamp) = link.timestamp {
+                    // https://docs.gtk.org/glib/method.DateTime.format.html
+                    if let Ok(value) = timestamp.format("%Y-%m-%d") {
+                        alt.push(value.to_string())
+                    }
                 }
 
                 // Append alt on exist or use URL
@@ -123,14 +123,14 @@ impl Reader {
                 });
 
                 buffer.insert_with_tags_by_name(&mut buffer.end_iter(), &alt.join(" "), &["link"]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                buffer.insert(&mut buffer.end_iter(), "\n");
 
                 continue;
             }
 
             // Nothing match, use plain text @TODO
             buffer.insert(&mut buffer.end_iter(), line);
-            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+            buffer.insert(&mut buffer.end_iter(), "\n");
         }
 
         // Init widget

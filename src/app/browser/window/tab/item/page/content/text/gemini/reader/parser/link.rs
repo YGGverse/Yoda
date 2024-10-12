@@ -1,17 +1,19 @@
-use gtk::glib::{GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags};
+use gtk::glib::{
+    DateTime, GString, Regex, RegexCompileFlags, RegexMatchFlags, TimeZone, Uri, UriFlags,
+};
 
 pub struct Link {
-    pub alt: Option<GString>,
-    pub date: Option<GString>, // @TODO https://docs.gtk.org/glib/struct.Date.html
-    pub is_external: Option<bool>, // on to_base option provided
-    pub uri: Uri,
+    pub alt: Option<GString>,        // [optional] alternative link description
+    pub is_external: Option<bool>,   // [optional] external link indication, on base option provided
+    pub timestamp: Option<DateTime>, // [optional] valid link DateTime object
+    pub uri: Uri,                    // [required] valid link URI object
 }
 
 impl Link {
-    pub fn from(line: &str, to_base: Option<&Uri>) -> Option<Self> {
+    pub fn from(line: &str, base: Option<&Uri>, timezone: Option<&TimeZone>) -> Option<Self> {
         // Define initial values
         let mut alt = None;
-        let mut date = None;
+        let mut timestamp = None;
         let mut is_external = None;
 
         // Begin line parse
@@ -26,7 +28,7 @@ impl Link {
         let unresolved_address = regex.get(1)?;
 
         // Convert address to the valid URI
-        let uri = match to_base {
+        let uri = match base {
             // Base conversion requested
             Some(base_uri) => {
                 // Convert relative address to absolute
@@ -64,9 +66,15 @@ impl Link {
             }
         };
 
-        // Date
-        if let Some(value) = regex.get(2) {
-            date = Some(GString::from(value.as_str()))
+        // Timestamp
+        if let Some(date) = regex.get(2) {
+            // @TODO even possible, but simpler to work with `DateTime` API
+            // await for new features in `Date` as better in Gemini context
+            // https://docs.gtk.org/glib/struct.Date.html
+            timestamp = match DateTime::from_iso8601(&format!("{date}T00:00:00"), timezone) {
+                Ok(value) => Some(value),
+                Err(_) => None,
+            }
         }
 
         // Alt
@@ -76,8 +84,8 @@ impl Link {
 
         Some(Self {
             alt,
-            date,
             is_external,
+            timestamp,
             uri,
         })
     }

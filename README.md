@@ -14,6 +14,7 @@ GTK 4 / Libadwaita client written in Rust
 
 Make sure your system support:
 
+* Glib 2.56+
 * GTK 4.8+
 * Libadwaita 1.4+
 
