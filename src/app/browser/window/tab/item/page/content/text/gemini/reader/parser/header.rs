@@ -1,4 +1,4 @@
-use gtk::glib::{gformat, markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags};
+use gtk::glib::{Regex, RegexCompileFlags, RegexMatchFlags};
 
 pub enum Level {
     H1,
@@ -7,13 +7,12 @@ pub enum Level {
 }
 
 pub struct Header {
-    // level: Level,
-    text: GString,
-    markup: GString,
+    value: String,
+    level: Level,
 }
 
 impl Header {
-    pub fn from(line: &str) -> Option<Header> {
+    pub fn from(line: &str) -> Option<Self> {
         // Parse line
         let parsed = Regex::split_simple(
             r"^(#{1,3})\s*(.+)$",
@@ -22,57 +21,35 @@ impl Header {
             RegexMatchFlags::DEFAULT,
         );
 
-        // Validate match results
-        if let Some(text) = parsed.get(2) {
-            if let Some(level) = parsed.get(1) {
-                // Init level
-                let level = match level.len() {
-                    1 => Level::H1,
-                    2 => Level::H2,
-                    3 => Level::H3,
-                    _ => return None,
-                };
+        // Detect header level
+        let level = parsed.get(1)?;
 
-                // Init text
-                let text = GString::from(text.as_str());
+        let level = match level.len() {
+            1 => Level::H1,
+            2 => Level::H2,
+            3 => Level::H3,
+            _ => return None,
+        };
 
-                if text.trim().is_empty() {
-                    return None;
-                }
+        // Detect header value
+        let value = parsed.get(2)?;
 
-                // Init markup
-                let markup = match level {
-                    Level::H1 => gformat!(
-                        "<span size=\"xx-large\">{}</span>\n",
-                        markup_escape_text(&text)
-                    ),
-                    Level::H2 => gformat!(
-                        "<span size=\"x-large\">{}</span>\n",
-                        markup_escape_text(&text)
-                    ),
-                    Level::H3 => gformat!(
-                        "<span size=\"large\">{}</span>\n",
-                        markup_escape_text(&text)
-                    ),
-                };
-
-                // Result
-                return Some(Header {
-                    // level,
-                    text,
-                    markup,
-                });
-            }
+        if value.trim().is_empty() {
+            return None;
         }
 
-        None // not header line given
+        // Result
+        Some(Header {
+            level,
+            value: String::from(value.as_str()),
+        })
     }
 
-    pub fn text(&self) -> &GString {
-        &self.text
+    pub fn level(&self) -> &Level {
+        &self.level
     }
 
-    pub fn markup(&self) -> &GString {
-        &self.markup
+    pub fn value(&self) -> &str {
+        self.value.as_str()
     }
 }
