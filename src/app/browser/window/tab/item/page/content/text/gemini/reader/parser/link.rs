@@ -1,58 +1,52 @@
-use gtk::glib::{
-    gformat, markup_escape_text, GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
-};
+use gtk::glib::{GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags};
 
 pub struct Link {
-    //  alt: Option<GString>,  // [optional] alternative text
-    //  date: Option<GString>, // [optional] date @TODO store in UnixTime?
-    //  external: bool,        // external link indicator
-    //  link: GString,         // original link, wanted for title tooltip
-    markup: GString, // pango markup with escaped special chars
-                     //  uri: Uri,              // parsed link object (currently not in use)
+    pub alt: Option<GString>,
+    pub date: Option<GString>, // @TODO https://docs.gtk.org/glib/struct.Date.html
+    pub is_external: Option<bool>,
+    pub uri: Uri,
 }
 
 impl Link {
-    // Link structure parser
-    // line - gemtext subject to parse
-    // base - Uri object, required for:
-    //    1. relative to absolute address conversion
-    //    2. external links indication
-    // returns new Link struct or None
-    pub fn from(line: &str, base: &Uri) -> Option<Link> {
-        // Init struct members
-        // let mut alt: Option<GString> = None;
-        // let mut date: Option<GString> = None;
-        let external: bool;
-        let link: GString;
-        let markup: GString;
-        let uri: Uri;
+    pub fn from(line: &str, to_base: Option<&Uri>) -> Option<Link> {
+        // Define initial values
+        let mut alt = None;
+        let mut date = None;
+        let mut is_external = None;
 
-        // Parse line
-        let parsed = Regex::split_simple(
+        // Begin line parse
+        let regex = Regex::split_simple(
             r"^=>\s*([^\s]+)\s*(\d{4}-\d{2}-\d{2})?\s*(.+)?$",
             line,
             RegexCompileFlags::DEFAULT,
             RegexMatchFlags::DEFAULT,
         );
 
-        // Address
-        match parsed.get(1) {
-            Some(address) => {
-                // Define original link value (used in titles or when alt is empty)
-                link = GString::from(address.as_str());
-                // Links in document usually relative, make them absolute to base given
-                match Uri::resolve_relative(Some(&base.to_str()), address.as_str(), UriFlags::NONE)
-                {
-                    Ok(resolved) => {
-                        // Make URI parsed as always valid (no idea why does lib operate strings, not objects)
-                        match Uri::parse(&resolved, UriFlags::NONE) {
-                            Ok(object) => {
-                                // Set external status
-                                external =
-                                    object.host() != base.host() || object.port() != base.port();
+        // Detect address required to continue
+        let unresolved_address = regex.get(1)?;
 
-                                // Set struct URI
-                                uri = object;
+        // Convert address to the valid URI
+        let uri = match to_base {
+            // Base conversion requested
+            Some(base_uri) => {
+                // Convert relative address to absolute
+                match Uri::resolve_relative(
+                    Some(&base_uri.to_str()),
+                    unresolved_address.as_str(),
+                    UriFlags::NONE,
+                ) {
+                    Ok(resolved_str) => {
+                        // Try convert string to the valid URI
+                        match Uri::parse(&resolved_str, UriFlags::NONE) {
+                            Ok(resolved_uri) => {
+                                // Change external status
+                                is_external = Some(
+                                    resolved_uri.host() != base_uri.host()
+                                        || resolved_uri.port() != base_uri.port(),
+                                );
+
+                                // Result
+                                resolved_uri
                             }
                             Err(_) => return None,
                         }
@@ -60,74 +54,31 @@ impl Link {
                     Err(_) => return None,
                 }
             }
-            None => return None,
-        }
-
-        // Create link name based on external status, date and alt values
-        let mut name = Vec::new();
-
-        if external {
-            name.push("⇖".to_string());
-        }
+            // Base resolve not requested
+            None => {
+                // Just try convert address to valid URI
+                match Uri::parse(&unresolved_address, UriFlags::NONE) {
+                    Ok(unresolved_uri) => unresolved_uri,
+                    Err(_) => return None,
+                }
+            }
+        };
 
         // Date
-        if let Some(this) = parsed.get(2) {
-            // date = Some(GString::from(this.to_string()));
-            name.push(this.to_string());
+        if let Some(value) = regex.get(2) {
+            date = Some(GString::from(value.as_str()))
         }
 
         // Alt
-        match parsed.get(3) {
-            // Not empty
-            Some(this) => {
-                // alt = Some(GString::from(this.to_string()));
-                name.push(this.to_string());
-            }
-            // Empty, use resolved address
-            None => name.push(link.to_string()),
+        if let Some(value) = regex.get(3) {
+            alt = Some(GString::from(value.as_str()))
         };
 
-        // Markup
-        markup = gformat!(
-            "<a href=\"{}\" title=\"{}\"><span underline=\"none\">{}</span></a>\n",
-            markup_escape_text(&uri.to_str()), // use resolved address for href
-            markup_escape_text(&link),         // show original address for title
-            markup_escape_text(&name.join(" ")),
-        );
-
         Some(Self {
-            // alt,
-            // date,
-            // external,
-            // link,
-            markup,
-            // uri,
+            alt,
+            date,
+            is_external,
+            uri,
         })
-    }
-
-    // Getters
-    /* @TODO
-    pub fn alt(&self) -> &Option<GString> {
-        &self.alt
-    }
-
-    pub fn date(&self) -> &Option<GString> {
-        &self.date
-    }
-
-    pub fn external(&self) -> &bool {
-        &self.external
-    }
-
-    pub fn link(&self) -> &GString {
-        &self.link
-    }
-
-    pub fn uri(&self) -> &Uri {
-        &self.uri
-    }*/
-
-    pub fn markup(&self) -> &GString {
-        &self.markup
     }
 }
