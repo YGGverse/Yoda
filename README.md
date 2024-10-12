@@ -53,7 +53,7 @@ cargo build
 
 ## Development
 
-Guide and protocol draft
+Quick start guide and maintenance protocol draft
 
 ### `browser`
 
