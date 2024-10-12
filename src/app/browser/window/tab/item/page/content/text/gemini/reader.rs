@@ -28,9 +28,10 @@ impl Reader {
         let mut title = None;
 
         // Init markup
-        let mut markup = String::new();
+        let buffer = TextBuffer::new(None);
 
         for line in gemtext.lines() {
+            /*
             // Is header
             if let Some(header) = Header::from(line) {
                 // Format
@@ -54,11 +55,10 @@ impl Reader {
 
             // Nothing match, escape string just
             markup.push_str(Plain::from(line).markup())
-        }
+            */
 
-        // Init buffer @TODO
-        let buffer = TextBuffer::new(None);
-        buffer.set_text(&markup);
+            buffer.insert(&mut buffer.end_iter(), &Plain::from(line));
+        }
 
         // Init widget
         let widget = Widget::new_arc(&buffer);

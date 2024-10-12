@@ -1,17 +1,11 @@
-use gtk::glib::{gformat, markup_escape_text, GString};
+use gtk::glib::{gformat, GString};
 
 pub struct Plain {
-    markup: GString,
+    // nothing yet..
 }
 
 impl Plain {
-    pub fn from(line: &str) -> Plain {
-        Self {
-            markup: gformat!("{}\n", markup_escape_text(line)),
-        }
-    }
-
-    pub fn markup(&self) -> &GString {
-        &self.markup
+    pub fn from(line: &str) -> GString {
+        gformat!("{}\n", line)
     }
 }
