@@ -10,14 +10,14 @@ GTK 4 / Libadwaita client written in Rust
 
 ## Build
 
-### Dependencies
+### Requirements
 
-Make sure system support:
+Make sure your system support:
 
 * GTK 4.8+
 * Libadwaita 1.4+
 
-Use [rustup installer](https://rustup.rs) to setup latest Rust compiler and package manager:
+Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and package manager:
 
 ``` bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -86,6 +86,7 @@ Guide and protocol draft
 
 * [SQLite](https://sqlite.org) used to operate with user profile: for example, restore and save widget sessions, manage auth, history, bookmarks, etc
 * Database stored in system config directory (could be detected simply using browser tools menu)
+* Structure of table should not be modified on `CARGO_PKG_VERSION_PATCH` change
 * Every `browser` mod may have own table, where table must:
   * contain same name as mod location, for example `app_browser_widget` for `src/app/browser/widget.rs`
   * every table include autoincrement `id` column and parental primary ID if exist
