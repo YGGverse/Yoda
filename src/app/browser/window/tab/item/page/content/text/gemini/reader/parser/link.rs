@@ -3,7 +3,7 @@ use gtk::glib::{GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlag
 pub struct Link {
     pub alt: Option<GString>,
     pub date: Option<GString>, // @TODO https://docs.gtk.org/glib/struct.Date.html
-    pub is_external: Option<bool>,
+    pub is_external: Option<bool>, // on to_base option provided
     pub uri: Uri,
 }
 
