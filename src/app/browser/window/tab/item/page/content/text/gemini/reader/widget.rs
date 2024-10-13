@@ -3,6 +3,8 @@ use gtk::{
 };
 use std::sync::Arc;
 
+const MARGIN: i32 = 16;
+
 pub struct Widget {
     gobject: TextView,
 }
@@ -16,11 +18,15 @@ impl Widget {
         motion_controller: EventControllerMotion,
     ) -> Arc<Self> {
         let gobject = TextView::builder()
-            .editable(false)
-            .cursor_visible(false)
-            .wrap_mode(WrapMode::Word)
-            .vexpand(true)
+            .bottom_margin(MARGIN)
             .buffer(buffer)
+            .cursor_visible(false)
+            .editable(false)
+            .left_margin(MARGIN)
+            .right_margin(MARGIN)
+            .top_margin(MARGIN)
+            .vexpand(true)
+            .wrap_mode(WrapMode::Word)
             .build();
 
         gobject.add_controller(primary_button_controller);
