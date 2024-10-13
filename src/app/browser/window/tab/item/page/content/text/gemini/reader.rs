@@ -40,16 +40,19 @@ impl Reader {
                 let tag = match header.level {
                     parser::header::Level::H1 => TextTag::builder()
                         .scale(1.6)
+                        .sentence(true)
                         .weight(500)
                         .wrap_mode(gtk::WrapMode::Word)
                         .build(),
                     parser::header::Level::H2 => TextTag::builder()
                         .scale(1.4)
+                        .sentence(true)
                         .weight(400)
                         .wrap_mode(gtk::WrapMode::Word)
                         .build(),
                     parser::header::Level::H3 => TextTag::builder()
                         .scale(1.2)
+                        .sentence(true)
                         .weight(400)
                         .wrap_mode(WrapMode::Word)
                         .build(),
@@ -74,7 +77,10 @@ impl Reader {
             // Is link
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
                 // Init new tag for link
-                let tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
+                let tag = TextTag::builder()
+                    .sentence(true)
+                    .wrap_mode(WrapMode::Word)
+                    .build();
 
                 // Append tag to buffer
                 buffer.tag_table().add(&tag);
