@@ -10,7 +10,11 @@ impl Widget {
     // Construct
     pub fn new_arc(child: &TextView) -> Arc<Self> {
         Arc::new(Self {
-            gobject: ClampScrollable::builder().child(child).build(),
+            gobject: ClampScrollable::builder()
+                .child(child)
+                .css_classes(["view"])
+                .maximum_size(840)
+                .build(),
         })
     }
 
