@@ -9,8 +9,9 @@ use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::SimpleAction,
     glib::{GString, TimeZone, Uri},
-    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, WrapMode,
+    pango::Underline,
+    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, ToVariant},
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
 };
 
 use std::{collections::HashMap, sync::Arc};
@@ -136,10 +137,14 @@ impl Reader {
         primary_button_controller.connect_released({
             let action_page_open = action_page_open.clone();
             let gobject = widget.gobject().clone();
+            let _links_ = links.clone(); // is copy
             move |_, _, x, y| {
-                if let Some(iter) = gobject.iter_at_location(x as i32, y as i32) {
+                let (window_x, window_y) =
+                    gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
+
+                if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
                     for tag in iter.tags() {
-                        if let Some(uri) = links.get(&tag) {
+                        if let Some(uri) = _links_.get(&tag) {
                             match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page
@@ -153,9 +158,34 @@ impl Reader {
             }
         });
 
-        // @TODO on middle-click, on hover events
-        // primary_button_controller(|_, _, _, _| {});
-        // motion_controller.connect_motion(|_, _, _| {});
+        motion_controller.connect_motion({
+            let gobject = widget.gobject().clone();
+            let _links_ = links.clone(); // is copy
+            move |_, x, y| {
+                // Remove underline decoration from all tags
+                gobject.buffer().tag_table().foreach(|tag| {
+                    tag.set_underline(Underline::None);
+                });
+
+                // Detect tag match current coords hovered
+                let (window_x, window_y) =
+                    gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
+
+                if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
+                    for tag in iter.tags() {
+                        // Show underline if tag contain URI (is link)
+                        if let Some(_) = _links_.get(&tag) {
+                            tag.set_underline(Underline::Single);
+
+                            // @TODO Show tooltip
+                        }
+                    }
+                }
+            } // @TODO expensive for CPU
+        });
+
+        // @TODO
+        // middle_button_controller(|_, _, _, _| {});
 
         // Result
         Arc::new(Self { title, widget })
