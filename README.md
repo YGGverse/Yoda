@@ -15,7 +15,7 @@ GTK 4 / Libadwaita client written in Rust
 Make sure your system support:
 
 * Glib 2.56+
-* GTK 4.8+
+* GTK 4.10+
 * Libadwaita 1.4+
 
 Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
