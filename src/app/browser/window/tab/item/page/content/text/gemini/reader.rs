@@ -9,8 +9,7 @@ use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::SimpleAction,
     glib::{GString, TimeZone, Uri},
-    pango::Underline,
-    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, ToVariant},
+    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
 };
 
@@ -139,12 +138,15 @@ impl Reader {
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
             move |_, _, x, y| {
+                // Detect tag match current coords hovered
                 let (window_x, window_y) =
                     gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
 
                 if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
                     for tag in iter.tags() {
+                        // Detect links on tag contain URI
                         if let Some(uri) = _links_.get(&tag) {
+                            // Select handler by scheme
                             match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page
@@ -162,27 +164,21 @@ impl Reader {
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
             move |_, x, y| {
-                // Remove underline decoration from all tags
-                gobject.buffer().tag_table().foreach(|tag| {
-                    tag.set_underline(Underline::None);
-                });
-
                 // Detect tag match current coords hovered
                 let (window_x, window_y) =
                     gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
 
                 if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
                     for tag in iter.tags() {
-                        // Show underline if tag contain URI (is link)
-                        if let Some(_) = _links_.get(&tag) {
-                            tag.set_underline(Underline::Single);
-
-                            // @TODO Show tooltip
+                        // Toggle cursor icon if tag contain URI (is link)
+                        match _links_.get(&tag) {
+                            Some(_) => gobject.set_cursor_from_name(Some("pointer")), // @TODO Show tooltip
+                            None => gobject.set_cursor_from_name(Some("text")),
                         }
                     }
                 }
-            } // @TODO expensive for CPU
-        });
+            }
+        }); // @TODO may be expensive for CPU
 
         // @TODO
         // middle_button_controller(|_, _, _, _| {});
