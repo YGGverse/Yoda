@@ -10,7 +10,7 @@ use gtk::{
     gio::SimpleAction,
     glib::{GString, TimeZone, Uri},
     prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, WrapMode,
 };
 
 use std::{collections::HashMap, sync::Arc};
@@ -137,7 +137,6 @@ impl Reader {
             let action_page_open = action_page_open.clone();
             let gobject = widget.gobject().clone();
             move |_, _, x, y| {
-                gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
                 if let Some(iter) = gobject.iter_at_location(x as i32, y as i32) {
                     for tag in iter.tags() {
                         if let Some(uri) = links.get(&tag) {
