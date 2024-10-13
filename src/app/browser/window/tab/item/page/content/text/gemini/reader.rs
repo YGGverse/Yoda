@@ -5,6 +5,7 @@ use parser::header::Header;
 use parser::link::Link;
 use widget::Widget;
 
+use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::SimpleAction,
@@ -28,6 +29,9 @@ impl Reader {
 
         // Init HashMap storage for event controllers
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
+
+        // Init system palette
+        let style = StyleManager::default();
 
         // Init new text buffer
         let buffer = TextBuffer::new(None);
@@ -78,6 +82,7 @@ impl Reader {
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
                 // Init new tag for link
                 let tag = TextTag::builder()
+                    .foreground_rgba(&style.accent_color_rgba())
                     .sentence(true)
                     .wrap_mode(WrapMode::Word)
                     .build();
