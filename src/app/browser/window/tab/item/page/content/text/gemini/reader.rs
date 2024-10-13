@@ -147,12 +147,15 @@ impl Reader {
             let action_page_open = action_page_open.clone();
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
-            move |_, _, x, y| {
+            move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
-                let (window_x, window_y) =
-                    gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
+                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                    TextWindowType::Widget,
+                    window_x as i32,
+                    window_y as i32,
+                );
 
-                if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
+                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Detect links on tag contain URI
                         if let Some(uri) = _links_.get(&tag) {
@@ -173,12 +176,15 @@ impl Reader {
         motion_controller.connect_motion({
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
-            move |_, x, y| {
+            move |_, window_x, window_y| {
                 // Detect tag match current coords hovered
-                let (window_x, window_y) =
-                    gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
+                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                    TextWindowType::Widget,
+                    window_x as i32,
+                    window_y as i32,
+                );
 
-                if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
+                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag contain URI (is link)
                         if let Some(_) = _links_.get(&tag) {
