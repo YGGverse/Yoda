@@ -13,7 +13,7 @@ impl Widget {
             gobject: ClampScrollable::builder()
                 .child(child)
                 .css_classes(["view"])
-                .maximum_size(840)
+                .maximum_size(800)
                 .build(),
         })
     }
