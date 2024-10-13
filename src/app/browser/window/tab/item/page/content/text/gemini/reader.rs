@@ -192,19 +192,21 @@ impl Reader {
                 if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag contain URI (is link)
-                        if let Some(_) = _links_.get(&tag) {
+                        if let Some(uri) = _links_.get(&tag) {
                             // Toggle cursor
                             gobject.set_cursor_from_name(Some("pointer"));
 
-                            // @TODO Show tooltip
+                            // Show tooltip
+                            gobject.set_tooltip_text(Some(uri.to_string().as_str()));
 
                             return;
                         }
                     }
                 }
 
-                // Restore default cursor
+                // Restore defaults
                 gobject.set_cursor_from_name(Some("text"));
+                gobject.set_tooltip_text(None);
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
