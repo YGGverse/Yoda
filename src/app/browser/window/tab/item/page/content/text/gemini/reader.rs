@@ -114,8 +114,12 @@ impl Reader {
                 continue;
             }
 
-            // Nothing match tags, use plain text @TODO
-            buffer.insert(&mut buffer.end_iter(), line);
+            // Nothing match custom tags above,
+            // just append plain text covered in empty tag (to handle controller events properly)
+            let tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
+
+            buffer.tag_table().add(&tag);
+            buffer.insert_with_tags(&mut buffer.end_iter(), &line, &[&tag]);
             buffer.insert(&mut buffer.end_iter(), "\n");
         }
 
