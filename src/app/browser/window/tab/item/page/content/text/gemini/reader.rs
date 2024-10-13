@@ -180,15 +180,22 @@ impl Reader {
 
                 if let Some(iter) = gobject.iter_at_location(window_x, window_y) {
                     for tag in iter.tags() {
-                        // Toggle cursor icon if tag contain URI (is link)
-                        match _links_.get(&tag) {
-                            Some(_) => gobject.set_cursor_from_name(Some("pointer")), // @TODO Show tooltip
-                            None => gobject.set_cursor_from_name(Some("text")),
+                        // Tag contain URI (is link)
+                        if let Some(_) = _links_.get(&tag) {
+                            // Toggle cursor
+                            gobject.set_cursor_from_name(Some("pointer"));
+
+                            // @TODO Show tooltip
+
+                            return;
                         }
                     }
                 }
+
+                // Restore default cursor
+                gobject.set_cursor_from_name(Some("text"));
             }
-        }); // @TODO may be expensive for CPU
+        }); // @TODO may be expensive for CPU, add timeout?
 
         // @TODO
         // middle_button_controller(|_, _, _, _| {});
