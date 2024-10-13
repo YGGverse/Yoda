@@ -3,7 +3,7 @@ use gtk::{
 };
 use std::sync::Arc;
 
-const MARGIN: i32 = 16;
+const MARGIN: i32 = 8;
 
 pub struct Widget {
     gobject: TextView,
