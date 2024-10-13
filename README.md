@@ -16,7 +16,7 @@ Make sure your system support:
 
 * Glib 2.56+
 * GTK 4.10+
-* Libadwaita 1.4+
+* Libadwaita 1.6+
 
 Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
 
