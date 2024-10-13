@@ -196,8 +196,11 @@ impl Reader {
                             // Toggle cursor
                             gobject.set_cursor_from_name(Some("pointer"));
 
-                            // Show tooltip
+                            // Show tooltip | @TODO set_gutter option?
                             gobject.set_tooltip_text(Some(uri.to_string().as_str()));
+
+                            // Any signal required to apply changes immediately @TODO power safe issue?
+                            gobject.emit_toggle_overwrite();
 
                             return;
                         }
@@ -207,6 +210,7 @@ impl Reader {
                 // Restore defaults
                 gobject.set_cursor_from_name(Some("text"));
                 gobject.set_tooltip_text(None);
+                gobject.emit_toggle_overwrite();
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
