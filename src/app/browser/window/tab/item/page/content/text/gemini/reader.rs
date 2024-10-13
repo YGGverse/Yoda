@@ -23,7 +23,12 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new_arc(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(
+        gemtext: &str,
+        base: &Uri,
+        action_tab_append: Arc<SimpleAction>,
+        action_page_open: Arc<SimpleAction>,
+    ) -> Arc<Self> {
         // Init default values
         let mut title = None;
 
@@ -162,7 +167,7 @@ impl Reader {
 
                 if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
-                        // Detect links on tag contain URI
+                        // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
                             // Select handler by scheme
                             match uri.scheme().as_str() {
@@ -172,6 +177,27 @@ impl Reader {
                                 }
                                 _ => (), // Protocol not supported, delegate to the external app @TODO
                             };
+                        }
+                    }
+                }
+            }
+        });
+
+        middle_button_controller.connect_pressed({
+            let gobject = widget.gobject().clone();
+            let _links_ = links.clone(); // is copy
+            move |_, _, window_x, window_y| {
+                // Detect tag match current coords hovered
+                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                    TextWindowType::Widget,
+                    window_x as i32,
+                    window_y as i32,
+                );
+                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
+                    for tag in iter.tags() {
+                        // Tag is link
+                        if let Some(_) = _links_.get(&tag) {
+                            action_tab_append.activate(None); // @TODO implement URI option
                         }
                     }
                 }
@@ -191,7 +217,7 @@ impl Reader {
 
                 if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
-                        // Tag contain URI (is link)
+                        // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
                             // Toggle cursor
                             gobject.set_cursor_from_name(Some("pointer"));
@@ -213,9 +239,6 @@ impl Reader {
                 gobject.emit_toggle_overwrite();
             }
         }); // @TODO may be expensive for CPU, add timeout?
-
-        // @TODO
-        // middle_button_controller(|_, _, _, _| {});
 
         // Result
         Arc::new(Self { title, widget })

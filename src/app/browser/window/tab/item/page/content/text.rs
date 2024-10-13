@@ -21,9 +21,14 @@ pub struct Text {
 
 impl Text {
     // Construct
-    pub fn gemini(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn gemini(
+        gemtext: &str,
+        base: &Uri,
+        action_tab_append: Arc<SimpleAction>,
+        action_page_open: Arc<SimpleAction>,
+    ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, action_page_open);
+        let gemini = Gemini::new(gemtext, base, action_tab_append, action_page_open);
 
         // Init meta
         let meta = Meta {

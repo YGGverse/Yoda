@@ -28,6 +28,7 @@ impl Item {
     pub fn new_arc(
         tab_view: &TabView,
         // Actions
+        action_tab_append: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -43,6 +44,7 @@ impl Item {
         // Init components
         let page = Page::new_arc(
             id.clone(),
+            action_tab_append.clone(),
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
             action_tab_page_navigation_history_forward.clone(),
@@ -123,6 +125,7 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         // Actions
+        action_tab_append: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -138,6 +141,7 @@ impl Item {
                     let item = Item::new_arc(
                         tab_view,
                         // Actions
+                        action_tab_append.clone(),
                         action_tab_page_navigation_base.clone(),
                         action_tab_page_navigation_history_back.clone(),
                         action_tab_page_navigation_history_forward.clone(),

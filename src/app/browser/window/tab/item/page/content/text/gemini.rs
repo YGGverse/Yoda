@@ -20,9 +20,14 @@ pub struct Gemini {
 
 impl Gemini {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn new(
+        gemtext: &str,
+        base: &Uri,
+        action_tab_append: Arc<SimpleAction>,
+        action_page_open: Arc<SimpleAction>,
+    ) -> Self {
         // Init components
-        let reader = Reader::new_arc(gemtext, base, action_page_open);
+        let reader = Reader::new_arc(gemtext, base, action_tab_append, action_page_open);
 
         let widget = Widget::new_arc(&reader.gobject());
 

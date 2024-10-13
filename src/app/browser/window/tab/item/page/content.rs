@@ -25,14 +25,16 @@ pub struct Content {
     // GTK
     widget: Box,
     // Actions
+    action_tab_append: Arc<SimpleAction>,
     action_page_open: Arc<SimpleAction>,
 }
 
 impl Content {
     // Construct
-    pub fn new(action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn new(action_tab_append: Arc<SimpleAction>, action_page_open: Arc<SimpleAction>) -> Self {
         Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
+            action_tab_append,
             action_page_open,
         }
     }
@@ -47,7 +49,12 @@ impl Content {
         // Re-compose
         match mime {
             Mime::TextGemini => {
-                let child = Text::gemini(data, base, self.action_page_open.clone());
+                let child = Text::gemini(
+                    data,
+                    base,
+                    self.action_tab_append.clone(),
+                    self.action_page_open.clone(),
+                );
 
                 self.widget.append(child.widget());
 

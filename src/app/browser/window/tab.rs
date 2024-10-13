@@ -17,6 +17,7 @@ use std::{cell::RefCell, collections::HashMap, sync::Arc};
 // Main
 pub struct Tab {
     // Actions
+    action_tab_append: Arc<SimpleAction>,
     action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
     action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -32,6 +33,7 @@ impl Tab {
     // Construct
     pub fn new_arc(
         // Actions
+        action_tab_append: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -67,6 +69,7 @@ impl Tab {
         // Return activated struct
         Arc::new(Self {
             // Define action links
+            action_tab_append,
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
             action_tab_page_navigation_history_forward,
@@ -85,6 +88,7 @@ impl Tab {
         let item = Item::new_arc(
             self.gobject(),
             // Actions
+            self.action_tab_append.clone(),
             self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_history_back.clone(),
             self.action_tab_page_navigation_history_forward.clone(),
@@ -206,6 +210,7 @@ impl Tab {
                         self.gobject(),
                         transaction,
                         &record.id,
+                        self.action_tab_append.clone(),
                         self.action_tab_page_navigation_base.clone(),
                         self.action_tab_page_navigation_history_back.clone(),
                         self.action_tab_page_navigation_history_forward.clone(),
