@@ -6,99 +6,83 @@ use parser::link::Link;
 use widget::Widget;
 
 use gtk::{
+    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::SimpleAction,
     glib::{GString, TimeZone, Uri},
-    prelude::{TextBufferExt, TextBufferExtManual},
-    TextBuffer, TextTag, TextTagTable, TextView, WrapMode,
+    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant},
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
 };
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 pub struct Reader {
     title: Option<GString>,
-    // css: CssProvider,
     widget: Arc<Widget>,
 }
 
 impl Reader {
     // Construct
     pub fn new_arc(gemtext: &str, base: &Uri, action_page_open: Arc<SimpleAction>) -> Arc<Self> {
-        // Init title
+        // Init default values
         let mut title = None;
 
-        // Init tag table
-        let tags = TextTagTable::new();
+        // Init HashMap storage for event controllers
+        let mut links: HashMap<TextTag, Uri> = HashMap::new();
 
-        // Init header tags
-        let h1 = TextTag::builder()
-            .name("h1")
-            .scale(1.6)
-            .weight(500)
-            .wrap_mode(gtk::WrapMode::Word)
-            .build();
+        // Init new text buffer
+        let buffer = TextBuffer::new(None);
 
-        tags.add(&h1);
-
-        let h2 = TextTag::builder()
-            .name("h2")
-            .scale(1.4)
-            .weight(400)
-            .wrap_mode(gtk::WrapMode::Word)
-            .build();
-
-        tags.add(&h2);
-
-        let h3 = TextTag::builder()
-            .name("h3")
-            .scale(1.2)
-            .weight(400)
-            .wrap_mode(WrapMode::Word)
-            .build();
-
-        tags.add(&h3);
-
-        // Init link tag
-        let link = TextTag::builder()
-            .name("link")
-            .wrap_mode(WrapMode::Word)
-            .build();
-
-        tags.add(&link);
-
-        // Parse lines
-        let buffer = TextBuffer::new(Some(&tags));
-
+        // Parse gemtext lines
         for line in gemtext.lines() {
             // Is header
             if let Some(header) = Header::from(line) {
-                // Detect level
+                // Build tag from level parsed
                 let tag = match header.level {
-                    parser::header::Level::H1 => "h1",
-                    parser::header::Level::H2 => "h2",
-                    parser::header::Level::H3 => "h3",
+                    parser::header::Level::H1 => TextTag::builder()
+                        .scale(1.6)
+                        .weight(500)
+                        .wrap_mode(gtk::WrapMode::Word)
+                        .build(),
+                    parser::header::Level::H2 => TextTag::builder()
+                        .scale(1.4)
+                        .weight(400)
+                        .wrap_mode(gtk::WrapMode::Word)
+                        .build(),
+                    parser::header::Level::H3 => TextTag::builder()
+                        .scale(1.2)
+                        .weight(400)
+                        .wrap_mode(WrapMode::Word)
+                        .build(),
                 };
 
-                // Insert tag line
-                buffer.insert_with_tags_by_name(
-                    &mut buffer.end_iter(),
-                    header.value.as_str(),
-                    &[tag],
-                );
+                // Register tag in buffer
+                buffer.tag_table().add(&tag);
 
+                // Append value to buffer
+                buffer.insert_with_tags(&mut buffer.end_iter(), header.value.as_str(), &[&tag]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
-                // Set title if empty, on first document header match
-                // this feature wanted to update parent elements like tab title
+                // Update reader title using first gemtext header match
                 if title == None {
                     title = Some(header.value.clone());
                 }
 
+                // Skip other actions for this line
                 continue;
             }
 
             // Is link
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
-                // Build link alt from optional values
+                // Init new tag for link
+                let tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
+
+                // Append tag to buffer
+                buffer.tag_table().add(&tag);
+
+                // Append tag to HashMap storage
+                links.insert(tag.clone(), link.uri.clone());
+
+                // Create vector for alt values
                 let mut alt = Vec::new();
 
                 // Append external indicator on exist
@@ -116,47 +100,63 @@ impl Reader {
                     }
                 }
 
-                // Append alt on exist or use URL
+                // Append alt value on exist or use URL
                 alt.push(match link.alt {
                     Some(alt) => alt.to_string(),
                     None => link.uri.to_string(),
                 });
 
-                buffer.insert_with_tags_by_name(&mut buffer.end_iter(), &alt.join(" "), &["link"]);
+                // Append alt vector values to buffer
+                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&tag]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
+                // Skip other actions for this line
                 continue;
             }
 
-            // Nothing match, use plain text @TODO
+            // Nothing match tags, use plain text @TODO
             buffer.insert(&mut buffer.end_iter(), line);
             buffer.insert(&mut buffer.end_iter(), "\n");
         }
 
+        // Init additional controllers
+        let primary_button_controller = GestureClick::builder().button(BUTTON_PRIMARY).build();
+        let middle_button_controller = GestureClick::builder().button(BUTTON_MIDDLE).build();
+        let motion_controller = EventControllerMotion::new();
+
         // Init widget
-        let widget = Widget::new_arc(&buffer);
+        let widget = Widget::new_arc(
+            &buffer,
+            primary_button_controller.clone(),
+            middle_button_controller.clone(),
+            motion_controller.clone(),
+        );
 
-        // Connect actions
-        /* @TODO
-        widget.connect_activate_link(move |_, href| {
-            // Detect requested protocol
-            if let Ok(uri) = Uri::parse(&href, UriFlags::NONE) {
-                return match uri.scheme().as_str() {
-                    "gemini" => {
-                        // Open new page
-                        action_page_open.activate(Some(&uri.to_str().to_variant()));
-
-                        // Prevent link open in external application
-                        Propagation::Stop
+        // Init events
+        primary_button_controller.connect_released({
+            let action_page_open = action_page_open.clone();
+            let gobject = widget.gobject().clone();
+            move |_, _, x, y| {
+                gobject.window_to_buffer_coords(TextWindowType::Widget, x as i32, y as i32);
+                if let Some(iter) = gobject.iter_at_location(x as i32, y as i32) {
+                    for tag in iter.tags() {
+                        if let Some(uri) = links.get(&tag) {
+                            match uri.scheme().as_str() {
+                                "gemini" => {
+                                    // Open new page
+                                    action_page_open.activate(Some(&uri.to_str().to_variant()));
+                                }
+                                _ => (), // Protocol not supported, delegate to the external app @TODO
+                            };
+                        }
                     }
-                    // Protocol not supported
-                    _ => Propagation::Proceed,
-                };
+                }
             }
+        });
 
-            // Delegate unparsable
-            Propagation::Proceed
-        }); */
+        // @TODO on middle-click, on hover events
+        // primary_button_controller(|_, _, _, _| {});
+        // motion_controller.connect_motion(|_, _, _| {});
 
         // Result
         Arc::new(Self { title, widget })
