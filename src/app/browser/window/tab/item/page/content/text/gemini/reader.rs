@@ -3,6 +3,8 @@ mod widget;
 
 use parser::header::Header;
 use parser::link::Link;
+use parser::list::List;
+use parser::quote::Quote;
 use widget::Widget;
 
 use adw::StyleManager;
@@ -10,6 +12,7 @@ use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::SimpleAction,
     glib::{GString, TimeZone, Uri},
+    pango::Style,
     prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
 };
@@ -124,6 +127,42 @@ impl Reader {
 
                 // Append alt vector values to buffer
                 buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&tag]);
+                buffer.insert(&mut buffer.end_iter(), "\n");
+
+                // Skip other actions for this line
+                continue;
+            }
+
+            // Is list
+            if let Some(list) = List::from(line) {
+                // Build tag from level parsed
+                let tag = TextTag::builder().wrap_mode(gtk::WrapMode::Word).build();
+
+                // Register tag in buffer
+                buffer.tag_table().add(&tag);
+
+                // Append value to buffer
+                buffer.insert(&mut buffer.end_iter(), " • ");
+                buffer.insert_with_tags(&mut buffer.end_iter(), list.value.as_str(), &[&tag]);
+                buffer.insert(&mut buffer.end_iter(), "\n");
+
+                // Skip other actions for this line
+                continue;
+            }
+
+            // Is quote
+            if let Some(quote) = Quote::from(line) {
+                // Build tag from level parsed
+                let tag = TextTag::builder()
+                    .style(Style::Italic)
+                    .wrap_mode(gtk::WrapMode::Word)
+                    .build();
+
+                // Register tag in buffer
+                buffer.tag_table().add(&tag);
+
+                // Append value to buffer
+                buffer.insert_with_tags(&mut buffer.end_iter(), quote.value.as_str(), &[&tag]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
