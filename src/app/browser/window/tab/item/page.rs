@@ -43,7 +43,7 @@ pub struct Page {
 impl Page {
     // Construct
     pub fn new_arc(
-        name: GString,
+        id: GString,
         action_tab_append: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -72,8 +72,8 @@ impl Page {
         );
 
         let widget = Widget::new_arc(
+            &id,
             action_page_open.clone(),
-            &name, // ID
             navigation.gobject(),
             content.gobject(),
         );

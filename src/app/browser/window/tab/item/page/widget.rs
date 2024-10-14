@@ -12,10 +12,9 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc(
+        name: &str,
         // Actions
         action_page_open: Arc<SimpleAction>,
-        // Options
-        name: &str,
         // Components
         navigation: &Box,
         content: &Box,
