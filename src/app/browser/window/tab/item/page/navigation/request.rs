@@ -94,7 +94,7 @@ impl Request {
     }
 
     // Setters
-    pub fn set_text(&self, value: &GString) {
+    pub fn set_text(&self, value: &str) {
         self.widget.set_text(value);
     }
 

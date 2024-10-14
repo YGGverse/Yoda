@@ -158,7 +158,7 @@ impl Navigation {
     }
 
     // Setters
-    pub fn set_request_text(&self, value: &GString) {
+    pub fn set_request_text(&self, value: &str) {
         // Focus out from content area on activate the link @TODO
         self.widget.focus();
 

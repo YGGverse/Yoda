@@ -181,7 +181,7 @@ impl Widget {
     }
 
     // Setters
-    pub fn set_text(&self, value: &GString) {
+    pub fn set_text(&self, value: &str) {
         self.gobject.set_text(value);
     }
 

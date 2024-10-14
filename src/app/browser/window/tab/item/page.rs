@@ -59,6 +59,7 @@ impl Page {
             action_tab_append.clone(),
             action_page_open.clone(),
         ));
+
         let navigation = Navigation::new_arc(
             action_tab_page_navigation_base.clone(),
             action_tab_page_navigation_history_back.clone(),
@@ -66,6 +67,7 @@ impl Page {
             action_tab_page_navigation_reload.clone(),
             action_update.clone(),
         );
+
         let widget = Widget::new_arc(
             action_page_open.clone(),
             &name, // ID
@@ -81,16 +83,14 @@ impl Page {
             let navigation = navigation.clone();
             let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
             move |_, request| {
-                // Convert to GString
-                let request = GString::from(
+                // Update request
+                navigation.set_request_text(
                     request
                         .expect("Parameter required for `page.open` action")
                         .get::<String>()
-                        .expect("Parameter does not match `String`"),
+                        .expect("Parameter does not match `String`")
+                        .as_str(),
                 );
-
-                // Update
-                navigation.set_request_text(&request);
 
                 // Reload page
                 action_tab_page_navigation_reload.activate(None);
