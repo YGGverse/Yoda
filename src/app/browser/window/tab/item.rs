@@ -195,6 +195,11 @@ impl Item {
         Ok(())
     }
 
+    // Setters
+    pub fn set_page_navigation_request_text(&self, value: &str) {
+        self.page.set_navigation_request_text(value);
+    }
+
     // Getters
     pub fn id(&self) -> GString {
         self.id.clone()

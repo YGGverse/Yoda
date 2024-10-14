@@ -85,7 +85,7 @@ impl Tab {
                 action_tab_page_navigation_history_forward.clone();
             let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
             let action_update = action_update.clone();
-            move |_, _| {
+            move |_, request| {
                 // Init new tab item
                 let item = Item::new_arc(
                     &gobject,
@@ -99,11 +99,18 @@ impl Tab {
                     action_update.clone(),
                     // Options
                     false,
-                    false, // open on background
+                    false,
                 );
 
                 // Register dynamically created tab components in the HashMap index
                 index.borrow_mut().insert(item.id(), item.clone());
+
+                // Set navigation request
+                if let Some(variant) = request {
+                    if let Some(value) = variant.get::<String>() {
+                        item.set_page_navigation_request_text(value.as_str())
+                    }
+                }
             }
         });
 

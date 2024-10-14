@@ -522,6 +522,11 @@ impl Page {
         Ok(())
     }
 
+    // Setters
+    pub fn set_navigation_request_text(&self, value: &str) {
+        self.navigation.set_request_text(value);
+    }
+
     // Getters
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
