@@ -1,5 +1,6 @@
 use gtk::{
     gio::{SimpleAction, SimpleActionGroup},
+    glib::uuid_string_random,
     prelude::{ActionMapExt, BoxExt, WidgetExt},
     Box, Orientation,
 };
@@ -32,7 +33,7 @@ impl Widget {
         gobject.append(navigation);
         gobject.append(content);
 
-        gobject.insert_action_group("page", Some(&action_group));
+        gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
 
         Arc::new(Self { gobject })
     }
