@@ -10,7 +10,7 @@ use widget::Widget;
 use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
-    gio::SimpleAction,
+    gio::{AppInfo, AppLaunchContext, SimpleAction},
     glib::{GString, TimeZone, Uri},
     pango::Style,
     prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
@@ -216,13 +216,20 @@ impl Reader {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
-                            // Select handler by scheme
+                            // Select link handler by scheme
                             return match uri.scheme().as_str() {
                                 "gemini" => {
-                                    // Open new page
+                                    // Open new page in browser
                                     action_page_open.activate(Some(&uri.to_str().to_variant()));
                                 }
-                                _ => (), // Protocol not supported, delegate to the external app @TODO
+                                // Scheme not supported, delegate link to the external app
+                                _ => match AppInfo::launch_default_for_uri(
+                                    &uri.to_str(),
+                                    Some(&AppLaunchContext::new()),
+                                ) {
+                                    Ok(_) => (),
+                                    Err(e) => todo!("{e}"),
+                                },
                             };
                         }
                     }
