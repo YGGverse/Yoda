@@ -25,16 +25,16 @@ pub struct Content {
     // GTK
     widget: Box,
     // Actions
-    action_tab_append: Arc<SimpleAction>,
+    action_tab_open: Arc<SimpleAction>,
     action_page_open: Arc<SimpleAction>,
 }
 
 impl Content {
     // Construct
-    pub fn new(action_tab_append: Arc<SimpleAction>, action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn new(action_tab_open: Arc<SimpleAction>, action_page_open: Arc<SimpleAction>) -> Self {
         Self {
             widget: Box::builder().orientation(Orientation::Vertical).build(),
-            action_tab_append,
+            action_tab_open,
             action_page_open,
         }
     }
@@ -52,7 +52,7 @@ impl Content {
                 let child = Text::gemini(
                     data,
                     base,
-                    self.action_tab_append.clone(),
+                    self.action_tab_open.clone(),
                     self.action_page_open.clone(),
                 );
 

@@ -26,7 +26,7 @@ impl Reader {
     pub fn new_arc(
         gemtext: &str,
         base: &Uri,
-        action_tab_append: Arc<SimpleAction>,
+        action_tab_open: Arc<SimpleAction>,
         action_page_open: Arc<SimpleAction>,
     ) -> Arc<Self> {
         // Init default values
@@ -197,8 +197,8 @@ impl Reader {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(_) = _links_.get(&tag) {
-                            return action_tab_append.activate(None); // @TODO implement URI option
-                                                                     // @TODO action does not work after focus out
+                            return action_tab_open.activate(None); // @TODO implement URI option
+                                                                   // @TODO action does not work after focus out
                         }
                     }
                 }

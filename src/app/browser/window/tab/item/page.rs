@@ -44,7 +44,7 @@ impl Page {
     // Construct
     pub fn new_arc(
         id: GString,
-        action_tab_append: Arc<SimpleAction>,
+        action_tab_open: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -59,7 +59,7 @@ impl Page {
 
         // Init components
         let content = Arc::new(Content::new(
-            action_tab_append.clone(),
+            action_tab_open.clone(),
             action_page_open.clone(),
         ));
 

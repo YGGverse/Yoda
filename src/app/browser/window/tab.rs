@@ -17,8 +17,9 @@ use std::{cell::RefCell, collections::HashMap, sync::Arc};
 
 // Main
 pub struct Tab {
-    // Actions
-    action_tab_append: Arc<SimpleAction>,
+    // Local actions
+    action_tab_open: Arc<SimpleAction>,
+    // Global actions
     action_tab_page_navigation_base: Arc<SimpleAction>,
     action_tab_page_navigation_history_back: Arc<SimpleAction>,
     action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -34,7 +35,6 @@ impl Tab {
     // Construct
     pub fn new_arc(
         // Actions
-        action_tab_append: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
         action_tab_page_navigation_history_forward: Arc<SimpleAction>,
@@ -73,10 +73,45 @@ impl Tab {
             }
         });
 
+        action_tab_open.connect_activate({
+            let index = index.clone();
+            let gobject = widget.gobject().clone();
+            // Actions
+            let action_tab_open = action_tab_open.clone();
+            let action_tab_page_navigation_base = action_tab_page_navigation_base.clone();
+            let action_tab_page_navigation_history_back =
+                action_tab_page_navigation_history_back.clone();
+            let action_tab_page_navigation_history_forward =
+                action_tab_page_navigation_history_forward.clone();
+            let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
+            let action_update = action_update.clone();
+            move |_, _| {
+                // Init new tab item
+                let item = Item::new_arc(
+                    &gobject,
+                    // Local actions
+                    action_tab_open.clone(),
+                    // Global actions
+                    action_tab_page_navigation_base.clone(),
+                    action_tab_page_navigation_history_back.clone(),
+                    action_tab_page_navigation_history_forward.clone(),
+                    action_tab_page_navigation_reload.clone(),
+                    action_update.clone(),
+                    // Options
+                    false,
+                    false, // open on background
+                );
+
+                // Register dynamically created tab components in the HashMap index
+                index.borrow_mut().insert(item.id(), item.clone());
+            }
+        });
+
         // Return activated struct
         Arc::new(Self {
-            // Define action links
-            action_tab_append,
+            // Local actions
+            action_tab_open,
+            // Global actions
             action_tab_page_navigation_base,
             action_tab_page_navigation_history_back,
             action_tab_page_navigation_history_forward,
@@ -94,8 +129,9 @@ impl Tab {
         // Init new tab item
         let item = Item::new_arc(
             self.gobject(),
-            // Actions
-            self.action_tab_append.clone(),
+            // Local actions
+            self.action_tab_open.clone(),
+            // Global actions
             self.action_tab_page_navigation_base.clone(),
             self.action_tab_page_navigation_history_back.clone(),
             self.action_tab_page_navigation_history_forward.clone(),
@@ -217,7 +253,7 @@ impl Tab {
                         self.gobject(),
                         transaction,
                         &record.id,
-                        self.action_tab_append.clone(),
+                        self.action_tab_open.clone(),
                         self.action_tab_page_navigation_base.clone(),
                         self.action_tab_page_navigation_history_back.clone(),
                         self.action_tab_page_navigation_history_forward.clone(),
