@@ -196,14 +196,13 @@ impl Reader {
                 if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
-                        if let Some(_) = _links_.get(&tag) {
-                            return action_tab_open.activate(None); // @TODO implement URI option
-                                                                   // @TODO action does not work after focus out
+                        if let Some(uri) = _links_.get(&tag) {
+                            return action_tab_open.activate(Some(&uri.to_string().to_variant()));
                         }
                     }
                 }
             }
-        });
+        }); // for a note: this action sensitive to focus out
 
         motion_controller.connect_motion({
             let gobject = widget.gobject().clone();
