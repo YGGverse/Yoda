@@ -198,6 +198,7 @@ impl Reader {
                         // Tag is link
                         if let Some(_) = _links_.get(&tag) {
                             return action_tab_append.activate(None); // @TODO implement URI option
+                                                                     // @TODO action does not work after focus out
                         }
                     }
                 }
