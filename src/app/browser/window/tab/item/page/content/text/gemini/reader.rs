@@ -136,14 +136,22 @@ impl Reader {
             // Is list
             if let Some(list) = List::from(line) {
                 // Build tag from level parsed
-                let tag = TextTag::builder().wrap_mode(gtk::WrapMode::Word).build();
+                let tag = TextTag::builder()
+                    .left_margin(28)
+                    .pixels_above_lines(4)
+                    .pixels_below_lines(4)
+                    .wrap_mode(gtk::WrapMode::Word)
+                    .build();
 
                 // Register tag in buffer
                 buffer.tag_table().add(&tag);
 
                 // Append value to buffer
-                buffer.insert(&mut buffer.end_iter(), " • ");
-                buffer.insert_with_tags(&mut buffer.end_iter(), list.value.as_str(), &[&tag]);
+                buffer.insert_with_tags(
+                    &mut buffer.end_iter(),
+                    format!("• {}", list.value).as_str(),
+                    &[&tag],
+                );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
