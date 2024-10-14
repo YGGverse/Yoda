@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use adw::TabView;
 use gtk::{
-    gio::{SimpleAction, SimpleActionGroup},
+    gio::{Icon, SimpleAction, SimpleActionGroup},
     glib::{uuid_string_random, GString},
     prelude::{ActionMapExt, WidgetExt},
 };
@@ -19,8 +19,14 @@ impl Widget {
         action_group.add_action(action_tab_append.as_ref());
 
         // Init gobject
-        let gobject = TabView::builder().build();
+        let gobject = TabView::new();
 
+        // Change default icon visible for tabs pinned
+        if let Ok(default_icon) = Icon::for_string("view-pin-symbolic") {
+            gobject.set_default_icon(&default_icon);
+        }
+
+        // Create new group for actions
         gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
 
         Self { gobject }
