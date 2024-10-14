@@ -170,7 +170,7 @@ impl Reader {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
                             // Select handler by scheme
-                            match uri.scheme().as_str() {
+                            return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page
                                     action_page_open.activate(Some(&uri.to_str().to_variant()));
@@ -197,7 +197,7 @@ impl Reader {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(_) = _links_.get(&tag) {
-                            action_tab_append.activate(None); // @TODO implement URI option
+                            return action_tab_append.activate(None); // @TODO implement URI option
                         }
                     }
                 }
