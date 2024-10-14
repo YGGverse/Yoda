@@ -13,7 +13,10 @@ use meta::{Meta, Mime, Status};
 
 use gtk::{
     gio::{Cancellable, SimpleAction, SocketClient, SocketProtocol, TlsCertificateFlags},
-    glib::{gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags},
+    glib::{
+        gformat, uuid_string_random, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags,
+        Uri, UriFlags,
+    },
     prelude::{
         ActionExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
         StaticVariantType, ToVariant,
@@ -50,7 +53,7 @@ impl Page {
     ) -> Arc<Self> {
         // Init local actions
         let action_page_open = Arc::new(SimpleAction::new(
-            "open", // @TODO
+            &uuid_string_random(),
             Some(&String::static_variant_type()),
         ));
 
