@@ -105,10 +105,11 @@ impl Tab {
                 // Register dynamically created tab components in the HashMap index
                 index.borrow_mut().insert(item.id(), item.clone());
 
-                // Set navigation request
+                // Apply request
                 if let Some(variant) = request {
                     if let Some(value) = variant.get::<String>() {
-                        item.set_page_navigation_request_text(value.as_str())
+                        item.set_page_navigation_request_text(value.as_str());
+                        item.page_navigation_reload();
                     }
                 }
             }
