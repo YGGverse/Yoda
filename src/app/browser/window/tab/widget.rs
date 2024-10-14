@@ -1,5 +1,11 @@
+use std::sync::Arc;
+
 use adw::TabView;
-use gtk::glib::GString;
+use gtk::{
+    gio::{SimpleAction, SimpleActionGroup},
+    glib::{uuid_string_random, GString},
+    prelude::{ActionMapExt, WidgetExt},
+};
 
 pub struct Widget {
     gobject: TabView,
@@ -7,10 +13,17 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new() -> Self {
-        Self {
-            gobject: TabView::builder().build(),
-        }
+    pub fn new(action_tab_append: Arc<SimpleAction>) -> Self {
+        // Init additional action group
+        let action_group = SimpleActionGroup::new();
+        action_group.add_action(action_tab_append.as_ref());
+
+        // Init gobject
+        let gobject = TabView::builder().build();
+
+        gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
+
+        Self { gobject }
     }
 
     // Actions

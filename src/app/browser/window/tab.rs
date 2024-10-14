@@ -9,7 +9,8 @@ use widget::Widget;
 use adw::TabView;
 use gtk::{
     gio::SimpleAction,
-    glib::{GString, Propagation},
+    glib::{uuid_string_random, GString, Propagation},
+    prelude::StaticVariantType,
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
@@ -40,11 +41,17 @@ impl Tab {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
     ) -> Arc<Self> {
+        // Init local actions
+        let action_tab_open = Arc::new(SimpleAction::new(
+            &uuid_string_random(),
+            Some(&String::static_variant_type()),
+        ));
+
         // Init empty HashMap index as no tabs appended yet
         let index = Arc::new(RefCell::new(HashMap::new()));
 
         // Init widget
-        let widget = Arc::new(Widget::new());
+        let widget = Arc::new(Widget::new(action_tab_open.clone()));
 
         // Init events
         widget.gobject().connect_close_page({
