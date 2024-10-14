@@ -1,7 +1,4 @@
-use gtk::{
-    prelude::{BoxExt, WidgetExt},
-    Box, Button, DirectionType, Entry, Orientation,
-};
+use gtk::{prelude::BoxExt, Box, Button, Entry, Orientation};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -32,11 +29,6 @@ impl Widget {
         gobject.append(bookmark);
 
         Arc::new(Self { gobject })
-    }
-
-    // Actions
-    pub fn focus(&self) {
-        self.gobject.child_focus(DirectionType::Right);
     }
 
     // Getters
