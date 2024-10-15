@@ -11,10 +11,10 @@ impl Multiline {
     // return Self constructed on success or None
     pub fn begin_from(line: &str) -> Option<Self> {
         if line.starts_with("```") {
-            let alt = line.trim_start_matches("```").trim();
+            let alt = line.trim_start_matches("```");
 
             return Some(Self {
-                alt: match alt.is_empty() {
+                alt: match alt.trim().is_empty() {
                     true => None,
                     false => Some(GString::from(alt)),
                 },
@@ -41,6 +41,6 @@ impl Multiline {
 
         // Append data to the buffer, trim close tag on exists
         self.buffer
-            .push(GString::from(line.trim_end_matches("```").trim()));
+            .push(GString::from(line.trim_end_matches("```")));
     }
 }
