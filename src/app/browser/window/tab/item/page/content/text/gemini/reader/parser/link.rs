@@ -42,10 +42,7 @@ impl Link {
                         match Uri::parse(&resolved_str, UriFlags::NONE) {
                             Ok(resolved_uri) => {
                                 // Change external status
-                                is_external = Some(
-                                    resolved_uri.host() != base_uri.host()
-                                        || resolved_uri.port() != base_uri.port(),
-                                );
+                                is_external = Some(resolved_uri.scheme() != base_uri.scheme());
 
                                 // Result
                                 resolved_uri
