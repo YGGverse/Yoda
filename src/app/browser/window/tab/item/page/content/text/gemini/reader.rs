@@ -2,11 +2,13 @@ mod parser;
 mod tag;
 mod widget;
 
-use parser::code::Code;
-use parser::header::Header;
-use parser::link::Link;
-use parser::list::List;
-use parser::quote::Quote;
+use parser::{
+    code::Code,
+    header::{Header, Level},
+    link::Link,
+    list::List,
+    quote::Quote,
+};
 use tag::Tag;
 use widget::Widget;
 
@@ -113,9 +115,9 @@ impl Reader {
                     &mut buffer.end_iter(),
                     header.value.as_str(),
                     &[match header.level {
-                        parser::header::Level::H1 => tag.h1(),
-                        parser::header::Level::H2 => tag.h2(),
-                        parser::header::Level::H3 => tag.h3(),
+                        Level::H1 => tag.h1(),
+                        Level::H2 => tag.h2(),
+                        Level::H3 => tag.h3(),
                     }],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
