@@ -209,15 +209,31 @@ impl Tab {
     }
 
     pub fn update(&self, id: &str) {
-        if let Some(item) = self.index.borrow().get(id) {
-            // Update item components
-            item.update();
+        match self.index.borrow().get(id) {
+            Some(item) => {
+                // Update item components
+                item.update();
 
-            // Update tab title on loading indicator inactive
-            if !item.page_is_loading() {
-                if let Some(title) = item.page_meta_title() {
-                    item.gobject().set_title(title.as_str())
-                };
+                // Update tab title on loading indicator inactive
+                if !item.page_is_loading() {
+                    if let Some(title) = item.page_meta_title() {
+                        item.gobject().set_title(title.as_str())
+                    };
+                }
+            }
+            // Update all tabs on ID not found @TODO change initial update method
+            None => {
+                for (_, item) in self.index.borrow().iter() {
+                    // Update item components
+                    item.update();
+
+                    // Update tab title on loading indicator inactive
+                    if !item.page_is_loading() {
+                        if let Some(title) = item.page_meta_title() {
+                            item.gobject().set_title(title.as_str())
+                        };
+                    }
+                }
             }
         }
     }
