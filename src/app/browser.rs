@@ -120,7 +120,7 @@ impl Browser {
         action_tab_append.connect_activate({
             let window = window.clone();
             move |_, _| {
-                window.tab_append();
+                window.tab_append(None);
             }
         });
 

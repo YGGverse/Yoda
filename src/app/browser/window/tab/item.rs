@@ -35,6 +35,7 @@ impl Item {
         action_tab_page_navigation_reload: Arc<SimpleAction>,
         action_update: Arc<SimpleAction>,
         // Options
+        position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
     ) -> Arc<Self> {
@@ -58,6 +59,7 @@ impl Item {
             tab_view,
             page.gobject(),
             None,
+            position,
             is_pinned,
             is_selected,
         ); // @TODO
@@ -149,6 +151,7 @@ impl Item {
                         action_tab_page_navigation_reload.clone(),
                         action_update.clone(),
                         // Options
+                        None,
                         record.is_pinned,
                         record.is_selected,
                     );

@@ -98,6 +98,10 @@ impl Tab {
                     action_tab_page_navigation_reload.clone(),
                     action_update.clone(),
                     // Options
+                    match gobject.selected_page() {
+                        Some(page) => Some(gobject.page_position(&page) + 1),
+                        None => None,
+                    },
                     false,
                     false,
                 );
@@ -133,7 +137,7 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(&self) -> Arc<Item> {
+    pub fn append(&self, position: Option<i32>) -> Arc<Item> {
         // Init new tab item
         let item = Item::new_arc(
             self.gobject(),
@@ -146,6 +150,7 @@ impl Tab {
             self.action_tab_page_navigation_reload.clone(),
             self.action_update.clone(),
             // Options
+            position,
             false,
             true,
         );
@@ -328,7 +333,7 @@ impl Tab {
     pub fn init(&self) {
         // Append just one blank page if no tabs available after last session restore
         if self.index.borrow().is_empty() {
-            self.append();
+            self.append(None);
         }
 
         // @TODO other/child features..

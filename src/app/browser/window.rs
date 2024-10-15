@@ -74,8 +74,8 @@ impl Window {
     }
 
     // Actions
-    pub fn tab_append(&self) {
-        self.tab.append();
+    pub fn tab_append(&self, position: Option<i32>) {
+        self.tab.append(position);
     }
 
     pub fn tab_page_navigation_base(&self) {

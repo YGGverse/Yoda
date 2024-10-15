@@ -20,10 +20,14 @@ impl Widget {
         tab_view: &TabView,
         page: &Box,
         title: Option<&str>,
+        position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
     ) -> Arc<Self> {
-        let gobject = tab_view.append(page);
+        let gobject = match position {
+            Some(number) => tab_view.insert(page, number),
+            None => tab_view.append(page),
+        };
 
         gobject.set_keyword(keyword);
 
