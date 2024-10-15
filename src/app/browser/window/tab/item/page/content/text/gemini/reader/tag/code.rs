@@ -10,6 +10,7 @@ impl Code {
         Self {
             tag: TextTag::builder()
                 .family("monospace") // @TODO
+                .left_margin(28)
                 .scale(0.8)
                 .wrap_mode(WrapMode::None)
                 .build(),
