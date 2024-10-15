@@ -1,7 +1,7 @@
 use adw::StatusPage;
 
 pub struct Error {
-    gobject: StatusPage,
+    // nothing yet..
 }
 
 impl Error {
