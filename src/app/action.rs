@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use gtk::{
     gio::SimpleAction,
-    glib::{gformat, uuid_string_random, GString},
+    glib::{gformat, uuid_string_random, GString, VariantTy},
     prelude::ActionExt,
 };
 
@@ -17,9 +17,9 @@ pub struct Action {
 
 impl Action {
     // Construct
-    pub fn new(group: &str, is_enabled: bool) -> Self {
+    pub fn new(group: &str, is_enabled: bool, parameter_type: Option<&VariantTy>) -> Self {
         // Create random action name as no static values should be in use
-        let simple = Arc::new(SimpleAction::new(&uuid_string_random(), None));
+        let simple = Arc::new(SimpleAction::new(&uuid_string_random(), parameter_type));
         simple.set_enabled(is_enabled);
 
         // Assign action to the group

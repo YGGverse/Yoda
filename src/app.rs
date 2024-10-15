@@ -38,18 +38,18 @@ impl App {
         profile_path: PathBuf,
     ) -> Self {
         // Init actions
-        let action_tool_debug = Action::new("win", true);
-        let action_tool_profile = Action::new("win", true);
-        let action_quit = Action::new("win", true);
-        let action_update = Action::new("win", true);
-        let action_tab_append = Action::new("win", true);
-        let action_tab_close = Action::new("win", true);
-        let action_tab_close_all = Action::new("win", true);
-        let action_tab_page_navigation_base = Action::new("win", false);
-        let action_tab_page_navigation_history_back = Action::new("win", false);
-        let action_tab_page_navigation_history_forward = Action::new("win", false);
-        let action_tab_page_navigation_reload = Action::new("win", true);
-        let action_tab_pin = Action::new("win", true);
+        let action_tool_debug = Action::new("win", true, None);
+        let action_tool_profile = Action::new("win", true, None);
+        let action_quit = Action::new("win", true, None);
+        let action_update = Action::new("win", true, None);
+        let action_tab_append = Action::new("win", true, None);
+        let action_tab_close = Action::new("win", true, None);
+        let action_tab_close_all = Action::new("win", true, None);
+        let action_tab_page_navigation_base = Action::new("win", false, None);
+        let action_tab_page_navigation_history_back = Action::new("win", false, None);
+        let action_tab_page_navigation_history_forward = Action::new("win", false, None);
+        let action_tab_page_navigation_reload = Action::new("win", true, None);
+        let action_tab_pin = Action::new("win", true, None);
 
         // Init GTK
         let gobject = Application::builder()
