@@ -12,6 +12,7 @@ use parser::{
 use tag::Tag;
 use widget::Widget;
 
+use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::{AppInfo, AppLaunchContext, SimpleAction},
@@ -39,7 +40,7 @@ impl Reader {
         let mut title = None;
 
         // Init HashMap storage for event controllers
-        let mut links: HashMap<&TextTag, Uri> = HashMap::new();
+        let mut links: HashMap<TextTag, Uri> = HashMap::new();
 
         // Init multiline code builder features
         let mut multiline = None;
@@ -133,9 +134,6 @@ impl Reader {
 
             // Is link
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
-                // Append tag to HashMap storage
-                // links.insert(tag.link(), link.uri.clone()); @TODO
-
                 // Create vector for alt values
                 let mut alt = Vec::new();
 
@@ -160,9 +158,23 @@ impl Reader {
                     None => link.uri.to_string(),
                 });
 
+                // Create new tag for new link
+                let a = TextTag::builder()
+                    .foreground_rgba(&StyleManager::default().accent_color_rgba()) // @TODO
+                    .sentence(true)
+                    .wrap_mode(WrapMode::Word)
+                    .build();
+
+                if !tag.add(&a) {
+                    panic!() // @TODO handle
+                }
+
                 // Append alt vector values to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&tag.link()]);
+                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
+
+                // Append tag to HashMap storage
+                links.insert(a, link.uri.clone());
 
                 // Skip other actions for this line
                 continue;
