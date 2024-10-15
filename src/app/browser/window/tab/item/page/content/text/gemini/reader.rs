@@ -1,6 +1,7 @@
 mod parser;
 mod widget;
 
+use parser::code::Code;
 use parser::header::Header;
 use parser::link::Link;
 use parser::list::List;
@@ -44,8 +45,95 @@ impl Reader {
         // Init new text buffer
         let buffer = TextBuffer::new(None);
 
+        // Init multiline code builder features
+        let mut multiline = None;
+
         // Parse gemtext lines
         for line in gemtext.lines() {
+            // Is inline code
+            if let Some(code) = Code::inline_from(line) {
+                // Build tag from level parsed
+                let tag = TextTag::builder()
+                    .family("monospace")
+                    .scale(0.8)
+                    .wrap_mode(WrapMode::None)
+                    .build();
+
+                // Register tag in buffer
+                buffer.tag_table().add(&tag);
+
+                // Append value to buffer
+                buffer.insert_with_tags(&mut buffer.end_iter(), code.value.as_str(), &[&tag]);
+                buffer.insert(&mut buffer.end_iter(), "\n");
+
+                // Skip other actions for this line
+                continue;
+            }
+
+            // Is multiline code
+            match multiline {
+                None => {
+                    // Open tag found
+                    if let Some(code) = Code::multiline_begin_from(line) {
+                        // Begin next lines collection into the code buffer
+                        multiline = Some(code);
+
+                        // Skip other actions for this line
+                        continue;
+                    }
+                }
+                Some(ref mut this) => {
+                    Code::multiline_continue_from(this, line);
+
+                    // Close tag found:
+                    if this.completed {
+                        // Is alt provided
+                        if let Some(alt) = &this.alt {
+                            // Build tag for code alt description
+                            let tag = TextTag::builder()
+                                .pixels_above_lines(4)
+                                .pixels_below_lines(8)
+                                .weight(500)
+                                .wrap_mode(WrapMode::None)
+                                .build();
+
+                            // Register tag in buffer
+                            buffer.tag_table().add(&tag);
+
+                            // Insert alt value to the main buffer
+                            buffer.insert_with_tags(&mut buffer.end_iter(), alt.as_str(), &[&tag]);
+                            buffer.insert(&mut buffer.end_iter(), "\n");
+                        }
+
+                        // Build tag container for multiline code result
+                        let tag = TextTag::builder()
+                            .family("monospace") // @TODO does not work
+                            .left_margin(28)
+                            .scale(0.8)
+                            .wrap_mode(WrapMode::None)
+                            .build();
+
+                        // Register tag in buffer
+                        buffer.tag_table().add(&tag);
+
+                        // Insert multiline code buffer into main buffer
+                        buffer.insert_with_tags(
+                            &mut buffer.end_iter(),
+                            &this.buffer.join("\n"),
+                            &[&tag],
+                        );
+
+                        buffer.insert(&mut buffer.end_iter(), "\n");
+
+                        // Reset
+                        multiline = None;
+                    }
+
+                    // Skip other actions for this line
+                    continue;
+                }
+            };
+
             // Is header
             if let Some(header) = Header::from(line) {
                 // Build tag from level parsed
@@ -54,13 +142,13 @@ impl Reader {
                         .scale(1.6)
                         .sentence(true)
                         .weight(500)
-                        .wrap_mode(gtk::WrapMode::Word)
+                        .wrap_mode(WrapMode::Word)
                         .build(),
                     parser::header::Level::H2 => TextTag::builder()
                         .scale(1.4)
                         .sentence(true)
                         .weight(400)
-                        .wrap_mode(gtk::WrapMode::Word)
+                        .wrap_mode(WrapMode::Word)
                         .build(),
                     parser::header::Level::H3 => TextTag::builder()
                         .scale(1.2)
@@ -140,7 +228,7 @@ impl Reader {
                     .left_margin(28)
                     .pixels_above_lines(4)
                     .pixels_below_lines(4)
-                    .wrap_mode(gtk::WrapMode::Word)
+                    .wrap_mode(WrapMode::Word)
                     .build();
 
                 // Register tag in buffer
@@ -163,7 +251,7 @@ impl Reader {
                 // Build tag from level parsed
                 let tag = TextTag::builder()
                     .style(Style::Italic)
-                    .wrap_mode(gtk::WrapMode::Word)
+                    .wrap_mode(WrapMode::Word)
                     .build();
 
                 // Register tag in buffer
