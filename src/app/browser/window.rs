@@ -106,8 +106,8 @@ impl Window {
         self.tab.pin();
     }
 
-    pub fn update(&self) {
-        self.tab.update();
+    pub fn update(&self, id: &str) {
+        self.tab.update(id);
     }
 
     pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {

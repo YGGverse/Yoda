@@ -9,7 +9,10 @@ use database::Database;
 use adw::Application;
 use gtk::{
     glib::ExitCode,
-    prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
+    prelude::{
+        ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt,
+        StaticVariantType, ToVariant,
+    },
 };
 use sqlite::{Connection, Transaction};
 
@@ -41,7 +44,7 @@ impl App {
         let action_tool_debug = Action::new("win", true, None);
         let action_tool_profile = Action::new("win", true, None);
         let action_quit = Action::new("win", true, None);
-        let action_update = Action::new("win", true, None);
+        let action_update = Action::new("win", true, Some(&String::static_variant_type()));
         let action_tab_append = Action::new("win", true, None);
         let action_tab_close = Action::new("win", true, None);
         let action_tab_close_all = Action::new("win", true, None);
@@ -102,7 +105,7 @@ impl App {
             let action_update = action_update.simple();
             move |_| {
                 // Make initial update
-                action_update.activate(None);
+                action_update.activate(Some(&"".to_variant())); // @TODO
             }
         });
 

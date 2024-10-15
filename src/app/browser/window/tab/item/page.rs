@@ -27,7 +27,7 @@ use sqlite::Transaction;
 use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
-    id: Arc<GString>,
+    id: GString,
     // Actions
     action_page_open: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
@@ -44,7 +44,7 @@ pub struct Page {
 impl Page {
     // Construct
     pub fn new_arc(
-        id: Arc<GString>,
+        id: GString,
         action_tab_open: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -155,6 +155,7 @@ impl Page {
         let request_text = self.navigation.request_text();
 
         // Init shared objects for async access
+        let id = self.id.to_variant();
         let navigation = self.navigation.clone();
         let content = self.content.clone();
         let meta = self.meta.clone();
@@ -166,7 +167,7 @@ impl Page {
         meta.borrow_mut().title = Some(gformat!("Loading.."));
         meta.borrow_mut().description = None;
 
-        action_update.activate(None);
+        action_update.activate(Some(&id));
 
         /*let _uri = */
         match Uri::parse(&request_text, UriFlags::NONE) {
@@ -187,7 +188,7 @@ impl Page {
                         meta.borrow_mut().status = Some(Status::Prepare);
                         meta.borrow_mut().description = Some(gformat!("Connect {host}.."));
 
-                        action_update.activate(None);
+                        action_update.activate(Some(&id));
 
                         // Create new connection
                         let cancellable = Cancellable::new();
@@ -208,7 +209,7 @@ impl Page {
                                     meta.borrow_mut().status = Some(Status::Connect);
                                     meta.borrow_mut().description = Some(gformat!("Connected to {host}.."));
 
-                                    action_update.activate(None);
+                                    action_update.activate(Some(&id));
 
                                     // Send request
                                     connection.output_stream().write_all_async(
@@ -221,7 +222,7 @@ impl Page {
                                                 meta.borrow_mut().status = Some(Status::Request);
                                                 meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
 
-                                                action_update.activate(None);
+                                                action_update.activate(Some(&id));
 
                                                 // Read response
                                                 connection.input_stream().read_all_async(
@@ -239,7 +240,7 @@ impl Page {
                                                                     meta.borrow_mut().description = Some(host);
                                                                     meta.borrow_mut().title = Some(uri.path());
 
-                                                                    action_update.activate(None);
+                                                                    action_update.activate(Some(&id));
 
                                                                     // Try create short base for title
                                                                     let path = uri.path();
@@ -290,7 +291,7 @@ impl Page {
                                                                                                     }
 
                                                                                                     // Update window components
-                                                                                                    action_update.activate(None);
+                                                                                                    action_update.activate(Some(&id));
                                                                                                 },
                                                                                                 None => todo!(),
                                                                                             }
@@ -299,7 +300,7 @@ impl Page {
                                                                                             meta.borrow_mut().status = Some(Status::Success);
                                                                                             meta.borrow_mut().mime = Some(Mime::TextPlain);
 
-                                                                                            action_update.activate(None);
+                                                                                            action_update.activate(Some(&id));
                                                                                             todo!()
                                                                                         },
                                                                                         _ => {
@@ -307,7 +308,7 @@ impl Page {
                                                                                             meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                             meta.borrow_mut().description = Some(gformat!("Content {mime} not supported"));
 
-                                                                                            action_update.activate(None);
+                                                                                            action_update.activate(Some(&id));
                                                                                         },
                                                                                     }
                                                                                     None => todo!(),
@@ -320,7 +321,7 @@ impl Page {
                                                                                 meta.borrow_mut().mime = Some(Mime::TextGemini);
                                                                                 meta.borrow_mut().title = Some(gformat!("Redirect"));
 
-                                                                                action_update.activate(None);
+                                                                                action_update.activate(Some(&id));
 
                                                                                 // Select widget
                                                                                 match parts.get(3) {
@@ -342,7 +343,7 @@ impl Page {
                                                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                                 meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
 
-                                                                                action_update.activate(None);
+                                                                                action_update.activate(Some(&id));
                                                                             },
                                                                         }
                                                                         None => todo!(),
@@ -353,7 +354,7 @@ impl Page {
                                                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                                                     meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
 
-                                                                    action_update.activate(None);
+                                                                    action_update.activate(Some(&id));
                                                                 }
                                                             }
 
@@ -368,7 +369,7 @@ impl Page {
                                                             meta.borrow_mut().title = Some(gformat!("Oops"));
                                                             meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
 
-                                                            action_update.activate(None);
+                                                            action_update.activate(Some(&id));
 
                                                             // Close connection
                                                             if let Err(e) = connection.close(Some(&cancellable)) {
@@ -384,7 +385,7 @@ impl Page {
                                                 meta.borrow_mut().title = Some(gformat!("Oops"));
                                                 meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
 
-                                                action_update.activate(None);
+                                                action_update.activate(Some(&id));
 
                                                 // Close connection
                                                 if let Err(e) = connection.close(Some(&cancellable)) {
@@ -400,7 +401,7 @@ impl Page {
                                     meta.borrow_mut().title = Some(gformat!("Oops"));
                                     meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
 
-                                    action_update.activate(None);
+                                    action_update.activate(Some(&id));
                                 }
                             },
                         );
@@ -415,7 +416,7 @@ impl Page {
                         meta.borrow_mut().description =
                             Some(gformat!("Protocol {scheme} not supported"));
 
-                        action_update.activate(None);
+                        action_update.activate(Some(&self.id.to_variant()));
                     }
                 }
             }

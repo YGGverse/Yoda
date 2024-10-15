@@ -17,7 +17,7 @@ use std::sync::Arc;
 pub struct Item {
     // Auto-generated unique item ID
     // useful as widget name in GTK actions callback
-    id: Arc<GString>,
+    id: GString,
     // Components
     page: Arc<Page>,
     widget: Arc<Widget>,
@@ -39,7 +39,7 @@ impl Item {
         is_selected: bool,
     ) -> Arc<Self> {
         // Generate unique ID for new page components
-        let id = Arc::new(uuid_string_random());
+        let id = uuid_string_random();
 
         // Init components
         let page = Page::new_arc(
@@ -201,7 +201,7 @@ impl Item {
     }
 
     // Getters
-    pub fn id(&self) -> Arc<GString> {
+    pub fn id(&self) -> GString {
         self.id.clone()
     }
 

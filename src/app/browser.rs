@@ -107,8 +107,13 @@ impl Browser {
 
         action_update.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.update();
+            move |_, id| {
+                window.update(
+                    id.expect("Page ID required for update action")
+                        .get::<String>()
+                        .expect("Parameter does not match `String`")
+                        .as_str(),
+                );
             }
         });
 

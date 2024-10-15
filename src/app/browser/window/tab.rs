@@ -26,7 +26,7 @@ pub struct Tab {
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
-    index: Arc<RefCell<HashMap<Arc<GString>, Arc<Item>>>>,
+    index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
     // GTK
     widget: Arc<Widget>,
 }
@@ -208,18 +208,16 @@ impl Tab {
         }
     }
 
-    pub fn update(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                // Update item components
-                item.update();
+    pub fn update(&self, id: &str) {
+        if let Some(item) = self.index.borrow().get(id) {
+            // Update item components
+            item.update();
 
-                // Update tab title on loading indicator inactive
-                if !item.page_is_loading() {
-                    if let Some(title) = item.page_meta_title() {
-                        item.gobject().set_title(title.as_str())
-                    };
-                }
+            // Update tab title on loading indicator inactive
+            if !item.page_is_loading() {
+                if let Some(title) = item.page_meta_title() {
+                    item.gobject().set_title(title.as_str())
+                };
             }
         }
     }

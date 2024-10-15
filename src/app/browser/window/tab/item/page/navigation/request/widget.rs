@@ -5,7 +5,7 @@ use database::Database;
 use gtk::{
     gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, GString, SourceId},
-    prelude::{ActionExt, EditableExt, EntryExt},
+    prelude::{ActionExt, EditableExt, EntryExt, ToVariant},
     Entry,
 };
 use sqlite::Transaction;
@@ -47,7 +47,7 @@ impl Widget {
 
         // Connect events
         gobject.connect_changed(move |_| {
-            action_update.activate(None);
+            action_update.activate(Some(&"".to_variant())); // @TODO
         });
 
         gobject.connect_activate(move |_| {
