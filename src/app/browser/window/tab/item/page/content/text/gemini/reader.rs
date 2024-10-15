@@ -1,4 +1,5 @@
 mod parser;
+mod tag;
 mod widget;
 
 use parser::code::Code;
@@ -6,14 +7,13 @@ use parser::header::Header;
 use parser::link::Link;
 use parser::list::List;
 use parser::quote::Quote;
+use tag::Tag;
 use widget::Widget;
 
-use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::{AppInfo, AppLaunchContext, SimpleAction},
     glib::{GString, TimeZone, Uri},
-    pango::Style,
     prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
 };
@@ -37,33 +37,23 @@ impl Reader {
         let mut title = None;
 
         // Init HashMap storage for event controllers
-        let mut links: HashMap<TextTag, Uri> = HashMap::new();
-
-        // Init system palette
-        let style = StyleManager::default();
-
-        // Init new text buffer
-        let buffer = TextBuffer::new(None);
+        let mut links: HashMap<&TextTag, Uri> = HashMap::new();
 
         // Init multiline code builder features
         let mut multiline = None;
+
+        // Init tags
+        let tag = Tag::new();
+
+        // Init new text buffer
+        let buffer = TextBuffer::new(Some(tag.gobject()));
 
         // Parse gemtext lines
         for line in gemtext.lines() {
             // Is inline code
             if let Some(code) = Code::inline_from(line) {
-                // Build tag from level parsed
-                let tag = TextTag::builder()
-                    .family("monospace")
-                    .scale(0.8)
-                    .wrap_mode(WrapMode::None)
-                    .build();
-
-                // Register tag in buffer
-                buffer.tag_table().add(&tag);
-
                 // Append value to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), code.value.as_str(), &[&tag]);
+                buffer.insert_with_tags(&mut buffer.end_iter(), code.value.as_str(), &[tag.code()]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
@@ -89,38 +79,20 @@ impl Reader {
                     if this.completed {
                         // Is alt provided
                         if let Some(alt) = &this.alt {
-                            // Build tag for code alt description
-                            let tag = TextTag::builder()
-                                .pixels_above_lines(4)
-                                .pixels_below_lines(8)
-                                .weight(500)
-                                .wrap_mode(WrapMode::None)
-                                .build();
-
-                            // Register tag in buffer
-                            buffer.tag_table().add(&tag);
-
                             // Insert alt value to the main buffer
-                            buffer.insert_with_tags(&mut buffer.end_iter(), alt.as_str(), &[&tag]);
+                            buffer.insert_with_tags(
+                                &mut buffer.end_iter(),
+                                alt.as_str(),
+                                &[tag.title()],
+                            );
                             buffer.insert(&mut buffer.end_iter(), "\n");
                         }
-
-                        // Build tag container for multiline code result
-                        let tag = TextTag::builder()
-                            .family("monospace") // @TODO does not work
-                            .left_margin(28)
-                            .scale(0.8)
-                            .wrap_mode(WrapMode::None)
-                            .build();
-
-                        // Register tag in buffer
-                        buffer.tag_table().add(&tag);
 
                         // Insert multiline code buffer into main buffer
                         buffer.insert_with_tags(
                             &mut buffer.end_iter(),
                             &this.buffer.join("\n"),
-                            &[&tag],
+                            &[tag.code()],
                         );
 
                         buffer.insert(&mut buffer.end_iter(), "\n");
@@ -136,33 +108,16 @@ impl Reader {
 
             // Is header
             if let Some(header) = Header::from(line) {
-                // Build tag from level parsed
-                let tag = match header.level {
-                    parser::header::Level::H1 => TextTag::builder()
-                        .scale(1.6)
-                        .sentence(true)
-                        .weight(500)
-                        .wrap_mode(WrapMode::Word)
-                        .build(),
-                    parser::header::Level::H2 => TextTag::builder()
-                        .scale(1.4)
-                        .sentence(true)
-                        .weight(400)
-                        .wrap_mode(WrapMode::Word)
-                        .build(),
-                    parser::header::Level::H3 => TextTag::builder()
-                        .scale(1.2)
-                        .sentence(true)
-                        .weight(400)
-                        .wrap_mode(WrapMode::Word)
-                        .build(),
-                };
-
-                // Register tag in buffer
-                buffer.tag_table().add(&tag);
-
                 // Append value to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), header.value.as_str(), &[&tag]);
+                buffer.insert_with_tags(
+                    &mut buffer.end_iter(),
+                    header.value.as_str(),
+                    &[match header.level {
+                        parser::header::Level::H1 => tag.h1(),
+                        parser::header::Level::H2 => tag.h2(),
+                        parser::header::Level::H3 => tag.h3(),
+                    }],
+                );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Update reader title using first gemtext header match
@@ -176,18 +131,8 @@ impl Reader {
 
             // Is link
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
-                // Init new tag for link
-                let tag = TextTag::builder()
-                    .foreground_rgba(&style.accent_color_rgba())
-                    .sentence(true)
-                    .wrap_mode(WrapMode::Word)
-                    .build();
-
-                // Append tag to buffer
-                buffer.tag_table().add(&tag);
-
                 // Append tag to HashMap storage
-                links.insert(tag.clone(), link.uri.clone());
+                // links.insert(tag.link(), link.uri.clone()); @TODO
 
                 // Create vector for alt values
                 let mut alt = Vec::new();
@@ -214,7 +159,7 @@ impl Reader {
                 });
 
                 // Append alt vector values to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&tag]);
+                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&tag.link()]);
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
@@ -223,22 +168,11 @@ impl Reader {
 
             // Is list
             if let Some(list) = List::from(line) {
-                // Build tag from level parsed
-                let tag = TextTag::builder()
-                    .left_margin(28)
-                    .pixels_above_lines(4)
-                    .pixels_below_lines(4)
-                    .wrap_mode(WrapMode::Word)
-                    .build();
-
-                // Register tag in buffer
-                buffer.tag_table().add(&tag);
-
                 // Append value to buffer
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     format!("• {}", list.value).as_str(),
-                    &[&tag],
+                    &[&tag.list()],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
@@ -248,17 +182,12 @@ impl Reader {
 
             // Is quote
             if let Some(quote) = Quote::from(line) {
-                // Build tag from level parsed
-                let tag = TextTag::builder()
-                    .style(Style::Italic)
-                    .wrap_mode(WrapMode::Word)
-                    .build();
-
-                // Register tag in buffer
-                buffer.tag_table().add(&tag);
-
                 // Append value to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), quote.value.as_str(), &[&tag]);
+                buffer.insert_with_tags(
+                    &mut buffer.end_iter(),
+                    quote.value.as_str(),
+                    &[&tag.quote()],
+                );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
