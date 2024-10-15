@@ -1,6 +1,8 @@
 // @TODO mod image;
+mod status;
 mod text;
 
+use status::Status;
 use text::Text;
 
 use gtk::{
@@ -12,18 +14,9 @@ use gtk::{
 
 use std::sync::Arc;
 
-pub enum Mime {
-    TextGemini,
-    // TextPlain,
-}
-
-pub struct ResetResult {
-    pub title: Option<GString>,
-}
-
 pub struct Content {
     // GTK
-    widget: Box,
+    gobject: Box,
     // Actions
     action_tab_open: Arc<SimpleAction>,
     action_page_open: Arc<SimpleAction>,
@@ -33,43 +26,44 @@ impl Content {
     // Construct
     pub fn new(action_tab_open: Arc<SimpleAction>, action_page_open: Arc<SimpleAction>) -> Self {
         Self {
-            widget: Box::builder().orientation(Orientation::Vertical).build(),
+            gobject: Box::builder().orientation(Orientation::Vertical).build(),
             action_tab_open,
             action_page_open,
         }
     }
 
     // Actions
-    pub fn reset(&self, mime: Mime, base: &Uri, data: &str) -> ResetResult {
-        // Cleanup
-        while let Some(child) = self.widget.last_child() {
-            self.widget.remove(&child)
-        }
+    pub fn set_status_error(&self, title: &str, description: &str) {
+        self.clean();
 
-        // Re-compose
-        match mime {
-            Mime::TextGemini => {
-                let child = Text::gemini(
-                    data,
-                    base,
-                    self.action_tab_open.clone(),
-                    self.action_page_open.clone(),
-                );
+        let status_default = Status::new_error(title, description);
 
-                self.widget.append(child.widget());
+        self.gobject.append(status_default.gobject());
+    }
 
-                ResetResult {
-                    title: child.meta_title().clone(),
-                }
-            } /* @TODO
-              Mime::TextPlain => {
-                  todo!()
-              } */
+    pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Option<GString> {
+        self.clean();
+
+        let text_gemini = Text::gemini(
+            data,
+            base,
+            self.action_tab_open.clone(),
+            self.action_page_open.clone(),
+        );
+
+        self.gobject.append(text_gemini.gobject());
+
+        text_gemini.meta_title().clone() // @TODO
+    }
+
+    pub fn clean(&self) {
+        while let Some(child) = self.gobject.last_child() {
+            self.gobject.remove(&child);
         }
     }
 
     // Getters
     pub fn gobject(&self) -> &Box {
-        &self.widget
+        &self.gobject
     }
 }

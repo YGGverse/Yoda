@@ -16,7 +16,7 @@ pub struct Meta {
 
 pub struct Text {
     meta: Meta,
-    widget: ScrolledWindow,
+    gobject: ScrolledWindow,
 }
 
 impl Text {
@@ -35,13 +35,13 @@ impl Text {
             title: gemini.reader_title().clone(),
         };
 
-        // Init widget
-        let widget = ScrolledWindow::builder().build();
+        // Init gobject
+        let gobject = ScrolledWindow::builder().build();
 
-        widget.set_child(Some(gemini.gobject()));
+        gobject.set_child(Some(gemini.gobject()));
 
         // Result
-        Self { meta, widget }
+        Self { meta, gobject }
     }
 
     // Getters
@@ -49,7 +49,7 @@ impl Text {
         &self.meta.title
     }
 
-    pub fn widget(&self) -> &ScrolledWindow {
-        &self.widget
+    pub fn gobject(&self) -> &ScrolledWindow {
+        &self.gobject
     }
 }

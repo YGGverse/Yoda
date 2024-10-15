@@ -275,8 +275,7 @@ impl Page {
                                                                                                     meta.borrow_mut().status = Some(Status::Success);
 
                                                                                                     // This content type may return parsed title
-                                                                                                    let result = content.reset(content::Mime::TextGemini, &uri, &source);
-                                                                                                    meta.borrow_mut().title = result.title.clone();
+                                                                                                    meta.borrow_mut().title = content.set_text_gemini(&uri, &source);
 
                                                                                                     // Add new history record
                                                                                                     let request = uri.to_str();
@@ -326,8 +325,7 @@ impl Page {
                                                                                 // Select widget
                                                                                 match parts.get(3) {
                                                                                     Some(source) => {
-                                                                                        let _ = content.reset(
-                                                                                            content::Mime::TextGemini,
+                                                                                        let _ = content.set_text_gemini(
                                                                                             &uri,
                                                                                             // @TODO use template file
                                                                                             &gformat!("# Redirect\n\nAuto-follow disabled, click on link below to continue\n\n=> {source}")
@@ -410,12 +408,19 @@ impl Page {
                     "nex" => {}
                     */
                     scheme => {
-                        // Update
-                        meta.borrow_mut().status = Some(Status::Failure);
-                        meta.borrow_mut().title = Some(gformat!("Oops"));
-                        meta.borrow_mut().description =
-                            Some(gformat!("Protocol {scheme} not supported"));
+                        let status = Status::Failure;
+                        let title = gformat!("Oops");
+                        let description = gformat!("Protocol {scheme} not supported");
 
+                        // Update widget
+                        content.set_status_error(title.as_str(), description.as_str());
+
+                        // Update meta
+                        meta.borrow_mut().status = Some(status);
+                        meta.borrow_mut().title = Some(title);
+                        meta.borrow_mut().description = Some(description);
+
+                        // Update window
                         action_update.activate(Some(&self.id.to_variant()));
                     }
                 }
