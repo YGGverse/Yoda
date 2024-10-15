@@ -27,6 +27,7 @@ use sqlite::Transaction;
 use std::{cell::RefCell, path::Path, sync::Arc};
 
 pub struct Page {
+    id: Arc<GString>,
     // Actions
     action_page_open: Arc<SimpleAction>,
     action_tab_page_navigation_reload: Arc<SimpleAction>,
@@ -43,7 +44,7 @@ pub struct Page {
 impl Page {
     // Construct
     pub fn new_arc(
-        id: GString,
+        id: Arc<GString>,
         action_tab_open: Arc<SimpleAction>,
         action_tab_page_navigation_base: Arc<SimpleAction>,
         action_tab_page_navigation_history_back: Arc<SimpleAction>,
@@ -102,6 +103,7 @@ impl Page {
 
         // Return activated structure
         Arc::new(Self {
+            id,
             // Actions
             action_page_open,
             action_tab_page_navigation_reload,

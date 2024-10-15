@@ -26,7 +26,7 @@ pub struct Tab {
     action_tab_page_navigation_reload: Arc<SimpleAction>,
     action_update: Arc<SimpleAction>,
     // Dynamically allocated reference index
-    index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
+    index: Arc<RefCell<HashMap<Arc<GString>, Arc<Item>>>>,
     // GTK
     widget: Arc<Widget>,
 }
