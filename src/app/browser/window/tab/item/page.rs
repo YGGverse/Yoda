@@ -1,14 +1,14 @@
 mod content;
 mod database;
+mod input;
 mod meta;
 mod navigation;
-mod request;
 mod widget;
 
 use content::Content;
 use database::Database;
+use input::Input;
 use navigation::Navigation;
-use request::Request;
 use widget::Widget;
 
 use meta::{Meta, Mime, Status};
@@ -37,7 +37,7 @@ pub struct Page {
     // Components
     navigation: Arc<Navigation>,
     content: Arc<Content>,
-    request: Arc<Request>,
+    input: Arc<Input>,
     // Extras
     meta: Arc<RefCell<Meta>>,
     // GTK
@@ -75,14 +75,14 @@ impl Page {
             action_update.clone(),
         );
 
-        let request = Request::new_arc();
+        let input = Input::new_arc();
 
         let widget = Widget::new_arc(
             &id,
             action_page_open.clone(),
             navigation.gobject(),
             content.gobject(),
-            request.gobject(),
+            input.gobject(),
         );
 
         // Init async mutable Meta object
@@ -117,7 +117,7 @@ impl Page {
             // Components
             content,
             navigation,
-            request,
+            input,
             // Extras
             meta,
             // GTK
@@ -165,7 +165,7 @@ impl Page {
         let id = self.id.to_variant();
         let navigation = self.navigation.clone();
         let content = self.content.clone();
-        let request = self.request.clone();
+        let input = self.input.clone();
         let meta = self.meta.clone();
         let action_update = self.action_update.clone();
 
@@ -279,7 +279,7 @@ impl Page {
                                                                                         meta.borrow_mut().description = None; // @TODO
                                                                                         meta.borrow_mut().title = Some(gformat!("Input expected"));
 
-                                                                                        request.show(&placeholder, false);
+                                                                                        input.show(&placeholder, false);
                                                                                     },
                                                                                     None => todo!(),
                                                                                 }
@@ -294,7 +294,7 @@ impl Page {
                                                                                         meta.borrow_mut().description = None; // @TODO
                                                                                         meta.borrow_mut().title = Some(gformat!("Input expected"));
 
-                                                                                        request.show(&placeholder, true);
+                                                                                        input.show(&placeholder, true);
                                                                                     },
                                                                                     None => todo!(),
                                                                                 }

@@ -7,12 +7,12 @@ use widget::Widget;
 use adw::ToolbarView;
 use std::sync::Arc;
 
-pub struct Request {
+pub struct Input {
     content: Arc<Content>,
     widget: Arc<Widget>,
 }
 
-impl Request {
+impl Input {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
