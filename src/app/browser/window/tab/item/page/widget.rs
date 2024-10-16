@@ -20,7 +20,7 @@ impl Widget {
         // Components
         navigation: &Box,
         content: &Box,
-        request: &ToolbarView,
+        input: &ToolbarView,
     ) -> Arc<Self> {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
@@ -33,8 +33,8 @@ impl Widget {
             .build();
 
         gobject.append(navigation);
+        gobject.append(input);
         gobject.append(content);
-        gobject.append(request);
 
         gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
 
