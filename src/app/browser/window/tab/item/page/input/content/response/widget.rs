@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, TextView};
+use gtk::{prelude::WidgetExt, TextView, WrapMode};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -13,6 +13,7 @@ impl Widget {
             .pixels_above_lines(8)
             .pixels_below_lines(8)
             .right_margin(8)
+            .wrap_mode(WrapMode::Word)
             .build();
 
         Arc::new(Self { gobject })
