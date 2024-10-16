@@ -8,10 +8,12 @@ use adw::ToolbarView;
 use std::sync::Arc;
 
 pub struct Request {
+    content: Arc<Content>,
     widget: Arc<Widget>,
 }
 
 impl Request {
+    // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
         let content = Content::new_arc();
@@ -20,7 +22,12 @@ impl Request {
         let widget = Widget::new_arc(content.gobject());
 
         // Result
-        Arc::new(Self { widget })
+        Arc::new(Self { content, widget })
+    }
+
+    // Actions
+    pub fn show(&self, placeholder: &str, sensitive: bool) {
+        self.content.set(placeholder, sensitive);
     }
 
     // Getters

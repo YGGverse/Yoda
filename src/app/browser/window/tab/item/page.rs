@@ -37,6 +37,7 @@ pub struct Page {
     // Components
     navigation: Arc<Navigation>,
     content: Arc<Content>,
+    request: Arc<Request>,
     // Extras
     meta: Arc<RefCell<Meta>>,
     // GTK
@@ -116,6 +117,7 @@ impl Page {
             // Components
             content,
             navigation,
+            request,
             // Extras
             meta,
             // GTK
@@ -163,6 +165,7 @@ impl Page {
         let id = self.id.to_variant();
         let navigation = self.navigation.clone();
         let content = self.content.clone();
+        let request = self.request.clone();
         let meta = self.meta.clone();
         let action_update = self.action_update.clone();
 
@@ -267,6 +270,36 @@ impl Page {
                                                                     // https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes
                                                                     match parts.get(1) {
                                                                         Some(code) => match code.as_str() {
+                                                                            // Input expected
+                                                                            "10" => {
+                                                                                match parts.get(4) {
+                                                                                    Some(placeholder) => {
+                                                                                        // Format response
+                                                                                        meta.borrow_mut().status = Some(Status::Input);
+                                                                                        meta.borrow_mut().description = None; // @TODO
+                                                                                        meta.borrow_mut().title = Some(gformat!("Input expected"));
+
+                                                                                        request.show(&placeholder, false);
+                                                                                    },
+                                                                                    None => todo!(),
+                                                                                }
+
+                                                                            },
+                                                                            // Sensitive input expected
+                                                                            "11" => {
+                                                                                match parts.get(4) {
+                                                                                    Some(placeholder) => {
+                                                                                        // Format response
+                                                                                        meta.borrow_mut().status = Some(Status::SensitiveInput);
+                                                                                        meta.borrow_mut().description = None; // @TODO
+                                                                                        meta.borrow_mut().title = Some(gformat!("Input expected"));
+
+                                                                                        request.show(&placeholder, true);
+                                                                                    },
+                                                                                    None => todo!(),
+                                                                                }
+                                                                            },
+                                                                            // Success
                                                                             "20" => {
                                                                                 match parts.get(2) {
                                                                                     Some(mime) => match mime.as_str() {

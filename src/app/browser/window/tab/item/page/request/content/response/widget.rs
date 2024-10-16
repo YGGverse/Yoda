@@ -1,4 +1,7 @@
-use gtk::Entry;
+use gtk::{
+    prelude::{EditableExt, EntryExt, WidgetExt},
+    Entry,
+};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -11,6 +14,13 @@ impl Widget {
         let gobject = Entry::builder().hexpand(true).build();
 
         Arc::new(Self { gobject })
+    }
+
+    // Actions
+    pub fn set(&self, placeholder_text: &str, sensitive: bool) {
+        self.gobject.set_text(&""); // reset
+        self.gobject.set_placeholder_text(Some(placeholder_text));
+        self.gobject.set_sensitive(sensitive);
     }
 
     // Getters

@@ -10,10 +10,12 @@ use gtk::Box;
 use std::sync::Arc;
 
 pub struct Content {
+    response: Arc<Response>,
     widget: Arc<Widget>,
 }
 
 impl Content {
+    // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
         let response = Response::new_arc();
@@ -28,7 +30,12 @@ impl Content {
         send.gobject().connect_clicked(|_| {}); */
 
         // Return activated struct
-        Arc::new(Self { widget })
+        Arc::new(Self { response, widget })
+    }
+
+    // Actions
+    pub fn set(&self, placeholder: &str, sensitive: bool) {
+        self.response.set(placeholder, sensitive);
     }
 
     // Getters

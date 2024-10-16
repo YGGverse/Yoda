@@ -10,12 +10,18 @@ pub struct Response {
 }
 
 impl Response {
+    // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init widget
         let widget = Widget::new_arc();
 
         // Result
         Arc::new(Self { widget })
+    }
+
+    // Actions
+    pub fn set(&self, placeholder: &str, sensitive: bool) {
+        self.widget.set(placeholder, sensitive);
     }
 
     // Getters

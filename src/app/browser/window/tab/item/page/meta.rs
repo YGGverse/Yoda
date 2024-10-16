@@ -12,11 +12,13 @@ pub enum Mime {
 pub enum Status {
     Connect,
     Failure,
+    Input,
     Prepare,
     Redirect,
     Reload,
     Request,
     Response,
+    SensitiveInput,
     Success,
 }
 
