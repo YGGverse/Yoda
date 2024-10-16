@@ -23,6 +23,14 @@ impl Input {
     }
 
     // Actions
+    pub fn show(&self) {
+        self.widget.show()
+    }
+
+    pub fn hide(&self) {
+        self.widget.hide()
+    }
+
     pub fn set_default(
         &self,
         action_page_open: Arc<SimpleAction>,
@@ -30,7 +38,7 @@ impl Input {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.widget.update(Some(
+        self.widget.set_child(Some(
             &Default::new_arc(action_page_open, base, title, size_limit).gobject(),
         ));
     }

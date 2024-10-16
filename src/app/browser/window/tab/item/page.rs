@@ -158,6 +158,9 @@ impl Page {
     }
 
     pub fn navigation_reload(&self) {
+        // Reset components
+        self.input.hide();
+
         // Init globals
         let request_text = self.navigation.request_text();
 
@@ -282,6 +285,7 @@ impl Page {
 
                                                                                         // Make input form
                                                                                         input.set_default(action_page_open, uri, Some(&description), Some(1024));
+                                                                                        input.show();
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);
