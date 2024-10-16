@@ -9,7 +9,7 @@ impl Widget {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         let gobject = Button::builder()
-            .css_classes(["accent"])
+            //.css_classes(["accent"])
             .halign(Align::End)
             .label("Send")
             .build();

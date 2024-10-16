@@ -4,7 +4,7 @@ mod widget;
 use content::Content;
 use widget::Widget;
 
-use adw::ToolbarView;
+use adw::Clamp;
 use std::sync::Arc;
 
 pub struct Input {
@@ -32,7 +32,7 @@ impl Input {
     }
 
     // Getters
-    pub fn gobject(&self) -> &ToolbarView {
+    pub fn gobject(&self) -> &Clamp {
         &self.widget.gobject()
     }
 }

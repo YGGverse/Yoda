@@ -1,16 +1,18 @@
-use adw::ToolbarView;
+use adw::Clamp;
 use gtk::{prelude::WidgetExt, Box};
 use std::sync::Arc;
 
 pub struct Widget {
-    gobject: ToolbarView,
+    gobject: Clamp,
 }
 
 impl Widget {
     // Construct
-    pub fn new_arc(content: &Box) -> Arc<Self> {
-        let gobject = ToolbarView::builder()
-            .content(content)
+    pub fn new_arc(child: &Box) -> Arc<Self> {
+        let gobject = Clamp::builder()
+            .child(child)
+            .css_classes(["app-notification"])
+            .maximum_size(800)
             .visible(false)
             .build();
 
@@ -23,7 +25,7 @@ impl Widget {
     }
 
     // Getters
-    pub fn gobject(&self) -> &ToolbarView {
+    pub fn gobject(&self) -> &Clamp {
         &self.gobject
     }
 }
