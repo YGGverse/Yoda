@@ -2,11 +2,13 @@ mod content;
 mod database;
 mod meta;
 mod navigation;
+mod request;
 mod widget;
 
 use content::Content;
 use database::Database;
 use navigation::Navigation;
+use request::Request;
 use widget::Widget;
 
 use meta::{Meta, Mime, Status};
@@ -72,11 +74,14 @@ impl Page {
             action_update.clone(),
         );
 
+        let request = Request::new_arc();
+
         let widget = Widget::new_arc(
             &id,
             action_page_open.clone(),
             navigation.gobject(),
             content.gobject(),
+            request.gobject(),
         );
 
         // Init async mutable Meta object

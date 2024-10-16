@@ -1,3 +1,4 @@
+use adw::ToolbarView;
 use gtk::{
     gio::{SimpleAction, SimpleActionGroup},
     glib::uuid_string_random,
@@ -19,6 +20,7 @@ impl Widget {
         // Components
         navigation: &Box,
         content: &Box,
+        request: &ToolbarView,
     ) -> Arc<Self> {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
@@ -32,6 +34,7 @@ impl Widget {
 
         gobject.append(navigation);
         gobject.append(content);
+        gobject.append(request);
 
         gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
 
