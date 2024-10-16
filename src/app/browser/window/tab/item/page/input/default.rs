@@ -11,6 +11,7 @@ use widget::Widget;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
+    prelude::WidgetExt,
     Box,
 };
 use std::sync::Arc;
@@ -23,7 +24,7 @@ pub struct Default {
 impl Default {
     // Construct
     pub fn new_arc(base: Uri, title: Option<&str>, size_limit: Option<usize>) -> Arc<Self> {
-        // Init local action group
+        // Init local action
         let action_update = Arc::new(SimpleAction::new(&uuid_string_random(), None));
 
         // Init components
@@ -50,6 +51,8 @@ impl Default {
                 });
             }
         });
+
+        widget.gobject().connect_realize(move |_| response.focus());
 
         // Return activated struct
         Arc::new(Self { widget })

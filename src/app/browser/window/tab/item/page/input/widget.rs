@@ -19,15 +19,6 @@ impl Widget {
     }
 
     // Actions
-    pub fn show(&self) {
-        self.gobject.set_visible(true)
-    }
-
-    /* not in use
-    pub fn hide(&self) {
-        self.gobject.set_visible(false)
-    } */
-
     pub fn update(&self, child: Option<&Box>) {
         if child.is_some() {
             self.gobject.set_child(child);

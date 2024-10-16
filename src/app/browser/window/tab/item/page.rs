@@ -280,9 +280,7 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Make input form
-                                                                                        input.use_default(uri, Some(&description), Some(1024));
-                                                                                        input.show();
-                                                                                        // @TODO hide
+                                                                                        input.set_default(uri, Some(&description), Some(1024));
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);
