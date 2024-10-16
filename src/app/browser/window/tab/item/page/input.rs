@@ -26,8 +26,8 @@ impl Input {
     }
 
     // Actions
-    pub fn show(&self, title: Option<&str>) {
-        self.content.set(title);
+    pub fn show(&self, title: Option<&str>, limit: Option<&i32>) {
+        self.content.update(title, limit);
         self.widget.show(true);
     }
 

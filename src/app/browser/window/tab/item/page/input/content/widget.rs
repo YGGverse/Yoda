@@ -1,4 +1,4 @@
-use gtk::{prelude::BoxExt, Box, Button, Label, Orientation, TextView};
+use gtk::{prelude::BoxExt, Box, Label, Orientation, TextView};
 use std::sync::Arc;
 
 const MARGIN: i32 = 6;
@@ -10,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(title: &Label, response: &TextView, send: &Button) -> Arc<Self> {
+    pub fn new_arc(title: &Label, response: &TextView, control: &Box) -> Arc<Self> {
         let gobject = Box::builder()
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
@@ -22,7 +22,7 @@ impl Widget {
 
         gobject.append(title);
         gobject.append(response);
-        gobject.append(send);
+        gobject.append(control);
 
         Arc::new(Self { gobject })
     }

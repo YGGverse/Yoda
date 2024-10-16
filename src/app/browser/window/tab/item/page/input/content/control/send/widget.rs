@@ -1,4 +1,4 @@
-use gtk::{Align, Button};
+use gtk::Button;
 use std::sync::Arc;
 
 pub struct Widget {
@@ -10,7 +10,6 @@ impl Widget {
     pub fn new_arc() -> Arc<Self> {
         let gobject = Button::builder()
             //.css_classes(["accent"])
-            .halign(Align::End)
             .label("Send")
             .build();
 

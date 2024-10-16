@@ -1,10 +1,10 @@
+mod control;
 mod response;
-mod send;
 mod title;
 mod widget;
 
+use control::Control;
 use response::Response;
-use send::Send;
 use title::Title;
 use widget::Widget;
 
@@ -12,8 +12,9 @@ use gtk::Box;
 use std::sync::Arc;
 
 pub struct Content {
-    title: Arc<Title>,
+    control: Arc<Control>,
     response: Arc<Response>,
+    title: Arc<Title>,
     widget: Arc<Widget>,
 }
 
@@ -21,29 +22,26 @@ impl Content {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
-        let title = Title::new_arc();
+        let control = Control::new_arc();
         let response = Response::new_arc();
-        let send = Send::new_arc();
+        let title = Title::new_arc();
 
         // Init widget
-        let widget = Widget::new_arc(title.gobject(), response.gobject(), send.gobject());
-
-        // Init events
-        /* @TODO
-        response.gobject().connect_activate(|_| {});
-        send.gobject().connect_clicked(|_| {}); */
+        let widget = Widget::new_arc(title.gobject(), response.gobject(), control.gobject());
 
         // Return activated struct
         Arc::new(Self {
-            title,
+            control,
             response,
+            title,
             widget,
         })
     }
 
     // Actions
-    pub fn set(&self, title: Option<&str>) {
-        self.title.set(title);
+    pub fn update(&self, title: Option<&str>, count_limit: Option<&i32>) {
+        self.control.update(&0, count_limit); // @TODO
+        self.title.update(title);
         self.response.grab_focus();
     }
 

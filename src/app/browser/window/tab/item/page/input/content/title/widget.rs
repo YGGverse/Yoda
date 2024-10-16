@@ -20,7 +20,7 @@ impl Widget {
     }
 
     // Actions
-    pub fn set(&self, text: Option<&str>) {
+    pub fn update(&self, text: Option<&str>) {
         match text {
             Some(value) => {
                 self.gobject.set_label(value);

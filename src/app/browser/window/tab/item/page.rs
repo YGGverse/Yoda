@@ -280,7 +280,7 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Show input request
-                                                                                        input.show(Some(&description));
+                                                                                        input.show(Some(&description), Some(&1024));
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);

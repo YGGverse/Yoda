@@ -5,11 +5,11 @@ use widget::Widget;
 use gtk::Label;
 use std::sync::Arc;
 
-pub struct Title {
+pub struct Limit {
     widget: Arc<Widget>,
 }
 
-impl Title {
+impl Limit {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init widget
@@ -20,8 +20,8 @@ impl Title {
     }
 
     // Actions
-    pub fn update(&self, text: Option<&str>) {
-        self.widget.update(text);
+    pub fn update(&self, count: &i32, limit: Option<&i32>) {
+        self.widget.update(count, limit);
     }
 
     // Getters
