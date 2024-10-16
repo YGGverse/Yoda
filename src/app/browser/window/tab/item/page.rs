@@ -272,32 +272,27 @@ impl Page {
                                                                         Some(code) => match code.as_str() {
                                                                             // Input expected
                                                                             "10" => {
-                                                                                match parts.get(4) {
+                                                                                match parts.get(3) {
                                                                                     Some(placeholder) => {
                                                                                         // Format response
-                                                                                        meta.borrow_mut().status = Some(Status::Input);
-                                                                                        meta.borrow_mut().description = None; // @TODO
-                                                                                        meta.borrow_mut().title = Some(gformat!("Input expected"));
+                                                                                        let status = Status::Input;
+                                                                                        let title = gformat!("Input expected");
+                                                                                        let description = gformat!("{placeholder}");
 
-                                                                                        input.show(&placeholder, false);
+                                                                                        // Show input request
+                                                                                        input.show(Some(&description));
+
+                                                                                        // Update meta
+                                                                                        meta.borrow_mut().status = Some(status);
+                                                                                        meta.borrow_mut().description = Some(description);
+                                                                                        meta.borrow_mut().title = Some(title);
                                                                                     },
                                                                                     None => todo!(),
                                                                                 }
-
                                                                             },
                                                                             // Sensitive input expected
                                                                             "11" => {
-                                                                                match parts.get(4) {
-                                                                                    Some(placeholder) => {
-                                                                                        // Format response
-                                                                                        meta.borrow_mut().status = Some(Status::SensitiveInput);
-                                                                                        meta.borrow_mut().description = None; // @TODO
-                                                                                        meta.borrow_mut().title = Some(gformat!("Input expected"));
-
-                                                                                        input.show(&placeholder, true);
-                                                                                    },
-                                                                                    None => todo!(),
-                                                                                }
+                                                                                todo!()
                                                                             },
                                                                             // Success
                                                                             "20" => {

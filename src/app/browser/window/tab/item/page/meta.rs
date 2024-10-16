@@ -18,7 +18,7 @@ pub enum Status {
     Reload,
     Request,
     Response,
-    SensitiveInput,
+    // @TODO SensitiveInput,
     Success,
 }
 

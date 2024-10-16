@@ -26,8 +26,8 @@ impl Input {
     }
 
     // Actions
-    pub fn show(&self, placeholder: &str, sensitive: bool) {
-        self.content.set(placeholder, sensitive);
+    pub fn show(&self, title: Option<&str>) {
+        self.content.set(title);
         self.widget.show(true);
     }
 

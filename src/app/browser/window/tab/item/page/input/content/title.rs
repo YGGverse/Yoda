@@ -2,14 +2,14 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::TextView;
+use gtk::Label;
 use std::sync::Arc;
 
-pub struct Response {
+pub struct Title {
     widget: Arc<Widget>,
 }
 
-impl Response {
+impl Title {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init widget
@@ -20,12 +20,12 @@ impl Response {
     }
 
     // Actions
-    pub fn grab_focus(&self) {
-        self.widget.grab_focus();
+    pub fn set(&self, text: Option<&str>) {
+        self.widget.set(text);
     }
 
     // Getters
-    pub fn gobject(&self) -> &TextView {
+    pub fn gobject(&self) -> &Label {
         &self.widget.gobject()
     }
 }
