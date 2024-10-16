@@ -286,6 +286,9 @@ impl Page {
                                                                                         meta.borrow_mut().status = Some(status);
                                                                                         meta.borrow_mut().description = Some(description);
                                                                                         meta.borrow_mut().title = Some(title);
+
+                                                                                        // Update page
+                                                                                        action_update.activate(Some(&id));
                                                                                     },
                                                                                     None => todo!(),
                                                                                 }
@@ -576,7 +579,7 @@ impl Page {
             Some(Status::Connect) => Some(0.25),
             Some(Status::Request) => Some(0.50),
             Some(Status::Response) => Some(0.75),
-            Some(Status::Failure | Status::Redirect | Status::Success) => Some(1.0),
+            Some(Status::Failure | Status::Redirect | Status::Success | Status::Input) => Some(1.0),
             _ => None,
         }
     }
