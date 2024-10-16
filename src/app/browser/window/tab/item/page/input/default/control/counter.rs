@@ -5,11 +5,11 @@ use widget::Widget;
 use gtk::Label;
 use std::sync::Arc;
 
-pub struct Left {
+pub struct Counter {
     widget: Arc<Widget>,
 }
 
-impl Left {
+impl Counter {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init widget
