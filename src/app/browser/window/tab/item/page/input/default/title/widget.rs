@@ -7,7 +7,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_arc(title: Option<&str>) -> Arc<Self> {
         let gobject = Label::builder()
             .css_classes(["heading"])
             .halign(Align::Start)
@@ -16,20 +16,12 @@ impl Widget {
             .visible(false)
             .build();
 
-        Arc::new(Self { gobject })
-    }
-
-    // Actions
-    pub fn update(&self, text: Option<&str>) {
-        match text {
-            Some(value) => {
-                self.gobject.set_label(value);
-                self.gobject.set_visible(!value.is_empty());
-            }
-            None => {
-                self.gobject.set_visible(false);
-            }
+        match title {
+            Some(value) => gobject.set_label(value),
+            None => gobject.set_visible(false),
         }
+
+        Arc::new(Self { gobject })
     }
 
     // Getters

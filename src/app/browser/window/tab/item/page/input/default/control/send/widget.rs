@@ -1,4 +1,4 @@
-use gtk::Button;
+use gtk::{prelude::WidgetExt, Button};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -14,6 +14,11 @@ impl Widget {
             .build();
 
         Arc::new(Self { gobject })
+    }
+
+    // Actions
+    pub fn update(&self, is_sensitive: bool) {
+        self.gobject.set_sensitive(is_sensitive);
     }
 
     // Getters

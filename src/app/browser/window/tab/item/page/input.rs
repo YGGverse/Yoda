@@ -1,34 +1,35 @@
-mod content;
+mod default;
 mod widget;
 
-use content::Content;
+use default::Default;
+use gtk::glib::Uri;
 use widget::Widget;
 
 use adw::Clamp;
 use std::sync::Arc;
 
 pub struct Input {
-    content: Arc<Content>,
     widget: Arc<Widget>,
 }
 
 impl Input {
     // Construct
     pub fn new_arc() -> Arc<Self> {
-        // Init components
-        let content = Content::new_arc();
-
         // Init widget
-        let widget = Widget::new_arc(content.gobject());
+        let widget = Widget::new_arc();
 
         // Result
-        Arc::new(Self { content, widget })
+        Arc::new(Self { widget })
     }
 
     // Actions
-    pub fn show(&self, title: Option<&str>, limit: Option<&i32>) {
-        self.content.update(title, limit);
-        self.widget.show(true);
+    pub fn use_default(&self, base: Uri, title: Option<&str>, size_limit: Option<usize>) {
+        self.widget
+            .update(Some(&Default::new_arc(base, title, size_limit).gobject()));
+    }
+
+    pub fn show(&self) {
+        self.widget.show();
     }
 
     // Getters

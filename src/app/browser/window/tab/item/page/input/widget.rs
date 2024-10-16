@@ -8,9 +8,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(child: &Box) -> Arc<Self> {
+    pub fn new_arc() -> Arc<Self> {
         let gobject = Clamp::builder()
-            .child(child)
             .css_classes(["app-notification"])
             .maximum_size(800)
             .visible(false)
@@ -20,8 +19,22 @@ impl Widget {
     }
 
     // Actions
-    pub fn show(&self, visible: bool) {
-        self.gobject.set_visible(visible);
+    pub fn show(&self) {
+        self.gobject.set_visible(true)
+    }
+
+    /* not in use
+    pub fn hide(&self) {
+        self.gobject.set_visible(false)
+    } */
+
+    pub fn update(&self, child: Option<&Box>) {
+        if child.is_some() {
+            self.gobject.set_child(child);
+            self.gobject.set_visible(true);
+        } else {
+            self.gobject.set_visible(false)
+        }
     }
 
     // Getters

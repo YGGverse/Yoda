@@ -8,22 +8,21 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc() -> Arc<Self> {
-        let gobject = Label::builder().use_markup(true).build();
+        let gobject = Label::builder().build();
 
         Arc::new(Self { gobject })
     }
 
     // Actions
-    pub fn update(&self, count: &i32, count_limit: Option<&i32>) {
-        match count_limit {
-            Some(limit) => {
+    pub fn update(&self, left: Option<usize>) {
+        match left {
+            Some(value) => {
                 // Update color on limit reached
                 self.gobject
-                    .set_css_classes(&[if count < limit { "success" } else { "error" }]); // @TODO add warning step?
+                    .set_css_classes(&[if value > 0 { "success" } else { "error" }]); // @TODO add warning step?
 
                 // Update text
-                self.gobject
-                    .set_markup(&format!("{count} <sup>/ {limit}</sup>"));
+                self.gobject.set_label(&value.to_string());
 
                 // Toggle visibility if limit provided
                 self.gobject.set_visible(true);

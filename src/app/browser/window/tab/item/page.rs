@@ -279,8 +279,10 @@ impl Page {
                                                                                         let title = gformat!("Input expected");
                                                                                         let description = gformat!("{placeholder}");
 
-                                                                                        // Show input request
-                                                                                        input.show(Some(&description), Some(&1024));
+                                                                                        // Make input form
+                                                                                        input.use_default(uri, Some(&description), Some(1024));
+                                                                                        input.show();
+                                                                                        // @TODO hide
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);

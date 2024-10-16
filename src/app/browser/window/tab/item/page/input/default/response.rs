@@ -2,7 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::TextView;
+use gtk::{gio::SimpleAction, glib::GString, TextView};
 use std::sync::Arc;
 
 pub struct Response {
@@ -11,20 +11,24 @@ pub struct Response {
 
 impl Response {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
         // Init widget
-        let widget = Widget::new_arc();
+        let widget = Widget::new_arc(action_update);
 
         // Result
         Arc::new(Self { widget })
     }
 
     // Actions
-    pub fn grab_focus(&self) {
-        self.widget.grab_focus();
+    pub fn focus(&self) {
+        self.widget.focus();
     }
 
     // Getters
+    pub fn text(&self) -> GString {
+        self.widget.text()
+    }
+
     pub fn gobject(&self) -> &TextView {
         &self.widget.gobject()
     }

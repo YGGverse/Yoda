@@ -2,14 +2,14 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::Label;
+use gtk::Button;
 use std::sync::Arc;
 
-pub struct Limit {
+pub struct Send {
     widget: Arc<Widget>,
 }
 
-impl Limit {
+impl Send {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init widget
@@ -20,12 +20,12 @@ impl Limit {
     }
 
     // Actions
-    pub fn update(&self, count: &i32, limit: Option<&i32>) {
-        self.widget.update(count, limit);
+    pub fn update(&self, is_sensitive: bool) {
+        self.widget.update(is_sensitive);
     }
 
     // Getters
-    pub fn gobject(&self) -> &Label {
+    pub fn gobject(&self) -> &Button {
         &self.widget.gobject()
     }
 }

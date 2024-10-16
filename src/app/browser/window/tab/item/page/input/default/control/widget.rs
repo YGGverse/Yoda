@@ -10,6 +10,7 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc(limit: &Label, send: &Button) -> Arc<Self> {
+        // Init gobject
         let gobject = Box::builder()
             .halign(Align::End)
             .orientation(Orientation::Horizontal)
@@ -19,6 +20,7 @@ impl Widget {
         gobject.append(limit);
         gobject.append(send);
 
+        // Return new struct
         Arc::new(Self { gobject })
     }
 

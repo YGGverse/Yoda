@@ -1,8 +1,8 @@
-mod limit;
+mod left;
 mod send;
 mod widget;
 
-use limit::Limit;
+use left::Left;
 use send::Send;
 use widget::Widget;
 
@@ -10,7 +10,7 @@ use gtk::Box;
 use std::sync::Arc;
 
 pub struct Control {
-    limit: Arc<Limit>,
+    limit: Arc<Left>,
     send: Arc<Send>,
     widget: Arc<Widget>,
 }
@@ -19,7 +19,7 @@ impl Control {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
-        let limit = Limit::new_arc();
+        let limit = Left::new_arc();
         let send = Send::new_arc();
 
         // Init widget
@@ -34,9 +34,13 @@ impl Control {
     }
 
     // Actions
-    pub fn update(&self, count: &i32, count_limit: Option<&i32>) {
-        self.limit.update(count, count_limit);
-        // @TODO self.send.update(limit);
+    pub fn update(&self, left: Option<usize>) {
+        // Update children components
+        self.limit.update(left);
+        self.send.update(match left {
+            Some(value) => value > 0,
+            None => false,
+        });
     }
 
     // Getters

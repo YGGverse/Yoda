@@ -11,17 +11,12 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_arc(title: Option<&str>) -> Arc<Self> {
         // Init widget
-        let widget = Widget::new_arc();
+        let widget = Widget::new_arc(title);
 
         // Result
         Arc::new(Self { widget })
-    }
-
-    // Actions
-    pub fn update(&self, text: Option<&str>) {
-        self.widget.update(text);
     }
 
     // Getters
