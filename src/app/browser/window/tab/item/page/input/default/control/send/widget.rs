@@ -1,4 +1,8 @@
-use gtk::{prelude::WidgetExt, Button};
+use gtk::{
+    gio::SimpleAction,
+    prelude::{ActionExt, ButtonExt, WidgetExt},
+    Button,
+};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -7,12 +11,21 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_arc(action_send: Arc<SimpleAction>) -> Arc<Self> {
+        // Init gobject
         let gobject = Button::builder()
             //.css_classes(["accent"])
             .label("Send")
             .build();
 
+        // Init events
+        gobject.connect_clicked({
+            move |_| {
+                action_send.activate(None);
+            }
+        });
+
+        // Return activated struct
         Arc::new(Self { gobject })
     }
 

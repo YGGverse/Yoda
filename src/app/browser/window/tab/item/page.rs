@@ -167,6 +167,7 @@ impl Page {
         let content = self.content.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
+        let action_page_open = self.action_page_open.clone();
         let action_update = self.action_update.clone();
 
         // Update
@@ -280,7 +281,7 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Make input form
-                                                                                        input.set_default(uri, Some(&description), Some(1024));
+                                                                                        input.set_default(action_page_open, uri, Some(&description), Some(1024));
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);

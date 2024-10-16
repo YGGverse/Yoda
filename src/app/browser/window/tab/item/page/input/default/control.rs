@@ -6,7 +6,7 @@ use left::Left;
 use send::Send;
 use widget::Widget;
 
-use gtk::Box;
+use gtk::{gio::SimpleAction, Box};
 use std::sync::Arc;
 
 pub struct Control {
@@ -17,10 +17,10 @@ pub struct Control {
 
 impl Control {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_arc(action_send: Arc<SimpleAction>) -> Arc<Self> {
         // Init components
         let left = Left::new_arc();
-        let send = Send::new_arc();
+        let send = Send::new_arc(action_send);
 
         // Init widget
         let widget = Widget::new_arc(left.gobject(), send.gobject());
