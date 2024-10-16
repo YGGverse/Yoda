@@ -9,6 +9,7 @@ impl Widget {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         let gobject = Label::builder()
+            .css_classes(["heading"])
             .halign(Align::Start)
             .margin_end(8)
             .margin_start(8)
