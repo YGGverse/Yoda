@@ -38,7 +38,7 @@ impl Control {
         // Update children components
         self.counter.update(chars_left);
         self.send.update(match chars_left {
-            Some(value) => value > 0,
+            Some(left) => left > 0,
             None => false,
         });
     }
