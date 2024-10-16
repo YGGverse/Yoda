@@ -28,6 +28,7 @@ impl Input {
     // Actions
     pub fn show(&self, placeholder: &str, sensitive: bool) {
         self.content.set(placeholder, sensitive);
+        self.widget.show(true);
     }
 
     // Getters

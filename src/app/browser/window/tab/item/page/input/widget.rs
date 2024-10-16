@@ -1,5 +1,5 @@
 use adw::ToolbarView;
-use gtk::Box;
+use gtk::{prelude::WidgetExt, Box};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -15,6 +15,11 @@ impl Widget {
             .build();
 
         Arc::new(Self { gobject })
+    }
+
+    // Actions
+    pub fn show(&self, visible: bool) {
+        self.gobject.set_visible(visible);
     }
 
     // Getters
