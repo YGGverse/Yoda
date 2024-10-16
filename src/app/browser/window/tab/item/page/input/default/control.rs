@@ -10,7 +10,7 @@ use gtk::Box;
 use std::sync::Arc;
 
 pub struct Control {
-    limit: Arc<Left>,
+    left: Arc<Left>,
     send: Arc<Send>,
     widget: Arc<Widget>,
 }
@@ -19,25 +19,21 @@ impl Control {
     // Construct
     pub fn new_arc() -> Arc<Self> {
         // Init components
-        let limit = Left::new_arc();
+        let left = Left::new_arc();
         let send = Send::new_arc();
 
         // Init widget
-        let widget = Widget::new_arc(limit.gobject(), send.gobject());
+        let widget = Widget::new_arc(left.gobject(), send.gobject());
 
         // Return activated struct
-        Arc::new(Self {
-            limit,
-            send,
-            widget,
-        })
+        Arc::new(Self { left, send, widget })
     }
 
     // Actions
-    pub fn update(&self, left: Option<usize>) {
+    pub fn update(&self, chars_left: Option<i32>) {
         // Update children components
-        self.limit.update(left);
-        self.send.update(match left {
+        self.left.update(chars_left);
+        self.send.update(match chars_left {
             Some(value) => value > 0,
             None => false,
         });

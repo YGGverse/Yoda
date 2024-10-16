@@ -20,8 +20,8 @@ impl Left {
     }
 
     // Actions
-    pub fn update(&self, left: Option<usize>) {
-        self.widget.update(left);
+    pub fn update(&self, chars_left: Option<i32>) {
+        self.widget.update(chars_left);
     }
 
     // Getters

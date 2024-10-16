@@ -40,10 +40,11 @@ impl Default {
             let response = response.clone();
             move |_, _| {
                 control.update(match size_limit {
-                    Some(limit_value) => Some(
-                        limit_value
-                            - (base.to_string_partial(UriHideFlags::QUERY).len()
-                                + Uri::escape_string(response.text().as_str(), None, false).len()),
+                    Some(limit) => Some(
+                        limit as i32
+                            - (base.to_string_partial(UriHideFlags::QUERY).len() as i32
+                                + Uri::escape_string(response.text().as_str(), None, false).len()
+                                    as i32),
                     ),
                     None => None,
                 });
