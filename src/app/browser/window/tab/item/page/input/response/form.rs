@@ -11,7 +11,7 @@ pub struct Form {
 
 impl Form {
     // Construct
-    pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_update: Arc<SimpleAction>, is_sensitive_input: bool) -> Arc<Self> {
         // Init widget
         let widget = Widget::new_arc(action_update);
 

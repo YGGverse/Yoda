@@ -37,7 +37,14 @@ impl Input {
         is_sensitive_input: bool,
     ) {
         self.widget.update(Some(
-            &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
+            &Response::new_arc(
+                action_page_open,
+                base,
+                title,
+                size_limit,
+                is_sensitive_input,
+            )
+            .gobject(),
         ));
     }
 

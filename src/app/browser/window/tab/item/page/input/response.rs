@@ -28,6 +28,7 @@ impl Response {
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
+        is_sensitive_input: bool,
     ) -> Arc<Self> {
         // Init local actions
         let action_update = Arc::new(SimpleAction::new(&uuid_string_random(), None));
@@ -35,7 +36,7 @@ impl Response {
 
         // Init components
         let control = Control::new_arc(action_send.clone());
-        let form = Form::new_arc(action_update.clone());
+        let form = Form::new_arc(action_update.clone(), is_sensitive_input);
         let title = Title::new_arc(title);
 
         // Init widget
