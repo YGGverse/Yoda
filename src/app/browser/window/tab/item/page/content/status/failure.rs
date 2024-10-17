@@ -1,10 +1,10 @@
 use adw::StatusPage;
 
-pub struct Error {
+pub struct Failure {
     // nothing yet..
 }
 
-impl Error {
+impl Failure {
     pub fn new(title: &str, description: &str) -> StatusPage {
         StatusPage::builder()
             .description(description)

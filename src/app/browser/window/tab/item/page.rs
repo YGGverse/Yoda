@@ -458,10 +458,10 @@ impl Page {
                     scheme => {
                         let status = Status::Failure;
                         let title = gformat!("Oops");
-                        let description = gformat!("Protocol {scheme} not supported");
+                        let description = gformat!("Protocol `{scheme}` not supported");
 
                         // Update widget
-                        content.set_status_error(title.as_str(), description.as_str());
+                        content.set_status_failure(title.as_str(), description.as_str());
 
                         // Update meta
                         meta.borrow_mut().status = Some(status);

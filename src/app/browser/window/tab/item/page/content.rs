@@ -33,7 +33,7 @@ impl Content {
     }
 
     // Actions
-    pub fn set_status_error(&self, title: &str, description: &str) {
+    pub fn set_status_failure(&self, title: &str, description: &str) {
         self.clean();
 
         let status_default = Status::new_error(title, description);

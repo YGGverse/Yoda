@@ -1,6 +1,6 @@
-mod error;
+mod failure;
 
-use error::Error;
+use failure::Failure;
 
 use adw::StatusPage;
 
@@ -12,7 +12,7 @@ impl Status {
     // Construct
     pub fn new_error(title: &str, description: &str) -> Self {
         Self {
-            gobject: Error::new(title, description),
+            gobject: Failure::new(title, description),
         }
     }
 
