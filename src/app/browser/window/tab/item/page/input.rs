@@ -31,6 +31,7 @@ impl Input {
         self.widget.hide()
     }
 
+    // Variant switcher
     pub fn use_response(
         &self,
         action_page_open: Arc<SimpleAction>,
