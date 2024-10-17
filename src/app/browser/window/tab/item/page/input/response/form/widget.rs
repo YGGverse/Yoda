@@ -1,7 +1,12 @@
 use gtk::{
-    gio::SimpleAction, glib::GString, prelude::{ActionExt, TextBufferExt, TextViewExt, WidgetExt}, TextView, WrapMode
+    gio::SimpleAction,
+    glib::GString,
+    prelude::{ActionExt, TextBufferExt, TextViewExt, WidgetExt},
+    TextView, WrapMode,
 };
 use std::sync::Arc;
+
+const MARGIN: i32 = 8;
 
 pub struct Widget {
     gobject: TextView,
@@ -12,10 +17,10 @@ impl Widget {
     pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
         // Init gobject
         let gobject = TextView::builder()
-            .left_margin(8)
-            .pixels_above_lines(8)
-            .pixels_below_lines(8)
-            .right_margin(8)
+            .bottom_margin(MARGIN)
+            .left_margin(MARGIN)
+            .right_margin(MARGIN)
+            .top_margin(MARGIN)
             .wrap_mode(WrapMode::Word)
             .build();
 
