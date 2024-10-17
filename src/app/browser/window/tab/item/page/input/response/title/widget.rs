@@ -16,9 +16,11 @@ impl Widget {
             .visible(false)
             .build();
 
-        match title {
-            Some(value) => gobject.set_label(value),
-            None => gobject.set_visible(false),
+        if let Some(label) = title {
+            if !label.is_empty() {
+                gobject.set_label(label);
+                gobject.set_visible(true)
+            }
         }
 
         Arc::new(Self { gobject })
