@@ -284,7 +284,7 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Make input form
-                                                                                        input.set_default(action_page_open, uri, Some(&description), Some(1024));
+                                                                                        input.use_response(action_page_open, uri, Some(&description), Some(1024));
                                                                                         input.show();
 
                                                                                         // Update meta

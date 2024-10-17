@@ -1,8 +1,8 @@
-mod default;
+mod response;
 mod widget;
 
-use default::Default;
 use gtk::{gio::SimpleAction, glib::Uri};
+use response::Response;
 use widget::Widget;
 
 use adw::Clamp;
@@ -31,7 +31,7 @@ impl Input {
         self.widget.hide()
     }
 
-    pub fn set_default(
+    pub fn use_response(
         &self,
         action_page_open: Arc<SimpleAction>,
         base: Uri,
@@ -39,7 +39,7 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.set_child(Some(
-            &Default::new_arc(action_page_open, base, title, size_limit).gobject(),
+            &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
         ));
     }
 

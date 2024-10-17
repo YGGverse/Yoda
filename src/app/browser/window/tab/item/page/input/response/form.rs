@@ -5,11 +5,11 @@ use widget::Widget;
 use gtk::{gio::SimpleAction, glib::GString, TextView};
 use std::sync::Arc;
 
-pub struct Response {
+pub struct Form {
     widget: Arc<Widget>,
 }
 
-impl Response {
+impl Form {
     // Construct
     pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
         // Init widget
