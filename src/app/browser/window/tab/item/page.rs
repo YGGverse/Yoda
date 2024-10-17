@@ -298,7 +298,6 @@ impl Page {
                                                                                             );
                                                                                         }
 
-
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);
                                                                                         meta.borrow_mut().description = Some(description);
