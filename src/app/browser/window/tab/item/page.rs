@@ -351,10 +351,20 @@ impl Page {
                                                                                             todo!()
                                                                                         },
                                                                                         _ => {
-                                                                                            meta.borrow_mut().status = Some(Status::Failure);
-                                                                                            meta.borrow_mut().title = Some(gformat!("Oops"));
-                                                                                            meta.borrow_mut().description = Some(gformat!("Content {mime} not supported"));
+                                                                                            // Define common data
+                                                                                            let status = Status::Failure;
+                                                                                            let title = gformat!("Oops");
+                                                                                            let description = gformat!("Content {mime} not supported");
 
+                                                                                            // Update widget
+                                                                                            content.set_status_failure(title.as_str(), description.as_str());
+
+                                                                                            // Update meta
+                                                                                            meta.borrow_mut().status = Some(status);
+                                                                                            meta.borrow_mut().title = Some(title);
+                                                                                            meta.borrow_mut().description = Some(description);
+
+                                                                                            // Update window
                                                                                             action_update.activate(Some(&id));
                                                                                         },
                                                                                     }
@@ -384,69 +394,115 @@ impl Page {
                                                                             },
                                                                             // @TODO
                                                                             _ => {
-                                                                                // Update
-                                                                                meta.borrow_mut().status = Some(Status::Failure);
-                                                                                meta.borrow_mut().title = Some(gformat!("Oops"));
-                                                                                meta.borrow_mut().description = Some(gformat!("Status {code} not supported"));
+                                                                                // Define common data
+                                                                                let status = Status::Failure;
+                                                                                let title = gformat!("Oops");
+                                                                                let description = gformat!("Status {code} not supported");
 
+                                                                                // Update widget
+                                                                                content.set_status_failure(title.as_str(), description.as_str());
+
+                                                                                // Update meta
+                                                                                meta.borrow_mut().status = Some(status);
+                                                                                meta.borrow_mut().title = Some(title);
+                                                                                meta.borrow_mut().description = Some(description);
+
+                                                                                // Update window
                                                                                 action_update.activate(Some(&id));
                                                                             },
                                                                         }
                                                                         None => todo!(),
                                                                     };
                                                                 }
-                                                                Err(e) => {
-                                                                    meta.borrow_mut().status = Some(Status::Failure);
-                                                                    meta.borrow_mut().title = Some(gformat!("Oops"));
-                                                                    meta.borrow_mut().description = Some(gformat!("Failed to read buffer data: {e}"));
+                                                                Err(error) => {
+                                                                    // Define common data
+                                                                    let status = Status::Failure;
+                                                                    let title = gformat!("Oops");
+                                                                    let description = gformat!("Failed to read buffer data: {:?}", error);
 
+                                                                    // Update widget
+                                                                    content.set_status_failure(title.as_str(), description.as_str());
+
+                                                                    // Update meta
+                                                                    meta.borrow_mut().status = Some(status);
+                                                                    meta.borrow_mut().title = Some(title);
+                                                                    meta.borrow_mut().description = Some(description);
+
+                                                                    // Update window
                                                                     action_update.activate(Some(&id));
                                                                 }
                                                             }
 
                                                             // Close connection
-                                                            if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                todo!("Error closing connection: {:?}", e);
+                                                            if let Err(error) = connection.close(Some(&cancellable)) {
+                                                                todo!("Error closing connection: {}", error.message());
                                                             }
                                                         }
-                                                        Err(e) => {
-                                                            // Update
-                                                            meta.borrow_mut().status = Some(Status::Failure);
-                                                            meta.borrow_mut().title = Some(gformat!("Oops"));
-                                                            meta.borrow_mut().description = Some(gformat!("Failed to read response: {:?}", e));
+                                                        Err(error) => {
+                                                            // Define common data
+                                                            let status = Status::Failure;
+                                                            let title = gformat!("Oops");
+                                                            let description = gformat!("Failed to read response: {}", error.1.message());
 
+                                                            // Update widget
+                                                            content.set_status_failure(title.as_str(), description.as_str());
+
+                                                            // Update meta
+                                                            meta.borrow_mut().status = Some(status);
+                                                            meta.borrow_mut().title = Some(title);
+                                                            meta.borrow_mut().description = Some(description);
+
+                                                            // Update window
                                                             action_update.activate(Some(&id));
 
                                                             // Close connection
-                                                            if let Err(e) = connection.close(Some(&cancellable)) {
-                                                                todo!("Error closing response connection: {:?}", e);
+                                                            if let Err(error) = connection.close(Some(&cancellable)) {
+                                                                todo!("Error closing response connection: {}", error.message());
                                                             }
                                                         }
                                                     },
                                                 );
                                             }
-                                            Err(e) => {
-                                                // Update
-                                                meta.borrow_mut().status = Some(Status::Failure);
-                                                meta.borrow_mut().title = Some(gformat!("Oops"));
-                                                meta.borrow_mut().description = Some(gformat!("Failed to read request: {:?}", e));
+                                            Err(error) => {
+                                                // Define common data
+                                                let status = Status::Failure;
+                                                let title = gformat!("Oops");
+                                                let description = gformat!("Failed to read request: {}", error.1.message());
 
+                                                // Update widget
+                                                content.set_status_failure(title.as_str(), description.as_str());
+
+                                                // Update meta
+                                                meta.borrow_mut().status = Some(status);
+                                                meta.borrow_mut().title = Some(title);
+                                                meta.borrow_mut().description = Some(description);
+
+                                                // Update window
                                                 action_update.activate(Some(&id));
 
                                                 // Close connection
-                                                if let Err(e) = connection.close(Some(&cancellable)) {
-                                                    todo!("Error closing request connection: {:?}", e);
+                                                if let Err(error) = connection.close(Some(&cancellable)) {
+                                                    todo!("Error closing request connection: {}", error.message());
                                                 }
                                             }
                                         },
                                     );
                                 }
-                                Err(e) => {
-                                    // Update
-                                    meta.borrow_mut().status = Some(Status::Failure);
-                                    meta.borrow_mut().title = Some(gformat!("Oops"));
-                                    meta.borrow_mut().description = Some(gformat!("Failed to connect: {:?}", e));
+                                Err(error) => {
+                                    // Define common data
+                                    let status = Status::Failure;
+                                    let title = gformat!("Oops");
+                                    let description = gformat!("Failed to connect: {}", error.message());
 
+                                    // Update widget
+                                    content.set_status_failure(title.as_str(), description.as_str());
+
+                                    // Update meta
+                                    meta.borrow_mut().status = Some(status);
+                                    meta.borrow_mut().title = Some(title);
+                                    meta.borrow_mut().description = Some(description);
+
+                                    // Update window
                                     action_update.activate(Some(&id));
                                 }
                             },
@@ -456,6 +512,7 @@ impl Page {
                     "nex" => {}
                     */
                     scheme => {
+                        // Define common data
                         let status = Status::Failure;
                         let title = gformat!("Oops");
                         let description = gformat!("Protocol `{scheme}` not supported");
