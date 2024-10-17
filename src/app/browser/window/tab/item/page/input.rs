@@ -23,23 +23,19 @@ impl Input {
     }
 
     // Actions
-    pub fn show(&self) {
-        self.widget.show()
+    pub fn unset(&self) {
+        self.widget.update(None);
     }
 
-    pub fn hide(&self) {
-        self.widget.hide()
-    }
-
-    // Variant switcher
-    pub fn use_response(
+    // Setters
+    pub fn set_new_response(
         &self,
         action_page_open: Arc<SimpleAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.widget.set_child(Some(
+        self.widget.update(Some(
             &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
         ));
     }

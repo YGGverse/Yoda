@@ -19,19 +19,12 @@ impl Widget {
     }
 
     // Actions
-    pub fn show(&self) {
-        self.gobject.set_visible(true)
-    }
-
-    pub fn hide(&self) {
-        self.gobject.set_visible(false)
-    }
-
-    pub fn set_child(&self, child: Option<&Box>) {
+    pub fn update(&self, child: Option<&Box>) {
         if child.is_some() {
+            self.gobject.set_visible(true); // widget may be hidden, make it visible to child redraw
             self.gobject.set_child(child);
         } else {
-            self.hide()
+            self.gobject.set_visible(false)
         }
     }
 

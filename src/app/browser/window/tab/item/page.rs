@@ -158,8 +158,8 @@ impl Page {
     }
 
     pub fn navigation_reload(&self) {
-        // Reset components
-        self.input.hide();
+        // Reset widgets
+        self.input.unset();
 
         // Init globals
         let request_text = self.navigation.request_text();
@@ -284,8 +284,7 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Make input form
-                                                                                        input.use_response(action_page_open, uri, Some(&description), Some(1024));
-                                                                                        input.show();
+                                                                                        input.set_new_response(action_page_open, uri, Some(&description), Some(1024));
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);
