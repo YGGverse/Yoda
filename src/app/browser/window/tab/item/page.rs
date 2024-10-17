@@ -284,7 +284,12 @@ impl Page {
                                                                                         let description = gformat!("{placeholder}");
 
                                                                                         // Make input form
-                                                                                        input.set_new_response(action_page_open, uri, Some(&description), Some(1024));
+                                                                                        input.set_new_response(
+                                                                                            action_page_open, uri,
+                                                                                            Some(&description),
+                                                                                            Some(1024),
+                                                                                            "11" == code.as_str() // sensitive input
+                                                                                        );
 
                                                                                         // Update meta
                                                                                         meta.borrow_mut().status = Some(status);

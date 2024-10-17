@@ -34,6 +34,7 @@ impl Input {
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
+        is_sensitive_input: bool,
     ) {
         self.widget.update(Some(
             &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
