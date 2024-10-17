@@ -275,7 +275,7 @@ impl Page {
                                                                     match parts.get(1) {
                                                                         Some(code) => match code.as_str() {
                                                                             // Input expected
-                                                                            "10" => {
+                                                                            "10" | "11" => {
                                                                                 match parts.get(3) {
                                                                                     Some(placeholder) => {
                                                                                         // Format response
@@ -296,10 +296,6 @@ impl Page {
                                                                                     },
                                                                                     None => todo!(),
                                                                                 }
-                                                                            },
-                                                                            // Sensitive input expected
-                                                                            "11" => {
-                                                                                todo!()
                                                                             },
                                                                             // Success
                                                                             "20" => {
