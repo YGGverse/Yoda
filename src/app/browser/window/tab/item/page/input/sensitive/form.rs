@@ -2,7 +2,8 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, glib::GString, TextView};
+use adw::PasswordEntryRow;
+use gtk::{gio::SimpleAction, glib::GString};
 use std::sync::Arc;
 
 pub struct Form {
@@ -11,9 +12,13 @@ pub struct Form {
 
 impl Form {
     // Construct
-    pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(
+        action_send: Arc<SimpleAction>,
+        title: Option<&str>,
+        max_length: Option<i32>,
+    ) -> Arc<Self> {
         // Init widget
-        let widget = Widget::new_arc(action_update);
+        let widget = Widget::new_arc(action_send, title, max_length);
 
         // Result
         Arc::new(Self { widget })
@@ -29,7 +34,7 @@ impl Form {
         self.widget.text()
     }
 
-    pub fn gobject(&self) -> &TextView {
+    pub fn gobject(&self) -> &PasswordEntryRow {
         &self.widget.gobject()
     }
 }

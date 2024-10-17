@@ -1,8 +1,10 @@
 mod response;
+mod sensitive;
 mod widget;
 
 use gtk::{gio::SimpleAction, glib::Uri};
 use response::Response;
+use sensitive::Sensitive;
 use widget::Widget;
 
 use adw::Clamp;
@@ -34,17 +36,21 @@ impl Input {
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
-        is_sensitive_input: bool,
     ) {
         self.widget.update(Some(
-            &Response::new_arc(
-                action_page_open,
-                base,
-                title,
-                size_limit,
-                is_sensitive_input,
-            )
-            .gobject(),
+            &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
+        ));
+    }
+
+    pub fn set_new_sensitive(
+        &self,
+        action_page_open: Arc<SimpleAction>,
+        base: Uri,
+        title: Option<&str>,
+        max_length: Option<i32>,
+    ) {
+        self.widget.update(Some(
+            &Sensitive::new_arc(action_page_open, base, title, max_length).gobject(),
         ));
     }
 
