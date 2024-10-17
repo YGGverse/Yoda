@@ -469,7 +469,7 @@ impl Page {
                         meta.borrow_mut().description = Some(description);
 
                         // Update window
-                        action_update.activate(Some(&self.id.to_variant()));
+                        action_update.activate(Some(&id));
                     }
                 }
             }
