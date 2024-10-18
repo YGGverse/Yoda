@@ -10,20 +10,24 @@ categories = ["network-programming", "gui"]
 repository = "https://github.com/YGGverse/Yoda"
 # homepage = "https://yggverse.github.io"
 
-[dependencies.sqlite]
-package = "rusqlite"
-version = "0.32.1"
+[dependencies.adw]
+package = "libadwaita"
+version = "0.7.0"
+features = ["v1_6"]
+
+[dependencies.gemini]
+package = "ggemini"
+version = "0.1.0"
+
+[dependencies.gemtext]
+package = "ggemtext"
+version = "0.1.1"
 
 [dependencies.gtk]
 package = "gtk4"
 version = "0.9.1"
 features = ["v4_10"]
 
-[dependencies.adw]
-package = "libadwaita"
-version = "0.7.0"
-features = ["v1_6"]
-
-[dependencies.gemtext]
-package = "ggemtext"
-version = "0.1.1"
+[dependencies.sqlite]
+package = "rusqlite"
+version = "0.32.1"
