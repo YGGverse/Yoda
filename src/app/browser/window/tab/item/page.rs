@@ -26,7 +26,7 @@ use gtk::{
     Box,
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, path::Path, sync::Arc};
+use std::{cell::RefCell, sync::Arc};
 
 pub struct Page {
     id: GString,
@@ -250,18 +250,9 @@ impl Page {
                                                                     // Format response
                                                                     meta.borrow_mut().status = Some(Status::Response);
                                                                     meta.borrow_mut().description = Some(host);
-                                                                    meta.borrow_mut().title = Some(uri.path());
+                                                                    meta.borrow_mut().title = uri.host();
 
                                                                     action_update.activate(Some(&id));
-
-                                                                    // Try create short base for title
-                                                                    let path = uri.path();
-                                                                    let path = Path::new(&path);
-                                                                    if let Some(base) = path.file_name() {
-                                                                        if let Some(base_str) = base.to_str() {
-                                                                            meta.borrow_mut().title = Some(GString::from(base_str));
-                                                                        }
-                                                                    }
 
                                                                     // Parse response @TODO read bytes
                                                                     let parts = Regex::split_simple(
