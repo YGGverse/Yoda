@@ -15,10 +15,11 @@ use widget::Widget;
 use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
-    gio::{AppInfo, AppLaunchContext, SimpleAction},
+    gio::{Cancellable, SimpleAction},
     glib::{GString, TimeZone, Uri},
     prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
+    UriLauncher, Window, WrapMode,
 };
 
 use std::{collections::HashMap, sync::Arc};
@@ -253,14 +254,17 @@ impl Reader {
                                     // Open new page in browser
                                     action_page_open.activate(Some(&uri.to_str().to_variant()));
                                 }
-                                // Scheme not supported, delegate link to the external app
-                                _ => match AppInfo::launch_default_for_uri(
-                                    &uri.to_str(),
-                                    Some(&AppLaunchContext::new()),
-                                ) {
-                                    Ok(_) => (),
-                                    Err(e) => todo!("{e}"),
-                                },
+                                // Scheme not supported, delegate
+                                _ => UriLauncher::new(&uri.to_str()).launch(
+                                    None::<&Window>,
+                                    None::<&Cancellable>,
+                                    |result| {
+                                        if let Err(error) = result {
+                                            // @TODO
+                                            println!("Could not delegate launch action: {error}")
+                                        }
+                                    },
+                                ),
                             };
                         }
                     }
