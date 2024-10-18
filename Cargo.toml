@@ -23,3 +23,7 @@ features = ["v4_10"]
 package = "libadwaita"
 version = "0.7.0"
 features = ["v1_6"]
+
+[dependencies.gemtext]
+package = "ggemtext"
+version = "0.1.1"

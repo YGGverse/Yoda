@@ -1,18 +1,17 @@
-mod parser;
 mod tag;
 mod widget;
 
-use parser::{
+use tag::Tag;
+use widget::Widget;
+
+use adw::StyleManager;
+use gemtext::line::{
     code::Code,
     header::{Header, Level},
     link::Link,
     list::List,
     quote::Quote,
 };
-use tag::Tag;
-use widget::Widget;
-
-use adw::StyleManager;
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::{Cancellable, SimpleAction},
