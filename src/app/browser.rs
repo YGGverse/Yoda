@@ -8,8 +8,9 @@ use window::Window;
 
 use adw::ApplicationWindow;
 use gtk::{
-    gio::{AppInfo, AppLaunchContext, SimpleAction},
+    gio::{Cancellable, File, SimpleAction},
     prelude::{ActionMapExt, GtkWindowExt},
+    FileLauncher,
 };
 use sqlite::Transaction;
 use std::{path::PathBuf, sync::Arc};
@@ -90,10 +91,15 @@ impl Browser {
 
         action_tool_profile.connect_activate({
             move |_, _| {
-                // @TODO [4_10] https://docs.gtk.org/gtk4/class.FileLauncher.html
-                let _ = AppInfo::launch_default_for_uri(
-                    &format!("file://{}", profile_path.to_string_lossy()),
-                    Some(&AppLaunchContext::new()),
+                FileLauncher::new(Some(&File::for_path(&profile_path))).launch(
+                    None::<&gtk::Window>,
+                    None::<&Cancellable>,
+                    |result| {
+                        if let Err(error) = result {
+                            // @TODO
+                            println!("Could not delegate launch action: {error}")
+                        }
+                    },
                 );
             }
         });
