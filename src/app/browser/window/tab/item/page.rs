@@ -350,6 +350,36 @@ impl Page {
                                                                                             action_update.activate(Some(&id));
                                                                                             todo!()
                                                                                         },
+                                                                                        "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                                                                            // Update meta
+                                                                                            meta.borrow_mut().status = Some(Status::Success);
+                                                                                            meta.borrow_mut().title = Some(gformat!("Picture")); // @TODO
+                                                                                            meta.borrow_mut().mime = match mime.as_str() {
+                                                                                                "image/png" => Some(Mime::ImagePng),
+                                                                                                "image/gif" => Some(Mime::ImageGif),
+                                                                                                "image/jpeg" => Some(Mime::ImageJpeg),
+                                                                                                "image/webp" => Some(Mime::ImageWebp),
+                                                                                                _ => panic!()
+                                                                                            };
+
+                                                                                            // Update content
+                                                                                            content.set_image(); // @TODO
+
+                                                                                            // Add new history record
+                                                                                            let request = uri.to_str();
+
+                                                                                            match navigation.history_current() {
+                                                                                                Some(current) => {
+                                                                                                    if current != request {
+                                                                                                        navigation.history_add(request);
+                                                                                                    }
+                                                                                                }
+                                                                                                None => navigation.history_add(request),
+                                                                                            }
+
+                                                                                            // Update window components
+                                                                                            action_update.activate(Some(&id));
+                                                                                        },
                                                                                         _ => {
                                                                                             // Define common data
                                                                                             let status = Status::Failure;

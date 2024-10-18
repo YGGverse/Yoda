@@ -1,7 +1,8 @@
-// @TODO mod image;
+mod image;
 mod status;
 mod text;
 
+use image::Image;
 use status::Status;
 use text::Text;
 
@@ -33,6 +34,14 @@ impl Content {
     }
 
     // Actions
+    pub fn set_image(&self) {
+        self.clean();
+
+        let image = Image::new();
+
+        self.gobject.append(image.gobject());
+    }
+
     pub fn set_status_failure(&self, title: &str, description: &str) {
         self.clean();
 

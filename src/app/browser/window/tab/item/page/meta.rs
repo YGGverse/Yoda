@@ -5,6 +5,10 @@ use gtk::glib::GString;
 pub enum Mime {
     TextGemini,
     TextPlain,
+    ImagePng,
+    ImageGif,
+    ImageJpeg,
+    ImageWebp,
 }
 
 // Internal page status (not related with gemini status code)
