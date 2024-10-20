@@ -111,3 +111,8 @@ Quick start guide and maintenance protocol
 
 * Package version in repository should be increased immediately after stable release on [crates.io](https://crates.io/crates/yoda) and before apply new changes
 * Currently, profile data stored in separated sub-directories, auto-created on every `CARGO_PKG_VERSION_MAJOR` or/and `CARGO_PKG_VERSION_MINOR` change
+
+### See also
+
+* [ggemtext](https://github.com/YGGverse/ggemtext) - Glib-oriented Gemtext API
+* [ggemini](https://github.com/YGGverse/ggemini) - Glib-oriented client for Gemini protocol (in development)
