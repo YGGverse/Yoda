@@ -264,7 +264,7 @@ impl Page {
 
                                                                     match response.header().status() {
                                                                         // 10 | 11
-                                                                        ResponseStatus::Input | ResponseStatus::SensitiveInput => {
+                                                                        Some(ResponseStatus::Input) | Some(ResponseStatus::SensitiveInput) => {
                                                                             // Format response
                                                                             let status = Status::Input;
                                                                             let title = gformat!("Input expected");
@@ -278,7 +278,7 @@ impl Page {
 
                                                                             // Make input form
                                                                             match response.header().status() {
-                                                                                ResponseStatus::SensitiveInput =>
+                                                                                Some(ResponseStatus::SensitiveInput) =>
                                                                                     input.set_new_sensitive(
                                                                                         action_page_open, uri,
                                                                                         Some(&description),
@@ -301,7 +301,7 @@ impl Page {
                                                                             action_update.activate(Some(&id));
                                                                         },
                                                                         // 20
-                                                                        ResponseStatus::Success =>
+                                                                        Some(ResponseStatus::Success) =>
                                                                             match response.header().mime() {
                                                                                 Some(ResponseMime::TextGemini) => {
                                                                                     // Update data
@@ -378,7 +378,7 @@ impl Page {
                                                                                 },
                                                                         },
                                                                         // 32
-                                                                        ResponseStatus::Redirect => {
+                                                                        Some(ResponseStatus::Redirect) => {
                                                                             // Update meta
                                                                             meta.borrow_mut().status = Some(Status::Redirect);
                                                                             meta.borrow_mut().title = Some(gformat!("Redirect"));
@@ -404,7 +404,7 @@ impl Page {
                                                                             }
                                                                         },
                                                                         // @TODO
-                                                                        _ => {
+                                                                        None => {
                                                                             // Define common data
                                                                             let status = Status::Failure;
                                                                             let title = gformat!("Oops");
