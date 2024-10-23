@@ -1,38 +1,30 @@
 use gtk::glib::GString;
 
-// Page MIME type (not related with gemini status code)
-// Useful for content renderer detection, etc
-pub enum Mime {
-    TextGemini,
-    TextPlain,
-    ImagePng,
-    ImageGif,
-    ImageJpeg,
-    ImageWebp,
-}
-
-// Internal page status (not related with gemini status code)
-// Useful for widgets composition
 pub enum Status {
+    // SensitiveInput,
+    // Complete,
     Connect,
+    // Connected,
+    // Connecting,
     Failure,
     Input,
     Prepare,
+    // ProxyNegotiated,
+    // ProxyNegotiating,
     Redirect,
     Reload,
     Request,
+    // Resolved,
+    // Resolving,
     Response,
-    // @TODO SensitiveInput,
     Success,
-}
+    // TlsHandshaked,
+    // TlsHandshaking,
+} // @TODO
 
 pub struct Meta {
-    // Text meta data for page
-    // Useful to update window title, label text, etc
     pub title: Option<GString>,
     pub description: Option<GString>,
-    // Enums
-    pub mime: Option<Mime>,
     pub status: Option<Status>,
 }
 
@@ -41,7 +33,6 @@ impl Meta {
         Self {
             title: None,
             description: None,
-            mime: None,
             status: None,
         }
     }
