@@ -231,7 +231,7 @@ impl Page {
                                             Ok(_) => {
                                                 // Define local namespace
                                                 use gemini::client::{
-                                                    connection::input_stream::ByteBuffer,
+                                                    connection::Input,
                                                     response::{
                                                         header::{
                                                             Mime as ResponseMime,
@@ -248,10 +248,10 @@ impl Page {
                                                 action_update.activate(Some(&id));
 
                                                 // Create new byte buffer and read server response
-                                                ByteBuffer::new().read_input_stream_async(
-                                                    connection.input_stream(),
-                                                    cancellable.clone(),
-                                                    Priority::DEFAULT,
+                                                Input::new_from_stream(
+                                                    connection.input_stream()
+                                                ).read_all_async(
+                                                    Some(cancellable.clone()),
                                                     None,
                                                     None,
                                                     move |i|  {
