@@ -229,13 +229,7 @@ impl Page {
                                         Some(&cancellable.clone()),
                                         move |o| match o {
                                             Ok(_) => {
-                                                // Update
-                                                meta.borrow_mut().status = Some(Status::Request);
-                                                meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
-
-                                                action_update.activate(Some(&id));
-
-                                                // Define local NS
+                                                // Define local namespace
                                                 use gemini::client::{
                                                     connection::input_stream::ByteBuffer,
                                                     response::{
@@ -247,7 +241,13 @@ impl Page {
                                                     }
                                                 };
 
-                                                // Read response
+                                                // Update page status
+                                                meta.borrow_mut().status = Some(Status::Request);
+                                                meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
+
+                                                action_update.activate(Some(&id));
+
+                                                // Create new byte buffer and read server response
                                                 ByteBuffer::new().read_input_stream_async(
                                                     connection.input_stream(),
                                                     cancellable.clone(),
