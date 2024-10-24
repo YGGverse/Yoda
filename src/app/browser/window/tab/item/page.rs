@@ -189,6 +189,15 @@ impl Page {
                         todo!()
                     }
                     "gemini" => {
+                        // Define local NS
+                        use gemini::client::{
+                            connection::Input,
+                            response::{
+                                header::{Mime as ResponseMime, Status as ResponseStatus},
+                                Response,
+                            },
+                        };
+
                         // Get host
                         let host = match uri.host() {
                             Some(host) => host,
@@ -229,18 +238,6 @@ impl Page {
                                         Some(&cancellable.clone()),
                                         move |o| match o {
                                             Ok(_) => {
-                                                // Define local namespace
-                                                use gemini::client::{
-                                                    connection::Input,
-                                                    response::{
-                                                        header::{
-                                                            Mime as ResponseMime,
-                                                            Status as ResponseStatus
-                                                        },
-                                                        Response,
-                                                    }
-                                                };
-
                                                 // Update page status
                                                 meta.borrow_mut().status = Some(Status::Request);
                                                 meta.borrow_mut().description = Some(gformat!("Request data from {host}.."));
