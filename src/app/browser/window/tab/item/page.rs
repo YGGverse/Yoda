@@ -20,8 +20,8 @@ use gtk::{
         Uri, UriFlags,
     },
     prelude::{
-        ActionExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
-        StaticVariantType, ToVariant,
+        ActionExt, IOStreamExt, OutputStreamExtManual, SocketClientExt, StaticVariantType,
+        ToVariant,
     },
     Box,
 };
@@ -235,24 +235,30 @@ impl Page {
 
                                                 action_update.activate(Some(&id));
 
-                                                // Read response
-                                                connection.input_stream().read_all_async(
-                                                    vec![0; 0xfffff], // 1Mb @TODO
-                                                    Priority::DEFAULT,
-                                                    Some(&cancellable.clone()),
-                                                    move |i| match i {
-                                                        Ok(i) => {
-                                                            // Define local NS
-                                                            use gemini::client::response::{
-                                                                header::{
-                                                                    Mime as ResponseMime,
-                                                                    Status as ResponseStatus
-                                                                },
-                                                                Response,
-                                                            };
+                                                // Define local NS
+                                                use gemini::client::{
+                                                    connection::input_stream::ByteBuffer,
+                                                    response::{
+                                                        header::{
+                                                            Mime as ResponseMime,
+                                                            Status as ResponseStatus
+                                                        },
+                                                        Response,
+                                                    }
+                                                };
 
+                                                // Read response
+                                                ByteBuffer::new().read_input_stream_async(
+                                                    connection.input_stream(),
+                                                    cancellable.clone(),
+                                                    Priority::DEFAULT,
+                                                    None,
+                                                    None,
+                                                    move |i|  {
+                                                        match i {
+                                                        Ok(buffer) => {
                                                             match Response::from_utf8(
-                                                                &i.0.to_vec(),
+                                                                &buffer.to_utf8(),
                                                             ) {
                                                                 Ok(response) => {
                                                                     // Format response
@@ -447,11 +453,11 @@ impl Page {
                                                                 todo!("Error closing connection: {}", error.message());
                                                             }
                                                         }
-                                                        Err(error) => {
+                                                        Err(_) => {
                                                             // Define common data
                                                             let status = Status::Failure;
                                                             let title = gformat!("Oops");
-                                                            let description = gformat!("Failed to read response: {}", error.1.message());
+                                                            let description = gformat!("Failed to read response");
 
                                                             // Update widget
                                                             content.set_status_failure(title.as_str(), description.as_str());
@@ -468,6 +474,7 @@ impl Page {
                                                             if let Err(error) = connection.close(Some(&cancellable)) {
                                                                 todo!("Error closing response connection: {}", error.message());
                                                             }
+                                                        }
                                                         }
                                                     },
                                                 );
