@@ -189,7 +189,7 @@ impl Page {
                         // Define local NS
                         use gemini::client::{
                             response::header::{Mime as ResponseMime, Status as ResponseStatus},
-                            simple_socket_request_async,
+                            single_socket_request_async,
                         };
 
                         // Update page status
@@ -197,7 +197,7 @@ impl Page {
                         action_update.activate(Some(&id));
 
                         // Begin request
-                        simple_socket_request_async(uri.clone(), move |result| match result {
+                        single_socket_request_async(uri.clone(), move |result| match result {
                             Ok(response) => {
                                 // Update page meta
                                 meta.borrow_mut().status = Some(Status::Connected);
