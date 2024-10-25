@@ -202,7 +202,6 @@ impl Page {
                                 // Format response
                                 meta.borrow_mut().status = Some(Status::Connected);
                                 meta.borrow_mut().title = uri.host();
-
                                 action_update.activate(Some(&id));
 
                                 match response.header().status() {
@@ -331,7 +330,7 @@ impl Page {
                                             action_update.activate(Some(&id));
                                         }
                                     },
-                                    // 32
+                                    // 31
                                     Some(ResponseStatus::Redirect) => {
                                         // Update meta
                                         meta.borrow_mut().status = Some(Status::Redirect);
