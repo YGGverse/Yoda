@@ -264,7 +264,7 @@ impl Reader {
                                         }
                                     },
                                 ),
-                            };
+                            }; // @TODO common handler?
                         }
                     }
                 }
@@ -285,7 +285,24 @@ impl Reader {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
-                            return action_tab_open.activate(Some(&uri.to_string().to_variant()));
+                            // Select link handler by scheme
+                            return match uri.scheme().as_str() {
+                                "gemini" => {
+                                    // Open new page in browser
+                                    action_tab_open.activate(Some(&uri.to_string().to_variant()));
+                                }
+                                // Scheme not supported, delegate
+                                _ => UriLauncher::new(&uri.to_str()).launch(
+                                    None::<&Window>,
+                                    None::<&Cancellable>,
+                                    |result| {
+                                        if let Err(error) = result {
+                                            // @TODO
+                                            println!("Could not delegate launch action: {error}")
+                                        }
+                                    },
+                                ),
+                            }; // @TODO common handler?
                         }
                     }
                 }
