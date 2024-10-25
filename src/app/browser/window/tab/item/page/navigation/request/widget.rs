@@ -139,9 +139,9 @@ impl Widget {
     }
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        // Skip update animation for Non value
+        // Skip update animation for None value
         if let Some(value) = progress_fraction {
-            // Update shared fraction value for async progressbar function, animate on changed only
+            // Update shared fraction on new value was changed
             if value != self.progress.fraction.replace(value) {
                 // Start new frame on previous process function completed (`source_id` changed to None)
                 // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
@@ -167,8 +167,11 @@ impl Widget {
                                 // Deactivate
                                 progress.source_id.replace(None);
 
-                                // Reset (to hide progress widget)
-                                gobject.set_progress_fraction(0.0);
+                                // Reset on 100% (to hide progress bar)
+                                // or, just await for new value request
+                                if gobject.progress_fraction() == 1.0 {
+                                    gobject.set_progress_fraction(0.0);
+                                }
 
                                 // Stop iteration
                                 ControlFlow::Break
