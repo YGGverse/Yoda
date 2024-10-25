@@ -199,11 +199,12 @@ impl Page {
                         // Begin request
                         simple_socket_request_async(uri.clone(), move |result| match result {
                             Ok(response) => {
-                                // Format response
+                                // Update page meta
                                 meta.borrow_mut().status = Some(Status::Connected);
                                 meta.borrow_mut().title = uri.host();
                                 action_update.activate(Some(&id));
 
+                                // Route by response
                                 match response.header().status() {
                                     // 10 | 11
                                     Some(ResponseStatus::Input)
