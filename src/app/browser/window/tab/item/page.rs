@@ -14,12 +14,16 @@ use widget::Widget;
 use meta::{Meta, Status};
 
 use gtk::{
-    gio::SimpleAction,
+    gdk_pixbuf::Pixbuf,
+    gio::{Cancellable, SimpleAction, SocketClient, SocketProtocol, TlsCertificateFlags},
     glib::{
-        gformat, uuid_string_random, GString, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
-        UriFlags,
+        gformat, uuid_string_random, Bytes, GString, Priority, Regex, RegexCompileFlags,
+        RegexMatchFlags, Uri, UriFlags,
     },
-    prelude::{ActionExt, StaticVariantType, ToVariant},
+    prelude::{
+        ActionExt, IOStreamExt, InputStreamExt, OutputStreamExt, SocketClientExt,
+        StaticVariantType, ToVariant,
+    },
     Box,
 };
 use sqlite::Transaction;
@@ -158,263 +162,24 @@ impl Page {
         // Reset widgets
         self.input.unset();
 
-        // Init globals
+        // Init shared objects to not spawn a lot
         let request_text = self.navigation.request_text();
-
-        // Init shared objects for async access
         let id = self.id.to_variant();
-        let navigation = self.navigation.clone();
-        let content = self.content.clone();
-        let input = self.input.clone();
-        let meta = self.meta.clone();
-        let action_page_open = self.action_page_open.clone();
-        let action_update = self.action_update.clone();
 
         // Update
-        meta.borrow_mut().status = Some(Status::Reload);
-        meta.borrow_mut().title = Some(gformat!("Loading.."));
-        meta.borrow_mut().description = None;
+        self.meta.borrow_mut().status = Some(Status::Reload);
+        self.meta.borrow_mut().title = Some(gformat!("Loading.."));
+        self.meta.borrow_mut().description = None;
 
-        action_update.activate(Some(&id));
+        self.action_update.activate(Some(&id));
 
-        /*let _uri = */
+        // Route by request
         match Uri::parse(&request_text, UriFlags::NONE) {
             Ok(uri) => {
-                // Route request by scheme
+                // Route by scheme
                 match uri.scheme().as_str() {
-                    "file" => {
-                        todo!()
-                    }
-                    "gemini" => {
-                        // Define local NS
-                        use gemini::client::{
-                            response::header::{Mime as ResponseMime, Status as ResponseStatus},
-                            single_socket_request_async,
-                        };
-
-                        // Update page status
-                        meta.borrow_mut().status = Some(Status::Connecting);
-                        action_update.activate(Some(&id));
-
-                        // Begin request
-                        single_socket_request_async(uri.clone(), move |result| match result {
-                            Ok(response) => {
-                                // Update page meta
-                                meta.borrow_mut().status = Some(Status::Connected);
-                                meta.borrow_mut().title = uri.host();
-                                action_update.activate(Some(&id));
-
-                                // Route by response
-                                match response.header().status() {
-                                    // 10 | 11
-                                    Some(ResponseStatus::Input)
-                                    | Some(ResponseStatus::SensitiveInput) => {
-                                        // Format response
-                                        let status = Status::Input;
-                                        let title = gformat!("Input expected");
-                                        let description = match response.header().meta() {
-                                            Some(meta) => match meta.to_gstring() {
-                                                Ok(value) => value,
-                                                Err(_) => title.clone(),
-                                            },
-                                            None => title.clone(),
-                                        };
-
-                                        // Make input form
-                                        match response.header().status() {
-                                            Some(ResponseStatus::SensitiveInput) => input
-                                                .set_new_sensitive(
-                                                    action_page_open,
-                                                    uri,
-                                                    Some(&description),
-                                                    Some(1024),
-                                                ),
-                                            _ => input.set_new_response(
-                                                action_page_open,
-                                                uri,
-                                                Some(&description),
-                                                Some(1024),
-                                            ),
-                                        }
-
-                                        // Update meta
-                                        meta.borrow_mut().status = Some(status);
-                                        meta.borrow_mut().description = Some(description);
-                                        meta.borrow_mut().title = Some(title);
-
-                                        // Update page
-                                        action_update.activate(Some(&id));
-                                    }
-                                    // 20
-                                    Some(ResponseStatus::Success) => match response.header().mime()
-                                    {
-                                        Some(ResponseMime::TextGemini) => {
-                                            // Update data
-                                            match response.body().to_gstring() {
-                                                Ok(source) => {
-                                                    meta.borrow_mut().status =
-                                                        Some(Status::Success);
-
-                                                    // This content type may return parsed title
-                                                    meta.borrow_mut().title =
-                                                        content.set_text_gemini(&uri, &source);
-
-                                                    // Add new history record
-                                                    let request = uri.to_str();
-
-                                                    match navigation.history_current() {
-                                                        Some(current) => {
-                                                            if current != request {
-                                                                navigation.history_add(request);
-                                                            }
-                                                        }
-                                                        None => navigation.history_add(request),
-                                                    }
-
-                                                    // Update window components
-                                                    action_update.activate(Some(&id));
-                                                }
-                                                Err(_) => todo!(),
-                                            }
-                                        }
-                                        Some(ResponseMime::TextPlain) => {
-                                            meta.borrow_mut().status = Some(Status::Success);
-
-                                            action_update.activate(Some(&id));
-                                            todo!()
-                                        }
-                                        Some(ResponseMime::ImagePng)
-                                        | Some(ResponseMime::ImageGif)
-                                        | Some(ResponseMime::ImageJpeg)
-                                        | Some(ResponseMime::ImageWebp) => {
-                                            // Update meta
-                                            meta.borrow_mut().status = Some(Status::Success);
-                                            meta.borrow_mut().title = Some(gformat!("Picture")); // @TODO
-
-                                            // Update content
-                                            content.set_image(); // @TODO
-
-                                            // Add new history record
-                                            let request = uri.to_str();
-
-                                            match navigation.history_current() {
-                                                Some(current) => {
-                                                    if current != request {
-                                                        navigation.history_add(request);
-                                                    }
-                                                }
-                                                None => navigation.history_add(request),
-                                            }
-
-                                            // Update window components
-                                            action_update.activate(Some(&id));
-                                        }
-                                        _ => {
-                                            // Define common data
-                                            let status = Status::Failure;
-                                            let title = gformat!("Oops");
-                                            let description =
-                                                gformat!("Content type not supported");
-
-                                            // Update widget
-                                            content.set_status_failure(
-                                                title.as_str(),
-                                                description.as_str(),
-                                            );
-
-                                            // Update meta
-                                            meta.borrow_mut().status = Some(status);
-                                            meta.borrow_mut().title = Some(title);
-                                            meta.borrow_mut().description = Some(description);
-
-                                            // Update window
-                                            action_update.activate(Some(&id));
-                                        }
-                                    },
-                                    // 31
-                                    Some(ResponseStatus::Redirect) => {
-                                        // Update meta
-                                        meta.borrow_mut().status = Some(Status::Redirect);
-                                        meta.borrow_mut().title = Some(gformat!("Redirect"));
-
-                                        action_update.activate(Some(&id));
-
-                                        // Select widget
-                                        match response.header().meta() {
-                                            Some(meta) => {
-                                                let _ = content.set_text_gemini(
-                                                        &uri,
-                                                        // @TODO use template file
-                                                        &gformat!(
-                                                            "# Redirect\n\nAuto-follow disabled, click on link below to continue\n\n=> {}",
-                                                            match meta.to_gstring() {
-                                                                Ok(url) => url,
-                                                                Err(_) => todo!()
-                                                            }
-                                                        )
-                                                    );
-                                            }
-                                            None => todo!(),
-                                        }
-                                    }
-                                    // @TODO
-                                    None => {
-                                        // Define common data
-                                        let status = Status::Failure;
-                                        let title = gformat!("Oops");
-                                        let description = gformat!("Status code not supported");
-
-                                        // Update widget
-                                        content.set_status_failure(
-                                            title.as_str(),
-                                            description.as_str(),
-                                        );
-
-                                        // Update meta
-                                        meta.borrow_mut().status = Some(status);
-                                        meta.borrow_mut().title = Some(title);
-                                        meta.borrow_mut().description = Some(description);
-
-                                        // Update window
-                                        action_update.activate(Some(&id));
-                                    }
-                                };
-                            }
-                            Err(reason) => {
-                                // Define common data
-                                let status = Status::Failure;
-                                let title = gformat!("Oops");
-                                let description = match reason {
-                                    gemini::client::Error::Connection => {
-                                        gformat!("Failed to connect")
-                                    }
-                                    gemini::client::Error::Request => {
-                                        gformat!("Failed to send request")
-                                    }
-                                    gemini::client::Error::Response => {
-                                        gformat!("Failed to read response")
-                                    }
-                                    gemini::client::Error::Close => {
-                                        gformat!("Failed to close connection")
-                                    }
-                                }; // @TODO explain
-
-                                // Update widget
-                                content.set_status_failure(title.as_str(), description.as_str());
-
-                                // Update meta
-                                meta.borrow_mut().status = Some(status);
-                                meta.borrow_mut().title = Some(title);
-                                meta.borrow_mut().description = Some(description);
-
-                                // Update window
-                                action_update.activate(Some(&id));
-                            }
-                        });
-                    }
-                    /* @TODO
-                    "nex" => {}
-                    */
+                    "file" => todo!(),
+                    "gemini" => self.load_gemini(uri), // @TODO
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
@@ -422,15 +187,16 @@ impl Page {
                         let description = gformat!("Protocol `{scheme}` not supported");
 
                         // Update widget
-                        content.set_status_failure(title.as_str(), description.as_str());
+                        self.content
+                            .set_status_failure(title.as_str(), description.as_str());
 
                         // Update meta
-                        meta.borrow_mut().status = Some(status);
-                        meta.borrow_mut().title = Some(title);
-                        meta.borrow_mut().description = Some(description);
+                        self.meta.borrow_mut().status = Some(status);
+                        self.meta.borrow_mut().title = Some(title);
+                        self.meta.borrow_mut().description = Some(description);
 
                         // Update window
-                        action_update.activate(Some(&id));
+                        self.action_update.activate(Some(&id));
                     }
                 }
             }
@@ -471,7 +237,7 @@ impl Page {
                     self.action_tab_page_navigation_reload.activate(None);
                 }
             }
-        };
+        }; // Uri::parse
     }
 
     pub fn update(&self) {
@@ -584,5 +350,285 @@ impl Page {
 
         // Success
         Ok(())
+    }
+
+    // Private helpers @TODO
+    fn load_gemini(&self, uri: Uri) {
+        // Use local namespaces
+        use gemini::client::{
+            buffer::{Buffer, Error as BufferError},
+            response::{
+                header::{Mime as ClientMime, Status as ClientStatus},
+                Header,
+            },
+        };
+
+        // Init shared objects (async)
+        let id = self.id.to_variant();
+        let navigation = self.navigation.clone();
+        let content = self.content.clone();
+        let input = self.input.clone();
+        let meta = self.meta.clone();
+        let action_page_open = self.action_page_open.clone();
+        let action_update = self.action_update.clone();
+        let url = uri.clone().to_str();
+
+        // Init socket
+        let client = SocketClient::new();
+
+        client.set_protocol(SocketProtocol::Tcp);
+        client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
+        client.set_tls(true);
+
+        // Create connection
+        client.connect_to_uri_async(
+            url.clone().as_str(),
+            1965,
+            None::<&Cancellable>,
+            move |connect| match connect {
+                Ok(connection) => {
+                    // Listen for status updates
+                    // @TODO
+
+                    // Send request
+                    connection.output_stream().write_bytes_async(
+                        &Bytes::from(gformat!("{url}\r\n").as_bytes()),
+                        Priority::DEFAULT,
+                        None::<&Cancellable>,
+                        move |request| match request {
+                            Ok(_) => {
+                                // Read header from response
+                                connection.clone().input_stream().read_bytes_async(
+                                    1024,
+                                    Priority::DEFAULT,
+                                    None::<&Cancellable>,
+                                    move |response| match response {
+                                        Ok(bytes) => {
+                                            // Read header from response
+                                            match Header::from_response(
+                                                &bytes
+                                            ) {
+                                                Ok(header) => {
+                                                    // Route by status
+                                                    match header.status() {
+                                                        ClientStatus::Input | ClientStatus::SensitiveInput => {
+                                                            // Format response
+                                                            let status = Status::Input;
+                                                            let title = gformat!("Input expected");
+                                                            let description = match header.meta() {
+                                                                Some(meta) => match meta.to_gstring() {
+                                                                    Ok(value) => value,
+                                                                    Err(_) => title.clone(),
+                                                                },
+                                                                None => title.clone(),
+                                                            };
+
+                                                            // Make input form
+                                                            match header.status() {
+                                                                ClientStatus::SensitiveInput =>
+                                                                    input.set_new_sensitive(
+                                                                        action_page_open,
+                                                                        uri,
+                                                                        Some(&description),
+                                                                        Some(1024),
+                                                                    ),
+                                                                _ =>
+                                                                    input.set_new_response(
+                                                                        action_page_open,
+                                                                        uri,
+                                                                        Some(&description),
+                                                                        Some(1024),
+                                                                    ),
+                                                            }
+
+                                                            // Update meta
+                                                            meta.borrow_mut().status = Some(status);
+                                                            meta.borrow_mut().description = Some(description);
+                                                            meta.borrow_mut().title = Some(title);
+
+                                                            // Update page
+                                                            action_update.activate(Some(&id));
+                                                        },
+                                                        ClientStatus::Success => {
+                                                            // Route by MIME
+                                                            match header.mime() {
+                                                                Some(ClientMime::TextGemini) => {
+                                                                    // Read entire input stream to buffer
+                                                                    Buffer::from_connection_async(
+                                                                        connection,
+                                                                        move |result|{
+                                                                            match result {
+                                                                                Ok(buffer) => {
+                                                                                    // Update page meta
+                                                                                    meta.borrow_mut().status = Some(Status::Success);
+                                                                                    meta.borrow_mut().title = content.set_text_gemini(
+                                                                                        &uri,
+                                                                                        &match GString::from_utf8(buffer.to_utf8()) {
+                                                                                            Ok(gemtext) => gemtext,
+                                                                                            Err(_) => todo!()
+                                                                                        }
+                                                                                    );
+
+                                                                                    // Add new history record
+                                                                                    let request = uri.to_str();
+
+                                                                                    match navigation.history_current() {
+                                                                                        Some(current) => {
+                                                                                            if current != request {
+                                                                                                navigation.history_add(request);
+                                                                                            }
+                                                                                        }
+                                                                                        None => navigation.history_add(request),
+                                                                                    }
+
+                                                                                    // Update window components
+                                                                                    action_update.activate(Some(&id));
+                                                                                }
+                                                                                Err((reason, message)) => {
+                                                                                    // Define common data
+                                                                                    let status = Status::Failure;
+                                                                                    let title = gformat!("Oops");
+                                                                                    let description = match reason {
+                                                                                        BufferError::InputStream => match message {
+                                                                                            Some(error) => gformat!("{error}"),
+                                                                                            None => gformat!("Undefined connection error")
+                                                                                        } ,
+                                                                                        BufferError::Overflow => gformat!("Buffer overflow"),
+                                                                                    };
+
+                                                                                    // Update widget
+                                                                                    content.set_status_failure(
+                                                                                        title.as_str(),
+                                                                                        description.as_str(),
+                                                                                    );
+
+                                                                                    // Update meta
+                                                                                    meta.borrow_mut().status = Some(status);
+                                                                                    meta.borrow_mut().title = Some(title);
+                                                                                    meta.borrow_mut().description = Some(description);
+
+                                                                                    // Update window
+                                                                                    action_update.activate(Some(&id));
+                                                                                },
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                },
+                                                                Some(
+                                                                    ClientMime::ImagePng |
+                                                                    ClientMime::ImageGif |
+                                                                    ClientMime::ImageJpeg |
+                                                                    ClientMime::ImageWebp
+                                                                ) => {
+                                                                    match Pixbuf::from_stream(
+                                                                        &connection.input_stream(),
+                                                                        None::<&Cancellable>,
+                                                                    ) {
+                                                                        Ok(buffer) => {
+                                                                            // Update page meta
+                                                                            meta.borrow_mut().status = Some(Status::Success);
+                                                                            meta.borrow_mut().title = Some(gformat!("Image"));
+
+                                                                            // Update page content
+                                                                            content.set_image(&buffer);
+
+                                                                            // Add history record
+                                                                            let request = uri.to_str();
+                                                                            match navigation.history_current() {
+                                                                                Some(current) => {
+                                                                                    if current != request {
+                                                                                        navigation.history_add(request);
+                                                                                    }
+                                                                                }
+                                                                                None => navigation.history_add(request),
+                                                                            }
+
+                                                                            // Update window components
+                                                                            action_update.activate(Some(&id));
+                                                                        }
+                                                                        Err(reason) => { // Pixbuf::from_stream
+                                                                            // Define common data
+                                                                            let status = Status::Failure;
+                                                                            let title = gformat!("Oops");
+                                                                            let description = gformat!("{}", reason.message());
+
+                                                                            // Update widget
+                                                                            content.set_status_failure(title.as_str(), description.as_str());
+
+                                                                            // Update meta
+                                                                            meta.borrow_mut().status = Some(status);
+                                                                            meta.borrow_mut().title = Some(title);
+                                                                            meta.borrow_mut().description = Some(description);
+                                                                        }
+                                                                    }
+                                                                },
+                                                                // @TODO stream extensions
+                                                                _ => {
+                                                                    // Define common data
+                                                                    let status = Status::Failure;
+                                                                    let title = gformat!("Oops");
+                                                                    let description =
+                                                                        gformat!("Content type not supported");
+
+                                                                    // Update widget
+                                                                    content.set_status_failure(
+                                                                        title.as_str(),
+                                                                        description.as_str(),
+                                                                    );
+
+                                                                    // Update meta
+                                                                    meta.borrow_mut().status = Some(status);
+                                                                    meta.borrow_mut().title = Some(title);
+                                                                    meta.borrow_mut().description = Some(description);
+
+                                                                    // Update window
+                                                                    action_update.activate(Some(&id));
+                                                                },
+                                                            }
+                                                        },
+                                                        ClientStatus::Redirect => {
+                                                            // Update meta
+                                                            meta.borrow_mut().status = Some(Status::Redirect);
+                                                            meta.borrow_mut().title = Some(gformat!("Redirect"));
+
+                                                            // Build gemtext message for manual redirection @TODO use template?
+                                                            match header.meta() {
+                                                                Some(meta) => {
+                                                                    let _ = content.set_text_gemini(
+                                                                        &uri,
+                                                                        &match meta.to_gstring() {
+                                                                            Ok(url) => gformat!(
+                                                                                "# Redirect\n\nAuto-follow disabled, click on link below to continue\n\n=> {url}"
+                                                                            ),
+                                                                            Err(_) => gformat!(
+                                                                                "# Redirect\n\nProvider request redirect but have not provided any target."
+                                                                            )
+                                                                        }
+                                                                    );
+                                                                },
+                                                                None => content.set_status_failure(
+                                                                    &"Oops",
+                                                                    &"Could not parse redirect meta"
+                                                                ),
+                                                            }
+
+                                                            action_update.activate(Some(&id));
+                                                        },
+                                                    }
+                                                },
+                                                Err(_) => todo!() // ResponseHeader::from_response
+                                            }
+                                        }
+                                        Err(_) => todo!(), // InputStream::read_bytes_async
+                                    },
+                                );
+                            }
+                            Err(_) => todo!(), // OutputStream::write_bytes_async
+                        },
+                    );
+                }
+                Err(_) => todo!(), // SocketClient::connect_to_uri_async
+            },
+        );
     }
 }
