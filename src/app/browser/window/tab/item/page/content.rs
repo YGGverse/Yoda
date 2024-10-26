@@ -7,6 +7,7 @@ use status::Status;
 use text::Text;
 
 use gtk::{
+    gdk_pixbuf::Pixbuf,
     gio::SimpleAction,
     glib::{GString, Uri},
     prelude::{BoxExt, WidgetExt},
@@ -34,10 +35,10 @@ impl Content {
     }
 
     // Actions
-    pub fn set_image(&self) {
+    pub fn set_image(&self, buffer: &Pixbuf) {
         self.clean();
 
-        let image = Image::new();
+        let image = Image::new_from_pixbuf(buffer);
 
         self.gobject.append(image.gobject());
     }

@@ -1,4 +1,4 @@
-use gtk::Picture;
+use gtk::{gdk_pixbuf::Pixbuf, Picture};
 
 pub struct Image {
     gobject: Picture,
@@ -6,9 +6,9 @@ pub struct Image {
 
 impl Image {
     // Construct
-    pub fn new() -> Self {
+    pub fn new_from_pixbuf(buffer: &Pixbuf) -> Self {
         Self {
-            gobject: Picture::new(),
+            gobject: Picture::for_pixbuf(buffer),
         }
     }
 
