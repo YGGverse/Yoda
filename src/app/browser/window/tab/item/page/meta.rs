@@ -1,24 +1,21 @@
 use gtk::glib::GString;
 
 pub enum Status {
-    // SensitiveInput,
-    // Complete,
+    Complete,
     Failure,
     Input,
     Connecting,
     Connected,
-    // ProxyNegotiated,
-    // ProxyNegotiating,
+    ProxyNegotiated,
+    ProxyNegotiating,
     Redirect,
     Reload,
-    // Request,
-    // Resolved,
-    // Resolving,
-    // Response,
+    Resolved,
+    Resolving,
     Success,
-    // TlsHandshaked,
-    // TlsHandshaking,
-} // @TODO
+    TlsHandshaked,
+    TlsHandshaking,
+}
 
 pub struct Meta {
     pub title: Option<GString>,

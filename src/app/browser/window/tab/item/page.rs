@@ -15,7 +15,10 @@ use meta::{Meta, Status};
 
 use gtk::{
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SimpleAction, SocketClient, SocketProtocol, TlsCertificateFlags},
+    gio::{
+        Cancellable, SimpleAction, SocketClient, SocketClientEvent, SocketProtocol,
+        TlsCertificateFlags,
+    },
     glib::{
         gformat, uuid_string_random, Bytes, GString, Priority, Regex, RegexCompileFlags,
         RegexMatchFlags, Uri, UriFlags,
@@ -315,9 +318,15 @@ impl Page {
         // Interpret status to progress fraction
         match self.meta.borrow().status {
             Some(Status::Reload) => Some(0.0),
-            Some(Status::Connecting) => Some(0.25),
-            Some(Status::Connected) => Some(0.50),
-            // Some(Status::Response) => Some(0.75),
+            Some(Status::Resolving) => Some(0.1),
+            Some(Status::Resolved) => Some(0.2),
+            Some(Status::Connecting) => Some(0.3),
+            Some(Status::Connected) => Some(0.4),
+            Some(Status::ProxyNegotiating) => Some(0.5),
+            Some(Status::ProxyNegotiated) => Some(0.6),
+            Some(Status::TlsHandshaking) => Some(0.7),
+            Some(Status::TlsHandshaked) => Some(0.8),
+            Some(Status::Complete) => Some(0.9),
             Some(Status::Failure | Status::Redirect | Status::Success | Status::Input) => Some(1.0),
             _ => None,
         }
@@ -364,13 +373,13 @@ impl Page {
         };
 
         // Init shared objects (async)
-        let id = self.id.to_variant();
-        let navigation = self.navigation.clone();
-        let content = self.content.clone();
-        let input = self.input.clone();
-        let meta = self.meta.clone();
         let action_page_open = self.action_page_open.clone();
         let action_update = self.action_update.clone();
+        let content = self.content.clone();
+        let id = self.id.to_variant();
+        let input = self.input.clone();
+        let meta = self.meta.clone();
+        let navigation = self.navigation.clone();
         let url = uri.clone().to_str();
 
         // Init socket
@@ -380,16 +389,35 @@ impl Page {
         client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
         client.set_tls(true);
 
+        // Listen for connection status updates
+        client.connect_event({
+            let action_update = action_update.clone();
+            let id = id.clone();
+            let meta = meta.clone();
+            move |_, event, _, _| {
+                meta.borrow_mut().status = Some(match event {
+                    SocketClientEvent::Resolving => Status::Resolving,
+                    SocketClientEvent::Resolved => Status::Resolved,
+                    SocketClientEvent::Connecting => Status::Connecting,
+                    SocketClientEvent::Connected => Status::Connected,
+                    SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
+                    SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
+                    SocketClientEvent::TlsHandshaking => Status::TlsHandshaking,
+                    SocketClientEvent::TlsHandshaked => Status::TlsHandshaked,
+                    SocketClientEvent::Complete => Status::Complete,
+                    _ => todo!(), // notice on API change
+                });
+                action_update.activate(Some(&id));
+            }
+        });
+
         // Create connection
-        client.connect_to_uri_async(
+        client.clone().connect_to_uri_async(
             url.clone().as_str(),
             1965,
             None::<&Cancellable>,
             move |connect| match connect {
                 Ok(connection) => {
-                    // Listen for status updates
-                    // @TODO
-
                     // Send request
                     connection.output_stream().write_bytes_async(
                         &Bytes::from(gformat!("{url}\r\n").as_bytes()),
@@ -398,7 +426,7 @@ impl Page {
                         move |request| match request {
                             Ok(_) => {
                                 // Read header from response
-                                connection.clone().input_stream().read_bytes_async(
+                                connection.input_stream().read_bytes_async(
                                     1024,
                                     Priority::DEFAULT,
                                     None::<&Cancellable>,
@@ -515,10 +543,8 @@ impl Page {
                                                                     );
                                                                 },
                                                                 Some(
-                                                                    ClientMime::ImagePng |
-                                                                    ClientMime::ImageGif |
-                                                                    ClientMime::ImageJpeg |
-                                                                    ClientMime::ImageWebp
+                                                                    ClientMime::ImagePng  | ClientMime::ImageGif |
+                                                                    ClientMime::ImageJpeg | ClientMime::ImageWebp
                                                                 ) => {
                                                                     match Pixbuf::from_stream(
                                                                         &connection.input_stream(),
