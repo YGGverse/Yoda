@@ -28,18 +28,18 @@ impl Browser {
         // Extras
         profile_path: PathBuf,
         // Actions
-        action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile: Arc<SimpleAction>,
-        action_quit: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
-        action_tab_append: Arc<SimpleAction>,
-        action_tab_close: Arc<SimpleAction>,
-        action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_tab_pin: Arc<SimpleAction>,
+        action_tool_debug: SimpleAction,
+        action_tool_profile: SimpleAction,
+        action_quit: SimpleAction,
+        action_update: SimpleAction,
+        action_tab_append: SimpleAction,
+        action_tab_close: SimpleAction,
+        action_tab_close_all: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_tab_pin: SimpleAction,
     ) -> Browser {
         let window = Arc::new(Window::new(
             action_tool_debug.clone(),
@@ -60,26 +60,26 @@ impl Browser {
         let widget = Arc::new(Widget::new(window.gobject()));
 
         // Assign actions
-        widget.gobject().add_action(action_tool_debug.as_ref());
-        widget.gobject().add_action(action_tool_profile.as_ref());
-        widget.gobject().add_action(action_quit.as_ref());
-        widget.gobject().add_action(action_update.as_ref());
-        widget.gobject().add_action(action_tab_append.as_ref());
-        widget.gobject().add_action(action_tab_close.as_ref());
-        widget.gobject().add_action(action_tab_close_all.as_ref());
+        widget.gobject().add_action(&action_tool_debug);
+        widget.gobject().add_action(&action_tool_profile);
+        widget.gobject().add_action(&action_quit);
+        widget.gobject().add_action(&action_update);
+        widget.gobject().add_action(&action_tab_append);
+        widget.gobject().add_action(&action_tab_close);
+        widget.gobject().add_action(&action_tab_close_all);
         widget
             .gobject()
-            .add_action(action_tab_page_navigation_base.as_ref());
+            .add_action(&action_tab_page_navigation_base);
         widget
             .gobject()
-            .add_action(action_tab_page_navigation_history_back.as_ref());
+            .add_action(&action_tab_page_navigation_history_back);
         widget
             .gobject()
-            .add_action(action_tab_page_navigation_history_forward.as_ref());
+            .add_action(&action_tab_page_navigation_history_forward);
         widget
             .gobject()
-            .add_action(action_tab_page_navigation_reload.as_ref());
-        widget.gobject().add_action(action_tab_pin.as_ref());
+            .add_action(&action_tab_page_navigation_reload);
+        widget.gobject().add_action(&action_tab_pin);
 
         // Init events
         action_tool_debug.connect_activate({

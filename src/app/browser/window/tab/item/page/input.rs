@@ -32,7 +32,7 @@ impl Input {
     // Setters
     pub fn set_new_response(
         &self,
-        action_page_open: Arc<SimpleAction>,
+        action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
@@ -44,7 +44,7 @@ impl Input {
 
     pub fn set_new_sensitive(
         &self,
-        action_page_open: Arc<SimpleAction>,
+        action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,

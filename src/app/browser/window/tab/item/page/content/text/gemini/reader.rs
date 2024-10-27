@@ -33,8 +33,8 @@ impl Reader {
     pub fn new_arc(
         gemtext: &str,
         base: &Uri,
-        action_tab_open: Arc<SimpleAction>,
-        action_page_open: Arc<SimpleAction>,
+        action_tab_open: SimpleAction,
+        action_page_open: SimpleAction,
     ) -> Arc<Self> {
         // Init default values
         let mut title = None;

@@ -10,14 +10,14 @@ use gtk::{
 use std::{cell::RefCell, sync::Arc};
 
 pub struct Base {
-    action_tab_page_navigation_base: Arc<SimpleAction>,
+    action_tab_page_navigation_base: SimpleAction,
     uri: RefCell<Option<Uri>>,
     widget: Arc<Widget>,
 }
 
 impl Base {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_base: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_tab_page_navigation_base: SimpleAction) -> Arc<Self> {
         Arc::new(Self {
             action_tab_page_navigation_base: action_tab_page_navigation_base.clone(),
             uri: RefCell::new(None),

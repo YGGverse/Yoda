@@ -24,14 +24,14 @@ pub struct Response {
 impl Response {
     // Construct
     pub fn new_arc(
-        action_page_open: Arc<SimpleAction>,
+        action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
     ) -> Arc<Self> {
         // Init local actions
-        let action_update = Arc::new(SimpleAction::new(&uuid_string_random(), None));
-        let action_send = Arc::new(SimpleAction::new(&uuid_string_random(), None));
+        let action_update = SimpleAction::new(&uuid_string_random(), None);
+        let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
         let control = Control::new_arc(action_send.clone());

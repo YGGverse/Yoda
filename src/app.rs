@@ -27,7 +27,7 @@ pub struct App {
     profile_database_connection: Arc<RwLock<Connection>>,
     // database: Arc<Database>,
     // Actions
-    // action_update: Arc<SimpleAction>,
+    // action_update: SimpleAction,
     // Components
     // browser: Arc<Browser>,
     // GTK

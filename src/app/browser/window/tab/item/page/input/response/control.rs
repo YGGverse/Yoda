@@ -17,7 +17,7 @@ pub struct Control {
 
 impl Control {
     // Construct
-    pub fn new_arc(action_send: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_send: SimpleAction) -> Arc<Self> {
         // Init components
         let counter = Counter::new_arc();
         let send = Send::new_arc(action_send);

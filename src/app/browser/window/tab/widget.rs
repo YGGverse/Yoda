@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use adw::TabView;
 use gtk::{
     gio::{Icon, SimpleAction, SimpleActionGroup},
@@ -13,10 +11,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(action_tab_append: Arc<SimpleAction>) -> Self {
+    pub fn new(action_tab_append: SimpleAction) -> Self {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
-        action_group.add_action(action_tab_append.as_ref());
+        action_group.add_action(&action_tab_append);
 
         // Init gobject
         let gobject = TabView::new();

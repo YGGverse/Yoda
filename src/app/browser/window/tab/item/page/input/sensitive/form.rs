@@ -13,7 +13,7 @@ pub struct Form {
 impl Form {
     // Construct
     pub fn new_arc(
-        action_send: Arc<SimpleAction>,
+        action_send: SimpleAction,
         title: Option<&str>,
         max_length: Option<i32>,
     ) -> Arc<Self> {

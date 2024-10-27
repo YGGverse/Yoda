@@ -17,17 +17,17 @@ pub struct Menu {
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new_arc(
-        action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile: Arc<SimpleAction>,
-        action_quit: Arc<SimpleAction>,
-        action_tab_append: Arc<SimpleAction>,
-        action_tab_close: Arc<SimpleAction>,
-        action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_tab_pin: Arc<SimpleAction>,
+        action_tool_debug: SimpleAction,
+        action_tool_profile: SimpleAction,
+        action_quit: SimpleAction,
+        action_tab_append: SimpleAction,
+        action_tab_close: SimpleAction,
+        action_tab_close_all: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_tab_pin: SimpleAction,
     ) -> Arc<Self> {
         // Init model
         let model = gio::Menu::new();
@@ -80,7 +80,7 @@ impl Menu {
 }
 
 // Private helpers
-fn detailed_action_name(action: Arc<SimpleAction>) -> GString {
+fn detailed_action_name(action: SimpleAction) -> GString {
     gformat!("win.{}", action.name()) // @TODO find the way to ident parent group
                                       // without application-wide dependencies import
                                       // see also src/app/action.rs

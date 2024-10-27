@@ -23,18 +23,18 @@ impl Window {
     // Construct
     pub fn new(
         // Actions
-        action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile: Arc<SimpleAction>,
-        action_quit: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
-        action_tab_append: Arc<SimpleAction>,
-        action_tab_close: Arc<SimpleAction>,
-        action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_tab_pin: Arc<SimpleAction>,
+        action_tool_debug: SimpleAction,
+        action_tool_profile: SimpleAction,
+        action_quit: SimpleAction,
+        action_update: SimpleAction,
+        action_tab_append: SimpleAction,
+        action_tab_close: SimpleAction,
+        action_tab_close_all: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_tab_pin: SimpleAction,
     ) -> Self {
         // Init components
         let tab = Tab::new_arc(

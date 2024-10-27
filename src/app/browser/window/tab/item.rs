@@ -28,12 +28,12 @@ impl Item {
     pub fn new_arc(
         tab_view: &TabView,
         // Actions
-        action_tab_open: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_open: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_update: SimpleAction,
         // Options
         position: Option<i32>,
         is_pinned: bool,
@@ -128,12 +128,12 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         // Actions
-        action_tab_open: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_open: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_update: SimpleAction,
     ) -> Result<Vec<Arc<Item>>, String> {
         let mut items = Vec::new();
 

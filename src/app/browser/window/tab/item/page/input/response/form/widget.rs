@@ -14,7 +14,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_update: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_update: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = TextView::builder()
             .bottom_margin(MARGIN)

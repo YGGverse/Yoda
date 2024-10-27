@@ -20,13 +20,13 @@ pub struct Sensitive {
 impl Sensitive {
     // Construct
     pub fn new_arc(
-        action_page_open: Arc<SimpleAction>,
+        action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
     ) -> Arc<Self> {
         // Init local actions
-        let action_send = Arc::new(SimpleAction::new(&uuid_string_random(), None));
+        let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
         let form = Form::new_arc(

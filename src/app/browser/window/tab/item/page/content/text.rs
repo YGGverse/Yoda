@@ -8,8 +8,6 @@ use gtk::{
     ScrolledWindow,
 };
 
-use std::sync::Arc;
-
 pub struct Meta {
     title: Option<GString>,
 }
@@ -24,8 +22,8 @@ impl Text {
     pub fn gemini(
         gemtext: &str,
         base: &Uri,
-        action_tab_append: Arc<SimpleAction>,
-        action_page_open: Arc<SimpleAction>,
+        action_tab_append: SimpleAction,
+        action_page_open: SimpleAction,
     ) -> Self {
         // Init components
         let gemini = Gemini::new(gemtext, base, action_tab_append, action_page_open);

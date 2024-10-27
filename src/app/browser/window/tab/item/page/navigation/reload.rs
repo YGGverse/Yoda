@@ -6,13 +6,13 @@ use gtk::{gio::SimpleAction, Button};
 use std::sync::Arc;
 
 pub struct Reload {
-    action_tab_page_navigation_reload: Arc<SimpleAction>,
+    action_tab_page_navigation_reload: SimpleAction,
     widget: Arc<Widget>,
 }
 
 impl Reload {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_reload: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_tab_page_navigation_reload: SimpleAction) -> Arc<Self> {
         Arc::new(Self {
             action_tab_page_navigation_reload: action_tab_page_navigation_reload.clone(),
             widget: Widget::new_arc(action_tab_page_navigation_reload),

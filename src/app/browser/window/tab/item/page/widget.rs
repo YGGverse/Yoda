@@ -16,7 +16,7 @@ impl Widget {
     pub fn new_arc(
         name: &str,
         // Actions
-        action_page_open: Arc<SimpleAction>,
+        action_page_open: SimpleAction,
         // Components
         navigation: &Box,
         content: &Box,
@@ -24,7 +24,7 @@ impl Widget {
     ) -> Arc<Self> {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
-        action_group.add_action(action_page_open.as_ref());
+        action_group.add_action(&action_page_open);
 
         // Init self
         let gobject = Box::builder()

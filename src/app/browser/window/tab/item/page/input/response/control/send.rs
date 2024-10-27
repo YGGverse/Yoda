@@ -11,7 +11,7 @@ pub struct Send {
 
 impl Send {
     // Construct
-    pub fn new_arc(action_send: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_send: SimpleAction) -> Arc<Self> {
         // Init widget
         let widget = Widget::new_arc(action_send);
 

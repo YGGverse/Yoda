@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_send: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_send: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = Button::builder()
             //.css_classes(["accent"])

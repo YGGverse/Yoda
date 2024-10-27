@@ -30,11 +30,11 @@ pub struct Navigation {
 
 impl Navigation {
     pub fn new_arc(
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init components
         let base = Base::new_arc(action_tab_page_navigation_base);

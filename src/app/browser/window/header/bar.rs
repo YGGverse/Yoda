@@ -21,17 +21,17 @@ pub struct Bar {
 impl Bar {
     // Construct
     pub fn new_arc(
-        action_tool_debug: Arc<SimpleAction>,
-        action_tool_profile: Arc<SimpleAction>,
-        action_quit: Arc<SimpleAction>,
-        action_tab_append: Arc<SimpleAction>,
-        action_tab_close: Arc<SimpleAction>,
-        action_tab_close_all: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_tab_pin: Arc<SimpleAction>,
+        action_tool_debug: SimpleAction,
+        action_tool_profile: SimpleAction,
+        action_quit: SimpleAction,
+        action_tab_append: SimpleAction,
+        action_tab_close: SimpleAction,
+        action_tab_close_all: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_tab_pin: SimpleAction,
         view: &TabView,
     ) -> Arc<Self> {
         // Init components

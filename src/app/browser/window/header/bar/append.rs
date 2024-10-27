@@ -11,7 +11,7 @@ pub struct Append {
 
 impl Append {
     // Construct
-    pub fn new_arc(action_tab_append: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_tab_append: SimpleAction) -> Arc<Self> {
         Arc::new(Self {
             widget: Widget::new_arc(action_tab_append),
         })

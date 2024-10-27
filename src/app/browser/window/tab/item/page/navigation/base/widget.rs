@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_base: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_tab_page_navigation_base: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-home-symbolic")

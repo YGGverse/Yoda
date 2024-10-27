@@ -18,13 +18,13 @@ use std::{cell::RefCell, collections::HashMap, sync::Arc};
 // Main
 pub struct Tab {
     // Local actions
-    action_tab_open: Arc<SimpleAction>,
+    action_tab_open: SimpleAction,
     // Global actions
-    action_tab_page_navigation_base: Arc<SimpleAction>,
-    action_tab_page_navigation_history_back: Arc<SimpleAction>,
-    action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-    action_tab_page_navigation_reload: Arc<SimpleAction>,
-    action_update: Arc<SimpleAction>,
+    action_tab_page_navigation_base: SimpleAction,
+    action_tab_page_navigation_history_back: SimpleAction,
+    action_tab_page_navigation_history_forward: SimpleAction,
+    action_tab_page_navigation_reload: SimpleAction,
+    action_update: SimpleAction,
     // Dynamically allocated reference index
     index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
     // GTK
@@ -35,17 +35,15 @@ impl Tab {
     // Construct
     pub fn new_arc(
         // Actions
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init local actions
-        let action_tab_open = Arc::new(SimpleAction::new(
-            &uuid_string_random(),
-            Some(&String::static_variant_type()),
-        ));
+        let action_tab_open =
+            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init empty HashMap index as no tabs appended yet
         let index = Arc::new(RefCell::new(HashMap::new()));

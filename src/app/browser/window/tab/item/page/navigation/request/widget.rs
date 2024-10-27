@@ -30,8 +30,8 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc(
-        action_update: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>, // @TODO local `action_page_open`?
+        action_update: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction, // @TODO local `action_page_open`?
     ) -> Arc<Self> {
         // Init animated progress bar state
         let progress = Arc::new(Progress {

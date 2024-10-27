@@ -23,8 +23,8 @@ impl Gemini {
     pub fn new(
         gemtext: &str,
         base: &Uri,
-        action_tab_open: Arc<SimpleAction>,
-        action_page_open: Arc<SimpleAction>,
+        action_tab_open: SimpleAction,
+        action_page_open: SimpleAction,
     ) -> Self {
         // Init components
         let reader = Reader::new_arc(gemtext, base, action_tab_open, action_page_open);

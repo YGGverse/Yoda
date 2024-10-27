@@ -13,20 +13,17 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
-
-use std::sync::Arc;
-
 pub struct Content {
     // GTK
     gobject: Box,
     // Actions
-    action_tab_open: Arc<SimpleAction>,
-    action_page_open: Arc<SimpleAction>,
+    action_tab_open: SimpleAction,
+    action_page_open: SimpleAction,
 }
 
 impl Content {
     // Construct
-    pub fn new(action_tab_open: Arc<SimpleAction>, action_page_open: Arc<SimpleAction>) -> Self {
+    pub fn new(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Self {
         Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
             action_tab_open,

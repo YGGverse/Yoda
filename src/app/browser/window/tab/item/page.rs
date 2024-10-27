@@ -35,9 +35,9 @@ use std::{cell::RefCell, sync::Arc};
 pub struct Page {
     id: GString,
     // Actions
-    action_page_open: Arc<SimpleAction>,
-    action_tab_page_navigation_reload: Arc<SimpleAction>,
-    action_update: Arc<SimpleAction>,
+    action_page_open: SimpleAction,
+    action_tab_page_navigation_reload: SimpleAction,
+    action_update: SimpleAction,
     // Components
     navigation: Arc<Navigation>,
     content: Arc<Content>,
@@ -52,18 +52,16 @@ impl Page {
     // Construct
     pub fn new_arc(
         id: GString,
-        action_tab_open: Arc<SimpleAction>,
-        action_tab_page_navigation_base: Arc<SimpleAction>,
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
-        action_tab_page_navigation_reload: Arc<SimpleAction>,
-        action_update: Arc<SimpleAction>,
+        action_tab_open: SimpleAction,
+        action_tab_page_navigation_base: SimpleAction,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
+        action_tab_page_navigation_reload: SimpleAction,
+        action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init local actions
-        let action_page_open = Arc::new(SimpleAction::new(
-            &uuid_string_random(),
-            Some(&String::static_variant_type()),
-        ));
+        let action_page_open =
+            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init components
         let content = Arc::new(Content::new(

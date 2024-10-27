@@ -6,13 +6,13 @@ use gtk::{gio::SimpleAction, Button};
 use std::sync::Arc;
 
 pub struct Forward {
-    action_tab_page_navigation_history_forward: Arc<SimpleAction>,
+    action_tab_page_navigation_history_forward: SimpleAction,
     widget: Arc<Widget>,
 }
 
 impl Forward {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_history_forward: Arc<SimpleAction>) -> Arc<Self> {
+    pub fn new_arc(action_tab_page_navigation_history_forward: SimpleAction) -> Arc<Self> {
         // Return activated struct
         Arc::new(Self {
             action_tab_page_navigation_history_forward: action_tab_page_navigation_history_forward

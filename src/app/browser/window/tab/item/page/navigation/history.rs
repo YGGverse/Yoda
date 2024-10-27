@@ -28,8 +28,8 @@ pub struct History {
 impl History {
     // Construct
     pub fn new_arc(
-        action_tab_page_navigation_history_back: Arc<SimpleAction>,
-        action_tab_page_navigation_history_forward: Arc<SimpleAction>,
+        action_tab_page_navigation_history_back: SimpleAction,
+        action_tab_page_navigation_history_forward: SimpleAction,
     ) -> Arc<Self> {
         // init components
         let back = Back::new_arc(action_tab_page_navigation_history_back);
