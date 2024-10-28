@@ -167,9 +167,11 @@ impl Page {
         let id = self.id.to_variant();
 
         // Update
-        self.meta.borrow_mut().status = Some(Status::Reload);
-        self.meta.borrow_mut().title = Some(gformat!("Loading.."));
-        self.meta.borrow_mut().description = None;
+        self.meta.replace(Meta {
+            status: Some(Status::Reload),
+            title: Some(gformat!("Loading..")),
+            description: None,
+        });
 
         self.action_update.activate(Some(&id));
 
@@ -191,9 +193,11 @@ impl Page {
                             .set_status_failure(title.as_str(), description.as_str());
 
                         // Update meta
-                        self.meta.borrow_mut().status = Some(status);
-                        self.meta.borrow_mut().title = Some(title);
-                        self.meta.borrow_mut().description = Some(description);
+                        self.meta.replace(Meta {
+                            status: Some(status),
+                            title: Some(title),
+                            description: Some(description),
+                        });
 
                         // Update window
                         self.action_update.activate(Some(&id));
@@ -473,9 +477,11 @@ impl Page {
                                                     }
 
                                                     // Update meta
-                                                    meta.borrow_mut().status = Some(status);
-                                                    meta.borrow_mut().description = Some(description);
-                                                    meta.borrow_mut().title = Some(title);
+                                                    meta.replace(Meta {
+                                                        status: Some(status),
+                                                        title: Some(title),
+                                                        description: Some(description),
+                                                    });
 
                                                     // Update page
                                                     action_update.activate(Some(&id));
@@ -523,9 +529,11 @@ impl Page {
                                                                             );
 
                                                                             // Update meta
-                                                                            meta.borrow_mut().status = Some(status);
-                                                                            meta.borrow_mut().title = Some(title);
-                                                                            meta.borrow_mut().description = Some(description);
+                                                                            meta.replace(Meta {
+                                                                                status: Some(status),
+                                                                                title: Some(title),
+                                                                                description: Some(description),
+                                                                            });
 
                                                                             // Update window
                                                                             action_update.activate(Some(&id));
@@ -563,9 +571,11 @@ impl Page {
                                                                     content.set_status_failure(title.as_str(), description.as_str());
 
                                                                     // Update meta
-                                                                    meta.borrow_mut().status = Some(status);
-                                                                    meta.borrow_mut().title = Some(title);
-                                                                    meta.borrow_mut().description = Some(description);
+                                                                    meta.replace(Meta {
+                                                                        status: Some(status),
+                                                                        title: Some(title),
+                                                                        description: Some(description),
+                                                                    });
                                                                 }
                                                             }
                                                         },
@@ -584,9 +594,11 @@ impl Page {
                                                             );
 
                                                             // Update meta
-                                                            meta.borrow_mut().status = Some(status);
-                                                            meta.borrow_mut().title = Some(title);
-                                                            meta.borrow_mut().description = Some(description);
+                                                            meta.replace(Meta {
+                                                                status: Some(status),
+                                                                title: Some(title),
+                                                                description: Some(description),
+                                                            });
 
                                                             // Update window
                                                             action_update.activate(Some(&id));
@@ -659,9 +671,11 @@ impl Page {
                                                 .set_status_failure(title.as_str(), description.as_str());
 
                                             // Update meta
-                                            meta.borrow_mut().status = Some(status);
-                                            meta.borrow_mut().title = Some(title);
-                                            meta.borrow_mut().description = Some(description);
+                                            meta.replace(Meta {
+                                                status: Some(status),
+                                                title: Some(title),
+                                                description: Some(description),
+                                            });
 
                                             // Update window
                                             action_update.activate(Some(&id));
@@ -680,9 +694,11 @@ impl Page {
                                     .set_status_failure(title.as_str(), description.as_str());
 
                                 // Update meta
-                                meta.borrow_mut().status = Some(status);
-                                meta.borrow_mut().title = Some(title);
-                                meta.borrow_mut().description = Some(description);
+                                meta.replace(Meta {
+                                    status: Some(status),
+                                    title: Some(title),
+                                    description: Some(description),
+                                });
 
                                 // Update window
                                 action_update.activate(Some(&id));
@@ -701,9 +717,11 @@ impl Page {
                         .set_status_failure(title.as_str(), description.as_str());
 
                     // Update meta
-                    meta.borrow_mut().status = Some(status);
-                    meta.borrow_mut().title = Some(title);
-                    meta.borrow_mut().description = Some(description);
+                    meta.replace(Meta {
+                        status: Some(status),
+                        title: Some(title),
+                        description: Some(description),
+                    });
 
                     // Update window
                     action_update.activate(Some(&id));
