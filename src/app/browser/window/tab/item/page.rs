@@ -428,6 +428,17 @@ impl Page {
                                     move |result| match result
                                     {
                                         Ok(header) => {
+                                            // Add history record
+                                            let request = uri.to_str();
+                                            match navigation.history_current() {
+                                                Some(current) => {
+                                                    if current != request {
+                                                        navigation.history_add(request);
+                                                    }
+                                                }
+                                                None => navigation.history_add(request),
+                                            }
+
                                             // Route by status
                                             match header.status() {
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
@@ -489,18 +500,6 @@ impl Page {
                                                                                 }
                                                                             );
 
-                                                                            // Add new history record
-                                                                            let request = uri.to_str();
-
-                                                                            match navigation.history_current() {
-                                                                                Some(current) => {
-                                                                                    if current != request {
-                                                                                        navigation.history_add(request);
-                                                                                    }
-                                                                                }
-                                                                                None => navigation.history_add(request),
-                                                                            }
-
                                                                             // Update window components
                                                                             action_update.activate(Some(&id));
                                                                         }
@@ -550,17 +549,6 @@ impl Page {
 
                                                                     // Update page content
                                                                     content.set_image(&buffer);
-
-                                                                    // Add history record
-                                                                    let request = uri.to_str();
-                                                                    match navigation.history_current() {
-                                                                        Some(current) => {
-                                                                            if current != request {
-                                                                                navigation.history_add(request);
-                                                                            }
-                                                                        }
-                                                                        None => navigation.history_add(request),
-                                                                    }
 
                                                                     // Update window components
                                                                     action_update.activate(Some(&id));
