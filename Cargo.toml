@@ -1,6 +1,6 @@
 [package]
 name = "Yoda"
-version = "0.7.0"
+version = "0.6.1"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
@@ -17,7 +17,7 @@ features = ["v1_6"]
 
 [dependencies.gemini]
 package = "ggemini"
-version = "0.5.0"
+version = "0.5.1"
 
 [dependencies.gemtext]
 package = "ggemtext"

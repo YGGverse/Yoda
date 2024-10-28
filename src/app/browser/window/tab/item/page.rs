@@ -430,6 +430,7 @@ impl Page {
                                         Ok(header) => {
                                             // Route by status
                                             match header.status() {
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
                                                 ClientStatus::Input | ClientStatus::SensitiveInput => {
                                                     // Format response
                                                     let status = Status::Input;
@@ -604,7 +605,11 @@ impl Page {
                                                         },
                                                     }
                                                 },
-                                                ClientStatus::Redirect => {
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+                                                ClientStatus::Redirect | ClientStatus::PermanentRedirect => {
+
+                                                    // @TODO ClientStatus::TemporaryRedirect
+
                                                     // Update meta
                                                     meta.borrow_mut().status = Some(Status::Redirect);
                                                     meta.borrow_mut().title = Some(gformat!("Redirect"));
@@ -616,10 +621,10 @@ impl Page {
                                                                 &uri,
                                                                 &match meta.to_gstring() {
                                                                     Ok(url) => gformat!(
-                                                                        "# Redirect\n\nAuto-follow disabled, click on link below to continue\n\n=> {url}"
+                                                                        "# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {url}"
                                                                     ),
                                                                     Err(_) => gformat!(
-                                                                        "# Redirect\n\nProvider request redirect but have not provided any target."
+                                                                        "# Redirect\n\nProvider request redirect but not provided any target."
                                                                     )
                                                                 }
                                                             );
