@@ -190,7 +190,7 @@ impl Page {
 
                         // Update widget
                         self.content
-                            .set_status_failure(title.as_str(), description.as_str());
+                            .set_status_failure(Some(title.as_str()), Some(description.as_str()));
 
                         // Update meta
                         self.meta.replace(Meta {
@@ -523,8 +523,8 @@ impl Page {
 
                                                                             // Update widget
                                                                             content.set_status_failure(
-                                                                                title.as_str(),
-                                                                                description.as_str(),
+                                                                                Some(title.as_str()),
+                                                                                Some(description.as_str())
                                                                             );
 
                                                                             // Update meta
@@ -545,6 +545,16 @@ impl Page {
                                                             ClientMime::ImagePng  | ClientMime::ImageGif |
                                                             ClientMime::ImageJpeg | ClientMime::ImageWebp
                                                         ) => {
+                                                            // Init loading placeholder
+                                                            /* @TODO count bytes on download
+                                                            let title = gformat!("Loading..");
+                                                            let description = gformat!(""); // collect totals here, invisible on start
+
+                                                            content.set_status_loading(
+                                                                Some(&title),
+                                                                Some(&description)
+                                                            ); */
+
                                                             match Pixbuf::from_stream( // @TODO async
                                                                 &connection.input_stream(),
                                                                 None::<&Cancellable>,
@@ -567,7 +577,10 @@ impl Page {
                                                                     let description = gformat!("{}", reason.message());
 
                                                                     // Update widget
-                                                                    content.set_status_failure(title.as_str(), description.as_str());
+                                                                    content.set_status_failure(
+                                                                        Some(title.as_str()),
+                                                                        Some(description.as_str())
+                                                                    );
 
                                                                     // Update meta
                                                                     meta.replace(Meta {
@@ -601,8 +614,8 @@ impl Page {
 
                                                             // Update widget
                                                             content.set_status_failure(
-                                                                title.as_str(),
-                                                                description.as_str(),
+                                                                Some(title.as_str()),
+                                                                Some(description.as_str()),
                                                             );
 
                                                             // Update meta
@@ -642,8 +655,8 @@ impl Page {
                                                             );
                                                         },
                                                         None => content.set_status_failure(
-                                                            &"Oops",
-                                                            &"Could not parse redirect meta"
+                                                            Some(&"Oops"),
+                                                            Some(&"Could not parse redirect meta")
                                                         ),
                                                     }
 
@@ -679,8 +692,10 @@ impl Page {
                                             };
 
                                             // Update widget
-                                            content
-                                                .set_status_failure(title.as_str(), description.as_str());
+                                            content.set_status_failure(
+                                                Some(title.as_str()),
+                                                Some(description.as_str())
+                                            );
 
                                             // Update meta
                                             meta.replace(Meta {
@@ -702,8 +717,10 @@ impl Page {
                                 let description = gformat!("Request error: {}", reason.message());
 
                                 // Update widget
-                                content
-                                    .set_status_failure(title.as_str(), description.as_str());
+                                content.set_status_failure(
+                                    Some(title.as_str()),
+                                    Some(description.as_str())
+                                );
 
                                 // Update meta
                                 meta.replace(Meta {
@@ -725,8 +742,10 @@ impl Page {
                     let description = gformat!("Connection error: {}", reason.message());
 
                     // Update widget
-                    content
-                        .set_status_failure(title.as_str(), description.as_str());
+                    content.set_status_failure(
+                        Some(title.as_str()),
+                        Some(description.as_str())
+                    );
 
                     // Update meta
                     meta.replace(Meta {

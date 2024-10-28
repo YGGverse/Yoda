@@ -40,10 +40,10 @@ impl Content {
         self.gobject.append(image.gobject());
     }
 
-    pub fn set_status_failure(&self, title: &str, description: &str) {
+    pub fn set_status_failure(&self, title: Option<&str>, description: Option<&str>) {
         self.clean();
 
-        let status_default = Status::new_error(title, description);
+        let status_default = Status::new_failure(title, description);
 
         self.gobject.append(status_default.gobject());
     }

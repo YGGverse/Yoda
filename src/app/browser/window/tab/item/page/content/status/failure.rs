@@ -1,15 +1,20 @@
+mod widget;
+use widget::Widget;
+
 use adw::StatusPage;
 
 pub struct Failure {
-    // nothing yet..
+    widget: Widget,
 }
 
 impl Failure {
-    pub fn new(title: &str, description: &str) -> StatusPage {
-        StatusPage::builder()
-            .description(description)
-            .icon_name("dialog-error-symbolic")
-            .title(title)
-            .build()
+    pub fn new(title: Option<&str>, description: Option<&str>) -> Self {
+        Self {
+            widget: Widget::new(title, description),
+        }
+    }
+
+    pub fn gobject(&self) -> &StatusPage {
+        &self.widget.gobject()
     }
 }
