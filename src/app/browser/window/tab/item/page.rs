@@ -363,7 +363,7 @@ impl Page {
         // Use local namespaces
         use gemini::client::response::{
             body::Error as BodyError,
-            header::{Mime as ClientMime, Status as ClientStatus},
+            header::{Error as HeaderError, Mime as ClientMime, Status as ClientStatus},
             Body, Header,
         };
 
@@ -634,15 +634,87 @@ impl Page {
                                                 },
                                             }
                                         },
-                                        Err(_) => todo!() // ResponseHeader::from_response
+                                        Err((reason, message)) => {
+                                            // Define common data
+                                            let status = Status::Failure;
+                                            let title = gformat!("Oops");
+                                            let description = match reason {
+                                                HeaderError::Buffer => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Buffer error")
+                                                },
+                                                HeaderError::InputStream => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Input stream reading error")
+                                                },
+                                                HeaderError::Protocol => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect protocol")
+                                                },
+                                                HeaderError::StatusDecode => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Could not detect status code")
+                                                },
+                                                HeaderError::StatusUndefined => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Undefined status code")
+                                                },
+                                            };
+
+                                            // Update widget
+                                            content
+                                                .set_status_failure(title.as_str(), description.as_str());
+
+                                            // Update meta
+                                            meta.borrow_mut().status = Some(status);
+                                            meta.borrow_mut().title = Some(title);
+                                            meta.borrow_mut().description = Some(description);
+
+                                            // Update window
+                                            action_update.activate(Some(&id));
+                                        } // Header::from_socket_connection_async
                                     }
                                 );
                             }
-                            Err(_) => todo!(), // OutputStream::write_bytes_async
+                            Err(reason) => {
+                                // Define common data
+                                let status = Status::Failure;
+                                let title = gformat!("Oops");
+                                let description = gformat!("Request error: {}", reason.message());
+
+                                // Update widget
+                                content
+                                    .set_status_failure(title.as_str(), description.as_str());
+
+                                // Update meta
+                                meta.borrow_mut().status = Some(status);
+                                meta.borrow_mut().title = Some(title);
+                                meta.borrow_mut().description = Some(description);
+
+                                // Update window
+                                action_update.activate(Some(&id));
+                            }, // OutputStream::write_bytes_async
                         },
                     );
                 }
-                Err(_) => todo!(), // SocketClient::connect_to_uri_async
+                Err(reason) => {
+                    // Define common data
+                    let status = Status::Failure;
+                    let title = gformat!("Oops");
+                    let description = gformat!("Connection error: {}", reason.message());
+
+                    // Update widget
+                    content
+                        .set_status_failure(title.as_str(), description.as_str());
+
+                    // Update meta
+                    meta.borrow_mut().status = Some(status);
+                    meta.borrow_mut().title = Some(title);
+                    meta.borrow_mut().description = Some(description);
+
+                    // Update window
+                    action_update.activate(Some(&id));
+                }, // SocketClient::connect_to_uri_async
             },
         );
     }
