@@ -545,7 +545,7 @@ impl Page {
                                                             ClientMime::ImagePng  | ClientMime::ImageGif |
                                                             ClientMime::ImageJpeg | ClientMime::ImageWebp
                                                         ) => {
-                                                            match Pixbuf::from_stream(
+                                                            match Pixbuf::from_stream( // @TODO async
                                                                 &connection.input_stream(),
                                                                 None::<&Cancellable>,
                                                             ) {
@@ -578,7 +578,20 @@ impl Page {
                                                                 }
                                                             }
                                                         },
-                                                        // @TODO stream extensions
+                                                        /* @TODO stream or download
+                                                        Some(
+                                                            ClientMime::AudioFlac | ClientMime::AudioMpeg | ClientMime::AudioOgg
+                                                        ) => {
+                                                            // Update page meta
+                                                            meta.borrow_mut().status = Some(Status::Success);
+                                                            meta.borrow_mut().title = Some(gformat!("Stream"));
+
+                                                            // Update page content
+                                                            // content.set_stream();
+
+                                                            // Update window components
+                                                            action_update.activate(Some(&id));
+                                                        }, */
                                                         _ => {
                                                             // Define common data
                                                             let status = Status::Failure;
