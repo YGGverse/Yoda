@@ -170,7 +170,7 @@ impl Page {
         self.meta.replace(Meta {
             status: Some(Status::Reload),
             title: Some(gformat!("Loading..")),
-            description: None,
+            //description: None,
         });
 
         self.action_update.activate(Some(&id));
@@ -196,7 +196,7 @@ impl Page {
                         self.meta.replace(Meta {
                             status: Some(status),
                             title: Some(title),
-                            description: Some(description),
+                            //description: Some(description),
                         });
 
                         // Update window
@@ -479,7 +479,7 @@ impl Page {
                                                     meta.replace(Meta {
                                                         status: Some(status),
                                                         title: Some(title),
-                                                        description: Some(description),
+                                                        //description: Some(description),
                                                     });
 
                                                     // Update page
@@ -531,7 +531,7 @@ impl Page {
                                                                             meta.replace(Meta {
                                                                                 status: Some(status),
                                                                                 title: Some(title),
-                                                                                description: Some(description),
+                                                                                //description: Some(description),
                                                                             });
 
                                                                             // Update window
@@ -573,7 +573,7 @@ impl Page {
                                                                     meta.replace(Meta {
                                                                         status: Some(status),
                                                                         title: Some(title),
-                                                                        description: Some(description),
+                                                                        //description: Some(description),
                                                                     });
                                                                 }
                                                             }
@@ -596,7 +596,7 @@ impl Page {
                                                             meta.replace(Meta {
                                                                 status: Some(status),
                                                                 title: Some(title),
-                                                                description: Some(description),
+                                                                //description: Some(description),
                                                             });
 
                                                             // Update window
@@ -673,7 +673,7 @@ impl Page {
                                             meta.replace(Meta {
                                                 status: Some(status),
                                                 title: Some(title),
-                                                description: Some(description),
+                                                //description: Some(description),
                                             });
 
                                             // Update window
@@ -696,7 +696,7 @@ impl Page {
                                 meta.replace(Meta {
                                     status: Some(status),
                                     title: Some(title),
-                                    description: Some(description),
+                                    //description: Some(description),
                                 });
 
                                 // Update window
@@ -719,7 +719,7 @@ impl Page {
                     meta.replace(Meta {
                         status: Some(status),
                         title: Some(title),
-                        description: Some(description),
+                        //description: Some(description),
                     });
 
                     // Update window
