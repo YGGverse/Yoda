@@ -381,6 +381,16 @@ impl Page {
         let navigation = self.navigation.clone();
         let url = uri.clone().to_str();
 
+        // Add history record
+        match navigation.history_current() {
+            Some(current) => {
+                if current != url {
+                    navigation.history_add(url.clone());
+                }
+            }
+            None => navigation.history_add(url.clone()),
+        }
+
         // Init socket
         let client = SocketClient::new();
 
@@ -432,17 +442,6 @@ impl Page {
                                     move |result| match result
                                     {
                                         Ok(header) => {
-                                            // Add history record
-                                            let request = uri.to_str();
-                                            match navigation.history_current() {
-                                                Some(current) => {
-                                                    if current != request {
-                                                        navigation.history_add(request);
-                                                    }
-                                                }
-                                                None => navigation.history_add(request),
-                                            }
-
                                             // Route by status
                                             match header.status() {
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
