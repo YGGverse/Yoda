@@ -508,14 +508,12 @@ impl Page {
                                                                             let status = Status::Failure;
                                                                             let title = gformat!("Oops");
                                                                             let description = match reason {
-                                                                                BodyError::InputStream => match message {
+                                                                                BodyError::InputStreamRead => match message {
                                                                                     Some(error) => gformat!("{error}"),
                                                                                     None => gformat!("Undefined connection error")
                                                                                 } ,
-                                                                                BodyError::Overflow => gformat!("Buffer overflow"),
-                                                                                BodyError::Buffer => todo!(),
-                                                                                BodyError::Decode => todo!(),
-                                                                                BodyError::Format => todo!(),
+                                                                                BodyError::BufferOverflow => gformat!("Buffer overflow"),
+                                                                                BodyError::Decode => gformat!("Buffer decode error"),
                                                                             };
 
                                                                             // Update widget
