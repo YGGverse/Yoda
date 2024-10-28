@@ -48,6 +48,14 @@ impl Content {
         self.gobject.append(status_default.gobject());
     }
 
+    pub fn set_status_loading(&self, title: Option<&str>, description: Option<&str>) {
+        self.clean();
+
+        let status_default = Status::new_loading(title, description);
+
+        self.gobject.append(status_default.gobject());
+    }
+
     pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Option<GString> {
         self.clean();
 
