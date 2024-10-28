@@ -662,7 +662,7 @@ impl Page {
                                                 },
                                                 HeaderError::StatusUndefined => match message {
                                                     Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Undefined status code")
+                                                    None => gformat!("Status code yet not supported")
                                                 },
                                             };
 
