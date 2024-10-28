@@ -10,7 +10,7 @@ pub struct Widget {
 impl Widget {
     // Constructors
 
-    /// Create new default widget configuration
+    /// Create new default widget configuration with options
     pub fn new(title: Option<&str>, description: Option<&str>) -> Self {
         let gobject = StatusPage::builder()
             .child(
