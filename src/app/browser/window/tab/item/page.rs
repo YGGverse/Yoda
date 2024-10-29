@@ -558,7 +558,7 @@ impl Page {
                                                                 None::<Cancellable>,
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                                                0xA00000, // 10M bytes max to prevent memory overflow if server play with promises @TODO optional?
+                                                                0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
                                                                 move |(_, total)| {
                                                                     // Update loading progress
                                                                     status.set_description(
