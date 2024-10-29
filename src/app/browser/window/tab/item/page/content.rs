@@ -48,6 +48,7 @@ impl Content {
         self.gobject.append(status_default.gobject());
     }
 
+    /// Loading placeholder
     pub fn set_status_loading(&self, title: Option<&str>, description: Option<&str>) {
         self.clean();
 
@@ -56,7 +57,18 @@ impl Content {
         self.gobject.append(status_default.gobject());
     }
 
-    /// Return gemtext match header `GString` on parsed, `None` otherwise
+    /// Default reading widget for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi),
+    /// removes previous children widget.
+    ///
+    /// **Arguments**
+    ///
+    /// * `base` - [Uri](https://docs.gtk.org/glib/struct.Uri.html) to resolve relative links in Gemtext
+    /// * `data` - Gemtext source to be parsed
+    ///
+    /// **Return**
+    ///
+    /// `GString` copy of any header found in `data` parsed, `None` otherwise
+    /// * header useful as window, tab title or any other UI related to content loaded
     pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Option<GString> {
         self.clean();
 
@@ -69,7 +81,7 @@ impl Content {
 
         self.gobject.append(text_gemini.gobject());
 
-        text_gemini.meta_title().clone() // @TODO
+        text_gemini.meta_title().clone()
     }
 
     pub fn clean(&self) {
