@@ -545,51 +545,90 @@ impl Page {
                                                             ClientMime::ImagePng  | ClientMime::ImageGif |
                                                             ClientMime::ImageJpeg | ClientMime::ImageWebp
                                                         ) => {
-                                                            // Init loading placeholder
-                                                            /* @TODO count bytes on download
-                                                            let title = gformat!("Loading..");
-                                                            let description = gformat!(""); // collect totals here, invisible on start
-
+                                                            // Final image size unknown, show loading widget
                                                             content.set_status_loading(
-                                                                Some(&title),
-                                                                Some(&description)
-                                                            ); */
+                                                                Some(&gformat!("Loading..")),
+                                                                None
+                                                            );
 
-                                                            match Pixbuf::from_stream( // @TODO async
-                                                                &connection.input_stream(),
-                                                                None::<&Cancellable>,
-                                                            ) {
-                                                                Ok(buffer) => {
-                                                                    // Update page meta
-                                                                    meta.borrow_mut().status = Some(Status::Success);
-                                                                    meta.borrow_mut().title = Some(gformat!("Image"));
+                                                            // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
+                                                            // this action allows to count the bytes for loading widget and validate max size for incoming data
+                                                            gemini::gio::memory_input_stream::from_socket_connection_async(
+                                                                connection.clone(),
+                                                                None::<Cancellable>,
+                                                                Priority::DEFAULT,
+                                                                0x400, // 1024 bytes per chunk, optional step for images download tracking
+                                                                0xA00000, // 10M bytes max to prevent memory overflow if server play with promises @TODO optional?
+                                                                move |(_, total)| {
+                                                                    println!("{total}");
+                                                                    // Update loading progress
+                                                                    // description = gformat!("{total}");
+                                                                },
+                                                                move |result| match result {
+                                                                    Ok(memory_input_stream) => {
+                                                                        match Pixbuf::from_stream( // @TODO async
+                                                                            &memory_input_stream,
+                                                                            None::<&Cancellable>,
+                                                                        ) {
+                                                                            Ok(buffer) => {
+                                                                                // Update page meta
+                                                                                meta.borrow_mut().status = Some(Status::Success);
+                                                                                meta.borrow_mut().title = Some(gformat!("Image"));
 
-                                                                    // Update page content
-                                                                    content.set_image(&buffer);
+                                                                                // Update page content
+                                                                                content.set_image(&buffer);
 
-                                                                    // Update window components
-                                                                    action_update.activate(Some(&id));
-                                                                }
-                                                                Err(reason) => { // Pixbuf::from_stream
-                                                                    // Define common data
-                                                                    let status = Status::Failure;
-                                                                    let title = gformat!("Oops");
-                                                                    let description = gformat!("{}", reason.message());
+                                                                                // Update window components
+                                                                                action_update.activate(Some(&id));
+                                                                            }
+                                                                            Err(reason) => { // Pixbuf::from_stream
+                                                                                // Define common data
+                                                                                let status = Status::Failure;
+                                                                                let title = gformat!("Oops");
+                                                                                let description = gformat!("{}", reason.message());
 
-                                                                    // Update widget
-                                                                    content.set_status_failure(
-                                                                        Some(title.as_str()),
-                                                                        Some(description.as_str())
-                                                                    );
+                                                                                // Update widget
+                                                                                content.set_status_failure(
+                                                                                    Some(title.as_str()),
+                                                                                    Some(description.as_str())
+                                                                                );
 
-                                                                    // Update meta
-                                                                    meta.replace(Meta {
-                                                                        status: Some(status),
-                                                                        title: Some(title),
-                                                                        //description: Some(description),
-                                                                    });
-                                                                }
-                                                            }
+                                                                                // Update meta
+                                                                                meta.replace(Meta {
+                                                                                    status: Some(status),
+                                                                                    title: Some(title),
+                                                                                    //description: Some(description),
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    Err((error, reason)) => {
+                                                                        // Define common data
+                                                                        let status = Status::Failure;
+                                                                        let title = gformat!("Oops");
+                                                                        let description = match reason {
+                                                                            Some(message) => gformat!("{message}"),
+                                                                            None => match error {
+                                                                                gemini::gio::memory_input_stream::Error::BytesTotal => gformat!("Allowed size reached"),
+                                                                                gemini::gio::memory_input_stream::Error::InputStream => gformat!("Input stream error"),
+                                                                            },
+                                                                        };
+
+                                                                        // Update widget
+                                                                        content.set_status_failure(
+                                                                            Some(title.as_str()),
+                                                                            Some(description.as_str())
+                                                                        );
+
+                                                                        // Update meta
+                                                                        meta.replace(Meta {
+                                                                            status: Some(status),
+                                                                            title: Some(title),
+                                                                            //description: Some(description),
+                                                                        });
+                                                                    }
+                                                                },
+                                                            );
                                                         },
                                                         /* @TODO stream or download
                                                         Some(
