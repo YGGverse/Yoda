@@ -56,6 +56,7 @@ impl Content {
         self.gobject.append(status_default.gobject());
     }
 
+    /// Return gemtext match header `GString` on parsed, `None` otherwise
     pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Option<GString> {
         self.clean();
 
