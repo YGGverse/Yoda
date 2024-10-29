@@ -575,7 +575,12 @@ impl Page {
                                                                                     Ok(buffer) => {
                                                                                         // Update page meta
                                                                                         meta.borrow_mut().status = Some(Status::Success);
-                                                                                        meta.borrow_mut().title = Some(gformat!("Image"));
+                                                                                        meta.borrow_mut().title = Some(
+                                                                                            match url.split('/').last() {
+                                                                                                Some(filename) => gformat!("{filename}"),
+                                                                                                None => gformat!("Image")
+                                                                                            }
+                                                                                        );
 
                                                                                         // Update page content
                                                                                         content.set_image(&buffer);
