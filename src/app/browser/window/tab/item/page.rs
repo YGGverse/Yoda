@@ -547,7 +547,7 @@ impl Page {
                                                         ) => {
                                                             // Final image size unknown, show loading widget
                                                             let status = content.set_status_loading(
-                                                                Some(&gformat!("Loading..")),
+                                                                Some(&"Loading.."),
                                                                 None
                                                             );
 
