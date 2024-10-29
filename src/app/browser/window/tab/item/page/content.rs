@@ -58,7 +58,7 @@ impl Content {
     }
 
     /// Default reading widget for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi),
-    /// removes previous children widget.
+    /// removes previous children component.
     ///
     /// **Arguments**
     ///
