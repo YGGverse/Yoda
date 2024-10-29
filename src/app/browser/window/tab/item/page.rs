@@ -559,48 +559,50 @@ impl Page {
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
                                                                 0xA00000, // 10M bytes max to prevent memory overflow if server play with promises @TODO optional?
-                                                                move |(_, total)| {
-                                                                    println!("{total}");
+                                                                move |(_, _total)| {
                                                                     // Update loading progress
                                                                     // description = gformat!("{total}");
                                                                 },
                                                                 move |result| match result {
                                                                     Ok(memory_input_stream) => {
-                                                                        match Pixbuf::from_stream( // @TODO async
+                                                                        Pixbuf::from_stream_async(
                                                                             &memory_input_stream,
                                                                             None::<&Cancellable>,
-                                                                        ) {
-                                                                            Ok(buffer) => {
-                                                                                // Update page meta
-                                                                                meta.borrow_mut().status = Some(Status::Success);
-                                                                                meta.borrow_mut().title = Some(gformat!("Image"));
+                                                                            move |result| {
+                                                                                match result {
+                                                                                    Ok(buffer) => {
+                                                                                        // Update page meta
+                                                                                        meta.borrow_mut().status = Some(Status::Success);
+                                                                                        meta.borrow_mut().title = Some(gformat!("Image"));
 
-                                                                                // Update page content
-                                                                                content.set_image(&buffer);
+                                                                                        // Update page content
+                                                                                        content.set_image(&buffer);
 
-                                                                                // Update window components
-                                                                                action_update.activate(Some(&id));
+                                                                                        // Update window components
+                                                                                        action_update.activate(Some(&id));
+                                                                                    }
+                                                                                    Err(reason) => { // Pixbuf::from_stream
+                                                                                        // Define common data
+                                                                                        let status = Status::Failure;
+                                                                                        let title = gformat!("Oops");
+                                                                                        let description = gformat!("{}", reason.message());
+
+                                                                                        // Update widget
+                                                                                        content.set_status_failure(
+                                                                                            Some(title.as_str()),
+                                                                                            Some(description.as_str())
+                                                                                        );
+
+                                                                                        // Update meta
+                                                                                        meta.replace(Meta {
+                                                                                            status: Some(status),
+                                                                                            title: Some(title),
+                                                                                            //description: Some(description),
+                                                                                        });
+                                                                                    }
+                                                                                }
                                                                             }
-                                                                            Err(reason) => { // Pixbuf::from_stream
-                                                                                // Define common data
-                                                                                let status = Status::Failure;
-                                                                                let title = gformat!("Oops");
-                                                                                let description = gformat!("{}", reason.message());
-
-                                                                                // Update widget
-                                                                                content.set_status_failure(
-                                                                                    Some(title.as_str()),
-                                                                                    Some(description.as_str())
-                                                                                );
-
-                                                                                // Update meta
-                                                                                meta.replace(Meta {
-                                                                                    status: Some(status),
-                                                                                    title: Some(title),
-                                                                                    //description: Some(description),
-                                                                                });
-                                                                            }
-                                                                        }
+                                                                        );
                                                                     },
                                                                     Err((error, reason)) => {
                                                                         // Define common data
