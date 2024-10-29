@@ -34,27 +34,23 @@ impl Content {
     // Actions
     pub fn set_image(&self, buffer: &Pixbuf) {
         self.clean();
-
         let image = Image::new_from_pixbuf(buffer);
-
         self.gobject.append(image.gobject());
     }
 
-    pub fn set_status_failure(&self, title: Option<&str>, description: Option<&str>) {
+    pub fn set_status_failure(&self, title: Option<&str>, description: Option<&str>) -> Status {
         self.clean();
-
-        let status_default = Status::new_failure(title, description);
-
-        self.gobject.append(status_default.gobject());
+        let status = Status::new_failure(title, description);
+        self.gobject.append(status.gobject());
+        status
     }
 
     /// Loading placeholder
-    pub fn set_status_loading(&self, title: Option<&str>, description: Option<&str>) {
+    pub fn set_status_loading(&self, title: Option<&str>, description: Option<&str>) -> Status {
         self.clean();
-
-        let status_default = Status::new_loading(title, description);
-
-        self.gobject.append(status_default.gobject());
+        let status = Status::new_loading(title, description);
+        self.gobject.append(status.gobject());
+        status
     }
 
     /// Default reading widget for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi),

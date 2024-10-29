@@ -13,20 +13,31 @@ pub struct Status {
 impl Status {
     // Constructors
 
-    /// Create new default failure component
+    /// Create new failure preset
+    ///
+    /// Useful as placeholder widget for error handlers
     pub fn new_failure(title: Option<&str>, description: Option<&str>) -> Self {
         Self {
             gobject: Failure::new(title, description).gobject().clone(),
         }
     }
 
-    /// Create new default loading component
+    /// Create new loading preset
     ///
-    /// Useful as the placeholder widget for async operations
+    /// Useful as placeholder widget for async operations
     pub fn new_loading(title: Option<&str>, description: Option<&str>) -> Self {
         Self {
             gobject: Loading::new(title, description).gobject().clone(),
         }
+    }
+
+    // Setters
+
+    /// Set new description for status component
+    ///
+    /// Useful for loading widgets to update byte totals and other dynamically changed information
+    pub fn set_description(&self, description: Option<&str>) {
+        self.gobject.set_description(description);
     }
 
     // Getters

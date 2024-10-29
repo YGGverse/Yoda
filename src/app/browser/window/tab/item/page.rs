@@ -457,7 +457,7 @@ impl Page {
                                                         None => title.clone(),
                                                     };
 
-                                                    // Make input form
+                                                    // Toggle input form variant
                                                     match header.status() {
                                                         ClientStatus::SensitiveInput =>
                                                             input.set_new_sensitive(
@@ -546,7 +546,7 @@ impl Page {
                                                             ClientMime::ImageJpeg | ClientMime::ImageWebp
                                                         ) => {
                                                             // Final image size unknown, show loading widget
-                                                            content.set_status_loading(
+                                                            let status = content.set_status_loading(
                                                                 Some(&gformat!("Loading..")),
                                                                 None
                                                             );
@@ -559,9 +559,11 @@ impl Page {
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
                                                                 0xA00000, // 10M bytes max to prevent memory overflow if server play with promises @TODO optional?
-                                                                move |(_, _total)| {
+                                                                move |(_, total)| {
                                                                     // Update loading progress
-                                                                    // description = gformat!("{total}");
+                                                                    status.set_description(
+                                                                        Some(&gformat!("Download: {total} bytes"))
+                                                                    );
                                                                 },
                                                                 move |result| match result {
                                                                     Ok(memory_input_stream) => {
@@ -695,10 +697,12 @@ impl Page {
                                                                 }
                                                             );
                                                         },
-                                                        None => content.set_status_failure(
-                                                            Some(&"Oops"),
-                                                            Some(&"Could not parse redirect meta")
-                                                        ),
+                                                        None => {
+                                                            content.set_status_failure(
+                                                                Some(&"Oops"),
+                                                                Some(&"Could not parse redirect meta")
+                                                            );
+                                                        },
                                                     }
 
                                                     action_update.activate(Some(&id));
