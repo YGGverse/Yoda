@@ -576,7 +576,7 @@ impl Page {
                                                                                         // Update page meta
                                                                                         meta.borrow_mut().status = Some(Status::Success);
                                                                                         meta.borrow_mut().title = Some(
-                                                                                            match url.split('/').last() {
+                                                                                            match url.split('/').last() { // @TODO may be empty
                                                                                                 Some(filename) => gformat!("{filename}"),
                                                                                                 None => gformat!("Image")
                                                                                             }
