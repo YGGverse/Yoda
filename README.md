@@ -16,6 +16,9 @@ GTK 4 / Libadwaita client written in Rust
 * [x] Hotkeys
 * [ ] Bookmarks
 * [ ] Build-in multimedia support
+  * [x] [Image](#images) viewer
+  * [ ] [Audio](#audio) streams
+  * [ ] [Video](#video) streams
 * [ ] Certificates management
 * [ ] Downloads
 * [ ] History
