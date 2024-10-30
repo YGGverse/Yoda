@@ -489,7 +489,7 @@ impl Page {
                                                                 move |result|{
                                                                     match result {
                                                                         Ok(buffer) => {
-                                                                            //
+                                                                            // Set children component
                                                                             let text_gemini = content.set_text_gemini(
                                                                                 &uri,
                                                                                 &match GString::from_utf8(buffer.to_utf8()) {
