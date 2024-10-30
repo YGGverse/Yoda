@@ -43,8 +43,8 @@ GTK 4 / Libadwaita client written in Rust
       * [x] `10` Input
       * [x] `11` Sensitive input
     * [ ] Redirection
-      * [x] `30` Redirection
-      * [ ] `31` (partial)
+      * [ ] `30` Temporary (partial)
+      * [ ] `31` Permanent (partial)
     * [ ] Temporary failure
     * [ ] Permanent failure
     * [ ] Client certificates
