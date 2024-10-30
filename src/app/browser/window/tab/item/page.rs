@@ -489,15 +489,21 @@ impl Page {
                                                                 move |result|{
                                                                     match result {
                                                                         Ok(buffer) => {
-                                                                            // Update page meta
-                                                                            meta.borrow_mut().status = Some(Status::Success);
-                                                                            meta.borrow_mut().title = content.set_text_gemini(
+                                                                            //
+                                                                            let text_gemini = content.set_text_gemini(
                                                                                 &uri,
                                                                                 &match GString::from_utf8(buffer.to_utf8()) {
                                                                                     Ok(gemtext) => gemtext,
                                                                                     Err(_) => todo!()
                                                                                 }
                                                                             );
+
+                                                                            // Update page meta
+                                                                            meta.borrow_mut().status = Some(Status::Success);
+                                                                            meta.borrow_mut().title = Some(match text_gemini.meta_title() {
+                                                                                Some(title) => title.clone(),
+                                                                                None => uri_to_title(&uri)
+                                                                            });
 
                                                                             // Update window components
                                                                             action_update.activate(Some(&id));
@@ -571,12 +577,7 @@ impl Page {
                                                                                     Ok(buffer) => {
                                                                                         // Update page meta
                                                                                         meta.borrow_mut().status = Some(Status::Success);
-                                                                                        meta.borrow_mut().title = Some(
-                                                                                            match url.split('/').last() { // @TODO may be empty
-                                                                                                Some(filename) => gformat!("{filename}"),
-                                                                                                None => gformat!("Image")
-                                                                                            }
-                                                                                        );
+                                                                                        meta.borrow_mut().title = Some(uri_to_title(&uri));
 
                                                                                         // Update page content
                                                                                         content.set_image(&buffer);
@@ -823,5 +824,22 @@ impl Page {
                 }, // SocketClient::connect_to_uri_async
             },
         );
+    }
+}
+
+// Tools
+
+/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+///
+/// Useful as common placeholder when page title could not be detected
+///
+/// * this feature may be improved and moved outside @TODO
+fn uri_to_title(uri: &Uri) -> GString {
+    match uri.path().split('/').last() {
+        Some(filename) => gformat!("{filename}"),
+        None => match uri.host() {
+            Some(host) => gformat!("{host}"),
+            None => gformat!("Untitled"),
+        },
     }
 }
