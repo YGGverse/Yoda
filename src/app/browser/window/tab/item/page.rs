@@ -29,7 +29,7 @@ use gtk::{
     Box,
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, sync::Arc, time::Duration};
 
 pub struct Page {
     id: GString,
@@ -548,7 +548,8 @@ impl Page {
                                                             // Final image size unknown, show loading widget
                                                             let status = content.set_status_loading(
                                                                 Some(&"Loading.."),
-                                                                None
+                                                                None,
+                                                                Some(Duration::from_secs(1)) // show if download time > 1 second
                                                             );
 
                                                             // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`

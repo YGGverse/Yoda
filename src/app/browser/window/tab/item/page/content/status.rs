@@ -5,6 +5,7 @@ use failure::Failure;
 use loading::Loading;
 
 use adw::StatusPage;
+use std::time::Duration;
 
 pub struct Status {
     gobject: StatusPage,
@@ -25,9 +26,15 @@ impl Status {
     /// Create new loading preset
     ///
     /// Useful as placeholder widget for async operations
-    pub fn new_loading(title: Option<&str>, description: Option<&str>) -> Self {
+    pub fn new_loading(
+        title: Option<&str>,
+        description: Option<&str>,
+        show_with_delay: Option<Duration>,
+    ) -> Self {
         Self {
-            gobject: Loading::new(title, description).gobject().clone(),
+            gobject: Loading::new(title, description, show_with_delay)
+                .gobject()
+                .clone(),
         }
     }
 

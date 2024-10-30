@@ -13,6 +13,8 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
+use std::time::Duration;
+
 pub struct Content {
     // GTK
     gobject: Box,
@@ -46,9 +48,14 @@ impl Content {
     }
 
     /// Loading placeholder
-    pub fn set_status_loading(&self, title: Option<&str>, description: Option<&str>) -> Status {
+    pub fn set_status_loading(
+        &self,
+        title: Option<&str>,
+        description: Option<&str>,
+        show_with_delay: Option<Duration>,
+    ) -> Status {
         self.clean();
-        let status = Status::new_loading(title, description);
+        let status = Status::new_loading(title, description, show_with_delay);
         self.gobject.append(status.gobject());
         status
     }
