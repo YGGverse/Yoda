@@ -64,6 +64,7 @@ GTK 4 / Libadwaita client written in Rust
   * [x] `image/webp`
 
 #### Audio
+  * [ ] `audio/flac`
   * [ ] `audio/mpeg`
   * [ ] `audio/ogg`
 
