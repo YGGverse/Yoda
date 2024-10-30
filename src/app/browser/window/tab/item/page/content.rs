@@ -9,7 +9,7 @@ use text::Text;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::SimpleAction,
-    glib::{GString, Uri},
+    glib::Uri,
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
@@ -25,6 +25,8 @@ pub struct Content {
 
 impl Content {
     // Construct
+
+    /// Create new container for different components
     pub fn new(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Self {
         Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
@@ -34,12 +36,20 @@ impl Content {
     }
 
     // Actions
-    pub fn set_image(&self, buffer: &Pixbuf) {
+
+    /// Set new `content::Image` component for `Self`
+    ///
+    /// * action removes previous children component from `Self`
+    pub fn set_image(&self, buffer: &Pixbuf) -> Image {
         self.clean();
         let image = Image::new_from_pixbuf(buffer);
         self.gobject.append(image.gobject());
+        image
     }
 
+    /// Set new `content::Status` component for `Self` with new `status::Failure` preset
+    ///
+    /// * action removes previous children component from `Self`
     pub fn set_status_failure(&self, title: Option<&str>, description: Option<&str>) -> Status {
         self.clean();
         let status = Status::new_failure(title, description);
@@ -47,7 +57,9 @@ impl Content {
         status
     }
 
-    /// Loading placeholder
+    /// Set new `content::Status` component for `Self` with new `status::Loading` preset
+    ///
+    /// * action removes previous children component from `Self`
     pub fn set_status_loading(
         &self,
         title: Option<&str>,
@@ -60,8 +72,11 @@ impl Content {
         status
     }
 
-    /// Default reading widget for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi),
-    /// removes previous children component.
+    /// Set new `content::Text` component for `Self` with new `text::Gemini` preset
+    ///
+    /// Useful as reader for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi)
+    ///
+    /// * action removes previous children component from `Self`
     ///
     /// **Arguments**
     ///
@@ -70,23 +85,21 @@ impl Content {
     ///
     /// **Return**
     ///
-    /// `GString` copy of any header found in `data` parsed, `None` otherwise
-    /// * header useful as window, tab title or any other UI related to content loaded
-    pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Option<GString> {
+    /// `Text` component with it public API
+    /// * could be useful to extract document title parsed from Gemtext
+    pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-
-        let text_gemini = Text::gemini(
+        let text = Text::gemini(
             data,
             base,
             self.action_tab_open.clone(),
             self.action_page_open.clone(),
         );
-
-        self.gobject.append(text_gemini.gobject());
-
-        text_gemini.meta_title().clone()
+        self.gobject.append(text.gobject());
+        text
     }
 
+    /// Remove all children components from `Self`
     pub fn clean(&self) {
         while let Some(child) = self.gobject.last_child() {
             self.gobject.remove(&child);
@@ -94,6 +107,8 @@ impl Content {
     }
 
     // Getters
+
+    /// Get reference to `Self` gobject
     pub fn gobject(&self) -> &Box {
         &self.gobject
     }
