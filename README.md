@@ -11,7 +11,6 @@ GTK 4 / Libadwaita client written in Rust
 ## Features
 
 ### Interface
-
 * [x] Multi-tab
 * [x] Hotkeys
 * [ ] Bookmarks
@@ -24,14 +23,14 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] History
 * [ ] Proxy
 * [ ] Session
-  * [x] Tabs
-    * [x] Pin status
-    * [x] Page
-      * [ ] Navigation
-        * [x] Request
-        * [ ] History
-  * [x] Window Size
-
+  * [ ] Window
+    * [x] Size
+    * [x] Tabs
+      * [x] Pin status
+      * [x] Page
+        * [ ] Navigation
+          * [x] Request
+          * [ ] History
 * [ ] User settings
 
 ### Protocols
