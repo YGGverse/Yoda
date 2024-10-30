@@ -3,10 +3,11 @@ mod database;
 use database::Database;
 
 use gtk::{
+    gdk::BUTTON_PRIMARY,
     gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, GString, SourceId},
-    prelude::{ActionExt, EditableExt, EntryExt, ToVariant},
-    Entry,
+    prelude::{ActionExt, EditableExt, EntryExt, ToVariant, WidgetExt},
+    Entry, GestureClick,
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, sync::Arc, time::Duration};
@@ -39,11 +40,19 @@ impl Widget {
             source_id: RefCell::new(None),
         });
 
+        // Init additional controllers
+        let primary_button_controller = GestureClick::builder().button(BUTTON_PRIMARY).build();
+
         // Init widget
         let gobject = Entry::builder()
             .placeholder_text(PLACEHOLDER_TEXT)
             .hexpand(true)
             .build();
+
+        gobject
+            .first_child()
+            .unwrap() // text widget should be there
+            .add_controller(primary_button_controller.clone());
 
         // Connect events
         gobject.connect_changed(move |_| {
@@ -52,6 +61,24 @@ impl Widget {
 
         gobject.connect_activate(move |_| {
             action_tab_page_navigation_reload.activate(None);
+        });
+
+        primary_button_controller.connect_pressed({
+            let gobject = gobject.clone();
+            move |_, _, _, _| {
+                let gobject = gobject.clone();
+                // Select entire text on first focus at entry
+                // this behavior implemented in most web-browsers,
+                // to simply overwrite current request with new value
+                if !gobject.first_child().unwrap().has_focus() {
+                    // Small trick to overwrite default GTK behavior
+                    // @TODO find another way to prevent defaults but with timeout
+                    timeout_add_local(Duration::from_millis(100), move || {
+                        gobject.select_region(0, gobject.text_length().into());
+                        ControlFlow::Break
+                    });
+                }
+            }
         });
 
         // Return activated struct
