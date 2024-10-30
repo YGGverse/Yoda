@@ -11,6 +11,7 @@ GTK 4 / Libadwaita client written in Rust
 ## Features
 
 ### Interface
+
 * [x] Multi-tab
 * [x] Hotkeys
 * [ ] Bookmarks
@@ -18,16 +19,17 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] Certificates management
 * [ ] Downloads
 * [ ] History
-* [ ] Proxy configuration
-* [ ] Server info
-* [ ] Session restore
+* [ ] Proxy
+* [ ] Session
   * [x] Tabs
   * [x] Page
     * [ ] Navigation
       * [x] Request
       * [ ] History
-* [ ] Settings
+* [ ] User settings
+
 ### Protocol support
+
 * [x] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
   * [ ] [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
     * [x] Success
@@ -44,7 +46,9 @@ GTK 4 / Libadwaita client written in Rust
     * [ ] Client certificates
   * [ ] Gemfeeds
 * [ ] [Nex](https://nightfall.city/nex/info/specification.txt)
+
 ### Media types
+
 * Text
   * [x] `text/gemini`
   * [x] `text/plain`
