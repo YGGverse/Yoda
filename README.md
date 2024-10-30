@@ -51,18 +51,24 @@ GTK 4 / Libadwaita client written in Rust
 
 ### Media types
 
-* Text
+#### Text
+
   * [x] `text/gemini`
   * [ ] `text/plain`
-* Images
+
+#### Images
+
   * [x] `image/gif`
   * [x] `image/jpeg`
   * [x] `image/png`
   * [x] `image/webp`
-* Audio
+
+#### Audio
+
   * [ ] `audio/mpeg`
   * [ ] `audio/ogg`
-* Video
+
+#### Video
 
 ## Build
 
