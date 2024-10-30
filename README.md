@@ -24,14 +24,13 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] History
 * [ ] Proxy
 * [ ] Session
-  * [ ] Window
-    * [x] Size
-    * [x] Tabs
-      * [x] Pin status
-      * [x] Page
-        * [ ] Navigation
-          * [x] Request
-          * [ ] History
+  * [x] Tabs
+    * [x] Pin status
+    * [x] Page
+      * [ ] Navigation
+        * [x] Request
+        * [ ] History
+  * [x] Window Size
 
 * [ ] User settings
 
