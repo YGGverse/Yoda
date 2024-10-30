@@ -35,7 +35,7 @@ GTK 4 / Libadwaita client written in Rust
 
 ### Protocols
 
-* [x] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
+#### [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
   * [ ] [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
     * [x] Success
       * [x] `20`
@@ -49,7 +49,9 @@ GTK 4 / Libadwaita client written in Rust
     * [ ] Permanent failure
     * [ ] Client certificates
   * [ ] Gemfeeds
-* [ ] [Nex](https://nightfall.city/nex/info/specification.txt)
+
+#### [Nex](https://nightfall.city/nex/info/specification.txt)
+#### Local
 
 ### Media types
 
