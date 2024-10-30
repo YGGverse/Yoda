@@ -50,7 +50,7 @@ GTK 4 / Libadwaita client written in Rust
 
 * Text
   * [x] `text/gemini`
-  * [x] `text/plain`
+  * [ ] `text/plain`
 * Images
   * [x] `image/gif`
   * [x] `image/jpeg`
