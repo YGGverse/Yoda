@@ -10,53 +10,53 @@ GTK 4 / Libadwaita client written in Rust
 
 ## Features
 
-* Interface
-  * [x] Multi-tab
-  * [x] Hotkeys
-  * [ ] Bookmarks
-  * [ ] Build-in multimedia support
-  * [ ] Certificates management
-  * [ ] Downloads
-  * [ ] History
-  * [ ] Proxy configuration
-  * [ ] Server info
-  * [ ] Session restore
-    * [x] Tabs
-    * [x] Page
-      * [ ] Navigation
-        * [x] Request
-        * [ ] History
-  * [ ] Settings
-* Protocols
-  * [x] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
-    * [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
-      * [x] Success
-        * [x] 20
-      * [x] Input
-        * [x] 10 Input
-        * [x] 11 Sensitive input
-      * [ ] Redirection
-        * [x] 30 Redirection
-        * [ ] 31 (partial)
-      * [ ] Failure
-        * [ ] Temporary failure
-        * [ ] Permanent failure
-      * [ ] Client certificates
-    * [ ] Gemfeeds
-  * [ ] [Nex](https://nightfall.city/nex/info/specification.txt)
-* Media types
-  * Text
-    * [x] `text/gemini`
-    * [x] `text/plain`
-  * Images
-    * [x] `image/gif`
-    * [x] `image/jpeg`
-    * [x] `image/png`
-    * [x] `image/webp`
-  * Audio
-    * [ ] `audio/mpeg`
-    * [ ] `audio/ogg`
-  * Video
+### Interface
+* [x] Multi-tab
+* [x] Hotkeys
+* [ ] Bookmarks
+* [ ] Build-in multimedia support
+* [ ] Certificates management
+* [ ] Downloads
+* [ ] History
+* [ ] Proxy configuration
+* [ ] Server info
+* [ ] Session restore
+  * [x] Tabs
+  * [x] Page
+    * [ ] Navigation
+      * [x] Request
+      * [ ] History
+* [ ] Settings
+### Protocols
+* [x] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
+  * [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
+    * [x] Success
+      * [x] 20
+    * [x] Input
+      * [x] 10 Input
+      * [x] 11 Sensitive input
+    * [ ] Redirection
+      * [x] 30 Redirection
+      * [ ] 31 (partial)
+    * [ ] Failure
+      * [ ] Temporary failure
+      * [ ] Permanent failure
+    * [ ] Client certificates
+  * [ ] Gemfeeds
+* [ ] [Nex](https://nightfall.city/nex/info/specification.txt)
+### Media types
+* Text
+  * [x] `text/gemini`
+  * [x] `text/plain`
+* Images
+  * [x] `image/gif`
+  * [x] `image/jpeg`
+  * [x] `image/png`
+  * [x] `image/webp`
+* Audio
+  * [ ] `audio/mpeg`
+  * [ ] `audio/ogg`
+* Video
 
 ## Build
 
