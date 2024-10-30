@@ -26,7 +26,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] Window
     * [x] Size
     * [x] Tabs
-      * [x] Pin status
+      * [x] Pin
       * [x] Page
         * [ ] Navigation
           * [x] Request
