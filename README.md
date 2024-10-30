@@ -27,9 +27,9 @@ GTK 4 / Libadwaita client written in Rust
       * [x] Request
       * [ ] History
 * [ ] Settings
-### Protocols
+### Protocol support
 * [x] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
-  * [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
+  * [ ] [Status codes](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
     * [x] Success
       * [x] 20
     * [x] Input
