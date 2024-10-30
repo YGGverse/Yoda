@@ -555,7 +555,7 @@ impl Page {
                                                             // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
                                                             // this action allows to count the bytes for loading widget and validate max size for incoming data
                                                             gemini::gio::memory_input_stream::from_socket_connection_async(
-                                                                connection.clone(),
+                                                                connection,
                                                                 None::<Cancellable>,
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
