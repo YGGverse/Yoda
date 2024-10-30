@@ -364,12 +364,8 @@ impl Page {
 
     // Private helpers @TODO
     fn load_gemini(&self, uri: Uri) {
-        // Use local namespaces
-        use gemini::client::response::{
-            body::Error as BodyError,
-            header::{Error as HeaderError, Mime as ClientMime, Status as ClientStatus},
-            Body, Header,
-        };
+        // Use local namespaces @TODO
+        // use gemini::client::response::
 
         // Init shared objects (async)
         let action_page_open = self.action_page_open.clone();
@@ -434,32 +430,30 @@ impl Page {
                         None::<&Cancellable>,
                         move |request| match request {
                             Ok(_) => {
-                                // Read header from input stream
-                                Header::from_socket_connection_async(
+                                // Read meta from input stream
+                                gemini::client::response::Meta::from_socket_connection_async(
                                     connection.clone(),
                                     Some(Priority::DEFAULT),
                                     None::<Cancellable>,
                                     move |result| match result
                                     {
-                                        Ok(header) => {
+                                        Ok(response) => {
                                             // Route by status
-                                            match header.status() {
+                                            match response.status() {
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                                                ClientStatus::Input | ClientStatus::SensitiveInput => {
+                                                gemini::client::response::meta::Status::Input |
+                                                gemini::client::response::meta::Status::SensitiveInput => {
                                                     // Format response
                                                     let status = Status::Input;
                                                     let title = gformat!("Input expected");
-                                                    let description = match header.meta() {
-                                                        Some(meta) => match meta.to_gstring() {
-                                                            Ok(value) => value,
-                                                            Err(_) => title.clone(),
-                                                        },
-                                                        None => title.clone(),
+                                                    let description = match response.data().value() {
+                                                            Some(value) => value,
+                                                            None => &title,
                                                     };
 
                                                     // Toggle input form variant
-                                                    match header.status() {
-                                                        ClientStatus::SensitiveInput =>
+                                                    match response.status() {
+                                                        gemini::client::response::meta::Status::SensitiveInput =>
                                                             input.set_new_sensitive(
                                                                 action_page_open,
                                                                 uri,
@@ -485,12 +479,12 @@ impl Page {
                                                     // Update page
                                                     action_update.activate(Some(&id));
                                                 },
-                                                ClientStatus::Success => {
+                                                gemini::client::response::meta::Status::Success => {
                                                     // Route by MIME
-                                                    match header.mime() {
-                                                        Some(ClientMime::TextGemini) => {
+                                                    match response.mime() {
+                                                        gemini::client::response::meta::Mime::TextGemini => {
                                                             // Read entire input stream to buffer
-                                                            Body::from_socket_connection_async(
+                                                            gemini::client::response::Body::from_socket_connection_async(
                                                                 connection,
                                                                 move |result|{
                                                                     match result {
@@ -513,12 +507,12 @@ impl Page {
                                                                             let status = Status::Failure;
                                                                             let title = gformat!("Oops");
                                                                             let description = match reason {
-                                                                                BodyError::InputStreamRead => match message {
+                                                                                gemini::client::response::body::Error::InputStreamRead => match message {
                                                                                     Some(error) => gformat!("{error}"),
                                                                                     None => gformat!("Undefined connection error")
                                                                                 } ,
-                                                                                BodyError::BufferOverflow => gformat!("Buffer overflow"),
-                                                                                BodyError::Decode => gformat!("Buffer decode error"),
+                                                                                gemini::client::response::body::Error::BufferOverflow => gformat!("Buffer overflow"),
+                                                                                gemini::client::response::body::Error::Decode => gformat!("Buffer decode error"),
                                                                             };
 
                                                                             // Update widget
@@ -541,10 +535,11 @@ impl Page {
                                                                 }
                                                             );
                                                         },
-                                                        Some(
-                                                            ClientMime::ImagePng  | ClientMime::ImageGif |
-                                                            ClientMime::ImageJpeg | ClientMime::ImageWebp
-                                                        ) => {
+                                                        gemini::client::response::meta::Mime::ImagePng  |
+                                                        gemini::client::response::meta::Mime::ImageGif |
+                                                        gemini::client::response::meta::Mime::ImageJpeg |
+                                                        gemini::client::response::meta::Mime::ImageWebp
+                                                         => {
                                                             // Final image size unknown, show loading widget
                                                             let status = content.set_status_loading(
                                                                 Some(&"Loading.."),
@@ -680,7 +675,8 @@ impl Page {
                                                     }
                                                 },
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-                                                ClientStatus::Redirect | ClientStatus::PermanentRedirect => {
+                                                gemini::client::response::meta::Status::Redirect |
+                                                gemini::client::response::meta::Status::PermanentRedirect => {
 
                                                     // @TODO ClientStatus::TemporaryRedirect
 
@@ -689,18 +685,11 @@ impl Page {
                                                     meta.borrow_mut().title = Some(gformat!("Redirect"));
 
                                                     // Build gemtext message for manual redirection @TODO use template?
-                                                    match header.meta() {
-                                                        Some(meta) => {
-                                                            let _ = content.set_text_gemini(
+                                                    match response.data().value() {
+                                                        Some(url) => {
+                                                            content.set_text_gemini(
                                                                 &uri,
-                                                                &match meta.to_gstring() {
-                                                                    Ok(url) => gformat!(
-                                                                        "# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {url}"
-                                                                    ),
-                                                                    Err(_) => gformat!(
-                                                                        "# Redirect\n\nProvider request redirect but not provided any target."
-                                                                    )
-                                                                }
+                                                                &gformat!("# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {url}")
                                                             );
                                                         },
                                                         None => {
@@ -720,25 +709,49 @@ impl Page {
                                             let status = Status::Failure;
                                             let title = gformat!("Oops");
                                             let description = match reason {
-                                                HeaderError::Buffer => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Buffer error")
-                                                },
-                                                HeaderError::InputStream => match message {
+                                                // Common
+                                                gemini::client::response::meta::Error::InputStream => match message {
                                                     Some(error) => gformat!("{error}"),
                                                     None => gformat!("Input stream reading error")
                                                 },
-                                                HeaderError::Protocol => match message {
+                                                gemini::client::response::meta::Error::Protocol => match message {
                                                     Some(error) => gformat!("{error}"),
                                                     None => gformat!("Incorrect protocol")
                                                 },
-                                                HeaderError::StatusDecode => match message {
+                                                // Status
+                                                gemini::client::response::meta::Error::StatusDecode => match message {
                                                     Some(error) => gformat!("{error}"),
                                                     None => gformat!("Could not detect status code")
                                                 },
-                                                HeaderError::StatusUndefined => match message {
+                                                gemini::client::response::meta::Error::StatusUndefined => match message {
                                                     Some(error) => gformat!("{error}"),
                                                     None => gformat!("Status code yet not supported")
+                                                },
+                                                gemini::client::response::meta::Error::StatusProtocol => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect status code protocol")
+                                                },
+                                                // Data
+                                                gemini::client::response::meta::Error::DataDecode => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect data encoding")
+                                                },
+                                                gemini::client::response::meta::Error::DataProtocol => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect data protocol")
+                                                },
+                                                // MIME
+                                                gemini::client::response::meta::Error::MimeDecode => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect MIME encoding")
+                                                },
+                                                gemini::client::response::meta::Error::MimeProtocol => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("Incorrect MIME protocol")
+                                                },
+                                                gemini::client::response::meta::Error::MimeUndefined => match message {
+                                                    Some(error) => gformat!("{error}"),
+                                                    None => gformat!("MIME type yet not supported (by library)")
                                                 },
                                             };
 
