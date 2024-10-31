@@ -813,12 +813,12 @@ impl Page {
                     // Define common data
                     let status = Status::Failure;
                     let title = gformat!("Oops");
-                    let description = gformat!("Connection error: {}", reason.message());
+                    let description = reason.message();
 
                     // Update widget
                     content.set_status_failure(
                         Some(title.as_str()),
-                        Some(description.as_str()),
+                        Some(description),
                         None
                     );
 
