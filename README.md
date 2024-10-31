@@ -48,8 +48,10 @@ GTK 4 / Libadwaita client written in Rust
     * [ ] Permanent failure
     * [ ] Client certificates
   * [ ] Gemfeeds
-* [ ] [Nex](https://nightfall.city/nex/info/specification.txt)
-* [ ] Local
+  * [ ] Titan
+* [ ] [NEX](https://nightfall.city/nex/info/specification.txt)
+  * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
+* [ ] Local `file://`
 
 ### Media types
 
