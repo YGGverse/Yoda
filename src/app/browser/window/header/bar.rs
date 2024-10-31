@@ -1,10 +1,8 @@
-mod append;
 mod control;
 mod menu;
 mod tab;
 mod widget;
 
-use append::Append;
 use control::Control;
 use menu::Menu;
 use tab::Tab;
@@ -36,8 +34,7 @@ impl Bar {
     ) -> Arc<Self> {
         // Init components
         let control = Control::new_arc();
-        let tab = Tab::new_arc(view);
-        let append = Append::new_arc(action_tab_append.clone());
+        let tab = Tab::new_arc(action_tab_append.clone(), view);
         let menu = Menu::new_arc(
             action_tool_debug,
             action_tool_profile,
@@ -54,12 +51,7 @@ impl Bar {
 
         // Build result
         Arc::new(Self {
-            widget: Widget::new_arc(
-                control.gobject(),
-                append.gobject(),
-                menu.gobject(),
-                tab.gobject(),
-            ),
+            widget: Widget::new_arc(control.gobject(), menu.gobject(), tab.gobject()),
         })
     }
 
