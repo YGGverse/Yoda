@@ -1,6 +1,9 @@
 use gtk::{prelude::BoxExt, Box, Button, Entry, Orientation};
 use std::sync::Arc;
 
+const MARGIN: i32 = 6;
+const SPACING: i32 = 6;
+
 pub struct Widget {
     gobject: Box,
 }
@@ -16,10 +19,10 @@ impl Widget {
     ) -> Arc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
-            .spacing(8)
-            .margin_start(6)
-            .margin_end(6)
-            .margin_bottom(6)
+            .spacing(SPACING)
+            .margin_start(MARGIN)
+            .margin_end(MARGIN)
+            .margin_bottom(MARGIN)
             .build();
 
         gobject.append(base);
