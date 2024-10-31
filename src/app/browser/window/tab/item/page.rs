@@ -484,18 +484,17 @@ impl Page {
                                                     match response.mime() {
                                                         gemini::client::response::meta::Mime::TextGemini => {
                                                             // Read entire input stream to buffer
-                                                            gemini::client::response::Body::from_socket_connection_async(
+                                                            gemini::client::response::data::Text::from_socket_connection_async(
                                                                 connection,
+                                                                Some(Priority::DEFAULT),
+                                                                None::<Cancellable>,
                                                                 move |result|{
                                                                     match result {
                                                                         Ok(buffer) => {
                                                                             // Set children component
                                                                             let text_gemini = content.set_text_gemini(
                                                                                 &uri,
-                                                                                &match GString::from_utf8(buffer.to_utf8()) {
-                                                                                    Ok(gemtext) => gemtext,
-                                                                                    Err(_) => todo!()
-                                                                                }
+                                                                                &buffer.data()
                                                                             );
 
                                                                             // Update page meta
@@ -513,12 +512,12 @@ impl Page {
                                                                             let status = Status::Failure;
                                                                             let title = gformat!("Oops");
                                                                             let description = match reason {
-                                                                                gemini::client::response::body::Error::InputStreamRead => match message {
+                                                                                gemini::client::response::data::text::Error::InputStream => match message {
                                                                                     Some(error) => gformat!("{error}"),
                                                                                     None => gformat!("Undefined connection error")
                                                                                 } ,
-                                                                                gemini::client::response::body::Error::BufferOverflow => gformat!("Buffer overflow"),
-                                                                                gemini::client::response::body::Error::Decode => gformat!("Buffer decode error"),
+                                                                                gemini::client::response::data::text::Error::BufferOverflow => gformat!("Buffer overflow"),
+                                                                                gemini::client::response::data::text::Error::Decode => gformat!("Buffer decode error"),
                                                                             };
 
                                                                             // Update widget
