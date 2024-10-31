@@ -670,7 +670,6 @@ impl Page {
                                                             meta.replace(Meta {
                                                                 status: Some(status),
                                                                 title: Some(title),
-                                                                //description: Some(description),
                                                             });
 
                                                             // Update window
