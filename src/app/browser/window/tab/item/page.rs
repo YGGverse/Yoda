@@ -799,7 +799,7 @@ impl Page {
 
                                 // Update window
                                 action_update.activate(Some(&id));
-                            }, // OutputStream::write_bytes_async
+                            },
                         },
                     );
                 }
@@ -819,12 +819,11 @@ impl Page {
                     meta.replace(Meta {
                         status: Some(status),
                         title: Some(title),
-                        //description: Some(description),
                     });
 
                     // Update window
                     action_update.activate(Some(&id));
-                }, // SocketClient::connect_to_uri_async
+                },
             },
         );
     }
