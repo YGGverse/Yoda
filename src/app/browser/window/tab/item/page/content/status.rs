@@ -43,8 +43,11 @@ impl Status {
     /// Set new description for status component
     ///
     /// Useful for loading widgets to update byte totals and other dynamically changed information
-    pub fn set_description(&self, description: Option<&str>) {
+    ///
+    /// Return `Self` reference to apply another functions in chain
+    pub fn set_description(&self, description: Option<&str>) -> &Self {
         self.gobject.set_description(description);
+        &self
     }
 
     // Getters
