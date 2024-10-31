@@ -51,7 +51,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] Titan
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt)
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
-* [ ] Local `file://`
+* [ ] `file://`
 
 ### Media types
 
