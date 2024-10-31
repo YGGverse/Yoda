@@ -14,7 +14,7 @@ impl Widget {
                 .autohide(false)
                 .expand_tabs(false)
                 .start_action_widget(start_action_widget)
-                .view(&view)
+                .view(view)
                 .build(),
         })
     }
