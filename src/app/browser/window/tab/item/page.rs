@@ -657,8 +657,7 @@ impl Page {
                                                             // Define common data
                                                             let status = Status::Failure;
                                                             let title = gformat!("Oops");
-                                                            let description =
-                                                                gformat!("Content type not supported");
+                                                            let description = gformat!("Content type not supported");
 
                                                             // Update widget
                                                             content.set_status_failure(
