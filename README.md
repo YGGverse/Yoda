@@ -171,6 +171,10 @@ Quick start guide and maintenance protocol
   * new branch created for every new PR `git checkout -b 'contribution-name'`
   * new code follows common [rustfmt](https://rust-lang.github.io/rustfmt/) style `cargo fmt --check`
 
+#### Contributors
+
+![wakatime](https://wakatime.com/badge/user/0b7fe6c1-b091-4c98-b930-75cfee17c7a5/project/018ebca8-4d22-4f9e-b557-186be6553d9a.svg) ![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)
+
 ### Releases
 
 * Package version in repository should be increased immediately after stable release on [crates.io](https://crates.io/crates/yoda) and before apply new changes
