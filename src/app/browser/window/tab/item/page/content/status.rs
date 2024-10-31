@@ -19,7 +19,7 @@ impl Status {
     /// Useful as placeholder widget for error handlers
     pub fn new_failure(title: Option<&str>, description: Option<&str>) -> Self {
         Self {
-            gobject: Failure::new(title, description).gobject().clone(),
+            gobject: Failure::new(title, description, None).gobject().clone(),
         }
     }
 
