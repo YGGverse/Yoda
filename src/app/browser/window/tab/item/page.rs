@@ -588,16 +588,15 @@ impl Page {
                                                                                         // Update window components
                                                                                         action_update.activate(Some(&id));
                                                                                     }
-                                                                                    Err(reason) => { // Pixbuf::from_stream
+                                                                                    Err(reason) => {
                                                                                         // Define common data
                                                                                         let status = Status::Failure;
                                                                                         let title = gformat!("Oops");
-                                                                                        let description = gformat!("{}", reason.message());
 
                                                                                         // Update widget
                                                                                         content.set_status_failure(
                                                                                             Some(title.as_str()),
-                                                                                            Some(description.as_str()),
+                                                                                            Some(reason.message()),
                                                                                             None
                                                                                         );
 
@@ -605,7 +604,6 @@ impl Page {
                                                                                         meta.replace(Meta {
                                                                                             status: Some(status),
                                                                                             title: Some(title),
-                                                                                            //description: Some(description),
                                                                                         });
                                                                                     }
                                                                                 }
@@ -787,12 +785,11 @@ impl Page {
                                 // Define common data
                                 let status = Status::Failure;
                                 let title = gformat!("Oops");
-                                let description = gformat!("Request error: {}", reason.message());
 
                                 // Update widget
                                 content.set_status_failure(
                                     Some(title.as_str()),
-                                    Some(description.as_str()),
+                                    Some(reason.message()),
                                     None
                                 );
 
@@ -800,7 +797,6 @@ impl Page {
                                 meta.replace(Meta {
                                     status: Some(status),
                                     title: Some(title),
-                                    //description: Some(description),
                                 });
 
                                 // Update window
