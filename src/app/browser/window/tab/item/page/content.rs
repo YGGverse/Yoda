@@ -40,7 +40,7 @@ impl Content {
     /// Set new `content::Image` component for `Self`
     ///
     /// * action removes previous children component from `Self`
-    pub fn set_image(&self, buffer: &Pixbuf) -> Image {
+    pub fn to_image(&self, buffer: &Pixbuf) -> Image {
         self.clean();
         let image = Image::new_from_pixbuf(buffer);
         self.gobject.append(image.gobject());
@@ -50,7 +50,7 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn set_status_failure(
+    pub fn to_status_failure(
         &self,
         title: Option<&str>,
         description: Option<&str>,
@@ -65,7 +65,7 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Loading` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn set_status_loading(
+    pub fn to_status_loading(
         &self,
         title: Option<&str>,
         description: Option<&str>,
@@ -92,7 +92,7 @@ impl Content {
     ///
     /// `Text` component with it public API
     /// * could be useful to extract document title parsed from Gemtext
-    pub fn set_text_gemini(&self, base: &Uri, data: &str) -> Text {
+    pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
         let text = Text::gemini(
             data,

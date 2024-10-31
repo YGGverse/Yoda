@@ -189,7 +189,7 @@ impl Page {
                         let description = gformat!("Protocol `{scheme}` not supported");
 
                         // Update widget
-                        self.content.set_status_failure(
+                        self.content.to_status_failure(
                             Some(title.as_str()),
                             Some(description.as_str()),
                             None,
@@ -495,7 +495,7 @@ impl Page {
                                                                     match result {
                                                                         Ok(buffer) => {
                                                                             // Set children component
-                                                                            let text_gemini = content.set_text_gemini(
+                                                                            let text_gemini = content.to_text_gemini(
                                                                                 &uri,
                                                                                 &buffer.data()
                                                                             );
@@ -524,7 +524,7 @@ impl Page {
                                                                             };
 
                                                                             // Update widget
-                                                                            content.set_status_failure(
+                                                                            content.to_status_failure(
                                                                                 Some(title.as_str()),
                                                                                 Some(description.as_str()),
                                                                                 None
@@ -550,7 +550,7 @@ impl Page {
                                                         gemini::client::response::meta::Mime::ImageWebp
                                                          => {
                                                             // Final image size unknown, show loading widget
-                                                            let status = content.set_status_loading(
+                                                            let status = content.to_status_loading(
                                                                 Some(&"Loading.."),
                                                                 None,
                                                                 Some(Duration::from_secs(1)) // show if download time > 1 second
@@ -583,7 +583,7 @@ impl Page {
                                                                                         meta.borrow_mut().title = Some(uri_to_title(&uri));
 
                                                                                         // Update page content
-                                                                                        content.set_image(&buffer);
+                                                                                        content.to_image(&buffer);
 
                                                                                         // Update window components
                                                                                         action_update.activate(Some(&id));
@@ -594,7 +594,7 @@ impl Page {
                                                                                         let title = gformat!("Oops");
 
                                                                                         // Update widget
-                                                                                        content.set_status_failure(
+                                                                                        content.to_status_failure(
                                                                                             Some(title.as_str()),
                                                                                             Some(reason.message()),
                                                                                             None
@@ -623,7 +623,7 @@ impl Page {
                                                                         };
 
                                                                         // Update widget
-                                                                        content.set_status_failure(
+                                                                        content.to_status_failure(
                                                                             Some(title.as_str()),
                                                                             Some(description.as_str()),
                                                                             None
@@ -648,7 +648,7 @@ impl Page {
                                                             meta.borrow_mut().title = Some(gformat!("Stream"));
 
                                                             // Update page content
-                                                            // content.set_stream();
+                                                            // content.to_stream();
 
                                                             // Update window components
                                                             action_update.activate(Some(&id));
@@ -660,7 +660,7 @@ impl Page {
                                                             let description = gformat!("Content type not supported");
 
                                                             // Update widget
-                                                            content.set_status_failure(
+                                                            content.to_status_failure(
                                                                 Some(title.as_str()),
                                                                 Some(description.as_str()),
                                                                 None
@@ -690,13 +690,13 @@ impl Page {
                                                     // Build gemtext message for manual redirection @TODO use template?
                                                     match response.data().value() {
                                                         Some(url) => {
-                                                            content.set_text_gemini(
+                                                            content.to_text_gemini(
                                                                 &uri,
                                                                 &gformat!("# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {url}")
                                                             );
                                                         },
                                                         None => {
-                                                            content.set_status_failure(
+                                                            content.to_status_failure(
                                                                 Some(&"Oops"),
                                                                 Some(&"Could not parse redirect meta"),
                                                                 None
@@ -760,7 +760,7 @@ impl Page {
                                             };
 
                                             // Update widget
-                                            content.set_status_failure(
+                                            content.to_status_failure(
                                                 Some(title.as_str()),
                                                 Some(description.as_str()),
                                                 None
@@ -785,7 +785,7 @@ impl Page {
                                 let title = gformat!("Oops");
 
                                 // Update widget
-                                content.set_status_failure(
+                                content.to_status_failure(
                                     Some(title.as_str()),
                                     Some(reason.message()),
                                     None
@@ -809,7 +809,7 @@ impl Page {
                     let title = gformat!("Oops");
 
                     // Update widget
-                    content.set_status_failure(
+                    content.to_status_failure(
                         Some(title.as_str()),
                         Some(reason.message()),
                         None
