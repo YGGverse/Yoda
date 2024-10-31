@@ -17,9 +17,15 @@ impl Status {
     /// Create new failure preset
     ///
     /// Useful as placeholder widget for error handlers
-    pub fn new_failure(title: Option<&str>, description: Option<&str>) -> Self {
+    pub fn new_failure(
+        title: Option<&str>,
+        description: Option<&str>,
+        icon_name: Option<&str>,
+    ) -> Self {
         Self {
-            gobject: Failure::new(title, description, None).gobject().clone(),
+            gobject: Failure::new(title, description, icon_name)
+                .gobject()
+                .clone(),
         }
     }
 

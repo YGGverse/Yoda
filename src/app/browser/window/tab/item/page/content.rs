@@ -50,9 +50,14 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn set_status_failure(&self, title: Option<&str>, description: Option<&str>) -> Status {
+    pub fn set_status_failure(
+        &self,
+        title: Option<&str>,
+        description: Option<&str>,
+        icon_name: Option<&str>,
+    ) -> Status {
         self.clean();
-        let status = Status::new_failure(title, description);
+        let status = Status::new_failure(title, description, icon_name);
         self.gobject.append(status.gobject());
         status
     }

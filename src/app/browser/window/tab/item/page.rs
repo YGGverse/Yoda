@@ -189,8 +189,11 @@ impl Page {
                         let description = gformat!("Protocol `{scheme}` not supported");
 
                         // Update widget
-                        self.content
-                            .set_status_failure(Some(title.as_str()), Some(description.as_str()));
+                        self.content.set_status_failure(
+                            Some(title.as_str()),
+                            Some(description.as_str()),
+                            None,
+                        );
 
                         // Update meta
                         self.meta.replace(Meta {
@@ -523,7 +526,8 @@ impl Page {
                                                                             // Update widget
                                                                             content.set_status_failure(
                                                                                 Some(title.as_str()),
-                                                                                Some(description.as_str())
+                                                                                Some(description.as_str()),
+                                                                                None
                                                                             );
 
                                                                             // Update meta
@@ -593,7 +597,8 @@ impl Page {
                                                                                         // Update widget
                                                                                         content.set_status_failure(
                                                                                             Some(title.as_str()),
-                                                                                            Some(description.as_str())
+                                                                                            Some(description.as_str()),
+                                                                                            None
                                                                                         );
 
                                                                                         // Update meta
@@ -622,7 +627,8 @@ impl Page {
                                                                         // Update widget
                                                                         content.set_status_failure(
                                                                             Some(title.as_str()),
-                                                                            Some(description.as_str())
+                                                                            Some(description.as_str()),
+                                                                            None
                                                                         );
 
                                                                         // Update meta
@@ -660,6 +666,7 @@ impl Page {
                                                             content.set_status_failure(
                                                                 Some(title.as_str()),
                                                                 Some(description.as_str()),
+                                                                None
                                                             );
 
                                                             // Update meta
@@ -695,7 +702,8 @@ impl Page {
                                                         None => {
                                                             content.set_status_failure(
                                                                 Some(&"Oops"),
-                                                                Some(&"Could not parse redirect meta")
+                                                                Some(&"Could not parse redirect meta"),
+                                                                None
                                                             );
                                                         },
                                                     }
@@ -758,7 +766,8 @@ impl Page {
                                             // Update widget
                                             content.set_status_failure(
                                                 Some(title.as_str()),
-                                                Some(description.as_str())
+                                                Some(description.as_str()),
+                                                None
                                             );
 
                                             // Update meta
@@ -783,7 +792,8 @@ impl Page {
                                 // Update widget
                                 content.set_status_failure(
                                     Some(title.as_str()),
-                                    Some(description.as_str())
+                                    Some(description.as_str()),
+                                    None
                                 );
 
                                 // Update meta
@@ -808,7 +818,8 @@ impl Page {
                     // Update widget
                     content.set_status_failure(
                         Some(title.as_str()),
-                        Some(description.as_str())
+                        Some(description.as_str()),
+                        None
                     );
 
                     // Update meta
