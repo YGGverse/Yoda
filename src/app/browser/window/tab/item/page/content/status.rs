@@ -1,9 +1,6 @@
 mod failure;
 mod loading;
 
-use failure::Failure;
-use loading::Loading;
-
 use adw::StatusPage;
 use std::time::Duration;
 
@@ -23,9 +20,7 @@ impl Status {
         icon_name: Option<&str>,
     ) -> Self {
         Self {
-            gobject: Failure::new(title, description, icon_name)
-                .gobject()
-                .clone(),
+            gobject: failure::new_gobject_from(title, description, icon_name),
         }
     }
 
@@ -38,9 +33,7 @@ impl Status {
         show_with_delay: Option<Duration>,
     ) -> Self {
         Self {
-            gobject: Loading::new(title, description, show_with_delay)
-                .gobject()
-                .clone(),
+            gobject: loading::new_gobject_from(title, description, show_with_delay),
         }
     }
 
