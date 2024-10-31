@@ -1,8 +1,7 @@
-use adw::Clamp;
 use gtk::{
     gio::{SimpleAction, SimpleActionGroup},
     glib::uuid_string_random,
-    prelude::{ActionMapExt, BoxExt, WidgetExt},
+    prelude::{ActionMapExt, BoxExt, IsA, WidgetExt},
     Box, Orientation,
 };
 use std::sync::Arc;
@@ -18,9 +17,9 @@ impl Widget {
         // Actions
         action_page_open: SimpleAction,
         // Components
-        navigation: &Box,
-        content: &Box,
-        input: &Clamp,
+        navigation: &impl IsA<gtk::Widget>,
+        content: &impl IsA<gtk::Widget>,
+        input: &impl IsA<gtk::Widget>,
     ) -> Arc<Self> {
         // Init additional action group
         let action_group = SimpleActionGroup::new();

@@ -1,4 +1,7 @@
-use gtk::{prelude::BoxExt, Box, Button, Orientation};
+use gtk::{
+    prelude::{BoxExt, IsA},
+    Box, Orientation,
+};
 use std::sync::Arc;
 
 pub struct Widget {
@@ -7,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(back: &Button, forward: &Button) -> Arc<Self> {
+    pub fn new_arc(back: &impl IsA<gtk::Widget>, forward: &impl IsA<gtk::Widget>) -> Arc<Self> {
         // Init widget
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)

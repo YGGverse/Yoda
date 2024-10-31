@@ -1,4 +1,7 @@
-use gtk::{prelude::BoxExt, Box, Button, Entry, Orientation};
+use gtk::{
+    prelude::{BoxExt, IsA},
+    Box, Orientation,
+};
 use std::sync::Arc;
 
 const MARGIN: i32 = 6;
@@ -11,11 +14,11 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new_arc(
-        base: &Button,
-        history: &Box,
-        reload: &Button,
-        request: &Entry,
-        bookmark: &Button,
+        base: &impl IsA<gtk::Widget>,
+        history: &impl IsA<gtk::Widget>,
+        reload: &impl IsA<gtk::Widget>,
+        request: &impl IsA<gtk::Widget>,
+        bookmark: &impl IsA<gtk::Widget>,
     ) -> Arc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
