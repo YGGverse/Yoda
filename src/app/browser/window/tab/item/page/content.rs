@@ -13,7 +13,7 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 pub struct Content {
     // GTK
@@ -27,12 +27,12 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Self {
-        Self {
+    pub fn new_arc(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Arc<Self> {
+        Arc::new(Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
             action_tab_open,
             action_page_open,
-        }
+        })
     }
 
     // Actions
@@ -50,14 +50,9 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_failure(
-        &self,
-        title: Option<&str>,
-        description: Option<&str>,
-        icon_name: Option<&str>,
-    ) -> Status {
+    pub fn to_status_failure(&self) -> Status {
         self.clean();
-        let status = Status::new_failure(title, description, icon_name);
+        let status = Status::new_failure();
         self.gobject.append(status.gobject());
         status
     }
@@ -65,14 +60,9 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Loading` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_loading(
-        &self,
-        title: Option<&str>,
-        description: Option<&str>,
-        show_with_delay: Option<Duration>,
-    ) -> Status {
+    pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> Status {
         self.clean();
-        let status = Status::new_loading(title, description, show_with_delay);
+        let status = Status::new_loading(show_with_delay);
         self.gobject.append(status.gobject());
         status
     }

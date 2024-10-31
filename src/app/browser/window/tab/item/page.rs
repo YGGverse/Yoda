@@ -63,10 +63,7 @@ impl Page {
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init components
-        let content = Arc::new(Content::new(
-            action_tab_open.clone(),
-            action_page_open.clone(),
-        ));
+        let content = Content::new_arc(action_tab_open.clone(), action_page_open.clone());
 
         let navigation = Navigation::new_arc(
             action_tab_page_navigation_base.clone(),
@@ -189,11 +186,10 @@ impl Page {
                         let description = gformat!("Protocol `{scheme}` not supported");
 
                         // Update widget
-                        self.content.to_status_failure(
-                            Some(title.as_str()),
-                            Some(description.as_str()),
-                            None,
-                        );
+                        self.content
+                            .to_status_failure()
+                            .set_title(title.as_str())
+                            .set_description(Some(description.as_str()));
 
                         // Update meta
                         self.meta.replace(Meta {
@@ -524,11 +520,10 @@ impl Page {
                                                                             };
 
                                                                             // Update widget
-                                                                            content.to_status_failure(
-                                                                                Some(title.as_str()),
-                                                                                Some(description.as_str()),
-                                                                                None
-                                                                            );
+                                                                            content
+                                                                                .to_status_failure()
+                                                                                .set_title(title.as_str())
+                                                                                .set_description(Some(description.as_str()));
 
                                                                             // Update meta
                                                                             meta.replace(Meta {
@@ -551,8 +546,6 @@ impl Page {
                                                          => {
                                                             // Final image size unknown, show loading widget
                                                             let status = content.to_status_loading(
-                                                                Some(&"Loading.."),
-                                                                None,
                                                                 Some(Duration::from_secs(1)) // show if download time > 1 second
                                                             );
 
@@ -594,11 +587,10 @@ impl Page {
                                                                                         let title = gformat!("Oops");
 
                                                                                         // Update widget
-                                                                                        content.to_status_failure(
-                                                                                            Some(title.as_str()),
-                                                                                            Some(reason.message()),
-                                                                                            None
-                                                                                        );
+                                                                                        content
+                                                                                            .to_status_failure()
+                                                                                            .set_title(title.as_str())
+                                                                                            .set_description(Some(reason.message()));
 
                                                                                         // Update meta
                                                                                         meta.replace(Meta {
@@ -623,17 +615,15 @@ impl Page {
                                                                         };
 
                                                                         // Update widget
-                                                                        content.to_status_failure(
-                                                                            Some(title.as_str()),
-                                                                            Some(description.as_str()),
-                                                                            None
-                                                                        );
+                                                                        content
+                                                                            .to_status_failure()
+                                                                            .set_title(title.as_str())
+                                                                            .set_description(Some(description.as_str()));
 
                                                                         // Update meta
                                                                         meta.replace(Meta {
                                                                             status: Some(status),
                                                                             title: Some(title),
-                                                                            //description: Some(description),
                                                                         });
                                                                     }
                                                                 },
@@ -660,11 +650,10 @@ impl Page {
                                                             let description = gformat!("Content type not supported");
 
                                                             // Update widget
-                                                            content.to_status_failure(
-                                                                Some(title.as_str()),
-                                                                Some(description.as_str()),
-                                                                None
-                                                            );
+                                                            content
+                                                                .to_status_failure()
+                                                                .set_title(title.as_str())
+                                                                .set_description(Some(description.as_str()));
 
                                                             // Update meta
                                                             meta.replace(Meta {
@@ -696,11 +685,9 @@ impl Page {
                                                             );
                                                         },
                                                         None => {
-                                                            content.to_status_failure(
-                                                                Some(&"Oops"),
-                                                                Some(&"Could not parse redirect meta"),
-                                                                None
-                                                            );
+                                                            content
+                                                                .to_status_failure()
+                                                                .set_description(Some("Could not parse redirect meta"));
                                                         },
                                                     }
 
@@ -760,11 +747,10 @@ impl Page {
                                             };
 
                                             // Update widget
-                                            content.to_status_failure(
-                                                Some(title.as_str()),
-                                                Some(description.as_str()),
-                                                None
-                                            );
+                                            content
+                                                .to_status_failure()
+                                                .set_title(title.as_str())
+                                                .set_description(Some(description.as_str()));
 
                                             // Update meta
                                             meta.replace(Meta {
@@ -785,11 +771,10 @@ impl Page {
                                 let title = gformat!("Oops");
 
                                 // Update widget
-                                content.to_status_failure(
-                                    Some(title.as_str()),
-                                    Some(reason.message()),
-                                    None
-                                );
+                                content
+                                    .to_status_failure()
+                                    .set_title(title.as_str())
+                                    .set_description(Some(reason.message()));
 
                                 // Update meta
                                 meta.replace(Meta {
@@ -809,11 +794,10 @@ impl Page {
                     let title = gformat!("Oops");
 
                     // Update widget
-                    content.to_status_failure(
-                        Some(title.as_str()),
-                        Some(reason.message()),
-                        None
-                    );
+                    content
+                        .to_status_failure()
+                        .set_title(title.as_str())
+                        .set_description(Some(reason.message()));
 
                     // Update meta
                     meta.replace(Meta {

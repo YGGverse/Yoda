@@ -5,15 +5,12 @@ use gtk::{
 };
 use std::time::Duration;
 
-/// 16-64 (px)
-const SPINNER_SIZE: i32 = 64;
+const SPINNER_SIZE: i32 = 64; // 16-64
+const DEFAULT_TITLE: &str = "Loading..";
 
-/// Create new `GObject` preset for loading [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-pub fn new_gobject_from(
-    title: Option<&str>,
-    description: Option<&str>,
-    show_with_delay: Option<Duration>,
-) -> StatusPage {
+/// Create new default `GObject` preset for loading
+/// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
+pub fn new_gobject(show_with_delay: Option<Duration>) -> StatusPage {
     let gobject = StatusPage::builder()
         .child(
             &Spinner::builder()
@@ -21,13 +18,8 @@ pub fn new_gobject_from(
                 .height_request(SPINNER_SIZE)
                 .build(),
         )
+        .title(DEFAULT_TITLE)
         .build();
-
-    if let Some(value) = title {
-        gobject.set_title(value);
-    }
-
-    gobject.set_description(description);
 
     if let Some(duration) = show_with_delay {
         gobject.set_visible(false);
