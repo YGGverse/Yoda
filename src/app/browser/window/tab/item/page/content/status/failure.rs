@@ -1,8 +1,8 @@
 use adw::StatusPage;
 
-const DEFAULT_ICON_NAME: Option<&str> = Some("dialog-error");
 const DEFAULT_TITLE: &str = "Oops";
 const DEFAULT_DESCRIPTION: Option<&str> = None;
+const DEFAULT_ICON_NAME: Option<&str> = Some("dialog-error");
 
 /// Create new `GObject` preset for failure [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
 pub fn new_gobject_from(
