@@ -45,8 +45,21 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] `30` Temporary (partial)
       * [ ] `31` Permanent (partial)
     * [ ] Temporary failure
+      * [ ] `40` Unspecified condition
+      * [ ] `41` Server unavailable
+      * [ ] `42` CGI error
+      * [ ] `43` Proxy error
+      * [ ] `44` Slow down
     * [ ] Permanent failure
+      * [ ] `50` General
+      * [ ] `51` Not found
+      * [ ] `52` Gone
+      * [ ] `53` Proxy request refused
+      * [ ] `59` Bad request
     * [ ] Client certificates
+      * [ ] `60` Certificate requested
+      * [ ] `61` Certificate not authorized
+      * [ ] `62` Certificate not valid
   * [ ] Gemfeeds
   * [ ] Titan
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt)
