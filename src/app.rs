@@ -48,7 +48,7 @@ impl App {
         let action_page_new = Action::new("win", true, None);
         let action_page_close = Action::new("win", true, None);
         let action_page_close_all = Action::new("win", true, None);
-        let action_page_base = Action::new("win", false, None);
+        let action_page_home = Action::new("win", false, None);
         let action_page_history_back = Action::new("win", false, None);
         let action_page_history_forward = Action::new("win", false, None);
         let action_page_reload = Action::new("win", true, None);
@@ -66,7 +66,7 @@ impl App {
         gobject.set_accels_for_action(&action_page_new.detailed_name(), &["<Primary>t"]);
         gobject.set_accels_for_action(&action_page_pin.detailed_name(), &["<Primary>p"]);
         gobject.set_accels_for_action(&action_page_close.detailed_name(), &["<Primary>q"]);
-        gobject.set_accels_for_action(&action_page_base.detailed_name(), &["<Primary>h"]);
+        gobject.set_accels_for_action(&action_page_home.detailed_name(), &["<Primary>h"]);
         gobject.set_accels_for_action(
             &action_page_history_back.detailed_name(),
             &["<Primary>Left"],
@@ -87,7 +87,7 @@ impl App {
             action_page_new.simple(),
             action_page_close.simple(),
             action_page_close_all.simple(),
-            action_page_base.simple(),
+            action_page_home.simple(),
             action_page_history_back.simple(),
             action_page_history_forward.simple(),
             action_page_reload.simple(),

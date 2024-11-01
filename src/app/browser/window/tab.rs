@@ -20,7 +20,7 @@ pub struct Tab {
     // Local actions
     action_tab_open: SimpleAction,
     // Global actions
-    action_page_base: SimpleAction,
+    action_page_home: SimpleAction,
     action_page_history_back: SimpleAction,
     action_page_history_forward: SimpleAction,
     action_page_reload: SimpleAction,
@@ -35,7 +35,7 @@ impl Tab {
     // Construct
     pub fn new_arc(
         // Actions
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -76,7 +76,7 @@ impl Tab {
             let gobject = widget.gobject().clone();
             // Actions
             let action_tab_open = action_tab_open.clone();
-            let action_page_base = action_page_base.clone();
+            let action_page_home = action_page_home.clone();
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
             let action_page_reload = action_page_reload.clone();
@@ -88,7 +88,7 @@ impl Tab {
                     // Local actions
                     action_tab_open.clone(),
                     // Global actions
-                    action_page_base.clone(),
+                    action_page_home.clone(),
                     action_page_history_back.clone(),
                     action_page_history_forward.clone(),
                     action_page_reload.clone(),
@@ -120,7 +120,7 @@ impl Tab {
             // Local actions
             action_tab_open,
             // Global actions
-            action_page_base,
+            action_page_home,
             action_page_history_back,
             action_page_history_forward,
             action_page_reload,
@@ -140,7 +140,7 @@ impl Tab {
             // Local actions
             self.action_tab_open.clone(),
             // Global actions
-            self.action_page_base.clone(),
+            self.action_page_home.clone(),
             self.action_page_history_back.clone(),
             self.action_page_history_forward.clone(),
             self.action_page_reload.clone(),
@@ -177,10 +177,10 @@ impl Tab {
         }
     }
 
-    pub fn page_navigation_base(&self) {
+    pub fn page_navigation_home(&self) {
         if let Some(id) = self.widget.current_page_keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_base();
+                item.page_navigation_home();
             }
         }
     }
@@ -277,7 +277,7 @@ impl Tab {
                         transaction,
                         &record.id,
                         self.action_tab_open.clone(),
-                        self.action_page_base.clone(),
+                        self.action_page_home.clone(),
                         self.action_page_history_back.clone(),
                         self.action_page_history_forward.clone(),
                         self.action_page_reload.clone(),

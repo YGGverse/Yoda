@@ -30,7 +30,7 @@ impl Window {
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -38,7 +38,7 @@ impl Window {
     ) -> Self {
         // Init components
         let tab = Tab::new_arc(
-            action_page_base.clone(),
+            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
@@ -53,7 +53,7 @@ impl Window {
             action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
-            action_page_base.clone(),
+            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
@@ -78,8 +78,8 @@ impl Window {
         self.tab.append(position);
     }
 
-    pub fn tab_page_navigation_base(&self) {
-        self.tab.page_navigation_base();
+    pub fn tab_page_navigation_home(&self) {
+        self.tab.page_navigation_home();
     }
 
     pub fn tab_page_navigation_history_back(&self) {

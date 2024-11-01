@@ -1,15 +1,15 @@
-mod base;
 mod bookmark;
 mod database;
 mod history;
+mod home;
 mod reload;
 mod request;
 mod widget;
 
-use base::Base;
 use bookmark::Bookmark;
 use database::Database;
 use history::History;
+use home::Home;
 use reload::Reload;
 use request::Request;
 use widget::Widget;
@@ -20,7 +20,7 @@ use sqlite::Transaction;
 use std::sync::Arc;
 
 pub struct Navigation {
-    base: Arc<Base>,
+    home: Arc<Home>,
     bookmark: Arc<Bookmark>,
     history: Arc<History>,
     reload: Arc<Reload>,
@@ -30,28 +30,22 @@ pub struct Navigation {
 
 impl Navigation {
     pub fn new_arc(
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init components
-        let base = Base::new_arc(action_page_base);
-        let history = History::new_arc(
-            action_page_history_back,
-            action_page_history_forward,
-        );
+        let home = Home::new_arc(action_page_home);
+        let history = History::new_arc(action_page_history_back, action_page_history_forward);
         let reload = Reload::new_arc(action_page_reload.clone());
-        let request = Request::new_arc(
-            action_update.clone(),
-            action_page_reload.clone(),
-        );
+        let request = Request::new_arc(action_update.clone(), action_page_reload.clone());
         let bookmark = Bookmark::new_arc();
 
         // Init widget
         let widget = Widget::new_arc(
-            base.gobject(),
+            home.gobject(),
             history.gobject(),
             reload.gobject(),
             request.gobject(),
@@ -61,7 +55,7 @@ impl Navigation {
         // Result
         Arc::new(Self {
             widget,
-            base,
+            home,
             history,
             reload,
             request,
@@ -91,7 +85,7 @@ impl Navigation {
     }
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        self.base.update(self.request.uri());
+        self.home.update(self.request.uri());
         self.history.update();
         self.reload.update(!self.request.is_empty());
         self.request.update(progress_fraction);
@@ -167,8 +161,8 @@ impl Navigation {
         &self.widget.gobject()
     }
 
-    pub fn base_url(&self) -> Option<GString> {
-        self.base.url()
+    pub fn home_url(&self) -> Option<GString> {
+        self.home.url()
     }
 
     pub fn request_text(&self) -> GString {

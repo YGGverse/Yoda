@@ -52,7 +52,7 @@ impl Page {
     pub fn new_arc(
         id: GString,
         action_tab_open: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -66,7 +66,7 @@ impl Page {
         let content = Content::new_arc(action_tab_open.clone(), action_page_open.clone());
 
         let navigation = Navigation::new_arc(
-            action_page_base.clone(),
+            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
@@ -128,8 +128,8 @@ impl Page {
         self.navigation.request_grab_focus();
     }
 
-    pub fn navigation_base(&self) {
-        if let Some(url) = self.navigation.base_url() {
+    pub fn navigation_home(&self) {
+        if let Some(url) = self.navigation.home_url() {
             // Update with history record
             self.action_page_open.activate(Some(&url.to_variant()));
         }

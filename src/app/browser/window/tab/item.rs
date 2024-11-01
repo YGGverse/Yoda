@@ -29,7 +29,7 @@ impl Item {
         tab_view: &TabView,
         // Actions
         action_tab_open: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -47,7 +47,7 @@ impl Item {
             id.clone(),
             // Actions
             action_tab_open.clone(),
-            action_page_base.clone(),
+            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
@@ -69,8 +69,8 @@ impl Item {
     }
 
     // Actions
-    pub fn page_navigation_base(&self) {
-        self.page.navigation_base()
+    pub fn page_navigation_home(&self) {
+        self.page.navigation_home()
     }
 
     pub fn page_navigation_history_back(&self) {
@@ -129,7 +129,7 @@ impl Item {
         app_browser_window_tab_id: &i64,
         // Actions
         action_tab_open: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -145,7 +145,7 @@ impl Item {
                         tab_view,
                         // Actions
                         action_tab_open.clone(),
-                        action_page_base.clone(),
+                        action_page_home.clone(),
                         action_page_history_back.clone(),
                         action_page_history_forward.clone(),
                         action_page_reload.clone(),

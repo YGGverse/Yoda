@@ -23,7 +23,7 @@ impl Menu {
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -40,7 +40,7 @@ impl Menu {
 
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
-                    main_page_navigation.append(Some("Base"), Some(&detailed_action_name(action_page_base)));
+                    main_page_navigation.append(Some("Home"), Some(&detailed_action_name(action_page_home)));
 
                     // Main > Page > Navigation > History
                     let main_page_navigation_history = gio::Menu::new();

@@ -35,7 +35,7 @@ impl Browser {
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_base: SimpleAction,
+        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
@@ -49,7 +49,7 @@ impl Browser {
             action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
-            action_page_base.clone(),
+            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
@@ -67,7 +67,7 @@ impl Browser {
         widget.gobject().add_action(&action_page_new);
         widget.gobject().add_action(&action_page_close);
         widget.gobject().add_action(&action_page_close_all);
-        widget.gobject().add_action(&action_page_base);
+        widget.gobject().add_action(&action_page_home);
         widget.gobject().add_action(&action_page_history_back);
         widget.gobject().add_action(&action_page_history_forward);
         widget.gobject().add_action(&action_page_reload);
@@ -136,10 +136,10 @@ impl Browser {
             }
         });
 
-        action_page_base.connect_activate({
+        action_page_home.connect_activate({
             let window = window.clone();
             move |_, _| {
-                window.tab_page_navigation_base();
+                window.tab_page_navigation_home();
             }
         });
 

@@ -9,19 +9,19 @@ use gtk::{
 };
 use std::{cell::RefCell, sync::Arc};
 
-pub struct Base {
-    action_page_base: SimpleAction,
+pub struct Home {
+    action_page_home: SimpleAction,
     uri: RefCell<Option<Uri>>,
     widget: Arc<Widget>,
 }
 
-impl Base {
+impl Home {
     // Construct
-    pub fn new_arc(action_page_base: SimpleAction) -> Arc<Self> {
+    pub fn new_arc(action_page_home: SimpleAction) -> Arc<Self> {
         Arc::new(Self {
-            action_page_base: action_page_base.clone(),
+            action_page_home: action_page_home.clone(),
             uri: RefCell::new(None),
-            widget: Widget::new_arc(action_page_base),
+            widget: Widget::new_arc(action_page_home),
         })
     }
 
@@ -37,7 +37,7 @@ impl Base {
         self.uri.replace(uri);
 
         // Update action status
-        self.action_page_base.set_enabled(status);
+        self.action_page_home.set_enabled(status);
 
         // Update child components
         self.widget.update(status);
