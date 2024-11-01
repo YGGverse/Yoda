@@ -41,18 +41,18 @@ impl App {
         profile_path: PathBuf,
     ) -> Self {
         // Init actions
-        let action_tool_debug = Action::new("win", true, None);
-        let action_tool_profile = Action::new("win", true, None);
+        let action_debug = Action::new("win", true, None);
+        let action_profile = Action::new("win", true, None);
         let action_quit = Action::new("win", true, None);
         let action_update = Action::new("win", true, Some(&String::static_variant_type()));
-        let action_tab_append = Action::new("win", true, None);
-        let action_tab_close = Action::new("win", true, None);
-        let action_tab_close_all = Action::new("win", true, None);
-        let action_tab_page_navigation_base = Action::new("win", false, None);
-        let action_tab_page_navigation_history_back = Action::new("win", false, None);
-        let action_tab_page_navigation_history_forward = Action::new("win", false, None);
-        let action_tab_page_navigation_reload = Action::new("win", true, None);
-        let action_tab_pin = Action::new("win", true, None);
+        let action_page_new = Action::new("win", true, None);
+        let action_page_close = Action::new("win", true, None);
+        let action_page_close_all = Action::new("win", true, None);
+        let action_page_base = Action::new("win", false, None);
+        let action_page_history_back = Action::new("win", false, None);
+        let action_page_history_forward = Action::new("win", false, None);
+        let action_page_reload = Action::new("win", true, None);
+        let action_page_pin = Action::new("win", true, None);
 
         // Init GTK
         let gobject = Application::builder()
@@ -60,44 +60,38 @@ impl App {
             .build();
 
         // Init accels
-        gobject.set_accels_for_action(&action_tool_debug.detailed_name(), &["<Primary>i"]);
+        gobject.set_accels_for_action(&action_debug.detailed_name(), &["<Primary>i"]);
         gobject.set_accels_for_action(&action_update.detailed_name(), &["<Primary>u"]);
         gobject.set_accels_for_action(&action_quit.detailed_name(), &["<Primary>Escape"]);
-        gobject.set_accels_for_action(&action_tab_append.detailed_name(), &["<Primary>t"]);
-        gobject.set_accels_for_action(&action_tab_pin.detailed_name(), &["<Primary>p"]);
-        gobject.set_accels_for_action(&action_tab_close.detailed_name(), &["<Primary>q"]);
+        gobject.set_accels_for_action(&action_page_new.detailed_name(), &["<Primary>t"]);
+        gobject.set_accels_for_action(&action_page_pin.detailed_name(), &["<Primary>p"]);
+        gobject.set_accels_for_action(&action_page_close.detailed_name(), &["<Primary>q"]);
+        gobject.set_accels_for_action(&action_page_base.detailed_name(), &["<Primary>h"]);
         gobject.set_accels_for_action(
-            &action_tab_page_navigation_base.detailed_name(),
-            &["<Primary>h"],
-        );
-        gobject.set_accels_for_action(
-            &action_tab_page_navigation_history_back.detailed_name(),
+            &action_page_history_back.detailed_name(),
             &["<Primary>Left"],
         );
         gobject.set_accels_for_action(
-            &action_tab_page_navigation_history_forward.detailed_name(),
+            &action_page_history_forward.detailed_name(),
             &["<Primary>Right"],
         );
-        gobject.set_accels_for_action(
-            &action_tab_page_navigation_reload.detailed_name(),
-            &["<Primary>r"],
-        );
+        gobject.set_accels_for_action(&action_page_reload.detailed_name(), &["<Primary>r"]);
 
         // Init components
         let browser = Arc::new(Browser::new(
             profile_path,
-            action_tool_debug.simple(),
-            action_tool_profile.simple(),
+            action_debug.simple(),
+            action_profile.simple(),
             action_quit.simple(),
             action_update.simple(),
-            action_tab_append.simple(),
-            action_tab_close.simple(),
-            action_tab_close_all.simple(),
-            action_tab_page_navigation_base.simple(),
-            action_tab_page_navigation_history_back.simple(),
-            action_tab_page_navigation_history_forward.simple(),
-            action_tab_page_navigation_reload.simple(),
-            action_tab_pin.simple(),
+            action_page_new.simple(),
+            action_page_close.simple(),
+            action_page_close_all.simple(),
+            action_page_base.simple(),
+            action_page_history_back.simple(),
+            action_page_history_forward.simple(),
+            action_page_reload.simple(),
+            action_page_pin.simple(),
         ));
 
         // Init events

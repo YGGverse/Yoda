@@ -28,12 +28,12 @@ pub struct History {
 impl History {
     // Construct
     pub fn new_arc(
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
     ) -> Arc<Self> {
         // init components
-        let back = Back::new_arc(action_tab_page_navigation_history_back);
-        let forward = Forward::new_arc(action_tab_page_navigation_history_forward);
+        let back = Back::new_arc(action_page_history_back);
+        let forward = Forward::new_arc(action_page_history_forward);
 
         // Init widget
         let widget = Widget::new_arc(back.gobject(), forward.gobject());

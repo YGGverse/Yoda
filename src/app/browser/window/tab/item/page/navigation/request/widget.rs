@@ -32,7 +32,7 @@ impl Widget {
     // Construct
     pub fn new_arc(
         action_update: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction, // @TODO local `action_page_open`?
+        action_page_reload: SimpleAction, // @TODO local `action_page_open`?
     ) -> Arc<Self> {
         // Init animated progress bar state
         let progress = Arc::new(Progress {
@@ -60,7 +60,7 @@ impl Widget {
         });
 
         gobject.connect_activate(move |_| {
-            action_tab_page_navigation_reload.activate(None);
+            action_page_reload.activate(None);
         });
 
         primary_button_controller.connect_pressed({

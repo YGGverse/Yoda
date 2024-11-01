@@ -22,11 +22,11 @@ impl Text {
     pub fn gemini(
         gemtext: &str,
         base: &Uri,
-        action_tab_append: SimpleAction,
+        action_page_new: SimpleAction,
         action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, action_tab_append, action_page_open);
+        let gemini = Gemini::new(gemtext, base, action_page_new, action_page_open);
 
         // Init meta
         let meta = Meta {

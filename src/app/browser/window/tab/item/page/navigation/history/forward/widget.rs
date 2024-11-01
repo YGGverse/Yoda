@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_history_forward: SimpleAction) -> Arc<Self> {
+    pub fn new_arc(action_page_history_forward: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-next-symbolic")
@@ -21,10 +21,10 @@ impl Widget {
 
         // Init events
         gobject.connect_clicked({
-            let action_tab_page_navigation_history_forward =
-                action_tab_page_navigation_history_forward.clone();
+            let action_page_history_forward =
+                action_page_history_forward.clone();
             move |_| {
-                action_tab_page_navigation_history_forward.activate(None);
+                action_page_history_forward.activate(None);
             }
         });
 

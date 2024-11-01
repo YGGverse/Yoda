@@ -19,34 +19,34 @@ pub struct Bar {
 impl Bar {
     // Construct
     pub fn new_arc(
-        action_tool_debug: SimpleAction,
-        action_tool_profile: SimpleAction,
+        action_debug: SimpleAction,
+        action_profile: SimpleAction,
         action_quit: SimpleAction,
-        action_tab_append: SimpleAction,
-        action_tab_close: SimpleAction,
-        action_tab_close_all: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
-        action_tab_pin: SimpleAction,
+        action_page_new: SimpleAction,
+        action_page_close: SimpleAction,
+        action_page_close_all: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
+        action_page_pin: SimpleAction,
         view: &TabView,
     ) -> Arc<Self> {
         // Init components
         let control = Control::new_arc();
-        let tab = Tab::new_arc(action_tab_append.clone(), view);
+        let tab = Tab::new_arc(action_page_new.clone(), view);
         let menu = Menu::new_arc(
-            action_tool_debug,
-            action_tool_profile,
+            action_debug,
+            action_profile,
             action_quit,
-            action_tab_append,
-            action_tab_close,
-            action_tab_close_all,
-            action_tab_page_navigation_base,
-            action_tab_page_navigation_history_back,
-            action_tab_page_navigation_history_forward,
-            action_tab_page_navigation_reload,
-            action_tab_pin,
+            action_page_new,
+            action_page_close,
+            action_page_close_all,
+            action_page_base,
+            action_page_history_back,
+            action_page_history_forward,
+            action_page_reload,
+            action_page_pin,
         );
 
         // Build result

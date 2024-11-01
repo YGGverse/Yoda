@@ -20,10 +20,10 @@ pub struct Tab {
     // Local actions
     action_tab_open: SimpleAction,
     // Global actions
-    action_tab_page_navigation_base: SimpleAction,
-    action_tab_page_navigation_history_back: SimpleAction,
-    action_tab_page_navigation_history_forward: SimpleAction,
-    action_tab_page_navigation_reload: SimpleAction,
+    action_page_base: SimpleAction,
+    action_page_history_back: SimpleAction,
+    action_page_history_forward: SimpleAction,
+    action_page_reload: SimpleAction,
     action_update: SimpleAction,
     // Dynamically allocated reference index
     index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
@@ -35,10 +35,10 @@ impl Tab {
     // Construct
     pub fn new_arc(
         // Actions
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init local actions
@@ -76,12 +76,10 @@ impl Tab {
             let gobject = widget.gobject().clone();
             // Actions
             let action_tab_open = action_tab_open.clone();
-            let action_tab_page_navigation_base = action_tab_page_navigation_base.clone();
-            let action_tab_page_navigation_history_back =
-                action_tab_page_navigation_history_back.clone();
-            let action_tab_page_navigation_history_forward =
-                action_tab_page_navigation_history_forward.clone();
-            let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
+            let action_page_base = action_page_base.clone();
+            let action_page_history_back = action_page_history_back.clone();
+            let action_page_history_forward = action_page_history_forward.clone();
+            let action_page_reload = action_page_reload.clone();
             let action_update = action_update.clone();
             move |_, request| {
                 // Init new tab item
@@ -90,10 +88,10 @@ impl Tab {
                     // Local actions
                     action_tab_open.clone(),
                     // Global actions
-                    action_tab_page_navigation_base.clone(),
-                    action_tab_page_navigation_history_back.clone(),
-                    action_tab_page_navigation_history_forward.clone(),
-                    action_tab_page_navigation_reload.clone(),
+                    action_page_base.clone(),
+                    action_page_history_back.clone(),
+                    action_page_history_forward.clone(),
+                    action_page_reload.clone(),
                     action_update.clone(),
                     // Options
                     match gobject.selected_page() {
@@ -122,10 +120,10 @@ impl Tab {
             // Local actions
             action_tab_open,
             // Global actions
-            action_tab_page_navigation_base,
-            action_tab_page_navigation_history_back,
-            action_tab_page_navigation_history_forward,
-            action_tab_page_navigation_reload,
+            action_page_base,
+            action_page_history_back,
+            action_page_history_forward,
+            action_page_reload,
             action_update,
             // Init empty HashMap index as no tabs appended yet
             index,
@@ -142,10 +140,10 @@ impl Tab {
             // Local actions
             self.action_tab_open.clone(),
             // Global actions
-            self.action_tab_page_navigation_base.clone(),
-            self.action_tab_page_navigation_history_back.clone(),
-            self.action_tab_page_navigation_history_forward.clone(),
-            self.action_tab_page_navigation_reload.clone(),
+            self.action_page_base.clone(),
+            self.action_page_history_back.clone(),
+            self.action_page_history_forward.clone(),
+            self.action_page_reload.clone(),
             self.action_update.clone(),
             // Options
             position,
@@ -279,10 +277,10 @@ impl Tab {
                         transaction,
                         &record.id,
                         self.action_tab_open.clone(),
-                        self.action_tab_page_navigation_base.clone(),
-                        self.action_tab_page_navigation_history_back.clone(),
-                        self.action_tab_page_navigation_history_forward.clone(),
-                        self.action_tab_page_navigation_reload.clone(),
+                        self.action_page_base.clone(),
+                        self.action_page_history_back.clone(),
+                        self.action_page_history_forward.clone(),
+                        self.action_page_reload.clone(),
                         self.action_update.clone(),
                     ) {
                         Ok(items) => {

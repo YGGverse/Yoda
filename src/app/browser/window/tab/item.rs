@@ -29,10 +29,10 @@ impl Item {
         tab_view: &TabView,
         // Actions
         action_tab_open: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
         action_update: SimpleAction,
         // Options
         position: Option<i32>,
@@ -47,10 +47,10 @@ impl Item {
             id.clone(),
             // Actions
             action_tab_open.clone(),
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
+            action_page_base.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
             action_update.clone(),
         );
 
@@ -129,10 +129,10 @@ impl Item {
         app_browser_window_tab_id: &i64,
         // Actions
         action_tab_open: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Result<Vec<Arc<Item>>, String> {
         let mut items = Vec::new();
@@ -145,10 +145,10 @@ impl Item {
                         tab_view,
                         // Actions
                         action_tab_open.clone(),
-                        action_tab_page_navigation_base.clone(),
-                        action_tab_page_navigation_history_back.clone(),
-                        action_tab_page_navigation_history_forward.clone(),
-                        action_tab_page_navigation_reload.clone(),
+                        action_page_base.clone(),
+                        action_page_history_back.clone(),
+                        action_page_history_forward.clone(),
+                        action_page_reload.clone(),
                         action_update.clone(),
                         // Options
                         None,

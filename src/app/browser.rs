@@ -28,68 +28,60 @@ impl Browser {
         // Extras
         profile_path: PathBuf,
         // Actions
-        action_tool_debug: SimpleAction,
-        action_tool_profile: SimpleAction,
+        action_debug: SimpleAction,
+        action_profile: SimpleAction,
         action_quit: SimpleAction,
         action_update: SimpleAction,
-        action_tab_append: SimpleAction,
-        action_tab_close: SimpleAction,
-        action_tab_close_all: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
-        action_tab_pin: SimpleAction,
+        action_page_new: SimpleAction,
+        action_page_close: SimpleAction,
+        action_page_close_all: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
+        action_page_pin: SimpleAction,
     ) -> Browser {
         let window = Arc::new(Window::new(
-            action_tool_debug.clone(),
-            action_tool_profile.clone(),
+            action_debug.clone(),
+            action_profile.clone(),
             action_quit.clone(),
             action_update.clone(),
-            action_tab_append.clone(),
-            action_tab_close.clone(),
-            action_tab_close_all.clone(),
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
-            action_tab_pin.clone(),
+            action_page_new.clone(),
+            action_page_close.clone(),
+            action_page_close_all.clone(),
+            action_page_base.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
+            action_page_pin.clone(),
         ));
 
         // Init widget
         let widget = Arc::new(Widget::new(window.gobject()));
 
         // Assign actions
-        widget.gobject().add_action(&action_tool_debug);
-        widget.gobject().add_action(&action_tool_profile);
+        widget.gobject().add_action(&action_debug);
+        widget.gobject().add_action(&action_profile);
         widget.gobject().add_action(&action_quit);
         widget.gobject().add_action(&action_update);
-        widget.gobject().add_action(&action_tab_append);
-        widget.gobject().add_action(&action_tab_close);
-        widget.gobject().add_action(&action_tab_close_all);
-        widget
-            .gobject()
-            .add_action(&action_tab_page_navigation_base);
-        widget
-            .gobject()
-            .add_action(&action_tab_page_navigation_history_back);
-        widget
-            .gobject()
-            .add_action(&action_tab_page_navigation_history_forward);
-        widget
-            .gobject()
-            .add_action(&action_tab_page_navigation_reload);
-        widget.gobject().add_action(&action_tab_pin);
+        widget.gobject().add_action(&action_page_new);
+        widget.gobject().add_action(&action_page_close);
+        widget.gobject().add_action(&action_page_close_all);
+        widget.gobject().add_action(&action_page_base);
+        widget.gobject().add_action(&action_page_history_back);
+        widget.gobject().add_action(&action_page_history_forward);
+        widget.gobject().add_action(&action_page_reload);
+        widget.gobject().add_action(&action_page_pin);
 
         // Init events
-        action_tool_debug.connect_activate({
+        action_debug.connect_activate({
             let widget = widget.clone();
             move |_, _| {
                 widget.gobject().emit_enable_debugging(true);
             }
         });
 
-        action_tool_profile.connect_activate({
+        action_profile.connect_activate({
             move |_, _| {
                 FileLauncher::new(Some(&File::for_path(&profile_path))).launch(
                     None::<&gtk::Window>,
@@ -123,56 +115,56 @@ impl Browser {
             }
         });
 
-        action_tab_append.connect_activate({
+        action_page_new.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_append(None);
             }
         });
 
-        action_tab_close.connect_activate({
+        action_page_close.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_close();
             }
         });
 
-        action_tab_close_all.connect_activate({
+        action_page_close_all.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_close_all();
             }
         });
 
-        action_tab_page_navigation_base.connect_activate({
+        action_page_base.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_page_navigation_base();
             }
         });
 
-        action_tab_page_navigation_history_back.connect_activate({
+        action_page_history_back.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_page_navigation_history_back();
             }
         });
 
-        action_tab_page_navigation_history_forward.connect_activate({
+        action_page_history_forward.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_page_navigation_history_forward();
             }
         });
 
-        action_tab_page_navigation_reload.connect_activate({
+        action_page_reload.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_page_navigation_reload();
             }
         });
 
-        action_tab_pin.connect_activate({
+        action_page_pin.connect_activate({
             let window = window.clone();
             move |_, _| {
                 window.tab_pin();

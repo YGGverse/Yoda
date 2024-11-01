@@ -35,7 +35,7 @@ pub struct Page {
     id: GString,
     // Actions
     action_page_open: SimpleAction,
-    action_tab_page_navigation_reload: SimpleAction,
+    action_page_reload: SimpleAction,
     action_update: SimpleAction,
     // Components
     navigation: Arc<Navigation>,
@@ -52,10 +52,10 @@ impl Page {
     pub fn new_arc(
         id: GString,
         action_tab_open: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init local actions
@@ -66,10 +66,10 @@ impl Page {
         let content = Content::new_arc(action_tab_open.clone(), action_page_open.clone());
 
         let navigation = Navigation::new_arc(
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
+            action_page_base.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
             action_update.clone(),
         );
 
@@ -89,7 +89,7 @@ impl Page {
         // Init events
         action_page_open.connect_activate({
             let navigation = navigation.clone();
-            let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
+            let action_page_reload = action_page_reload.clone();
             move |_, request| {
                 // Update request
                 navigation.set_request_text(
@@ -101,7 +101,7 @@ impl Page {
                 );
 
                 // Reload page
-                action_tab_page_navigation_reload.activate(None);
+                action_page_reload.activate(None);
             }
         });
 
@@ -110,7 +110,7 @@ impl Page {
             id,
             // Actions
             action_page_open,
-            action_tab_page_navigation_reload,
+            action_page_reload,
             action_update,
             // Components
             content,
@@ -141,7 +141,7 @@ impl Page {
             self.navigation.set_request_text(&request);
 
             // Reload page
-            self.action_tab_page_navigation_reload.activate(None);
+            self.action_page_reload.activate(None);
         }
     }
 
@@ -151,7 +151,7 @@ impl Page {
             self.navigation.set_request_text(&request);
 
             // Reload page
-            self.action_tab_page_navigation_reload.activate(None);
+            self.action_page_reload.activate(None);
         }
     }
 
@@ -218,7 +218,7 @@ impl Page {
                             self.navigation.set_request_text(&request_text);
 
                             // Reload page
-                            self.action_tab_page_navigation_reload.activate(None);
+                            self.action_page_reload.activate(None);
                         }
                         Err(_) => {
                             // @TODO any action here?
@@ -235,7 +235,7 @@ impl Page {
                     self.navigation.set_request_text(&request_text);
 
                     // Reload page
-                    self.action_tab_page_navigation_reload.activate(None);
+                    self.action_page_reload.activate(None);
                 }
             }
         }; // Uri::parse

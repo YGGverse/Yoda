@@ -23,41 +23,41 @@ impl Window {
     // Construct
     pub fn new(
         // Actions
-        action_tool_debug: SimpleAction,
-        action_tool_profile: SimpleAction,
+        action_debug: SimpleAction,
+        action_profile: SimpleAction,
         action_quit: SimpleAction,
         action_update: SimpleAction,
-        action_tab_append: SimpleAction,
-        action_tab_close: SimpleAction,
-        action_tab_close_all: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
-        action_tab_pin: SimpleAction,
+        action_page_new: SimpleAction,
+        action_page_close: SimpleAction,
+        action_page_close_all: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
+        action_page_pin: SimpleAction,
     ) -> Self {
         // Init components
         let tab = Tab::new_arc(
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
+            action_page_base.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
             action_update.clone(),
         );
 
         let header = Header::new_arc(
             // Actions
-            action_tool_debug.clone(),
-            action_tool_profile.clone(),
+            action_debug.clone(),
+            action_profile.clone(),
             action_quit.clone(),
-            action_tab_append.clone(),
-            action_tab_close.clone(),
-            action_tab_close_all.clone(),
-            action_tab_page_navigation_base.clone(),
-            action_tab_page_navigation_history_back.clone(),
-            action_tab_page_navigation_history_forward.clone(),
-            action_tab_page_navigation_reload.clone(),
-            action_tab_pin.clone(),
+            action_page_new.clone(),
+            action_page_close.clone(),
+            action_page_close_all.clone(),
+            action_page_base.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
+            action_page_pin.clone(),
             // Widgets
             tab.gobject(),
         );

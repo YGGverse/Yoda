@@ -17,35 +17,35 @@ pub struct Menu {
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new_arc(
-        action_tool_debug: SimpleAction,
-        action_tool_profile: SimpleAction,
+        action_debug: SimpleAction,
+        action_profile: SimpleAction,
         action_quit: SimpleAction,
-        action_tab_append: SimpleAction,
-        action_tab_close: SimpleAction,
-        action_tab_close_all: SimpleAction,
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
-        action_tab_pin: SimpleAction,
+        action_page_new: SimpleAction,
+        action_page_close: SimpleAction,
+        action_page_close_all: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
+        action_page_pin: SimpleAction,
     ) -> Arc<Self> {
         // Main
         let main = gio::Menu::new();
 
             // Main > Page
             let main_page = gio::Menu::new();
-                main_page.append(Some("New"), Some(&detailed_action_name(action_tab_append)));
-                main_page.append(Some("Reload"), Some(&detailed_action_name(action_tab_page_navigation_reload)));
-                main_page.append(Some("Pin"), Some(&detailed_action_name(action_tab_pin)));
+                main_page.append(Some("New"), Some(&detailed_action_name(action_page_new)));
+                main_page.append(Some("Reload"), Some(&detailed_action_name(action_page_reload)));
+                main_page.append(Some("Pin"), Some(&detailed_action_name(action_page_pin)));
 
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
-                    main_page_navigation.append(Some("Base"), Some(&detailed_action_name(action_tab_page_navigation_base)));
+                    main_page_navigation.append(Some("Base"), Some(&detailed_action_name(action_page_base)));
 
                     // Main > Page > Navigation > History
                     let main_page_navigation_history = gio::Menu::new();
-                        main_page_navigation_history.append(Some("Back"), Some(&detailed_action_name(action_tab_page_navigation_history_back)));
-                        main_page_navigation_history.append(Some("Forward"), Some(&detailed_action_name(action_tab_page_navigation_history_forward)));
+                        main_page_navigation_history.append(Some("Back"), Some(&detailed_action_name(action_page_history_back)));
+                        main_page_navigation_history.append(Some("Forward"), Some(&detailed_action_name(action_page_history_forward)));
 
                     main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
 
@@ -53,8 +53,8 @@ impl Menu {
 
                 // Main > Page > Close
                 let main_page_close = gio::Menu::new();
-                    main_page_close.append(Some("Current"), Some(&detailed_action_name(action_tab_close)));
-                    main_page_close.append(Some("All"), Some(&detailed_action_name(action_tab_close_all)));
+                    main_page_close.append(Some("Current"), Some(&detailed_action_name(action_page_close)));
+                    main_page_close.append(Some("All"), Some(&detailed_action_name(action_page_close_all)));
 
                     main_page.append_submenu(Some("Close"), &main_page_close);
 
@@ -62,8 +62,8 @@ impl Menu {
 
             // Main > Tool
             let main_tool = gio::Menu::new();
-                main_tool.append(Some("Debug"), Some(&detailed_action_name(action_tool_debug)));
-                main_tool.append(Some("Profile"), Some(&detailed_action_name(action_tool_profile)));
+                main_tool.append(Some("Debug"), Some(&detailed_action_name(action_debug)));
+                main_tool.append(Some("Profile"), Some(&detailed_action_name(action_profile)));
 
             main.append_submenu(Some("Tool"), &main_tool);
 

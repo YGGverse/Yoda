@@ -11,10 +11,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(action_tab_append: SimpleAction) -> Self {
+    pub fn new(action_page_new: SimpleAction) -> Self {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
-        action_group.add_action(&action_tab_append);
+        action_group.add_action(&action_page_new);
 
         // Init gobject
         let gobject = TabView::new();

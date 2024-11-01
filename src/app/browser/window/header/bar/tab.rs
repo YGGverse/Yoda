@@ -14,9 +14,9 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new_arc(action_tab_append: SimpleAction, view: &TabView) -> Arc<Self> {
+    pub fn new_arc(action_page_new: SimpleAction, view: &TabView) -> Arc<Self> {
         Arc::new(Self {
-            widget: Widget::new_arc(view, Append::new_arc(action_tab_append).gobject()),
+            widget: Widget::new_arc(view, Append::new_arc(action_page_new).gobject()),
         })
     }
 

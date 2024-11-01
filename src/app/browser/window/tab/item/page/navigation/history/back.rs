@@ -6,25 +6,25 @@ use gtk::{gio::SimpleAction, Button};
 use std::sync::Arc;
 
 pub struct Back {
-    action_tab_page_navigation_history_back: SimpleAction,
+    action_page_history_back: SimpleAction,
     widget: Arc<Widget>,
 }
 
 impl Back {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_history_back: SimpleAction) -> Arc<Self> {
+    pub fn new_arc(action_page_history_back: SimpleAction) -> Arc<Self> {
         // Return activated struct
         Arc::new(Self {
-            action_tab_page_navigation_history_back: action_tab_page_navigation_history_back
+            action_page_history_back: action_page_history_back
                 .clone(),
-            widget: Widget::new_arc(action_tab_page_navigation_history_back),
+            widget: Widget::new_arc(action_page_history_back),
         })
     }
 
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action_tab_page_navigation_history_back
+        self.action_page_history_back
             .set_enabled(status);
 
         // Update child components

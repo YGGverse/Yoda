@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_tab_page_navigation_reload: SimpleAction) -> Arc<Self> {
+    pub fn new_arc(action_page_reload: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("view-refresh-symbolic")
@@ -21,9 +21,9 @@ impl Widget {
 
         // Init events
         gobject.connect_clicked({
-            let action_tab_page_navigation_reload = action_tab_page_navigation_reload.clone();
+            let action_page_reload = action_page_reload.clone();
             move |_| {
-                action_tab_page_navigation_reload.activate(None);
+                action_page_reload.activate(None);
             }
         });
 

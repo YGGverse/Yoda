@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_tab_append: SimpleAction) -> Arc<Self> {
+    pub fn new_arc(action_page_new: SimpleAction) -> Arc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("tab-new-symbolic")
@@ -22,7 +22,7 @@ impl Widget {
 
         // Init events
         gobject.connect_clicked(move |_| {
-            action_tab_append.activate(None);
+            action_page_new.activate(None);
         });
 
         Arc::new(Self { gobject })

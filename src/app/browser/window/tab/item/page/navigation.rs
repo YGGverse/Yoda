@@ -30,22 +30,22 @@ pub struct Navigation {
 
 impl Navigation {
     pub fn new_arc(
-        action_tab_page_navigation_base: SimpleAction,
-        action_tab_page_navigation_history_back: SimpleAction,
-        action_tab_page_navigation_history_forward: SimpleAction,
-        action_tab_page_navigation_reload: SimpleAction,
+        action_page_base: SimpleAction,
+        action_page_history_back: SimpleAction,
+        action_page_history_forward: SimpleAction,
+        action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init components
-        let base = Base::new_arc(action_tab_page_navigation_base);
+        let base = Base::new_arc(action_page_base);
         let history = History::new_arc(
-            action_tab_page_navigation_history_back,
-            action_tab_page_navigation_history_forward,
+            action_page_history_back,
+            action_page_history_forward,
         );
-        let reload = Reload::new_arc(action_tab_page_navigation_reload.clone());
+        let reload = Reload::new_arc(action_page_reload.clone());
         let request = Request::new_arc(
             action_update.clone(),
-            action_tab_page_navigation_reload.clone(),
+            action_page_reload.clone(),
         );
         let bookmark = Bookmark::new_arc();
 
