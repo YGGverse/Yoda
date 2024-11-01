@@ -676,6 +676,7 @@ impl Page {
                                                     // Build gemtext message for manual redirection @TODO use template?
                                                     match response.data() {
                                                         Some(url) => {
+                                                            // @TODO URI can by relative, resolve to base
                                                             content.to_text_gemini(
                                                                 &uri,
                                                                 &gformat!(
