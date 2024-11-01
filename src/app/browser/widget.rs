@@ -3,7 +3,10 @@ mod database;
 use database::Database;
 
 use adw::ApplicationWindow;
-use gtk::{prelude::GtkWindowExt, Box};
+use gtk::{
+    gio::SimpleAction,
+    prelude::{ActionMapExt, GtkWindowExt, IsA},
+};
 use sqlite::Transaction;
 
 // Default options
@@ -17,7 +20,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(content: &Box) -> Self {
+    pub fn new(content: &impl IsA<gtk::Widget>, actions: &[SimpleAction]) -> Self {
         // Init GTK
         let gobject = ApplicationWindow::builder()
             .content(content)
@@ -25,6 +28,11 @@ impl Widget {
             .default_width(DEFAULT_WIDTH)
             .maximized(MAXIMIZED)
             .build();
+
+        // Register actions
+        for action in actions {
+            gobject.add_action(action);
+        }
 
         // Return new struct
         Self { gobject }

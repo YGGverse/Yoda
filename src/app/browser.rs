@@ -9,7 +9,7 @@ use window::Window;
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
-    prelude::{ActionMapExt, GtkWindowExt},
+    prelude::GtkWindowExt,
     FileLauncher,
 };
 use sqlite::Transaction;
@@ -57,21 +57,23 @@ impl Browser {
         ));
 
         // Init widget
-        let widget = Arc::new(Widget::new(window.gobject()));
-
-        // Assign actions
-        widget.gobject().add_action(&action_debug);
-        widget.gobject().add_action(&action_profile);
-        widget.gobject().add_action(&action_quit);
-        widget.gobject().add_action(&action_update);
-        widget.gobject().add_action(&action_page_new);
-        widget.gobject().add_action(&action_page_close);
-        widget.gobject().add_action(&action_page_close_all);
-        widget.gobject().add_action(&action_page_home);
-        widget.gobject().add_action(&action_page_history_back);
-        widget.gobject().add_action(&action_page_history_forward);
-        widget.gobject().add_action(&action_page_reload);
-        widget.gobject().add_action(&action_page_pin);
+        let widget = Arc::new(Widget::new(
+            window.gobject(),
+            &[
+                action_debug.clone(),
+                action_profile.clone(),
+                action_quit.clone(),
+                action_update.clone(),
+                action_page_new.clone(),
+                action_page_close.clone(),
+                action_page_close_all.clone(),
+                action_page_home.clone(),
+                action_page_history_back.clone(),
+                action_page_history_forward.clone(),
+                action_page_reload.clone(),
+                action_page_pin.clone(),
+            ],
+        ));
 
         // Init events
         action_debug.connect_activate({
