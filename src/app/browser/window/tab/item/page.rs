@@ -478,7 +478,7 @@ impl Page {
                                                 gemini::client::response::meta::Status::Success => {
                                                     // Route by MIME
                                                     match response.mime() {
-                                                        gemini::client::response::meta::Mime::TextGemini => {
+                                                        Some(gemini::client::response::meta::Mime::TextGemini) => {
                                                             // Read entire input stream to buffer
                                                             gemini::client::response::data::Text::from_socket_connection_async(
                                                                 connection,
@@ -535,11 +535,12 @@ impl Page {
                                                                 }
                                                             );
                                                         },
-                                                        gemini::client::response::meta::Mime::ImagePng  |
-                                                        gemini::client::response::meta::Mime::ImageGif |
-                                                        gemini::client::response::meta::Mime::ImageJpeg |
-                                                        gemini::client::response::meta::Mime::ImageWebp
-                                                         => {
+                                                        Some(
+                                                            gemini::client::response::meta::Mime::ImagePng  |
+                                                            gemini::client::response::meta::Mime::ImageGif  |
+                                                            gemini::client::response::meta::Mime::ImageJpeg |
+                                                            gemini::client::response::meta::Mime::ImageWebp
+                                                        ) => {
                                                             // Final image size unknown, show loading widget
                                                             let status = content.to_status_loading(
                                                                 Some(Duration::from_secs(1)) // show if download time > 1 second
