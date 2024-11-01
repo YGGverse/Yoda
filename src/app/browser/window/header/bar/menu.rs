@@ -35,6 +35,7 @@ impl Menu {
             // Main > Page
             let main_page = gio::Menu::new();
                 main_page.append(Some("New"), Some(&detailed_action_name(action_tab_append)));
+                main_page.append(Some("Reload"), Some(&detailed_action_name(action_tab_page_navigation_reload)));
                 main_page.append(Some("Pin"), Some(&detailed_action_name(action_tab_pin)));
 
                 // Main > Page > Navigation
@@ -47,9 +48,8 @@ impl Menu {
                         main_page_navigation_history.append(Some("Forward"), Some(&detailed_action_name(action_tab_page_navigation_history_forward)));
 
                     main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
-                    main_page_navigation.append(Some("Reload"), Some(&detailed_action_name(action_tab_page_navigation_reload)));
 
-                main_page.append_submenu(Some("Navigation"), &main_page_navigation);
+                main_page.append_section(None, &main_page_navigation);
 
                 // Main > Page > Close
                 let main_page_close = gio::Menu::new();
