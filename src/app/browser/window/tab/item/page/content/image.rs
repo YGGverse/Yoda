@@ -1,4 +1,6 @@
-use gtk::{gdk_pixbuf::Pixbuf, Picture};
+use gtk::{gdk_pixbuf::Pixbuf, prelude::WidgetExt, Picture};
+
+const MARGIN: i32 = 6;
 
 pub struct Image {
     gobject: Picture,
@@ -7,9 +9,12 @@ pub struct Image {
 impl Image {
     // Construct
     pub fn new_from_pixbuf(buffer: &Pixbuf) -> Self {
-        Self {
-            gobject: Picture::for_pixbuf(buffer),
-        }
+        let gobject = Picture::for_pixbuf(buffer);
+
+        gobject.set_margin_end(MARGIN);
+        gobject.set_margin_start(MARGIN);
+
+        Self { gobject }
     }
 
     // Getters
