@@ -41,6 +41,7 @@ impl Browser {
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
     ) -> Browser {
+        // Init components
         let window = Arc::new(Window::new(
             action_debug.clone(),
             action_profile.clone(),
@@ -173,7 +174,7 @@ impl Browser {
             }
         });
 
-        // Return new activated Browser struct
+        // Return new activated `Self`
         Self {
             widget,
             // header,
