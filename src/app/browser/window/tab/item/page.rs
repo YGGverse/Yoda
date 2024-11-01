@@ -443,9 +443,9 @@ impl Page {
                                                     // Format response
                                                     let status = Status::Input;
                                                     let title = gformat!("Input expected");
-                                                    let description = match response.data().value() {
-                                                            Some(value) => value,
-                                                            None => &title,
+                                                    let description = match response.data() {
+                                                        Some(data) => data.value(),
+                                                        None => &title,
                                                     };
 
                                                     // Toggle input form variant
@@ -674,11 +674,14 @@ impl Page {
                                                     meta.borrow_mut().title = Some(gformat!("Redirect"));
 
                                                     // Build gemtext message for manual redirection @TODO use template?
-                                                    match response.data().value() {
+                                                    match response.data() {
                                                         Some(url) => {
                                                             content.to_text_gemini(
                                                                 &uri,
-                                                                &gformat!("# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {url}")
+                                                                &gformat!(
+                                                                    "# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {}",
+                                                                    url.value()
+                                                                )
                                                             );
                                                         },
                                                         None => {
