@@ -359,7 +359,7 @@ impl Page {
         Ok(())
     }
 
-    // Private helpers @TODO
+    // Private helpers @TODO move outside
     fn load_gemini(&self, uri: Uri) {
         // Use local namespaces @TODO
         // use gemini::client::response::
@@ -694,6 +694,26 @@ impl Page {
 
                                                     action_update.activate(Some(&id));
                                                 },
+                                                _ => {
+                                                    // Define common data
+                                                    let status = Status::Failure;
+                                                    let title = gformat!("Oops");
+
+                                                    // Update widget
+                                                    content
+                                                        .to_status_failure()
+                                                        .set_title(title.as_str())
+                                                        .set_description(Some("Status code yet not supported"));
+
+                                                    // Update meta
+                                                    meta.replace(Meta {
+                                                        status: Some(status),
+                                                        title: Some(title),
+                                                    });
+
+                                                    // Update window
+                                                    action_update.activate(Some(&id));
+                                                }
                                             }
                                         },
                                         Err((reason, message)) => {
