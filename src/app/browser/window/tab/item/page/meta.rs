@@ -27,7 +27,7 @@ pub struct Meta {
     status: RefCell<Status>,
     title: RefCell<GString>,
     redirect: RefCell<Option<Redirect>>,
-    redirect_count: RefCell<i8>,
+    redirect_count: RefCell<Option<i8>>,
 }
 
 impl Meta {
@@ -38,7 +38,7 @@ impl Meta {
             status: RefCell::new(status),
             title: RefCell::new(title),
             redirect: RefCell::new(None),
-            redirect_count: RefCell::new(0),
+            redirect_count: RefCell::new(None),
         })
     }
 
@@ -60,8 +60,15 @@ impl Meta {
         self
     }
 
-    pub fn set_redirect_count(&self, redirect_count: i8) -> &Self {
+    pub fn set_redirect_count(&self, redirect_count: Option<i8>) -> &Self {
         self.redirect_count.replace(redirect_count);
+        self
+    }
+
+    pub fn unset_redirect_count(&self) -> &Self {
+        if self.redirect_count.borrow().is_some() {
+            self.set_redirect_count(None);
+        }
         self
     }
 
@@ -81,7 +88,7 @@ impl Meta {
         self.title.borrow().clone()
     }
 
-    pub fn redirect_count(&self) -> i8 {
+    pub fn redirect_count(&self) -> Option<i8> {
         self.redirect_count.borrow().clone()
     }
 

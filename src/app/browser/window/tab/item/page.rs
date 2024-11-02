@@ -169,13 +169,20 @@ impl Page {
 
         // Try **take** request value from Redirect holder first
         let request = if let Some(redirect) = self.meta.take_redirect() {
-            // Increase redirect counter
-            self.meta.set_redirect_count(self.meta.redirect_count() + 1);
-
-            // Prevent infinitive redirection by global settings
-            if self.meta.redirect_count() > DEFAULT_MAX_REDIRECT_COUNT {
-                todo!();
-            }
+            // Update redirect counter
+            self.meta
+                .set_redirect_count(match self.meta.redirect_count() {
+                    Some(value) => {
+                        // Prevent infinitive redirection
+                        if value > DEFAULT_MAX_REDIRECT_COUNT {
+                            todo!()
+                        }
+                        // Increase
+                        Some(value + 1)
+                    }
+                    // Set initial value
+                    None => Some(1),
+                });
 
             // Update navigation on redirect `is_foreground`
             if redirect.is_foreground() {
@@ -198,8 +205,8 @@ impl Page {
                 None => self.navigation.history_add(value),
             }
 
-            // Reset redirect counter as value taken from user input
-            self.meta.set_redirect_count(0);
+            // Reset redirect counter as request value taken from user input
+            self.meta.unset_redirect_count();
 
             // Return value from navigation entry
             self.navigation.request_text()
@@ -715,7 +722,7 @@ impl Page {
                                                                                     )
                                                                                 );
                                                                             // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
-                                                                            } else if meta.redirect_count() >= 5 {
+                                                                            } else if meta.redirect_count() > Some(5) {
                                                                                 // Update meta
                                                                                 meta.set_status(Status::Failure)
                                                                                     .set_title(&"Oops");
