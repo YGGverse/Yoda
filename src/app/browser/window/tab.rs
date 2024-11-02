@@ -217,9 +217,7 @@ impl Tab {
 
                 // Update tab title on loading indicator inactive
                 if !item.page_is_loading() {
-                    if let Some(title) = item.page_meta_title() {
-                        item.gobject().set_title(title.as_str())
-                    };
+                    item.gobject().set_title(item.page_meta_title().as_str())
                 }
             }
             // Update all tabs on ID not found @TODO change initial update method
@@ -230,9 +228,7 @@ impl Tab {
 
                     // Update tab title on loading indicator inactive
                     if !item.page_is_loading() {
-                        if let Some(title) = item.page_meta_title() {
-                            item.gobject().set_title(title.as_str())
-                        };
+                        item.gobject().set_title(item.page_meta_title().as_str())
                     }
                 }
             }

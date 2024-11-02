@@ -21,7 +21,7 @@ use gtk::{
     },
     glib::{
         gformat, uuid_string_random, Bytes, GString, Priority, Regex, RegexCompileFlags,
-        RegexMatchFlags, Uri, UriFlags,
+        RegexMatchFlags, Uri, UriFlags, UriHideFlags,
     },
     prelude::{
         ActionExt, IOStreamExt, OutputStreamExt, SocketClientExt, StaticVariantType, ToVariant,
@@ -29,7 +29,7 @@ use gtk::{
     Box,
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 pub struct Page {
     id: GString,
@@ -42,7 +42,7 @@ pub struct Page {
     content: Arc<Content>,
     input: Arc<Input>,
     // Extras
-    meta: Arc<RefCell<Meta>>,
+    meta: Arc<Meta>,
     // GTK
     widget: Arc<Widget>,
 }
@@ -84,7 +84,7 @@ impl Page {
         );
 
         // Init async mutable Meta object
-        let meta = Arc::new(RefCell::new(Meta::new()));
+        let meta = Meta::new_arc(Status::New, gformat!("New page"));
 
         // Init events
         action_page_open.connect_activate({
@@ -105,7 +105,7 @@ impl Page {
             }
         });
 
-        // Return activated structure
+        // Return activated `Self`
         Arc::new(Self {
             id,
             // Actions
@@ -164,11 +164,7 @@ impl Page {
         let id = self.id.to_variant();
 
         // Update
-        self.meta.replace(Meta {
-            status: Some(Status::Reload),
-            title: Some(gformat!("Loading..")),
-        });
-
+        self.meta.set_status(Status::Reload).set_title(&"Loading..");
         self.action_update.activate(Some(&id));
 
         // Route by request
@@ -181,20 +177,18 @@ impl Page {
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
-                        let title = gformat!("Oops");
-                        let description = gformat!("Protocol `{scheme}` not supported");
+                        let title = &"Oops";
 
                         // Update widget
                         self.content
                             .to_status_failure()
-                            .set_title(title.as_str())
-                            .set_description(Some(description.as_str()));
+                            .set_title(title)
+                            .set_description(Some(
+                                gformat!("Protocol `{scheme}` not supported").as_str(),
+                            ));
 
                         // Update meta
-                        self.meta.replace(Meta {
-                            status: Some(status),
-                            title: Some(title),
-                        });
+                        self.meta.set_status(status).set_title(title);
 
                         // Update window
                         self.action_update.activate(Some(&id));
@@ -314,19 +308,19 @@ impl Page {
     // Getters
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
-        match self.meta.borrow().status {
-            Some(Status::Reload) => Some(0.0),
-            Some(Status::Resolving) => Some(0.1),
-            Some(Status::Resolved) => Some(0.2),
-            Some(Status::Connecting) => Some(0.3),
-            Some(Status::Connected) => Some(0.4),
-            Some(Status::ProxyNegotiating) => Some(0.5),
-            Some(Status::ProxyNegotiated) => Some(0.6),
-            Some(Status::TlsHandshaking) => Some(0.7),
-            Some(Status::TlsHandshaked) => Some(0.8),
-            Some(Status::Complete) => Some(0.9),
-            Some(Status::Failure | Status::Redirect | Status::Success | Status::Input) => Some(1.0),
-            _ => None,
+        match self.meta.status() {
+            Status::Reload => Some(0.0),
+            Status::Resolving => Some(0.1),
+            Status::Resolved => Some(0.2),
+            Status::Connecting => Some(0.3),
+            Status::Connected => Some(0.4),
+            Status::ProxyNegotiating => Some(0.5),
+            Status::ProxyNegotiated => Some(0.6),
+            Status::TlsHandshaking => Some(0.7),
+            Status::TlsHandshaked => Some(0.8),
+            Status::Complete => Some(0.9),
+            Status::Failure | Status::Redirect | Status::Success | Status::Input => Some(1.0),
+            Status::New => None,
         }
     }
 
@@ -337,8 +331,8 @@ impl Page {
         }
     }
 
-    pub fn meta_title(&self) -> Option<GString> {
-        self.meta.borrow().title.clone()
+    pub fn meta_title(&self) -> GString {
+        self.meta.title()
     }
 
     pub fn gobject(&self) -> &Box {
@@ -366,6 +360,7 @@ impl Page {
 
         // Init shared objects (async)
         let action_page_open = self.action_page_open.clone();
+        let action_page_reload = self.action_page_reload.clone();
         let action_update = self.action_update.clone();
         let content = self.content.clone();
         let id = self.id.to_variant();
@@ -373,6 +368,31 @@ impl Page {
         let meta = self.meta.clone();
         let navigation = self.navigation.clone();
         let url = uri.clone().to_str();
+
+        // Check for page redirect pending
+        if meta.is_redirect() {
+            // Check for protocol limits
+            if meta.redirect_count().unwrap() > 5 {
+                // Update meta
+                meta.set_status(Status::Failure).set_title(&"Oops");
+                // Show placeholder with confirmation request to continue
+                content.to_text_gemini(
+                    &uri,
+                    &gformat!(
+                        // @TODO status page?
+                        "# Redirect issue\n\nRedirection limit reached\n\nContinue:\n\n=> {}",
+                        meta.redirect_target().unwrap().to_string()
+                    ),
+                );
+
+                return; // @TODO
+            } else {
+                action_page_open.activate(Some(
+                    &meta.redirect_target().unwrap().to_string().to_variant(),
+                ));
+                // @TODO is_follow
+            }
+        }
 
         // Add history record
         match navigation.history_current() {
@@ -397,7 +417,7 @@ impl Page {
             let id = id.clone();
             let meta = meta.clone();
             move |_, event, _, _| {
-                meta.borrow_mut().status = Some(match event {
+                meta.set_status(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
                     SocketClientEvent::Resolved => Status::Resolved,
                     SocketClientEvent::Connecting => Status::Connecting,
@@ -442,10 +462,10 @@ impl Page {
                                                 gemini::client::response::meta::Status::SensitiveInput => {
                                                     // Format response
                                                     let status = Status::Input;
-                                                    let title = gformat!("Input expected");
+                                                    let title = &"Input expected";
                                                     let description = match response.data() {
-                                                        Some(data) => data.value(),
-                                                        None => &title,
+                                                        Some(data) => data.value().as_str(),
+                                                        None => title,
                                                     };
 
                                                     // Toggle input form variant
@@ -467,10 +487,8 @@ impl Page {
                                                     }
 
                                                     // Update meta
-                                                    meta.replace(Meta {
-                                                        status: Some(status),
-                                                        title: Some(title),
-                                                    });
+                                                    meta.set_status(status)
+                                                        .set_title(title);
 
                                                     // Update page
                                                     action_update.activate(Some(&id));
@@ -493,12 +511,14 @@ impl Page {
                                                                                 &buffer.data()
                                                                             );
 
+                                                                            let title = match text_gemini.meta_title() {
+                                                                                Some(title) => title,
+                                                                                None => &uri_to_title(&uri)
+                                                                            };
+
                                                                             // Update page meta
-                                                                            meta.borrow_mut().status = Some(Status::Success);
-                                                                            meta.borrow_mut().title = Some(match text_gemini.meta_title() {
-                                                                                Some(title) => title.clone(),
-                                                                                None => uri_to_title(&uri)
-                                                                            });
+                                                                            meta.set_status(Status::Success)
+                                                                                .set_title(title);
 
                                                                             // Update window components
                                                                             action_update.activate(Some(&id));
@@ -506,7 +526,7 @@ impl Page {
                                                                         Err((reason, message)) => {
                                                                             // Define common data
                                                                             let status = Status::Failure;
-                                                                            let title = gformat!("Oops");
+                                                                            let title = &"Oops";
                                                                             let description = match reason {
                                                                                 gemini::client::response::data::text::Error::InputStream => match message {
                                                                                     Some(error) => gformat!("{error}"),
@@ -519,14 +539,12 @@ impl Page {
                                                                             // Update widget
                                                                             content
                                                                                 .to_status_failure()
-                                                                                .set_title(title.as_str())
+                                                                                .set_title(title)
                                                                                 .set_description(Some(description.as_str()));
 
                                                                             // Update meta
-                                                                            meta.replace(Meta {
-                                                                                status: Some(status),
-                                                                                title: Some(title),
-                                                                            });
+                                                                            meta.set_status(status)
+                                                                                .set_title(title);
 
                                                                             // Update window
                                                                             action_update.activate(Some(&id));
@@ -569,8 +587,8 @@ impl Page {
                                                                                 match result {
                                                                                     Ok(buffer) => {
                                                                                         // Update page meta
-                                                                                        meta.borrow_mut().status = Some(Status::Success);
-                                                                                        meta.borrow_mut().title = Some(uri_to_title(&uri));
+                                                                                        meta.set_status(Status::Success)
+                                                                                            .set_title(uri_to_title(&uri).as_str());
 
                                                                                         // Update page content
                                                                                         content.to_image(&buffer);
@@ -581,19 +599,17 @@ impl Page {
                                                                                     Err(reason) => {
                                                                                         // Define common data
                                                                                         let status = Status::Failure;
-                                                                                        let title = gformat!("Oops");
+                                                                                        let title = &"Oops";
 
                                                                                         // Update widget
                                                                                         content
                                                                                             .to_status_failure()
-                                                                                            .set_title(title.as_str())
+                                                                                            .set_title(title)
                                                                                             .set_description(Some(reason.message()));
 
                                                                                         // Update meta
-                                                                                        meta.replace(Meta {
-                                                                                            status: Some(status),
-                                                                                            title: Some(title),
-                                                                                        });
+                                                                                        meta.set_status(status)
+                                                                                            .set_title(title);
                                                                                     }
                                                                                 }
                                                                             }
@@ -602,7 +618,7 @@ impl Page {
                                                                     Err((error, reason)) => {
                                                                         // Define common data
                                                                         let status = Status::Failure;
-                                                                        let title = gformat!("Oops");
+                                                                        let title = &"Oops";
                                                                         let description = match reason {
                                                                             Some(message) => gformat!("{message}"),
                                                                             None => match error {
@@ -614,14 +630,12 @@ impl Page {
                                                                         // Update widget
                                                                         content
                                                                             .to_status_failure()
-                                                                            .set_title(title.as_str())
+                                                                            .set_title(title)
                                                                             .set_description(Some(description.as_str()));
 
                                                                         // Update meta
-                                                                        meta.replace(Meta {
-                                                                            status: Some(status),
-                                                                            title: Some(title),
-                                                                        });
+                                                                        meta.set_status(status)
+                                                                            .set_title(title);
                                                                     }
                                                                 },
                                                             );
@@ -643,20 +657,18 @@ impl Page {
                                                         _ => {
                                                             // Define common data
                                                             let status = Status::Failure;
-                                                            let title = gformat!("Oops");
+                                                            let title = &"Oops";
                                                             let description = gformat!("Content type not supported");
 
                                                             // Update widget
                                                             content
                                                                 .to_status_failure()
-                                                                .set_title(title.as_str())
+                                                                .set_title(title)
                                                                 .set_description(Some(description.as_str()));
 
                                                             // Update meta
-                                                            meta.replace(Meta {
-                                                                status: Some(status),
-                                                                title: Some(title),
-                                                            });
+                                                            meta.set_status(status)
+                                                                .set_title(title);
 
                                                             // Update window
                                                             action_update.activate(Some(&id));
@@ -666,29 +678,87 @@ impl Page {
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
                                                 gemini::client::response::meta::Status::Redirect |
                                                 gemini::client::response::meta::Status::PermanentRedirect => {
-
-                                                    // @TODO ClientStatus::TemporaryRedirect
-
-                                                    // Update meta
-                                                    meta.borrow_mut().status = Some(Status::Redirect);
-                                                    meta.borrow_mut().title = Some(gformat!("Redirect"));
-
-                                                    // Build gemtext message for manual redirection @TODO use template?
+                                                    // Extract redirection URL from response data
                                                     match response.data() {
-                                                        Some(url) => {
-                                                            // @TODO URI can by relative, resolve to base
-                                                            content.to_text_gemini(
-                                                                &uri,
-                                                                &gformat!(
-                                                                    "# Redirect\n\nAuto-follow not implemented, click on link below to continue\n\n=> {}",
-                                                                    url.value()
-                                                                )
-                                                            );
+                                                        Some(unresolved_url) => {
+                                                            // New URL from server MAY to be relative (according to the protocol),
+                                                            // resolve to absolute URI using current request value as the base for parser
+                                                            // https://docs.gtk.org/glib/type_func.Uri.resolve_relative.html
+                                                            match Uri::resolve_relative(
+                                                                Some(&uri.to_string()),
+                                                                &unresolved_url.value(),
+                                                                UriFlags::NONE,
+                                                            ) {
+                                                                Ok(resolved_url) => {
+                                                                    // Build valid URI (this conversion wanted to process query and fragment later)
+                                                                    match Uri::parse(resolved_url.as_str(), UriFlags::NONE) {
+                                                                        Ok(resolved_uri) => {
+                                                                            // Client MUST prevent external redirects
+                                                                            if is_external_uri(&resolved_uri, &uri) {
+                                                                                // Update meta
+                                                                                meta.set_status(Status::Failure)
+                                                                                    .set_title(&"Oops");
+
+                                                                                // Show placeholder with confirmation request to continue
+                                                                                content.to_text_gemini(
+                                                                                    &uri,
+                                                                                    &gformat!( // @TODO status page?
+                                                                                        "# Redirect issue\n\nExternal redirects not allowed by protocol\n\nContinue:\n\n=> {}",
+                                                                                        resolved_uri.to_string()
+                                                                                    )
+                                                                                );
+                                                                            } else {
+                                                                                // Update meta
+                                                                                meta.set_redirect(
+                                                                                    match meta.redirect_count() {
+                                                                                        Some(count) => count + 1,
+                                                                                        None => 0
+                                                                                    },
+                                                                                    match response.status() {
+                                                                                        gemini::client::response::meta::Status::PermanentRedirect => true,
+                                                                                        _ => false
+                                                                                    },
+                                                                                    Uri::parse(
+                                                                                        resolved_uri.to_string_partial(
+                                                                                            UriHideFlags::FRAGMENT | UriHideFlags::QUERY // @TODO review fragment specification
+                                                                                        ).as_str(),
+                                                                                        UriFlags::NONE
+                                                                                    ).unwrap()
+                                                                                )
+                                                                                    .set_status(Status::Redirect)
+                                                                                    .set_title(&"Redirect"); // @TODO is really wanted here?
+
+                                                                                // Reload page to apply redirect
+                                                                                action_page_reload.activate(None);
+                                                                            }
+                                                                        },
+                                                                        Err(reason) => {
+                                                                            meta.set_status(Status::Failure);
+                                                                            content
+                                                                                .to_status_failure()
+                                                                                .set_description(Some(reason.message()));
+                                                                        }
+                                                                    }
+                                                                }
+                                                                Err(reason) => {
+                                                                    meta.set_status(Status::Failure);
+                                                                    content
+                                                                        .to_status_failure()
+                                                                        .set_description(Some(reason.message()));
+                                                                },
+                                                            }
                                                         },
                                                         None => {
+                                                            let status = Status::Failure;
+                                                            let title = &"Oops";
+
+                                                            meta.set_status(status)
+                                                                .set_title(title);
+
                                                             content
                                                                 .to_status_failure()
-                                                                .set_description(Some("Could not parse redirect meta"));
+                                                                .set_title(title)
+                                                                .set_description(Some("Redirection target not defined"));
                                                         },
                                                     }
 
@@ -697,19 +767,17 @@ impl Page {
                                                 _ => {
                                                     // Define common data
                                                     let status = Status::Failure;
-                                                    let title = gformat!("Oops");
+                                                    let title = &"Oops";
 
                                                     // Update widget
                                                     content
                                                         .to_status_failure()
-                                                        .set_title(title.as_str())
+                                                        .set_title(title)
                                                         .set_description(Some("Status code yet not supported"));
 
                                                     // Update meta
-                                                    meta.replace(Meta {
-                                                        status: Some(status),
-                                                        title: Some(title),
-                                                    });
+                                                    meta.set_status(status)
+                                                        .set_title(title);
 
                                                     // Update window
                                                     action_update.activate(Some(&id));
@@ -719,7 +787,7 @@ impl Page {
                                         Err((reason, message)) => {
                                             // Define common data
                                             let status = Status::Failure;
-                                            let title = gformat!("Oops");
+                                            let title = &"Oops";
                                             let description = match reason {
                                                 // Common
                                                 gemini::client::response::meta::Error::InputStream => match message {
@@ -770,15 +838,12 @@ impl Page {
                                             // Update widget
                                             content
                                                 .to_status_failure()
-                                                .set_title(title.as_str())
+                                                .set_title(title)
                                                 .set_description(Some(description.as_str()));
 
                                             // Update meta
-                                            meta.replace(Meta {
-                                                status: Some(status),
-                                                title: Some(title),
-                                                //description: Some(description),
-                                            });
+                                            meta.set_status(status)
+                                                .set_title(title);
 
                                             // Update window
                                             action_update.activate(Some(&id));
@@ -789,19 +854,17 @@ impl Page {
                             Err(reason) => {
                                 // Define common data
                                 let status = Status::Failure;
-                                let title = gformat!("Oops");
+                                let title = &"Oops";
 
                                 // Update widget
                                 content
                                     .to_status_failure()
-                                    .set_title(title.as_str())
+                                    .set_title(title)
                                     .set_description(Some(reason.message()));
 
                                 // Update meta
-                                meta.replace(Meta {
-                                    status: Some(status),
-                                    title: Some(title),
-                                });
+                                meta.set_status(status)
+                                    .set_title(title);
 
                                 // Update window
                                 action_update.activate(Some(&id));
@@ -812,19 +875,17 @@ impl Page {
                 Err(reason) => {
                     // Define common data
                     let status = Status::Failure;
-                    let title = gformat!("Oops");
+                    let title = &"Oops";
 
                     // Update widget
                     content
                         .to_status_failure()
-                        .set_title(title.as_str())
+                        .set_title(title)
                         .set_description(Some(reason.message()));
 
                     // Update meta
-                    meta.replace(Meta {
-                        status: Some(status),
-                        title: Some(title),
-                    });
+                    meta.set_status(status)
+                        .set_title(title);
 
                     // Update window
                     action_update.activate(Some(&id));
@@ -849,4 +910,17 @@ fn uri_to_title(uri: &Uri) -> GString {
             None => gformat!("Untitled"),
         },
     }
+}
+
+/// Compare `subject` with `base`
+///
+/// Return `false` on scheme, port or host mismatch
+fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
+    if subject.scheme() != base.scheme() {
+        return true;
+    }
+    if subject.port() != base.port() {
+        return true;
+    }
+    subject.host() != base.host()
 }

@@ -212,7 +212,7 @@ impl Item {
         self.page.is_loading()
     }
 
-    pub fn page_meta_title(&self) -> Option<GString> {
+    pub fn page_meta_title(&self) -> GString {
         self.page.meta_title()
     }
 
