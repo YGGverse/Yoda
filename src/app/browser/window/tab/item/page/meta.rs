@@ -1,7 +1,7 @@
 mod redirect;
 use redirect::Redirect;
 
-use gtk::glib::{GString, Uri};
+use gtk::glib::GString;
 use std::{cell::RefCell, sync::Arc};
 
 #[derive(Debug, Clone)]
@@ -27,6 +27,7 @@ pub struct Meta {
     status: RefCell<Status>,
     title: RefCell<GString>,
     redirect: RefCell<Option<Redirect>>,
+    redirect_count: RefCell<i8>,
 }
 
 impl Meta {
@@ -37,6 +38,7 @@ impl Meta {
             status: RefCell::new(status),
             title: RefCell::new(title),
             redirect: RefCell::new(None),
+            redirect_count: RefCell::new(0),
         })
     }
 
@@ -52,16 +54,22 @@ impl Meta {
         self
     }
 
-    pub fn set_redirect(&self, count: i8, is_follow: bool, target: Uri) -> &Self {
+    pub fn set_redirect(&self, request: GString, is_foreground: bool) -> &Self {
         self.redirect
-            .replace(Some(Redirect::new(count, is_follow, target)));
+            .replace(Some(Redirect::new(request, is_foreground)));
         self
     }
 
+    pub fn set_redirect_count(&self, redirect_count: i8) -> &Self {
+        self.redirect_count.replace(redirect_count);
+        self
+    }
+
+    /* @TODO not in use
     pub fn unset_redirect(&self) -> &Self {
         self.redirect.replace(None);
         self
-    }
+    } */
 
     // Getters
 
@@ -73,28 +81,14 @@ impl Meta {
         self.title.borrow().clone()
     }
 
-    pub fn is_redirect(&self) -> bool {
-        self.redirect.borrow().is_some()
+    pub fn redirect_count(&self) -> i8 {
+        self.redirect_count.borrow().clone()
     }
 
-    pub fn redirect_count(&self) -> Option<i8> {
-        match *self.redirect.borrow() {
-            Some(ref redirect) => Some(redirect.count().clone()),
-            None => None,
-        }
-    }
-
-    pub fn redirect_target(&self) -> Option<Uri> {
-        match *self.redirect.borrow() {
-            Some(ref redirect) => Some(redirect.target().clone()),
-            None => None,
-        }
-    }
-
-    pub fn redirect_is_follow(&self) -> Option<bool> {
-        match *self.redirect.borrow() {
-            Some(ref redirect) => Some(redirect.is_follow().clone()),
-            None => None,
-        }
+    /// WARNING!
+    ///
+    /// This function **take** the `Redirect` without clone semantics
+    pub fn take_redirect(&self) -> Option<Redirect> {
+        self.redirect.take()
     }
 }

@@ -155,20 +155,62 @@ impl Page {
         }
     }
 
+    // @TODO rename to `load`
     pub fn navigation_reload(&self) {
+        /// Global limit to prevent infinitive redirects (ALL protocols)
+        /// * every protocol implementation has own value checker, according to specification
+        const DEFAULT_MAX_REDIRECT_COUNT: i8 = 10;
+
         // Reset widgets
         self.input.unset();
 
-        // Init shared objects to not spawn a lot
-        let request_text = self.navigation.request_text();
+        // Create shared variant value
         let id = self.id.to_variant();
+
+        // Try **take** request value from Redirect holder first
+        let request = if let Some(redirect) = self.meta.take_redirect() {
+            // Increase redirect counter
+            self.meta.set_redirect_count(self.meta.redirect_count() + 1);
+
+            // Prevent infinitive redirection by global settings
+            if self.meta.redirect_count() > DEFAULT_MAX_REDIRECT_COUNT {
+                todo!();
+            }
+
+            // Update navigation on redirect `is_foreground`
+            if redirect.is_foreground() {
+                self.navigation
+                    .set_request_text(redirect.request().as_str());
+            }
+
+            // Return value from redirection holder
+            redirect.request()
+        } else {
+            // Add history record
+            let value = self.navigation.request_text();
+
+            match self.navigation.history_current() {
+                Some(current) => {
+                    if current != value {
+                        self.navigation.history_add(value);
+                    }
+                }
+                None => self.navigation.history_add(value),
+            }
+
+            // Reset redirect counter as value taken from user input
+            self.meta.set_redirect_count(0);
+
+            // Return value from navigation entry
+            self.navigation.request_text()
+        };
 
         // Update
         self.meta.set_status(Status::Reload).set_title(&"Loading..");
         self.action_update.activate(Some(&id));
 
         // Route by request
-        match Uri::parse(&request_text, UriFlags::NONE) {
+        match Uri::parse(&request, UriFlags::NONE) {
             Ok(uri) => {
                 // Route by scheme
                 match uri.scheme().as_str() {
@@ -199,17 +241,17 @@ impl Page {
                 // Try interpret URI manually
                 if Regex::match_simple(
                     r"^[^\/\s]+\.[\w]{2,}",
-                    request_text.clone(),
+                    request.clone(),
                     RegexCompileFlags::DEFAULT,
                     RegexMatchFlags::DEFAULT,
                 ) {
                     // Seems request contain some host, try append default scheme
-                    let request_text = gformat!("gemini://{request_text}");
+                    let request = gformat!("gemini://{request}");
                     // Make sure new request conversable to valid URI
-                    match Uri::parse(&request_text, UriFlags::NONE) {
+                    match Uri::parse(&request, UriFlags::NONE) {
                         Ok(_) => {
                             // Update
-                            self.navigation.set_request_text(&request_text);
+                            self.navigation.set_request_text(&request);
 
                             // Reload page
                             self.action_page_reload.activate(None);
@@ -220,13 +262,13 @@ impl Page {
                     }
                 } else {
                     // Plain text given, make search request to default provider
-                    let request_text = gformat!(
+                    let request = gformat!(
                         "gemini://tlgs.one/search?{}",
-                        Uri::escape_string(&request_text, None, false)
+                        Uri::escape_string(&request, None, false)
                     );
 
                     // Update
-                    self.navigation.set_request_text(&request_text);
+                    self.navigation.set_request_text(&request);
 
                     // Reload page
                     self.action_page_reload.activate(None);
@@ -366,43 +408,7 @@ impl Page {
         let id = self.id.to_variant();
         let input = self.input.clone();
         let meta = self.meta.clone();
-        let navigation = self.navigation.clone();
         let url = uri.clone().to_str();
-
-        // Check for page redirect pending
-        if meta.is_redirect() {
-            // Check for protocol limits
-            if meta.redirect_count().unwrap() > 5 {
-                // Update meta
-                meta.set_status(Status::Failure).set_title(&"Oops");
-                // Show placeholder with confirmation request to continue
-                content.to_text_gemini(
-                    &uri,
-                    &gformat!(
-                        // @TODO status page?
-                        "# Redirect issue\n\nRedirection limit reached\n\nContinue:\n\n=> {}",
-                        meta.redirect_target().unwrap().to_string()
-                    ),
-                );
-
-                return; // @TODO
-            } else {
-                action_page_open.activate(Some(
-                    &meta.redirect_target().unwrap().to_string().to_variant(),
-                ));
-                // @TODO is_follow
-            }
-        }
-
-        // Add history record
-        match navigation.history_current() {
-            Some(current) => {
-                if current != url {
-                    navigation.history_add(url.clone());
-                }
-            }
-            None => navigation.history_add(url.clone()),
-        }
 
         // Init socket
         let client = SocketClient::new();
@@ -681,8 +687,8 @@ impl Page {
                                                     // Extract redirection URL from response data
                                                     match response.data() {
                                                         Some(unresolved_url) => {
-                                                            // New URL from server MAY to be relative (according to the protocol),
-                                                            // resolve to absolute URI using current request value as the base for parser
+                                                            // New URL from server MAY to be relative (according to the protocol specification),
+                                                            // resolve to absolute URI gobject using current request as the base for parser:
                                                             // https://docs.gtk.org/glib/type_func.Uri.resolve_relative.html
                                                             match Uri::resolve_relative(
                                                                 Some(&uri.to_string()),
@@ -690,60 +696,84 @@ impl Page {
                                                                 UriFlags::NONE,
                                                             ) {
                                                                 Ok(resolved_url) => {
-                                                                    // Build valid URI (this conversion wanted to process query and fragment later)
+                                                                    // Build valid URI from resolved URL string
+                                                                    // this conversion wanted to simply exclude `query` and `fragment` later (as restricted by protocol specification)
                                                                     match Uri::parse(resolved_url.as_str(), UriFlags::NONE) {
                                                                         Ok(resolved_uri) => {
-                                                                            // Client MUST prevent external redirects
+                                                                            // Client MUST prevent external redirects (by protocol specification)
                                                                             if is_external_uri(&resolved_uri, &uri) {
                                                                                 // Update meta
                                                                                 meta.set_status(Status::Failure)
                                                                                     .set_title(&"Oops");
 
-                                                                                // Show placeholder with confirmation request to continue
+                                                                                // Show placeholder with manual confirmation to continue @TODO status page?
                                                                                 content.to_text_gemini(
                                                                                     &uri,
-                                                                                    &gformat!( // @TODO status page?
+                                                                                    &gformat!(
                                                                                         "# Redirect issue\n\nExternal redirects not allowed by protocol\n\nContinue:\n\n=> {}",
                                                                                         resolved_uri.to_string()
                                                                                     )
                                                                                 );
-                                                                            } else {
+                                                                            // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
+                                                                            } else if meta.redirect_count() >= 5 {
                                                                                 // Update meta
+                                                                                meta.set_status(Status::Failure)
+                                                                                    .set_title(&"Oops");
+
+                                                                                // Show placeholder with manual confirmation to continue @TODO status page?
+                                                                                content.to_text_gemini(
+                                                                                    &uri,
+                                                                                    &gformat!(
+                                                                                        "# Redirect issue\n\nLimit the number of redirects reached\n\nContinue:\n\n=> {}",
+                                                                                        resolved_uri.to_string()
+                                                                                    )
+                                                                                );
+                                                                            // Redirection value looks valid, create new redirect (stored in meta `Redirect` holder)
+                                                                            // then call page reload action to apply it by the parental controller
+                                                                            } else {
                                                                                 meta.set_redirect(
-                                                                                    match meta.redirect_count() {
-                                                                                        Some(count) => count + 1,
-                                                                                        None => 0
-                                                                                    },
+                                                                                    // Skip query and fragment by protocol requirements
+                                                                                    // @TODO review fragment specification
+                                                                                    resolved_uri.to_string_partial(
+                                                                                        UriHideFlags::FRAGMENT | UriHideFlags::QUERY
+                                                                                    ),
+                                                                                    // Set follow policy based on status code
                                                                                     match response.status() {
                                                                                         gemini::client::response::meta::Status::PermanentRedirect => true,
                                                                                         _ => false
                                                                                     },
-                                                                                    Uri::parse(
-                                                                                        resolved_uri.to_string_partial(
-                                                                                            UriHideFlags::FRAGMENT | UriHideFlags::QUERY // @TODO review fragment specification
-                                                                                        ).as_str(),
-                                                                                        UriFlags::NONE
-                                                                                    ).unwrap()
                                                                                 )
-                                                                                    .set_status(Status::Redirect)
-                                                                                    .set_title(&"Redirect"); // @TODO is really wanted here?
+                                                                                    .set_status(Status::Redirect) // @TODO is this status really wanted?
+                                                                                    .set_title(&"Redirect");
 
-                                                                                // Reload page to apply redirect
+                                                                                // Reload page to apply redirection
                                                                                 action_page_reload.activate(None);
                                                                             }
                                                                         },
                                                                         Err(reason) => {
-                                                                            meta.set_status(Status::Failure);
+                                                                            let status = Status::Failure;
+                                                                            let title = &"Oops";
+
+                                                                            meta.set_status(status)
+                                                                                .set_title(title);
+
                                                                             content
                                                                                 .to_status_failure()
+                                                                                .set_title(title)
                                                                                 .set_description(Some(reason.message()));
                                                                         }
                                                                     }
                                                                 }
                                                                 Err(reason) => {
-                                                                    meta.set_status(Status::Failure);
+                                                                    let status = Status::Failure;
+                                                                    let title = &"Oops";
+
+                                                                    meta.set_status(status)
+                                                                        .set_title(title);
+
                                                                     content
                                                                         .to_status_failure()
+                                                                        .set_title(title)
                                                                         .set_description(Some(reason.message()));
                                                                 },
                                                             }

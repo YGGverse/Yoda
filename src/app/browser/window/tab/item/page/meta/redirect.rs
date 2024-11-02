@@ -1,4 +1,4 @@
-use gtk::glib::Uri;
+use gtk::glib::GString;
 
 /// # Redirection data holder
 ///
@@ -8,33 +8,32 @@ use gtk::glib::Uri;
 ///
 /// ## Members
 ///
-/// * `count` - to limit redirect attempts
-/// * `is_follow` - indicates how to process this redirect exactly
-/// * `target` - destination address
+/// * `is_foreground` - indicates how to process this redirect
+/// * `request` - destination
+///   * currently, it's raw `GString` not [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+/// because of compatibility with request field as it could contain any other, not parsable values
 pub struct Redirect {
-    count: i8,
-    is_follow: bool,
-    target: Uri,
+    is_foreground: bool,
+    request: GString,
 }
 
 impl Redirect {
-    pub fn new(count: i8, is_follow: bool, target: Uri) -> Self {
+    // Constructors
+
+    pub fn new(request: GString, is_foreground: bool) -> Self {
         Self {
-            count,
-            is_follow,
-            target,
+            is_foreground,
+            request,
         }
     }
 
-    pub fn count(&self) -> &i8 {
-        &self.count
+    // Getters
+
+    pub fn request(&self) -> GString {
+        self.request.clone()
     }
 
-    pub fn is_follow(&self) -> &bool {
-        &self.is_follow
-    }
-
-    pub fn target(&self) -> &Uri {
-        &self.target
+    pub fn is_foreground(&self) -> bool {
+        self.is_foreground
     }
 }

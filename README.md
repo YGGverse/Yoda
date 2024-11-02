@@ -41,9 +41,9 @@ GTK 4 / Libadwaita client written in Rust
     * [x] Input
       * [x] `10` Input
       * [x] `11` Sensitive input
-    * [ ] Redirection
-      * [ ] `30` Temporary (partial)
-      * [ ] `31` Permanent (partial)
+    * [x] Redirection
+      * [x] `30` Temporary
+      * [x] `31` Permanent
     * [ ] Temporary failure
       * [ ] `40` Unspecified condition
       * [ ] `41` Server unavailable
