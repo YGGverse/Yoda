@@ -43,17 +43,6 @@ impl Meta {
     // Setters
 
     pub fn set_status(&self, status: Status) -> &Self {
-        match status {
-            Status::Redirect => {
-                if self.redirect.borrow().is_none() {
-                    panic!("Set `redirect` before use this status")
-                }
-            }
-            _ => {
-                self.unset_redirect();
-            }
-        };
-
         self.status.replace(status);
         self
     }
