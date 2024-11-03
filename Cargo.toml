@@ -4,7 +4,7 @@ version = "0.7.0"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
-description = "Yoda - Browser for Gemini protocol"
+description = "Browser for Gemini Protocol"
 keywords = ["gemini", "gemini-protocol", "gtk", "browser", "client"]
 categories = ["network-programming", "gui"]
 repository = "https://github.com/YGGverse/Yoda"
@@ -17,7 +17,7 @@ features = ["v1_6"]
 
 [dependencies.gemini]
 package = "ggemini"
-version = "0.8.0"
+version = "0.9.0"
 
 [dependencies.gemtext]
 package = "ggemtext"
