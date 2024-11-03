@@ -13,7 +13,7 @@ impl Widget {
             gobject: TabBar::builder()
                 .autohide(false)
                 .expand_tabs(false)
-                .start_action_widget(start_action_widget)
+                .end_action_widget(start_action_widget) // @TODO find solution to append after tabs
                 .view(view)
                 .build(),
         })
