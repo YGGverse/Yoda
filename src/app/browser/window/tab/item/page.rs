@@ -320,7 +320,7 @@ impl Page {
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
         // Update status
-        self.meta.set_status(Status::Restore);
+        self.meta.set_status(Status::SessionRestore);
 
         // Begin page restore
         match Database::records(transaction, app_browser_window_tab_item_id) {
@@ -335,7 +335,7 @@ impl Page {
         }
 
         // Update status
-        self.meta.set_status(Status::Restored);
+        self.meta.set_status(Status::SessionRestored);
 
         Ok(())
     }
@@ -368,7 +368,7 @@ impl Page {
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
         match self.meta.status() {
-            Status::Reload | Status::Restore => Some(0.0),
+            Status::Reload | Status::SessionRestore => Some(0.0),
             Status::Resolving => Some(0.1),
             Status::Resolved => Some(0.2),
             Status::Connecting => Some(0.3),
@@ -379,7 +379,7 @@ impl Page {
             Status::TlsHandshaked => Some(0.8),
             Status::Complete => Some(0.9),
             Status::Failure | Status::Redirect | Status::Success | Status::Input => Some(1.0),
-            Status::New | Status::Restored => None,
+            Status::New | Status::SessionRestored => None,
         }
     }
 
