@@ -3,7 +3,7 @@ mod database;
 use database::Database;
 
 use adw::{TabPage, TabView};
-use gtk::Box;
+use gtk::prelude::IsA;
 use sqlite::Transaction;
 use std::sync::Arc;
 
@@ -18,15 +18,15 @@ impl Widget {
     pub fn new_arc(
         keyword: &str, // ID
         tab_view: &TabView,
-        page: &Box,
+        child: &impl IsA<gtk::Widget>,
         title: Option<&str>,
         position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
     ) -> Arc<Self> {
         let gobject = match position {
-            Some(number) => tab_view.insert(page, number),
-            None => tab_view.append(page),
+            Some(number) => tab_view.insert(child, number),
+            None => tab_view.append(child),
         };
 
         gobject.set_keyword(keyword);
