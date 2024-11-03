@@ -54,17 +54,24 @@ impl Widget {
             action_page_reload.activate(None);
         });
 
-        gobject.connect_state_flags_changed(|this, state| {
-            // Select entire text on key release
-            // this behavior implemented in most web-browsers,
-            // to simply overwrite current request with new value
-            // Note:
-            // * Custom GestureClick is not option here, as GTK Entry already has default one
-            if state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN) {
-                // Continue on first focus event
-                if this.selection_bounds().is_none() {
+        gobject.connect_state_flags_changed({
+            // Define last focus state container
+            let has_focus = RefCell::new(false);
+            move |this, state| {
+                // Select entire text on first click release
+                // this behavior implemented in most web-browsers,
+                // to simply overwrite current request with new value
+                // Note:
+                // * Custom GestureClick is not an option here, as GTK Entry has default controller
+                // * This is experimental feature as does not follow native GTK behavior @TODO test
+                if !has_focus.take()
+                    && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
+                    && this.selection_bounds().is_none()
+                {
                     this.select_region(0, this.text_length().into());
                 }
+                // Update last focus state
+                has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
             }
         });
 
