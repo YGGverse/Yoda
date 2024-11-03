@@ -22,6 +22,8 @@ pub enum Status {
     Reload,
     Resolved,
     Resolving,
+    Restore,
+    Restored,
     Success,
     TlsHandshaked,
     TlsHandshaking,
