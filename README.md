@@ -28,10 +28,13 @@ GTK 4 / Libadwaita client written in Rust
     * [x] Tabs
       * [x] Pin
       * [x] Page
+        * [ ] Content (cache)
+        * [x] Meta
+          * [x] Title
         * [ ] Navigation
           * [x] Request
           * [ ] History
-        * [ ] Content (cache)
+
 * [ ] User settings
 
 ### Protocols

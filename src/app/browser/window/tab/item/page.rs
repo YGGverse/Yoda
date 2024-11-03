@@ -301,6 +301,7 @@ impl Page {
                     match Database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
+                            self.meta.clean(transaction, &record.id)?;
                             self.navigation.clean(transaction, &record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
@@ -322,6 +323,7 @@ impl Page {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
+                    self.meta.restore(transaction, &record.id)?;
                     self.navigation.restore(transaction, &record.id)?;
                 }
             }
@@ -341,6 +343,7 @@ impl Page {
                 let id = Database::last_insert_id(transaction);
 
                 // Delegate save action to childs
+                self.meta.save(transaction, &id)?;
                 self.navigation.save(transaction, &id)?;
             }
             Err(e) => return Err(e.to_string()),
@@ -396,6 +399,7 @@ impl Page {
         }
 
         // Delegate migration to childs
+        Meta::migrate(tx)?;
         Navigation::migrate(tx)?;
 
         // Success
