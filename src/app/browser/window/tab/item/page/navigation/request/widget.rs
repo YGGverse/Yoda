@@ -63,7 +63,7 @@ impl Widget {
                 // to simply overwrite current request with new value
                 // Note:
                 // * Custom GestureClick is not an option here, as GTK Entry has default controller
-                // * This is experimental feature as does not follow native GTK behavior @TODO make optional
+                // * This is experimental feature does not follow native GTK behavior @TODO make optional
                 if !has_focus.take()
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
                     && this.selection_bounds().is_none()
