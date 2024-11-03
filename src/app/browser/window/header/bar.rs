@@ -19,6 +19,7 @@ pub struct Bar {
 impl Bar {
     // Construct
     pub fn new_arc(
+        action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
         action_quit: SimpleAction,
@@ -36,6 +37,7 @@ impl Bar {
         let control = Control::new_arc();
         let tab = Tab::new_arc(action_page_new.clone(), view);
         let menu = Menu::new_arc(
+            action_about,
             action_debug,
             action_profile,
             action_quit,

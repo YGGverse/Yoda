@@ -41,6 +41,7 @@ impl App {
         profile_path: PathBuf,
     ) -> Self {
         // Init actions
+        let action_about = Action::new("win", true, None);
         let action_debug = Action::new("win", true, None);
         let action_profile = Action::new("win", true, None);
         let action_quit = Action::new("win", true, None);
@@ -80,6 +81,7 @@ impl App {
         // Init components
         let browser = Arc::new(Browser::new(
             profile_path,
+            action_about.simple(),
             action_debug.simple(),
             action_profile.simple(),
             action_quit.simple(),

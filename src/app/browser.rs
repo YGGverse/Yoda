@@ -1,7 +1,9 @@
+mod about;
 mod database;
 mod widget;
 mod window;
 
+use about::About;
 use database::Database;
 use widget::Widget;
 use window::Window;
@@ -28,6 +30,7 @@ impl Browser {
         // Extras
         profile_path: PathBuf,
         // Actions
+        action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
         action_quit: SimpleAction,
@@ -43,6 +46,7 @@ impl Browser {
     ) -> Browser {
         // Init components
         let window = Arc::new(Window::new(
+            action_about.clone(),
             action_debug.clone(),
             action_profile.clone(),
             action_quit.clone(),
@@ -61,6 +65,7 @@ impl Browser {
         let widget = Arc::new(Widget::new(
             window.gobject(),
             &[
+                action_about.clone(),
                 action_debug.clone(),
                 action_profile.clone(),
                 action_quit.clone(),
@@ -77,6 +82,13 @@ impl Browser {
         ));
 
         // Init events
+        action_about.connect_activate({
+            let window = window.clone();
+            move |_, _| {
+                About::new().present(Some(window.gobject()));
+            }
+        });
+
         action_debug.connect_activate({
             let widget = widget.clone();
             move |_, _| {

@@ -23,6 +23,7 @@ impl Window {
     // Construct
     pub fn new(
         // Actions
+        action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
         action_quit: SimpleAction,
@@ -47,17 +48,18 @@ impl Window {
 
         let header = Header::new_arc(
             // Actions
-            action_debug.clone(),
-            action_profile.clone(),
-            action_quit.clone(),
-            action_page_new.clone(),
-            action_page_close.clone(),
-            action_page_close_all.clone(),
-            action_page_home.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
-            action_page_reload.clone(),
-            action_page_pin.clone(),
+            action_about,
+            action_debug,
+            action_profile,
+            action_quit,
+            action_page_new,
+            action_page_close,
+            action_page_close_all,
+            action_page_home,
+            action_page_history_back,
+            action_page_history_forward,
+            action_page_reload,
+            action_page_pin,
             // Widgets
             tab.gobject(),
         );

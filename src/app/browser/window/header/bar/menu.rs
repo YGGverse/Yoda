@@ -17,6 +17,7 @@ pub struct Menu {
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new_arc(
+        action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
         action_quit: SimpleAction,
@@ -64,6 +65,7 @@ impl Menu {
             let main_tool = gio::Menu::new();
                 main_tool.append(Some("Debug"), Some(&detailed_action_name(action_debug)));
                 main_tool.append(Some("Profile"), Some(&detailed_action_name(action_profile)));
+                main_tool.append(Some("About"), Some(&detailed_action_name(action_about)));
 
             main.append_submenu(Some("Tool"), &main_tool);
 

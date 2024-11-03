@@ -16,6 +16,7 @@ impl Header {
     // Construct
     pub fn new_arc(
         // Actions
+        action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
         action_quit: SimpleAction,
@@ -32,6 +33,7 @@ impl Header {
     ) -> Arc<Self> {
         // Init components
         let bar = Bar::new_arc(
+            action_about,
             action_debug,
             action_profile,
             action_quit,
