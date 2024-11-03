@@ -68,7 +68,7 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] `file://` - localhost browser
-* [ ] `config://` - low-level settings editor
+* [ ] `config://` - low-level key/value settings editor
 
 ### Media types
 
