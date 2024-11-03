@@ -60,8 +60,7 @@ impl Widget {
             // to simply overwrite current request with new value
             // Note:
             // * Custom GestureClick is not option here, as GTK Entry already has default one
-            println!("{:?}", state);
-            if state.contains(StateFlags::ACTIVE) && state.contains(StateFlags::FOCUS_WITHIN) {
+            if state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN) {
                 // Continue on first focus event
                 if this.selection_bounds().is_none() {
                     this.select_region(0, this.text_length().into());
