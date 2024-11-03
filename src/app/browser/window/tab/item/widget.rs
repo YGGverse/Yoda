@@ -124,18 +124,18 @@ impl Widget {
     pub fn gobject(&self) -> &TabPage {
         &self.gobject
     }
+}
 
-    // Tools
-    pub fn migrate(tx: &Transaction) -> Result<(), String> {
-        // Migrate self components
-        if let Err(e) = Database::init(&tx) {
-            return Err(e.to_string());
-        }
-
-        // Delegate migration to childs
-        // nothing yet..
-
-        // Success
-        Ok(())
+// Tools
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = Database::init(&tx) {
+        return Err(e.to_string());
     }
+
+    // Delegate migration to childs
+    // nothing yet..
+
+    // Success
+    Ok(())
 }

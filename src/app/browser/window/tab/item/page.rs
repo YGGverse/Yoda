@@ -391,21 +391,6 @@ impl Page {
         &self.widget.gobject()
     }
 
-    // Tools
-    pub fn migrate(tx: &Transaction) -> Result<(), String> {
-        // Migrate self components
-        if let Err(e) = Database::init(tx) {
-            return Err(e.to_string());
-        }
-
-        // Delegate migration to childs
-        Meta::migrate(tx)?;
-        Navigation::migrate(tx)?;
-
-        // Success
-        Ok(())
-    }
-
     // Private helpers @TODO move outside
     fn load_gemini(&self, uri: Uri) {
         // Use local namespaces @TODO
@@ -937,6 +922,20 @@ impl Page {
 }
 
 // Tools
+
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = Database::init(tx) {
+        return Err(e.to_string());
+    }
+
+    // Delegate migration to childs
+    meta::migrate(tx)?;
+    navigation::migrate(tx)?;
+
+    // Success
+    Ok(())
+}
 
 /// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
 ///

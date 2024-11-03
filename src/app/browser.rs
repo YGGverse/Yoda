@@ -250,21 +250,21 @@ impl Browser {
     pub fn gobject(&self) -> &ApplicationWindow {
         &self.widget.gobject()
     }
+}
 
-    // Tools
-    pub fn migrate(tx: &Transaction) -> Result<(), String> {
-        // Migrate self components
-        if let Err(e) = Database::init(&tx) {
-            return Err(e.to_string());
-        }
-
-        // Delegate migration to childs
-        /* @TODO
-        Header::migrate(&tx)?; */
-        Window::migrate(&tx)?;
-        Widget::migrate(&tx)?;
-
-        // Success
-        Ok(())
+// Tools
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = Database::init(&tx) {
+        return Err(e.to_string());
     }
+
+    // Delegate migration to childs
+    /* @TODO
+    header::migrate(&tx)?; */
+    window::migrate(&tx)?;
+    widget::migrate(&tx)?;
+
+    // Success
+    Ok(())
 }

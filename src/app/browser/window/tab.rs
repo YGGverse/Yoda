@@ -335,21 +335,18 @@ impl Tab {
     pub fn gobject(&self) -> &TabView {
         self.widget.gobject()
     }
+}
 
-    // Tools
-    pub fn migrate(tx: &Transaction) -> Result<(), String> {
-        // Migrate self components
-        if let Err(e) = Database::init(&tx) {
-            return Err(e.to_string());
-        }
-
-        // Delegate migration to childs
-        Item::migrate(&tx)?;
-
-        /* @TODO
-        Page::migrate(&tx)?; */
-
-        // Success
-        Ok(())
+// Tools
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = Database::init(&tx) {
+        return Err(e.to_string());
     }
+
+    // Delegate migration to childs
+    item::migrate(&tx)?;
+
+    // Success
+    Ok(())
 }

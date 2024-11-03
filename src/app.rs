@@ -233,7 +233,7 @@ impl App {
             };
 
             // Begin migration
-            match App::migrate(&transaction) {
+            match migrate(&transaction) {
                 Ok(_) => {
                     // Confirm changes
                     match transaction.commit() {
@@ -248,18 +248,18 @@ impl App {
         // Start application
         self.gobject.run()
     }
+}
 
-    // Tools
-    fn migrate(tx: &Transaction) -> Result<(), String> {
-        // Migrate self components
-        if let Err(e) = Database::init(&tx) {
-            return Err(e.to_string());
-        }
-
-        // Delegate migration to childs
-        Browser::migrate(&tx)?;
-
-        // Success
-        Ok(())
+// Tools
+fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = Database::init(&tx) {
+        return Err(e.to_string());
     }
+
+    // Delegate migration to childs
+    browser::migrate(&tx)?;
+
+    // Success
+    Ok(())
 }
