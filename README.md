@@ -34,7 +34,6 @@ GTK 4 / Libadwaita client written in Rust
         * [ ] Navigation
           * [x] Request
           * [ ] History
-
 * [ ] User settings
 
 ### Protocols
