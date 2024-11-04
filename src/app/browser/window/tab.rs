@@ -85,17 +85,17 @@ impl Tab {
 
         // Init events
 
-        // Setup actions for context menu
         widget.gobject().connect_setup_menu({
+            // Clone actions to update
             let action_page_close = action_page_close.clone();
             let action_page_home = action_page_home.clone();
             let action_page_reload = action_page_reload.clone();
             move |tab_view, tab_page| {
-                // Get state
+                // Setup state for selected page
                 let state = match tab_page {
-                    // Menu opened: setup selected page
+                    // Context menu opened
                     Some(this) => tab_view.page_position(this).to_variant(),
-                    // Menu closed: reset to defaults
+                    // Context menu closed (reset state to defaults)
                     None => (-1).to_variant(),
                 };
 
