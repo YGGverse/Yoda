@@ -11,6 +11,7 @@ use window::Window;
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
+    glib::Variant,
     prelude::{ActionExt, GtkWindowExt},
     FileLauncher,
 };
@@ -120,14 +121,7 @@ impl Browser {
 
         action_update.connect_activate({
             let window = window.clone();
-            move |_, id| {
-                window.update(
-                    id.expect("Page ID required for update action")
-                        .get::<String>()
-                        .expect("Parameter does not match `String`")
-                        .as_str(),
-                );
-            }
+            move |_, this| window.update(string_from_variant(this).as_str())
         });
 
         action_page_new.connect_activate({
@@ -174,19 +168,7 @@ impl Browser {
 
         action_page_reload.connect_activate({
             let window = window.clone();
-            move |this, _| {
-                let page_position = this
-                    .state()
-                    .expect("Page position required for reload action")
-                    .get::<i32>()
-                    .expect("Parameter does not match `i32`");
-
-                if page_position > -1 {
-                    window.tab_page_navigation_reload(Some(page_position));
-                } else {
-                    window.tab_page_navigation_reload(None);
-                }
-            }
+            move |this, _| window.tab_page_navigation_reload(page_position_from_action_state(this))
         });
 
         action_page_pin.connect_activate({
@@ -290,3 +272,28 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Success
     Ok(())
 }
+
+/// Extract formatted page position from C-based
+/// [action state](https://docs.gtk.org/gio/property.SimpleAction.state.html)
+fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
+    let page_position = action
+        .state()
+        .expect("Page position required for reload action")
+        .get::<i32>()
+        .expect("Parameter does not match `i32`");
+
+    if page_position > -1 {
+        Some(page_position)
+    } else {
+        None
+    }
+} // @TODO move outside
+
+/// Extract `String` from C-based
+/// [Variant](https://docs.gtk.org/glib/struct.Variant.html)
+fn string_from_variant(variant: Option<&Variant>) -> String {
+    variant
+        .expect("Variant required for this action")
+        .get::<String>()
+        .expect("Parameter does not match `String`")
+} // @TODO move outside
