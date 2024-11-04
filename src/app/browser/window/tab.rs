@@ -57,6 +57,15 @@ impl Tab {
             Some(&gformat!("win.{}", action_page_reload.name())),
         ); // @TODO resolve namespace outside
 
+        let navigation = Menu::new();
+
+        navigation.append(
+            Some("Home"),
+            Some(&gformat!("win.{}", action_page_home.name())),
+        );
+
+        menu.append_section(None, &navigation);
+
         let close = Menu::new();
 
         close.append(
@@ -78,31 +87,22 @@ impl Tab {
 
         // Setup actions for context menu
         widget.gobject().connect_setup_menu({
+            let action_page_close = action_page_close.clone();
+            let action_page_home = action_page_home.clone();
             let action_page_reload = action_page_reload.clone();
             move |tab_view, tab_page| {
-                // Enable actions by default
-                action_page_reload.set_enabled(true);
+                // Get state
+                let state = match tab_page {
+                    // Menu opened: setup selected page
+                    Some(this) => tab_view.page_position(this).to_variant(),
+                    // Menu closed: reset to defaults
+                    None => (-1).to_variant(),
+                };
 
-                match tab_page {
-                    // Menu opened:
-                    // setup actions to operate with page selected only
-                    Some(this) => {
-                        // Set state
-                        let state = tab_view.page_position(this).to_variant();
-
-                        // Update related actions
-                        action_page_reload.change_state(&state);
-                    }
-                    // Menu closed:
-                    // return actions to default values
-                    None => {
-                        // Set state
-                        let state = &(-1).to_variant();
-
-                        // Update related actions
-                        action_page_reload.change_state(&state);
-                    }
-                }
+                // Update actions
+                action_page_close.change_state(&state);
+                action_page_home.change_state(&state);
+                action_page_reload.change_state(&state);
             }
         });
 
