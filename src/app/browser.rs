@@ -278,7 +278,7 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
     let page_position = action
         .state()
-        .expect("Page position required for reload action")
+        .expect("Page position required for this action")
         .get::<i32>()
         .expect("Parameter does not match `i32`");
 
