@@ -275,8 +275,8 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
 // Private helpers @TODO move outside
 
-/// Extract formatted page position from C-based
-/// [action state](https://docs.gtk.org/gio/property.SimpleAction.state.html)
+/// Extract `Optional` page position from C-based
+/// [SimpleAction state](https://docs.gtk.org/gio/property.SimpleAction.state.html)
 fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
     let page_position = action
         .state()
@@ -291,8 +291,7 @@ fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
     }
 }
 
-/// Extract `String` from C-based
-/// [Variant](https://docs.gtk.org/glib/struct.Variant.html)
+/// Extract `String` from [Variant](https://docs.gtk.org/glib/struct.Variant.html)
 fn string_from_variant(variant: Option<&Variant>) -> String {
     variant
         .expect("Variant required for this action")
