@@ -242,20 +242,9 @@ impl Tab {
 
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_navigation_reload(&self, page_position: Option<i32>) {
-        match page_position {
-            Some(value) => {
-                if let Some(id) = self.widget.gobject().nth_page(value).keyword() {
-                    if let Some(item) = self.index.borrow().get(&id) {
-                        item.page_navigation_reload();
-                    }
-                }
-            }
-            None => {
-                if let Some(id) = self.widget.current_page_keyword() {
-                    if let Some(item) = self.index.borrow().get(&id) {
-                        item.page_navigation_reload();
-                    }
-                }
+        if let Some(id) = self.widget.page_keyword(page_position) {
+            if let Some(item) = self.index.borrow().get(&id) {
+                item.page_navigation_reload();
             }
         }
     }
