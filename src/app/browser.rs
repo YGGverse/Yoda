@@ -273,6 +273,8 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     Ok(())
 }
 
+// Private helpers @TODO move outside
+
 /// Extract formatted page position from C-based
 /// [action state](https://docs.gtk.org/gio/property.SimpleAction.state.html)
 fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
@@ -287,7 +289,7 @@ fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
     } else {
         None
     }
-} // @TODO move outside
+}
 
 /// Extract `String` from C-based
 /// [Variant](https://docs.gtk.org/glib/struct.Variant.html)
@@ -296,4 +298,4 @@ fn string_from_variant(variant: Option<&Variant>) -> String {
         .expect("Variant required for this action")
         .get::<String>()
         .expect("Parameter does not match `String`")
-} // @TODO move outside
+}
