@@ -32,17 +32,19 @@ impl Widget {
 
     // Actions
 
-    pub fn close(&self) {
-        if let Some(selected_page) = self.gobject.selected_page() {
-            self.gobject.close_page(&selected_page);
+    /// Close page at given `position`, `None` to close selected page (if available)
+    pub fn close(&self, position: Option<i32>) {
+        if let Some(page) = self.page(position) {
+            self.gobject.close_page(&page);
         }
     }
 
+    /// Close all pages, including selected one
     pub fn close_all(&self) {
         // @TODO skip pinned or make confirmation alert (GTK>=4.10)
         if let Some(selected_page) = self.gobject.selected_page() {
             self.gobject.close_other_pages(&selected_page);
-            self.close();
+            self.close(None);
         }
     }
 
@@ -54,7 +56,7 @@ impl Widget {
         Some(id)
     } // @TODO remove as deprecated
 
-    /// Get **keyword** for page position, `None` for selected page
+    /// Get **keyword** for page at given position, `None` for selected page
     /// * return `None` if requested page or selected not found
     pub fn page_keyword(&self, position: Option<i32>) -> Option<GString> {
         self.page(position)?.keyword()
@@ -69,6 +71,7 @@ impl Widget {
         }
     }
 
+    /// Get reference of [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) `GObject`
     pub fn gobject(&self) -> &TabView {
         &self.gobject
     }

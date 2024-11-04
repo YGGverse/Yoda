@@ -197,12 +197,12 @@ impl Tab {
         item
     }
 
-    // Close active tab
-    pub fn close(&self) {
-        self.widget.close();
+    /// Close page at given `position`, `None` to close selected page (if available)
+    pub fn close(&self, position: Option<i32>) {
+        self.widget.close(position);
     }
 
-    // Close all tabs
+    // Close all pages
     pub fn close_all(&self) {
         self.widget.close_all();
     }
@@ -241,8 +241,8 @@ impl Tab {
     }
 
     /// Reload page at `i32` position or selected page on `None` given
-    pub fn page_navigation_reload(&self, page_position: Option<i32>) {
-        if let Some(id) = self.widget.page_keyword(page_position) {
+    pub fn page_navigation_reload(&self, position: Option<i32>) {
+        if let Some(id) = self.widget.page_keyword(position) {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_reload();
             }

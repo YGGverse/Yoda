@@ -133,8 +133,8 @@ impl Browser {
 
         action_page_close.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_close();
+            move |this, _| {
+                window.tab_close(page_position_from_action_state(this));
             }
         });
 

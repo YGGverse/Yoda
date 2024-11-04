@@ -76,8 +76,8 @@ impl Window {
     }
 
     // Actions
-    pub fn tab_append(&self, position: Option<i32>) {
-        self.tab.append(position);
+    pub fn tab_append(&self, page_position: Option<i32>) {
+        self.tab.append(page_position);
     }
 
     pub fn tab_page_navigation_home(&self) {
@@ -92,13 +92,14 @@ impl Window {
         self.tab.page_navigation_history_forward();
     }
 
-    /// Reload page at `i32` position or selected page on `None` given
-    pub fn tab_page_navigation_reload(&self, page_position: Option<i32>) {
-        self.tab.page_navigation_reload(page_position);
+    /// Reload page at given position or selected page on `None` given
+    pub fn tab_page_navigation_reload(&self, position: Option<i32>) {
+        self.tab.page_navigation_reload(position);
     }
 
-    pub fn tab_close(&self) {
-        self.tab.close();
+    /// Close page at given position or selected page on `None` given
+    pub fn tab_close(&self, page_position: Option<i32>) {
+        self.tab.close(page_position);
     }
 
     pub fn tab_close_all(&self) {
