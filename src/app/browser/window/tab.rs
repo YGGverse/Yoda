@@ -1,15 +1,17 @@
 mod database;
 mod item;
+mod menu;
 mod widget;
 
 use database::Database;
 use item::Item;
+use menu::Menu;
 use widget::Widget;
 
 use adw::TabView;
 use gtk::{
-    gio::{Menu, SimpleAction},
-    glib::{gformat, uuid_string_random, GString, Propagation},
+    gio::SimpleAction,
+    glib::{uuid_string_random, GString, Propagation},
     prelude::{ActionExt, StaticVariantType, ToVariant},
 };
 use sqlite::Transaction;
@@ -50,58 +52,19 @@ impl Tab {
         // Init empty HashMap index as no tabs appended yet
         let index = Arc::new(RefCell::new(HashMap::new()));
 
-        // @TODO move to mod
-        let menu = Menu::new();
-
-        menu.append(
-            Some("Reload"),
-            Some(&gformat!("win.{}", action_page_reload.name())),
+        // Init context menu
+        let menu = Menu::new(
+            action_page_close_all.clone(),
+            action_page_close.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_home.clone(),
+            action_page_pin.clone(),
+            action_page_reload.clone(),
         );
-
-        menu.append(
-            Some("Pin"),
-            Some(&gformat!("win.{}", action_page_pin.name())),
-        );
-
-        let navigation = Menu::new();
-
-        navigation.append(
-            Some("Home"),
-            Some(&gformat!("win.{}", action_page_home.name())),
-        );
-
-        menu.append_section(None, &navigation);
-
-        let history = Menu::new();
-
-        history.append(
-            Some("Back"),
-            Some(&gformat!("win.{}", action_page_history_back.name())),
-        );
-
-        history.append(
-            Some("Forward"),
-            Some(&gformat!("win.{}", action_page_history_forward.name())),
-        );
-
-        menu.append_submenu(Some("History"), &history);
-
-        let close = Menu::new();
-
-        close.append(
-            Some("Current"),
-            Some(&gformat!("win.{}", action_page_close.name())),
-        );
-
-        close.append(
-            Some("All"),
-            Some(&gformat!("win.{}", action_page_close_all.name())),
-        );
-
-        menu.append_submenu(Some("Close"), &close);
 
         // Init widget
-        let widget = Arc::new(Widget::new(&menu));
+        let widget = Arc::new(Widget::new(menu.gobject()));
 
         // Init events
 
