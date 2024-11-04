@@ -11,7 +11,7 @@ use window::Window;
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
-    prelude::GtkWindowExt,
+    prelude::{ActionExt, GtkWindowExt},
     FileLauncher,
 };
 use sqlite::Transaction;
@@ -174,8 +174,14 @@ impl Browser {
 
         action_page_reload.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_page_navigation_reload();
+            move |this, _| {
+                let page_position = this
+                    .state()
+                    .expect("Page position required for reload action")
+                    .get::<i32>()
+                    .expect("Parameter does not match `i32`");
+
+                window.tab_page_navigation_reload(page_position);
             }
         });
 

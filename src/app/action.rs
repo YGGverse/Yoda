@@ -4,7 +4,7 @@
 
 use gtk::{
     gio::SimpleAction,
-    glib::{gformat, uuid_string_random, GString, VariantTy},
+    glib::{gformat, uuid_string_random, GString, Variant, VariantTy},
     prelude::ActionExt,
 };
 
@@ -18,6 +18,23 @@ impl Action {
     pub fn new(group: &str, is_enabled: bool, parameter_type: Option<&VariantTy>) -> Self {
         // Create random action name as no static values should be in use
         let simple = SimpleAction::new(&uuid_string_random(), parameter_type);
+        simple.set_enabled(is_enabled);
+
+        // Assign action to the group
+        let group = GString::from(group);
+
+        // Return new Action
+        Self { group, simple }
+    }
+
+    pub fn new_stateful(
+        group: &str,
+        is_enabled: bool,
+        parameter_type: Option<&VariantTy>,
+        state: &Variant,
+    ) -> Self {
+        // Create random action name as no static values should be in use
+        let simple = SimpleAction::new_stateful(&uuid_string_random(), parameter_type, state);
         simple.set_enabled(is_enabled);
 
         // Assign action to the group

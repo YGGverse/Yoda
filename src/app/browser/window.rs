@@ -92,8 +92,8 @@ impl Window {
         self.tab.page_navigation_history_forward();
     }
 
-    pub fn tab_page_navigation_reload(&self) {
-        self.tab.page_navigation_reload();
+    pub fn tab_page_navigation_reload(&self, page_position: i32) {
+        self.tab.page_navigation_reload(page_position);
     }
 
     pub fn tab_close(&self) {

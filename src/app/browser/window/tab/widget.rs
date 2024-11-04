@@ -1,36 +1,37 @@
 use adw::TabView;
 use gtk::{
-    gio::{Icon, SimpleAction, SimpleActionGroup},
-    glib::{uuid_string_random, GString},
-    prelude::{ActionMapExt, WidgetExt},
+    gio::{Icon, MenuModel},
+    glib::GString,
+    prelude::IsA,
 };
 
+/// Currently used as the indicator for pinned tabs
+const DEFAULT_TAB_ICON: &str = "view-pin-symbolic";
+
+/// Wrapper for [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) GObject
 pub struct Widget {
     gobject: TabView,
 }
 
 impl Widget {
     // Construct
-    pub fn new(action_page_new: SimpleAction) -> Self {
-        // Init additional action group
-        let action_group = SimpleActionGroup::new();
-        action_group.add_action(&action_page_new);
-
+    pub fn new(menu_model: &impl IsA<MenuModel>) -> Self {
         // Init gobject
-        let gobject = TabView::new();
+        let gobject = TabView::builder().menu_model(menu_model).build();
 
-        // Change default icon visible for tabs pinned
-        if let Ok(default_icon) = Icon::for_string("view-pin-symbolic") {
+        // Change default icon (if available in the system icon set)
+        // * visible for pinned tabs only
+        // * @TODO not default GTK behavior, make this feature optional
+        if let Ok(default_icon) = Icon::for_string(DEFAULT_TAB_ICON) {
             gobject.set_default_icon(&default_icon);
         }
 
-        // Create new group for actions
-        gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
-
+        // Done
         Self { gobject }
     }
 
     // Actions
+
     pub fn close(&self) {
         if let Some(selected_page) = self.gobject.selected_page() {
             self.gobject.close_page(&selected_page);
@@ -46,6 +47,7 @@ impl Widget {
     }
 
     // Getters
+
     pub fn current_page_keyword(&self) -> Option<GString> {
         let page = self.gobject.selected_page()?;
         let id = page.keyword()?;

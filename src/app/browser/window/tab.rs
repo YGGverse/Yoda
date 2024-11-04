@@ -8,9 +8,9 @@ use widget::Widget;
 
 use adw::TabView;
 use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, GString, Propagation},
-    prelude::StaticVariantType,
+    gio::{Menu, SimpleAction},
+    glib::{gformat, uuid_string_random, GString, Propagation},
+    prelude::{ActionExt, StaticVariantType, ToVariant},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, sync::Arc};
@@ -48,10 +48,51 @@ impl Tab {
         // Init empty HashMap index as no tabs appended yet
         let index = Arc::new(RefCell::new(HashMap::new()));
 
+        // @TODO move to mod
+        let menu = Menu::new();
+
+        menu.append(
+            Some("Reload"),
+            Some(&gformat!("win.{}", action_page_reload.name())),
+        ); // @TODO resolve namespace outside
+
         // Init widget
-        let widget = Arc::new(Widget::new(action_tab_open.clone()));
+        let widget = Arc::new(Widget::new(&menu));
 
         // Init events
+
+        // Setup actions for context menu
+        widget.gobject().connect_setup_menu({
+            let action_page_reload = action_page_reload.clone();
+            move |tab_view, tab_page| {
+                // Enable actions by default
+                action_page_reload.set_enabled(true);
+
+                match tab_page {
+                    // Menu opened:
+                    // setup actions to operate with page selected only
+                    Some(this) => {
+                        let position = tab_view.page_position(this).to_variant();
+
+                        action_page_reload.change_state(&position);
+                    }
+                    // Menu closed:
+                    // return actions to default values
+                    None => match tab_view.selected_page() {
+                        Some(selected) => {
+                            // Get position of page selected
+                            let position = tab_view.page_position(&selected).to_variant();
+
+                            // Update related actions
+                            action_page_reload.change_state(&position);
+                        }
+                        // No selected page found, disable related actions
+                        None => action_page_reload.set_enabled(false),
+                    },
+                }
+            }
+        });
+
         widget.gobject().connect_close_page({
             let index = index.clone();
             move |_, item| {
@@ -201,8 +242,8 @@ impl Tab {
         }
     }
 
-    pub fn page_navigation_reload(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
+    pub fn page_navigation_reload(&self, page_position: i32) {
+        if let Some(id) = self.widget.gobject().nth_page(page_position).keyword() {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_reload();
             }
