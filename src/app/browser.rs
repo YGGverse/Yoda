@@ -154,15 +154,15 @@ impl Browser {
 
         action_page_history_back.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_page_navigation_history_back();
+            move |this, _| {
+                window.tab_page_navigation_history_back(page_position_from_action_state(this));
             }
         });
 
         action_page_history_forward.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_page_navigation_history_forward();
+            move |this, _| {
+                window.tab_page_navigation_history_forward(page_position_from_action_state(this));
             }
         });
 

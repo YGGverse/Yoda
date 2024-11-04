@@ -1,7 +1,6 @@
 use adw::{TabPage, TabView};
 use gtk::{
     gio::{Icon, MenuModel},
-    glib::GString,
     prelude::IsA,
 };
 
@@ -64,18 +63,6 @@ impl Widget {
     }
 
     // Getters
-
-    pub fn current_page_keyword(&self) -> Option<GString> {
-        let page = self.gobject.selected_page()?;
-        let id = page.keyword()?;
-        Some(id)
-    } // @TODO remove as deprecated
-
-    /// Get **keyword** for page at given position, `None` for selected page
-    /// * return `None` if requested page or selected not found
-    pub fn page_keyword(&self, position: Option<i32>) -> Option<GString> {
-        self.page(position)?.keyword()
-    }
 
     /// Get tab page by position, `None` for selected page
     /// * return `None` if requested or selected page not found

@@ -72,6 +72,20 @@ impl Tab {
 
         menu.append_section(None, &navigation);
 
+        let history = Menu::new();
+
+        history.append(
+            Some("Back"),
+            Some(&gformat!("win.{}", action_page_history_back.name())),
+        );
+
+        history.append(
+            Some("Forward"),
+            Some(&gformat!("win.{}", action_page_history_forward.name())),
+        );
+
+        menu.append_submenu(Some("History"), &history);
+
         let close = Menu::new();
 
         close.append(
@@ -94,6 +108,8 @@ impl Tab {
         widget.gobject().connect_setup_menu({
             // Clone actions to update
             let action_page_close = action_page_close.clone();
+            let action_page_history_back = action_page_history_back.clone();
+            let action_page_history_forward = action_page_history_forward.clone();
             let action_page_home = action_page_home.clone();
             let action_page_pin = action_page_pin.clone();
             let action_page_reload = action_page_reload.clone();
@@ -108,6 +124,8 @@ impl Tab {
 
                 // Update actions
                 action_page_close.change_state(&state);
+                action_page_history_back.change_state(&state);
+                action_page_history_forward.change_state(&state);
                 action_page_home.change_state(&state);
                 action_page_pin.change_state(&state);
                 action_page_reload.change_state(&state);
@@ -236,34 +254,42 @@ impl Tab {
     }
 
     pub fn page_navigation_home(&self, page_position: Option<i32>) {
-        if let Some(id) = self.widget.page_keyword(page_position) {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_home();
+        if let Some(page) = self.widget.page(page_position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page_navigation_home();
+                }
             }
         }
     }
 
-    pub fn page_navigation_history_back(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_history_back();
+    pub fn page_navigation_history_back(&self, page_position: Option<i32>) {
+        if let Some(page) = self.widget.page(page_position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page_navigation_history_back();
+                }
             }
         }
     }
 
-    pub fn page_navigation_history_forward(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_history_forward();
+    pub fn page_navigation_history_forward(&self, page_position: Option<i32>) {
+        if let Some(page) = self.widget.page(page_position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page_navigation_history_forward();
+                }
             }
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
-    pub fn page_navigation_reload(&self, position: Option<i32>) {
-        if let Some(id) = self.widget.page_keyword(position) {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_reload();
+    pub fn page_navigation_reload(&self, page_position: Option<i32>) {
+        if let Some(page) = self.widget.page(page_position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page_navigation_reload();
+                }
             }
         }
     }

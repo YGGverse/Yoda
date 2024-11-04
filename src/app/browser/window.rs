@@ -87,12 +87,12 @@ impl Window {
         self.tab.page_navigation_home(page_position);
     }
 
-    pub fn tab_page_navigation_history_back(&self) {
-        self.tab.page_navigation_history_back();
+    pub fn tab_page_navigation_history_back(&self, page_position: Option<i32>) {
+        self.tab.page_navigation_history_back(page_position);
     }
 
-    pub fn tab_page_navigation_history_forward(&self) {
-        self.tab.page_navigation_history_forward();
+    pub fn tab_page_navigation_history_forward(&self, page_position: Option<i32>) {
+        self.tab.page_navigation_history_forward(page_position);
     }
 
     /// Reload page at given position or selected page on `None` given
