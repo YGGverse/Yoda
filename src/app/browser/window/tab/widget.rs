@@ -14,7 +14,9 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
+    // Constructors
+
+    /// Create new `Self`
     pub fn new(menu_model: &impl IsA<MenuModel>) -> Self {
         // Init gobject
         let gobject = TabView::builder().menu_model(menu_model).build();
