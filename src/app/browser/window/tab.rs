@@ -72,23 +72,21 @@ impl Tab {
                     // Menu opened:
                     // setup actions to operate with page selected only
                     Some(this) => {
-                        let position = tab_view.page_position(this).to_variant();
+                        // Set state
+                        let state = tab_view.page_position(this).to_variant();
 
-                        action_page_reload.change_state(&position);
+                        // Update related actions
+                        action_page_reload.change_state(&state);
                     }
                     // Menu closed:
                     // return actions to default values
-                    None => match tab_view.selected_page() {
-                        Some(selected) => {
-                            // Get position of page selected
-                            let position = tab_view.page_position(&selected).to_variant();
+                    None => {
+                        // Set state
+                        let state = &(-1).to_variant();
 
-                            // Update related actions
-                            action_page_reload.change_state(&position);
-                        }
-                        // No selected page found, disable related actions
-                        None => action_page_reload.set_enabled(false),
-                    },
+                        // Update related actions
+                        action_page_reload.change_state(&state);
+                    }
                 }
             }
         });
@@ -242,10 +240,22 @@ impl Tab {
         }
     }
 
-    pub fn page_navigation_reload(&self, page_position: i32) {
-        if let Some(id) = self.widget.gobject().nth_page(page_position).keyword() {
-            if let Some(item) = self.index.borrow().get(&id) {
-                item.page_navigation_reload();
+    /// Reload page at `i32` position or selected page on `None` given
+    pub fn page_navigation_reload(&self, page_position: Option<i32>) {
+        match page_position {
+            Some(value) => {
+                if let Some(id) = self.widget.gobject().nth_page(value).keyword() {
+                    if let Some(item) = self.index.borrow().get(&id) {
+                        item.page_navigation_reload();
+                    }
+                }
+            }
+            None => {
+                if let Some(id) = self.widget.current_page_keyword() {
+                    if let Some(item) = self.index.borrow().get(&id) {
+                        item.page_navigation_reload();
+                    }
+                }
             }
         }
     }

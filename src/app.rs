@@ -52,7 +52,7 @@ impl App {
         let action_page_home = Action::new("win", false, None);
         let action_page_history_back = Action::new("win", false, None);
         let action_page_history_forward = Action::new("win", false, None);
-        let action_page_reload = Action::new_stateful("win", true, None, &0.to_variant()); // @TODO
+        let action_page_reload = Action::new_stateful("win", true, None, &(-1).to_variant());
         let action_page_pin = Action::new("win", true, None);
 
         // Init GTK

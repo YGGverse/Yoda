@@ -181,7 +181,11 @@ impl Browser {
                     .get::<i32>()
                     .expect("Parameter does not match `i32`");
 
-                window.tab_page_navigation_reload(page_position);
+                if page_position > -1 {
+                    window.tab_page_navigation_reload(Some(page_position));
+                } else {
+                    window.tab_page_navigation_reload(None);
+                }
             }
         });
 

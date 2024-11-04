@@ -27,6 +27,9 @@ impl Action {
         Self { group, simple }
     }
 
+    /// Stateful constructors useful for actions that require custom values
+    /// but could not receive it directly with action argument
+    /// e.g. [MenuModel](https://docs.gtk.org/gio/class.MenuModel.html)
     pub fn new_stateful(
         group: &str,
         is_enabled: bool,
