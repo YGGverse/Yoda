@@ -32,7 +32,7 @@ impl Widget {
 
     // Actions
 
-    /// Close page at given `position`, `None` to close selected page
+    /// Close page at given `position`, `None` to close selected page (if available)
     /// * this action includes `pinned` pages, to prevent that:
     ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
     ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
@@ -51,6 +51,13 @@ impl Widget {
         while let Some(page) = self.gobject.selected_page() {
             self.gobject.set_page_pinned(&page, false);
             self.gobject.close_page(&page);
+        }
+    }
+
+    /// Toggle pin for page at given `position`, `None` to pin selected page (if available)
+    pub fn pin(&self, position: Option<i32>) {
+        if let Some(page) = self.page(position) {
+            self.gobject.set_page_pinned(&page, !page.is_pinned()); // toggle
         }
     }
 

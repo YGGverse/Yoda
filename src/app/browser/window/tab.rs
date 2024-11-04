@@ -39,6 +39,7 @@ impl Tab {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
+        action_page_pin: SimpleAction,
         action_page_reload: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
@@ -55,7 +56,12 @@ impl Tab {
         menu.append(
             Some("Reload"),
             Some(&gformat!("win.{}", action_page_reload.name())),
-        ); // @TODO resolve namespace outside
+        );
+
+        menu.append(
+            Some("Pin"),
+            Some(&gformat!("win.{}", action_page_pin.name())),
+        );
 
         let navigation = Menu::new();
 
@@ -89,6 +95,7 @@ impl Tab {
             // Clone actions to update
             let action_page_close = action_page_close.clone();
             let action_page_home = action_page_home.clone();
+            let action_page_pin = action_page_pin.clone();
             let action_page_reload = action_page_reload.clone();
             move |tab_view, tab_page| {
                 // Setup state for selected page
@@ -102,6 +109,7 @@ impl Tab {
                 // Update actions
                 action_page_close.change_state(&state);
                 action_page_home.change_state(&state);
+                action_page_pin.change_state(&state);
                 action_page_reload.change_state(&state);
             }
         });
@@ -223,16 +231,12 @@ impl Tab {
     }
 
     // Toggle pin status for active tab
-    pub fn pin(&self) {
-        if let Some(page) = self.widget.gobject().selected_page() {
-            self.widget
-                .gobject()
-                .set_page_pinned(&page, !page.is_pinned()); // toggle
-        }
+    pub fn pin(&self, page_position: Option<i32>) {
+        self.widget.pin(page_position);
     }
 
-    pub fn page_navigation_home(&self) {
-        if let Some(id) = self.widget.current_page_keyword() {
+    pub fn page_navigation_home(&self, page_position: Option<i32>) {
+        if let Some(id) = self.widget.page_keyword(page_position) {
             if let Some(item) = self.index.borrow().get(&id) {
                 item.page_navigation_home();
             }

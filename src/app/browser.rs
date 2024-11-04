@@ -147,8 +147,8 @@ impl Browser {
 
         action_page_home.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_page_navigation_home();
+            move |this, _| {
+                window.tab_page_navigation_home(page_position_from_action_state(this));
             }
         });
 
@@ -173,8 +173,8 @@ impl Browser {
 
         action_page_pin.connect_activate({
             let window = window.clone();
-            move |_, _| {
-                window.tab_pin();
+            move |this, _| {
+                window.tab_pin(page_position_from_action_state(this));
             }
         });
 

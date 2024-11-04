@@ -44,6 +44,7 @@ impl Window {
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
+            action_page_pin.clone(),
             action_page_reload.clone(),
             action_update.clone(),
         );
@@ -82,8 +83,8 @@ impl Window {
         self.tab.append(page_position);
     }
 
-    pub fn tab_page_navigation_home(&self) {
-        self.tab.page_navigation_home();
+    pub fn tab_page_navigation_home(&self, page_position: Option<i32>) {
+        self.tab.page_navigation_home(page_position);
     }
 
     pub fn tab_page_navigation_history_back(&self) {
@@ -108,8 +109,8 @@ impl Window {
         self.tab.close_all();
     }
 
-    pub fn tab_pin(&self) {
-        self.tab.pin();
+    pub fn tab_pin(&self, page_position: Option<i32>) {
+        self.tab.pin(page_position);
     }
 
     pub fn update(&self, id: &str) {
