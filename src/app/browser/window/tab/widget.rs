@@ -32,21 +32,25 @@ impl Widget {
 
     // Actions
 
-    /// Close page at given `position`, `None` to close selected page (if available)
-    /// * this action does not close pinned pages
+    /// Close page at given `position`, `None` to close selected page
+    /// * this action includes `pinned` pages, to prevent that:
+    ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
+    ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
     pub fn close(&self, position: Option<i32>) {
         if let Some(page) = self.page(position) {
+            self.gobject.set_page_pinned(&page, false);
             self.gobject.close_page(&page);
         }
     }
 
     /// Close all pages
-    /// * this action does not close pinned pages
+    /// * this action includes `pinned` pages, to prevent that:
+    ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
+    ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
     pub fn close_all(&self) {
-        // @TODO skip pinned or make confirmation alert (GTK>=4.10)
-        if let Some(selected_page) = self.gobject.selected_page() {
-            self.gobject.close_other_pages(&selected_page);
-            self.gobject.close_page(&selected_page);
+        while let Some(page) = self.gobject.selected_page() {
+            self.gobject.set_page_pinned(&page, false);
+            self.gobject.close_page(&page);
         }
     }
 
