@@ -39,6 +39,8 @@ impl Window {
     ) -> Self {
         // Init components
         let tab = Tab::new_arc(
+            action_page_close.clone(),
+            action_page_close_all.clone(),
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),

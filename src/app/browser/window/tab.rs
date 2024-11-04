@@ -34,7 +34,8 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new_arc(
-        // Actions
+        action_page_close: SimpleAction,
+        action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
@@ -55,6 +56,20 @@ impl Tab {
             Some("Reload"),
             Some(&gformat!("win.{}", action_page_reload.name())),
         ); // @TODO resolve namespace outside
+
+        let close = Menu::new();
+
+        close.append(
+            Some("Current"),
+            Some(&gformat!("win.{}", action_page_close.name())),
+        );
+
+        close.append(
+            Some("All"),
+            Some(&gformat!("win.{}", action_page_close_all.name())),
+        );
+
+        menu.append_submenu(Some("Close"), &close);
 
         // Init widget
         let widget = Arc::new(Widget::new(&menu));
