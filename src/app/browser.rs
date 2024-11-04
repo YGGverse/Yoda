@@ -282,7 +282,7 @@ fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
         .state()
         .expect("Page position required for this action")
         .get::<i32>()
-        .expect("Parameter does not match `i32`");
+        .expect("Parameter type does not match `i32`");
 
     if page_position > -1 {
         Some(page_position)
@@ -296,5 +296,5 @@ fn string_from_variant(variant: Option<&Variant>) -> String {
     variant
         .expect("Variant required for this action")
         .get::<String>()
-        .expect("Parameter does not match `String`")
+        .expect("Parameter type does not match `String`")
 }
