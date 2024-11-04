@@ -33,18 +33,20 @@ impl Widget {
     // Actions
 
     /// Close page at given `position`, `None` to close selected page (if available)
+    /// * this action does not close pinned pages
     pub fn close(&self, position: Option<i32>) {
         if let Some(page) = self.page(position) {
             self.gobject.close_page(&page);
         }
     }
 
-    /// Close all pages, including selected one
+    /// Close all pages
+    /// * this action does not close pinned pages
     pub fn close_all(&self) {
         // @TODO skip pinned or make confirmation alert (GTK>=4.10)
         if let Some(selected_page) = self.gobject.selected_page() {
             self.gobject.close_other_pages(&selected_page);
-            self.close(None);
+            self.gobject.close_page(&selected_page);
         }
     }
 
