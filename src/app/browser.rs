@@ -148,27 +148,27 @@ impl Browser {
         action_page_home.connect_activate({
             let window = window.clone();
             move |this, _| {
-                window.tab_page_navigation_home(page_position_from_action_state(this));
+                window.tab_page_home(page_position_from_action_state(this));
             }
         });
 
         action_page_history_back.connect_activate({
             let window = window.clone();
             move |this, _| {
-                window.tab_page_navigation_history_back(page_position_from_action_state(this));
+                window.tab_page_history_back(page_position_from_action_state(this));
             }
         });
 
         action_page_history_forward.connect_activate({
             let window = window.clone();
             move |this, _| {
-                window.tab_page_navigation_history_forward(page_position_from_action_state(this));
+                window.tab_page_history_forward(page_position_from_action_state(this));
             }
         });
 
         action_page_reload.connect_activate({
             let window = window.clone();
-            move |this, _| window.tab_page_navigation_reload(page_position_from_action_state(this))
+            move |this, _| window.tab_page_reload(page_position_from_action_state(this))
         });
 
         action_page_pin.connect_activate({

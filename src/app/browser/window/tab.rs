@@ -152,7 +152,7 @@ impl Tab {
                 if let Some(variant) = request {
                     if let Some(value) = variant.get::<String>() {
                         item.set_page_navigation_request_text(value.as_str());
-                        item.page_navigation_reload();
+                        item.page_reload();
                     }
                 }
             }
@@ -216,42 +216,42 @@ impl Tab {
         self.widget.pin(page_position);
     }
 
-    pub fn page_navigation_home(&self, page_position: Option<i32>) {
+    pub fn page_home(&self, page_position: Option<i32>) {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_navigation_home();
+                    item.page_home();
                 }
             }
         }
     }
 
-    pub fn page_navigation_history_back(&self, page_position: Option<i32>) {
+    pub fn page_history_back(&self, page_position: Option<i32>) {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_navigation_history_back();
+                    item.page_history_back();
                 }
             }
         }
     }
 
-    pub fn page_navigation_history_forward(&self, page_position: Option<i32>) {
+    pub fn page_history_forward(&self, page_position: Option<i32>) {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_navigation_history_forward();
+                    item.page_history_forward();
                 }
             }
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
-    pub fn page_navigation_reload(&self, page_position: Option<i32>) {
+    pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_navigation_reload();
+                    item.page_reload();
                 }
             }
         }

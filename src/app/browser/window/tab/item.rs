@@ -69,20 +69,20 @@ impl Item {
     }
 
     // Actions
-    pub fn page_navigation_home(&self) {
-        self.page.navigation_home()
+    pub fn page_home(&self) {
+        self.page.home()
     }
 
-    pub fn page_navigation_history_back(&self) {
-        self.page.navigation_history_back()
+    pub fn page_history_back(&self) {
+        self.page.history_back()
     }
 
-    pub fn page_navigation_history_forward(&self) {
-        self.page.navigation_history_forward()
+    pub fn page_history_forward(&self) {
+        self.page.history_forward()
     }
 
-    pub fn page_navigation_reload(&self) {
-        self.page.navigation_reload()
+    pub fn page_reload(&self) {
+        self.page.reload()
     }
 
     pub fn page_navigation_request_grab_focus(&self) {

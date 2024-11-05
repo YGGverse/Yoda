@@ -83,21 +83,21 @@ impl Window {
         self.tab.append(page_position);
     }
 
-    pub fn tab_page_navigation_home(&self, page_position: Option<i32>) {
-        self.tab.page_navigation_home(page_position);
+    pub fn tab_page_home(&self, page_position: Option<i32>) {
+        self.tab.page_home(page_position);
     }
 
-    pub fn tab_page_navigation_history_back(&self, page_position: Option<i32>) {
-        self.tab.page_navigation_history_back(page_position);
+    pub fn tab_page_history_back(&self, page_position: Option<i32>) {
+        self.tab.page_history_back(page_position);
     }
 
-    pub fn tab_page_navigation_history_forward(&self, page_position: Option<i32>) {
-        self.tab.page_navigation_history_forward(page_position);
+    pub fn tab_page_history_forward(&self, page_position: Option<i32>) {
+        self.tab.page_history_forward(page_position);
     }
 
     /// Reload page at given position or selected page on `None` given
-    pub fn tab_page_navigation_reload(&self, position: Option<i32>) {
-        self.tab.page_navigation_reload(position);
+    pub fn tab_page_reload(&self, position: Option<i32>) {
+        self.tab.page_reload(position);
     }
 
     /// Close page at given position or selected page on `None` given

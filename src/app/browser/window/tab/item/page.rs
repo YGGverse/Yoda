@@ -124,18 +124,15 @@ impl Page {
     }
 
     // Actions
-    pub fn navigation_request_grab_focus(&self) {
-        self.navigation.request_grab_focus();
-    }
 
-    pub fn navigation_home(&self) {
+    pub fn home(&self) {
         if let Some(url) = self.navigation.home_url() {
             // Update with history record
             self.action_page_open.activate(Some(&url.to_variant()));
         }
     }
 
-    pub fn navigation_history_back(&self) {
+    pub fn history_back(&self) {
         if let Some(request) = self.navigation.history_back(true) {
             // Update
             self.navigation.set_request_text(&request);
@@ -145,7 +142,7 @@ impl Page {
         }
     }
 
-    pub fn navigation_history_forward(&self) {
+    pub fn history_forward(&self) {
         if let Some(request) = self.navigation.history_forward(true) {
             // Update
             self.navigation.set_request_text(&request);
@@ -155,8 +152,7 @@ impl Page {
         }
     }
 
-    // @TODO rename to `load`
-    pub fn navigation_reload(&self) {
+    pub fn reload(&self) {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
         const DEFAULT_MAX_REDIRECT_COUNT: i8 = 10;
@@ -359,12 +355,18 @@ impl Page {
         Ok(())
     }
 
+    pub fn navigation_request_grab_focus(&self) {
+        self.navigation.request_grab_focus();
+    }
+
     // Setters
+
     pub fn set_navigation_request_text(&self, value: &str) {
         self.navigation.set_request_text(value);
     }
 
     // Getters
+
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
         match self.meta.status() {
