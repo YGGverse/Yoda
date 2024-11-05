@@ -66,6 +66,9 @@ GTK 4 / Libadwaita client written in Rust
   * [x] [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) (by [ggemtext](https://github.com/YGGverse/ggemtext))
     * [x] H1, H2, H3
     * [x] Code (inline/multiline)
+      * [x] Inline
+      * [x] Multiline
+        * [x] Alt
       * [ ] Terminal emulation
       * [ ] Syntax highlight
     * [x] Link
