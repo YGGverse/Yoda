@@ -1,14 +1,13 @@
-mod action;
 mod browser;
 mod database;
 
-use action::Action;
 use browser::Browser;
 use database::Database;
 
 use adw::Application;
 use gtk::{
-    glib::ExitCode,
+    gio::SimpleAction,
+    glib::{gformat, uuid_string_random, ExitCode},
     prelude::{
         ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt,
         StaticVariantType, ToVariant,
@@ -44,19 +43,26 @@ impl App {
         let default_state = (-1).to_variant();
 
         // Init actions
-        let action_about = Action::new("win", true, None);
-        let action_debug = Action::new("win", true, None);
-        let action_profile = Action::new("win", true, None);
-        let action_quit = Action::new("win", true, None);
-        let action_update = Action::new("win", true, Some(&String::static_variant_type()));
-        let action_page_new = Action::new("win", true, None);
-        let action_page_close = Action::new_stateful("win", true, None, &default_state);
-        let action_page_close_all = Action::new("win", true, None);
-        let action_page_home = Action::new_stateful("win", false, None, &default_state);
-        let action_page_history_back = Action::new_stateful("win", false, None, &default_state);
-        let action_page_history_forward = Action::new_stateful("win", false, None, &default_state);
-        let action_page_reload = Action::new_stateful("win", true, None, &default_state);
-        let action_page_pin = Action::new_stateful("win", true, None, &default_state);
+        let action_about = SimpleAction::new(&uuid_string_random(), None);
+        let action_debug = SimpleAction::new(&uuid_string_random(), None);
+        let action_profile = SimpleAction::new(&uuid_string_random(), None);
+        let action_quit = SimpleAction::new(&uuid_string_random(), None);
+        let action_update =
+            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
+        let action_page_new = SimpleAction::new(&uuid_string_random(), None);
+        let action_page_close =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
+        let action_page_close_all = SimpleAction::new(&uuid_string_random(), None);
+        let action_page_home =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
+        let action_page_history_back =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
+        let action_page_history_forward =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
+        let action_page_reload =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
+        let action_page_pin =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
 
         // Init GTK
         let gobject = Application::builder()
@@ -65,19 +71,28 @@ impl App {
 
         // Init accels
         let accels_config = &[
-            (action_page_reload.detailed_name(), &["<Primary>r"]),
-            (action_debug.detailed_name(), &["<Primary>i"]),
-            (action_page_close.detailed_name(), &["<Primary>q"]),
-            (action_page_history_back.detailed_name(), &["<Primary>Left"]),
             (
-                action_page_history_forward.detailed_name(),
+                gformat!("win.{}", action_page_reload.name()),
+                &["<Primary>r"],
+            ),
+            (gformat!("win.{}", action_debug.name()), &["<Primary>i"]),
+            (
+                gformat!("win.{}", action_page_close.name()),
+                &["<Primary>q"],
+            ),
+            (
+                gformat!("win.{}", action_page_history_back.name()),
+                &["<Primary>Left"],
+            ),
+            (
+                gformat!("win.{}", action_page_history_forward.name()),
                 &["<Primary>Right"],
             ),
-            (action_page_home.detailed_name(), &["<Primary>h"]),
-            (action_page_new.detailed_name(), &["<Primary>t"]),
-            (action_page_pin.detailed_name(), &["<Primary>p"]),
-            (action_quit.detailed_name(), &["<Primary>Escape"]),
-            (action_update.detailed_name(), &["<Primary>u"]),
+            (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
+            (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
+            (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
+            (gformat!("win.{}", action_quit.name()), &["<Primary>Escape"]),
+            (gformat!("win.{}", action_update.name()), &["<Primary>u"]),
         ]; // @TODO config
 
         for (detailed_action_name, &accels) in accels_config {
@@ -87,24 +102,24 @@ impl App {
         // Init components
         let browser = Arc::new(Browser::new(
             profile_path,
-            action_about.simple(),
-            action_debug.simple(),
-            action_profile.simple(),
-            action_quit.simple(),
-            action_update.simple(),
-            action_page_new.simple(),
-            action_page_close.simple(),
-            action_page_close_all.simple(),
-            action_page_home.simple(),
-            action_page_history_back.simple(),
-            action_page_history_forward.simple(),
-            action_page_reload.simple(),
-            action_page_pin.simple(),
+            action_about.clone(),
+            action_debug.clone(),
+            action_profile.clone(),
+            action_quit.clone(),
+            action_update.clone(),
+            action_page_new.clone(),
+            action_page_close.clone(),
+            action_page_close_all.clone(),
+            action_page_home.clone(),
+            action_page_history_back.clone(),
+            action_page_history_forward.clone(),
+            action_page_reload.clone(),
+            action_page_pin.clone(),
         ));
 
         // Init events
         gobject.connect_activate({
-            let action_update = action_update.simple();
+            let action_update = action_update.clone();
             move |_| {
                 // Make initial update
                 action_update.activate(Some(&"".to_variant())); // @TODO
