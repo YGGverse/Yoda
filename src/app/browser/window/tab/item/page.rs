@@ -34,8 +34,8 @@ use std::{sync::Arc, time::Duration};
 pub struct Page {
     id: GString,
     // Actions
+    action_page_load: SimpleAction,
     action_page_open: SimpleAction,
-    action_page_reload: SimpleAction,
     action_update: SimpleAction,
     // Components
     navigation: Arc<Navigation>,
@@ -59,6 +59,7 @@ impl Page {
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init local actions
+        let action_page_load = SimpleAction::new(&uuid_string_random(), None);
         let action_page_open =
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
@@ -86,42 +87,13 @@ impl Page {
 
         let meta = Meta::new_arc(Status::New, gformat!("New page"));
 
-        // Init events
-        action_page_open.connect_activate({
-            let navigation = navigation.clone();
-            let action_page_reload = action_page_reload.clone();
-            move |_, parameter| {
-                // Get request value from action parameter
-                let request = parameter
-                    .expect("Parameter required for this action")
-                    .get::<String>()
-                    .expect("Parameter does not match `String`");
-
-                // Update navigation entry
-                navigation.set_request_text(&request);
-
-                // Add history record
-                match navigation.history_current() {
-                    Some(current) => {
-                        if current != request {
-                            navigation.history_add(request.into());
-                        }
-                    }
-                    None => navigation.history_add(request.into()),
-                }
-
-                // Reload page
-                action_page_reload.activate(None);
-            }
-        });
-
-        // Return activated `Self`
-        Arc::new(Self {
+        // Init `Self`
+        let this = Arc::new(Self {
             id,
             // Actions
-            action_page_open,
-            action_page_reload,
-            action_update,
+            action_page_load: action_page_load.clone(),
+            action_page_open: action_page_open.clone(),
+            action_update: action_update.clone(),
             // Components
             content,
             navigation,
@@ -130,7 +102,33 @@ impl Page {
             meta,
             // GTK
             widget,
-        })
+        });
+
+        // Init events
+        action_page_load.connect_activate({
+            let this = this.clone();
+            move |_, _| this.load(false)
+        });
+
+        action_page_open.connect_activate({
+            let this = this.clone();
+            move |_, parameter| {
+                // Get request value from action parameter
+                let request = parameter
+                    .expect("Parameter required for this action")
+                    .get::<String>()
+                    .expect("Parameter does not match `String`");
+
+                // Update navigation entry
+                this.navigation.set_request_text(&request);
+
+                // Reload page
+                this.load(true);
+            }
+        });
+
+        // Return activated `Self`
+        this
     }
 
     // Actions
@@ -147,8 +145,8 @@ impl Page {
             // Update navigation entry
             self.navigation.set_request_text(&request);
 
-            // Reload page (without history record)
-            self.reload();
+            // Load page (without history record)
+            self.load(false);
         }
     }
 
@@ -157,12 +155,16 @@ impl Page {
             // Update navigation entry
             self.navigation.set_request_text(&request);
 
-            // Reload page (without history record)
-            self.reload();
+            // Load page (without history record)
+            self.load(false);
         }
     }
 
     pub fn reload(&self) {
+        self.load(true);
+    }
+
+    pub fn load(&self, history: bool) {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
         const DEFAULT_MAX_REDIRECT_COUNT: i8 = 10;
@@ -205,6 +207,18 @@ impl Page {
             // Return value from navigation entry
             self.navigation.request_text()
         };
+
+        // Add history record
+        if history {
+            match self.navigation.history_current() {
+                Some(current) => {
+                    if current != request {
+                        self.navigation.history_add(request.clone());
+                    }
+                }
+                None => self.navigation.history_add(request.clone()),
+            }
+        }
 
         // Update
         self.meta.set_status(Status::Reload).set_title(&"Loading..");
@@ -254,8 +268,8 @@ impl Page {
                             // Update navigation entry
                             self.navigation.set_request_text(&request);
 
-                            // Reload page (without history record)
-                            self.reload();
+                            // Load page (without history record)
+                            self.load(false);
                         }
                         Err(_) => {
                             // @TODO any action here?
@@ -271,8 +285,8 @@ impl Page {
                     // Update navigation entry
                     self.navigation.set_request_text(&request);
 
-                    // Reload page (without history record)
-                    self.reload();
+                    // Load page (without history record)
+                    self.load(false);
                 }
             }
         }; // Uri::parse
@@ -404,8 +418,8 @@ impl Page {
         // use gemini::client::response::
 
         // Init shared objects (async)
+        let action_page_load = self.action_page_load.clone();
         let action_page_open = self.action_page_open.clone();
-        let action_page_reload = self.action_page_reload.clone();
         let action_update = self.action_update.clone();
         let content = self.content.clone();
         let id = self.id.to_variant();
@@ -750,7 +764,7 @@ impl Page {
                                                                                     .set_title(&"Redirect");
 
                                                                                 // Reload page to apply redirection
-                                                                                action_page_reload.activate(None);
+                                                                                action_page_load.activate(None);
                                                                             }
                                                                         },
                                                                         Err(reason) => {
