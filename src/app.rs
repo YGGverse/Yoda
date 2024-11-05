@@ -40,6 +40,9 @@ impl App {
         profile_database_connection: Arc<RwLock<Connection>>,
         profile_path: PathBuf,
     ) -> Self {
+        // Init defaults
+        const DEFAULT_ACTION_PAGE_STATE: i32 = -1;
+
         // Init actions
         let action_about = Action::new("win", true, None);
         let action_debug = Action::new("win", true, None);
@@ -47,14 +50,19 @@ impl App {
         let action_quit = Action::new("win", true, None);
         let action_update = Action::new("win", true, Some(&String::static_variant_type()));
         let action_page_new = Action::new("win", true, None);
-        let action_page_close = Action::new_stateful("win", true, None, &(-1).to_variant());
+        let action_page_close =
+            Action::new_stateful("win", true, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
         let action_page_close_all = Action::new("win", true, None);
-        let action_page_home = Action::new_stateful("win", false, None, &(-1).to_variant());
-        let action_page_history_back = Action::new_stateful("win", false, None, &(-1).to_variant());
+        let action_page_home =
+            Action::new_stateful("win", false, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
+        let action_page_history_back =
+            Action::new_stateful("win", false, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
         let action_page_history_forward =
-            Action::new_stateful("win", false, None, &(-1).to_variant());
-        let action_page_reload = Action::new_stateful("win", true, None, &(-1).to_variant());
-        let action_page_pin = Action::new_stateful("win", true, None, &(-1).to_variant());
+            Action::new_stateful("win", false, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
+        let action_page_reload =
+            Action::new_stateful("win", true, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
+        let action_page_pin =
+            Action::new_stateful("win", true, None, &DEFAULT_ACTION_PAGE_STATE.to_variant());
 
         // Init GTK
         let gobject = Application::builder()
