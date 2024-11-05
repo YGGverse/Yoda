@@ -64,13 +64,16 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] `61` Certificate not authorized
       * [ ] `62` Certificate not valid
   * [x] [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) (by [ggemtext](https://github.com/YGGverse/ggemtext))
-    * [x] H1, H2, H3
     * [x] Code (inline/multiline)
       * [x] Inline
       * [x] Multiline
         * [x] Alt
       * [ ] Terminal emulation*
       * [ ] Syntax highlight*
+    * [x] Header
+      * [x] H1
+      * [x] H2
+      * [x] H3
     * [x] Link
       * [x] Address
       * [x] Date
