@@ -69,6 +69,9 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] Terminal emulation
       * [ ] Syntax highlight
     * [x] Link
+      * [x] Address
+      * [x] Date
+      * [x] Alt
     * [x] List
     * [x] Quote
   * [ ] Gemfeed
