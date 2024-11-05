@@ -83,7 +83,6 @@ impl Page {
             input.gobject(),
         );
 
-        // Init async mutable Meta object
         let meta = Meta::new_arc(Status::New, gformat!("New page"));
 
         // Init events
@@ -94,7 +93,7 @@ impl Page {
                 // Update request
                 navigation.set_request_text(
                     request
-                        .expect("Parameter required for `page.open` action")
+                        .expect("Parameter required for this action")
                         .get::<String>()
                         .expect("Parameter does not match `String`")
                         .as_str(),
