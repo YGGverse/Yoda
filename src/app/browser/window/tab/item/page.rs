@@ -48,7 +48,9 @@ pub struct Page {
 }
 
 impl Page {
-    // Construct
+    // Constructors
+
+    /// Create new activated `Arc<Self>`
     pub fn new_arc(
         id: GString,
         action_tab_open: SimpleAction,
