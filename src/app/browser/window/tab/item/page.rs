@@ -148,7 +148,7 @@ impl Page {
             self.navigation.set_request_text(&request);
 
             // Reload page (without history record)
-            self.action_page_reload.activate(None);
+            self.reload();
         }
     }
 
@@ -158,7 +158,7 @@ impl Page {
             self.navigation.set_request_text(&request);
 
             // Reload page (without history record)
-            self.action_page_reload.activate(None);
+            self.reload();
         }
     }
 
@@ -251,11 +251,11 @@ impl Page {
                     // Make sure new request conversable to valid URI
                     match Uri::parse(&request, UriFlags::NONE) {
                         Ok(_) => {
-                            // Update
+                            // Update navigation entry
                             self.navigation.set_request_text(&request);
 
-                            // Reload page
-                            self.action_page_reload.activate(None);
+                            // Reload page (without history record)
+                            self.reload();
                         }
                         Err(_) => {
                             // @TODO any action here?
@@ -268,11 +268,11 @@ impl Page {
                         Uri::escape_string(&request, None, false)
                     );
 
-                    // Update
+                    // Update navigation entry
                     self.navigation.set_request_text(&request);
 
-                    // Reload page
-                    self.action_page_reload.activate(None);
+                    // Reload page (without history record)
+                    self.reload();
                 }
             }
         }; // Uri::parse
