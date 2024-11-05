@@ -84,8 +84,6 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] `file://` - localhost browser
 * [ ] `config://` - low-level key/value settings editor
 
-* extra features
-
 ### Media types
 
 #### Text
