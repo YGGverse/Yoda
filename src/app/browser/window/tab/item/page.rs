@@ -70,6 +70,7 @@ impl Page {
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
+            action_page_open.clone(),
             action_update.clone(),
         );
 
@@ -89,15 +90,25 @@ impl Page {
         action_page_open.connect_activate({
             let navigation = navigation.clone();
             let action_page_reload = action_page_reload.clone();
-            move |_, request| {
-                // Update request
-                navigation.set_request_text(
-                    request
-                        .expect("Parameter required for this action")
-                        .get::<String>()
-                        .expect("Parameter does not match `String`")
-                        .as_str(),
-                );
+            move |_, parameter| {
+                // Get request value from action parameter
+                let request = parameter
+                    .expect("Parameter required for this action")
+                    .get::<String>()
+                    .expect("Parameter does not match `String`");
+
+                // Update navigation entry
+                navigation.set_request_text(&request);
+
+                // Add history record
+                match navigation.history_current() {
+                    Some(current) => {
+                        if current != request {
+                            navigation.history_add(request.into());
+                        }
+                    }
+                    None => navigation.history_add(request.into()),
+                }
 
                 // Reload page
                 action_page_reload.activate(None);
@@ -188,18 +199,6 @@ impl Page {
             // Return value from redirection holder
             redirect.request()
         } else {
-            // Add history record
-            let value = self.navigation.request_text();
-
-            match self.navigation.history_current() {
-                Some(current) => {
-                    if current != value {
-                        self.navigation.history_add(value);
-                    }
-                }
-                None => self.navigation.history_add(value),
-            }
-
             // Reset redirect counter as request value taken from user input
             self.meta.unset_redirect_count();
 

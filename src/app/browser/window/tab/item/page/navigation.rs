@@ -34,13 +34,14 @@ impl Navigation {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
+        action_page_open: SimpleAction,
         action_update: SimpleAction,
     ) -> Arc<Self> {
         // Init components
         let home = Home::new_arc(action_page_home);
         let history = History::new_arc(action_page_history_back, action_page_history_forward);
         let reload = Reload::new_arc(action_page_reload.clone());
-        let request = Request::new_arc(action_update.clone(), action_page_reload.clone());
+        let request = Request::new_arc(action_update.clone(), action_page_open.clone());
         let bookmark = Bookmark::new_arc();
 
         // Init widget

@@ -29,10 +29,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(
-        action_update: SimpleAction,
-        action_page_reload: SimpleAction, // @TODO local `action_page_open`?
-    ) -> Arc<Self> {
+    pub fn new_arc(action_update: SimpleAction, action_page_open: SimpleAction) -> Arc<Self> {
         // Init animated progress bar state
         let progress = Arc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -50,8 +47,8 @@ impl Widget {
             action_update.activate(Some(&"".to_variant())); // @TODO
         });
 
-        gobject.connect_activate(move |_| {
-            action_page_reload.activate(None);
+        gobject.connect_activate(move |this| {
+            action_page_open.activate(Some(&this.text().to_variant()));
         });
 
         gobject.connect_state_flags_changed({
