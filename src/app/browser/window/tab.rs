@@ -68,6 +68,50 @@ impl Tab {
 
         // Init events
 
+        action_tab_open.connect_activate({
+            let index = index.clone();
+            let gobject = widget.gobject().clone();
+            // Actions
+            let action_tab_open = action_tab_open.clone();
+            let action_page_home = action_page_home.clone();
+            let action_page_history_back = action_page_history_back.clone();
+            let action_page_history_forward = action_page_history_forward.clone();
+            let action_page_reload = action_page_reload.clone();
+            let action_update = action_update.clone();
+            move |_, request| {
+                // Init new tab item
+                let item = Item::new_arc(
+                    &gobject,
+                    // Local actions
+                    action_tab_open.clone(),
+                    // Global actions
+                    action_page_home.clone(),
+                    action_page_history_back.clone(),
+                    action_page_history_forward.clone(),
+                    action_page_reload.clone(),
+                    action_update.clone(),
+                    // Options
+                    match gobject.selected_page() {
+                        Some(page) => Some(gobject.page_position(&page) + 1),
+                        None => None,
+                    },
+                    false,
+                    false,
+                );
+
+                // Register dynamically created tab components in the HashMap index
+                index.borrow_mut().insert(item.id(), item.clone());
+
+                // Apply request
+                if let Some(variant) = request {
+                    if let Some(value) = variant.get::<String>() {
+                        item.set_page_navigation_request_text(value.as_str());
+                        item.page_reload();
+                    }
+                }
+            }
+        });
+
         widget.gobject().connect_setup_menu({
             // Clone actions to update
             let action_page_close = action_page_close.clone();
@@ -114,45 +158,14 @@ impl Tab {
             }
         });
 
-        action_tab_open.connect_activate({
+        widget.gobject().connect_selected_page_notify({
             let index = index.clone();
-            let gobject = widget.gobject().clone();
-            // Actions
-            let action_tab_open = action_tab_open.clone();
-            let action_page_home = action_page_home.clone();
-            let action_page_history_back = action_page_history_back.clone();
-            let action_page_history_forward = action_page_history_forward.clone();
-            let action_page_reload = action_page_reload.clone();
-            let action_update = action_update.clone();
-            move |_, request| {
-                // Init new tab item
-                let item = Item::new_arc(
-                    &gobject,
-                    // Local actions
-                    action_tab_open.clone(),
-                    // Global actions
-                    action_page_home.clone(),
-                    action_page_history_back.clone(),
-                    action_page_history_forward.clone(),
-                    action_page_reload.clone(),
-                    action_update.clone(),
-                    // Options
-                    match gobject.selected_page() {
-                        Some(page) => Some(gobject.page_position(&page) + 1),
-                        None => None,
-                    },
-                    false,
-                    false,
-                );
-
-                // Register dynamically created tab components in the HashMap index
-                index.borrow_mut().insert(item.id(), item.clone());
-
-                // Apply request
-                if let Some(variant) = request {
-                    if let Some(value) = variant.get::<String>() {
-                        item.set_page_navigation_request_text(value.as_str());
-                        item.page_reload();
+            move |this| {
+                if let Some(page) = this.selected_page() {
+                    if let Some(id) = page.keyword() {
+                        if let Some(item) = index.borrow().get(&id) {
+                            item.update();
+                        }
                     }
                 }
             }
