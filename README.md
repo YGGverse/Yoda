@@ -69,8 +69,8 @@ GTK 4 / Libadwaita client written in Rust
       * [x] Inline
       * [x] Multiline
         * [x] Alt
-      * [ ] Terminal emulation
-      * [ ] Syntax highlight
+      * [ ] Terminal emulation*
+      * [ ] Syntax highlight*
     * [x] Link
       * [x] Address
       * [x] Date
@@ -83,6 +83,8 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] `file://` - localhost browser
 * [ ] `config://` - low-level key/value settings editor
+
+* extra features
 
 ### Media types
 
