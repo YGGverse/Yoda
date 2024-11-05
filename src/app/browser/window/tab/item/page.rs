@@ -133,6 +133,8 @@ impl Page {
 
     // Actions
 
+    /// Navigate home URL (parsed from current navigation entry)
+    /// * this method create new history record in memory as defined in `action_page_open` action
     pub fn home(&self) {
         if let Some(url) = self.navigation.home_url() {
             // Update with history record
@@ -140,6 +142,8 @@ impl Page {
         }
     }
 
+    /// Navigate back in history
+    /// * this method does not create new history record in memory
     pub fn history_back(&self) {
         if let Some(request) = self.navigation.history_back(true) {
             // Update navigation entry
@@ -150,6 +154,8 @@ impl Page {
         }
     }
 
+    /// Navigate forward in history
+    /// * this method does not create new history record in memory
     pub fn history_forward(&self) {
         if let Some(request) = self.navigation.history_forward(true) {
             // Update navigation entry
@@ -160,10 +166,14 @@ impl Page {
         }
     }
 
+    /// Used as API for external reload actions
+    /// * this method record history to memory buffer by default
     pub fn reload(&self) {
         self.load(true);
     }
 
+    /// Main loader for different protocols, that routed by scheme
+    /// * every protocol has it own (children) method implementation
     pub fn load(&self, history: bool) {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
