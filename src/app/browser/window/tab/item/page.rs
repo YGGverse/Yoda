@@ -95,7 +95,7 @@ impl Page {
             // Actions
             action_page_load: action_page_load.clone(),
             action_page_open: action_page_open.clone(),
-            action_update: action_update,
+            action_update,
             // Components
             content,
             navigation,
