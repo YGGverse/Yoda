@@ -103,10 +103,6 @@ impl Request {
         &self.widget.gobject()
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.widget.is_empty()
-    }
-
     pub fn text(&self) -> GString {
         self.widget.text()
     }

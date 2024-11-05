@@ -211,10 +211,6 @@ impl Widget {
         &self.gobject
     }
 
-    pub fn is_empty(&self) -> bool {
-        0 == self.gobject.text_length()
-    }
-
     pub fn text(&self) -> GString {
         self.gobject.text()
     }

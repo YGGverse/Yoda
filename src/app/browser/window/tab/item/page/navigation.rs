@@ -88,7 +88,7 @@ impl Navigation {
     pub fn update(&self, progress_fraction: Option<f64>) {
         self.home.update(self.request.uri());
         self.history.update();
-        self.reload.update(!self.request.is_empty());
+        self.reload.update(!self.request.text().is_empty());
         self.request.update(progress_fraction);
         self.bookmark.update();
     }
