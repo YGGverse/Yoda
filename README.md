@@ -63,6 +63,14 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] `60` Certificate requested
       * [ ] `61` Certificate not authorized
       * [ ] `62` Certificate not valid
+  * [x] [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) (by [ggemtext](https://github.com/YGGverse/ggemtext))
+    * [x] H1, H2, H3
+    * [x] Code (inline/multiline)
+      * [ ] Terminal emulation
+      * [ ] Syntax highlight
+    * [x] Link
+    * [x] List
+    * [x] Quote
   * [ ] Gemfeed
   * [ ] Titan
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
@@ -200,5 +208,5 @@ Quick start guide and maintenance protocol
 
 ### See also
 
-* [ggemtext](https://github.com/YGGverse/ggemtext) - Glib-oriented Gemtext API
-* [ggemini](https://github.com/YGGverse/ggemini) - Glib-oriented client for Gemini protocol (in development)
+* [ggemtext](https://github.com/YGGverse/ggemtext) - Glib-oriented [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) API
+* [ggemini](https://github.com/YGGverse/ggemini) - Glib-oriented client for [Gemini protocol](https://geminiprotocol.net/docs/protocol-specification.gmi)
