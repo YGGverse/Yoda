@@ -144,20 +144,20 @@ impl Page {
 
     pub fn history_back(&self) {
         if let Some(request) = self.navigation.history_back(true) {
-            // Update
+            // Update navigation entry
             self.navigation.set_request_text(&request);
 
-            // Reload page
+            // Reload page (without history record)
             self.action_page_reload.activate(None);
         }
     }
 
     pub fn history_forward(&self) {
         if let Some(request) = self.navigation.history_forward(true) {
-            // Update
+            // Update navigation entry
             self.navigation.set_request_text(&request);
 
-            // Reload page
+            // Reload page (without history record)
             self.action_page_reload.activate(None);
         }
     }
