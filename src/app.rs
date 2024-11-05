@@ -64,22 +64,25 @@ impl App {
             .build();
 
         // Init accels
-        gobject.set_accels_for_action(&action_debug.detailed_name(), &["<Primary>i"]);
-        gobject.set_accels_for_action(&action_update.detailed_name(), &["<Primary>u"]);
-        gobject.set_accels_for_action(&action_quit.detailed_name(), &["<Primary>Escape"]);
-        gobject.set_accels_for_action(&action_page_new.detailed_name(), &["<Primary>t"]);
-        gobject.set_accels_for_action(&action_page_pin.detailed_name(), &["<Primary>p"]);
-        gobject.set_accels_for_action(&action_page_close.detailed_name(), &["<Primary>q"]);
-        gobject.set_accels_for_action(&action_page_home.detailed_name(), &["<Primary>h"]);
-        gobject.set_accels_for_action(
-            &action_page_history_back.detailed_name(),
-            &["<Primary>Left"],
-        );
-        gobject.set_accels_for_action(
-            &action_page_history_forward.detailed_name(),
-            &["<Primary>Right"],
-        );
-        gobject.set_accels_for_action(&action_page_reload.detailed_name(), &["<Primary>r"]);
+        let accels_config = &[
+            (action_page_reload.detailed_name(), &["<Primary>r"]),
+            (action_debug.detailed_name(), &["<Primary>i"]),
+            (action_page_close.detailed_name(), &["<Primary>q"]),
+            (action_page_history_back.detailed_name(), &["<Primary>Left"]),
+            (
+                action_page_history_forward.detailed_name(),
+                &["<Primary>Right"],
+            ),
+            (action_page_home.detailed_name(), &["<Primary>h"]),
+            (action_page_new.detailed_name(), &["<Primary>t"]),
+            (action_page_pin.detailed_name(), &["<Primary>p"]),
+            (action_quit.detailed_name(), &["<Primary>Escape"]),
+            (action_update.detailed_name(), &["<Primary>u"]),
+        ]; // @TODO config
+
+        for (detailed_action_name, &accels) in accels_config {
+            gobject.set_accels_for_action(detailed_action_name, &accels);
+        }
 
         // Init components
         let browser = Arc::new(Browser::new(
