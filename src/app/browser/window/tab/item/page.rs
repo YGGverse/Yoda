@@ -112,15 +112,14 @@ impl Page {
 
         action_page_open.connect_activate({
             let this = this.clone();
-            move |_, parameter| {
-                // Get request value from action parameter
-                let request = parameter
-                    .expect("Parameter required for this action")
-                    .get::<String>()
-                    .expect("Parameter does not match `String`");
-
-                // Update navigation entry
-                this.navigation.set_request_text(&request);
+            move |_, request| {
+                // Set request value from action parameter
+                this.navigation.set_request_text(
+                    &request
+                        .expect("Parameter required for this action")
+                        .get::<String>()
+                        .expect("Parameter does not match `String`"),
+                );
 
                 // Reload page
                 this.load(true);
