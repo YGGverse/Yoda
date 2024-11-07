@@ -25,7 +25,16 @@ impl Widget {
         is_selected: bool,
     ) -> Arc<Self> {
         let gobject = match position {
-            Some(number) => tab_view.insert(child, number),
+            Some(value) => {
+                // If given `position` match pinned tab, GTK will panic with notice:
+                // adw_tab_view_insert: assertion 'position >= self->n_pinned_pages'
+                // as the solution, prepend new page after pinned tabs on this case
+                if value > tab_view.n_pinned_pages() {
+                    tab_view.insert(child, value)
+                } else {
+                    tab_view.prepend(child)
+                }
+            }
             None => tab_view.append(child),
         };
 
