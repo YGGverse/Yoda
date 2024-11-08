@@ -287,9 +287,9 @@ impl Page {
                         }
                     }
                 } else {
-                    // Plain text given, make seRch request to default provider
+                    // Plain text given, make search request to default provider
                     let request = gformat!(
-                        "gemini://tlgs.one/seRch?{}",
+                        "gemini://tlgs.one/search?{}",
                         Uri::escape_string(&request, None, false)
                     );
 

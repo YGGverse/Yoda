@@ -12,7 +12,7 @@ use gtk::{
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
-const PLACEHOLDER_TEXT: &str = "URL or seRch term...";
+const PLACEHOLDER_TEXT: &str = "URL or search term...";
 
 // Progress bar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
