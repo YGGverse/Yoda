@@ -232,7 +232,7 @@ impl Page {
         }
 
         // Update
-        self.meta.set_status(Status::Reload).set_title(&"Loading..");
+        self.meta.set_status(Status::Reload).set_title("Loading..");
         self.action_update.activate(Some(&id));
 
         // Route by request
@@ -245,7 +245,7 @@ impl Page {
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
-                        let title = &"Oops";
+                        let title = "Oops";
 
                         // Update widget
                         self.content
@@ -496,7 +496,7 @@ impl Page {
                                                 gemini::client::response::meta::Status::SensitiveInput => {
                                                     // Format response
                                                     let status = Status::Input;
-                                                    let title = &"Input expected";
+                                                    let title = "Input expected";
                                                     let description = match response.data() {
                                                         Some(data) => data.value().as_str(),
                                                         None => title,
@@ -508,14 +508,14 @@ impl Page {
                                                             input.set_new_sensitive(
                                                                 action_page_open,
                                                                 uri,
-                                                                Some(&description),
+                                                                Some(description),
                                                                 Some(1024),
                                                             ),
                                                         _ =>
                                                             input.set_new_response(
                                                                 action_page_open,
                                                                 uri,
-                                                                Some(&description),
+                                                                Some(description),
                                                                 Some(1024),
                                                             ),
                                                     }
@@ -542,7 +542,7 @@ impl Page {
                                                                             // Set children component
                                                                             let text_gemini = content.to_text_gemini(
                                                                                 &uri,
-                                                                                &buffer.data()
+                                                                                buffer.data()
                                                                             );
 
                                                                             let title = match text_gemini.meta_title() {
@@ -560,7 +560,7 @@ impl Page {
                                                                         Err((reason, message)) => {
                                                                             // Define common data
                                                                             let status = Status::Failure;
-                                                                            let title = &"Oops";
+                                                                            let title = "Oops";
                                                                             let description = match reason {
                                                                                 gemini::client::response::data::text::Error::InputStream => match message {
                                                                                     Some(error) => gformat!("{error}"),
@@ -633,7 +633,7 @@ impl Page {
                                                                                     Err(reason) => {
                                                                                         // Define common data
                                                                                         let status = Status::Failure;
-                                                                                        let title = &"Oops";
+                                                                                        let title = "Oops";
 
                                                                                         // Update widget
                                                                                         content
@@ -652,7 +652,7 @@ impl Page {
                                                                     Err((error, reason)) => {
                                                                         // Define common data
                                                                         let status = Status::Failure;
-                                                                        let title = &"Oops";
+                                                                        let title = "Oops";
                                                                         let description = match reason {
                                                                             Some(message) => gformat!("{message}"),
                                                                             None => match error {
@@ -691,7 +691,7 @@ impl Page {
                                                         _ => {
                                                             // Define common data
                                                             let status = Status::Failure;
-                                                            let title = &"Oops";
+                                                            let title = "Oops";
                                                             let description = gformat!("Content type not supported");
 
                                                             // Update widget
@@ -732,7 +732,7 @@ impl Page {
                                                                             if is_external_uri(&resolved_uri, &uri) {
                                                                                 // Update meta
                                                                                 meta.set_status(Status::Failure)
-                                                                                    .set_title(&"Oops");
+                                                                                    .set_title("Oops");
 
                                                                                 // Show placeholder with manual confirmation to continue @TODO status page?
                                                                                 content.to_text_gemini(
@@ -746,7 +746,7 @@ impl Page {
                                                                             } else if meta.redirect_count() > Some(5) {
                                                                                 // Update meta
                                                                                 meta.set_status(Status::Failure)
-                                                                                    .set_title(&"Oops");
+                                                                                    .set_title("Oops");
 
                                                                                 // Show placeholder with manual confirmation to continue @TODO status page?
                                                                                 content.to_text_gemini(
@@ -772,7 +772,7 @@ impl Page {
                                                                                     },
                                                                                 )
                                                                                     .set_status(Status::Redirect) // @TODO is this status really wanted?
-                                                                                    .set_title(&"Redirect");
+                                                                                    .set_title("Redirect");
 
                                                                                 // Reload page to apply redirection
                                                                                 action_page_load.activate(None);
@@ -780,7 +780,7 @@ impl Page {
                                                                         },
                                                                         Err(reason) => {
                                                                             let status = Status::Failure;
-                                                                            let title = &"Oops";
+                                                                            let title = "Oops";
 
                                                                             meta.set_status(status)
                                                                                 .set_title(title);
@@ -794,7 +794,7 @@ impl Page {
                                                                 }
                                                                 Err(reason) => {
                                                                     let status = Status::Failure;
-                                                                    let title = &"Oops";
+                                                                    let title = "Oops";
 
                                                                     meta.set_status(status)
                                                                         .set_title(title);
@@ -808,7 +808,7 @@ impl Page {
                                                         },
                                                         None => {
                                                             let status = Status::Failure;
-                                                            let title = &"Oops";
+                                                            let title = "Oops";
 
                                                             meta.set_status(status)
                                                                 .set_title(title);
@@ -825,7 +825,7 @@ impl Page {
                                                 _ => {
                                                     // Define common data
                                                     let status = Status::Failure;
-                                                    let title = &"Oops";
+                                                    let title = "Oops";
 
                                                     // Update widget
                                                     content
@@ -845,7 +845,7 @@ impl Page {
                                         Err((reason, message)) => {
                                             // Define common data
                                             let status = Status::Failure;
-                                            let title = &"Oops";
+                                            let title = "Oops";
                                             let description = match reason {
                                                 // Common
                                                 gemini::client::response::meta::Error::InputStream => match message {
@@ -912,7 +912,7 @@ impl Page {
                             Err(reason) => {
                                 // Define common data
                                 let status = Status::Failure;
-                                let title = &"Oops";
+                                let title = "Oops";
 
                                 // Update widget
                                 content
@@ -933,7 +933,7 @@ impl Page {
                 Err(reason) => {
                     // Define common data
                     let status = Status::Failure;
-                    let title = &"Oops";
+                    let title = "Oops";
 
                     // Update widget
                     content
