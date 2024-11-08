@@ -73,7 +73,7 @@ impl History {
     }
 
     pub fn back(&self, follow_to_index: bool) -> Option<GString> {
-        let index = self.index.borrow().clone(); // keep outside as borrow
+        let index = *self.index.borrow();
         if let Some(usize) = index {
             // Make sure value positive to prevent panic
             if usize > 0 {
@@ -89,7 +89,7 @@ impl History {
     }
 
     pub fn current(&self) -> Option<GString> {
-        let index = self.index.borrow().clone(); // keep outside as borrow
+        let index = *self.index.borrow();
         if let Some(usize) = index {
             if let Some(memory) = self.memory.borrow().get(usize) {
                 return Some(memory.request.clone());
@@ -99,7 +99,7 @@ impl History {
     }
 
     pub fn forward(&self, follow_to_index: bool) -> Option<GString> {
-        let index = self.index.borrow().clone(); // keep outside as borrow
+        let index = *self.index.borrow();
         if let Some(usize) = index {
             if let Some(memory) = self.memory.borrow().get(usize + 1) {
                 if follow_to_index {

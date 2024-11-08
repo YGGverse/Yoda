@@ -95,7 +95,7 @@ impl Meta {
     }
 
     pub fn redirect_count(&self) -> Option<i8> {
-        self.redirect_count.borrow().clone()
+        *self.redirect_count.borrow()
     }
 
     /// WARNING!
