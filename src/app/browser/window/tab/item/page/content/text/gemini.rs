@@ -29,7 +29,7 @@ impl Gemini {
         // Init components
         let reader = Reader::new_rc(gemtext, base, action_tab_open, action_page_open);
 
-        let widget = Widget::new_rc(&reader.gobject());
+        let widget = Widget::new_rc(reader.gobject());
 
         // Result
         Self { reader, widget }

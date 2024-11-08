@@ -186,7 +186,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     format!("• {}", list.value).as_str(),
-                    &[&tag.list()],
+                    &[tag.list()],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
@@ -200,7 +200,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     quote.value.as_str(),
-                    &[&tag.quote()],
+                    &[tag.quote()],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 

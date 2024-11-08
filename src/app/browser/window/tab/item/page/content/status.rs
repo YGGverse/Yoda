@@ -36,7 +36,7 @@ impl Status {
     /// Return `Self` reference to apply another functions in chain
     pub fn set_title(&self, value: &str) -> &Self {
         self.gobject.set_title(value);
-        &self
+        self
     }
 
     /// Set new description for `Self`
@@ -46,7 +46,7 @@ impl Status {
     /// Return `Self` reference to apply another functions in chain
     pub fn set_description(&self, value: Option<&str>) -> &Self {
         self.gobject.set_description(value);
-        &self
+        self
     }
 
     // Getters
