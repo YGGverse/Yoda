@@ -6,15 +6,15 @@ use widget::Widget;
 
 use adw::{TabView, ToolbarView};
 use gtk::gio::SimpleAction;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Header {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Header {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         // Actions
         action_about: SimpleAction,
         action_debug: SimpleAction,
@@ -30,9 +30,9 @@ impl Header {
         action_page_pin: SimpleAction,
         // Widgets
         tab_view: &TabView,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init components
-        let bar = Bar::new_arc(
+        let bar = Bar::new_rc(
             action_about,
             action_debug,
             action_profile,
@@ -49,8 +49,8 @@ impl Header {
         );
 
         // Return new struct
-        Arc::new(Self {
-            widget: Widget::new_arc(bar.gobject()),
+        Rc::new(Self {
+            widget: Widget::new_rc(bar.gobject()),
         })
     }
 

@@ -1,5 +1,5 @@
 use gtk::Button;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -7,8 +7,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc() -> Rc<Self> {
+        Rc::new(Self {
             gobject: Button::builder()
                 .icon_name("starred-symbolic")
                 .tooltip_text("Bookmark")

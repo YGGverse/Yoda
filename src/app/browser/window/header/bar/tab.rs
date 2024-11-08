@@ -6,17 +6,17 @@ use widget::Widget;
 
 use adw::{TabBar, TabView};
 use gtk::gio::SimpleAction;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Tab {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Tab {
     // Construct
-    pub fn new_arc(action_page_new: SimpleAction, view: &TabView) -> Arc<Self> {
-        Arc::new(Self {
-            widget: Widget::new_arc(view, Append::new_arc(action_page_new).gobject()),
+    pub fn new_rc(action_page_new: SimpleAction, view: &TabView) -> Rc<Self> {
+        Rc::new(Self {
+            widget: Widget::new_rc(view, Append::new_rc(action_page_new).gobject()),
         })
     }
 

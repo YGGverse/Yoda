@@ -1,5 +1,5 @@
 use gtk::{PackType, WindowControls};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: WindowControls,
@@ -7,8 +7,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc() -> Rc<Self> {
+        Rc::new(Self {
             gobject: WindowControls::builder()
                 .side(PackType::End)
                 .margin_end(4)

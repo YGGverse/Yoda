@@ -8,20 +8,20 @@ use sensitive::Sensitive;
 use widget::Widget;
 
 use adw::Clamp;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Input {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Input {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_rc() -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc();
+        let widget = Widget::new_rc();
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Actions
@@ -38,7 +38,7 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            &Response::new_arc(action_page_open, base, title, size_limit).gobject(),
+            &Response::new_rc(action_page_open, base, title, size_limit).gobject(),
         ));
     }
 
@@ -50,7 +50,7 @@ impl Input {
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            &Sensitive::new_arc(action_page_open, base, title, max_length).gobject(),
+            &Sensitive::new_rc(action_page_open, base, title, max_length).gobject(),
         ));
     }
 

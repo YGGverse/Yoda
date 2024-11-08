@@ -3,20 +3,20 @@ mod widget;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Button};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Send {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Send {
     // Construct
-    pub fn new_arc(action_send: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_send: SimpleAction) -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc(action_send);
+        let widget = Widget::new_rc(action_send);
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Actions

@@ -2,7 +2,7 @@ use gtk::{
     prelude::{BoxExt, IsA},
     Box, Orientation,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
@@ -13,13 +13,13 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         base: &impl IsA<gtk::Widget>,
         history: &impl IsA<gtk::Widget>,
         reload: &impl IsA<gtk::Widget>,
         request: &impl IsA<gtk::Widget>,
         bookmark: &impl IsA<gtk::Widget>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(SPACING)
@@ -34,7 +34,7 @@ impl Widget {
         gobject.append(request);
         gobject.append(bookmark);
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

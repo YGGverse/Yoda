@@ -1,6 +1,6 @@
 use adw::PasswordEntryRow;
 use gtk::{prelude::BoxExt, Box, Orientation};
-use std::sync::Arc;
+use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(response: &PasswordEntryRow) -> Arc<Self> {
+    pub fn new_rc(response: &PasswordEntryRow) -> Rc<Self> {
         let gobject = Box::builder()
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
@@ -23,7 +23,7 @@ impl Widget {
 
         gobject.append(response);
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

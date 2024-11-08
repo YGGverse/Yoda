@@ -15,30 +15,18 @@ use gtk::{
 };
 use sqlite::{Connection, Transaction};
 
-use std::{
-    path::PathBuf,
-    sync::{Arc, RwLock},
-};
+use std::{path::PathBuf, rc::Rc, sync::RwLock};
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
-    profile_database_connection: Arc<RwLock<Connection>>,
-    // database: Arc<Database>,
-    // Actions
-    // action_update: SimpleAction,
-    // Components
-    // browser: Arc<Browser>,
-    // GTK
+    profile_database_connection: Rc<RwLock<Connection>>,
     gobject: Application,
 }
 
 impl App {
     // Construct
-    pub fn new(
-        profile_database_connection: Arc<RwLock<Connection>>,
-        profile_path: PathBuf,
-    ) -> Self {
+    pub fn new(profile_database_connection: Rc<RwLock<Connection>>, profile_path: PathBuf) -> Self {
         // Init defaults
         let default_state = (-1).to_variant();
 
@@ -100,7 +88,7 @@ impl App {
         }
 
         // Init components
-        let browser = Arc::new(Browser::new(
+        let browser = Rc::new(Browser::new(
             profile_path,
             action_about.clone(),
             action_debug.clone(),

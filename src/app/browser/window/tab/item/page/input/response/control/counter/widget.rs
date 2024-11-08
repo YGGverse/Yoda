@@ -1,5 +1,5 @@
 use gtk::{prelude::WidgetExt, Label};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Label,
@@ -7,10 +7,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_rc() -> Rc<Self> {
         let gobject = Label::builder().build();
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

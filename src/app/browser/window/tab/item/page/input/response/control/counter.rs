@@ -3,20 +3,20 @@ mod widget;
 use widget::Widget;
 
 use gtk::Label;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Counter {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Counter {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
+    pub fn new_rc() -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc();
+        let widget = Widget::new_rc();
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Actions

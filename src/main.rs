@@ -3,10 +3,7 @@ mod app;
 use app::App;
 use gtk::glib::{user_config_dir, ExitCode};
 use sqlite::Connection;
-use std::{
-    fs::create_dir_all,
-    sync::{Arc, RwLock},
-};
+use std::{fs::create_dir_all, rc::Rc, sync::RwLock};
 
 const VENDOR: &str = "YGGverse";
 const APP_ID: &str = "Yoda"; // env!("CARGO_PKG_NAME");
@@ -36,7 +33,7 @@ fn main() -> ExitCode {
 
     // Init database connection
     let profile_database_connection = match Connection::open(profile_database_path) {
-        Ok(connection) => Arc::new(RwLock::new(connection)),
+        Ok(connection) => Rc::new(RwLock::new(connection)),
         Err(e) => panic!("Failed to connect profile database: {e}"),
     };
 

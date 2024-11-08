@@ -3,19 +3,19 @@ mod widget;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Button};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Reload {
     action_page_reload: SimpleAction,
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Reload {
     // Construct
-    pub fn new_arc(action_page_reload: SimpleAction) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(action_page_reload: SimpleAction) -> Rc<Self> {
+        Rc::new(Self {
             action_page_reload: action_page_reload.clone(),
-            widget: Widget::new_arc(action_page_reload),
+            widget: Widget::new_rc(action_page_reload),
         })
     }
 

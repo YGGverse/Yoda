@@ -1,6 +1,6 @@
 use adw::TabBar;
 use gtk::{prelude::BoxExt, Box, MenuButton, Orientation, WindowControls};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Box,
@@ -8,7 +8,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(control: &WindowControls, menu: &MenuButton, tab: &TabBar) -> Arc<Self> {
+    pub fn new_rc(control: &WindowControls, menu: &MenuButton, tab: &TabBar) -> Rc<Self> {
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(8)
@@ -18,7 +18,7 @@ impl Widget {
         gobject.append(menu);
         gobject.append(control);
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

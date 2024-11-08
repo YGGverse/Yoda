@@ -1,6 +1,6 @@
 use adw::ToolbarView;
 use gtk::Box;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: ToolbarView,
@@ -8,12 +8,12 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(top_bar: &Box) -> Arc<Self> {
+    pub fn new_rc(top_bar: &Box) -> Rc<Self> {
         let gobject = ToolbarView::builder().build();
 
         gobject.add_top_bar(top_bar);
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

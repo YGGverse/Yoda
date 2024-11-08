@@ -29,7 +29,7 @@ use gtk::{
     Box,
 };
 use sqlite::Transaction;
-use std::{sync::Arc, time::Duration};
+use std::{rc::Rc, time::Duration};
 
 pub struct Page {
     id: GString,
@@ -38,20 +38,20 @@ pub struct Page {
     action_page_open: SimpleAction,
     action_update: SimpleAction,
     // Components
-    navigation: Arc<Navigation>,
-    content: Arc<Content>,
-    input: Arc<Input>,
+    navigation: Rc<Navigation>,
+    content: Rc<Content>,
+    input: Rc<Input>,
     // Extras
-    meta: Arc<Meta>,
+    meta: Rc<Meta>,
     // GTK
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Page {
     // Constructors
 
-    /// Create new activated `Arc<Self>`
-    pub fn new_arc(
+    /// Create new activated `Rc<Self>`
+    pub fn new_rc(
         id: GString,
         action_tab_open: SimpleAction,
         action_page_home: SimpleAction,
@@ -59,16 +59,16 @@ impl Page {
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
         action_update: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init local actions
         let action_page_load = SimpleAction::new(&uuid_string_random(), None);
         let action_page_open =
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init components
-        let content = Content::new_arc(action_tab_open.clone(), action_page_open.clone());
+        let content = Content::new_rc(action_tab_open.clone(), action_page_open.clone());
 
-        let navigation = Navigation::new_arc(
+        let navigation = Navigation::new_rc(
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
@@ -77,9 +77,9 @@ impl Page {
             action_update.clone(),
         );
 
-        let input = Input::new_arc();
+        let input = Input::new_rc();
 
-        let widget = Widget::new_arc(
+        let widget = Widget::new_rc(
             &id,
             action_page_open.clone(),
             navigation.gobject(),
@@ -87,10 +87,10 @@ impl Page {
             input.gobject(),
         );
 
-        let meta = Meta::new_arc(Status::New, gformat!("New page"));
+        let meta = Meta::new_rc(Status::New, gformat!("New page"));
 
         // Init `Self`
-        let this = Arc::new(Self {
+        let this = Rc::new(Self {
             id,
             // Actions
             action_page_load: action_page_load.clone(),
@@ -287,9 +287,9 @@ impl Page {
                         }
                     }
                 } else {
-                    // Plain text given, make search request to default provider
+                    // Plain text given, make seRch request to default provider
                     let request = gformat!(
-                        "gemini://tlgs.one/search?{}",
+                        "gemini://tlgs.one/seRch?{}",
                         Uri::escape_string(&request, None, false)
                     );
 

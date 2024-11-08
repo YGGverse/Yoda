@@ -7,21 +7,21 @@ use gtk::{
     glib::{gformat, GString, Uri},
     Button,
 };
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
     action_page_home: SimpleAction,
     uri: RefCell<Option<Uri>>,
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Home {
     // Construct
-    pub fn new_arc(action_page_home: SimpleAction) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(action_page_home: SimpleAction) -> Rc<Self> {
+        Rc::new(Self {
             action_page_home: action_page_home.clone(),
             uri: RefCell::new(None),
-            widget: Widget::new_arc(action_page_home),
+            widget: Widget::new_rc(action_page_home),
         })
     }
 

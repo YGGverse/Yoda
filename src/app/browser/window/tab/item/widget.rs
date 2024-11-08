@@ -5,7 +5,7 @@ use database::Database;
 use adw::{TabPage, TabView};
 use gtk::prelude::IsA;
 use sqlite::Transaction;
-use std::sync::Arc;
+use std::rc::Rc;
 
 const DEFAULT_TITLE: &str = "New page";
 
@@ -15,7 +15,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         keyword: &str, // ID
         tab_view: &TabView,
         child: &impl IsA<gtk::Widget>,
@@ -23,7 +23,7 @@ impl Widget {
         position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         let gobject = match position {
             Some(value) => {
                 // If given `position` match pinned tab, GTK will panic with notice:
@@ -51,7 +51,7 @@ impl Widget {
             tab_view.set_selected_page(&gobject);
         }
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

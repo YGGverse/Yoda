@@ -7,7 +7,7 @@ use forward::Forward;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, glib::GString, Box};
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, rc::Rc};
 
 struct Memory {
     request: GString,
@@ -16,27 +16,27 @@ struct Memory {
 
 pub struct History {
     // Components
-    back: Arc<Back>,
-    forward: Arc<Forward>,
+    back: Rc<Back>,
+    forward: Rc<Forward>,
     // Extras
     memory: RefCell<Vec<Memory>>,
     index: RefCell<Option<usize>>,
     // GTK
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl History {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // init components
-        let back = Back::new_arc(action_page_history_back);
-        let forward = Forward::new_arc(action_page_history_forward);
+        let back = Back::new_rc(action_page_history_back);
+        let forward = Forward::new_rc(action_page_history_forward);
 
         // Init widget
-        let widget = Widget::new_arc(back.gobject(), forward.gobject());
+        let widget = Widget::new_rc(back.gobject(), forward.gobject());
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -44,7 +44,7 @@ impl History {
         // Init index
         let index = RefCell::new(None);
 
-        Arc::new(Self {
+        Rc::new(Self {
             back,
             forward,
             memory,

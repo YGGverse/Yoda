@@ -11,11 +11,11 @@ use gtk::{
 
 use adw::ClampScrollable;
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Gemini {
-    reader: Arc<Reader>,
-    widget: Arc<Widget>,
+    reader: Rc<Reader>,
+    widget: Rc<Widget>,
 }
 
 impl Gemini {
@@ -27,9 +27,9 @@ impl Gemini {
         action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let reader = Reader::new_arc(gemtext, base, action_tab_open, action_page_open);
+        let reader = Reader::new_rc(gemtext, base, action_tab_open, action_page_open);
 
-        let widget = Widget::new_arc(&reader.gobject());
+        let widget = Widget::new_rc(&reader.gobject());
 
         // Result
         Self { reader, widget }

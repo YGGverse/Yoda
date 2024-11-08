@@ -10,26 +10,26 @@ use gtk::{
     prelude::{ActionExt, ToVariant, WidgetExt},
     Box,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Sensitive {
     // Components
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Sensitive {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init local actions
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
-        let form = Form::new_arc(
+        let form = Form::new_rc(
             action_send.clone(),
             title,
             match max_length {
@@ -41,7 +41,7 @@ impl Sensitive {
         );
 
         // Init widget
-        let widget = Widget::new_arc(form.gobject());
+        let widget = Widget::new_rc(form.gobject());
 
         // Init events
         action_send.connect_activate({
@@ -61,7 +61,7 @@ impl Sensitive {
         widget.gobject().connect_realize(move |_| form.focus());
 
         // Return activated struct
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Getters

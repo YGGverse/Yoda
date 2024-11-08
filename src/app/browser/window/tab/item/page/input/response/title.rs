@@ -3,20 +3,20 @@ mod widget;
 use widget::Widget;
 
 use gtk::Label;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Title {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Title {
     // Construct
-    pub fn new_arc(title: Option<&str>) -> Arc<Self> {
+    pub fn new_rc(title: Option<&str>) -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc(title);
+        let widget = Widget::new_rc(title);
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Getters

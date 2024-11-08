@@ -7,7 +7,7 @@ use gtk::{
     glib::GString,
     prelude::{ActionExt, EditableExt, WidgetExt},
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: PasswordEntryRow,
@@ -15,11 +15,11 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_send: SimpleAction,
         title: Option<&str>,
         max_length: Option<i32>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init gobject
         let gobject = PasswordEntryRow::builder().show_apply_button(true).build();
 
@@ -37,7 +37,7 @@ impl Widget {
         });
 
         // Return activated struct
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

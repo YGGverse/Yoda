@@ -4,7 +4,7 @@ use gtk::{
     prelude::{ActionExt, TextBufferExt, TextViewExt, WidgetExt},
     TextView, WrapMode,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 const MARGIN: i32 = 8;
 
@@ -14,7 +14,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_update: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_update: SimpleAction) -> Rc<Self> {
         // Init gobject
         let gobject = TextView::builder()
             .bottom_margin(MARGIN)
@@ -30,7 +30,7 @@ impl Widget {
         });
 
         // Return activated struct
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

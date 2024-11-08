@@ -6,7 +6,7 @@ use redirect::Redirect;
 
 use gtk::glib::GString;
 use sqlite::Transaction;
-use std::{cell::RefCell, sync::Arc};
+use std::{cell::RefCell, rc::Rc};
 
 #[derive(Debug, Clone)]
 pub enum Status {
@@ -39,8 +39,8 @@ pub struct Meta {
 impl Meta {
     // Constructors
 
-    pub fn new_arc(status: Status, title: GString) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(status: Status, title: GString) -> Rc<Self> {
+        Rc::new(Self {
             status: RefCell::new(status),
             title: RefCell::new(title),
             redirect: RefCell::new(None),

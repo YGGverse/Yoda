@@ -4,24 +4,24 @@ use widget::Widget;
 
 use adw::PasswordEntryRow;
 use gtk::{gio::SimpleAction, glib::GString};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Form {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Form {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_send: SimpleAction,
         title: Option<&str>,
         max_length: Option<i32>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc(action_send, title, max_length);
+        let widget = Widget::new_rc(action_send, title, max_length);
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Actions

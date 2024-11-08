@@ -1,5 +1,5 @@
 use gtk::{prelude::BoxExt, Align, Box, Button, Label, Orientation};
-use std::sync::Arc;
+use std::rc::Rc;
 
 const SPACING: i32 = 8;
 
@@ -9,7 +9,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(limit: &Label, send: &Button) -> Arc<Self> {
+    pub fn new_rc(limit: &Label, send: &Button) -> Rc<Self> {
         // Init gobject
         let gobject = Box::builder()
             .halign(Align::End)
@@ -21,7 +21,7 @@ impl Widget {
         gobject.append(send);
 
         // Return new struct
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

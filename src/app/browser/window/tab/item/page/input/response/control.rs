@@ -7,26 +7,26 @@ use send::Send;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Box};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Control {
-    counter: Arc<Counter>,
-    send: Arc<Send>,
-    widget: Arc<Widget>,
+    counter: Rc<Counter>,
+    send: Rc<Send>,
+    widget: Rc<Widget>,
 }
 
 impl Control {
     // Construct
-    pub fn new_arc(action_send: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_send: SimpleAction) -> Rc<Self> {
         // Init components
-        let counter = Counter::new_arc();
-        let send = Send::new_arc(action_send);
+        let counter = Counter::new_rc();
+        let send = Send::new_rc(action_send);
 
         // Init widget
-        let widget = Widget::new_arc(counter.gobject(), send.gobject());
+        let widget = Widget::new_rc(counter.gobject(), send.gobject());
 
         // Return activated struct
-        Arc::new(Self {
+        Rc::new(Self {
             counter,
             send,
             widget,

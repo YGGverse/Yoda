@@ -10,15 +10,15 @@ use widget::Widget;
 
 use adw::TabView;
 use gtk::{gio::SimpleAction, Box};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Bar {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Bar {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
@@ -32,11 +32,11 @@ impl Bar {
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
         view: &TabView,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init components
-        let control = Control::new_arc();
-        let tab = Tab::new_arc(action_page_new.clone(), view);
-        let menu = Menu::new_arc(
+        let control = Control::new_rc();
+        let tab = Tab::new_rc(action_page_new.clone(), view);
+        let menu = Menu::new_rc(
             action_about,
             action_debug,
             action_profile,
@@ -52,8 +52,8 @@ impl Bar {
         );
 
         // Build result
-        Arc::new(Self {
-            widget: Widget::new_arc(control.gobject(), menu.gobject(), tab.gobject()),
+        Rc::new(Self {
+            widget: Widget::new_rc(control.gobject(), menu.gobject(), tab.gobject()),
         })
     }
 

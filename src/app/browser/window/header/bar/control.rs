@@ -3,17 +3,17 @@ mod widget;
 use widget::Widget;
 
 use gtk::WindowControls;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Control {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Control {
     // Construct
-    pub fn new_arc() -> Arc<Self> {
-        Arc::new(Self {
-            widget: Widget::new_arc(),
+    pub fn new_rc() -> Rc<Self> {
+        Rc::new(Self {
+            widget: Widget::new_rc(),
         })
     }
 

@@ -12,20 +12,20 @@ use gtk::{
     glib::{uuid_string_random, GString},
 };
 use sqlite::Transaction;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Item {
     // Auto-generated unique item ID
     // useful as widget name in GTK actions callback
     id: GString,
     // Components
-    page: Arc<Page>,
-    widget: Arc<Widget>,
+    page: Rc<Page>,
+    widget: Rc<Widget>,
 }
 
 impl Item {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         tab_view: &TabView,
         // Actions
         action_tab_open: SimpleAction,
@@ -38,12 +38,12 @@ impl Item {
         position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
         // Init components
-        let page = Page::new_arc(
+        let page = Page::new_rc(
             id.clone(),
             // Actions
             action_tab_open.clone(),
@@ -54,7 +54,7 @@ impl Item {
             action_update.clone(),
         );
 
-        let widget = Widget::new_arc(
+        let widget = Widget::new_rc(
             id.as_str(),
             tab_view,
             page.gobject(),
@@ -65,7 +65,7 @@ impl Item {
         ); // @TODO
 
         // Return struct
-        Arc::new(Self { id, page, widget })
+        Rc::new(Self { id, page, widget })
     }
 
     // Actions
@@ -134,14 +134,14 @@ impl Item {
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
         action_update: SimpleAction,
-    ) -> Result<Vec<Arc<Item>>, String> {
+    ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
         match Database::records(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
-                    let item = Item::new_arc(
+                    let item = Item::new_rc(
                         tab_view,
                         // Actions
                         action_tab_open.clone(),

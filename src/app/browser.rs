@@ -16,13 +16,13 @@ use gtk::{
     FileLauncher,
 };
 use sqlite::Transaction;
-use std::{path::PathBuf, sync::Arc};
+use std::{path::PathBuf, rc::Rc};
 
 pub struct Browser {
     // Components
-    // header: Arc<Header>,
-    window: Arc<Window>,
-    widget: Arc<Widget>,
+    // header: Rc<Header>,
+    window: Rc<Window>,
+    widget: Rc<Widget>,
 }
 
 impl Browser {
@@ -46,7 +46,7 @@ impl Browser {
         action_page_pin: SimpleAction,
     ) -> Browser {
         // Init components
-        let window = Arc::new(Window::new(
+        let window = Rc::new(Window::new(
             action_about.clone(),
             action_debug.clone(),
             action_profile.clone(),
@@ -63,7 +63,7 @@ impl Browser {
         ));
 
         // Init widget
-        let widget = Arc::new(Widget::new(
+        let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
                 action_about.clone(),

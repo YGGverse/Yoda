@@ -1,5 +1,5 @@
 use gtk::{prelude::WidgetExt, Align, Label};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Label,
@@ -7,7 +7,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(title: Option<&str>) -> Arc<Self> {
+    pub fn new_rc(title: Option<&str>) -> Rc<Self> {
         let gobject = Label::builder()
             .css_classes(["heading"])
             .halign(Align::Start)
@@ -23,7 +23,7 @@ impl Widget {
             }
         }
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

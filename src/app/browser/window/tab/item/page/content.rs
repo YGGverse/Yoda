@@ -13,7 +13,7 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
-use std::{sync::Arc, time::Duration};
+use std::{rc::Rc, time::Duration};
 
 pub struct Content {
     // GTK
@@ -27,8 +27,8 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new_arc(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(action_tab_open: SimpleAction, action_page_open: SimpleAction) -> Rc<Self> {
+        Rc::new(Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
             action_tab_open,
             action_page_open,

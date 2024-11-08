@@ -9,9 +9,9 @@ use gtk::{
     Entry, StateFlags,
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
-const PLACEHOLDER_TEXT: &str = "URL or search term...";
+const PLACEHOLDER_TEXT: &str = "URL or seRch term...";
 
 // Progress bar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
@@ -24,14 +24,14 @@ struct Progress {
 
 pub struct Widget {
     gobject: Entry,
-    progress: Arc<Progress>,
+    progress: Rc<Progress>,
 }
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_update: SimpleAction, action_page_open: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_update: SimpleAction, action_page_open: SimpleAction) -> Rc<Self> {
         // Init animated progress bar state
-        let progress = Arc::new(Progress {
+        let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
             source_id: RefCell::new(None),
         });
@@ -73,7 +73,7 @@ impl Widget {
         });
 
         // Return activated struct
-        Arc::new(Self { gobject, progress })
+        Rc::new(Self { gobject, progress })
     }
 
     // Actions

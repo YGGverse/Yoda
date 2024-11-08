@@ -4,7 +4,7 @@ use gtk::{
     prelude::{ActionMapExt, BoxExt, IsA, WidgetExt},
     Box, Orientation,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Box,
@@ -12,7 +12,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         name: &str,
         // Actions
         action_page_open: SimpleAction,
@@ -20,7 +20,7 @@ impl Widget {
         navigation: &impl IsA<gtk::Widget>,
         content: &impl IsA<gtk::Widget>,
         input: &impl IsA<gtk::Widget>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init additional action group
         let action_group = SimpleActionGroup::new();
         action_group.add_action(&action_page_open);
@@ -37,7 +37,7 @@ impl Widget {
 
         gobject.insert_action_group(&uuid_string_random(), Some(&action_group));
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

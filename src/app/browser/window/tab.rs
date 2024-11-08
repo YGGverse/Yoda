@@ -15,7 +15,7 @@ use gtk::{
     prelude::{ActionExt, StaticVariantType, ToVariant},
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, collections::HashMap, sync::Arc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
@@ -28,14 +28,14 @@ pub struct Tab {
     action_page_reload: SimpleAction,
     action_update: SimpleAction,
     // Dynamically allocated reference index
-    index: Arc<RefCell<HashMap<GString, Arc<Item>>>>,
+    index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
     // GTK
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Tab {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -44,13 +44,13 @@ impl Tab {
         action_page_pin: SimpleAction,
         action_page_reload: SimpleAction,
         action_update: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init local actions
         let action_tab_open =
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init empty HashMap index as no tabs appended yet
-        let index = Arc::new(RefCell::new(HashMap::new()));
+        let index = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
         let menu = Menu::new(
@@ -64,7 +64,7 @@ impl Tab {
         );
 
         // Init widget
-        let widget = Arc::new(Widget::new(menu.gobject()));
+        let widget = Rc::new(Widget::new(menu.gobject()));
 
         // Init events
 
@@ -80,7 +80,7 @@ impl Tab {
             let action_update = action_update.clone();
             move |_, request| {
                 // Init new tab item
-                let item = Item::new_arc(
+                let item = Item::new_rc(
                     &gobject,
                     // Local actions
                     action_tab_open.clone(),
@@ -172,7 +172,7 @@ impl Tab {
         });
 
         // Return activated struct
-        Arc::new(Self {
+        Rc::new(Self {
             // Local actions
             action_tab_open,
             // Global actions
@@ -189,9 +189,9 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(&self, position: Option<i32>) -> Arc<Item> {
+    pub fn append(&self, position: Option<i32>) -> Rc<Item> {
         // Init new tab item
-        let item = Item::new_arc(
+        let item = Item::new_rc(
             self.gobject(),
             // Local actions
             self.action_tab_open.clone(),

@@ -1,6 +1,6 @@
 use adw::ClampScrollable;
 use gtk::TextView;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: ClampScrollable,
@@ -8,8 +8,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(child: &TextView) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(child: &TextView) -> Rc<Self> {
+        Rc::new(Self {
             gobject: ClampScrollable::builder()
                 .child(child)
                 .css_classes(["view"])

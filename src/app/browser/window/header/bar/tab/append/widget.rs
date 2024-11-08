@@ -3,7 +3,7 @@ use gtk::{
     prelude::{ActionExt, ButtonExt},
     Align, Button,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_page_new: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_page_new: SimpleAction) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("tab-new-symbolic")
@@ -25,7 +25,7 @@ impl Widget {
             action_page_new.activate(None);
         });
 
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Getters

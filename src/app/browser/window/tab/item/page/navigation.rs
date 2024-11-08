@@ -17,35 +17,35 @@ use widget::Widget;
 use gtk::{gio::SimpleAction, glib::GString, prelude::WidgetExt, Box};
 use sqlite::Transaction;
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Navigation {
-    home: Arc<Home>,
-    bookmark: Arc<Bookmark>,
-    history: Arc<History>,
-    reload: Arc<Reload>,
-    request: Arc<Request>,
-    widget: Arc<Widget>,
+    home: Rc<Home>,
+    bookmark: Rc<Bookmark>,
+    history: Rc<History>,
+    reload: Rc<Reload>,
+    request: Rc<Request>,
+    widget: Rc<Widget>,
 }
 
 impl Navigation {
-    pub fn new_arc(
+    pub fn new_rc(
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
         action_page_open: SimpleAction,
         action_update: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init components
-        let home = Home::new_arc(action_page_home);
-        let history = History::new_arc(action_page_history_back, action_page_history_forward);
-        let reload = Reload::new_arc(action_page_reload.clone());
-        let request = Request::new_arc(action_update.clone(), action_page_open.clone());
-        let bookmark = Bookmark::new_arc();
+        let home = Home::new_rc(action_page_home);
+        let history = History::new_rc(action_page_history_back, action_page_history_forward);
+        let reload = Reload::new_rc(action_page_reload.clone());
+        let request = Request::new_rc(action_update.clone(), action_page_open.clone());
+        let bookmark = Bookmark::new_rc();
 
         // Init widget
-        let widget = Widget::new_arc(
+        let widget = Widget::new_rc(
             home.gobject(),
             history.gobject(),
             reload.gobject(),
@@ -54,7 +54,7 @@ impl Navigation {
         );
 
         // Result
-        Arc::new(Self {
+        Rc::new(Self {
             widget,
             home,
             history,

@@ -10,22 +10,22 @@ use gtk::{
     Entry,
 };
 use sqlite::Transaction;
-use std::sync::Arc;
+use std::rc::Rc;
 
 // Main
 pub struct Request {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Request {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         // Actions
         action_update: SimpleAction,
         action_page_reload: SimpleAction, // @TODO local `action_page_open`?
-    ) -> Arc<Self> {
-        Arc::new(Self {
-            widget: Widget::new_arc(action_update, action_page_reload),
+    ) -> Rc<Self> {
+        Rc::new(Self {
+            widget: Widget::new_rc(action_update, action_page_reload),
         })
     }
 

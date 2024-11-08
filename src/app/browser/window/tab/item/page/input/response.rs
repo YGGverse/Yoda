@@ -14,32 +14,32 @@ use gtk::{
     prelude::{ActionExt, ToVariant, WidgetExt},
     Box,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Response {
     // Components
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Response {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         action_page_open: SimpleAction,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
-        let control = Control::new_arc(action_send.clone());
-        let form = Form::new_arc(action_update.clone());
-        let title = Title::new_arc(title);
+        let control = Control::new_rc(action_send.clone());
+        let form = Form::new_rc(action_update.clone());
+        let title = Title::new_rc(title);
 
         // Init widget
-        let widget = Widget::new_arc(title.gobject(), form.gobject(), control.gobject());
+        let widget = Widget::new_rc(title.gobject(), form.gobject(), control.gobject());
 
         // Init events
         action_update.connect_activate({
@@ -76,7 +76,7 @@ impl Response {
         widget.gobject().connect_realize(move |_| form.focus());
 
         // Return activated struct
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Getters

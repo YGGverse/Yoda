@@ -9,14 +9,14 @@ use gtk::{
     MenuButton,
 };
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Menu {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
-    pub fn new_arc(
+    pub fn new_rc(
         action_about: SimpleAction,
         action_debug: SimpleAction,
         action_profile: SimpleAction,
@@ -29,7 +29,7 @@ impl Menu {
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Main
         let main = gio::Menu::new();
 
@@ -72,7 +72,7 @@ impl Menu {
             main.append(Some("Quit"), Some(&detailed_action_name(action_quit)));
 
         // Result
-        Arc::new(Self { widget:Widget::new_arc(&main) })
+        Rc::new(Self { widget:Widget::new_rc(&main) })
     }
 
     // Getters

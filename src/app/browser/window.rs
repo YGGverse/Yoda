@@ -9,14 +9,14 @@ use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 use gtk::{gio::SimpleAction, Box};
 
 pub struct Window {
-    //header: Arc<Header>,
-    tab: Arc<Tab>,
-    widget: Arc<Widget>,
+    //header: Rc<Header>,
+    tab: Rc<Tab>,
+    widget: Rc<Widget>,
 }
 
 impl Window {
@@ -38,7 +38,7 @@ impl Window {
         action_page_pin: SimpleAction,
     ) -> Self {
         // Init components
-        let tab = Tab::new_arc(
+        let tab = Tab::new_rc(
             action_page_close.clone(),
             action_page_close_all.clone(),
             action_page_home.clone(),
@@ -49,7 +49,7 @@ impl Window {
             action_update.clone(),
         );
 
-        let header = Header::new_arc(
+        let header = Header::new_rc(
             // Actions
             action_about,
             action_debug,
@@ -68,7 +68,7 @@ impl Window {
         );
 
         // GTK
-        let widget = Arc::new(Widget::new(header.gobject(), tab.gobject()));
+        let widget = Rc::new(Widget::new(header.gobject(), tab.gobject()));
 
         // Init struct
         Self {

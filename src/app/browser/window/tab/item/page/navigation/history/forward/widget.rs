@@ -3,7 +3,7 @@ use gtk::{
     prelude::{ActionExt, ButtonExt, WidgetExt},
     Button,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_page_history_forward: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_page_history_forward: SimpleAction) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-next-symbolic")
@@ -21,15 +21,14 @@ impl Widget {
 
         // Init events
         gobject.connect_clicked({
-            let action_page_history_forward =
-                action_page_history_forward.clone();
+            let action_page_history_forward = action_page_history_forward.clone();
             move |_| {
                 action_page_history_forward.activate(None);
             }
         });
 
         // Return activated struct
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

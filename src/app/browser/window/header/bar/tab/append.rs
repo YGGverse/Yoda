@@ -3,17 +3,17 @@ mod widget;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Button};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Append {
-    pub widget: Arc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Append {
     // Construct
-    pub fn new_arc(action_page_new: SimpleAction) -> Arc<Self> {
-        Arc::new(Self {
-            widget: Widget::new_arc(action_page_new),
+    pub fn new_rc(action_page_new: SimpleAction) -> Rc<Self> {
+        Rc::new(Self {
+            widget: Widget::new_rc(action_page_new),
         })
     }
 

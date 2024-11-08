@@ -3,20 +3,20 @@ mod widget;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Button};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Back {
     action_page_history_back: SimpleAction,
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Back {
     // Construct
-    pub fn new_arc(action_page_history_back: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_page_history_back: SimpleAction) -> Rc<Self> {
         // Return activated struct
-        Arc::new(Self {
+        Rc::new(Self {
             action_page_history_back: action_page_history_back.clone(),
-            widget: Widget::new_arc(action_page_history_back),
+            widget: Widget::new_rc(action_page_history_back),
         })
     }
 

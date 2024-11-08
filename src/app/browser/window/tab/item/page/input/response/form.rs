@@ -3,20 +3,20 @@ mod widget;
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, glib::GString, TextView};
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Form {
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Form {
     // Construct
-    pub fn new_arc(action_update: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_update: SimpleAction) -> Rc<Self> {
         // Init widget
-        let widget = Widget::new_arc(action_update);
+        let widget = Widget::new_rc(action_update);
 
         // Result
-        Arc::new(Self { widget })
+        Rc::new(Self { widget })
     }
 
     // Actions

@@ -21,21 +21,21 @@ use gtk::{
     UriLauncher, Window, WrapMode,
 };
 
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, rc::Rc};
 
 pub struct Reader {
     title: Option<GString>,
-    widget: Arc<Widget>,
+    widget: Rc<Widget>,
 }
 
 impl Reader {
     // Construct
-    pub fn new_arc(
+    pub fn new_rc(
         gemtext: &str,
         base: &Uri,
         action_tab_open: SimpleAction,
         action_page_open: SimpleAction,
-    ) -> Arc<Self> {
+    ) -> Rc<Self> {
         // Init default values
         let mut title = None;
 
@@ -223,7 +223,7 @@ impl Reader {
         let motion_controller = EventControllerMotion::new();
 
         // Init widget
-        let widget = Widget::new_arc(
+        let widget = Widget::new_rc(
             &buffer,
             primary_button_controller.clone(),
             middle_button_controller.clone(),
@@ -346,7 +346,7 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Arc::new(Self { title, widget })
+        Rc::new(Self { title, widget })
     }
 
     // Getters

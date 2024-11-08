@@ -3,7 +3,7 @@ use gtk::{
     prelude::{ActionExt, ButtonExt, WidgetExt},
     Button,
 };
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(action_page_home: SimpleAction) -> Arc<Self> {
+    pub fn new_rc(action_page_home: SimpleAction) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-home-symbolic")
@@ -28,7 +28,7 @@ impl Widget {
         });
 
         // Return activated struct
-        Arc::new(Self { gobject })
+        Rc::new(Self { gobject })
     }
 
     // Actions

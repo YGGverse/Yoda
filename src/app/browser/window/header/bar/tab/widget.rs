@@ -1,6 +1,6 @@
 use adw::{TabBar, TabView};
 use gtk::prelude::IsA;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct Widget {
     gobject: TabBar,
@@ -8,8 +8,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_arc(view: &TabView, start_action_widget: &impl IsA<gtk::Widget>) -> Arc<Self> {
-        Arc::new(Self {
+    pub fn new_rc(view: &TabView, start_action_widget: &impl IsA<gtk::Widget>) -> Rc<Self> {
+        Rc::new(Self {
             gobject: TabBar::builder()
                 .autohide(false)
                 .expand_tabs(false)
