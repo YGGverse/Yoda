@@ -205,6 +205,7 @@ Quick start guide and maintenance protocol
 * Before commit, please make sure:
   * new branch created for every new PR `git checkout -b 'contribution-name'`
   * new code follows common [rustfmt](https://rust-lang.github.io/rustfmt/) style `cargo fmt --check`
+  * use `cargo clippy` for final optimization
 
 #### Contributors
 
