@@ -4,7 +4,7 @@ mod widget;
 use bar::Bar;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use adw::{TabView, ToolbarView};
 use gtk::gio::SimpleAction;
 use std::rc::Rc;

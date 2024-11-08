@@ -1,6 +1,6 @@
 use gtk::{gio::SimpleAction, glib::uuid_string_random, prelude::StaticVariantType};
 
-pub struct Browser {
+pub struct Action {
     about: SimpleAction,
     debug: SimpleAction,
     profile: SimpleAction,
@@ -8,7 +8,7 @@ pub struct Browser {
     update: SimpleAction,
 }
 
-impl Browser {
+impl Action {
     // Constructors
 
     pub fn new() -> Self {

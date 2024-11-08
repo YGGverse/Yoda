@@ -12,7 +12,7 @@ use meta::{Meta, Status};
 use navigation::Navigation;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{

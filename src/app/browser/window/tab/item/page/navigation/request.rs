@@ -4,7 +4,7 @@ mod widget;
 use database::Database;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri, UriFlags},

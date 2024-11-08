@@ -170,9 +170,7 @@ Quick start guide and maintenance protocol
   * massive structures
   * structures with implementation
 * Every module must:
-  * encapsulate it members: compose childs and stay composable for parents
-  * access 1 level of childs, never parents (e.g. through `super`)
-    * if some feature require new global data type, it must be implemented as the local or external `crate` extension
+  * encapsulate members - use objects, not static names (unlike native GTK actions API)
   * implement only one public API `struct` per file (same as one file for one class)
     * implementable `struct` is public, where it members - private
   * contain main `struct` implementation:

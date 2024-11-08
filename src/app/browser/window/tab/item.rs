@@ -6,7 +6,7 @@ use database::Database;
 use page::Page;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use adw::{TabPage, TabView};
 use gtk::{
     gio::SimpleAction,

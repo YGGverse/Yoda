@@ -2,7 +2,7 @@ mod database;
 
 use database::Database;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, GString, SourceId},

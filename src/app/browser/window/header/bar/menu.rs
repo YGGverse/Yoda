@@ -2,7 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gio::{self, SimpleAction},
     glib::{gformat, GString},

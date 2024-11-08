@@ -1,14 +1,16 @@
 mod about;
+mod action;
 mod database;
 mod widget;
 mod window;
 
 use about::About;
+use action::Action;
 use database::Database;
 use widget::Widget;
 use window::Window;
 
-use crate::{action::Browser as BrowserAction, profile::Profile};
+use crate::profile::Profile;
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
@@ -20,15 +22,15 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Browser {
-    window: Rc<Window>,
+    action: Rc<Action>,
     widget: Rc<Widget>,
+    window: Rc<Window>,
 }
 
 impl Browser {
     // Construct
     pub fn new(
         profile: Rc<Profile>,
-        browser_action: Rc<BrowserAction>,
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
@@ -38,9 +40,12 @@ impl Browser {
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
     ) -> Browser {
+        // Init actions
+        let action = Rc::new(Action::new());
+
         // Init components
         let window = Rc::new(Window::new(
-            browser_action.clone(),
+            action.clone(),
             action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
@@ -55,11 +60,11 @@ impl Browser {
         let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
-                browser_action.about().clone(),
-                browser_action.debug().clone(),
-                browser_action.profile().clone(),
-                browser_action.quit().clone(),
-                browser_action.update().clone(),
+                action.about().clone(),
+                action.debug().clone(),
+                action.profile().clone(),
+                action.quit().clone(),
+                action.update().clone(),
                 action_page_new.clone(),
                 action_page_close.clone(),
                 action_page_close_all.clone(),
@@ -74,21 +79,21 @@ impl Browser {
         // Init events
 
         // Browser actions
-        browser_action.about().connect_activate({
+        action.about().connect_activate({
             let window = window.clone();
             move |_, _| {
                 About::new().present(Some(window.gobject()));
             }
         });
 
-        browser_action.debug().connect_activate({
+        action.debug().connect_activate({
             let widget = widget.clone();
             move |_, _| {
                 widget.gobject().emit_enable_debugging(true);
             }
         });
 
-        browser_action.profile().connect_activate({
+        action.profile().connect_activate({
             move |_, _| {
                 FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
                     None::<&gtk::Window>,
@@ -103,14 +108,14 @@ impl Browser {
             }
         });
 
-        browser_action.quit().connect_activate({
+        action.quit().connect_activate({
             let widget = widget.clone();
             move |_, _| {
                 widget.gobject().close();
             }
         });
 
-        browser_action.update().connect_activate({
+        action.update().connect_activate({
             let window = window.clone();
             move |_, this| window.update(string_from_variant(this).as_str())
         });
@@ -172,13 +177,14 @@ impl Browser {
 
         // Return new activated `Self`
         Self {
+            action,
             widget,
-            // header,
             window,
         }
     }
 
     // Actions
+
     pub fn clean(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
         match Database::records(transaction, app_id) {
             Ok(records) => {
@@ -243,6 +249,11 @@ impl Browser {
     }
 
     // Getters
+
+    pub fn action(&self) -> &Rc<Action> {
+        &self.action
+    }
+
     pub fn gobject(&self) -> &ApplicationWindow {
         self.widget.gobject()
     }

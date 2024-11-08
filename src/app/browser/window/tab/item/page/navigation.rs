@@ -14,7 +14,7 @@ use reload::Reload;
 use request::Request;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{gio::SimpleAction, glib::GString, prelude::WidgetExt, Box};
 use sqlite::Transaction;
 use std::rc::Rc;

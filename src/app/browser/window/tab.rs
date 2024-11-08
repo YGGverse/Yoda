@@ -8,7 +8,7 @@ use item::Item;
 use menu::Menu;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use adw::TabView;
 use gtk::{
     gio::SimpleAction,

@@ -9,7 +9,7 @@ use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
 
-use crate::action::Browser as BrowserAction;
+use crate::app::browser::action::Action as BrowserAction;
 use gtk::{gio::SimpleAction, Box};
 use std::rc::Rc;
 

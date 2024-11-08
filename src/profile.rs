@@ -1,5 +1,5 @@
 mod database;
-pub use database::Database;
+use database::Database;
 
 use gtk::glib::user_config_dir;
 use std::{

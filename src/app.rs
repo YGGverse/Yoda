@@ -4,7 +4,7 @@ mod database;
 use browser::Browser;
 use database::Database;
 
-use crate::{action::Browser as BrowserAction, profile::Profile};
+use crate::profile::Profile;
 use adw::Application;
 use gtk::{
     gio::SimpleAction,
@@ -29,9 +29,6 @@ impl App {
         // Init profile
         let profile = Rc::new(Profile::new());
 
-        // Init actions
-        let browser_action = Rc::new(BrowserAction::new());
-
         // @TODO
         let default_state = (-1).to_variant();
 
@@ -55,51 +52,9 @@ impl App {
             .application_id(APPLICATION_ID)
             .build();
 
-        // Init accels
-        let accels_config = &[
-            // Browser actions
-            (
-                gformat!("win.{}", browser_action.debug().name()),
-                &["<Primary>i"],
-            ),
-            (
-                gformat!("win.{}", browser_action.quit().name()),
-                &["<Primary>Escape"],
-            ),
-            (
-                gformat!("win.{}", browser_action.update().name()),
-                &["<Primary>u"],
-            ),
-            // Other
-            (
-                gformat!("win.{}", action_page_reload.name()),
-                &["<Primary>r"],
-            ),
-            (
-                gformat!("win.{}", action_page_close.name()),
-                &["<Primary>q"],
-            ),
-            (
-                gformat!("win.{}", action_page_history_back.name()),
-                &["<Primary>Left"],
-            ),
-            (
-                gformat!("win.{}", action_page_history_forward.name()),
-                &["<Primary>Right"],
-            ),
-            (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
-            (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
-            (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
-        ]; // @TODO config
-
-        for (detailed_action_name, &accels) in accels_config {
-            gobject.set_accels_for_action(detailed_action_name, &accels);
-        }
-
         // Init components
         let browser = Rc::new(Browser::new(
             profile.clone(),
-            browser_action.clone(),
             action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
@@ -112,7 +67,7 @@ impl App {
 
         // Init events
         gobject.connect_activate({
-            let update = browser_action.update().clone();
+            let update = browser.action().update().clone();
             move |_| {
                 // Make initial update
                 update.activate(Some(&"".to_variant())); // @TODO
@@ -217,6 +172,47 @@ impl App {
                 }
             }
         });
+
+        // Init accels
+        let accels_config = &[
+            // Browser actions
+            (
+                gformat!("win.{}", browser.action().debug().name()),
+                &["<Primary>i"],
+            ),
+            (
+                gformat!("win.{}", browser.action().quit().name()),
+                &["<Primary>Escape"],
+            ),
+            (
+                gformat!("win.{}", browser.action().update().name()),
+                &["<Primary>u"],
+            ),
+            // Other
+            (
+                gformat!("win.{}", action_page_reload.name()),
+                &["<Primary>r"],
+            ),
+            (
+                gformat!("win.{}", action_page_close.name()),
+                &["<Primary>q"],
+            ),
+            (
+                gformat!("win.{}", action_page_history_back.name()),
+                &["<Primary>Left"],
+            ),
+            (
+                gformat!("win.{}", action_page_history_forward.name()),
+                &["<Primary>Right"],
+            ),
+            (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
+            (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
+            (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
+        ]; // @TODO config
+
+        for (detailed_action_name, &accels) in accels_config {
+            gobject.set_accels_for_action(detailed_action_name, &accels);
+        }
 
         // Return activated App struct
         Self { profile, gobject }
