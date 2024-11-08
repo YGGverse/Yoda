@@ -38,7 +38,7 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            &Response::new_rc(action_page_open, base, title, size_limit).gobject(),
+            Response::new_rc(action_page_open, base, title, size_limit).gobject(),
         ));
     }
 
@@ -50,7 +50,7 @@ impl Input {
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            &Sensitive::new_rc(action_page_open, base, title, max_length).gobject(),
+            Sensitive::new_rc(action_page_open, base, title, max_length).gobject(),
         ));
     }
 

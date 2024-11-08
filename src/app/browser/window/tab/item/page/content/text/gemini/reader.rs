@@ -213,7 +213,7 @@ impl Reader {
             let tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
 
             buffer.tag_table().add(&tag);
-            buffer.insert_with_tags(&mut buffer.end_iter(), &line, &[&tag]);
+            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag]);
             buffer.insert(&mut buffer.end_iter(), "\n");
         }
 
