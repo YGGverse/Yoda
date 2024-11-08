@@ -32,12 +32,8 @@ impl Sensitive {
         let form = Form::new_rc(
             action_send.clone(),
             title,
-            match max_length {
-                Some(value) => {
-                    Some(value - base.to_string_partial(UriHideFlags::QUERY).len() as i32)
-                }
-                None => None,
-            },
+            max_length
+                .map(|value| value - base.to_string_partial(UriHideFlags::QUERY).len() as i32),
         );
 
         // Init widget

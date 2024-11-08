@@ -47,15 +47,11 @@ impl Response {
             let control = control.clone();
             let form = form.clone();
             move |_, _| {
-                control.update(match size_limit {
-                    Some(limit) => Some(
-                        limit as i32
-                            - (base.to_string_partial(UriHideFlags::QUERY).len() as i32
-                                + Uri::escape_string(form.text().as_str(), None, false).len()
-                                    as i32),
-                    ),
-                    None => None,
-                });
+                control.update(size_limit.map(|limit| {
+                    limit as i32
+                        - (base.to_string_partial(UriHideFlags::QUERY).len() as i32
+                            + Uri::escape_string(form.text().as_str(), None, false).len() as i32)
+                }));
             }
         });
 
