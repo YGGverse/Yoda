@@ -8,11 +8,11 @@ mod widget;
 use content::Content;
 use database::Database;
 use input::Input;
+use meta::{Meta, Status};
 use navigation::Navigation;
 use widget::Widget;
 
-use meta::{Meta, Status};
-
+use crate::action::Browser as BrowserAction;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{
@@ -34,9 +34,9 @@ use std::{rc::Rc, time::Duration};
 pub struct Page {
     id: GString,
     // Actions
+    browser_action: Rc<BrowserAction>,
     action_page_load: SimpleAction,
     action_page_open: SimpleAction,
-    action_update: SimpleAction,
     // Components
     navigation: Rc<Navigation>,
     content: Rc<Content>,
@@ -53,12 +53,12 @@ impl Page {
     /// Create new activated `Rc<Self>`
     pub fn new_rc(
         id: GString,
+        browser_action: Rc<BrowserAction>,
         action_tab_open: SimpleAction,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_update: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
         let action_page_load = SimpleAction::new(&uuid_string_random(), None);
@@ -69,12 +69,12 @@ impl Page {
         let content = Content::new_rc(action_tab_open.clone(), action_page_open.clone());
 
         let navigation = Navigation::new_rc(
+            browser_action.clone(),
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
             action_page_open.clone(),
-            action_update.clone(),
         );
 
         let input = Input::new_rc();
@@ -93,9 +93,9 @@ impl Page {
         let this = Rc::new(Self {
             id,
             // Actions
+            browser_action,
             action_page_load: action_page_load.clone(),
             action_page_open: action_page_open.clone(),
-            action_update,
             // Components
             content,
             navigation,
@@ -233,7 +233,7 @@ impl Page {
 
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
-        self.action_update.activate(Some(&id));
+        self.browser_action.update().activate(Some(&id));
 
         // Route by request
         match Uri::parse(&request, UriFlags::NONE) {
@@ -259,7 +259,7 @@ impl Page {
                         self.meta.set_status(status).set_title(title);
 
                         // Update window
-                        self.action_update.activate(Some(&id));
+                        self.browser_action.update().activate(Some(&id));
                     }
                 }
             }
@@ -429,9 +429,9 @@ impl Page {
         // use gemini::client::response::
 
         // Init shared objects (async)
+        let update = self.browser_action.update().clone();
         let action_page_load = self.action_page_load.clone();
         let action_page_open = self.action_page_open.clone();
-        let action_update = self.action_update.clone();
         let content = self.content.clone();
         let id = self.id.to_variant();
         let input = self.input.clone();
@@ -447,7 +447,7 @@ impl Page {
 
         // Listen for connection status updates
         client.connect_event({
-            let action_update = action_update.clone();
+            let update = update.clone();
             let id = id.clone();
             let meta = meta.clone();
             move |_, event, _, _| {
@@ -463,7 +463,7 @@ impl Page {
                     SocketClientEvent::Complete => Status::Complete,
                     _ => todo!(), // notice on API change
                 });
-                action_update.activate(Some(&id));
+                update.activate(Some(&id));
             }
         });
 
@@ -525,7 +525,7 @@ impl Page {
                                                         .set_title(title);
 
                                                     // Update page
-                                                    action_update.activate(Some(&id));
+                                                    update.activate(Some(&id));
                                                 },
                                                 gemini::client::response::meta::Status::Success => {
                                                     // Route by MIME
@@ -555,7 +555,7 @@ impl Page {
                                                                                 .set_title(title);
 
                                                                             // Update window components
-                                                                            action_update.activate(Some(&id));
+                                                                            update.activate(Some(&id));
                                                                         }
                                                                         Err((reason, message)) => {
                                                                             // Define common data
@@ -581,7 +581,7 @@ impl Page {
                                                                                 .set_title(title);
 
                                                                             // Update window
-                                                                            action_update.activate(Some(&id));
+                                                                            update.activate(Some(&id));
                                                                         },
                                                                     }
                                                                 }
@@ -628,7 +628,7 @@ impl Page {
                                                                                         content.to_image(&buffer);
 
                                                                                         // Update window components
-                                                                                        action_update.activate(Some(&id));
+                                                                                        update.activate(Some(&id));
                                                                                     }
                                                                                     Err(reason) => {
                                                                                         // Define common data
@@ -686,7 +686,7 @@ impl Page {
                                                             // content.to_stream();
 
                                                             // Update window components
-                                                            action_update.activate(Some(&id));
+                                                            update.activate(Some(&id));
                                                         }, */
                                                         _ => {
                                                             // Define common data
@@ -705,7 +705,7 @@ impl Page {
                                                                 .set_title(title);
 
                                                             // Update window
-                                                            action_update.activate(Some(&id));
+                                                            update.activate(Some(&id));
                                                         },
                                                     }
                                                 },
@@ -817,7 +817,7 @@ impl Page {
                                                         },
                                                     }
 
-                                                    action_update.activate(Some(&id));
+                                                    update.activate(Some(&id));
                                                 },
                                                 _ => {
                                                     // Define common data
@@ -835,7 +835,7 @@ impl Page {
                                                         .set_title(title);
 
                                                     // Update window
-                                                    action_update.activate(Some(&id));
+                                                    update.activate(Some(&id));
                                                 }
                                             }
                                         },
@@ -901,7 +901,7 @@ impl Page {
                                                 .set_title(title);
 
                                             // Update window
-                                            action_update.activate(Some(&id));
+                                            update.activate(Some(&id));
                                         } // Header::from_socket_connection_async
                                     }
                                 );
@@ -922,7 +922,7 @@ impl Page {
                                     .set_title(title);
 
                                 // Update window
-                                action_update.activate(Some(&id));
+                                update.activate(Some(&id));
                             },
                         },
                     );
@@ -943,7 +943,7 @@ impl Page {
                         .set_title(title);
 
                     // Update window
-                    action_update.activate(Some(&id));
+                    update.activate(Some(&id));
                 },
             },
         );

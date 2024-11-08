@@ -9,9 +9,9 @@ use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
 
-use std::rc::Rc;
-
+use crate::action::Browser as BrowserAction;
 use gtk::{gio::SimpleAction, Box};
+use std::rc::Rc;
 
 pub struct Window {
     //header: Rc<Header>,
@@ -23,11 +23,7 @@ impl Window {
     // Construct
     pub fn new(
         // Actions
-        action_about: SimpleAction,
-        action_debug: SimpleAction,
-        action_profile: SimpleAction,
-        action_quit: SimpleAction,
-        action_update: SimpleAction,
+        browser_action: Rc<BrowserAction>,
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
@@ -39,6 +35,7 @@ impl Window {
     ) -> Self {
         // Init components
         let tab = Tab::new_rc(
+            browser_action.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
             action_page_home.clone(),
@@ -46,15 +43,11 @@ impl Window {
             action_page_history_forward.clone(),
             action_page_pin.clone(),
             action_page_reload.clone(),
-            action_update.clone(),
         );
 
         let header = Header::new_rc(
             // Actions
-            action_about,
-            action_debug,
-            action_profile,
-            action_quit,
+            browser_action,
             action_page_new,
             action_page_close,
             action_page_close_all,

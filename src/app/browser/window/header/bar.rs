@@ -8,6 +8,7 @@ use menu::Menu;
 use tab::Tab;
 use widget::Widget;
 
+use crate::action::Browser as BrowserAction;
 use adw::TabView;
 use gtk::{gio::SimpleAction, Box};
 use std::rc::Rc;
@@ -19,10 +20,7 @@ pub struct Bar {
 impl Bar {
     // Construct
     pub fn new_rc(
-        action_about: SimpleAction,
-        action_debug: SimpleAction,
-        action_profile: SimpleAction,
-        action_quit: SimpleAction,
+        browser_action: Rc<BrowserAction>,
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
@@ -37,10 +35,7 @@ impl Bar {
         let control = Control::new_rc();
         let tab = Tab::new_rc(action_page_new.clone(), view);
         let menu = Menu::new_rc(
-            action_about,
-            action_debug,
-            action_profile,
-            action_quit,
+            browser_action,
             action_page_new,
             action_page_close,
             action_page_close_all,

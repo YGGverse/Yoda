@@ -6,6 +6,7 @@ use database::Database;
 use page::Page;
 use widget::Widget;
 
+use crate::action::Browser as BrowserAction;
 use adw::{TabPage, TabView};
 use gtk::{
     gio::SimpleAction,
@@ -27,13 +28,14 @@ impl Item {
     // Construct
     pub fn new_rc(
         tab_view: &TabView,
-        // Actions
+        // Global actions
+        browser_action: Rc<BrowserAction>,
+        // @TODO
         action_tab_open: SimpleAction,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_update: SimpleAction,
         // Options
         position: Option<i32>,
         is_pinned: bool,
@@ -46,12 +48,12 @@ impl Item {
         let page = Page::new_rc(
             id.clone(),
             // Actions
+            browser_action,
             action_tab_open.clone(),
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
-            action_update.clone(),
         );
 
         let widget = Widget::new_rc(
@@ -128,12 +130,12 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
         // Actions
+        browser_action: Rc<BrowserAction>,
         action_tab_open: SimpleAction,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_update: SimpleAction,
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -144,12 +146,12 @@ impl Item {
                     let item = Item::new_rc(
                         tab_view,
                         // Actions
+                        browser_action.clone(),
                         action_tab_open.clone(),
                         action_page_home.clone(),
                         action_page_history_back.clone(),
                         action_page_history_forward.clone(),
                         action_page_reload.clone(),
-                        action_update.clone(),
                         // Options
                         None,
                         record.is_pinned,

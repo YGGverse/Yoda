@@ -8,6 +8,7 @@ use item::Item;
 use menu::Menu;
 use widget::Widget;
 
+use crate::action::Browser as BrowserAction;
 use adw::TabView;
 use gtk::{
     gio::SimpleAction,
@@ -19,14 +20,15 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
+    // Global actions
+    browser_action: Rc<BrowserAction>,
     // Local actions
     action_tab_open: SimpleAction,
-    // Global actions
+    // Page actions
     action_page_home: SimpleAction,
     action_page_history_back: SimpleAction,
     action_page_history_forward: SimpleAction,
     action_page_reload: SimpleAction,
-    action_update: SimpleAction,
     // Dynamically allocated reference index
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
     // GTK
@@ -36,6 +38,7 @@ pub struct Tab {
 impl Tab {
     // Construct
     pub fn new_rc(
+        browser_action: Rc<BrowserAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -43,7 +46,6 @@ impl Tab {
         action_page_history_forward: SimpleAction,
         action_page_pin: SimpleAction,
         action_page_reload: SimpleAction,
-        action_update: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
         let action_tab_open =
@@ -72,24 +74,27 @@ impl Tab {
             let index = index.clone();
             let gobject = widget.gobject().clone();
             // Actions
+            let browser_action = browser_action.clone();
+
             let action_tab_open = action_tab_open.clone();
             let action_page_home = action_page_home.clone();
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
             let action_page_reload = action_page_reload.clone();
-            let action_update = action_update.clone();
+
             move |_, request| {
                 // Init new tab item
                 let item = Item::new_rc(
                     &gobject,
+                    // Global actions
+                    browser_action.clone(),
                     // Local actions
                     action_tab_open.clone(),
-                    // Global actions
+                    // Page actions
                     action_page_home.clone(),
                     action_page_history_back.clone(),
                     action_page_history_forward.clone(),
                     action_page_reload.clone(),
-                    action_update.clone(),
                     // Options
                     gobject
                         .selected_page()
@@ -172,6 +177,7 @@ impl Tab {
 
         // Return activated struct
         Rc::new(Self {
+            browser_action,
             // Local actions
             action_tab_open,
             // Global actions
@@ -179,7 +185,6 @@ impl Tab {
             action_page_history_back,
             action_page_history_forward,
             action_page_reload,
-            action_update,
             // Init empty HashMap index as no tabs appended yet
             index,
             // GTK
@@ -192,6 +197,7 @@ impl Tab {
         // Init new tab item
         let item = Item::new_rc(
             self.gobject(),
+            self.browser_action.clone(),
             // Local actions
             self.action_tab_open.clone(),
             // Global actions
@@ -199,7 +205,6 @@ impl Tab {
             self.action_page_history_back.clone(),
             self.action_page_history_forward.clone(),
             self.action_page_reload.clone(),
-            self.action_update.clone(),
             // Options
             position,
             false,
@@ -332,12 +337,12 @@ impl Tab {
                         self.gobject(),
                         transaction,
                         &record.id,
+                        self.browser_action.clone(),
                         self.action_tab_open.clone(),
                         self.action_page_home.clone(),
                         self.action_page_history_back.clone(),
                         self.action_page_history_forward.clone(),
                         self.action_page_reload.clone(),
-                        self.action_update.clone(),
                     ) {
                         Ok(items) => {
                             for item in items {

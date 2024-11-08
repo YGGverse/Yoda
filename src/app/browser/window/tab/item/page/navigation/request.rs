@@ -4,6 +4,7 @@ mod widget;
 use database::Database;
 use widget::Widget;
 
+use crate::action::Browser as BrowserAction;
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri, UriFlags},
@@ -21,11 +22,11 @@ impl Request {
     // Construct
     pub fn new_rc(
         // Actions
-        action_update: SimpleAction,
+        browser_action: Rc<BrowserAction>,
         action_page_reload: SimpleAction, // @TODO local `action_page_open`?
     ) -> Rc<Self> {
         Rc::new(Self {
-            widget: Widget::new_rc(action_update, action_page_reload),
+            widget: Widget::new_rc(browser_action, action_page_reload),
         })
     }
 

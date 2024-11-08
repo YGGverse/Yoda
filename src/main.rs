@@ -1,3 +1,4 @@
+mod action;
 mod app;
 
 use app::App;

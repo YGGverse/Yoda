@@ -4,6 +4,7 @@ mod widget;
 use bar::Bar;
 use widget::Widget;
 
+use crate::action::Browser as BrowserAction;
 use adw::{TabView, ToolbarView};
 use gtk::gio::SimpleAction;
 use std::rc::Rc;
@@ -16,10 +17,7 @@ impl Header {
     // Construct
     pub fn new_rc(
         // Actions
-        action_about: SimpleAction,
-        action_debug: SimpleAction,
-        action_profile: SimpleAction,
-        action_quit: SimpleAction,
+        browser_action: Rc<BrowserAction>,
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
@@ -33,10 +31,7 @@ impl Header {
     ) -> Rc<Self> {
         // Init components
         let bar = Bar::new_rc(
-            action_about,
-            action_debug,
-            action_profile,
-            action_quit,
+            browser_action,
             action_page_new,
             action_page_close,
             action_page_close_all,

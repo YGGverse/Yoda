@@ -2,6 +2,7 @@ mod database;
 
 use database::Database;
 
+use crate::action::Browser as BrowserAction;
 use gtk::{
     gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, GString, SourceId},
@@ -29,7 +30,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(action_update: SimpleAction, action_page_open: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(browser_action: Rc<BrowserAction>, action_page_open: SimpleAction) -> Rc<Self> {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -44,7 +45,7 @@ impl Widget {
 
         // Connect events
         gobject.connect_changed(move |_| {
-            action_update.activate(Some(&"".to_variant())); // @TODO
+            browser_action.update().activate(Some(&"".to_variant())); // @TODO
         });
 
         gobject.connect_activate(move |this| {

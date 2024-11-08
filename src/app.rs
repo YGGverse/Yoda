@@ -4,13 +4,13 @@ mod database;
 use browser::Browser;
 use database::Database;
 
+use crate::action::Browser as BrowserAction;
 use adw::Application;
 use gtk::{
     gio::SimpleAction,
     glib::{gformat, uuid_string_random, ExitCode},
     prelude::{
-        ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt,
-        StaticVariantType, ToVariant,
+        ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt, ToVariant,
     },
 };
 use sqlite::{Connection, Transaction};
@@ -27,16 +27,13 @@ pub struct App {
 impl App {
     // Construct
     pub fn new(profile_database_connection: Rc<RwLock<Connection>>, profile_path: PathBuf) -> Self {
+        // Init actions
+        let browser_action = Rc::new(BrowserAction::new());
+
         // Init defaults
         let default_state = (-1).to_variant();
 
         // Init actions
-        let action_about = SimpleAction::new(&uuid_string_random(), None);
-        let action_debug = SimpleAction::new(&uuid_string_random(), None);
-        let action_profile = SimpleAction::new(&uuid_string_random(), None);
-        let action_quit = SimpleAction::new(&uuid_string_random(), None);
-        let action_update =
-            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
         let action_page_new = SimpleAction::new(&uuid_string_random(), None);
         let action_page_close =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
@@ -59,11 +56,24 @@ impl App {
 
         // Init accels
         let accels_config = &[
+            // Browser actions
+            (
+                gformat!("win.{}", browser_action.debug().name()),
+                &["<Primary>i"],
+            ),
+            (
+                gformat!("win.{}", browser_action.quit().name()),
+                &["<Primary>Escape"],
+            ),
+            (
+                gformat!("win.{}", browser_action.update().name()),
+                &["<Primary>u"],
+            ),
+            // Other
             (
                 gformat!("win.{}", action_page_reload.name()),
                 &["<Primary>r"],
             ),
-            (gformat!("win.{}", action_debug.name()), &["<Primary>i"]),
             (
                 gformat!("win.{}", action_page_close.name()),
                 &["<Primary>q"],
@@ -79,8 +89,6 @@ impl App {
             (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
             (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
             (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
-            (gformat!("win.{}", action_quit.name()), &["<Primary>Escape"]),
-            (gformat!("win.{}", action_update.name()), &["<Primary>u"]),
         ]; // @TODO config
 
         for (detailed_action_name, &accels) in accels_config {
@@ -90,11 +98,7 @@ impl App {
         // Init components
         let browser = Rc::new(Browser::new(
             profile_path,
-            action_about.clone(),
-            action_debug.clone(),
-            action_profile.clone(),
-            action_quit.clone(),
-            action_update.clone(),
+            browser_action.clone(),
             action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
@@ -107,10 +111,10 @@ impl App {
 
         // Init events
         gobject.connect_activate({
-            let action_update = action_update.clone();
+            let update = browser_action.update().clone();
             move |_| {
                 // Make initial update
-                action_update.activate(Some(&"".to_variant())); // @TODO
+                update.activate(Some(&"".to_variant())); // @TODO
             }
         });
 
