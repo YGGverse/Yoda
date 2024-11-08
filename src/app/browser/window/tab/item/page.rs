@@ -720,7 +720,7 @@ impl Page {
                                                             // https://docs.gtk.org/glib/type_func.Uri.resolve_relative.html
                                                             match Uri::resolve_relative(
                                                                 Some(&uri.to_string()),
-                                                                &unresolved_url.value(),
+                                                                unresolved_url.value(),
                                                                 UriFlags::NONE,
                                                             ) {
                                                                 Ok(resolved_url) => {
