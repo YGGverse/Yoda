@@ -124,7 +124,7 @@ impl Reader {
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Update reader title using first gemtext header match
-                if title == None {
+                if title.is_none() {
                     title = Some(header.value.clone());
                 }
 
