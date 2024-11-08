@@ -34,8 +34,8 @@ impl Profile {
             env!("CARGO_PKG_VERSION_MINOR")
         )); // @TODO remove after auto-migrate feature implementation
 
-        if let Err(e) = create_dir_all(&config_path) {
-            panic!("Failed to create profile directory: {e}")
+        if let Err(reason) = create_dir_all(&config_path) {
+            panic!("{reason}")
         }
 
         // Init database path
