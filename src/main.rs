@@ -39,7 +39,7 @@ fn main() -> ExitCode {
 
     // Init GTK, start application
     match gtk::init() {
-        Ok(_) => App::new(profile_database_connection, profile_path).run(),
+        Ok(_) => App::new(profile_database_connection, profile_path).run(), // @TODO common struct for profile data
         Err(_) => ExitCode::FAILURE,
     }
 }
