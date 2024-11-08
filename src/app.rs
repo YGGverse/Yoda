@@ -276,12 +276,12 @@ impl App {
 // Tools
 fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(&tx) {
+    if let Err(e) = Database::init(tx) {
         return Err(e.to_string());
     }
 
     // Delegate migration to childs
-    browser::migrate(&tx)?;
+    browser::migrate(tx)?;
 
     // Success
     Ok(())

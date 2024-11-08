@@ -259,15 +259,15 @@ impl Browser {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(&tx) {
+    if let Err(e) = Database::init(tx) {
         return Err(e.to_string());
     }
 
     // Delegate migration to childs
     /* @TODO
-    header::migrate(&tx)?; */
-    window::migrate(&tx)?;
-    widget::migrate(&tx)?;
+    header::migrate(tx)?; */
+    window::migrate(tx)?;
+    widget::migrate(tx)?;
 
     // Success
     Ok(())
