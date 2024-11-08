@@ -172,6 +172,7 @@ Quick start guide and maintenance protocol
 * Every module must:
   * encapsulate it members: compose childs and stay composable for parents
   * access 1 level of childs, never parents (e.g. through `super`)
+    * if some feature require new global data type, it must be implemented as the local or external `crate` extension
   * implement only one public API `struct` per file (same as one file for one class)
     * implementable `struct` is public, where it members - private
   * contain main `struct` implementation:
@@ -205,7 +206,7 @@ Quick start guide and maintenance protocol
 * Before commit, please make sure:
   * new branch created for every new PR `git checkout -b 'contribution-name'`
   * new code follows common [rustfmt](https://rust-lang.github.io/rustfmt/) style `cargo fmt --check`
-  * use `cargo clippy` for final optimization
+  * run `cargo clippy` for final optimization
 
 #### Contributors
 
