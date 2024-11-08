@@ -91,10 +91,9 @@ impl Tab {
                     action_page_reload.clone(),
                     action_update.clone(),
                     // Options
-                    match gobject.selected_page() {
-                        Some(page) => Some(gobject.page_position(&page) + 1),
-                        None => None,
-                    },
+                    gobject
+                        .selected_page()
+                        .map(|page| gobject.page_position(&page) + 1),
                     false,
                     false,
                 );

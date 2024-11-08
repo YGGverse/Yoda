@@ -975,11 +975,7 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 ///
 /// * this feature may be improved and moved outside @TODO
 fn uri_to_title(uri: &Uri) -> GString {
-    let title = GString::from(match uri.path().split('/').last() {
-        Some(filename) => filename,
-        None => "",
-    });
-
+    let title = GString::from(uri.path().split('/').last().unwrap_or_default());
     if title.is_empty() {
         match uri.host() {
             Some(host) => gformat!("{host}"),
