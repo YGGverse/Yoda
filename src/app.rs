@@ -4,7 +4,7 @@ mod database;
 use browser::Browser;
 use database::Database;
 
-use crate::{action::Browser as BrowserAction, Profile};
+use crate::{action::Browser as BrowserAction, profile::Profile};
 use adw::Application;
 use gtk::{
     gio::SimpleAction,
@@ -25,14 +25,16 @@ pub struct App {
 
 impl App {
     // Construct
-    pub fn new(profile: Rc<Profile>) -> Self {
+    pub fn new() -> Self {
+        // Init profile
+        let profile = Rc::new(Profile::new());
+
         // Init actions
         let browser_action = Rc::new(BrowserAction::new());
 
-        // Init defaults
+        // @TODO
         let default_state = (-1).to_variant();
 
-        // Init actions
         let action_page_new = SimpleAction::new(&uuid_string_random(), None);
         let action_page_close =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);

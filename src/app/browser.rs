@@ -8,7 +8,7 @@ use database::Database;
 use widget::Widget;
 use window::Window;
 
-use crate::{action::Browser as BrowserAction, Profile};
+use crate::{action::Browser as BrowserAction, profile::Profile};
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},

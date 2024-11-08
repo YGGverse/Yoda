@@ -7,6 +7,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
+const VENDOR: &str = "YGGverse";
+const APP_ID: &str = "Yoda";
+const BRANCH: &str = "master";
+
 const DB_NAME: &str = "profile.sqlite3";
 
 pub struct Profile {
@@ -17,14 +21,18 @@ pub struct Profile {
 impl Profile {
     // Constructors
 
-    pub fn new(vendor: &str, app_id: &str, branch: &str, version: &str) -> Self {
+    pub fn new() -> Self {
         // Init profile path
         let mut config_path = user_config_dir();
 
-        config_path.push(vendor);
-        config_path.push(app_id);
-        config_path.push(branch);
-        config_path.push(version); // @TODO remove after auto-migrate feature implementation
+        config_path.push(VENDOR);
+        config_path.push(APP_ID);
+        config_path.push(BRANCH);
+        config_path.push(format!(
+            "{}.{}",
+            env!("CARGO_PKG_VERSION_MAJOR"),
+            env!("CARGO_PKG_VERSION_MINOR")
+        )); // @TODO remove after auto-migrate feature implementation
 
         if let Err(e) = create_dir_all(&config_path) {
             panic!("Failed to create profile directory: {e}")
