@@ -11,7 +11,7 @@ use gtk::glib::GString;
 /// * `is_foreground` - indicates how to process this redirect
 /// * `request` - destination
 ///   * currently, it's raw `GString` not [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-/// because of compatibility with request field as it could contain any other, not parsable values
+///     because of compatibility with request field as it could contain any other, not parsable values
 pub struct Redirect {
     is_foreground: bool,
     request: GString,
