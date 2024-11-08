@@ -159,7 +159,7 @@ impl Navigation {
 
     // Getters
     pub fn gobject(&self) -> &Box {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 
     pub fn home_url(&self) -> Option<GString> {

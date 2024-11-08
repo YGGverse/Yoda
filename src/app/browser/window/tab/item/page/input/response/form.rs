@@ -30,6 +30,6 @@ impl Form {
     }
 
     pub fn gobject(&self) -> &TextView {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

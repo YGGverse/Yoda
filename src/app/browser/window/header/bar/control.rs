@@ -19,6 +19,6 @@ impl Control {
 
     // Getters
     pub fn gobject(&self) -> &WindowControls {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

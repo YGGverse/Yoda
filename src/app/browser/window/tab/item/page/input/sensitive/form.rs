@@ -35,6 +35,6 @@ impl Form {
     }
 
     pub fn gobject(&self) -> &PasswordEntryRow {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

@@ -56,6 +56,6 @@ impl Header {
 
     // Getters
     pub fn gobject(&self) -> &ToolbarView {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

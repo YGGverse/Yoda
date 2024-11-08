@@ -217,7 +217,7 @@ impl Item {
     }
 
     pub fn gobject(&self) -> &TabPage {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }
 

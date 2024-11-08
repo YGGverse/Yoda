@@ -56,6 +56,6 @@ impl Input {
 
     // Getters
     pub fn gobject(&self) -> &Clamp {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

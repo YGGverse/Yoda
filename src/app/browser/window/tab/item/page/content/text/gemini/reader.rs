@@ -355,6 +355,6 @@ impl Reader {
     }
 
     pub fn gobject(&self) -> &TextView {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

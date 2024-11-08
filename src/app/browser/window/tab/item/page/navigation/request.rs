@@ -100,7 +100,7 @@ impl Request {
 
     // Getters
     pub fn gobject(&self) -> &Entry {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 
     pub fn text(&self) -> GString {

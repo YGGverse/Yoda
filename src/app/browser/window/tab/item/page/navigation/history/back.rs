@@ -15,8 +15,7 @@ impl Back {
     pub fn new_arc(action_page_history_back: SimpleAction) -> Arc<Self> {
         // Return activated struct
         Arc::new(Self {
-            action_page_history_back: action_page_history_back
-                .clone(),
+            action_page_history_back: action_page_history_back.clone(),
             widget: Widget::new_arc(action_page_history_back),
         })
     }
@@ -24,8 +23,7 @@ impl Back {
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action_page_history_back
-            .set_enabled(status);
+        self.action_page_history_back.set_enabled(status);
 
         // Update child components
         self.widget.update(status);
@@ -33,6 +31,6 @@ impl Back {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

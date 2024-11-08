@@ -26,6 +26,6 @@ impl Counter {
 
     // Getters
     pub fn gobject(&self) -> &Label {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

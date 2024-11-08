@@ -75,30 +75,30 @@ impl Tag {
     }
 
     pub fn code(&self) -> &TextTag {
-        &self.code.gobject()
+        self.code.gobject()
     }
 
     pub fn h1(&self) -> &TextTag {
-        &self.h1.gobject()
+        self.h1.gobject()
     }
 
     pub fn h2(&self) -> &TextTag {
-        &self.h2.gobject()
+        self.h2.gobject()
     }
 
     pub fn h3(&self) -> &TextTag {
-        &self.h3.gobject()
+        self.h3.gobject()
     }
 
     pub fn list(&self) -> &TextTag {
-        &self.list.gobject()
+        self.list.gobject()
     }
 
     pub fn quote(&self) -> &TextTag {
-        &self.quote.gobject()
+        self.quote.gobject()
     }
 
     pub fn title(&self) -> &TextTag {
-        &self.title.gobject()
+        self.title.gobject()
     }
 }

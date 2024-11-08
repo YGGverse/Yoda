@@ -22,6 +22,6 @@ impl Tab {
 
     // Getters
     pub fn gobject(&self) -> &TabBar {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

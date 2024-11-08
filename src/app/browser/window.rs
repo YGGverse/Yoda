@@ -173,7 +173,7 @@ impl Window {
 
     // Getters
     pub fn gobject(&self) -> &Box {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }
 

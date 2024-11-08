@@ -15,8 +15,7 @@ impl Forward {
     pub fn new_arc(action_page_history_forward: SimpleAction) -> Arc<Self> {
         // Return activated struct
         Arc::new(Self {
-            action_page_history_forward: action_page_history_forward
-                .clone(),
+            action_page_history_forward: action_page_history_forward.clone(),
             widget: Widget::new_arc(action_page_history_forward),
         })
     }
@@ -24,8 +23,7 @@ impl Forward {
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action_page_history_forward
-            .set_enabled(status);
+        self.action_page_history_forward.set_enabled(status);
 
         // Update child components
         self.widget.update(status);
@@ -33,6 +31,6 @@ impl Forward {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

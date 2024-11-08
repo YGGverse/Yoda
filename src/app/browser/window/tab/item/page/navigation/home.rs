@@ -45,7 +45,7 @@ impl Home {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 
     pub fn url(&self) -> Option<GString> {

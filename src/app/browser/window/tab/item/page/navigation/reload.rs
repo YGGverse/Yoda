@@ -22,8 +22,7 @@ impl Reload {
     // Actions
     pub fn update(&self, is_enabled: bool) {
         // Update actions
-        self.action_page_reload
-            .set_enabled(is_enabled);
+        self.action_page_reload.set_enabled(is_enabled);
 
         // Update child components
         self.widget.update(is_enabled);
@@ -31,6 +30,6 @@ impl Reload {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

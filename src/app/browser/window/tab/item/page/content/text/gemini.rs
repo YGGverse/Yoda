@@ -37,10 +37,10 @@ impl Gemini {
 
     // Getters
     pub fn reader_title(&self) -> &Option<GString> {
-        &self.reader.title()
+        self.reader.title()
     }
 
     pub fn gobject(&self) -> &ClampScrollable {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

@@ -252,7 +252,7 @@ impl Browser {
 
     // Getters
     pub fn gobject(&self) -> &ApplicationWindow {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }
 

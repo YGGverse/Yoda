@@ -19,6 +19,6 @@ impl Append {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

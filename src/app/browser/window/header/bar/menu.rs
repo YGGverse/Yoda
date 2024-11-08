@@ -77,7 +77,7 @@ impl Menu {
 
     // Getters
     pub fn gobject(&self) -> &MenuButton {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }
 

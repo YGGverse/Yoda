@@ -24,6 +24,6 @@ impl Bookmark {
 
     // Getters
     pub fn gobject(&self) -> &Button {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }

@@ -15,6 +15,6 @@ impl Default {
     }
 
     pub fn gobject(&self) -> &Video {
-        &self.widget.gobject()
+        self.widget.gobject()
     }
 }
