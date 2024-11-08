@@ -8,7 +8,7 @@ use database::Database;
 use widget::Widget;
 use window::Window;
 
-use crate::action::Browser as BrowserAction;
+use crate::{action::Browser as BrowserAction, Profile};
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
@@ -17,7 +17,7 @@ use gtk::{
     FileLauncher,
 };
 use sqlite::Transaction;
-use std::{path::PathBuf, rc::Rc};
+use std::rc::Rc;
 
 pub struct Browser {
     window: Rc<Window>,
@@ -27,9 +27,7 @@ pub struct Browser {
 impl Browser {
     // Construct
     pub fn new(
-        // Extras
-        profile_path: PathBuf,
-        // Actions
+        profile: Rc<Profile>,
         browser_action: Rc<BrowserAction>,
         action_page_new: SimpleAction,
         action_page_close: SimpleAction,
@@ -92,7 +90,7 @@ impl Browser {
 
         browser_action.profile().connect_activate({
             move |_, _| {
-                FileLauncher::new(Some(&File::for_path(&profile_path))).launch(
+                FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
                     None::<&gtk::Window>,
                     None::<&Cancellable>,
                     |result| {

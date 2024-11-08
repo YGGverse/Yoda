@@ -4,7 +4,7 @@ mod database;
 use browser::Browser;
 use database::Database;
 
-use crate::action::Browser as BrowserAction;
+use crate::{action::Browser as BrowserAction, Profile};
 use adw::Application;
 use gtk::{
     gio::SimpleAction,
@@ -13,20 +13,19 @@ use gtk::{
         ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt, ToVariant,
     },
 };
-use sqlite::{Connection, Transaction};
-
-use std::{path::PathBuf, rc::Rc, sync::RwLock};
+use sqlite::Transaction;
+use std::rc::Rc;
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
-    profile_database_connection: Rc<RwLock<Connection>>,
+    profile: Rc<Profile>,
     gobject: Application,
 }
 
 impl App {
     // Construct
-    pub fn new(profile_database_connection: Rc<RwLock<Connection>>, profile_path: PathBuf) -> Self {
+    pub fn new(profile: Rc<Profile>) -> Self {
         // Init actions
         let browser_action = Rc::new(BrowserAction::new());
 
@@ -97,7 +96,7 @@ impl App {
 
         // Init components
         let browser = Rc::new(Browser::new(
-            profile_path,
+            profile.clone(),
             browser_action.clone(),
             action_page_new.clone(),
             action_page_close.clone(),
@@ -120,10 +119,10 @@ impl App {
 
         gobject.connect_startup({
             let browser = browser.clone();
-            let profile_database_connection = profile_database_connection.clone();
+            let profile = profile.clone();
             move |this| {
                 // Init readable connection
-                match profile_database_connection.read() {
+                match profile.database().connection().read() {
                     Ok(connection) => {
                         // Create transaction
                         match connection.unchecked_transaction() {
@@ -161,12 +160,11 @@ impl App {
         });
 
         gobject.connect_shutdown({
-            // let browser = browser.clone();
-            let profile_database_connection = profile_database_connection.clone();
             let browser = browser.clone();
+            let profile = profile.clone();
             move |_| {
                 // Init writable connection
-                match profile_database_connection.write() {
+                match profile.database().connection().write() {
                     Ok(mut connection) => {
                         // Create transaction
                         match connection.transaction() {
@@ -219,16 +217,7 @@ impl App {
         });
 
         // Return activated App struct
-        Self {
-            // database,
-            profile_database_connection,
-            // Actions (SimpleAction)
-            // action_update: action_update.simple(),
-            // Components
-            // browser,
-            // GTK
-            gobject,
-        }
+        Self { profile, gobject }
     }
 
     // Actions
@@ -236,7 +225,7 @@ impl App {
         // Begin database migration @TODO
         {
             // Init writable connection
-            let mut connection = match self.profile_database_connection.try_write() {
+            let mut connection = match self.profile.database().connection().try_write() {
                 Ok(connection) => connection,
                 Err(e) => todo!("{e}"),
             };
