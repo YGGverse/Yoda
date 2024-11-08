@@ -766,10 +766,7 @@ impl Page {
                                                                                         UriHideFlags::FRAGMENT | UriHideFlags::QUERY
                                                                                     ),
                                                                                     // Set follow policy based on status code
-                                                                                    match response.status() {
-                                                                                        gemini::client::response::meta::Status::PermanentRedirect => true,
-                                                                                        _ => false
-                                                                                    },
+                                                                                    matches!(response.status(), gemini::client::response::meta::Status::PermanentRedirect),
                                                                                 )
                                                                                     .set_status(Status::Redirect) // @TODO is this status really wanted?
                                                                                     .set_title("Redirect");
