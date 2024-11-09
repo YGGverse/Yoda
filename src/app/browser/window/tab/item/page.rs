@@ -186,16 +186,13 @@ impl Page {
         // Reset widgets
         self.input.unset();
 
-        // Cancel previous async loading operations
-        {
-            let cancellable = self.cancellable.borrow();
-
-            if !cancellable.is_cancelled() {
-                cancellable.cancel();
-            }
+        // Cancel previous async operations
+        let cancellable = self.cancellable.take();
+        if !cancellable.is_cancelled() {
+            cancellable.cancel();
         }
 
-        // Create new cancellable pointer
+        // Create new cancellable
         self.cancellable.replace(Cancellable::new());
 
         // Create shared variant value
