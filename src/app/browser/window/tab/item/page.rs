@@ -24,15 +24,17 @@ use gtk::{
         RegexMatchFlags, Uri, UriFlags, UriHideFlags,
     },
     prelude::{
-        ActionExt, IOStreamExt, OutputStreamExt, SocketClientExt, StaticVariantType, ToVariant,
+        ActionExt, CancellableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
+        StaticVariantType, ToVariant,
     },
     Box,
 };
 use sqlite::Transaction;
-use std::{rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
 pub struct Page {
     id: GString,
+    cancellable: RefCell<Cancellable>,
     // Actions
     browser_action: Rc<BrowserAction>,
     action_page_load: SimpleAction,
@@ -91,6 +93,7 @@ impl Page {
 
         // Init `Self`
         let this = Rc::new(Self {
+            cancellable: RefCell::new(Cancellable::new()),
             id,
             // Actions
             browser_action,
@@ -182,6 +185,18 @@ impl Page {
 
         // Reset widgets
         self.input.unset();
+
+        // Cancel previous async loading operations
+        {
+            let cancellable = self.cancellable.borrow();
+
+            if !cancellable.is_cancelled() {
+                cancellable.cancel();
+            }
+        }
+
+        // Create new cancellable pointer
+        self.cancellable.replace(Cancellable::new());
 
         // Create shared variant value
         let id = self.id.to_variant();
@@ -429,6 +444,7 @@ impl Page {
         // use gemini::client::response::
 
         // Init shared objects (async)
+        let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
         let action_page_load = self.action_page_load.clone();
         let action_page_open = self.action_page_open.clone();
@@ -471,21 +487,21 @@ impl Page {
         client.clone().connect_to_uri_async(
             url.clone().as_str(),
             1965,
-            None::<&Cancellable>,
+            Some(&cancellable.clone()),
             move |connect| match connect {
                 Ok(connection) => {
                     // Send request
                     connection.output_stream().write_bytes_async(
                         &Bytes::from(gformat!("{url}\r\n").as_bytes()),
                         Priority::DEFAULT,
-                        None::<&Cancellable>,
+                        Some(&cancellable.clone()),
                         move |request| match request {
                             Ok(_) => {
                                 // Read meta from input stream
                                 gemini::client::response::Meta::from_socket_connection_async(
                                     connection.clone(),
                                     Some(Priority::DEFAULT),
-                                    None::<Cancellable>,
+                                    Some(cancellable.clone()),
                                     move |result| match result
                                     {
                                         Ok(response) => {
@@ -535,7 +551,7 @@ impl Page {
                                                             gemini::client::response::data::Text::from_socket_connection_async(
                                                                 connection,
                                                                 Some(Priority::DEFAULT),
-                                                                None::<Cancellable>,
+                                                                Some(cancellable.clone()),
                                                                 move |result|{
                                                                     match result {
                                                                         Ok(buffer) => {
@@ -602,7 +618,7 @@ impl Page {
                                                             // this action allows to count the bytes for loading widget and validate max size for incoming data
                                                             gemini::gio::memory_input_stream::from_socket_connection_async(
                                                                 connection,
-                                                                None::<Cancellable>,
+                                                                Some(cancellable.clone()),
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
                                                                 0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
@@ -616,7 +632,7 @@ impl Page {
                                                                     Ok(memory_input_stream) => {
                                                                         Pixbuf::from_stream_async(
                                                                             &memory_input_stream,
-                                                                            None::<&Cancellable>,
+                                                                            Some(&cancellable),
                                                                             move |result| {
                                                                                 match result {
                                                                                     Ok(buffer) => {
