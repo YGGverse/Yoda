@@ -174,12 +174,17 @@ impl App {
         });
 
         // Init accels
-        let accels_config = &[
+        for (detailed_action_name, accels) in &[
             // Browser actions
-            (
-                gformat!("win.{}", browser.action().debug().name()),
-                &["<Primary>i"],
-            ),
+            {
+                let (group, action, _, accels) = crate::action::APP_BROWSER_WIDGET_DEBUG;
+                (gformat!("{group}.{action}"), accels)
+            },
+            {
+                let (group, action, _, accels) = crate::action::APP_BROWSER_WIDGET_CLOSE;
+                (gformat!("{group}.{action}"), accels)
+            },
+            // @TODO
             (
                 gformat!("win.{}", browser.action().quit().name()),
                 &["<Primary>Escape"],
@@ -194,10 +199,6 @@ impl App {
                 &["<Primary>r"],
             ),
             (
-                gformat!("win.{}", action_page_close.name()),
-                &["<Primary>q"],
-            ),
-            (
                 gformat!("win.{}", action_page_history_back.name()),
                 &["<Primary>Left"],
             ),
@@ -208,9 +209,7 @@ impl App {
             (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
             (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
             (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
-        ]; // @TODO config
-
-        for (detailed_action_name, &accels) in accels_config {
+        ] {
             gobject.set_accels_for_action(detailed_action_name, &accels);
         }
 

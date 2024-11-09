@@ -1,5 +1,7 @@
+mod action;
 mod database;
 
+use action::Action;
 use database::Database;
 
 use adw::ApplicationWindow;
@@ -28,6 +30,8 @@ impl Widget {
             .default_width(DEFAULT_WIDTH)
             .maximized(MAXIMIZED)
             .build();
+
+        Action::new_for(&gobject);
 
         // Register actions
         for action in actions {

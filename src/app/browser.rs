@@ -15,7 +15,7 @@ use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
     glib::Variant,
-    prelude::{ActionExt, GtkWindowExt},
+    prelude::ActionExt,
     FileLauncher,
 };
 use sqlite::Transaction;
@@ -86,13 +86,6 @@ impl Browser {
             }
         });
 
-        action.debug().connect_activate({
-            let widget = widget.clone();
-            move |_, _| {
-                widget.gobject().emit_enable_debugging(true);
-            }
-        });
-
         action.profile().connect_activate({
             move |_, _| {
                 FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
@@ -104,13 +97,6 @@ impl Browser {
                         }
                     },
                 );
-            }
-        });
-
-        action.quit().connect_activate({
-            let widget = widget.clone();
-            move |_, _| {
-                widget.gobject().close();
             }
         });
 

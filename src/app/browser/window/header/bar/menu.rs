@@ -60,13 +60,22 @@ impl Menu {
 
             // Main > Tool
             let main_tool = gio::Menu::new();
-                main_tool.append(Some("Debug"), Some(&detailed_action_name(browser_action.debug())));
+
+                {   // Debug
+                    let (group, action, _, _) = crate::action::APP_BROWSER_WIDGET_DEBUG;
+                    main_tool.append(Some("Debug"), Some(&gformat!("{group}.{action}")));
+                }
+
                 main_tool.append(Some("Profile"), Some(&detailed_action_name(browser_action.profile())));
                 main_tool.append(Some("About"), Some(&detailed_action_name(browser_action.about())));
 
             main.append_submenu(Some("Tool"), &main_tool);
 
-            main.append(Some("Quit"), Some(&detailed_action_name(browser_action.quit())));
+            {
+                // Quit
+                let (group, action, _, _) = crate::action::APP_BROWSER_WIDGET_CLOSE;
+                main.append(Some("Quit"), Some(&gformat!("{group}.{action}")));
+            }
 
         // Result
         Rc::new(Self { widget:Widget::new_rc(&main) })
