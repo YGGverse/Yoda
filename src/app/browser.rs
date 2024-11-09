@@ -100,8 +100,7 @@ impl Browser {
                     None::<&Cancellable>,
                     |result| {
                         if let Err(error) = result {
-                            // @TODO
-                            println!("Could not delegate launch action: {error}")
+                            println!("{error}")
                         }
                     },
                 );
