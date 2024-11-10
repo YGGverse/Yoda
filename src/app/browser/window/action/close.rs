@@ -53,26 +53,22 @@ impl Close {
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     pub fn connect_activate(&self, callback: impl Fn(Option<i32>) + 'static) {
-        let state = self.state();
-        self.gobject.connect_activate(move |_, _| callback(state));
+        self.gobject.connect_activate(move |this, _| {
+            let state = this
+                .state()
+                .expect("State value required")
+                .get::<i32>()
+                .expect("Parameter type does not match `i32`");
+
+            callback(if state == DEFAULT_STATE {
+                None
+            } else {
+                Some(state)
+            })
+        });
     }
 
     // Getters
-
-    pub fn state(&self) -> Option<i32> {
-        let state = self
-            .gobject
-            .state()
-            .expect("State value required")
-            .get::<i32>()
-            .expect("Parameter type does not match `i32`");
-
-        if state != DEFAULT_STATE {
-            Some(state)
-        } else {
-            None
-        }
-    }
 
     /// Get reference to [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) GObject
     pub fn gobject(&self) -> &SimpleAction {
