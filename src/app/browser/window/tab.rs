@@ -110,7 +110,7 @@ impl Tab {
                     }
                 }
             }
-        });
+        }); // @TODO fix new item on middle click
 
         // Return activated struct
         Rc::new(Self {
