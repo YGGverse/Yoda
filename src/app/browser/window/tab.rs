@@ -83,13 +83,10 @@ impl Tab {
         widget.gobject().connect_setup_menu({
             let window_action = window_action.clone();
             move |tab_view, tab_page| {
-                // Set state
-                let state = match tab_page {
-                    // Context menu opened
-                    Some(this) => Some(tab_view.page_position(this)),
-                    // Context menu closed (reset state to defaults)
-                    None => None,
-                };
+                // Set new state for page selected on menu open
+                // * this action return default state (`None`) on menu close
+                let state = tab_page.map(|this| tab_view.page_position(this));
+
                 // Update actions with new state value
                 window_action.close_all().change_state(state);
                 window_action.close().change_state(state);
