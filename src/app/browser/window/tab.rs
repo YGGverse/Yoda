@@ -35,7 +35,7 @@ impl Tab {
         let action = Rc::new(Action::new());
 
         // Init empty HashMap index as no tabs appended yet
-        let index = Rc::new(RefCell::new(HashMap::new()));
+        let index: Rc<RefCell<HashMap<GString, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
         let menu = Menu::new(window_action.clone());
@@ -44,41 +44,6 @@ impl Tab {
         let widget = Rc::new(Widget::new(menu.gobject()));
 
         // Init events
-
-        action.open().connect_activate({
-            let index = index.clone();
-            let gobject = widget.gobject().clone();
-            // Actions
-            let browser_action = browser_action.clone();
-            let window_action = window_action.clone();
-            let action = action.clone();
-
-            move |request| {
-                // Init new tab item
-                let item = Item::new_rc(
-                    &gobject,
-                    // Actions
-                    browser_action.clone(),
-                    window_action.clone(),
-                    action.clone(),
-                    // Options
-                    gobject
-                        .selected_page()
-                        .map(|page| gobject.page_position(&page) + 1),
-                    false,
-                    false,
-                );
-
-                // Register dynamically created tab components in the HashMap index
-                index.borrow_mut().insert(item.id(), item.clone());
-
-                // Apply request
-                if let Some(value) = request {
-                    item.set_page_navigation_request_text(value.as_str());
-                    item.page_reload();
-                }
-            }
-        });
 
         widget.gobject().connect_setup_menu({
             let window_action = window_action.clone();
@@ -124,6 +89,23 @@ impl Tab {
                     if let Some(id) = page.keyword() {
                         if let Some(item) = index.borrow().get(&id) {
                             item.update();
+                        }
+                    }
+                }
+            }
+        });
+
+        action.open().connect_activate({
+            let index = index.clone();
+            let widget = widget.clone();
+            move |request| {
+                if let Some(value) = request {
+                    if let Some(page) = widget.page(None) {
+                        if let Some(id) = page.keyword() {
+                            if let Some(item) = index.borrow().get(&id) {
+                                item.set_page_navigation_request_text(value.as_str());
+                                item.page_reload();
+                            }
                         }
                     }
                 }
