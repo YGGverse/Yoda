@@ -13,22 +13,15 @@ use widget::Widget;
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use adw::TabView;
-use gtk::{
-    gio::SimpleAction,
-    glib::{GString, Propagation},
-    prelude::{ActionExt, ToVariant},
-};
+use gtk::glib::{GString, Propagation};
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
-    // Global actions
+    // Actions
     browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
-    // Page actions
-    action_page_history_back: SimpleAction,
-    action_page_history_forward: SimpleAction,
     // Dynamically allocated reference index
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
     action: Rc<Action>,
@@ -37,14 +30,7 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new_rc(
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
-        action_page_close: SimpleAction,
-        action_page_close_all: SimpleAction,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
-    ) -> Rc<Self> {
+    pub fn new_rc(browser_action: Rc<BrowserAction>, window_action: Rc<WindowAction>) -> Rc<Self> {
         // Init local actions
         let action = Rc::new(Action::new());
 
@@ -52,13 +38,7 @@ impl Tab {
         let index = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
-        let menu = Menu::new(
-            window_action.clone(),
-            action_page_close_all.clone(),
-            action_page_close.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
-        );
+        let menu = Menu::new(window_action.clone());
 
         // Init widget
         let widget = Rc::new(Widget::new(menu.gobject()));
@@ -73,20 +53,14 @@ impl Tab {
             let window_action = window_action.clone();
             let action = action.clone();
 
-            let action_page_history_back = action_page_history_back.clone();
-            let action_page_history_forward = action_page_history_forward.clone();
-
             move |request| {
                 // Init new tab item
                 let item = Item::new_rc(
                     &gobject,
-                    // Global actions
+                    // Actions
                     browser_action.clone(),
                     window_action.clone(),
                     action.clone(),
-                    // Page actions
-                    action_page_history_back.clone(),
-                    action_page_history_forward.clone(),
                     // Options
                     gobject
                         .selected_page()
@@ -107,36 +81,23 @@ impl Tab {
         });
 
         widget.gobject().connect_setup_menu({
-            // Clone actions to update
-            let action_page_close = action_page_close.clone();
-            let action_page_history_back = action_page_history_back.clone();
-            let action_page_history_forward = action_page_history_forward.clone();
             let window_action = window_action.clone();
             move |tab_view, tab_page| {
-                // Update actions
-                let state_v2 = match tab_page {
+                // Set state
+                let state = match tab_page {
                     // Context menu opened
                     Some(this) => Some(tab_view.page_position(this)),
                     // Context menu closed (reset state to defaults)
                     None => None,
-                }; // @TODO
-
-                window_action.pin().change_state(state_v2);
-                window_action.reload().change_state(state_v2);
-                window_action.home().change_state(state_v2);
-
-                // @TODO old version requires update
-                // Setup state for selected page
-                let state = match tab_page {
-                    // Context menu opened
-                    Some(this) => tab_view.page_position(this).to_variant(),
-                    // Context menu closed (reset state to defaults)
-                    None => (-1).to_variant(),
                 };
-
-                action_page_close.change_state(&state);
-                action_page_history_back.change_state(&state);
-                action_page_history_forward.change_state(&state);
+                // Update actions with new state value
+                window_action.close_all().change_state(state);
+                window_action.close().change_state(state);
+                window_action.history_back().change_state(state);
+                window_action.history_forward().change_state(state);
+                window_action.home().change_state(state);
+                window_action.pin().change_state(state);
+                window_action.reload().change_state(state);
             }
         });
 
@@ -176,10 +137,6 @@ impl Tab {
         Rc::new(Self {
             browser_action,
             window_action,
-            // Global actions
-            action_page_history_back,
-            action_page_history_forward,
-            // Init empty HashMap index as no tabs appended yet
             index,
             action,
             widget,
@@ -193,11 +150,8 @@ impl Tab {
             self.gobject(),
             self.browser_action.clone(),
             self.window_action.clone(),
-            // Local actions
+            // Actions
             self.action.clone(),
-            // Global actions
-            self.action_page_history_back.clone(),
-            self.action_page_history_forward.clone(),
             // Options
             position,
             false,
@@ -338,8 +292,6 @@ impl Tab {
                         self.browser_action.clone(),
                         self.window_action.clone(),
                         self.action.clone(),
-                        self.action_page_history_back.clone(),
-                        self.action_page_history_forward.clone(),
                     ) {
                         Ok(items) => {
                             for item in items {

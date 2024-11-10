@@ -5,8 +5,7 @@ use widget::Widget;
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
-    gio::{self, SimpleAction},
-    prelude::ActionExt,
+    gio::{self},
     MenuButton,
 };
 use std::rc::Rc;
@@ -19,10 +18,6 @@ impl Menu {
     pub fn new_rc(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-        action_page_close: SimpleAction,
-        action_page_close_all: SimpleAction,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
     ) -> Rc<Self> {
         // Main
         let main = gio::Menu::new();
@@ -58,8 +53,18 @@ impl Menu {
 
                     // Main > Page > Navigation > History
                     let main_page_navigation_history = gio::Menu::new();
-                        main_page_navigation_history.append(Some("Back"), Some(&detailed_action_name(&action_page_history_back)));
-                        main_page_navigation_history.append(Some("Forward"), Some(&detailed_action_name(&action_page_history_forward)));
+
+                        main_page_navigation_history.append(Some("Back"), Some(&format!(
+                            "{}.{}",
+                            window_action.id(),
+                            window_action.history_back().id()
+                        )));
+
+                        main_page_navigation_history.append(Some("Forward"), Some(&format!(
+                            "{}.{}",
+                            window_action.id(),
+                            window_action.history_forward().id()
+                        )));
 
                     main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
 
@@ -67,8 +72,18 @@ impl Menu {
 
                 // Main > Page > Close
                 let main_page_close = gio::Menu::new();
-                    main_page_close.append(Some("Current"), Some(&detailed_action_name(&action_page_close)));
-                    main_page_close.append(Some("All"), Some(&detailed_action_name(&action_page_close_all)));
+
+                    main_page_close.append(Some("Current"), Some(&format!(
+                        "{}.{}",
+                        window_action.id(),
+                        window_action.close().id()
+                    )));
+
+                    main_page_close.append(Some("All"), Some(&format!(
+                        "{}.{}",
+                        window_action.id(),
+                        window_action.close_all().id()
+                    )));
 
                     main_page.append_submenu(Some("Close"), &main_page_close);
 
@@ -112,11 +127,4 @@ impl Menu {
     pub fn gobject(&self) -> &MenuButton {
         self.widget.gobject()
     }
-}
-
-// Private helpers
-fn detailed_action_name(action: &SimpleAction) -> String {
-    format!("win.{}", action.name()) // @TODO find the way to ident parent group
-                                     // without application-wide dependencies import
-                                     // see also src/app/action.rs
 }

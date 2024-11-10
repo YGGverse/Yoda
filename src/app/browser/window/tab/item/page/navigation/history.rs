@@ -6,7 +6,8 @@ use back::Back;
 use forward::Forward;
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, glib::GString, Box};
+use crate::app::browser::window::action::Action as WindowAction;
+use gtk::{glib::GString, Box};
 use std::{cell::RefCell, rc::Rc};
 
 struct Memory {
@@ -27,13 +28,10 @@ pub struct History {
 
 impl History {
     // Construct
-    pub fn new_rc(
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
-    ) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         // init components
-        let back = Back::new_rc(action_page_history_back);
-        let forward = Forward::new_rc(action_page_history_forward);
+        let back = Back::new_rc(window_action.clone());
+        let forward = Forward::new_rc(window_action);
 
         // Init widget
         let widget = Widget::new_rc(back.gobject(), forward.gobject());

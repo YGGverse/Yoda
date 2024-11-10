@@ -33,13 +33,11 @@ impl Navigation {
     pub fn new_rc(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
         action_page_open: SimpleAction,
     ) -> Rc<Self> {
         // Init components
         let home = Home::new_rc(window_action.clone());
-        let history = History::new_rc(action_page_history_back, action_page_history_forward);
+        let history = History::new_rc(window_action.clone());
         let reload = Reload::new_rc(window_action);
         let request = Request::new_rc(browser_action, action_page_open.clone());
         let bookmark = Bookmark::new_rc();

@@ -3,8 +3,9 @@ use database::Database;
 
 use adw::ApplicationWindow;
 use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionMapExt, GtkWindowExt, IsA},
+    gio::SimpleActionGroup,
+    glib::GString,
+    prelude::{GtkWindowExt, IsA, WidgetExt},
 };
 use sqlite::Transaction;
 
@@ -19,7 +20,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(content: &impl IsA<gtk::Widget>, actions: &[SimpleAction]) -> Self {
+    pub fn new(
+        content: &impl IsA<gtk::Widget>,
+        action_groups: &[(&GString, &SimpleActionGroup)],
+    ) -> Self {
         // Init GTK
         let gobject = ApplicationWindow::builder()
             .content(content)
@@ -29,8 +33,8 @@ impl Widget {
             .build();
 
         // Register actions
-        for action in actions {
-            gobject.add_action(action);
+        for (name, group) in action_groups {
+            gobject.insert_action_group(name, Some(group.clone()));
         }
 
         // Return new struct

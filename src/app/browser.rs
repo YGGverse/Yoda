@@ -13,8 +13,8 @@ use window::Window;
 use crate::profile::Profile;
 use adw::ApplicationWindow;
 use gtk::{
-    gio::{Cancellable, File, SimpleAction},
-    prelude::{ActionExt, GtkWindowExt, WidgetExt},
+    gio::{Cancellable, File},
+    prelude::GtkWindowExt,
     FileLauncher,
 };
 use sqlite::Transaction;
@@ -28,47 +28,21 @@ pub struct Browser {
 
 impl Browser {
     // Construct
-    pub fn new(
-        profile: Rc<Profile>,
-        action_page_close: SimpleAction,
-        action_page_close_all: SimpleAction,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
-    ) -> Browser {
+    pub fn new(profile: Rc<Profile>) -> Browser {
         // Init components
         let action = Rc::new(Action::new());
-        let window = Rc::new(Window::new(
-            action.clone(),
-            action_page_close.clone(),
-            action_page_close_all.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
-        ));
+        let window = Rc::new(Window::new(action.clone()));
 
         // Init widget
         let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
-                action_page_close.clone(),
-                action_page_close_all.clone(),
-                action_page_history_back.clone(),
-                action_page_history_forward.clone(),
+                // Connect action groups
+                (action.id(), action.gobject()),
+                (window.action().id(), window.action().gobject()),
+                (window.tab().action().id(), window.tab().action().gobject()),
             ],
         ));
-
-        // Connect actions (window required for accels)
-        widget
-            .gobject()
-            .insert_action_group(action.id(), Some(action.gobject()));
-
-        widget
-            .gobject()
-            .insert_action_group(window.action().id(), Some(window.action().gobject()));
-
-        widget.gobject().insert_action_group(
-            window.tab().action().id(),
-            Some(window.tab().action().gobject()),
-        );
 
         // Connect events
         action.about().connect_activate({
@@ -107,35 +81,6 @@ impl Browser {
         action.update().connect_activate({
             let window = window.clone();
             move |tab_item_id| window.update(tab_item_id)
-        });
-
-        // @TODO
-        action_page_close.connect_activate({
-            let window = window.clone();
-            move |this, _| {
-                window.tab_close(page_position_from_action_state(this));
-            }
-        });
-
-        action_page_close_all.connect_activate({
-            let window = window.clone();
-            move |_, _| {
-                window.tab_close_all();
-            }
-        });
-
-        action_page_history_back.connect_activate({
-            let window = window.clone();
-            move |this, _| {
-                window.tab_page_history_back(page_position_from_action_state(this));
-            }
-        });
-
-        action_page_history_forward.connect_activate({
-            let window = window.clone();
-            move |this, _| {
-                window.tab_page_history_forward(page_position_from_action_state(this));
-            }
         });
 
         // Return new activated `Self`
@@ -245,22 +190,4 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Success
     Ok(())
-}
-
-// Private helpers @TODO move outside
-
-/// Extract `Optional` page position from C-based
-/// [SimpleAction state](https://docs.gtk.org/gio/property.SimpleAction.state.html)
-fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
-    let page_position = action
-        .state()
-        .expect("Page position required for this action")
-        .get::<i32>()
-        .expect("Parameter type does not match `i32`");
-
-    if page_position > -1 {
-        Some(page_position)
-    } else {
-        None
-    }
 }

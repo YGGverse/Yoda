@@ -60,8 +60,6 @@ impl Page {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
         let action_page_load = SimpleAction::new(&uuid_string_random(), None);
@@ -74,8 +72,6 @@ impl Page {
         let navigation = Navigation::new_rc(
             browser_action.clone(),
             window_action.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
             action_page_open.clone(),
         );
 

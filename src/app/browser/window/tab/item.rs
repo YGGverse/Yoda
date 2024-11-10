@@ -10,10 +10,7 @@ use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use crate::app::browser::window::tab::action::Action as TabAction;
 use adw::{TabPage, TabView};
-use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, GString},
-};
+use gtk::glib::{uuid_string_random, GString};
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -30,13 +27,10 @@ impl Item {
     // Construct
     pub fn new_rc(
         tab_view: &TabView,
-        // Global actions
+        // Actions
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        // @TODO
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
         // Options
         position: Option<i32>,
         is_pinned: bool,
@@ -52,8 +46,6 @@ impl Item {
             browser_action,
             window_action,
             tab_action,
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
         );
 
         let widget = Widget::new_rc(
@@ -133,8 +125,6 @@ impl Item {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -148,8 +138,6 @@ impl Item {
                         browser_action.clone(),
                         window_action.clone(),
                         tab_action.clone(),
-                        action_page_history_back.clone(),
-                        action_page_history_forward.clone(),
                         // Options
                         None,
                         record.is_pinned,

@@ -7,11 +7,8 @@ use database::Database;
 use crate::profile::Profile;
 use adw::Application;
 use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, ExitCode},
-    prelude::{
-        ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt, ToVariant,
-    },
+    glib::ExitCode,
+    prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -29,30 +26,13 @@ impl App {
         // Init profile
         let profile = Rc::new(Profile::new());
 
-        // @TODO
-        let default_state = (-1).to_variant();
-
-        let action_page_close =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
-        let action_page_close_all = SimpleAction::new(&uuid_string_random(), None);
-        let action_page_history_back =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
-        let action_page_history_forward =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
-
         // Init GTK
         let gobject = Application::builder()
             .application_id(APPLICATION_ID)
             .build();
 
         // Init components
-        let browser = Rc::new(Browser::new(
-            profile.clone(),
-            action_page_close.clone(),
-            action_page_close_all.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
-        ));
+        let browser = Rc::new(Browser::new(profile.clone()));
 
         // Init events
         gobject.connect_activate({
@@ -219,16 +199,30 @@ impl App {
                 ),
                 &["<Primary>h"],
             ),
-            // @TODO
             (
-                format!("win.{}", action_page_history_back.name()),
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().history_back().id()
+                ),
                 &["<Primary>Left"],
             ),
             (
-                format!("win.{}", action_page_history_forward.name()),
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().history_forward().id()
+                ),
                 &["<Primary>Right"],
             ),
-            // @TODO page close missed
+            (
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().close().id()
+                ),
+                &["<Primary>q"],
+            ),
         ] {
             gobject.set_accels_for_action(detailed_action_name, &accels);
         }

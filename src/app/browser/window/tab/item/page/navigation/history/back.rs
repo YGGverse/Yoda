@@ -2,28 +2,32 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, Button};
+use crate::app::browser::window::action::Action as WindowAction;
+use gtk::Button;
 use std::rc::Rc;
 
 pub struct Back {
-    action_page_history_back: SimpleAction,
+    window_action: Rc<WindowAction>,
     widget: Rc<Widget>,
 }
 
 impl Back {
     // Construct
-    pub fn new_rc(action_page_history_back: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         // Return activated struct
         Rc::new(Self {
-            action_page_history_back: action_page_history_back.clone(),
-            widget: Widget::new_rc(action_page_history_back),
+            window_action: window_action.clone(),
+            widget: Widget::new_rc(window_action),
         })
     }
 
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action_page_history_back.set_enabled(status);
+        self.window_action
+            .history_back()
+            .gobject()
+            .set_enabled(status);
 
         // Update child components
         self.widget.update(status);

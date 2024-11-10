@@ -12,7 +12,7 @@ use tab::Tab;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
-use gtk::{gio::SimpleAction, glib::GString, Box};
+use gtk::{glib::GString, Box};
 use std::rc::Rc;
 
 pub struct Window {
@@ -27,35 +27,13 @@ impl Window {
     pub fn new(
         // Actions
         browser_action: Rc<BrowserAction>,
-        action_page_close: SimpleAction,
-        action_page_close_all: SimpleAction,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
     ) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Tab::new_rc(
-            browser_action.clone(),
-            action.clone(),
-            action_page_close.clone(),
-            action_page_close_all.clone(),
-            action_page_history_back.clone(),
-            action_page_history_forward.clone(),
-        );
-
-        let header = Header::new_rc(
-            // Actions
-            browser_action,
-            action.clone(),
-            action_page_close,
-            action_page_close_all,
-            action_page_history_back,
-            action_page_history_forward,
-            // Widgets
-            tab.gobject(),
-        );
+        let tab = Tab::new_rc(browser_action.clone(), action.clone());
+        let header = Header::new_rc(browser_action, action.clone(), tab.gobject());
 
         // GTK
         let widget = Rc::new(Widget::new(header.gobject(), tab.gobject()));
@@ -83,6 +61,34 @@ impl Window {
             move |position| tab.page_home(position)
         });
 
+        action.close().connect_activate({
+            let tab = tab.clone();
+            move |position| {
+                tab.close(position);
+            }
+        });
+
+        action.close_all().connect_activate({
+            let tab = tab.clone();
+            move |_| {
+                tab.close_all();
+            } // @TODO position not in use
+        });
+
+        action.history_back().connect_activate({
+            let tab = tab.clone();
+            move |position| {
+                tab.page_history_back(position);
+            } // @TODO rename destination method
+        });
+
+        action.history_forward().connect_activate({
+            let tab = tab.clone();
+            move |position| {
+                tab.page_history_forward(position);
+            } // @TODO rename destination method
+        });
+
         // Init struct
         Self {
             //header,
@@ -93,23 +99,6 @@ impl Window {
     }
 
     // Actions
-    pub fn tab_page_history_back(&self, page_position: Option<i32>) {
-        self.tab.page_history_back(page_position);
-    }
-
-    pub fn tab_page_history_forward(&self, page_position: Option<i32>) {
-        self.tab.page_history_forward(page_position);
-    }
-
-    /// Close page at given position or selected page on `None` given
-    pub fn tab_close(&self, page_position: Option<i32>) {
-        self.tab.close(page_position);
-    }
-
-    pub fn tab_close_all(&self) {
-        self.tab.close_all();
-    }
-
     pub fn update(&self, tab_item_id: Option<GString>) {
         self.tab.update(tab_item_id);
     }

@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::{gio::SimpleAction, prelude::ActionExt};
+use std::rc::Rc;
 
 /// Context menu wrapper
 ///
@@ -14,13 +12,7 @@ impl Menu {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(
-        window_action: Rc<WindowAction>,
-        action_page_close_all: SimpleAction,
-        action_page_close: SimpleAction,
-        action_page_history_back: SimpleAction,
-        action_page_history_forward: SimpleAction,
-    ) -> Self {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
         let main = gtk::gio::Menu::new();
 
         main.append(
@@ -58,12 +50,20 @@ impl Menu {
 
         history.append(
             Some("Back"),
-            Some(&detailed_action_name(action_page_history_back)),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.history_back().id()
+            )),
         );
 
         history.append(
             Some("Forward"),
-            Some(&detailed_action_name(action_page_history_forward)),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.history_forward().id()
+            )),
         );
 
         main.append_submenu(Some("History"), &history);
@@ -72,12 +72,20 @@ impl Menu {
 
         close.append(
             Some("Current"),
-            Some(&detailed_action_name(action_page_close)),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.close().id()
+            )),
         );
 
         close.append(
             Some("All"),
-            Some(&detailed_action_name(action_page_close_all)),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.close_all().id()
+            )),
         );
 
         main.append_submenu(Some("Close"), &close);
@@ -89,12 +97,4 @@ impl Menu {
     pub fn gobject(&self) -> &gtk::gio::Menu {
         &self.gobject
     }
-}
-
-// Private helpers
-
-fn detailed_action_name(action: SimpleAction) -> String {
-    format!("win.{}", action.name()) // @TODO find the way to ident parent group
-                                     // without application-wide dependencies import
-                                     // see also src/app/action.rs
 }
