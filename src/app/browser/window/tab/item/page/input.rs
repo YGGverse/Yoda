@@ -2,12 +2,13 @@ mod response;
 mod sensitive;
 mod widget;
 
-use gtk::{gio::SimpleAction, glib::Uri};
 use response::Response;
 use sensitive::Sensitive;
 use widget::Widget;
 
+use crate::app::browser::window::tab::action::Action as TabAction;
 use adw::Clamp;
+use gtk::glib::Uri;
 use std::rc::Rc;
 
 pub struct Input {
@@ -32,25 +33,25 @@ impl Input {
     // Setters
     pub fn set_new_response(
         &self,
-        action_page_open: SimpleAction,
+        tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            Response::new_rc(action_page_open, base, title, size_limit).gobject(),
+            Response::new_rc(tab_action, base, title, size_limit).gobject(),
         ));
     }
 
     pub fn set_new_sensitive(
         &self,
-        action_page_open: SimpleAction,
+        tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            Sensitive::new_rc(action_page_open, base, title, max_length).gobject(),
+            Sensitive::new_rc(tab_action, base, title, max_length).gobject(),
         ));
     }
 

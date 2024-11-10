@@ -4,6 +4,7 @@ mod widget;
 use tag::Tag;
 use widget::Widget;
 
+use crate::app::browser::window::tab::action::Action as TabAction;
 use adw::StyleManager;
 use gemtext::line::{
     code::Code,
@@ -20,7 +21,6 @@ use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
     UriLauncher, Window, WrapMode,
 };
-
 use std::{collections::HashMap, rc::Rc};
 
 pub struct Reader {
@@ -33,7 +33,7 @@ impl Reader {
     pub fn new_rc(
         gemtext: &str,
         base: &Uri,
-        action_tab_open: SimpleAction,
+        tab_action: Rc<TabAction>,
         action_page_open: SimpleAction,
     ) -> Rc<Self> {
         // Init default values
@@ -289,7 +289,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    action_tab_open.activate(Some(&uri.to_string().to_variant()));
+                                    tab_action.open().activate(Some(&uri.to_string()));
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(

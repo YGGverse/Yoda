@@ -13,6 +13,7 @@ use navigation::Navigation;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::tab::action::Action as TabAction;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{
@@ -24,8 +25,7 @@ use gtk::{
         RegexMatchFlags, Uri, UriFlags, UriHideFlags,
     },
     prelude::{
-        ActionExt, CancellableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
-        StaticVariantType, ToVariant,
+        ActionExt, CancellableExt, IOStreamExt, OutputStreamExt, SocketClientExt, StaticVariantType,
     },
     Box,
 };
@@ -37,8 +37,8 @@ pub struct Page {
     cancellable: RefCell<Cancellable>,
     // Actions
     browser_action: Rc<BrowserAction>,
+    tab_action: Rc<TabAction>,
     action_page_load: SimpleAction,
-    action_page_open: SimpleAction,
     // Components
     navigation: Rc<Navigation>,
     content: Rc<Content>,
@@ -56,7 +56,7 @@ impl Page {
     pub fn new_rc(
         id: GString,
         browser_action: Rc<BrowserAction>,
-        action_tab_open: SimpleAction,
+        tab_action: Rc<TabAction>,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
@@ -68,7 +68,7 @@ impl Page {
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init components
-        let content = Content::new_rc(action_tab_open.clone(), action_page_open.clone());
+        let content = Content::new_rc(tab_action.clone(), action_page_open.clone());
 
         let navigation = Navigation::new_rc(
             browser_action.clone(),
@@ -97,8 +97,8 @@ impl Page {
             id,
             // Actions
             browser_action,
+            tab_action,
             action_page_load: action_page_load.clone(),
-            action_page_open: action_page_open.clone(),
             // Components
             content,
             navigation,
@@ -142,7 +142,7 @@ impl Page {
     pub fn home(&self) {
         if let Some(url) = self.navigation.home_url() {
             // Update with history record
-            self.action_page_open.activate(Some(&url.to_variant()));
+            self.tab_action.open().activate(Some(&url));
         }
     }
 
@@ -444,7 +444,7 @@ impl Page {
         let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
         let action_page_load = self.action_page_load.clone();
-        let action_page_open = self.action_page_open.clone();
+        let tab_action = self.tab_action.clone();
         let content = self.content.clone();
         let id = self.id.clone();
         let input = self.input.clone();
@@ -519,14 +519,14 @@ impl Page {
                                                     match response.status() {
                                                         gemini::client::response::meta::Status::SensitiveInput =>
                                                             input.set_new_sensitive(
-                                                                action_page_open,
+                                                                tab_action,
                                                                 uri,
                                                                 Some(description),
                                                                 Some(1024),
                                                             ),
                                                         _ =>
                                                             input.set_new_response(
-                                                                action_page_open,
+                                                                tab_action,
                                                                 uri,
                                                                 Some(description),
                                                                 Some(1024),

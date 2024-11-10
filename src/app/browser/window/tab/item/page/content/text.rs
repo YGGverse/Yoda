@@ -2,11 +2,13 @@ mod gemini;
 
 use gemini::Gemini;
 
+use crate::app::browser::window::tab::action::Action as TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{GString, Uri},
     ScrolledWindow,
 };
+use std::rc::Rc;
 
 pub struct Meta {
     title: Option<GString>,
@@ -22,11 +24,11 @@ impl Text {
     pub fn gemini(
         gemtext: &str,
         base: &Uri,
-        action_page_new: SimpleAction,
+        tab_action: Rc<TabAction>,
         action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, action_page_new, action_page_open);
+        let gemini = Gemini::new(gemtext, base, tab_action, action_page_open);
 
         // Init meta
         let meta = Meta {

@@ -1,8 +1,10 @@
+mod action;
 mod database;
 mod item;
 mod menu;
 mod widget;
 
+use action::Action;
 use database::Database;
 use item::Item;
 use menu::Menu;
@@ -12,8 +14,8 @@ use crate::app::browser::action::Action as BrowserAction;
 use adw::TabView;
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, GString, Propagation},
-    prelude::{ActionExt, StaticVariantType, ToVariant},
+    glib::{GString, Propagation},
+    prelude::{ActionExt, ToVariant},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
@@ -22,8 +24,6 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 pub struct Tab {
     // Global actions
     browser_action: Rc<BrowserAction>,
-    // Local actions
-    action_tab_open: SimpleAction,
     // Page actions
     action_page_home: SimpleAction,
     action_page_history_back: SimpleAction,
@@ -31,7 +31,7 @@ pub struct Tab {
     action_page_reload: SimpleAction,
     // Dynamically allocated reference index
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
-    // GTK
+    action: Rc<Action>,
     widget: Rc<Widget>,
 }
 
@@ -48,8 +48,7 @@ impl Tab {
         action_page_reload: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
-        let action_tab_open =
-            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
+        let action = Rc::new(Action::new());
 
         // Init empty HashMap index as no tabs appended yet
         let index = Rc::new(RefCell::new(HashMap::new()));
@@ -70,26 +69,25 @@ impl Tab {
 
         // Init events
 
-        action_tab_open.connect_activate({
+        action.open().connect_activate({
             let index = index.clone();
             let gobject = widget.gobject().clone();
             // Actions
             let browser_action = browser_action.clone();
+            let action = action.clone();
 
-            let action_tab_open = action_tab_open.clone();
             let action_page_home = action_page_home.clone();
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
             let action_page_reload = action_page_reload.clone();
 
-            move |_, request| {
+            move |request| {
                 // Init new tab item
                 let item = Item::new_rc(
                     &gobject,
                     // Global actions
                     browser_action.clone(),
-                    // Local actions
-                    action_tab_open.clone(),
+                    action.clone(),
                     // Page actions
                     action_page_home.clone(),
                     action_page_history_back.clone(),
@@ -107,11 +105,9 @@ impl Tab {
                 index.borrow_mut().insert(item.id(), item.clone());
 
                 // Apply request
-                if let Some(variant) = request {
-                    if let Some(value) = variant.get::<String>() {
-                        item.set_page_navigation_request_text(value.as_str());
-                        item.page_reload();
-                    }
+                if let Some(value) = request {
+                    item.set_page_navigation_request_text(value.as_str());
+                    item.page_reload();
                 }
             }
         });
@@ -178,8 +174,6 @@ impl Tab {
         // Return activated struct
         Rc::new(Self {
             browser_action,
-            // Local actions
-            action_tab_open,
             // Global actions
             action_page_home,
             action_page_history_back,
@@ -187,7 +181,7 @@ impl Tab {
             action_page_reload,
             // Init empty HashMap index as no tabs appended yet
             index,
-            // GTK
+            action,
             widget,
         })
     }
@@ -199,7 +193,7 @@ impl Tab {
             self.gobject(),
             self.browser_action.clone(),
             // Local actions
-            self.action_tab_open.clone(),
+            self.action.clone(),
             // Global actions
             self.action_page_home.clone(),
             self.action_page_history_back.clone(),
@@ -343,7 +337,7 @@ impl Tab {
                         transaction,
                         &record.id,
                         self.browser_action.clone(),
-                        self.action_tab_open.clone(),
+                        self.action.clone(),
                         self.action_page_home.clone(),
                         self.action_page_history_back.clone(),
                         self.action_page_history_forward.clone(),

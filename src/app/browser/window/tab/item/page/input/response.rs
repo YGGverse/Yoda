@@ -8,10 +8,11 @@ use form::Form;
 use title::Title;
 use widget::Widget;
 
+use crate::app::browser::window::tab::action::Action as TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::{ActionExt, ToVariant, WidgetExt},
+    prelude::WidgetExt,
     Box,
 };
 use std::rc::Rc;
@@ -24,7 +25,7 @@ pub struct Response {
 impl Response {
     // Construct
     pub fn new_rc(
-        action_page_open: SimpleAction,
+        tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
@@ -58,14 +59,11 @@ impl Response {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                action_page_open.activate(Some(
-                    &format!(
-                        "{}?{}",
-                        base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(form.text().as_str(), None, false),
-                    )
-                    .to_variant(),
-                ));
+                tab_action.open().activate(Some(&format!(
+                    "{}?{}",
+                    base.to_string_partial(UriHideFlags::QUERY),
+                    Uri::escape_string(form.text().as_str(), None, false),
+                )));
             }
         });
 
