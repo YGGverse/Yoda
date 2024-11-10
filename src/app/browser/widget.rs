@@ -22,7 +22,7 @@ impl Widget {
     // Construct
     pub fn new(
         content: &impl IsA<gtk::Widget>,
-        action_groups: &[(&GString, &SimpleActionGroup)],
+        action_groups: &[(&GString, SimpleActionGroup)],
     ) -> Self {
         // Init GTK
         let gobject = ApplicationWindow::builder()
@@ -34,7 +34,7 @@ impl Widget {
 
         // Register actions
         for (name, group) in action_groups {
-            gobject.insert_action_group(name, Some(group.clone()));
+            gobject.insert_action_group(name, Some(group));
         }
 
         // Return new struct

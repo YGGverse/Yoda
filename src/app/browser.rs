@@ -37,10 +37,22 @@ impl Browser {
         let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
-                // Connect action groups
-                (action.id(), action.gobject()),
-                (window.action().id(), window.action().gobject()),
-                (window.tab().action().id(), window.tab().action().gobject()),
+                // Connect action groups (to apply accels)
+                (
+                    // Browser
+                    action.id(),
+                    action.gobject().clone(),
+                ),
+                (
+                    // Window
+                    window.action().id(),
+                    window.action().gobject().clone(),
+                ),
+                (
+                    // Tab
+                    window.tab().action().id(),
+                    window.tab().action().gobject().clone(),
+                ),
             ],
         ));
 
