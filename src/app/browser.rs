@@ -65,7 +65,7 @@ impl Browser {
             ],
         ));
 
-        // Connect actions
+        // Connect actions (window required for accels)
         widget
             .gobject()
             .insert_action_group(action.id(), Some(action.gobject()));
@@ -77,7 +77,7 @@ impl Browser {
         widget.gobject().insert_action_group(
             window.tab().action().id(),
             Some(window.tab().action().gobject()),
-        ); // @TODO is really wanted to append it here?
+        );
 
         // Connect events
         action.about().connect_activate({
