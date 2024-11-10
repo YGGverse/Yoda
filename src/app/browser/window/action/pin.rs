@@ -57,7 +57,7 @@ impl Pin {
         let state = self
             .gobject
             .state()
-            .expect("State value required for this action")
+            .expect("Required state value")
             .get::<i32>()
             .expect("Parameter type does not match `i32`");
 
