@@ -253,6 +253,10 @@ impl Browser {
     pub fn gobject(&self) -> &ApplicationWindow {
         self.widget.gobject()
     }
+
+    pub fn window(&self) -> &Rc<Window> {
+        &self.window
+    }
 }
 
 // Tools

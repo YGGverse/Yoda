@@ -165,6 +165,11 @@ impl Window {
     }
 
     // Getters
+
+    pub fn tab(&self) -> &Rc<Tab> {
+        &self.tab
+    }
+
     pub fn gobject(&self) -> &Box {
         self.widget.gobject()
     }

@@ -197,6 +197,15 @@ impl App {
                 ),
                 &["<Primary>u"],
             ),
+            // Tab actions
+            (
+                gformat!(
+                    "{}.{}",
+                    browser.window().tab().action().id(),
+                    browser.window().tab().action().append().id()
+                ),
+                &["<Primary>t"],
+            ),
             // @TODO
             (
                 gformat!("win.{}", action_page_reload.name()),
@@ -211,7 +220,6 @@ impl App {
                 &["<Primary>Right"],
             ),
             (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
-            (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
             (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
             // @TODO page close missed
         ] {

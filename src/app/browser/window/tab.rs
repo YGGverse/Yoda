@@ -396,6 +396,11 @@ impl Tab {
     }
 
     // Getters
+
+    pub fn action(&self) -> &Rc<Action> {
+        &self.action
+    }
+
     pub fn gobject(&self) -> &TabView {
         self.widget.gobject()
     }
