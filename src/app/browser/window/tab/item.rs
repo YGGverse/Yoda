@@ -10,7 +10,10 @@ use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use crate::app::browser::window::tab::action::Action as TabAction;
 use adw::{TabPage, TabView};
-use gtk::glib::{uuid_string_random, GString};
+use gtk::{
+    glib::{uuid_string_random, GString},
+    prelude::EditableExt,
+};
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -63,26 +66,6 @@ impl Item {
     }
 
     // Actions
-    pub fn page_home(&self) {
-        self.page.home()
-    }
-
-    pub fn page_history_back(&self) {
-        self.page.history_back()
-    }
-
-    pub fn page_history_forward(&self) {
-        self.page.history_forward()
-    }
-
-    pub fn page_reload(&self) {
-        self.page.reload()
-    }
-
-    pub fn page_navigation_request_grab_focus(&self) {
-        self.page.navigation_request_grab_focus()
-    }
-
     pub fn update(&self) {
         // Update child components
         self.page.update();
@@ -188,12 +171,22 @@ impl Item {
 
     // Setters
     pub fn set_page_navigation_request_text(&self, value: &str) {
-        self.page.set_navigation_request_text(value);
+        self.page
+            .navigation()
+            .request()
+            .widget()
+            .gobject()
+            .set_text(value);
     }
 
     // Getters
+
     pub fn id(&self) -> GString {
         self.id.clone()
+    }
+
+    pub fn page(&self) -> &Rc<Page> {
+        &self.page
     }
 
     pub fn page_is_loading(&self) -> bool {

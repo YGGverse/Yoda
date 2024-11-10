@@ -7,7 +7,8 @@ use widget::Widget;
 use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gio::SimpleAction,
-    glib::{GString, Uri, UriFlags},
+    glib::{Uri, UriFlags},
+    prelude::EditableExt,
     Entry,
 };
 use sqlite::Transaction;
@@ -94,22 +95,17 @@ impl Request {
         Ok(())
     }
 
-    // Setters
-    pub fn set_text(&self, value: &str) {
-        self.widget.set_text(value);
-    }
-
     // Getters
     pub fn gobject(&self) -> &Entry {
         self.widget.gobject()
     }
 
-    pub fn text(&self) -> GString {
-        self.widget.text()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 
     pub fn uri(&self) -> Option<Uri> {
-        match Uri::parse(&self.widget.text(), UriFlags::NONE) {
+        match Uri::parse(&self.widget.gobject().text(), UriFlags::NONE) {
             Ok(uri) => Some(uri),
             _ => None,
         }

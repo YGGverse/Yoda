@@ -13,7 +13,10 @@ use widget::Widget;
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use adw::TabView;
-use gtk::glib::{GString, Propagation};
+use gtk::{
+    glib::{GString, Propagation},
+    prelude::WidgetExt,
+};
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -104,7 +107,7 @@ impl Tab {
                         if let Some(id) = page.keyword() {
                             if let Some(item) = index.borrow().get(&id) {
                                 item.set_page_navigation_request_text(value.as_str());
-                                item.page_reload();
+                                item.page().reload();
                             }
                         }
                     }
@@ -139,7 +142,13 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index.borrow_mut().insert(item.id(), item.clone());
 
-        item.page_navigation_request_grab_focus(); // @TODO
+        item.page()
+            .navigation()
+            .request()
+            .widget()
+            .gobject()
+            .grab_focus();
+
         item
     }
 
@@ -162,7 +171,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_home();
+                    item.page().home();
                 }
             }
         }
@@ -172,7 +181,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_history_back();
+                    item.page().history_back();
                 }
             }
         }
@@ -182,7 +191,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_history_forward();
+                    item.page().history_forward();
                 }
             }
         }
@@ -193,7 +202,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page_reload();
+                    item.page().reload();
                 }
             }
         }

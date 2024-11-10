@@ -26,7 +26,8 @@ use gtk::{
         RegexMatchFlags, Uri, UriFlags, UriHideFlags,
     },
     prelude::{
-        ActionExt, CancellableExt, IOStreamExt, OutputStreamExt, SocketClientExt, StaticVariantType,
+        ActionExt, CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
+        StaticVariantType,
     },
     Box,
 };
@@ -79,7 +80,7 @@ impl Page {
         let widget = Widget::new_rc(
             &id,
             action_page_open.clone(),
-            navigation.gobject(),
+            navigation.widget().gobject(),
             content.gobject(),
             input.gobject(),
         );
@@ -114,7 +115,7 @@ impl Page {
             let this = this.clone();
             move |_, request| {
                 // Set request value from action parameter
-                this.navigation.set_request_text(
+                this.navigation().request().widget().gobject().set_text(
                     &request
                         .expect("Parameter required for this action")
                         .get::<String>()
@@ -135,7 +136,7 @@ impl Page {
     /// Navigate home URL (parsed from current navigation entry)
     /// * this method create new history record in memory as defined in `action_page_open` action
     pub fn home(&self) {
-        if let Some(url) = self.navigation.home_url() {
+        if let Some(url) = self.navigation.home().url() {
             // Update with history record
             self.tab_action.open().activate(Some(&url));
         }
@@ -144,9 +145,13 @@ impl Page {
     /// Navigate back in history
     /// * this method does not create new history record in memory
     pub fn history_back(&self) {
-        if let Some(request) = self.navigation.history_back(true) {
+        if let Some(request) = self.navigation.history().back(true) {
             // Update navigation entry
-            self.navigation.set_request_text(&request);
+            self.navigation
+                .request()
+                .widget()
+                .gobject()
+                .set_text(&request);
 
             // Load page (without history record)
             self.load(false);
@@ -156,9 +161,13 @@ impl Page {
     /// Navigate forward in history
     /// * this method does not create new history record in memory
     pub fn history_forward(&self) {
-        if let Some(request) = self.navigation.history_forward(true) {
+        if let Some(request) = self.navigation.history().forward(true) {
             // Update navigation entry
-            self.navigation.set_request_text(&request);
+            self.navigation
+                .request()
+                .widget()
+                .gobject()
+                .set_text(&request);
 
             // Load page (without history record)
             self.load(false);
@@ -213,7 +222,10 @@ impl Page {
             // Update navigation on redirect `is_foreground`
             if redirect.is_foreground() {
                 self.navigation
-                    .set_request_text(redirect.request().as_str());
+                    .request()
+                    .widget()
+                    .gobject()
+                    .set_text(redirect.request().as_str());
             }
 
             // Return value from redirection holder
@@ -223,18 +235,18 @@ impl Page {
             self.meta.unset_redirect_count();
 
             // Return value from navigation entry
-            self.navigation.request_text()
+            self.navigation.request().widget().gobject().text()
         };
 
         // Add history record
         if history {
-            match self.navigation.history_current() {
+            match self.navigation.history().current() {
                 Some(current) => {
                     if current != request {
-                        self.navigation.history_add(request.clone());
+                        self.navigation.history().add(request.clone(), true);
                     }
                 }
-                None => self.navigation.history_add(request.clone()),
+                None => self.navigation.history().add(request.clone(), true),
             }
         }
 
@@ -284,7 +296,11 @@ impl Page {
                     match Uri::parse(&request, UriFlags::NONE) {
                         Ok(_) => {
                             // Update navigation entry
-                            self.navigation.set_request_text(&request);
+                            self.navigation
+                                .request()
+                                .widget()
+                                .gobject()
+                                .set_text(&request);
 
                             // Load page (without history record)
                             self.load(false);
@@ -301,7 +317,11 @@ impl Page {
                     );
 
                     // Update navigation entry
-                    self.navigation.set_request_text(&request);
+                    self.navigation
+                        .request()
+                        .widget()
+                        .gobject()
+                        .set_text(&request);
 
                     // Load page (without history record)
                     self.load(false);
@@ -385,16 +405,6 @@ impl Page {
         Ok(())
     }
 
-    pub fn navigation_request_grab_focus(&self) {
-        self.navigation.request_grab_focus();
-    }
-
-    // Setters
-
-    pub fn set_navigation_request_text(&self, value: &str) {
-        self.navigation.set_request_text(value);
-    }
-
     // Getters
 
     pub fn progress_fraction(&self) -> Option<f64> {
@@ -424,6 +434,15 @@ impl Page {
 
     pub fn meta_title(&self) -> GString {
         self.meta.title()
+    }
+
+    /*
+    pub fn meta(&self) -> &Rc<Meta> {
+        &self.meta
+    } */
+
+    pub fn navigation(&self) -> &Rc<Navigation> {
+        &self.navigation
     }
 
     pub fn gobject(&self) -> &Box {

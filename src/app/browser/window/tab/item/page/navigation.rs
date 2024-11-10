@@ -16,7 +16,7 @@ use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::{gio::SimpleAction, glib::GString, prelude::WidgetExt, Box};
+use gtk::{gio::SimpleAction, prelude::EditableExt};
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -63,30 +63,12 @@ impl Navigation {
     }
 
     // Actions
-    pub fn request_grab_focus(&self) {
-        self.request.gobject().grab_focus();
-    }
-
-    pub fn history_add(&self, request: GString) {
-        self.history.add(request, true);
-    }
-
-    pub fn history_back(&self, follow_to_index: bool) -> Option<GString> {
-        self.history.back(follow_to_index)
-    }
-
-    pub fn history_current(&self) -> Option<GString> {
-        self.history.current()
-    }
-
-    pub fn history_forward(&self, follow_to_index: bool) -> Option<GString> {
-        self.history.forward(follow_to_index)
-    }
 
     pub fn update(&self, progress_fraction: Option<f64>) {
         self.home.update(self.request.uri());
         self.history.update();
-        self.reload.update(!self.request.text().is_empty());
+        self.reload
+            .update(!self.request.widget().gobject().text().is_empty());
         self.request.update(progress_fraction);
         self.bookmark.update();
     }
@@ -150,22 +132,32 @@ impl Navigation {
         Ok(())
     }
 
-    // Setters
-    pub fn set_request_text(&self, value: &str) {
-        self.request.set_text(value);
-    }
-
     // Getters
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
+
+    pub fn home(&self) -> &Rc<Home> {
+        &self.home
     }
 
-    pub fn home_url(&self) -> Option<GString> {
-        self.home.url()
+    pub fn history(&self) -> &Rc<History> {
+        &self.history
     }
 
-    pub fn request_text(&self) -> GString {
-        self.request.text()
+    /*
+    pub fn reload(&self) -> &Rc<Reload> {
+        &self.reload
+    } */
+
+    pub fn request(&self) -> &Rc<Request> {
+        &self.request
+    }
+
+    /*
+    pub fn bookmark(&self) -> &Rc<Bookmark> {
+        &self.bookmark
+    } */
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }
 

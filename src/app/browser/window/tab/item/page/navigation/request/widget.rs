@@ -5,7 +5,7 @@ use database::Database;
 use crate::app::browser::action::Action as BrowserAction;
 use gtk::{
     gio::SimpleAction,
-    glib::{timeout_add_local, ControlFlow, GString, SourceId},
+    glib::{timeout_add_local, ControlFlow, SourceId},
     prelude::{ActionExt, EditableExt, EntryExt, ToVariant, WidgetExt},
     Entry, StateFlags,
 };
@@ -202,18 +202,10 @@ impl Widget {
         }
     }
 
-    // Setters
-    pub fn set_text(&self, value: &str) {
-        self.gobject.set_text(value);
-    }
-
     // Getters
+
     pub fn gobject(&self) -> &Entry {
         &self.gobject
-    }
-
-    pub fn text(&self) -> GString {
-        self.gobject.text()
     }
 }
 
