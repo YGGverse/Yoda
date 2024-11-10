@@ -19,6 +19,13 @@ impl Append {
         }
     }
 
+    // Actions
+
+    /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
+    pub fn activate(&self) {
+        self.gobject.activate(None);
+    }
+
     // Events
 
     /// Define callback function for

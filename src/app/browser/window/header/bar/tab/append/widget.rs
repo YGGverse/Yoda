@@ -1,8 +1,5 @@
-use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionExt, ButtonExt},
-    Align, Button,
-};
+use crate::app::browser::window::action::Action as WindowAction;
+use gtk::{prelude::ButtonExt, Align, Button};
 use std::rc::Rc;
 
 pub struct Widget {
@@ -11,7 +8,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(action_page_new: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("tab-new-symbolic")
@@ -21,9 +18,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| {
-            action_page_new.activate(None);
-        });
+        gobject.connect_clicked(move |_| window_action.append().activate());
 
         Rc::new(Self { gobject })
     }

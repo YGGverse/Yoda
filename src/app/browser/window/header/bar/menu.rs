@@ -3,6 +3,7 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
     gio::{self, SimpleAction},
     glib::{gformat, GString},
@@ -18,7 +19,7 @@ pub struct Menu {
 impl Menu {
     pub fn new_rc(
         browser_action: Rc<BrowserAction>,
-        action_page_new: SimpleAction,
+        window_action: Rc<WindowAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -32,7 +33,12 @@ impl Menu {
 
             // Main > Page
             let main_page = gio::Menu::new();
-                main_page.append(Some("New"), Some(&detailed_action_name(&action_page_new)));
+                main_page.append(Some("New"), Some(&gformat!(
+                    "{}.{}",
+                    window_action.id(),
+                    window_action.append().id()
+                )));
+
                 main_page.append(Some("Reload"), Some(&detailed_action_name(&action_page_reload)));
                 main_page.append(Some("Pin"), Some(&detailed_action_name(&action_page_pin)));
 

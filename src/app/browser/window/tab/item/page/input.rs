@@ -33,25 +33,25 @@ impl Input {
     // Setters
     pub fn set_new_response(
         &self,
-        tab_action: Rc<TabAction>,
+        action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            Response::new_rc(tab_action, base, title, size_limit).gobject(),
+            Response::new_rc(action, base, title, size_limit).gobject(),
         ));
     }
 
     pub fn set_new_sensitive(
         &self,
-        tab_action: Rc<TabAction>,
+        action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            Sensitive::new_rc(tab_action, base, title, max_length).gobject(),
+            Sensitive::new_rc(action, base, title, max_length).gobject(),
         ));
     }
 

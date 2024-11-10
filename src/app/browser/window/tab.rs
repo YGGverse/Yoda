@@ -11,6 +11,7 @@ use menu::Menu;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use adw::TabView;
 use gtk::{
     gio::SimpleAction,
@@ -24,6 +25,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 pub struct Tab {
     // Global actions
     browser_action: Rc<BrowserAction>,
+    window_action: Rc<WindowAction>,
     // Page actions
     action_page_home: SimpleAction,
     action_page_history_back: SimpleAction,
@@ -39,6 +41,7 @@ impl Tab {
     // Construct
     pub fn new_rc(
         browser_action: Rc<BrowserAction>,
+        window_action: Rc<WindowAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -74,6 +77,7 @@ impl Tab {
             let gobject = widget.gobject().clone();
             // Actions
             let browser_action = browser_action.clone();
+            let window_action = window_action.clone();
             let action = action.clone();
 
             let action_page_home = action_page_home.clone();
@@ -87,6 +91,7 @@ impl Tab {
                     &gobject,
                     // Global actions
                     browser_action.clone(),
+                    window_action.clone(),
                     action.clone(),
                     // Page actions
                     action_page_home.clone(),
@@ -174,6 +179,7 @@ impl Tab {
         // Return activated struct
         Rc::new(Self {
             browser_action,
+            window_action,
             // Global actions
             action_page_home,
             action_page_history_back,
@@ -192,6 +198,7 @@ impl Tab {
         let item = Item::new_rc(
             self.gobject(),
             self.browser_action.clone(),
+            self.window_action.clone(),
             // Local actions
             self.action.clone(),
             // Global actions
@@ -337,6 +344,7 @@ impl Tab {
                         transaction,
                         &record.id,
                         self.browser_action.clone(),
+                        self.window_action.clone(),
                         self.action.clone(),
                         self.action_page_home.clone(),
                         self.action_page_history_back.clone(),

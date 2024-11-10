@@ -32,7 +32,6 @@ impl App {
         // @TODO
         let default_state = (-1).to_variant();
 
-        let action_page_new = SimpleAction::new(&uuid_string_random(), None);
         let action_page_close =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_close_all = SimpleAction::new(&uuid_string_random(), None);
@@ -55,7 +54,6 @@ impl App {
         // Init components
         let browser = Rc::new(Browser::new(
             profile.clone(),
-            action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
             action_page_home.clone(),
@@ -201,8 +199,8 @@ impl App {
             (
                 gformat!(
                     "{}.{}",
-                    browser.window().tab().action().id(),
-                    browser.window().tab().action().append().id()
+                    browser.window().action().id(),
+                    browser.window().action().append().id()
                 ),
                 &["<Primary>t"],
             ),

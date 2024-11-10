@@ -1,6 +1,6 @@
-mod open;
+mod append;
 
-use open::Open;
+use append::Append;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -12,7 +12,7 @@ use std::rc::Rc;
 /// [SimpleActionGroup](https://docs.gtk.org/gio/class.SimpleActionGroup.html) wrapper for `Browser` actions
 pub struct Action {
     // Actions
-    open: Rc<Open>,
+    append: Rc<Append>,
     // Group
     id: GString,
     gobject: SimpleActionGroup,
@@ -24,7 +24,7 @@ impl Action {
     /// Create new `Self`
     pub fn new() -> Self {
         // Init actions
-        let open = Rc::new(Open::new());
+        let append = Rc::new(Append::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -33,17 +33,21 @@ impl Action {
         let gobject = SimpleActionGroup::new();
 
         // Add action to given group
-        gobject.add_action(open.gobject());
+        gobject.add_action(append.gobject());
 
         // Done
-        Self { open, id, gobject }
+        Self {
+            append,
+            id,
+            gobject,
+        }
     }
 
     // Getters
 
-    /// Get reference `Open` action
-    pub fn open(&self) -> &Rc<Open> {
-        &self.open
+    /// Get reference `Append` action
+    pub fn append(&self) -> &Rc<Append> {
+        &self.append
     }
 
     /// Get auto-generated name for action group

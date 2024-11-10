@@ -30,7 +30,6 @@ impl Browser {
     // Construct
     pub fn new(
         profile: Rc<Profile>,
-        action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -43,7 +42,6 @@ impl Browser {
         let action = Rc::new(Action::new());
         let window = Rc::new(Window::new(
             action.clone(),
-            action_page_new.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
             action_page_home.clone(),
@@ -57,7 +55,6 @@ impl Browser {
         let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
-                action_page_new.clone(),
                 action_page_close.clone(),
                 action_page_close_all.clone(),
                 action_page_home.clone(),
@@ -68,10 +65,16 @@ impl Browser {
             ],
         ));
 
-        // Connect actions to browser window
+        // Connect browser actions to window
         widget
             .gobject()
             .insert_action_group(action.id(), Some(action.gobject()));
+
+        // Connect tab actions to window
+        widget.gobject().insert_action_group(
+            window.tab().action().id(),
+            Some(window.tab().action().gobject()),
+        ); // @TODO is really wanted to append it here?
 
         // Connect events
         action.about().connect_activate({
@@ -113,13 +116,6 @@ impl Browser {
         });
 
         // @TODO
-        action_page_new.connect_activate({
-            let window = window.clone();
-            move |_, _| {
-                window.tab_append(None);
-            }
-        });
-
         action_page_close.connect_activate({
             let window = window.clone();
             move |this, _| {

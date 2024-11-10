@@ -2,7 +2,8 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, Button};
+use crate::app::browser::window::action::Action as WindowAction;
+use gtk::Button;
 use std::rc::Rc;
 
 pub struct Append {
@@ -11,9 +12,9 @@ pub struct Append {
 
 impl Append {
     // Construct
-    pub fn new_rc(action_page_new: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         Rc::new(Self {
-            widget: Widget::new_rc(action_page_new),
+            widget: Widget::new_rc(window_action),
         })
     }
 

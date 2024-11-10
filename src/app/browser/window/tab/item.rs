@@ -7,6 +7,7 @@ use page::Page;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use crate::app::browser::window::tab::action::Action as TabAction;
 use adw::{TabPage, TabView};
 use gtk::{
@@ -31,6 +32,7 @@ impl Item {
         tab_view: &TabView,
         // Global actions
         browser_action: Rc<BrowserAction>,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
         // @TODO
         action_page_home: SimpleAction,
@@ -132,6 +134,7 @@ impl Item {
         app_browser_window_tab_id: &i64,
         // Actions
         browser_action: Rc<BrowserAction>,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
@@ -148,6 +151,7 @@ impl Item {
                         tab_view,
                         // Actions
                         browser_action.clone(),
+                        window_action.clone(),
                         tab_action.clone(),
                         action_page_home.clone(),
                         action_page_history_back.clone(),

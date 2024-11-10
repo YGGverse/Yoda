@@ -1,8 +1,10 @@
+mod action;
 mod database;
 mod header;
 mod tab;
 mod widget;
 
+use action::Action;
 use database::Database;
 use header::Header;
 use sqlite::Transaction;
@@ -16,6 +18,7 @@ use std::rc::Rc;
 pub struct Window {
     //header: Rc<Header>,
     tab: Rc<Tab>,
+    action: Rc<Action>,
     widget: Rc<Widget>,
 }
 
@@ -24,7 +27,6 @@ impl Window {
     pub fn new(
         // Actions
         browser_action: Rc<BrowserAction>,
-        action_page_new: SimpleAction,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
         action_page_home: SimpleAction,
@@ -33,9 +35,13 @@ impl Window {
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
     ) -> Self {
+        // Init local actions
+        let action = Rc::new(Action::new());
+
         // Init components
         let tab = Tab::new_rc(
             browser_action.clone(),
+            action.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
             action_page_home.clone(),
@@ -48,7 +54,7 @@ impl Window {
         let header = Header::new_rc(
             // Actions
             browser_action,
-            action_page_new,
+            action.clone(),
             action_page_close,
             action_page_close_all,
             action_page_home,
@@ -63,19 +69,24 @@ impl Window {
         // GTK
         let widget = Rc::new(Widget::new(header.gobject(), tab.gobject()));
 
+        // Init events
+        action.append().connect_activate({
+            let tab = tab.clone();
+            move || {
+                tab.append(None);
+            }
+        });
+
         // Init struct
         Self {
             //header,
             tab,
+            action,
             widget,
         }
     }
 
     // Actions
-    pub fn tab_append(&self, page_position: Option<i32>) {
-        self.tab.append(page_position);
-    }
-
     pub fn tab_page_home(&self, page_position: Option<i32>) {
         self.tab.page_home(page_position);
     }
@@ -165,6 +176,10 @@ impl Window {
     }
 
     // Getters
+
+    pub fn action(&self) -> &Rc<Action> {
+        &self.action
+    }
 
     pub fn tab(&self) -> &Rc<Tab> {
         &self.tab
