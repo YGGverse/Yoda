@@ -65,12 +65,15 @@ impl Browser {
             ],
         ));
 
-        // Connect browser actions to window
+        // Connect actions
         widget
             .gobject()
             .insert_action_group(action.id(), Some(action.gobject()));
 
-        // Connect tab actions to window
+        widget
+            .gobject()
+            .insert_action_group(window.action().id(), Some(window.action().gobject()));
+
         widget.gobject().insert_action_group(
             window.tab().action().id(),
             Some(window.tab().action().gobject()),
