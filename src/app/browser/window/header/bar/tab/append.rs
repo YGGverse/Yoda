@@ -12,10 +12,10 @@ pub struct Append {
 
 impl Append {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
-        Rc::new(Self {
-            widget: Widget::new_rc(window_action),
-        })
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
+        Self {
+            widget: Rc::new(Widget::new(window_action)),
+        }
     }
 
     // Getters

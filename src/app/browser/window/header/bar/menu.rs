@@ -15,10 +15,10 @@ pub struct Menu {
 }
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
-    pub fn new_rc(
+    pub fn new(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Main
         let main = gio::Menu::new();
 
@@ -120,7 +120,7 @@ impl Menu {
         )));
 
         // Result
-        Rc::new(Self { widget:Widget::new_rc(&main) })
+        Self { widget:Rc::new(Widget::new(&main)) }
     }
 
     // Getters

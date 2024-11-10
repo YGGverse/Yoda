@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-home-symbolic")
@@ -22,8 +22,8 @@ impl Widget {
         // Init events
         gobject.connect_clicked(move |_| window_action.home().activate());
 
-        // Return activated struct
-        Rc::new(Self { gobject })
+        // Return activated `Self`
+        Self { gobject }
     }
 
     // Actions

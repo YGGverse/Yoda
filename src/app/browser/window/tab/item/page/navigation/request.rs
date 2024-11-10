@@ -20,14 +20,14 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         // Actions
         browser_action: Rc<BrowserAction>,
         action_page_reload: SimpleAction, // @TODO local `action_page_open`?
-    ) -> Rc<Self> {
-        Rc::new(Self {
-            widget: Widget::new_rc(browser_action, action_page_reload),
-        })
+    ) -> Self {
+        Self {
+            widget: Rc::new(Widget::new(browser_action, action_page_reload)),
+        }
     }
 
     // Actions

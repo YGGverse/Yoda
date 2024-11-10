@@ -1,6 +1,5 @@
 use adw::Clamp;
 use gtk::{prelude::WidgetExt, Box};
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: Clamp,
@@ -8,14 +7,14 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
+    pub fn new() -> Self {
         let gobject = Clamp::builder()
             .css_classes(["app-notification"])
             .maximum_size(800)
             .visible(false)
             .build();
 
-        Rc::new(Self { gobject })
+        Self { gobject }
     }
 
     // Actions

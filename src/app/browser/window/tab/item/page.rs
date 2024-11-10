@@ -67,25 +67,25 @@ impl Page {
             SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
 
         // Init components
-        let content = Content::new_rc(tab_action.clone(), action_page_open.clone());
+        let content = Rc::new(Content::new(tab_action.clone(), action_page_open.clone()));
 
-        let navigation = Navigation::new_rc(
+        let navigation = Rc::new(Navigation::new(
             browser_action.clone(),
             window_action.clone(),
             action_page_open.clone(),
-        );
+        ));
 
-        let input = Input::new_rc();
+        let input = Rc::new(Input::new());
 
-        let widget = Widget::new_rc(
+        let widget = Rc::new(Widget::new(
             &id,
             action_page_open.clone(),
             navigation.widget().gobject(),
             content.gobject(),
             input.gobject(),
-        );
+        ));
 
-        let meta = Meta::new_rc(Status::New, gformat!("New page"));
+        let meta = Rc::new(Meta::new(Status::New, gformat!("New page")));
 
         // Init `Self`
         let this = Rc::new(Self {

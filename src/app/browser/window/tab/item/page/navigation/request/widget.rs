@@ -30,7 +30,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(browser_action: Rc<BrowserAction>, action_page_open: SimpleAction) -> Rc<Self> {
+    pub fn new(browser_action: Rc<BrowserAction>, action_page_open: SimpleAction) -> Self {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -73,8 +73,8 @@ impl Widget {
             }
         });
 
-        // Return activated struct
-        Rc::new(Self { gobject, progress })
+        // Return activated `Self`
+        Self { gobject, progress }
     }
 
     // Actions

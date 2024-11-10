@@ -20,25 +20,25 @@ pub struct Sensitive {
 
 impl Sensitive {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Init local actions
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
-        let form = Form::new_rc(
+        let form = Rc::new(Form::new(
             action_send.clone(),
             title,
             max_length
                 .map(|value| value - base.to_string_partial(UriHideFlags::QUERY).len() as i32),
-        );
+        ));
 
         // Init widget
-        let widget = Widget::new_rc(form.gobject());
+        let widget = Rc::new(Widget::new(form.gobject()));
 
         // Init events
         action_send.connect_activate({
@@ -55,7 +55,7 @@ impl Sensitive {
         widget.gobject().connect_realize(move |_| form.focus());
 
         // Return activated struct
-        Rc::new(Self { widget })
+        Self { widget }
     }
 
     // Getters

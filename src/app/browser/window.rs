@@ -32,8 +32,8 @@ impl Window {
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Tab::new_rc(browser_action.clone(), action.clone());
-        let header = Header::new_rc(browser_action, action.clone(), tab.gobject());
+        let tab = Rc::new(Tab::new(browser_action.clone(), action.clone()));
+        let header = Header::new(browser_action, action.clone(), tab.gobject());
 
         // GTK
         let widget = Rc::new(Widget::new(header.gobject(), tab.gobject()));

@@ -11,12 +11,10 @@ pub struct Form {
 
 impl Form {
     // Construct
-    pub fn new_rc(action_update: SimpleAction) -> Rc<Self> {
-        // Init widget
-        let widget = Widget::new_rc(action_update);
-
-        // Result
-        Rc::new(Self { widget })
+    pub fn new(action_update: SimpleAction) -> Self {
+        Self {
+            widget: Rc::new(Widget::new(action_update)),
+        }
     }
 
     // Actions

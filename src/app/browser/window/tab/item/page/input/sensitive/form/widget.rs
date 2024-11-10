@@ -7,7 +7,6 @@ use gtk::{
     glib::GString,
     prelude::{ActionExt, EditableExt, WidgetExt},
 };
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: PasswordEntryRow,
@@ -15,11 +14,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(
-        action_send: SimpleAction,
-        title: Option<&str>,
-        max_length: Option<i32>,
-    ) -> Rc<Self> {
+    pub fn new(action_send: SimpleAction, title: Option<&str>, max_length: Option<i32>) -> Self {
         // Init gobject
         let gobject = PasswordEntryRow::builder().show_apply_button(true).build();
 
@@ -37,7 +32,7 @@ impl Widget {
         });
 
         // Return activated struct
-        Rc::new(Self { gobject })
+        Self { gobject }
     }
 
     // Actions

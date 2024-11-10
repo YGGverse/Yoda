@@ -1,6 +1,5 @@
 use adw::PasswordEntryRow;
 use gtk::{prelude::BoxExt, Box, Orientation};
-use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
@@ -11,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(response: &PasswordEntryRow) -> Rc<Self> {
+    pub fn new(response: &PasswordEntryRow) -> Self {
         let gobject = Box::builder()
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
@@ -23,7 +22,7 @@ impl Widget {
 
         gobject.append(response);
 
-        Rc::new(Self { gobject })
+        Self { gobject }
     }
 
     // Getters

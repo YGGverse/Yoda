@@ -1,5 +1,4 @@
 use gtk::{PackType, WindowControls};
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: WindowControls,
@@ -7,13 +6,13 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
-        Rc::new(Self {
+    pub fn new() -> Self {
+        Self {
             gobject: WindowControls::builder()
                 .side(PackType::End)
                 .margin_end(4)
                 .build(),
-        })
+        }
     }
 
     // Getters

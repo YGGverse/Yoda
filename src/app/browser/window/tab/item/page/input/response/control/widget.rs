@@ -1,5 +1,4 @@
 use gtk::{prelude::BoxExt, Align, Box, Button, Label, Orientation};
-use std::rc::Rc;
 
 const SPACING: i32 = 8;
 
@@ -9,7 +8,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(limit: &Label, send: &Button) -> Rc<Self> {
+    pub fn new(limit: &Label, send: &Button) -> Self {
         // Init gobject
         let gobject = Box::builder()
             .halign(Align::End)
@@ -20,8 +19,8 @@ impl Widget {
         gobject.append(limit);
         gobject.append(send);
 
-        // Return new struct
-        Rc::new(Self { gobject })
+        // Return new `Self`
+        Self { gobject }
     }
 
     // Getters

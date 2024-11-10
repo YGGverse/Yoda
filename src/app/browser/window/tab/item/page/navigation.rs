@@ -30,36 +30,36 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new_rc(
+    pub fn new(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         action_page_open: SimpleAction,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Init components
-        let home = Home::new_rc(window_action.clone());
-        let history = History::new_rc(window_action.clone());
-        let reload = Reload::new_rc(window_action);
-        let request = Request::new_rc(browser_action, action_page_open.clone());
-        let bookmark = Bookmark::new_rc();
+        let home = Rc::new(Home::new(window_action.clone()));
+        let history = Rc::new(History::new(window_action.clone()));
+        let reload = Rc::new(Reload::new(window_action));
+        let request = Rc::new(Request::new(browser_action, action_page_open.clone()));
+        let bookmark = Rc::new(Bookmark::new());
 
         // Init widget
-        let widget = Widget::new_rc(
+        let widget = Rc::new(Widget::new(
             home.gobject(),
             history.gobject(),
             reload.gobject(),
             request.widget().gobject(),
             bookmark.gobject(),
-        );
+        ));
 
-        // Result
-        Rc::new(Self {
+        // Done
+        Self {
             widget,
             home,
             history,
             reload,
             request,
             bookmark,
-        })
+        }
     }
 
     // Actions

@@ -17,12 +17,12 @@ pub struct Input {
 
 impl Input {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
+    pub fn new() -> Self {
         // Init widget
-        let widget = Widget::new_rc();
+        let widget = Rc::new(Widget::new());
 
         // Result
-        Rc::new(Self { widget })
+        Self { widget }
     }
 
     // Actions
@@ -39,7 +39,7 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            Response::new_rc(action, base, title, size_limit).gobject(),
+            Response::new(action, base, title, size_limit).gobject(),
         ));
     }
 
@@ -51,7 +51,7 @@ impl Input {
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            Sensitive::new_rc(action, base, title, max_length).gobject(),
+            Sensitive::new(action, base, title, max_length).gobject(),
         ));
     }
 

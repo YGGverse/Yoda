@@ -11,12 +11,10 @@ pub struct Counter {
 
 impl Counter {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
-        // Init widget
-        let widget = Widget::new_rc();
-
-        // Result
-        Rc::new(Self { widget })
+    pub fn new() -> Self {
+        Self {
+            widget: Rc::new(Widget::new()),
+        }
     }
 
     // Actions

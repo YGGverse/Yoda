@@ -3,7 +3,6 @@ use gtk::{
     prelude::{ActionExt, ButtonExt, WidgetExt},
     Button,
 };
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -11,7 +10,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(action_send: SimpleAction) -> Rc<Self> {
+    pub fn new(action_send: SimpleAction) -> Self {
         // Init gobject
         let gobject = Button::builder()
             //.css_classes(["accent"])
@@ -25,8 +24,8 @@ impl Widget {
             }
         });
 
-        // Return activated struct
-        Rc::new(Self { gobject })
+        // Return activated `Self`
+        Self { gobject }
     }
 
     // Actions

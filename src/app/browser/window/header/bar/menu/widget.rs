@@ -1,5 +1,4 @@
 use gtk::{gio::Menu, Align, MenuButton};
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: MenuButton,
@@ -7,8 +6,8 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(model: &Menu) -> Rc<Self> {
-        Rc::new(Self {
+    pub fn new(model: &Menu) -> Self {
+        Self {
             gobject: MenuButton::builder()
                 .css_classes(["flat"])
                 .icon_name("open-menu-symbolic")
@@ -16,7 +15,7 @@ impl Widget {
                 .tooltip_text("Menu")
                 .valign(Align::Center)
                 .build(),
-        })
+        }
     }
 
     // Getters

@@ -15,20 +15,20 @@ pub struct Header {
 
 impl Header {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         // Actions
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         // Widgets
         tab_view: &TabView,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Init components
-        let bar = Bar::new_rc(browser_action, window_action, tab_view);
+        let bar = Bar::new(browser_action, window_action, tab_view);
 
         // Return new struct
-        Rc::new(Self {
-            widget: Widget::new_rc(bar.gobject()),
-        })
+        Self {
+            widget: Rc::new(Widget::new(bar.gobject())),
+        }
     }
 
     // Getters

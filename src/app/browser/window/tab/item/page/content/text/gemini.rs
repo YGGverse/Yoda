@@ -26,9 +26,8 @@ impl Gemini {
         action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let reader = Reader::new_rc(gemtext, base, tab_action, action_page_open);
-
-        let widget = Widget::new_rc(reader.gobject());
+        let reader = Rc::new(Reader::new(gemtext, base, tab_action, action_page_open));
+        let widget = Rc::new(Widget::new(reader.gobject()));
 
         // Result
         Self { reader, widget }

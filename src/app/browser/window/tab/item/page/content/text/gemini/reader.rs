@@ -30,12 +30,12 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         gemtext: &str,
         base: &Uri,
         tab_action: Rc<TabAction>,
         action_page_open: SimpleAction,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Init default values
         let mut title = None;
 
@@ -223,12 +223,12 @@ impl Reader {
         let motion_controller = EventControllerMotion::new();
 
         // Init widget
-        let widget = Widget::new_rc(
+        let widget = Rc::new(Widget::new(
             &buffer,
             primary_button_controller.clone(),
             middle_button_controller.clone(),
             motion_controller.clone(),
-        );
+        ));
 
         // Init events
         primary_button_controller.connect_released({
@@ -346,7 +346,7 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Rc::new(Self { title, widget })
+        Self { title, widget }
     }
 
     // Getters

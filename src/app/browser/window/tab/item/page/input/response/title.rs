@@ -11,12 +11,10 @@ pub struct Title {
 
 impl Title {
     // Construct
-    pub fn new_rc(title: Option<&str>) -> Rc<Self> {
-        // Init widget
-        let widget = Widget::new_rc(title);
-
-        // Result
-        Rc::new(Self { widget })
+    pub fn new(title: Option<&str>) -> Self {
+        Self {
+            widget: Rc::new(Widget::new(title)),
+        }
     }
 
     // Getters

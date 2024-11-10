@@ -24,23 +24,27 @@ pub struct Response {
 
 impl Response {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
-        let control = Control::new_rc(action_send.clone());
-        let form = Form::new_rc(action_update.clone());
-        let title = Title::new_rc(title);
+        let control = Rc::new(Control::new(action_send.clone()));
+        let form = Rc::new(Form::new(action_update.clone()));
+        let title = Rc::new(Title::new(title));
 
         // Init widget
-        let widget = Widget::new_rc(title.gobject(), form.gobject(), control.gobject());
+        let widget = Rc::new(Widget::new(
+            title.gobject(),
+            form.gobject(),
+            control.gobject(),
+        ));
 
         // Init events
         action_update.connect_activate({
@@ -70,7 +74,7 @@ impl Response {
         widget.gobject().connect_realize(move |_| form.focus());
 
         // Return activated struct
-        Rc::new(Self { widget })
+        Self { widget }
     }
 
     // Getters

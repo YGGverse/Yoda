@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-previous-symbolic")
@@ -20,15 +20,10 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked({
-            let window_action = window_action.clone();
-            move |_| {
-                window_action.history_back().activate();
-            }
-        });
+        gobject.connect_clicked(move |_| window_action.history_back().activate());
 
-        // Return activated struct
-        Rc::new(Self { gobject })
+        // Return activated `Self`
+        Self { gobject }
     }
 
     // Actions

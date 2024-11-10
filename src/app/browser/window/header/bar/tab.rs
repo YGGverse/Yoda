@@ -14,10 +14,10 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>, view: &TabView) -> Rc<Self> {
-        Rc::new(Self {
-            widget: Widget::new_rc(view, Append::new_rc(window_action).gobject()),
-        })
+    pub fn new(window_action: Rc<WindowAction>, view: &TabView) -> Self {
+        Self {
+            widget: Rc::new(Widget::new(view, Append::new(window_action).gobject())),
+        }
     }
 
     // Getters

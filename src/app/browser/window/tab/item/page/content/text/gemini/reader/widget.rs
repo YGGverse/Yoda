@@ -1,7 +1,6 @@
 use gtk::{
     prelude::WidgetExt, EventControllerMotion, GestureClick, TextBuffer, TextView, WrapMode,
 };
-use std::rc::Rc;
 
 const MARGIN: i32 = 8;
 
@@ -11,12 +10,12 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         buffer: &TextBuffer,
         primary_button_controller: GestureClick,
         middle_button_controller: GestureClick,
         motion_controller: EventControllerMotion,
-    ) -> Rc<Self> {
+    ) -> Self {
         let gobject = TextView::builder()
             .bottom_margin(MARGIN)
             .buffer(buffer)
@@ -33,7 +32,7 @@ impl Widget {
         gobject.add_controller(middle_button_controller);
         gobject.add_controller(motion_controller);
 
-        Rc::new(Self { gobject })
+        Self { gobject }
     }
 
     // Getters

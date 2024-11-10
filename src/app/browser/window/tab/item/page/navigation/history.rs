@@ -28,13 +28,13 @@ pub struct History {
 
 impl History {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
         // init components
-        let back = Back::new_rc(window_action.clone());
-        let forward = Forward::new_rc(window_action);
+        let back = Rc::new(Back::new(window_action.clone()));
+        let forward = Rc::new(Forward::new(window_action));
 
         // Init widget
-        let widget = Widget::new_rc(back.gobject(), forward.gobject());
+        let widget = Rc::new(Widget::new(back.gobject(), forward.gobject()));
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -42,13 +42,13 @@ impl History {
         // Init index
         let index = RefCell::new(None);
 
-        Rc::new(Self {
+        Self {
             back,
             forward,
             memory,
             index,
             widget,
-        })
+        }
     }
 
     // Actions

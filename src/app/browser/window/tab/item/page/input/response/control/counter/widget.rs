@@ -1,5 +1,4 @@
 use gtk::{prelude::WidgetExt, Label};
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: Label,
@@ -7,10 +6,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
-        let gobject = Label::builder().build();
-
-        Rc::new(Self { gobject })
+    pub fn new() -> Self {
+        Self {
+            gobject: Label::builder().build(),
+        }
     }
 
     // Actions

@@ -1,5 +1,4 @@
 use gtk::Button;
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: Button,
@@ -7,14 +6,14 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
-        Rc::new(Self {
+    pub fn new() -> Self {
+        Self {
             gobject: Button::builder()
                 .icon_name("starred-symbolic")
                 .tooltip_text("Bookmark")
                 .sensitive(false)
                 .build(),
-        })
+        }
     }
 
     // Getters

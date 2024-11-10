@@ -1,5 +1,4 @@
 mod widget;
-
 use widget::Widget;
 
 use gtk::{gio::SimpleAction, Button};
@@ -11,12 +10,12 @@ pub struct Send {
 
 impl Send {
     // Construct
-    pub fn new_rc(action_send: SimpleAction) -> Rc<Self> {
+    pub fn new(action_send: SimpleAction) -> Self {
         // Init widget
-        let widget = Widget::new_rc(action_send);
+        let widget = Rc::new(Widget::new(action_send));
 
         // Result
-        Rc::new(Self { widget })
+        Self { widget }
     }
 
     // Actions

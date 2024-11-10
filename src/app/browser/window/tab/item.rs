@@ -51,7 +51,7 @@ impl Item {
             tab_action,
         );
 
-        let widget = Widget::new_rc(
+        let widget = Rc::new(Widget::new(
             id.as_str(),
             tab_view,
             page.gobject(),
@@ -59,7 +59,7 @@ impl Item {
             position,
             is_pinned,
             is_selected,
-        ); // @TODO
+        )); // @TODO
 
         // Return struct
         Rc::new(Self { id, page, widget })

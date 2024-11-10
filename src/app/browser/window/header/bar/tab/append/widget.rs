@@ -8,7 +8,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("tab-new-symbolic")
@@ -20,7 +20,7 @@ impl Widget {
         // Init events
         gobject.connect_clicked(move |_| window_action.append().activate());
 
-        Rc::new(Self { gobject })
+        Self { gobject }
     }
 
     // Getters

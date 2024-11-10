@@ -28,12 +28,12 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new_rc(tab_action: Rc<TabAction>, action_page_open: SimpleAction) -> Rc<Self> {
-        Rc::new(Self {
+    pub fn new(tab_action: Rc<TabAction>, action_page_open: SimpleAction) -> Self {
+        Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
             tab_action,
             action_page_open,
-        })
+        }
     }
 
     // Actions

@@ -17,12 +17,12 @@ pub struct Home {
 
 impl Home {
     // Construct
-    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
-        Rc::new(Self {
+    pub fn new(window_action: Rc<WindowAction>) -> Self {
+        Self {
             window_action: window_action.clone(),
             uri: RefCell::new(None),
-            widget: Widget::new_rc(window_action),
-        })
+            widget: Rc::new(Widget::new(window_action)),
+        }
     }
 
     // Actions

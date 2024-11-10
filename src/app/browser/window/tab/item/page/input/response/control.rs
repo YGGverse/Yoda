@@ -17,20 +17,20 @@ pub struct Control {
 
 impl Control {
     // Construct
-    pub fn new_rc(action_send: SimpleAction) -> Rc<Self> {
+    pub fn new(action_send: SimpleAction) -> Self {
         // Init components
-        let counter = Counter::new_rc();
-        let send = Send::new_rc(action_send);
+        let counter = Rc::new(Counter::new());
+        let send = Rc::new(Send::new(action_send));
 
         // Init widget
-        let widget = Widget::new_rc(counter.gobject(), send.gobject());
+        let widget = Rc::new(Widget::new(counter.gobject(), send.gobject()));
 
         // Return activated struct
-        Rc::new(Self {
+        Self {
             counter,
             send,
             widget,
-        })
+        }
     }
 
     // Actions

@@ -33,7 +33,7 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new_rc(browser_action: Rc<BrowserAction>, window_action: Rc<WindowAction>) -> Rc<Self> {
+    pub fn new(browser_action: Rc<BrowserAction>, window_action: Rc<WindowAction>) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
 
@@ -115,14 +115,14 @@ impl Tab {
             }
         }); // @TODO fix new item on middle click
 
-        // Return activated struct
-        Rc::new(Self {
+        // Return activated `Self`
+        Self {
             browser_action,
             window_action,
             index,
             action,
             widget,
-        })
+        }
     }
 
     // Actions

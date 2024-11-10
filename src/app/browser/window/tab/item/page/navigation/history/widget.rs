@@ -2,7 +2,6 @@ use gtk::{
     prelude::{BoxExt, IsA},
     Box, Orientation,
 };
-use std::rc::Rc;
 
 pub struct Widget {
     gobject: Box,
@@ -10,7 +9,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(back: &impl IsA<gtk::Widget>, forward: &impl IsA<gtk::Widget>) -> Rc<Self> {
+    pub fn new(back: &impl IsA<gtk::Widget>, forward: &impl IsA<gtk::Widget>) -> Self {
         // Init widget
         let gobject = Box::builder()
             .orientation(Orientation::Horizontal)
@@ -23,8 +22,8 @@ impl Widget {
         gobject.append(back);
         gobject.append(forward);
 
-        // Return activated struct
-        Rc::new(Self { gobject })
+        // Return activated `Self`
+        Self { gobject }
     }
 
     // Getters

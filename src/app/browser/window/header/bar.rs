@@ -19,24 +19,27 @@ pub struct Bar {
 }
 
 impl Bar {
-    // Construct
-    pub fn new_rc(
+    // Constructors
+
+    pub fn new(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         view: &TabView,
-    ) -> Rc<Self> {
-        // Init components
-        let control = Control::new_rc();
-        let tab = Tab::new_rc(window_action.clone(), view);
-        let menu = Menu::new_rc(browser_action, window_action);
-
-        // Build result
-        Rc::new(Self {
-            widget: Widget::new_rc(control.gobject(), menu.gobject(), tab.gobject()),
-        })
+    ) -> Self {
+        let control = Control::new();
+        let tab = Tab::new(window_action.clone(), view);
+        let menu = Menu::new(browser_action, window_action);
+        Self {
+            widget: Rc::new(Widget::new(
+                control.gobject(),
+                menu.gobject(),
+                tab.gobject(),
+            )),
+        }
     }
 
     // Getters
+
     pub fn gobject(&self) -> &Box {
         self.widget.gobject()
     }

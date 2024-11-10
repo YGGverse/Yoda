@@ -12,16 +12,12 @@ pub struct Form {
 
 impl Form {
     // Construct
-    pub fn new_rc(
-        action_send: SimpleAction,
-        title: Option<&str>,
-        max_length: Option<i32>,
-    ) -> Rc<Self> {
+    pub fn new(action_send: SimpleAction, title: Option<&str>, max_length: Option<i32>) -> Self {
         // Init widget
-        let widget = Widget::new_rc(action_send, title, max_length);
+        let widget = Rc::new(Widget::new(action_send, title, max_length));
 
         // Result
-        Rc::new(Self { widget })
+        Self { widget }
     }
 
     // Actions

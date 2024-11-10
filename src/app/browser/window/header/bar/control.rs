@@ -11,10 +11,10 @@ pub struct Control {
 
 impl Control {
     // Construct
-    pub fn new_rc() -> Rc<Self> {
-        Rc::new(Self {
-            widget: Widget::new_rc(),
-        })
+    pub fn new() -> Self {
+        Self {
+            widget: Rc::new(Widget::new()),
+        }
     }
 
     // Getters
