@@ -1,6 +1,8 @@
 mod append;
+mod pin;
 
 use append::Append;
+use pin::Pin;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -13,6 +15,7 @@ use std::rc::Rc;
 pub struct Action {
     // Actions
     append: Rc<Append>,
+    pin: Rc<Pin>,
     // Group
     id: GString,
     gobject: SimpleActionGroup,
@@ -25,6 +28,7 @@ impl Action {
     pub fn new() -> Self {
         // Init actions
         let append = Rc::new(Append::new());
+        let pin = Rc::new(Pin::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -34,10 +38,12 @@ impl Action {
 
         // Add action to given group
         gobject.add_action(append.gobject());
+        gobject.add_action(pin.gobject());
 
         // Done
         Self {
             append,
+            pin,
             id,
             gobject,
         }
@@ -48,6 +54,11 @@ impl Action {
     /// Get reference `Append` action
     pub fn append(&self) -> &Rc<Append> {
         &self.append
+    }
+
+    /// Get reference `Pin` action
+    pub fn pin(&self) -> &Rc<Pin> {
+        &self.pin
     }
 
     /// Get auto-generated name for action group

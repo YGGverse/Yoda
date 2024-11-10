@@ -29,7 +29,6 @@ impl Bar {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_page_pin: SimpleAction,
         view: &TabView,
     ) -> Rc<Self> {
         // Init components
@@ -44,7 +43,6 @@ impl Bar {
             action_page_history_back,
             action_page_history_forward,
             action_page_reload,
-            action_page_pin,
         );
 
         // Build result

@@ -6,7 +6,6 @@ use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
     gio::{self, SimpleAction},
-    glib::{gformat, GString},
     prelude::ActionExt,
     MenuButton,
 };
@@ -26,21 +25,24 @@ impl Menu {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_page_pin: SimpleAction,
     ) -> Rc<Self> {
         // Main
         let main = gio::Menu::new();
 
             // Main > Page
             let main_page = gio::Menu::new();
-                main_page.append(Some("New"), Some(&gformat!(
+                main_page.append(Some("New"), Some(&format!(
                     "{}.{}",
                     window_action.id(),
                     window_action.append().id()
                 )));
 
                 main_page.append(Some("Reload"), Some(&detailed_action_name(&action_page_reload)));
-                main_page.append(Some("Pin"), Some(&detailed_action_name(&action_page_pin)));
+                main_page.append(Some("Pin"), Some(&format!(
+                    "{}.{}",
+                    window_action.id(),
+                    window_action.pin().id()
+                )));
 
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
@@ -68,19 +70,19 @@ impl Menu {
             let main_tool = gio::Menu::new();
 
                 // Debug
-                main_tool.append(Some("Debug"), Some(&gformat!(
+                main_tool.append(Some("Debug"), Some(&format!(
                     "{}.{}",
                     browser_action.id(),
                     browser_action.debug().id()
                 )));
 
-                main_tool.append(Some("Profile"), Some(&gformat!(
+                main_tool.append(Some("Profile"), Some(&format!(
                     "{}.{}",
                     browser_action.id(),
                     browser_action.profile().id()
                 )));
 
-                main_tool.append(Some("About"), Some(&gformat!(
+                main_tool.append(Some("About"), Some(&format!(
                     "{}.{}",
                     browser_action.id(),
                     browser_action.about().id()
@@ -88,7 +90,7 @@ impl Menu {
 
         main.append_submenu(Some("Tool"), &main_tool);
 
-        main.append(Some("Quit"), Some(&gformat!(
+        main.append(Some("Quit"), Some(&format!(
             "{}.{}",
             browser_action.id(),
             browser_action.close().id()
@@ -105,8 +107,8 @@ impl Menu {
 }
 
 // Private helpers
-fn detailed_action_name(action: &SimpleAction) -> GString {
-    gformat!("win.{}", action.name()) // @TODO find the way to ident parent group
-                                      // without application-wide dependencies import
-                                      // see also src/app/action.rs
+fn detailed_action_name(action: &SimpleAction) -> String {
+    format!("win.{}", action.name()) // @TODO find the way to ident parent group
+                                     // without application-wide dependencies import
+                                     // see also src/app/action.rs
 }

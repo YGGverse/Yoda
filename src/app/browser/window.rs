@@ -33,7 +33,6 @@ impl Window {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_page_pin: SimpleAction,
     ) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
@@ -47,7 +46,6 @@ impl Window {
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_pin.clone(),
             action_page_reload.clone(),
         );
 
@@ -61,7 +59,6 @@ impl Window {
             action_page_history_back,
             action_page_history_forward,
             action_page_reload,
-            action_page_pin,
             // Widgets
             tab.gobject(),
         );
@@ -75,6 +72,11 @@ impl Window {
             move || {
                 tab.append(None);
             }
+        });
+
+        action.pin().connect_activate({
+            let tab = tab.clone();
+            move |page_position| tab.pin(page_position)
         });
 
         // Init struct
@@ -111,10 +113,6 @@ impl Window {
 
     pub fn tab_close_all(&self) {
         self.tab.close_all();
-    }
-
-    pub fn tab_pin(&self, page_position: Option<i32>) {
-        self.tab.pin(page_position);
     }
 
     pub fn update(&self, tab_item_id: Option<GString>) {

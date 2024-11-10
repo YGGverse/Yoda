@@ -1,3 +1,6 @@
+use std::rc::Rc;
+
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{gio::SimpleAction, prelude::ActionExt};
 
 /// Context menu wrapper
@@ -12,12 +15,12 @@ impl Menu {
 
     /// Create new `Self`
     pub fn new(
+        window_action: Rc<WindowAction>,
         action_page_close_all: SimpleAction,
         action_page_close: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_home: SimpleAction,
-        action_page_pin: SimpleAction,
         action_page_reload: SimpleAction,
     ) -> Self {
         let main = gtk::gio::Menu::new();
@@ -27,7 +30,14 @@ impl Menu {
             Some(&detailed_action_name(action_page_reload)),
         );
 
-        main.append(Some("Pin"), Some(&detailed_action_name(action_page_pin)));
+        main.append(
+            Some("Pin"),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.pin().id()
+            )),
+        );
 
         let navigation = gtk::gio::Menu::new();
 

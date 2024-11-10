@@ -36,7 +36,6 @@ impl Browser {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_reload: SimpleAction,
-        action_page_pin: SimpleAction,
     ) -> Browser {
         // Init components
         let action = Rc::new(Action::new());
@@ -48,7 +47,6 @@ impl Browser {
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
-            action_page_pin.clone(),
         ));
 
         // Init widget
@@ -61,7 +59,6 @@ impl Browser {
                 action_page_history_back.clone(),
                 action_page_history_forward.clone(),
                 action_page_reload.clone(),
-                action_page_pin.clone(),
             ],
         ));
 
@@ -157,13 +154,6 @@ impl Browser {
         action_page_reload.connect_activate({
             let window = window.clone();
             move |this, _| window.tab_page_reload(page_position_from_action_state(this))
-        });
-
-        action_page_pin.connect_activate({
-            let window = window.clone();
-            move |this, _| {
-                window.tab_pin(page_position_from_action_state(this));
-            }
         });
 
         // Return new activated `Self`

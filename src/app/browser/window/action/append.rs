@@ -4,7 +4,7 @@ use gtk::{
     prelude::ActionExt,
 };
 
-/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Append` action of `Browser` group
+/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Append` action of `Window` group
 pub struct Append {
     gobject: SimpleAction,
 }

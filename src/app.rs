@@ -8,7 +8,7 @@ use crate::profile::Profile;
 use adw::Application;
 use gtk::{
     gio::SimpleAction,
-    glib::{gformat, uuid_string_random, ExitCode},
+    glib::{uuid_string_random, ExitCode},
     prelude::{
         ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt, ToVariant,
     },
@@ -43,8 +43,6 @@ impl App {
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_reload =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
-        let action_page_pin =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
 
         // Init GTK
         let gobject = Application::builder()
@@ -60,7 +58,6 @@ impl App {
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_reload.clone(),
-            action_page_pin.clone(),
         ));
 
         // Init events
@@ -172,7 +169,7 @@ impl App {
         for (detailed_action_name, &accels) in &[
             // Browser actions
             (
-                gformat!(
+                format!(
                     "{}.{}",
                     browser.action().id(),
                     browser.action().close().id()
@@ -180,7 +177,7 @@ impl App {
                 &["<Primary>Escape"],
             ),
             (
-                gformat!(
+                format!(
                     "{}.{}",
                     browser.action().id(),
                     browser.action().debug().id()
@@ -188,7 +185,7 @@ impl App {
                 &["<Primary>i"],
             ),
             (
-                gformat!(
+                format!(
                     "{}.{}",
                     browser.action().id(),
                     browser.action().update().id()
@@ -197,28 +194,35 @@ impl App {
             ),
             // Tab actions
             (
-                gformat!(
+                format!(
                     "{}.{}",
                     browser.window().action().id(),
                     browser.window().action().append().id()
                 ),
                 &["<Primary>t"],
             ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().pin().id()
+                ),
+                &["<Primary>p"],
+            ),
             // @TODO
             (
-                gformat!("win.{}", action_page_reload.name()),
+                format!("win.{}", action_page_reload.name()),
                 &["<Primary>r"],
             ),
             (
-                gformat!("win.{}", action_page_history_back.name()),
+                format!("win.{}", action_page_history_back.name()),
                 &["<Primary>Left"],
             ),
             (
-                gformat!("win.{}", action_page_history_forward.name()),
+                format!("win.{}", action_page_history_forward.name()),
                 &["<Primary>Right"],
             ),
-            (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
-            (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
+            (format!("win.{}", action_page_home.name()), &["<Primary>h"]),
             // @TODO page close missed
         ] {
             gobject.set_accels_for_action(detailed_action_name, &accels);

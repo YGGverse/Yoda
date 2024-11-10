@@ -47,7 +47,6 @@ impl Tab {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_pin: SimpleAction,
         action_page_reload: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
@@ -58,12 +57,12 @@ impl Tab {
 
         // Init context menu
         let menu = Menu::new(
+            window_action.clone(),
             action_page_close_all.clone(),
             action_page_close.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_home.clone(),
-            action_page_pin.clone(),
             action_page_reload.clone(),
         );
 
@@ -123,9 +122,19 @@ impl Tab {
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
             let action_page_home = action_page_home.clone();
-            let action_page_pin = action_page_pin.clone();
+            let window_action = window_action.clone();
             let action_page_reload = action_page_reload.clone();
             move |tab_view, tab_page| {
+                // Update actions
+                let state_v2 = match tab_page {
+                    // Context menu opened
+                    Some(this) => Some(tab_view.page_position(this)),
+                    // Context menu closed (reset state to defaults)
+                    None => None,
+                }; // @TODO
+                window_action.pin().change_state(state_v2);
+
+                // @TODO old version requires update
                 // Setup state for selected page
                 let state = match tab_page {
                     // Context menu opened
@@ -134,12 +143,10 @@ impl Tab {
                     None => (-1).to_variant(),
                 };
 
-                // Update actions
                 action_page_close.change_state(&state);
                 action_page_history_back.change_state(&state);
                 action_page_history_forward.change_state(&state);
                 action_page_home.change_state(&state);
-                action_page_pin.change_state(&state);
                 action_page_reload.change_state(&state);
             }
         });
