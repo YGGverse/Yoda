@@ -47,7 +47,7 @@ impl Navigation {
             home.gobject(),
             history.gobject(),
             reload.gobject(),
-            request.gobject(),
+            request.widget().gobject(),
             bookmark.gobject(),
         );
 

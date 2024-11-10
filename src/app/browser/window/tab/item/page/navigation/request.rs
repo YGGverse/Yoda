@@ -9,7 +9,6 @@ use gtk::{
     gio::SimpleAction,
     glib::{Uri, UriFlags},
     prelude::EditableExt,
-    Entry,
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -96,9 +95,6 @@ impl Request {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Entry {
-        self.widget.gobject()
-    }
 
     pub fn widget(&self) -> &Rc<Widget> {
         &self.widget
