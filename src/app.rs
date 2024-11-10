@@ -186,10 +186,6 @@ impl App {
             },
             // @TODO
             (
-                gformat!("win.{}", browser.action().quit().name()),
-                &["<Primary>Escape"],
-            ),
-            (
                 gformat!("win.{}", browser.action().update().name()),
                 &["<Primary>u"],
             ),
@@ -209,6 +205,7 @@ impl App {
             (gformat!("win.{}", action_page_home.name()), &["<Primary>h"]),
             (gformat!("win.{}", action_page_new.name()), &["<Primary>t"]),
             (gformat!("win.{}", action_page_pin.name()), &["<Primary>p"]),
+            // @TODO page close missed
         ] {
             gobject.set_accels_for_action(detailed_action_name, &accels);
         }
