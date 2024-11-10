@@ -129,7 +129,6 @@ impl Tab {
             self.gobject(),
             self.browser_action.clone(),
             self.window_action.clone(),
-            // Actions
             self.action.clone(),
             // Options
             position,
