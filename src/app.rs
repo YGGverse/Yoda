@@ -67,11 +67,8 @@ impl App {
 
         // Init events
         gobject.connect_activate({
-            let update = browser.action().update().clone();
-            move |_| {
-                // Make initial update
-                update.activate(Some(&"".to_variant())); // @TODO
-            }
+            let browser = browser.clone();
+            move |_| browser.update()
         });
 
         gobject.connect_startup({
@@ -174,22 +171,33 @@ impl App {
         });
 
         // Init accels
-        for (detailed_action_name, accels) in &[
+        for (detailed_action_name, &accels) in &[
             // Browser actions
-            {
-                let (group, action, _, accels) = crate::action::APP_BROWSER_WIDGET_DEBUG;
-                (gformat!("{group}.{action}"), accels)
-            },
-            {
-                let (group, action, _, accels) = crate::action::APP_BROWSER_WIDGET_CLOSE;
-                (gformat!("{group}.{action}"), accels)
-            },
-            // @TODO
             (
-                gformat!("win.{}", browser.action().update().name()),
+                gformat!(
+                    "{}.{}",
+                    browser.action().id(),
+                    browser.action().close().id()
+                ),
+                &["<Primary>Escape"],
+            ),
+            (
+                gformat!(
+                    "{}.{}",
+                    browser.action().id(),
+                    browser.action().debug().id()
+                ),
+                &["<Primary>i"],
+            ),
+            (
+                gformat!(
+                    "{}.{}",
+                    browser.action().id(),
+                    browser.action().update().id()
+                ),
                 &["<Primary>u"],
             ),
-            // Other
+            // @TODO
             (
                 gformat!("win.{}", action_page_reload.name()),
                 &["<Primary>r"],

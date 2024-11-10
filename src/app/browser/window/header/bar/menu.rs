@@ -61,21 +61,32 @@ impl Menu {
             // Main > Tool
             let main_tool = gio::Menu::new();
 
-                {   // Debug
-                    let (group, action, _, _) = crate::action::APP_BROWSER_WIDGET_DEBUG;
-                    main_tool.append(Some("Debug"), Some(&gformat!("{group}.{action}")));
-                }
+                // Debug
+                main_tool.append(Some("Debug"), Some(&gformat!(
+                    "{}.{}",
+                    browser_action.id(),
+                    browser_action.debug().id()
+                )));
 
-                main_tool.append(Some("Profile"), Some(&detailed_action_name(browser_action.profile())));
-                main_tool.append(Some("About"), Some(&detailed_action_name(browser_action.about())));
+                main_tool.append(Some("Profile"), Some(&gformat!(
+                    "{}.{}",
+                    browser_action.id(),
+                    browser_action.profile().id()
+                )));
 
-            main.append_submenu(Some("Tool"), &main_tool);
+                main_tool.append(Some("About"), Some(&gformat!(
+                    "{}.{}",
+                    browser_action.id(),
+                    browser_action.about().id()
+                )));
 
-            {
-                // Quit
-                let (group, action, _, _) = crate::action::APP_BROWSER_WIDGET_CLOSE;
-                main.append(Some("Quit"), Some(&gformat!("{group}.{action}")));
-            }
+        main.append_submenu(Some("Tool"), &main_tool);
+
+        main.append(Some("Quit"), Some(&gformat!(
+            "{}.{}",
+            browser_action.id(),
+            browser_action.close().id()
+        )));
 
         // Result
         Rc::new(Self { widget:Widget::new_rc(&main) })

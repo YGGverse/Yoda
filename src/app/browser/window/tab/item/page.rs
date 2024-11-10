@@ -196,7 +196,7 @@ impl Page {
         self.cancellable.replace(Cancellable::new());
 
         // Create shared variant value
-        let id = self.id.to_variant();
+        let id = self.id.clone();
 
         // Try **take** request value from Redirect holder first
         let request = if let Some(redirect) = self.meta.take_redirect() {
@@ -446,7 +446,7 @@ impl Page {
         let action_page_load = self.action_page_load.clone();
         let action_page_open = self.action_page_open.clone();
         let content = self.content.clone();
-        let id = self.id.to_variant();
+        let id = self.id.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
         let url = uri.clone().to_str();

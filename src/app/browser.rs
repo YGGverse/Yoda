@@ -14,8 +14,7 @@ use crate::profile::Profile;
 use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File, SimpleAction},
-    glib::Variant,
-    prelude::ActionExt,
+    prelude::{ActionExt, GtkWindowExt, WidgetExt},
     FileLauncher,
 };
 use sqlite::Transaction;
@@ -40,10 +39,8 @@ impl Browser {
         action_page_reload: SimpleAction,
         action_page_pin: SimpleAction,
     ) -> Browser {
-        // Init actions
-        let action = Rc::new(Action::new());
-
         // Init components
+        let action = Rc::new(Action::new());
         let window = Rc::new(Window::new(
             action.clone(),
             action_page_new.clone(),
@@ -60,11 +57,6 @@ impl Browser {
         let widget = Rc::new(Widget::new(
             window.gobject(),
             &[
-                action.about().clone(),
-                action.debug().clone(),
-                action.profile().clone(),
-                action.quit().clone(),
-                action.update().clone(),
                 action_page_new.clone(),
                 action_page_close.clone(),
                 action_page_close_all.clone(),
@@ -76,18 +68,33 @@ impl Browser {
             ],
         ));
 
-        // Init events
+        // Connect actions to browser window
+        widget
+            .gobject()
+            .insert_action_group(action.id(), Some(action.gobject()));
 
-        // Browser actions
+        // Connect events
         action.about().connect_activate({
             let window = window.clone();
-            move |_, _| {
+            move || {
                 About::new().present(Some(window.gobject()));
             }
         });
 
+        action.close().connect_activate({
+            let widget = widget.clone();
+            move || widget.gobject().close()
+        });
+
+        action.debug().connect_activate({
+            let widget = widget.clone();
+            move || {
+                widget.gobject().emit_enable_debugging(true);
+            }
+        });
+
         action.profile().connect_activate({
-            move |_, _| {
+            move || {
                 FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
                     None::<&gtk::Window>,
                     None::<&Cancellable>,
@@ -96,16 +103,16 @@ impl Browser {
                             println!("{error}")
                         }
                     },
-                );
+                ); // @TODO move out?
             }
         });
 
         action.update().connect_activate({
             let window = window.clone();
-            move |_, this| window.update(string_from_variant(this).as_str())
+            move |tab_item_id| window.update(tab_item_id)
         });
 
-        // Other
+        // @TODO
         action_page_new.connect_activate({
             let window = window.clone();
             move |_, _| {
@@ -233,6 +240,10 @@ impl Browser {
         self.window.init();
     }
 
+    pub fn update(&self) {
+        self.window.update(None);
+    }
+
     // Getters
 
     pub fn action(&self) -> &Rc<Action> {
@@ -277,12 +288,4 @@ fn page_position_from_action_state(action: &SimpleAction) -> Option<i32> {
     } else {
         None
     }
-}
-
-/// Extract `String` from [Variant](https://docs.gtk.org/glib/struct.Variant.html)
-fn string_from_variant(variant: Option<&Variant>) -> String {
-    variant
-        .expect("Variant required for this action")
-        .get::<String>()
-        .expect("Parameter type does not match `String`")
 }

@@ -10,7 +10,7 @@ use tab::Tab;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
-use gtk::{gio::SimpleAction, Box};
+use gtk::{gio::SimpleAction, glib::GString, Box};
 use std::rc::Rc;
 
 pub struct Window {
@@ -106,8 +106,8 @@ impl Window {
         self.tab.pin(page_position);
     }
 
-    pub fn update(&self, id: &str) {
-        self.tab.update(id);
+    pub fn update(&self, tab_item_id: Option<GString>) {
+        self.tab.update(tab_item_id);
     }
 
     pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {

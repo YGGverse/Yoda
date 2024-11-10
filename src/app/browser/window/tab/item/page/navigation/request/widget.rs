@@ -45,7 +45,7 @@ impl Widget {
 
         // Connect events
         gobject.connect_changed(move |_| {
-            browser_action.update().activate(Some(&"".to_variant())); // @TODO
+            browser_action.update().activate(None);
         });
 
         gobject.connect_activate(move |this| {

@@ -274,8 +274,13 @@ impl Tab {
         }
     }
 
-    pub fn update(&self, id: &str) {
-        match self.index.borrow().get(id) {
+    pub fn update(&self, item_id: Option<GString>) {
+        let key = match item_id {
+            Some(value) => value,
+            None => GString::new(), // @TODO
+        };
+
+        match self.index.borrow().get(&key) {
             Some(item) => {
                 // Update item components
                 item.update();
@@ -298,7 +303,7 @@ impl Tab {
                 }
             }
         }
-    }
+    } // @TODO need optimization
 
     pub fn clean(
         &self,
