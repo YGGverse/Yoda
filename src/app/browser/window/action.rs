@@ -1,8 +1,10 @@
 mod append;
 mod pin;
+mod reload;
 
 use append::Append;
 use pin::Pin;
+use reload::Reload;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -16,6 +18,7 @@ pub struct Action {
     // Actions
     append: Rc<Append>,
     pin: Rc<Pin>,
+    reload: Rc<Reload>,
     // Group
     id: GString,
     gobject: SimpleActionGroup,
@@ -29,6 +32,7 @@ impl Action {
         // Init actions
         let append = Rc::new(Append::new());
         let pin = Rc::new(Pin::new());
+        let reload = Rc::new(Reload::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -39,11 +43,13 @@ impl Action {
         // Add action to given group
         gobject.add_action(append.gobject());
         gobject.add_action(pin.gobject());
+        gobject.add_action(reload.gobject());
 
         // Done
         Self {
             append,
             pin,
+            reload,
             id,
             gobject,
         }
@@ -59,6 +65,11 @@ impl Action {
     /// Get reference `Pin` action
     pub fn pin(&self) -> &Rc<Pin> {
         &self.pin
+    }
+
+    /// Get reference `Reload` action
+    pub fn reload(&self) -> &Rc<Reload> {
+        &self.reload
     }
 
     /// Get auto-generated name for action group

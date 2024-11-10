@@ -2,27 +2,31 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, Button};
+use crate::app::browser::window::action::Action as WindowAction;
+use gtk::Button;
 use std::rc::Rc;
 
 pub struct Reload {
-    action_page_reload: SimpleAction,
+    window_action: Rc<WindowAction>,
     widget: Rc<Widget>,
 }
 
 impl Reload {
     // Construct
-    pub fn new_rc(action_page_reload: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         Rc::new(Self {
-            action_page_reload: action_page_reload.clone(),
-            widget: Widget::new_rc(action_page_reload),
+            window_action: window_action.clone(),
+            widget: Widget::new_rc(window_action),
         })
     }
 
     // Actions
     pub fn update(&self, is_enabled: bool) {
         // Update actions
-        self.action_page_reload.set_enabled(is_enabled);
+        self.window_action
+            .reload()
+            .gobject()
+            .set_enabled(is_enabled);
 
         // Update child components
         self.widget.update(is_enabled);

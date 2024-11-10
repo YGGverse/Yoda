@@ -21,13 +21,16 @@ impl Menu {
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         action_page_home: SimpleAction,
-        action_page_reload: SimpleAction,
     ) -> Self {
         let main = gtk::gio::Menu::new();
 
         main.append(
             Some("Reload"),
-            Some(&detailed_action_name(action_page_reload)),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.reload().id()
+            )),
         );
 
         main.append(

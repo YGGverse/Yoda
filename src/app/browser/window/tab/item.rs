@@ -38,7 +38,6 @@ impl Item {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
         // Options
         position: Option<i32>,
         is_pinned: bool,
@@ -52,11 +51,11 @@ impl Item {
             id.clone(),
             // Actions
             browser_action,
+            window_action,
             tab_action,
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_reload.clone(),
         );
 
         let widget = Widget::new_rc(
@@ -139,7 +138,6 @@ impl Item {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -156,7 +154,6 @@ impl Item {
                         action_page_home.clone(),
                         action_page_history_back.clone(),
                         action_page_history_forward.clone(),
-                        action_page_reload.clone(),
                         // Options
                         None,
                         record.is_pinned,

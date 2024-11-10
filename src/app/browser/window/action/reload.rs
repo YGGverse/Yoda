@@ -9,12 +9,12 @@ use gtk::{
 /// C-compatible variant type
 const DEFAULT_STATE: i32 = -1;
 
-/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Pin` action of `Window` group
-pub struct Pin {
+/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Reload` action of `Window` group
+pub struct Reload {
     gobject: SimpleAction,
 }
 
-impl Pin {
+impl Reload {
     // Constructors
 
     /// Create new `Self`
@@ -29,6 +29,11 @@ impl Pin {
     }
 
     // Actions
+
+    /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
+    pub fn activate(&self) {
+        self.gobject.activate(None);
+    }
 
     /// Change action [state](https://docs.gtk.org/gio/method.SimpleAction.set_state.html)
     /// * set `DEFAULT_STATE` on `None`

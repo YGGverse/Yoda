@@ -24,7 +24,6 @@ impl Menu {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
     ) -> Rc<Self> {
         // Main
         let main = gio::Menu::new();
@@ -37,7 +36,12 @@ impl Menu {
                     window_action.append().id()
                 )));
 
-                main_page.append(Some("Reload"), Some(&detailed_action_name(&action_page_reload)));
+                main_page.append(Some("Reload"), Some(&format!(
+                    "{}.{}",
+                    window_action.id(),
+                    window_action.reload().id()
+                )));
+
                 main_page.append(Some("Pin"), Some(&format!(
                     "{}.{}",
                     window_action.id(),

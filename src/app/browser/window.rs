@@ -32,7 +32,6 @@ impl Window {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
     ) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
@@ -46,7 +45,6 @@ impl Window {
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_reload.clone(),
         );
 
         let header = Header::new_rc(
@@ -58,7 +56,6 @@ impl Window {
             action_page_home,
             action_page_history_back,
             action_page_history_forward,
-            action_page_reload,
             // Widgets
             tab.gobject(),
         );
@@ -76,7 +73,12 @@ impl Window {
 
         action.pin().connect_activate({
             let tab = tab.clone();
-            move |page_position| tab.pin(page_position)
+            move |position| tab.pin(position)
+        });
+
+        action.reload().connect_activate({
+            let tab = tab.clone();
+            move |position| tab.page_reload(position)
         });
 
         // Init struct
@@ -99,11 +101,6 @@ impl Window {
 
     pub fn tab_page_history_forward(&self, page_position: Option<i32>) {
         self.tab.page_history_forward(page_position);
-    }
-
-    /// Reload page at given position or selected page on `None` given
-    pub fn tab_page_reload(&self, position: Option<i32>) {
-        self.tab.page_reload(position);
     }
 
     /// Close page at given position or selected page on `None` given

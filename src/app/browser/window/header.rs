@@ -25,7 +25,6 @@ impl Header {
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
         // Widgets
         tab_view: &TabView,
     ) -> Rc<Self> {
@@ -38,7 +37,6 @@ impl Header {
             action_page_home,
             action_page_history_back,
             action_page_history_forward,
-            action_page_reload,
             tab_view,
         );
 

@@ -15,6 +15,7 @@ use request::Request;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{gio::SimpleAction, glib::GString, prelude::WidgetExt, Box};
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -31,16 +32,16 @@ pub struct Navigation {
 impl Navigation {
     pub fn new_rc(
         browser_action: Rc<BrowserAction>,
+        window_action: Rc<WindowAction>,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
         action_page_open: SimpleAction,
     ) -> Rc<Self> {
         // Init components
         let home = Home::new_rc(action_page_home);
         let history = History::new_rc(action_page_history_back, action_page_history_forward);
-        let reload = Reload::new_rc(action_page_reload.clone());
+        let reload = Reload::new_rc(window_action);
         let request = Request::new_rc(browser_action, action_page_open.clone());
         let bookmark = Bookmark::new_rc();
 

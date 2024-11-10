@@ -1,6 +1,6 @@
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionExt, ButtonExt, WidgetExt},
+    prelude::{ButtonExt, WidgetExt},
     Button,
 };
 use std::rc::Rc;
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(action_page_reload: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("view-refresh-symbolic")
@@ -20,12 +20,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked({
-            let action_page_reload = action_page_reload.clone();
-            move |_| {
-                action_page_reload.activate(None);
-            }
-        });
+        gobject.connect_clicked(move |_| window_action.reload().activate());
 
         // Return activated struct
         Rc::new(Self { gobject })

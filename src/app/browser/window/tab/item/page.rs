@@ -13,6 +13,7 @@ use navigation::Navigation;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use crate::app::browser::window::tab::action::Action as TabAction;
 use gtk::{
     gdk_pixbuf::Pixbuf,
@@ -37,6 +38,7 @@ pub struct Page {
     cancellable: RefCell<Cancellable>,
     // Actions
     browser_action: Rc<BrowserAction>,
+    window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
     action_page_load: SimpleAction,
     // Components
@@ -56,11 +58,11 @@ impl Page {
     pub fn new_rc(
         id: GString,
         browser_action: Rc<BrowserAction>,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
         action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_reload: SimpleAction,
     ) -> Rc<Self> {
         // Init local actions
         let action_page_load = SimpleAction::new(&uuid_string_random(), None);
@@ -72,10 +74,10 @@ impl Page {
 
         let navigation = Navigation::new_rc(
             browser_action.clone(),
+            window_action.clone(),
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_reload.clone(),
             action_page_open.clone(),
         );
 
@@ -97,6 +99,7 @@ impl Page {
             id,
             // Actions
             browser_action,
+            window_action,
             tab_action,
             action_page_load: action_page_load.clone(),
             // Components

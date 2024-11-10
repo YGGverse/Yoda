@@ -41,8 +41,6 @@ impl App {
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_history_forward =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
-        let action_page_reload =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
 
         // Init GTK
         let gobject = Application::builder()
@@ -57,7 +55,6 @@ impl App {
             action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_reload.clone(),
         ));
 
         // Init events
@@ -209,11 +206,15 @@ impl App {
                 ),
                 &["<Primary>p"],
             ),
-            // @TODO
             (
-                format!("win.{}", action_page_reload.name()),
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().reload().id()
+                ),
                 &["<Primary>r"],
             ),
+            // @TODO
             (
                 format!("win.{}", action_page_history_back.name()),
                 &["<Primary>Left"],
