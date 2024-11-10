@@ -38,7 +38,6 @@ pub struct Page {
     cancellable: RefCell<Cancellable>,
     // Actions
     browser_action: Rc<BrowserAction>,
-    window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
     action_page_load: SimpleAction,
     // Components
@@ -93,7 +92,6 @@ impl Page {
             id,
             // Actions
             browser_action,
-            window_action,
             tab_action,
             action_page_load: action_page_load.clone(),
             // Components

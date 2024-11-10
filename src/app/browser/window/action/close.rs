@@ -30,10 +30,11 @@ impl Close {
 
     // Actions
 
+    /* @TODO not in use
     /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     pub fn activate(&self) {
         self.gobject.activate(None);
-    }
+    } */
 
     /// Change action [state](https://docs.gtk.org/gio/method.SimpleAction.set_state.html)
     /// * set `DEFAULT_STATE` on `None`
