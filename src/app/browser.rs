@@ -32,7 +32,6 @@ impl Browser {
         profile: Rc<Profile>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Browser {
@@ -42,7 +41,6 @@ impl Browser {
             action.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
-            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
         ));
@@ -53,7 +51,6 @@ impl Browser {
             &[
                 action_page_close.clone(),
                 action_page_close_all.clone(),
-                action_page_home.clone(),
                 action_page_history_back.clone(),
                 action_page_history_forward.clone(),
             ],
@@ -124,13 +121,6 @@ impl Browser {
             let window = window.clone();
             move |_, _| {
                 window.tab_close_all();
-            }
-        });
-
-        action_page_home.connect_activate({
-            let window = window.clone();
-            move |this, _| {
-                window.tab_page_home(page_position_from_action_state(this));
             }
         });
 

@@ -21,7 +21,6 @@ impl Menu {
         window_action: Rc<WindowAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Rc<Self> {
@@ -50,7 +49,12 @@ impl Menu {
 
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
-                    main_page_navigation.append(Some("Home"), Some(&detailed_action_name(&action_page_home)));
+
+                    main_page.append(Some("Home"), Some(&format!(
+                        "{}.{}",
+                        window_action.id(),
+                        window_action.home().id()
+                    )));
 
                     // Main > Page > Navigation > History
                     let main_page_navigation_history = gio::Menu::new();

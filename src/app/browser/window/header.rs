@@ -22,7 +22,6 @@ impl Header {
         window_action: Rc<WindowAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         // Widgets
@@ -34,7 +33,6 @@ impl Header {
             window_action,
             action_page_close,
             action_page_close_all,
-            action_page_home,
             action_page_history_back,
             action_page_history_forward,
             tab_view,

@@ -60,7 +60,6 @@ impl Page {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Rc<Self> {
@@ -75,7 +74,6 @@ impl Page {
         let navigation = Navigation::new_rc(
             browser_action.clone(),
             window_action.clone(),
-            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
             action_page_open.clone(),

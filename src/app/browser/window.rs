@@ -29,7 +29,6 @@ impl Window {
         browser_action: Rc<BrowserAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Self {
@@ -42,7 +41,6 @@ impl Window {
             action.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
-            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
         );
@@ -53,7 +51,6 @@ impl Window {
             action.clone(),
             action_page_close,
             action_page_close_all,
-            action_page_home,
             action_page_history_back,
             action_page_history_forward,
             // Widgets
@@ -81,6 +78,11 @@ impl Window {
             move |position| tab.page_reload(position)
         });
 
+        action.home().connect_activate({
+            let tab = tab.clone();
+            move |position| tab.page_home(position)
+        });
+
         // Init struct
         Self {
             //header,
@@ -91,10 +93,6 @@ impl Window {
     }
 
     // Actions
-    pub fn tab_page_home(&self, page_position: Option<i32>) {
-        self.tab.page_home(page_position);
-    }
-
     pub fn tab_page_history_back(&self, page_position: Option<i32>) {
         self.tab.page_history_back(page_position);
     }

@@ -2,26 +2,26 @@ mod widget;
 
 use widget::Widget;
 
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
-    gio::SimpleAction,
     glib::{gformat, GString, Uri},
     Button,
 };
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
-    action_page_home: SimpleAction,
+    window_action: Rc<WindowAction>,
     uri: RefCell<Option<Uri>>,
     widget: Rc<Widget>,
 }
 
 impl Home {
     // Construct
-    pub fn new_rc(action_page_home: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         Rc::new(Self {
-            action_page_home: action_page_home.clone(),
+            window_action: window_action.clone(),
             uri: RefCell::new(None),
-            widget: Widget::new_rc(action_page_home),
+            widget: Widget::new_rc(window_action),
         })
     }
 
@@ -37,7 +37,7 @@ impl Home {
         self.uri.replace(uri);
 
         // Update action status
-        self.action_page_home.set_enabled(status);
+        self.window_action.home().gobject().set_enabled(status);
 
         // Update child components
         self.widget.update(status);

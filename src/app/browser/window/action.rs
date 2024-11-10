@@ -1,8 +1,10 @@
 mod append;
+mod home;
 mod pin;
 mod reload;
 
 use append::Append;
+use home::Home;
 use pin::Pin;
 use reload::Reload;
 
@@ -17,6 +19,7 @@ use std::rc::Rc;
 pub struct Action {
     // Actions
     append: Rc<Append>,
+    home: Rc<Home>,
     pin: Rc<Pin>,
     reload: Rc<Reload>,
     // Group
@@ -31,6 +34,7 @@ impl Action {
     pub fn new() -> Self {
         // Init actions
         let append = Rc::new(Append::new());
+        let home = Rc::new(Home::new());
         let pin = Rc::new(Pin::new());
         let reload = Rc::new(Reload::new());
 
@@ -42,12 +46,14 @@ impl Action {
 
         // Add action to given group
         gobject.add_action(append.gobject());
+        gobject.add_action(home.gobject());
         gobject.add_action(pin.gobject());
         gobject.add_action(reload.gobject());
 
         // Done
         Self {
             append,
+            home,
             pin,
             reload,
             id,
@@ -60,6 +66,11 @@ impl Action {
     /// Get reference `Append` action
     pub fn append(&self) -> &Rc<Append> {
         &self.append
+    }
+
+    /// Get reference `Home` action
+    pub fn home(&self) -> &Rc<Home> {
+        &self.home
     }
 
     /// Get reference `Pin` action

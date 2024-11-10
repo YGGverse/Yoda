@@ -27,7 +27,6 @@ pub struct Tab {
     browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
     // Page actions
-    action_page_home: SimpleAction,
     action_page_history_back: SimpleAction,
     action_page_history_forward: SimpleAction,
     // Dynamically allocated reference index
@@ -43,7 +42,6 @@ impl Tab {
         window_action: Rc<WindowAction>,
         action_page_close: SimpleAction,
         action_page_close_all: SimpleAction,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Rc<Self> {
@@ -60,7 +58,6 @@ impl Tab {
             action_page_close.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
-            action_page_home.clone(),
         );
 
         // Init widget
@@ -76,7 +73,6 @@ impl Tab {
             let window_action = window_action.clone();
             let action = action.clone();
 
-            let action_page_home = action_page_home.clone();
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
 
@@ -89,7 +85,6 @@ impl Tab {
                     window_action.clone(),
                     action.clone(),
                     // Page actions
-                    action_page_home.clone(),
                     action_page_history_back.clone(),
                     action_page_history_forward.clone(),
                     // Options
@@ -116,7 +111,6 @@ impl Tab {
             let action_page_close = action_page_close.clone();
             let action_page_history_back = action_page_history_back.clone();
             let action_page_history_forward = action_page_history_forward.clone();
-            let action_page_home = action_page_home.clone();
             let window_action = window_action.clone();
             move |tab_view, tab_page| {
                 // Update actions
@@ -126,8 +120,10 @@ impl Tab {
                     // Context menu closed (reset state to defaults)
                     None => None,
                 }; // @TODO
+
                 window_action.pin().change_state(state_v2);
                 window_action.reload().change_state(state_v2);
+                window_action.home().change_state(state_v2);
 
                 // @TODO old version requires update
                 // Setup state for selected page
@@ -141,7 +137,6 @@ impl Tab {
                 action_page_close.change_state(&state);
                 action_page_history_back.change_state(&state);
                 action_page_history_forward.change_state(&state);
-                action_page_home.change_state(&state);
             }
         });
 
@@ -182,7 +177,6 @@ impl Tab {
             browser_action,
             window_action,
             // Global actions
-            action_page_home,
             action_page_history_back,
             action_page_history_forward,
             // Init empty HashMap index as no tabs appended yet
@@ -202,7 +196,6 @@ impl Tab {
             // Local actions
             self.action.clone(),
             // Global actions
-            self.action_page_home.clone(),
             self.action_page_history_back.clone(),
             self.action_page_history_forward.clone(),
             // Options
@@ -345,7 +338,6 @@ impl Tab {
                         self.browser_action.clone(),
                         self.window_action.clone(),
                         self.action.clone(),
-                        self.action_page_home.clone(),
                         self.action_page_history_back.clone(),
                         self.action_page_history_forward.clone(),
                     ) {

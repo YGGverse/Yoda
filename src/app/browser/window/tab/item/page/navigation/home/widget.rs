@@ -1,6 +1,6 @@
+use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionExt, ButtonExt, WidgetExt},
+    prelude::{ButtonExt, WidgetExt},
     Button,
 };
 use std::rc::Rc;
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new_rc(action_page_home: SimpleAction) -> Rc<Self> {
+    pub fn new_rc(window_action: Rc<WindowAction>) -> Rc<Self> {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-home-symbolic")
@@ -20,12 +20,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked({
-            let action_page_home = action_page_home.clone();
-            move |_| {
-                action_page_home.activate(None);
-            }
-        });
+        gobject.connect_clicked(move |_| window_action.home().activate());
 
         // Return activated struct
         Rc::new(Self { gobject })

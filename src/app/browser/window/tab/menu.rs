@@ -20,7 +20,6 @@ impl Menu {
         action_page_close: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
-        action_page_home: SimpleAction,
     ) -> Self {
         let main = gtk::gio::Menu::new();
 
@@ -44,7 +43,14 @@ impl Menu {
 
         let navigation = gtk::gio::Menu::new();
 
-        navigation.append(Some("Home"), Some(&detailed_action_name(action_page_home)));
+        navigation.append(
+            Some("Home"),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.home().id()
+            )),
+        );
 
         main.append_section(None, &navigation);
 

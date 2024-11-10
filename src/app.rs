@@ -35,8 +35,6 @@ impl App {
         let action_page_close =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_close_all = SimpleAction::new(&uuid_string_random(), None);
-        let action_page_home =
-            SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_history_back =
             SimpleAction::new_stateful(&uuid_string_random(), None, &default_state);
         let action_page_history_forward =
@@ -52,7 +50,6 @@ impl App {
             profile.clone(),
             action_page_close.clone(),
             action_page_close_all.clone(),
-            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
         ));
@@ -214,6 +211,14 @@ impl App {
                 ),
                 &["<Primary>r"],
             ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
+                    browser.window().action().home().id()
+                ),
+                &["<Primary>h"],
+            ),
             // @TODO
             (
                 format!("win.{}", action_page_history_back.name()),
@@ -223,7 +228,6 @@ impl App {
                 format!("win.{}", action_page_history_forward.name()),
                 &["<Primary>Right"],
             ),
-            (format!("win.{}", action_page_home.name()), &["<Primary>h"]),
             // @TODO page close missed
         ] {
             gobject.set_accels_for_action(detailed_action_name, &accels);

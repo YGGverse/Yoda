@@ -35,7 +35,6 @@ impl Item {
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
         // @TODO
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
         // Options
@@ -53,7 +52,6 @@ impl Item {
             browser_action,
             window_action,
             tab_action,
-            action_page_home.clone(),
             action_page_history_back.clone(),
             action_page_history_forward.clone(),
         );
@@ -135,7 +133,6 @@ impl Item {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_home: SimpleAction,
         action_page_history_back: SimpleAction,
         action_page_history_forward: SimpleAction,
     ) -> Result<Vec<Rc<Item>>, String> {
@@ -151,7 +148,6 @@ impl Item {
                         browser_action.clone(),
                         window_action.clone(),
                         tab_action.clone(),
-                        action_page_home.clone(),
                         action_page_history_back.clone(),
                         action_page_history_forward.clone(),
                         // Options
