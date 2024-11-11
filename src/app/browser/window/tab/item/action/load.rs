@@ -50,11 +50,4 @@ impl Load {
             })
         });
     }
-
-    // Getters
-
-    /// Get reference to [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) GObject
-    pub fn gobject(&self) -> &SimpleAction {
-        &self.gobject
-    }
 }

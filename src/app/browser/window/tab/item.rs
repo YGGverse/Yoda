@@ -22,7 +22,6 @@ pub struct Item {
     // useful as widget name in GTK actions callback
     id: GString,
     // Components
-    action: Rc<Action>,
     page: Rc<Page>,
     widget: Rc<Widget>,
 }
@@ -94,12 +93,7 @@ impl Item {
         });
 
         // Done
-        Self {
-            id,
-            action,
-            page,
-            widget,
-        }
+        Self { id, page, widget }
     }
 
     // Actions
