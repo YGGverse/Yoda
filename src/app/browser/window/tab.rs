@@ -112,12 +112,8 @@ impl Tab {
             self.widget.gobject(),
             self.browser_action.clone(),
             self.window_action.clone(),
-            // Options
-            position,
-            request,
-            is_pinned,
-            is_selected,
-            is_load,
+            // Options tuple
+            (position, request, is_pinned, is_selected, is_load),
         ));
 
         // Register dynamically created tab components in the HashMap index
