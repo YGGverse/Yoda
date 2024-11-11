@@ -3,10 +3,7 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::{
-    glib::{gformat, GString, Uri},
-    Button,
-};
+use gtk::glib::{gformat, GString, Uri};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
@@ -44,8 +41,8 @@ impl Home {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 
     pub fn url(&self) -> Option<GString> {

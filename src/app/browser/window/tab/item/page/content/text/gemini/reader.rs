@@ -4,7 +4,7 @@ mod widget;
 use tag::Tag;
 use widget::Widget;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use adw::StyleManager;
 use gemtext::line::{
     code::Code,
@@ -15,9 +15,9 @@ use gemtext::line::{
 };
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
-    gio::{Cancellable, SimpleAction},
+    gio::Cancellable,
     glib::{GString, TimeZone, Uri},
-    prelude::{ActionExt, TextBufferExt, TextBufferExtManual, TextViewExt, ToVariant, WidgetExt},
+    prelude::{TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
     UriLauncher, Window, WrapMode,
 };
@@ -33,8 +33,8 @@ impl Reader {
     pub fn new(
         gemtext: &str,
         base: &Uri,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_open: SimpleAction,
     ) -> Self {
         // Init default values
         let mut title = None;
@@ -232,7 +232,7 @@ impl Reader {
 
         // Init events
         primary_button_controller.connect_released({
-            let action_page_open = action_page_open.clone();
+            let tab_action = tab_action.clone();
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
             move |_, _, window_x, window_y| {
@@ -251,7 +251,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    action_page_open.activate(Some(&uri.to_str().to_variant()));
+                                    tab_action.load().activate(Some(&uri.to_str()));
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
@@ -259,8 +259,7 @@ impl Reader {
                                     None::<&Cancellable>,
                                     |result| {
                                         if let Err(error) = result {
-                                            // @TODO
-                                            println!("Could not delegate launch action: {error}")
+                                            println!("{error}")
                                         }
                                     },
                                 ),
@@ -289,7 +288,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    tab_action.open().activate(Some(&uri.to_string()));
+                                    window_action.append().activate();
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
@@ -297,8 +296,7 @@ impl Reader {
                                     None::<&Cancellable>,
                                     |result| {
                                         if let Err(error) = result {
-                                            // @TODO
-                                            println!("Could not delegate launch action: {error}")
+                                            println!("{error}")
                                         }
                                     },
                                 ),

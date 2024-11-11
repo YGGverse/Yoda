@@ -6,7 +6,7 @@ use response::Response;
 use sensitive::Sensitive;
 use widget::Widget;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::tab::item::Action as TabAction;
 use adw::Clamp;
 use gtk::glib::Uri;
 use std::rc::Rc;

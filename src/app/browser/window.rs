@@ -12,13 +12,12 @@ use tab::Tab;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
-use gtk::{glib::GString, Box};
+use gtk::glib::GString;
 use std::rc::Rc;
 
 pub struct Window {
-    //header: Rc<Header>,
-    tab: Rc<Tab>,
     action: Rc<Action>,
+    tab: Rc<Tab>,
     widget: Rc<Widget>,
 }
 
@@ -33,10 +32,10 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::new(browser_action.clone(), action.clone()));
-        let header = Header::new(browser_action, action.clone(), tab.gobject());
+        let header = Header::new(browser_action, action.clone(), tab.widget().gobject());
 
         // GTK
-        let widget = Rc::new(Widget::new(header.gobject(), tab.gobject()));
+        let widget = Rc::new(Widget::new(header.gobject(), tab.widget().gobject()));
 
         // Init events
         action.append().connect_activate({
@@ -91,9 +90,8 @@ impl Window {
 
         // Init struct
         Self {
-            //header,
-            tab,
             action,
+            tab,
             widget,
         }
     }
@@ -163,12 +161,8 @@ impl Window {
         &self.action
     }
 
-    pub fn tab(&self) -> &Rc<Tab> {
-        &self.tab
-    }
-
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }
 

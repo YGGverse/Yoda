@@ -3,7 +3,6 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::Button;
 use std::rc::Rc;
 
 pub struct Forward {
@@ -33,7 +32,8 @@ impl Forward {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }

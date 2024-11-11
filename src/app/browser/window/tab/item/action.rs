@@ -1,6 +1,5 @@
-mod open;
-
-use open::Open;
+mod load;
+use load::Load;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -12,7 +11,7 @@ use std::rc::Rc;
 /// [SimpleActionGroup](https://docs.gtk.org/gio/class.SimpleActionGroup.html) wrapper for `Browser` actions
 pub struct Action {
     // Actions
-    open: Rc<Open>,
+    load: Rc<Load>,
     // Group
     id: GString,
     gobject: SimpleActionGroup,
@@ -24,7 +23,7 @@ impl Action {
     /// Create new `Self`
     pub fn new() -> Self {
         // Init actions
-        let open = Rc::new(Open::new());
+        let load = Rc::new(Load::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -33,17 +32,17 @@ impl Action {
         let gobject = SimpleActionGroup::new();
 
         // Add action to given group
-        gobject.add_action(open.gobject());
+        gobject.add_action(load.gobject());
 
         // Done
-        Self { open, id, gobject }
+        Self { load, id, gobject }
     }
 
     // Getters
 
-    /// Get reference `Open` action
-    pub fn open(&self) -> &Rc<Open> {
-        &self.open
+    /// Get reference to `Load` action
+    pub fn load(&self) -> &Rc<Load> {
+        &self.load
     }
 
     /// Get auto-generated name for action group

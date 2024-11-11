@@ -1,10 +1,8 @@
-mod action;
 mod database;
 mod item;
 mod menu;
 mod widget;
 
-use action::Action;
 use database::Database;
 use item::Item;
 use menu::Menu;
@@ -12,7 +10,6 @@ use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
-use adw::TabView;
 use gtk::{
     glib::{GString, Propagation},
     prelude::WidgetExt,
@@ -22,22 +19,16 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
-    // Actions
     browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
-    // Dynamically allocated reference index
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
-    action: Rc<Action>,
     widget: Rc<Widget>,
 }
 
 impl Tab {
     // Construct
     pub fn new(browser_action: Rc<BrowserAction>, window_action: Rc<WindowAction>) -> Self {
-        // Init local actions
-        let action = Rc::new(Action::new());
-
-        // Init empty HashMap index as no tabs appended yet
+        // Init empty HashMap index
         let index: Rc<RefCell<HashMap<GString, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
@@ -98,29 +89,11 @@ impl Tab {
             }
         });
 
-        action.open().connect_activate({
-            let index = index.clone();
-            let widget = widget.clone();
-            move |request| {
-                if let Some(value) = request {
-                    if let Some(page) = widget.page(None) {
-                        if let Some(id) = page.keyword() {
-                            if let Some(item) = index.borrow().get(&id) {
-                                item.set_page_navigation_request_text(value.as_str());
-                                item.page().reload();
-                            }
-                        }
-                    }
-                }
-            }
-        }); // @TODO fix new item on middle click
-
         // Return activated `Self`
         Self {
             browser_action,
             window_action,
             index,
-            action,
             widget,
         }
     }
@@ -128,19 +101,20 @@ impl Tab {
     // Actions
     pub fn append(&self, position: Option<i32>) -> Rc<Item> {
         // Init new tab item
-        let item = Item::new_rc(
-            self.gobject(),
+        let item = Rc::new(Item::new(
+            self.widget.gobject(),
             self.browser_action.clone(),
             self.window_action.clone(),
-            self.action.clone(),
             // Options
             position,
             false,
             true,
-        );
+        ));
 
         // Register dynamically created tab components in the HashMap index
-        self.index.borrow_mut().insert(item.id(), item.clone());
+        self.index
+            .borrow_mut()
+            .insert(item.id().clone(), item.clone());
 
         item.page()
             .navigation()
@@ -220,8 +194,10 @@ impl Tab {
                 item.update();
 
                 // Update tab title on loading indicator inactive
-                if !item.page_is_loading() {
-                    item.gobject().set_title(item.page_meta_title().as_str())
+                if !item.page().is_loading() {
+                    item.widget()
+                        .gobject()
+                        .set_title(item.page().meta().title().as_str())
                 }
             }
             // Update all tabs on ID not found @TODO change initial update method
@@ -231,8 +207,10 @@ impl Tab {
                     item.update();
 
                     // Update tab title on loading indicator inactive
-                    if !item.page_is_loading() {
-                        item.gobject().set_title(item.page_meta_title().as_str())
+                    if !item.page().is_loading() {
+                        item.widget()
+                            .gobject()
+                            .set_title(item.page().meta().title().as_str())
                     }
                 }
             }
@@ -273,17 +251,18 @@ impl Tab {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
-                        self.gobject(),
+                        self.widget.gobject(),
                         transaction,
                         &record.id,
                         self.browser_action.clone(),
                         self.window_action.clone(),
-                        self.action.clone(),
                     ) {
                         Ok(items) => {
                             for item in items {
                                 // Register dynamically created tab item in the HashMap index
-                                self.index.borrow_mut().insert(item.id(), item.clone());
+                                self.index
+                                    .borrow_mut()
+                                    .insert(item.id().clone(), item.clone());
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -311,9 +290,9 @@ impl Tab {
                     item.save(
                         transaction,
                         &id,
-                        &self.widget.gobject().page_position(item.gobject()),
-                        &item.gobject().is_pinned(),
-                        &item.gobject().is_selected(),
+                        &self.widget.gobject().page_position(item.widget().gobject()),
+                        &item.widget().gobject().is_pinned(),
+                        &item.widget().gobject().is_selected(),
                     )?;
                 }
             }
@@ -334,12 +313,8 @@ impl Tab {
 
     // Getters
 
-    pub fn action(&self) -> &Rc<Action> {
-        &self.action
-    }
-
-    pub fn gobject(&self) -> &TabView {
-        self.widget.gobject()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }
 

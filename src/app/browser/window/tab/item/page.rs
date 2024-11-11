@@ -12,24 +12,18 @@ use meta::{Meta, Status};
 use navigation::Navigation;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::{
+    window::{tab::item::Action as TabAction, Action as WindowAction},
+    Action as BrowserAction,
+};
 use gtk::{
     gdk_pixbuf::Pixbuf,
-    gio::{
-        Cancellable, SimpleAction, SocketClient, SocketClientEvent, SocketProtocol,
-        TlsCertificateFlags,
-    },
+    gio::{Cancellable, SocketClient, SocketClientEvent, SocketProtocol, TlsCertificateFlags},
     glib::{
-        gformat, uuid_string_random, Bytes, GString, Priority, Regex, RegexCompileFlags,
-        RegexMatchFlags, Uri, UriFlags, UriHideFlags,
+        gformat, Bytes, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
+        UriFlags, UriHideFlags,
     },
-    prelude::{
-        ActionExt, CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
-        StaticVariantType,
-    },
-    Box,
+    prelude::{CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc, time::Duration};
@@ -39,47 +33,38 @@ pub struct Page {
     cancellable: RefCell<Cancellable>,
     // Actions
     browser_action: Rc<BrowserAction>,
+    window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
-    action_page_load: SimpleAction,
     // Components
     navigation: Rc<Navigation>,
     content: Rc<Content>,
     input: Rc<Input>,
-    // Extras
     meta: Rc<Meta>,
-    // GTK
     widget: Rc<Widget>,
 }
 
 impl Page {
     // Constructors
 
-    /// Create new activated `Rc<Self>`
-    pub fn new_rc(
+    pub fn new(
         id: GString,
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-    ) -> Rc<Self> {
-        // Init local actions
-        let action_page_load = SimpleAction::new(&uuid_string_random(), None);
-        let action_page_open =
-            SimpleAction::new(&uuid_string_random(), Some(&String::static_variant_type()));
-
+    ) -> Self {
         // Init components
-        let content = Rc::new(Content::new(tab_action.clone(), action_page_open.clone()));
+        let content = Rc::new(Content::new(window_action.clone(), tab_action.clone()));
 
         let navigation = Rc::new(Navigation::new(
             browser_action.clone(),
             window_action.clone(),
-            action_page_open.clone(),
+            tab_action.clone(),
         ));
 
         let input = Rc::new(Input::new());
 
         let widget = Rc::new(Widget::new(
             &id,
-            action_page_open.clone(),
             navigation.widget().gobject(),
             content.gobject(),
             input.gobject(),
@@ -87,48 +72,21 @@ impl Page {
 
         let meta = Rc::new(Meta::new(Status::New, gformat!("New page")));
 
-        // Init `Self`
-        let this = Rc::new(Self {
+        // Done
+        Self {
             cancellable: RefCell::new(Cancellable::new()),
             id,
             // Actions
             browser_action,
+            window_action,
             tab_action,
-            action_page_load: action_page_load.clone(),
             // Components
             content,
             navigation,
             input,
-            // Extras
             meta,
-            // GTK
             widget,
-        });
-
-        // Init events
-        action_page_load.connect_activate({
-            let this = this.clone();
-            move |_, _| this.load(false)
-        });
-
-        action_page_open.connect_activate({
-            let this = this.clone();
-            move |_, request| {
-                // Set request value from action parameter
-                this.navigation().request().widget().gobject().set_text(
-                    &request
-                        .expect("Parameter required for this action")
-                        .get::<String>()
-                        .expect("Parameter does not match `String`"),
-                );
-
-                // Reload page
-                this.load(true);
-            }
-        });
-
-        // Return activated `Self`
-        this
+        }
     }
 
     // Actions
@@ -138,7 +96,7 @@ impl Page {
     pub fn home(&self) {
         if let Some(url) = self.navigation.home().url() {
             // Update with history record
-            self.tab_action.open().activate(Some(&url));
+            self.tab_action.load().activate(Some(&url));
         }
     }
 
@@ -432,21 +390,16 @@ impl Page {
         }
     }
 
-    pub fn meta_title(&self) -> GString {
-        self.meta.title()
-    }
-
-    /*
     pub fn meta(&self) -> &Rc<Meta> {
         &self.meta
-    } */
+    }
 
     pub fn navigation(&self) -> &Rc<Navigation> {
         &self.navigation
     }
 
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 
     // Private helpers @TODO move outside
@@ -457,7 +410,6 @@ impl Page {
         // Init shared objects (async)
         let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
-        let action_page_load = self.action_page_load.clone();
         let tab_action = self.tab_action.clone();
         let content = self.content.clone();
         let id = self.id.clone();
@@ -799,7 +751,7 @@ impl Page {
                                                                                     .set_title("Redirect");
 
                                                                                 // Reload page to apply redirection
-                                                                                action_page_load.activate(None);
+                                                                                tab_action.load().activate(None);
                                                                             }
                                                                         },
                                                                         Err(reason) => {

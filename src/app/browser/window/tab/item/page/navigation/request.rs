@@ -4,9 +4,8 @@ mod widget;
 use database::Database;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    gio::SimpleAction,
     glib::{Uri, UriFlags},
     prelude::EditableExt,
 };
@@ -23,10 +22,10 @@ impl Request {
     pub fn new(
         // Actions
         browser_action: Rc<BrowserAction>,
-        action_page_reload: SimpleAction, // @TODO local `action_page_open`?
+        tab_action: Rc<TabAction>,
     ) -> Self {
         Self {
-            widget: Rc::new(Widget::new(browser_action, action_page_reload)),
+            widget: Rc::new(Widget::new(browser_action, tab_action)),
         }
     }
 

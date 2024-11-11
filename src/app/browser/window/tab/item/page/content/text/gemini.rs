@@ -4,12 +4,9 @@ mod widget;
 use reader::Reader;
 use widget::Widget;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use adw::ClampScrollable;
-use gtk::{
-    gio::SimpleAction,
-    glib::{GString, Uri},
-};
+use gtk::glib::{GString, Uri};
 use std::rc::Rc;
 
 pub struct Gemini {
@@ -22,11 +19,11 @@ impl Gemini {
     pub fn new(
         gemtext: &str,
         base: &Uri,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let reader = Rc::new(Reader::new(gemtext, base, tab_action, action_page_open));
+        let reader = Rc::new(Reader::new(gemtext, base, window_action, tab_action));
         let widget = Rc::new(Widget::new(reader.gobject()));
 
         // Result

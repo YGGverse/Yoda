@@ -14,9 +14,10 @@ use reload::Reload;
 use request::Request;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
-use gtk::{gio::SimpleAction, prelude::EditableExt};
+use crate::app::browser::window::tab::item::Action as TabAction;
+use crate::app::browser::window::Action as WindowAction;
+use crate::app::browser::Action as BrowserAction;
+use gtk::prelude::EditableExt;
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -33,22 +34,22 @@ impl Navigation {
     pub fn new(
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-        action_page_open: SimpleAction,
+        tab_action: Rc<TabAction>,
     ) -> Self {
         // Init components
         let home = Rc::new(Home::new(window_action.clone()));
         let history = Rc::new(History::new(window_action.clone()));
         let reload = Rc::new(Reload::new(window_action));
-        let request = Rc::new(Request::new(browser_action, action_page_open.clone()));
+        let request = Rc::new(Request::new(browser_action, tab_action));
         let bookmark = Rc::new(Bookmark::new());
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            home.gobject(),
-            history.gobject(),
-            reload.gobject(),
+            home.widget().gobject(),
+            history.widget().gobject(),
+            reload.widget().gobject(),
             request.widget().gobject(),
-            bookmark.gobject(),
+            bookmark.widget().gobject(),
         ));
 
         // Done

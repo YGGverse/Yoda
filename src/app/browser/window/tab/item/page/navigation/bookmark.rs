@@ -2,7 +2,6 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::Button;
 use std::rc::Rc;
 
 pub struct Bookmark {
@@ -23,7 +22,8 @@ impl Bookmark {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }

@@ -3,7 +3,6 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::Button;
 use std::rc::Rc;
 
 pub struct Back {
@@ -12,7 +11,8 @@ pub struct Back {
 }
 
 impl Back {
-    // Construct
+    // Constructors
+
     pub fn new(window_action: Rc<WindowAction>) -> Self {
         Self {
             window_action: window_action.clone(),
@@ -21,6 +21,7 @@ impl Back {
     }
 
     // Actions
+
     pub fn update(&self, status: bool) {
         // Update actions
         self.window_action
@@ -33,7 +34,8 @@ impl Back {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }

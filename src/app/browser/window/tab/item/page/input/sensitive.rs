@@ -4,7 +4,7 @@ mod widget;
 use form::Form;
 use widget::Widget;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::tab::item::action::Action as TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
@@ -44,7 +44,7 @@ impl Sensitive {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                tab_action.open().activate(Some(&format!(
+                tab_action.load().activate(Some(&format!(
                     "{}?{}",
                     base.to_string_partial(UriHideFlags::QUERY),
                     Uri::escape_string(form.text().as_str(), None, false),

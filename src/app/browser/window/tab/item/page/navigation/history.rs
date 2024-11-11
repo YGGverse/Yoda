@@ -7,7 +7,7 @@ use forward::Forward;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::{glib::GString, Box};
+use gtk::glib::GString;
 use std::{cell::RefCell, rc::Rc};
 
 struct Memory {
@@ -34,7 +34,10 @@ impl History {
         let forward = Rc::new(Forward::new(window_action));
 
         // Init widget
-        let widget = Rc::new(Widget::new(back.gobject(), forward.gobject()));
+        let widget = Rc::new(Widget::new(
+            back.widget().gobject(),
+            forward.widget().gobject(),
+        ));
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -122,7 +125,8 @@ impl History {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }

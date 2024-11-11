@@ -1,15 +1,15 @@
+mod action;
 mod database;
 mod page;
 mod widget;
 
+use action::Action;
 use database::Database;
 use page::Page;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
-use crate::app::browser::window::tab::action::Action as TabAction;
-use adw::{TabPage, TabView};
+use crate::app::browser::{window::Action as WindowAction, Action as BrowserAction};
+use adw::TabView;
 use gtk::{
     glib::{uuid_string_random, GString},
     prelude::EditableExt,
@@ -22,47 +22,70 @@ pub struct Item {
     // useful as widget name in GTK actions callback
     id: GString,
     // Components
+    action: Rc<Action>,
     page: Rc<Page>,
     widget: Rc<Widget>,
 }
 
 impl Item {
     // Construct
-    pub fn new_rc(
+    pub fn new(
         tab_view: &TabView,
         // Actions
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-        tab_action: Rc<TabAction>,
         // Options
         position: Option<i32>,
         is_pinned: bool,
         is_selected: bool,
-    ) -> Rc<Self> {
+    ) -> Self {
         // Generate unique ID for new page components
         let id = uuid_string_random();
 
         // Init components
-        let page = Page::new_rc(
+
+        let action = Rc::new(Action::new());
+
+        let page = Rc::new(Page::new(
             id.clone(),
-            // Actions
             browser_action,
             window_action,
-            tab_action,
-        );
+            action.clone(),
+        ));
 
         let widget = Rc::new(Widget::new(
             id.as_str(),
             tab_view,
-            page.gobject(),
+            page.widget().gobject(),
             None,
             position,
             is_pinned,
             is_selected,
-        )); // @TODO
+        ));
 
-        // Return struct
-        Rc::new(Self { id, page, widget })
+        // Init events
+
+        action.load().connect_activate({
+            let page = page.clone();
+            move |request| {
+                if let Some(text) = request {
+                    page.navigation()
+                        .request()
+                        .widget()
+                        .gobject()
+                        .set_text(&text);
+                }
+                page.load(true);
+            }
+        });
+
+        // Done
+        Self {
+            id,
+            action,
+            page,
+            widget,
+        }
     }
 
     // Actions
@@ -71,7 +94,7 @@ impl Item {
         self.page.update();
 
         // Update tab loading indicator
-        self.widget.gobject().set_loading(self.page_is_loading());
+        self.widget.gobject().set_loading(self.page().is_loading());
     }
 
     pub fn clean(
@@ -107,7 +130,6 @@ impl Item {
         // Actions
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
-        tab_action: Rc<TabAction>,
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -115,17 +137,16 @@ impl Item {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
-                    let item = Item::new_rc(
+                    let item = Rc::new(Item::new(
                         tab_view,
                         // Actions
                         browser_action.clone(),
                         window_action.clone(),
-                        tab_action.clone(),
                         // Options
                         None,
                         record.is_pinned,
                         record.is_selected,
-                    );
+                    ));
 
                     // Delegate restore action to the item childs
                     item.page.restore(transaction, &record.id)?;
@@ -169,36 +190,18 @@ impl Item {
         Ok(())
     }
 
-    // Setters
-    pub fn set_page_navigation_request_text(&self, value: &str) {
-        self.page
-            .navigation()
-            .request()
-            .widget()
-            .gobject()
-            .set_text(value);
-    }
-
     // Getters
 
-    pub fn id(&self) -> GString {
-        self.id.clone()
+    pub fn id(&self) -> &GString {
+        &self.id
     }
 
     pub fn page(&self) -> &Rc<Page> {
         &self.page
     }
 
-    pub fn page_is_loading(&self) -> bool {
-        self.page.is_loading()
-    }
-
-    pub fn page_meta_title(&self) -> GString {
-        self.page.meta_title()
-    }
-
-    pub fn gobject(&self) -> &TabPage {
-        self.widget.gobject()
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }
 

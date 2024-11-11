@@ -2,9 +2,8 @@ mod gemini;
 
 use gemini::Gemini;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use gtk::{
-    gio::SimpleAction,
     glib::{GString, Uri},
     ScrolledWindow,
 };
@@ -24,11 +23,11 @@ impl Text {
     pub fn gemini(
         gemtext: &str,
         base: &Uri,
+        window_action: Rc<WindowAction>,
         tab_action: Rc<TabAction>,
-        action_page_open: SimpleAction,
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, tab_action, action_page_open);
+        let gemini = Gemini::new(gemtext, base, window_action, tab_action);
 
         // Init meta
         let meta = Meta {

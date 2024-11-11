@@ -35,7 +35,7 @@ impl Browser {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            window.gobject(),
+            window.widget().gobject(),
             &[
                 // Connect action groups (to apply accels)
                 (
@@ -48,11 +48,6 @@ impl Browser {
                     window.action().id(),
                     window.action().gobject().clone(),
                 ),
-                (
-                    // Tab
-                    window.tab().action().id(),
-                    window.tab().action().gobject().clone(),
-                ),
             ],
         ));
 
@@ -60,7 +55,7 @@ impl Browser {
         action.about().connect_activate({
             let window = window.clone();
             move || {
-                About::new().present(Some(window.gobject()));
+                About::new().present(Some(window.widget().gobject()));
             }
         });
 

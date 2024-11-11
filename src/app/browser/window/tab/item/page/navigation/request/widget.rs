@@ -2,11 +2,10 @@ mod database;
 
 use database::Database;
 
-use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    gio::SimpleAction,
     glib::{timeout_add_local, ControlFlow, SourceId},
-    prelude::{ActionExt, EditableExt, EntryExt, ToVariant, WidgetExt},
+    prelude::{EditableExt, EntryExt, WidgetExt},
     Entry, StateFlags,
 };
 use sqlite::Transaction;
@@ -30,7 +29,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(browser_action: Rc<BrowserAction>, action_page_open: SimpleAction) -> Self {
+    pub fn new(browser_action: Rc<BrowserAction>, tab_action: Rc<TabAction>) -> Self {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -49,7 +48,7 @@ impl Widget {
         });
 
         gobject.connect_activate(move |this| {
-            action_page_open.activate(Some(&this.text().to_variant()));
+            tab_action.load().activate(Some(&this.text()));
         });
 
         gobject.connect_state_flags_changed({

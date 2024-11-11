@@ -3,7 +3,6 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::Button;
 use std::rc::Rc;
 
 pub struct Reload {
@@ -21,6 +20,7 @@ impl Reload {
     }
 
     // Actions
+
     pub fn update(&self, is_enabled: bool) {
         // Update actions
         self.window_action
@@ -33,7 +33,8 @@ impl Reload {
     }
 
     // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
+
+    pub fn widget(&self) -> &Rc<Widget> {
+        &self.widget
     }
 }

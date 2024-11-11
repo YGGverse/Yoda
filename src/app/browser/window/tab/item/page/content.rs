@@ -6,10 +6,9 @@ use image::Image;
 use status::Status;
 use text::Text;
 
-use crate::app::browser::window::tab::action::Action as TabAction;
+use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use gtk::{
     gdk_pixbuf::Pixbuf,
-    gio::SimpleAction,
     glib::Uri,
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
@@ -17,22 +16,20 @@ use gtk::{
 use std::{rc::Rc, time::Duration};
 
 pub struct Content {
-    // GTK
-    gobject: Box,
-    // Actions
+    window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
-    action_page_open: SimpleAction,
+    gobject: Box,
 }
 
 impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new(tab_action: Rc<TabAction>, action_page_open: SimpleAction) -> Self {
+    pub fn new(window_action: Rc<WindowAction>, tab_action: Rc<TabAction>) -> Self {
         Self {
             gobject: Box::builder().orientation(Orientation::Vertical).build(),
+            window_action,
             tab_action,
-            action_page_open,
         }
     }
 
@@ -88,8 +85,8 @@ impl Content {
         let text = Text::gemini(
             data,
             base,
+            self.window_action.clone(),
             self.tab_action.clone(),
-            self.action_page_open.clone(),
         );
         self.gobject.append(text.gobject());
         text
