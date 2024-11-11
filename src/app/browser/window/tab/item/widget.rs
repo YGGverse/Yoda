@@ -20,8 +20,7 @@ impl Widget {
         child: &impl IsA<gtk::Widget>,
         title: Option<&str>,
         position: Option<i32>,
-        is_pinned: bool,
-        is_selected: bool,
+        state: (bool, bool, bool),
     ) -> Self {
         let gobject = match position {
             Some(value) => {
@@ -37,6 +36,9 @@ impl Widget {
             None => tab_view.append(child),
         };
 
+        let (is_pinned, is_selected, is_attention) = state;
+
+        gobject.set_needs_attention(is_attention);
         gobject.set_keyword(keyword);
 
         gobject.set_title(match title {

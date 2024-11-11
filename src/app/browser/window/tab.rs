@@ -126,9 +126,6 @@ impl Tab {
             ),
         ));
 
-        // Apply tab attention request
-        item.widget().gobject().set_needs_attention(is_attention);
-
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
@@ -311,6 +308,7 @@ impl Tab {
                         &self.widget.gobject().page_position(item.widget().gobject()),
                         &item.widget().gobject().is_pinned(),
                         &item.widget().gobject().is_selected(),
+                        &item.widget().gobject().needs_attention(),
                     )?;
                 }
             }
