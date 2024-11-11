@@ -8,8 +8,10 @@ use item::Item;
 use menu::Menu;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
+use crate::app::browser::{
+    window::action::{Action as WindowAction, Position},
+    Action as BrowserAction,
+};
 use gtk::{
     glib::{GString, Propagation},
     prelude::WidgetExt,
@@ -103,7 +105,7 @@ impl Tab {
     // Actions
     pub fn append(
         &self,
-        position: Option<i32>,
+        position: Position,
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
@@ -321,7 +323,7 @@ impl Tab {
     pub fn init(&self) {
         // Append just one blank page if no tabs available after last session restore
         if self.index.borrow().is_empty() {
-            self.append(None, None, false, true, false, false);
+            self.append(Position::End, None, false, true, false, false);
         }
 
         // @TODO other/child features..

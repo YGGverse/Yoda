@@ -23,6 +23,8 @@ use gtk::{
 };
 use std::rc::Rc;
 
+pub use append::Position; // public enum
+
 /// [SimpleActionGroup](https://docs.gtk.org/gio/class.SimpleActionGroup.html) wrapper for `Browser` actions
 pub struct Action {
     // Actions

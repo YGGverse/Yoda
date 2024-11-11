@@ -8,7 +8,10 @@ use database::Database;
 use page::Page;
 use widget::Widget;
 
-use crate::app::browser::{window::Action as WindowAction, Action as BrowserAction};
+use crate::app::browser::{
+    window::action::{Action as WindowAction, Position},
+    Action as BrowserAction,
+};
 use adw::TabView;
 use gtk::{
     glib::{uuid_string_random, GString},
@@ -34,7 +37,7 @@ impl Item {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         // Options tuple @TODO struct?
-        options: (Option<i32>, Option<String>, bool, bool, bool, bool),
+        options: (Position, Option<String>, bool, bool, bool, bool),
     ) -> Self {
         // Get item options from tuple
         let (position, request, is_pinned, is_selected, is_attention, is_load) = options;
@@ -150,7 +153,7 @@ impl Item {
                         window_action.clone(),
                         // Options tuple
                         (
-                            None,
+                            Position::End,
                             None,
                             record.is_pinned,
                             record.is_selected,

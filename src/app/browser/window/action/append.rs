@@ -1,11 +1,34 @@
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, GString},
+    glib::{uuid_string_random, GString, Variant},
     prelude::{ActionExt, ToVariant},
 };
 
-/// C-compatible variant type defaults
-const DEFAULT_POSITION: i32 = -1;
+/// Append options
+pub enum Position {
+    After,
+    End,
+    Number(i32),
+}
+
+// C-compatible Position values
+const POSITION_AFTER: i32 = -1;
+const POSITION_END: i32 = -2;
+
+// Implement conversion trait
+impl ToVariant for Position {
+    fn to_variant(&self) -> Variant {
+        match self {
+            Position::After => &POSITION_AFTER,
+            Position::End => &POSITION_END,
+            Position::Number(value) => value,
+        }
+        .to_variant()
+    }
+}
+
+// Action state defaults
+const DEFAULT_POSITION: Position = Position::End;
 const DEFAULT_REQUEST: String = String::new();
 const DEFAULT_IS_PINNED: bool = false;
 const DEFAULT_IS_SELECTED: bool = true;
@@ -50,7 +73,7 @@ impl Append {
 
         // Set default state
         self.change_state(
-            Some(DEFAULT_POSITION),
+            DEFAULT_POSITION,
             Some(DEFAULT_REQUEST),
             DEFAULT_IS_PINNED,
             DEFAULT_IS_SELECTED,
@@ -76,7 +99,7 @@ impl Append {
     /// * this action reset previous state for action after activation
     pub fn activate_stateful_once(
         &self,
-        position: Option<i32>,
+        position: Position,
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
@@ -114,7 +137,7 @@ impl Append {
     /// Emit state change for action
     pub fn change_state(
         &self,
-        position: Option<i32>,
+        position: Position,
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
@@ -124,11 +147,7 @@ impl Append {
         self.gobject.change_state(
             &(
                 // Convert Option to C-based variant value
-                if let Some(position) = position {
-                    position
-                } else {
-                    DEFAULT_POSITION
-                },
+                position,
                 if let Some(request) = request {
                     request
                 } else {
@@ -150,7 +169,7 @@ impl Append {
     /// * return `position`,`request`,`is_pinned`,`is_selected`,`is_attention`,`is_load` state as tuple
     pub fn connect_activate(
         &self,
-        callback: impl Fn(Option<i32>, Option<String>, bool, bool, bool, bool) + 'static,
+        callback: impl Fn(Position, Option<String>, bool, bool, bool, bool) + 'static,
     ) {
         self.gobject.connect_activate(move |this, _| {
             let (position, request, is_pinned, is_selected, is_attention, is_load) = state(this);
@@ -179,18 +198,18 @@ impl Append {
 }
 
 /// Shared helper to get C-based action state in Optional format
-pub fn state(this: &SimpleAction) -> (Option<i32>, Option<String>, bool, bool, bool, bool) {
+pub fn state(this: &SimpleAction) -> (Position, Option<String>, bool, bool, bool, bool) {
     let (position, request, is_pinned, is_selected, is_attention, is_load) = this
         .state()
         .expect("Expected (`position`,`request`,`is_pinned`,`is_selected`,`is_attention`,`is_load`) state")
         .get::<(i32, String, bool, bool, bool, bool)>()
         .expect("Parameter type does not match (`i32`,`String`,`bool`,`bool`,`bool`,`bool`) tuple");
     (
-        // Convert from C-based variant value to Option
-        if position == DEFAULT_POSITION {
-            None
-        } else {
-            Some(position)
+        // Convert from C-based variant value to Position enum
+        match position {
+            POSITION_AFTER => Position::After,
+            POSITION_END => Position::End,
+            value => Position::Number(value),
         },
         if request.is_empty() {
             None

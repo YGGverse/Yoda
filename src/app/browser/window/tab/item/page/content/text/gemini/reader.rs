@@ -4,7 +4,9 @@ mod widget;
 use tag::Tag;
 use widget::Widget;
 
-use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
+use crate::app::browser::window::{
+    action::Position, tab::item::Action as TabAction, Action as WindowAction,
+};
 use adw::StyleManager;
 use gemtext::line::{
     code::Code,
@@ -283,7 +285,7 @@ impl Reader {
                                 "gemini" => {
                                     // Open new page in browser
                                     actions.0.append().activate_stateful_once(
-                                        None,
+                                        Position::After,
                                         Some(uri.to_string()),
                                         false,
                                         false,
