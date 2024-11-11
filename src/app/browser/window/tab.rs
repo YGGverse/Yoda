@@ -105,6 +105,7 @@ impl Tab {
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
+        is_load: bool,
     ) -> Rc<Item> {
         // Init new tab item
         let item = Rc::new(Item::new(
@@ -116,6 +117,7 @@ impl Tab {
             request,
             is_pinned,
             is_selected,
+            is_load,
         ));
 
         // Register dynamically created tab components in the HashMap index
@@ -312,7 +314,7 @@ impl Tab {
     pub fn init(&self) {
         // Append just one blank page if no tabs available after last session restore
         if self.index.borrow().is_empty() {
-            self.append(None, None, false, true);
+            self.append(None, None, false, true, false);
         }
 
         // @TODO other/child features..

@@ -39,6 +39,7 @@ impl Item {
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
+        is_load: bool,
     ) -> Self {
         // Generate unique ID for new page components
         let id = uuid_string_random();
@@ -72,8 +73,11 @@ impl Item {
                 .widget()
                 .gobject()
                 .set_text(&text);
-            page.load(true);
-        } // @TODO load optionally
+
+            if is_load {
+                page.load(true);
+            }
+        }
 
         action.load().connect_activate({
             let page = page.clone();
@@ -157,6 +161,7 @@ impl Item {
                         None,
                         record.is_pinned,
                         record.is_selected,
+                        false,
                     ));
 
                     // Delegate restore action to the item childs

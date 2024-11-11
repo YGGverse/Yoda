@@ -293,6 +293,7 @@ impl Reader {
                                         Some(uri.to_string()),
                                         false,
                                         false,
+                                        true,
                                     ); // @TODO
                                 }
                                 // Scheme not supported, delegate

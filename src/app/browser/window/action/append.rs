@@ -9,6 +9,7 @@ const DEFAULT_POSITION: i32 = -1;
 const DEFAULT_REQUEST: String = String::new();
 const DEFAULT_IS_PINNED: bool = false;
 const DEFAULT_IS_SELECTED: bool = true;
+const DEFAULT_IS_LOAD: bool = false;
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Append` action of `Window` group
 pub struct Append {
@@ -29,6 +30,7 @@ impl Append {
                     DEFAULT_REQUEST,
                     DEFAULT_IS_PINNED,
                     DEFAULT_IS_SELECTED,
+                    DEFAULT_IS_LOAD,
                 )
                     .to_variant(),
             ),
@@ -41,7 +43,7 @@ impl Append {
     /// * this action reset previous state for action after activation
     pub fn activate_default_once(&self) {
         // Save current state in memory
-        let (position, request, is_pinned, is_selected) = state(&self.gobject);
+        let (position, request, is_pinned, is_selected, is_load) = state(&self.gobject);
 
         // Set default state
         self.change_state(
@@ -49,13 +51,14 @@ impl Append {
             Some(DEFAULT_REQUEST),
             DEFAULT_IS_PINNED,
             DEFAULT_IS_SELECTED,
+            DEFAULT_IS_LOAD,
         );
 
         // Activate action
         self.gobject.activate(None);
 
         // Return previous state
-        self.change_state(position, request, is_pinned, is_selected);
+        self.change_state(position, request, is_pinned, is_selected, is_load);
     }
 
     /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
@@ -66,18 +69,19 @@ impl Append {
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
+        is_load: bool,
     ) {
         // Save current state in memory
-        let (_position, _request, _is_pinned, _is_selected) = state(&self.gobject);
+        let (_position, _request, _is_pinned, _is_selected, _is_load) = state(&self.gobject);
 
         // Apply requested state
-        self.change_state(position, request, is_pinned, is_selected);
+        self.change_state(position, request, is_pinned, is_selected, is_load);
 
         // Activate action
         self.gobject.activate(None);
 
         // Return previous state
-        self.change_state(_position, _request, _is_pinned, _is_selected);
+        self.change_state(_position, _request, _is_pinned, _is_selected, _is_load);
     }
 
     /// Emit state change for action
@@ -87,6 +91,7 @@ impl Append {
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
+        is_load: bool,
     ) {
         self.gobject.change_state(
             &(
@@ -103,6 +108,7 @@ impl Append {
                 },
                 is_pinned,
                 is_selected,
+                is_load,
             )
                 .to_variant(),
         );
@@ -112,14 +118,14 @@ impl Append {
 
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
-    /// * return `position`, `is_pinned`, `is_selected` state as tuple
+    /// * return `position`,`request`,`is_pinned`,`is_selected`,`is_load` state as tuple
     pub fn connect_activate(
         &self,
-        callback: impl Fn(Option<i32>, Option<String>, bool, bool) + 'static,
+        callback: impl Fn(Option<i32>, Option<String>, bool, bool, bool) + 'static,
     ) {
         self.gobject.connect_activate(move |this, _| {
-            let (position, request, is_pinned, is_selected) = state(this);
-            callback(position, request, is_pinned, is_selected)
+            let (position, request, is_pinned, is_selected, is_load) = state(this);
+            callback(position, request, is_pinned, is_selected, is_load)
         });
     }
 
@@ -137,12 +143,12 @@ impl Append {
 }
 
 /// Shared helper to get C-based action state in Optional format
-pub fn state(this: &SimpleAction) -> (Option<i32>, Option<String>, bool, bool) {
-    let (position, request, is_pinned, is_selected) = this
+pub fn state(this: &SimpleAction) -> (Option<i32>, Option<String>, bool, bool, bool) {
+    let (position, request, is_pinned, is_selected, is_load) = this
         .state()
-        .expect("Expected (`position`,`request`,`is_pinned`,`is_selected`) state")
-        .get::<(i32, String, bool, bool)>()
-        .expect("Parameter type does not match (`i32`,`String`,`bool`,`bool`) tuple");
+        .expect("Expected (`position`,`request`,`is_pinned`,`is_selected`,`is_load`) state")
+        .get::<(i32, String, bool, bool, bool)>()
+        .expect("Parameter type does not match (`i32`,`String`,`bool`,`bool`,`bool`) tuple");
     (
         // Convert from C-based variant value to Option
         if position == DEFAULT_POSITION {
@@ -157,5 +163,6 @@ pub fn state(this: &SimpleAction) -> (Option<i32>, Option<String>, bool, bool) {
         },
         is_pinned,
         is_selected,
+        is_load,
     )
 }

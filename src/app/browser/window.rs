@@ -38,8 +38,8 @@ impl Window {
         // Init events
         action.append().connect_activate({
             let tab = tab.clone();
-            move |position, request, is_pinned, is_selected| {
-                tab.append(position, request, is_pinned, is_selected);
+            move |position, request, is_pinned, is_selected, is_load| {
+                tab.append(position, request, is_pinned, is_selected, is_load);
             }
         });
 
