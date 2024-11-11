@@ -183,7 +183,7 @@ pub fn state(this: &SimpleAction) -> (Option<i32>, Option<String>, bool, bool, b
     let (position, request, is_pinned, is_selected, is_attention, is_load) = this
         .state()
         .expect("Expected (`position`,`request`,`is_pinned`,`is_selected`,`is_attention`,`is_load`) state")
-        .get::<(i32, String, bool, bool, bool,bool)>()
+        .get::<(i32, String, bool, bool, bool, bool)>()
         .expect("Parameter type does not match (`i32`,`String`,`bool`,`bool`,`bool`,`bool`) tuple");
     (
         // Convert from C-based variant value to Option
