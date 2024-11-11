@@ -294,7 +294,8 @@ impl Reader {
                                         false,
                                         false,
                                         true,
-                                    ); // @TODO
+                                        true,
+                                    );
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(

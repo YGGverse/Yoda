@@ -34,10 +34,10 @@ impl Item {
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
         // Options tuple @TODO struct?
-        options: (Option<i32>, Option<String>, bool, bool, bool),
+        options: (Option<i32>, Option<String>, bool, bool, bool, bool),
     ) -> Self {
         // Get item options from tuple
-        let (position, request, is_pinned, is_selected, is_load) = options;
+        let (position, request, is_pinned, is_selected, _is_attention, is_load) = options;
 
         // Generate unique ID for new page components
         let id = uuid_string_random();
@@ -150,7 +150,14 @@ impl Item {
                         browser_action.clone(),
                         window_action.clone(),
                         // Options tuple
-                        (None, None, record.is_pinned, record.is_selected, false),
+                        (
+                            None,
+                            None,
+                            record.is_pinned,
+                            record.is_selected,
+                            false,
+                            false,
+                        ),
                     ));
 
                     // Delegate restore action to the item childs

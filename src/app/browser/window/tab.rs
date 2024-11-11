@@ -85,6 +85,8 @@ impl Tab {
                             item.update();
                         }
                     }
+                    // Reset attention decorator
+                    page.set_needs_attention(false);
                 }
             }
         });
@@ -105,6 +107,7 @@ impl Tab {
         request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
+        is_attention: bool,
         is_load: bool,
     ) -> Rc<Item> {
         // Init new tab item
@@ -113,8 +116,18 @@ impl Tab {
             self.browser_action.clone(),
             self.window_action.clone(),
             // Options tuple
-            (position, request, is_pinned, is_selected, is_load),
+            (
+                position,
+                request,
+                is_pinned,
+                is_selected,
+                is_attention,
+                is_load,
+            ),
         ));
+
+        // Apply tab attention request
+        item.widget().gobject().set_needs_attention(is_attention);
 
         // Register dynamically created tab components in the HashMap index
         self.index
@@ -310,7 +323,7 @@ impl Tab {
     pub fn init(&self) {
         // Append just one blank page if no tabs available after last session restore
         if self.index.borrow().is_empty() {
-            self.append(None, None, false, true, false);
+            self.append(None, None, false, true, false, false);
         }
 
         // @TODO other/child features..
