@@ -33,15 +33,13 @@ impl Window {
         // Init components
         let tab = Rc::new(Tab::new(browser_action.clone(), action.clone()));
         let header = Header::new(browser_action, action.clone(), tab.widget().gobject());
-
-        // GTK
         let widget = Rc::new(Widget::new(header.gobject(), tab.widget().gobject()));
 
         // Init events
         action.append().connect_activate({
             let tab = tab.clone();
-            move || {
-                tab.append(None);
+            move |position, is_pinned, is_selected| {
+                tab.append(position, is_pinned, is_selected);
             }
         });
 

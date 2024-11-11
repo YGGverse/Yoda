@@ -99,7 +99,7 @@ impl Tab {
     }
 
     // Actions
-    pub fn append(&self, position: Option<i32>) -> Rc<Item> {
+    pub fn append(&self, position: Option<i32>, is_pinned: bool, is_selected: bool) -> Rc<Item> {
         // Init new tab item
         let item = Rc::new(Item::new(
             self.widget.gobject(),
@@ -107,8 +107,8 @@ impl Tab {
             self.window_action.clone(),
             // Options
             position,
-            false,
-            true,
+            is_pinned,
+            is_selected,
         ));
 
         // Register dynamically created tab components in the HashMap index
@@ -305,7 +305,7 @@ impl Tab {
     pub fn init(&self) {
         // Append just one blank page if no tabs available after last session restore
         if self.index.borrow().is_empty() {
-            self.append(None);
+            self.append(None, false, true);
         }
 
         // @TODO other/child features..

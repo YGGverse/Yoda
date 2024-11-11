@@ -18,7 +18,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| window_action.append().activate());
+        gobject.connect_clicked(move |_| window_action.append().activate_default_once());
 
         Self { gobject }
     }
