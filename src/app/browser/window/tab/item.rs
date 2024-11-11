@@ -36,6 +36,7 @@ impl Item {
         window_action: Rc<WindowAction>,
         // Options
         position: Option<i32>,
+        request: Option<String>,
         is_pinned: bool,
         is_selected: bool,
     ) -> Self {
@@ -64,6 +65,15 @@ impl Item {
         ));
 
         // Init events
+
+        if let Some(text) = request {
+            page.navigation()
+                .request()
+                .widget()
+                .gobject()
+                .set_text(&text);
+            page.load(true);
+        } // @TODO load optionally
 
         action.load().connect_activate({
             let page = page.clone();
@@ -143,6 +153,7 @@ impl Item {
                         browser_action.clone(),
                         window_action.clone(),
                         // Options
+                        None,
                         None,
                         record.is_pinned,
                         record.is_selected,

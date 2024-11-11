@@ -288,9 +288,12 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    window_action
-                                        .append()
-                                        .activate_stateful_once(None, false, false);
+                                    window_action.append().activate_stateful_once(
+                                        None,
+                                        Some(uri.to_string()),
+                                        false,
+                                        false,
+                                    ); // @TODO
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
