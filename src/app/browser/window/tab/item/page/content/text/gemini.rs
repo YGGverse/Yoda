@@ -16,14 +16,9 @@ pub struct Gemini {
 
 impl Gemini {
     // Construct
-    pub fn new(
-        gemtext: &str,
-        base: &Uri,
-        window_action: Rc<WindowAction>,
-        tab_action: Rc<TabAction>,
-    ) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, actions: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
         // Init components
-        let reader = Rc::new(Reader::new(gemtext, base, window_action, tab_action));
+        let reader = Rc::new(Reader::new(gemtext, base, actions));
         let widget = Rc::new(Widget::new(reader.gobject()));
 
         // Result

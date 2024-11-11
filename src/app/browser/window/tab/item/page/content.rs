@@ -85,8 +85,7 @@ impl Content {
         let text = Text::gemini(
             data,
             base,
-            self.window_action.clone(),
-            self.tab_action.clone(),
+            (self.window_action.clone(), self.tab_action.clone()),
         );
         self.gobject.append(text.gobject());
         text

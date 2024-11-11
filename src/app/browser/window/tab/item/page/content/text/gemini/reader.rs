@@ -30,12 +30,7 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new(
-        gemtext: &str,
-        base: &Uri,
-        window_action: Rc<WindowAction>,
-        tab_action: Rc<TabAction>,
-    ) -> Self {
+    pub fn new(gemtext: &str, base: &Uri, actions: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
         // Init default values
         let mut title = None;
 
@@ -232,7 +227,6 @@ impl Reader {
 
         // Init events
         primary_button_controller.connect_released({
-            let tab_action = tab_action.clone();
             let gobject = widget.gobject().clone();
             let _links_ = links.clone(); // is copy
             move |_, _, window_x, window_y| {
@@ -251,7 +245,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    tab_action.load().activate(Some(&uri.to_str()));
+                                    actions.1.load().activate(Some(&uri.to_str()));
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
@@ -288,7 +282,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    window_action.append().activate_stateful_once(
+                                    actions.0.append().activate_stateful_once(
                                         None,
                                         Some(uri.to_string()),
                                         false,
