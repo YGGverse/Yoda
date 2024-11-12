@@ -69,27 +69,27 @@ impl Action {
 
     // Getters
 
-    /// Get reference `About` action
+    /// Get reference to `About` action
     pub fn about(&self) -> &Rc<About> {
         &self.about
     }
 
-    /// Get reference `Close` action
+    /// Get reference to `Close` action
     pub fn close(&self) -> &Rc<Close> {
         &self.close
     }
 
-    /// Get reference `Debug` action
+    /// Get reference to `Debug` action
     pub fn debug(&self) -> &Rc<Debug> {
         &self.debug
     }
 
-    /// Get reference `Profile` action
+    /// Get reference to `Profile` action
     pub fn profile(&self) -> &Rc<Profile> {
         &self.profile
     }
 
-    /// Get reference `Update` action
+    /// Get reference to `Update` action
     pub fn update(&self) -> &Rc<Update> {
         &self.update
     }

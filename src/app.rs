@@ -178,6 +178,14 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window().action().id(),
+                    browser.window().action().bookmark().id()
+                ),
+                &["<Primary>b"],
+            ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window().action().id(),
                     browser.window().action().pin().id()
                 ),
                 &["<Primary>p"],

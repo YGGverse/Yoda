@@ -36,16 +36,27 @@ impl Menu {
                     window_action.reload().id()
                 )));
 
-                main_page.append(Some("Pin"), Some(&format!(
-                    "{}.{}",
-                    window_action.id(),
-                    window_action.pin().id()
-                )));
+                // Main > Page > Mark
+                let main_page_mark = gio::Menu::new();
+
+                    main_page_mark.append(Some("Bookmark"), Some(&format!(
+                        "{}.{}",
+                        window_action.id(),
+                        window_action.bookmark().id()
+                    )));
+
+                    main_page_mark.append(Some("Pin"), Some(&format!(
+                        "{}.{}",
+                        window_action.id(),
+                        window_action.pin().id()
+                    )));
+
+                main_page.append_section(None, &main_page_mark);
 
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
 
-                    main_page.append(Some("Home"), Some(&format!(
+                    main_page_navigation.append(Some("Home"), Some(&format!(
                         "{}.{}",
                         window_action.id(),
                         window_action.home().id()

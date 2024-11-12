@@ -24,7 +24,18 @@ impl Menu {
             )),
         );
 
-        main.append(
+        let main_mark = gtk::gio::Menu::new();
+
+        main_mark.append(
+            Some("Bookmark"),
+            Some(&format!(
+                "{}.{}",
+                window_action.id(),
+                window_action.bookmark().id()
+            )),
+        );
+
+        main_mark.append(
             Some("Pin"),
             Some(&format!(
                 "{}.{}",
@@ -32,6 +43,8 @@ impl Menu {
                 window_action.pin().id()
             )),
         );
+
+        main.append_section(None, &main_mark);
 
         let navigation = gtk::gio::Menu::new();
 

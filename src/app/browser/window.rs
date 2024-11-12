@@ -49,6 +49,11 @@ impl Window {
             }
         });
 
+        action.bookmark().connect_activate({
+            let tab = tab.clone();
+            move |position| tab.bookmark(position)
+        });
+
         action.pin().connect_activate({
             let tab = tab.clone();
             move |position| tab.pin(position)

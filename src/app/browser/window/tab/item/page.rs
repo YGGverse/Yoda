@@ -88,6 +88,10 @@ impl Page {
 
     // Actions
 
+    pub fn bookmark(&self) {
+        // @TODO self.navigation.request().widget().gobject().text()
+    }
+
     /// Navigate home URL (parsed from current navigation entry)
     /// * this method create new history record in memory as defined in `action_page_open` action
     pub fn home(&self) {

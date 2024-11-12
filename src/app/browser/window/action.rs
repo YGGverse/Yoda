@@ -1,4 +1,5 @@
 mod append;
+mod bookmark;
 mod close;
 mod close_all;
 mod history_back;
@@ -8,6 +9,7 @@ mod pin;
 mod reload;
 
 use append::Append;
+use bookmark::Bookmark;
 use close::Close;
 use close_all::CloseAll;
 use history_back::HistoryBack;
@@ -29,6 +31,7 @@ pub use append::Position; // public enum
 pub struct Action {
     // Actions
     append: Rc<Append>,
+    bookmark: Rc<Bookmark>,
     close_all: Rc<CloseAll>,
     close: Rc<Close>,
     history_back: Rc<HistoryBack>,
@@ -48,6 +51,7 @@ impl Action {
     pub fn new() -> Self {
         // Init actions
         let append = Rc::new(Append::new());
+        let bookmark = Rc::new(Bookmark::new());
         let close = Rc::new(Close::new());
         let close_all = Rc::new(CloseAll::new());
         let history_back = Rc::new(HistoryBack::new());
@@ -64,6 +68,7 @@ impl Action {
 
         // Add action to given group
         gobject.add_action(append.gobject());
+        gobject.add_action(bookmark.gobject());
         gobject.add_action(close_all.gobject());
         gobject.add_action(close.gobject());
         gobject.add_action(history_back.gobject());
@@ -75,6 +80,7 @@ impl Action {
         // Done
         Self {
             append,
+            bookmark,
             close_all,
             close,
             history_back,
@@ -89,42 +95,47 @@ impl Action {
 
     // Getters
 
-    /// Get reference `Append` action
+    /// Get reference to `Append` action
     pub fn append(&self) -> &Rc<Append> {
         &self.append
     }
 
-    /// Get reference `CloseAll` action
+    /// Get reference to `Bookmark` action
+    pub fn bookmark(&self) -> &Rc<Bookmark> {
+        &self.bookmark
+    }
+
+    /// Get reference to `CloseAll` action
     pub fn close_all(&self) -> &Rc<CloseAll> {
         &self.close_all
     }
 
-    /// Get reference `Close` action
+    /// Get reference to `Close` action
     pub fn close(&self) -> &Rc<Close> {
         &self.close
     }
 
-    /// Get reference `HistoryBack` action
+    /// Get reference to `HistoryBack` action
     pub fn history_back(&self) -> &Rc<HistoryBack> {
         &self.history_back
     }
 
-    /// Get reference `HistoryForward` action
+    /// Get reference to `HistoryForward` action
     pub fn history_forward(&self) -> &Rc<HistoryForward> {
         &self.history_forward
     }
 
-    /// Get reference `Home` action
+    /// Get reference to `Home` action
     pub fn home(&self) -> &Rc<Home> {
         &self.home
     }
 
-    /// Get reference `Pin` action
+    /// Get reference to `Pin` action
     pub fn pin(&self) -> &Rc<Pin> {
         &self.pin
     }
 
-    /// Get reference `Reload` action
+    /// Get reference to `Reload` action
     pub fn reload(&self) -> &Rc<Reload> {
         &self.reload
     }

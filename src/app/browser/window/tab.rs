@@ -152,6 +152,16 @@ impl Tab {
         self.widget.close_all();
     }
 
+    pub fn bookmark(&self, page_position: Option<i32>) {
+        if let Some(page) = self.widget.page(page_position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page().bookmark();
+                }
+            }
+        }
+    }
+
     // Toggle pin status for active tab
     pub fn pin(&self, page_position: Option<i32>) {
         self.widget.pin(page_position);
