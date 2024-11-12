@@ -65,7 +65,7 @@ impl Navigation {
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        self.bookmark.update();
+        self.bookmark.update(false); // @TODO DB from request
         self.history.update();
         self.home.update(self.request.uri());
         self.reload

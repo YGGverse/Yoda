@@ -20,9 +20,7 @@ impl Bookmark {
     }
 
     // Actions
-    pub fn update(&self) {
-        let is_enabled = false; // @TODO DB
-
+    pub fn update(&self, is_enabled: bool) {
         // Update actions
         self.window_action
             .bookmark()
