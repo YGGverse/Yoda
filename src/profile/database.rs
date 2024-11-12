@@ -1,7 +1,9 @@
 mod bookmark;
+mod history;
 mod identity;
 
 use bookmark::Bookmark;
+use history::History;
 use identity::Identity;
 
 use sqlite::{Connection, Error};
@@ -55,6 +57,7 @@ fn init(mut connection: RwLockWriteGuard<'_, Connection>) -> Result<(), Error> {
 
     // Init profile components
     Bookmark::init(&transaction)?;
+    History::init(&transaction)?;
     Identity::init(&transaction)?;
 
     // Apply changes
