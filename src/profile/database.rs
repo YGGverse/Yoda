@@ -25,7 +25,7 @@ impl Database {
         };
 
         // Init profile components
-        match connection.try_write() {
+        match connection.write() {
             Ok(writable) => {
                 if let Err(reason) = init(writable) {
                     panic!("{reason}")
