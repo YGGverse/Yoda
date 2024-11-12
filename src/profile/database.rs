@@ -48,7 +48,7 @@ impl Database {
 // Tools
 
 fn init(mut connection: RwLockWriteGuard<'_, Connection>) -> Result<(), Error> {
-    // Create transaction
+    // Begin transaction
     let transaction = connection.transaction()?;
 
     // Init profile components
