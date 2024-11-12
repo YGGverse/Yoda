@@ -71,16 +71,12 @@ impl Window {
 
         action.close().connect_activate({
             let tab = tab.clone();
-            move |position| {
-                tab.close(position);
-            }
+            move |position| tab.close(position)
         });
 
         action.close_all().connect_activate({
             let tab = tab.clone();
-            move |_| {
-                tab.close_all();
-            } // @TODO position not in use
+            move |_| tab.close_all()
         });
 
         action.history_back().connect_activate({
