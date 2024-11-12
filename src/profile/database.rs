@@ -12,7 +12,7 @@ impl Database {
         Self {
             connection: match Connection::open(path) {
                 Ok(connection) => Rc::new(RwLock::new(connection)),
-                Err(e) => panic!("Failed to connect profile database: {e}"),
+                Err(reason) => panic!("{reason}"),
             },
         }
     }
