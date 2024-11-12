@@ -16,7 +16,7 @@ impl Bookmark {
             (
                 `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `time` INTEGER NOT NULL,
-                `data` TEXT
+                `request` TEXT
             )",
             [],
         )
