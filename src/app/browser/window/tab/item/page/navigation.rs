@@ -21,9 +21,9 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Navigation {
-    home: Rc<Home>,
     bookmark: Rc<Bookmark>,
     history: Rc<History>,
+    home: Rc<Home>,
     reload: Rc<Reload>,
     request: Rc<Request>,
     widget: Rc<Widget>,
@@ -38,9 +38,9 @@ impl Navigation {
         // Init components
         let home = Rc::new(Home::new(window_action.clone()));
         let history = Rc::new(History::new(window_action.clone()));
-        let reload = Rc::new(Reload::new(window_action));
+        let reload = Rc::new(Reload::new(window_action.clone()));
         let request = Rc::new(Request::new(browser_action, tab_action));
-        let bookmark = Rc::new(Bookmark::new());
+        let bookmark = Rc::new(Bookmark::new(window_action));
 
         // Init widget
         let widget = Rc::new(Widget::new(
@@ -53,24 +53,24 @@ impl Navigation {
 
         // Done
         Self {
-            widget,
-            home,
+            bookmark,
             history,
+            home,
             reload,
             request,
-            bookmark,
+            widget,
         }
     }
 
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        self.home.update(self.request.uri());
+        self.bookmark.update();
         self.history.update();
+        self.home.update(self.request.uri());
         self.reload
             .update(!self.request.widget().gobject().text().is_empty());
         self.request.update(progress_fraction);
-        self.bookmark.update();
     }
 
     pub fn clean(
