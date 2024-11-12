@@ -94,7 +94,7 @@ impl Page {
     pub fn home(&self) {
         if let Some(url) = self.navigation.home().url() {
             // Update with history record
-            self.tab_action.load().activate(Some(&url));
+            self.tab_action.load().activate(Some(&url), true);
         }
     }
 
@@ -748,8 +748,8 @@ impl Page {
                                                                                     .set_status(Status::Redirect) // @TODO is this status really wanted?
                                                                                     .set_title("Redirect");
 
-                                                                                // Reload page to apply redirection
-                                                                                tab_action.load().activate(None);
+                                                                                // Reload page to apply redirection (without history record request)
+                                                                                tab_action.load().activate(None, false);
                                                                             }
                                                                         },
                                                                         Err(reason) => {

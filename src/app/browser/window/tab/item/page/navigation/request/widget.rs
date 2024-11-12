@@ -48,7 +48,7 @@ impl Widget {
         });
 
         gobject.connect_activate(move |this| {
-            tab_action.load().activate(Some(&this.text()));
+            tab_action.load().activate(Some(&this.text()), true);
         });
 
         gobject.connect_state_flags_changed({

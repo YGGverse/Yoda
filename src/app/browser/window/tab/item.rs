@@ -81,7 +81,7 @@ impl Item {
 
         action.load().connect_activate({
             let page = page.clone();
-            move |request| {
+            move |request, is_history| {
                 if let Some(text) = request {
                     page.navigation()
                         .request()
@@ -89,7 +89,7 @@ impl Item {
                         .gobject()
                         .set_text(&text);
                 }
-                page.load(true);
+                page.load(is_history);
             }
         });
 
