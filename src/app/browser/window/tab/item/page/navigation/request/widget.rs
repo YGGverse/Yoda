@@ -27,7 +27,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(browser_action: Rc<BrowserAction>, tab_action: Rc<TabAction>) -> Self {
+    pub fn new(action: (Rc<BrowserAction>, Rc<TabAction>)) -> Self {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -42,11 +42,11 @@ impl Widget {
 
         // Connect events
         gobject.connect_changed(move |_| {
-            browser_action.update().activate(None);
+            action.0.update().activate(None);
         });
 
         gobject.connect_activate(move |this| {
-            tab_action.load().activate(Some(&this.text()), true);
+            action.1.load().activate(Some(&this.text()), true);
         });
 
         gobject.connect_state_flags_changed({

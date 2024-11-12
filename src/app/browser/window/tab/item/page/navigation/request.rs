@@ -18,13 +18,9 @@ pub struct Request {
 
 impl Request {
     // Construct
-    pub fn new(
-        // Actions
-        browser_action: Rc<BrowserAction>,
-        tab_action: Rc<TabAction>,
-    ) -> Self {
+    pub fn new(action: (Rc<BrowserAction>, Rc<TabAction>)) -> Self {
         Self {
-            widget: Rc::new(Widget::new(browser_action, tab_action)),
+            widget: Rc::new(Widget::new(action)),
         }
     }
 

@@ -50,9 +50,7 @@ impl Item {
 
         let page = Rc::new(Page::new(
             id.clone(),
-            browser_action,
-            window_action,
-            action.clone(),
+            (browser_action, window_action, action.clone()),
         ));
 
         let widget = Rc::new(Widget::new(

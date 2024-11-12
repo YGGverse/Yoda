@@ -44,20 +44,15 @@ pub struct Page {
 impl Page {
     // Constructors
 
-    pub fn new(
-        id: GString,
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
-        tab_action: Rc<TabAction>,
-    ) -> Self {
+    pub fn new(id: GString, action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>)) -> Self {
         // Init components
-        let content = Rc::new(Content::new(window_action.clone(), tab_action.clone()));
+        let content = Rc::new(Content::new((action.1.clone(), action.2.clone())));
 
-        let navigation = Rc::new(Navigation::new(
-            browser_action.clone(),
-            window_action.clone(),
-            tab_action.clone(),
-        ));
+        let navigation = Rc::new(Navigation::new((
+            action.0.clone(),
+            action.1.clone(),
+            action.2.clone(),
+        )));
 
         let input = Rc::new(Input::new());
 
@@ -75,8 +70,8 @@ impl Page {
             cancellable: RefCell::new(Cancellable::new()),
             id,
             // Actions
-            browser_action,
-            tab_action,
+            browser_action: action.0,
+            tab_action: action.2,
             // Components
             content,
             navigation,
