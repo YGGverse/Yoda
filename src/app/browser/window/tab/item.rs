@@ -4,7 +4,6 @@ mod page;
 mod widget;
 
 use action::Action;
-use database::Database;
 use page::Page;
 use widget::Widget;
 
@@ -111,10 +110,10 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_id) {
+        match database::records(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             self.page.clean(transaction, &record.id)?;
@@ -142,7 +141,7 @@ impl Item {
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
-        match Database::records(transaction, app_browser_window_tab_id) {
+        match database::records(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
@@ -185,7 +184,7 @@ impl Item {
         is_selected: &bool,
         is_attention: &bool,
     ) -> Result<(), String> {
-        match Database::add(
+        match database::add(
             transaction,
             app_browser_window_tab_id,
             page_position,
@@ -194,7 +193,7 @@ impl Item {
             is_attention,
         ) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.page.save(transaction, &id)?;
@@ -224,7 +223,7 @@ impl Item {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

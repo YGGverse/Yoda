@@ -6,7 +6,6 @@ mod navigation;
 mod widget;
 
 use content::Content;
-use database::Database;
 use input::Input;
 use meta::{Meta, Status};
 use navigation::Navigation;
@@ -297,10 +296,10 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_id) {
+        match database::records(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             self.meta.clean(transaction, &record.id)?;
@@ -325,7 +324,7 @@ impl Page {
         self.meta.set_status(Status::SessionRestore);
 
         // Begin page restore
-        match Database::records(transaction, app_browser_window_tab_item_id) {
+        match database::records(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
@@ -347,9 +346,9 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_tab_item_id) {
+        match database::add(transaction, app_browser_window_tab_item_id) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.meta.save(transaction, &id)?;
@@ -931,7 +930,7 @@ impl Page {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

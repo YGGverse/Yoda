@@ -3,7 +3,6 @@ mod item;
 mod menu;
 mod widget;
 
-use database::Database;
 use item::Item;
 use menu::Menu;
 use widget::Widget;
@@ -239,10 +238,10 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_id) {
+        match database::records(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
@@ -264,7 +263,7 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_id) {
+        match database::records(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
@@ -297,10 +296,10 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_id) {
+        match database::add(transaction, app_browser_window_id) {
             Ok(_) => {
                 // Delegate save action to childs
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Read collected HashMap index
                 for (_, item) in self.index.borrow().iter() {
@@ -339,7 +338,7 @@ impl Tab {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

@@ -1,7 +1,6 @@
 mod database;
 mod redirect;
 
-use database::Database;
 use redirect::Redirect;
 
 use gtk::glib::GString;
@@ -112,10 +111,10 @@ impl Meta {
         transaction: &Transaction,
         app_browser_window_tab_page_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_page_id) {
+        match database::records(transaction, app_browser_window_tab_page_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             // nothing yet..
@@ -135,7 +134,7 @@ impl Meta {
         transaction: &Transaction,
         app_browser_window_tab_page_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_page_id) {
+        match database::records(transaction, app_browser_window_tab_page_id) {
             Ok(records) => {
                 for record in records {
                     // Record value can be stored as NULL
@@ -161,7 +160,7 @@ impl Meta {
         // Keep value in memory until operation complete
         let title = self.title();
 
-        match Database::add(
+        match database::add(
             transaction,
             app_browser_window_tab_page_id,
             match title.is_empty() {
@@ -170,7 +169,7 @@ impl Meta {
             },
         ) {
             Ok(_) => {
-                // let id = Database::last_insert_id(transaction);
+                // let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 // nothing yet..
@@ -185,7 +184,7 @@ impl Meta {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

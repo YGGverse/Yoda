@@ -1,7 +1,5 @@
 mod database;
 
-use database::Database;
-
 use crate::app::browser::window::action::Position;
 use adw::{TabPage, TabView};
 use gtk::prelude::IsA;
@@ -62,10 +60,10 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_id) {
+        match database::records(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             // nothing yet..
@@ -85,7 +83,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_id) {
+        match database::records(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     // Record value can be stored as NULL
@@ -111,7 +109,7 @@ impl Widget {
         // Keep value in memory until operation complete
         let title = self.gobject.title();
 
-        match Database::add(
+        match database::add(
             transaction,
             app_browser_window_tab_item_id,
             match title.is_empty() {
@@ -120,7 +118,7 @@ impl Widget {
             },
         ) {
             Ok(_) => {
-                // let id = Database::last_insert_id(transaction);
+                // let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 // nothing yet..
@@ -142,7 +140,7 @@ impl Widget {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

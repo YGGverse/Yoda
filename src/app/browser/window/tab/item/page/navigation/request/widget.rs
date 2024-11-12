@@ -1,7 +1,5 @@
 mod database;
 
-use database::Database;
-
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
     glib::{timeout_add_local, ControlFlow, SourceId},
@@ -82,13 +80,13 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_request_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(
+        match database::records(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
         ) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             // nothing yet..
@@ -108,7 +106,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_request_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(
+        match database::records(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
         ) {
@@ -136,7 +134,7 @@ impl Widget {
         // Keep value in memory until operation complete
         let text = self.gobject.text();
 
-        match Database::add(
+        match database::add(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
             match text.is_empty() {
@@ -145,7 +143,7 @@ impl Widget {
             },
         ) {
             Ok(_) => {
-                // let id = Database::last_insert_id(transaction);
+                // let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 // nothing yet..
@@ -211,7 +209,7 @@ impl Widget {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

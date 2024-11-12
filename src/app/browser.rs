@@ -6,7 +6,6 @@ mod window;
 
 use about::About;
 use action::Action;
-use database::Database;
 use widget::Widget;
 use window::Window;
 
@@ -101,10 +100,10 @@ impl Browser {
     // Actions
 
     pub fn clean(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_id) {
+        match database::records(transaction, app_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             self.window.clean(transaction, &record.id)?;
@@ -124,7 +123,7 @@ impl Browser {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_id) {
+        match database::records(transaction, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
@@ -142,9 +141,9 @@ impl Browser {
     }
 
     pub fn save(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match Database::add(transaction, app_id) {
+        match database::add(transaction, app_id) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.widget.save(transaction, &id)?;
@@ -185,7 +184,7 @@ impl Browser {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

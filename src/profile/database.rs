@@ -2,10 +2,6 @@ mod bookmark;
 mod history;
 mod identity;
 
-use bookmark::Bookmark;
-use history::History;
-use identity::Identity;
-
 use sqlite::{Connection, Error};
 use std::{
     path::Path,
@@ -56,9 +52,9 @@ fn init(mut connection: RwLockWriteGuard<'_, Connection>) -> Result<(), Error> {
     let transaction = connection.transaction()?;
 
     // Init profile components
-    Bookmark::init(&transaction)?;
-    History::init(&transaction)?;
-    Identity::init(&transaction)?;
+    bookmark::init(&transaction)?;
+    history::init(&transaction)?;
+    identity::init(&transaction)?;
 
     // Apply changes
     transaction.commit()?;

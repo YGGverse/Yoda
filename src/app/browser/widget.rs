@@ -1,5 +1,4 @@
 mod database;
-use database::Database;
 
 use adw::ApplicationWindow;
 use gtk::{
@@ -43,10 +42,10 @@ impl Widget {
 
     // Actions
     pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_browser_id) {
+        match database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -62,7 +61,7 @@ impl Widget {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_browser_id) {
+        match database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Restore widget
@@ -81,7 +80,7 @@ impl Widget {
     }
 
     pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::add(
+        match database::add(
             transaction,
             app_browser_id,
             &self.gobject.default_width(),
@@ -108,7 +107,7 @@ impl Widget {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

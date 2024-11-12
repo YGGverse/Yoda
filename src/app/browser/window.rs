@@ -5,7 +5,6 @@ mod tab;
 mod widget;
 
 use action::Action;
-use database::Database;
 use header::Header;
 use sqlite::Transaction;
 use tab::Tab;
@@ -107,10 +106,10 @@ impl Window {
     }
 
     pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_browser_id) {
+        match database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             self.tab.clean(transaction, &record.id)?;
@@ -126,7 +125,7 @@ impl Window {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::records(transaction, app_browser_id) {
+        match database::records(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
@@ -140,12 +139,12 @@ impl Window {
     }
 
     pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match Database::add(transaction, app_browser_id) {
+        match database::add(transaction, app_browser_id) {
             Ok(_) => {
                 // Delegate save action to childs
                 if let Err(e) = self
                     .tab
-                    .save(transaction, &Database::last_insert_id(transaction))
+                    .save(transaction, &database::last_insert_id(transaction))
                 {
                     return Err(e.to_string());
                 }
@@ -174,7 +173,7 @@ impl Window {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

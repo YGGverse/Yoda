@@ -2,7 +2,6 @@ mod browser;
 mod database;
 
 use browser::Browser;
-use database::Database;
 
 use crate::profile::Profile;
 use adw::Application;
@@ -51,7 +50,7 @@ impl App {
                         match connection.unchecked_transaction() {
                             Ok(transaction) => {
                                 // Restore previous session from DB
-                                match Database::records(&transaction) {
+                                match database::records(&transaction) {
                                     Ok(records) => {
                                         // Restore child components
                                         for record in records {
@@ -92,11 +91,11 @@ impl App {
                         // Create transaction
                         match connection.transaction() {
                             Ok(transaction) => {
-                                match Database::records(&transaction) {
+                                match database::records(&transaction) {
                                     Ok(records) => {
                                         // Cleanup previous session records
                                         for record in records {
-                                            match Database::delete(&transaction, &record.id) {
+                                            match database::delete(&transaction, &record.id) {
                                                 Ok(_) => {
                                                     // Delegate clean action to childs
                                                     if let Err(e) =
@@ -110,12 +109,12 @@ impl App {
                                         }
 
                                         // Save current session to DB
-                                        match Database::add(&transaction) {
+                                        match database::add(&transaction) {
                                             Ok(_) => {
                                                 // Delegate save action to childs
                                                 if let Err(e) = browser.save(
                                                     &transaction,
-                                                    &Database::last_insert_id(&transaction),
+                                                    &database::last_insert_id(&transaction),
                                                 ) {
                                                     todo!("{e}")
                                                 }
@@ -268,7 +267,7 @@ impl App {
 // Tools
 fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

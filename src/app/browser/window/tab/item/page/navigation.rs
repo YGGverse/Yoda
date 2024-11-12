@@ -7,7 +7,6 @@ mod request;
 mod widget;
 
 use bookmark::Bookmark;
-use database::Database;
 use history::History;
 use home::Home;
 use reload::Reload;
@@ -79,10 +78,10 @@ impl Navigation {
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_page_id) {
+        match database::records(transaction, app_browser_window_tab_item_page_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             self.request.clean(transaction, &record.id)?;
@@ -102,7 +101,7 @@ impl Navigation {
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_page_id) {
+        match database::records(transaction, app_browser_window_tab_item_page_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
@@ -120,9 +119,9 @@ impl Navigation {
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_tab_item_page_id) {
+        match database::add(transaction, app_browser_window_tab_item_page_id) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.request.save(transaction, &id)?;
@@ -165,7 +164,7 @@ impl Navigation {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 

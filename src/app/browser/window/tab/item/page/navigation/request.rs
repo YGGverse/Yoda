@@ -1,7 +1,6 @@
 mod database;
 mod widget;
 
-use database::Database;
 use widget::Widget;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
@@ -39,10 +38,10 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(records) => {
                 for record in records {
-                    match Database::delete(transaction, &record.id) {
+                    match database::delete(transaction, &record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             self.widget.clean(transaction, &record.id)?;
@@ -62,7 +61,7 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match Database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
@@ -80,9 +79,9 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match Database::add(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::add(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(_) => {
-                let id = Database::last_insert_id(transaction);
+                let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.widget.save(transaction, &id)?;
@@ -110,7 +109,7 @@ impl Request {
 // Tools
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = Database::init(tx) {
+    if let Err(e) = database::init(tx) {
         return Err(e.to_string());
     }
 
