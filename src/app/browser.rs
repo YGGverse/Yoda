@@ -177,7 +177,7 @@ impl Browser {
 
         // Show welcome dialog on profile not selected yet (e.g. first launch)
         if self.profile.database.selected().is_none() {
-            Welcome::new(self.profile.clone()).present(Some(self.widget.gobject()));
+            // @TODO Welcome::new(self.profile.clone()).present(Some(self.widget.gobject()));
         }
 
         self
