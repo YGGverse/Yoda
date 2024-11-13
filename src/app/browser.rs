@@ -1,11 +1,13 @@
 mod about;
 mod action;
 mod database;
+mod welcome;
 mod widget;
 mod window;
 
 use about::About;
 use action::Action;
+use welcome::Welcome;
 use widget::Widget;
 use window::Window;
 
@@ -21,6 +23,7 @@ use std::rc::Rc;
 
 pub struct Browser {
     action: Rc<Action>,
+    profile: Rc<Profile>,
     widget: Rc<Widget>,
     window: Rc<Window>,
 }
@@ -71,6 +74,7 @@ impl Browser {
         });
 
         action.profile().connect_activate({
+            let profile = profile.clone();
             move || {
                 FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
                     None::<&gtk::Window>,
@@ -92,6 +96,7 @@ impl Browser {
         // Return new activated `Self`
         Self {
             action,
+            profile,
             widget,
             window,
         }
@@ -159,6 +164,10 @@ impl Browser {
     }
 
     pub fn init(&self) {
+        // Show welcome dialog on profile not selected yet (e.g. first launch) @TODO
+        // Welcome::new(self.profile.clone()).present(Some(self.widget.gobject()));
+
+        // Init main window
         self.window.init();
     }
 
