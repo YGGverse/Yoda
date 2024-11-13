@@ -28,7 +28,7 @@ impl Database {
     pub fn records(&self) -> Vec<Table> {
         let readable = self.connection.read().unwrap();
         let tx = readable.unchecked_transaction().unwrap();
-        records(&tx).unwrap()
+        select(&tx).unwrap()
     }
 
     /// Get selected profile record if exist
@@ -44,13 +44,31 @@ impl Database {
     // Setters
 
     pub fn add(&self, is_active: bool, time: &DateTime, name: Option<&str>) -> Result<i64, ()> {
+        // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
 
-        add(&tx, is_active, time, name).unwrap();
+        // New record has active status
+        if is_active {
+            // Deactivate other records as only one profile should be active
+            for record in select(&tx).unwrap() {
+                let _ = update(
+                    &tx,
+                    record.id,
+                    false,
+                    &record.time,
+                    record.name.as_ref().map(|x| x.as_str()),
+                );
+            }
+        }
 
+        // Create new record
+        insert(&tx, is_active, time, name).unwrap();
+
+        // Hold insert ID for result
         let id = last_insert_id(&tx);
 
+        // Done
         match tx.commit() {
             Ok(_) => Ok(id),
             Err(_) => Err(()), // @TODO
@@ -73,16 +91,36 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(
+pub fn insert(
     tx: &Transaction,
     is_active: bool,
     time: &DateTime,
     name: Option<&str>,
 ) -> Result<usize, Error> {
-    tx.execute("INSERT INTO `profile`", (is_active, time.to_unix(), name))
+    tx.execute(
+        "INSERT INTO `profile` (
+            `is_active`,
+            `time`,
+            `name`
+        ) VALUES (?, ?, ?)",
+        (is_active, time.to_unix(), name),
+    )
 }
 
-pub fn records(tx: &Transaction) -> Result<Vec<Table>, Error> {
+pub fn update(
+    tx: &Transaction,
+    id: i64,
+    is_active: bool,
+    time: &DateTime,
+    name: Option<&str>,
+) -> Result<usize, Error> {
+    tx.execute(
+        "UPDATE `profile` SET `is_active` = ?, `time` = ?, `name` = ? WHERE `id` = ? LIMIT 1",
+        (is_active, time.to_unix(), name, id),
+    )
+}
+
+pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare("SELECT `id`, `is_active`, `time`, `name` FROM `profile`")?;
     let result = stmt.query_map([], |row| {
         Ok(Table {

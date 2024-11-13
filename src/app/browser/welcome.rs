@@ -1,4 +1,5 @@
 mod widget;
+use gtk::glib::DateTime;
 use widget::Widget;
 
 use crate::profile::Profile;
@@ -19,13 +20,19 @@ impl Welcome {
         let widget = Rc::new(Widget::new(parent));
 
         // Init events
-        widget.connect_response(|value| {
-            match value {
-                Some(id) => {
-                    // Select profile by record ID @TODO
-                }
-                None => {
-                    // Create new profile @TODO
+        widget.connect_response({
+            let profile = profile.clone();
+            move |value| {
+                match value {
+                    Some(id) => {
+                        // Select profile by record ID @TODO
+                    }
+                    None => {
+                        // Create and select new profile
+                        let _ = profile
+                            .database
+                            .add(true, &DateTime::now_local().unwrap(), None);
+                    }
                 }
             }
         });
