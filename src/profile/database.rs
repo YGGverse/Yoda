@@ -2,7 +2,6 @@ use gtk::glib::DateTime;
 use sqlite::{Connection, Error, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
-#[derive(Debug)]
 pub struct Table {
     pub id: i64,
     pub is_active: bool,
@@ -165,10 +164,6 @@ pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     }
 
     Ok(records)
-}
-
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute("DELETE FROM `profile` WHERE `id` = ?", [id])
 }
 
 pub fn last_insert_id(tx: &Transaction) -> i64 {
