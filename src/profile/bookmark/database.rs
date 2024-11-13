@@ -12,6 +12,8 @@ pub struct Bookmark {
     // nothing yet..
 }
 
+// Low-level DB API
+
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_bookmark`
@@ -25,7 +27,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(
+pub fn insert(
     tx: &Transaction,
     profile_id: &i64,
     time: &DateTime,
@@ -41,7 +43,7 @@ pub fn add(
     )
 }
 
-pub fn records(
+pub fn select(
     tx: &Transaction,
     profile_id: &i64,
     request: Option<&str>,

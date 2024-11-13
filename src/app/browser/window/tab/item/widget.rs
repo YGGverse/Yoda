@@ -60,7 +60,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_item_id) {
+        match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -83,7 +83,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_item_id) {
+        match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     // Record value can be stored as NULL
@@ -109,7 +109,7 @@ impl Widget {
         // Keep value in memory until operation complete
         let title = self.gobject.title();
 
-        match database::add(
+        match database::insert(
             transaction,
             app_browser_window_tab_item_id,
             match title.is_empty() {

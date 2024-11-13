@@ -295,7 +295,7 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_item_id) {
+        match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -323,7 +323,7 @@ impl Page {
         self.meta.set_status(Status::SessionRestore);
 
         // Begin page restore
-        match database::records(transaction, app_browser_window_tab_item_id) {
+        match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
@@ -345,7 +345,7 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
-        match database::add(transaction, app_browser_window_tab_item_id) {
+        match database::insert(transaction, app_browser_window_tab_item_id) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 

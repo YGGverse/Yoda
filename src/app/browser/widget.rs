@@ -42,7 +42,7 @@ impl Widget {
 
     // Actions
     pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match database::records(transaction, app_browser_id) {
+        match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -61,7 +61,7 @@ impl Widget {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match database::records(transaction, app_browser_id) {
+        match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Restore widget
@@ -80,7 +80,7 @@ impl Widget {
     }
 
     pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
-        match database::add(
+        match database::insert(
             transaction,
             app_browser_id,
             &self.gobject.default_width(),

@@ -14,11 +14,11 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(tx: &Transaction) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction) -> Result<usize, Error> {
     tx.execute("INSERT INTO `app` DEFAULT VALUES", [])
 }
 
-pub fn records(tx: &Transaction) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare("SELECT `id` FROM `app`")?;
     let result = stmt.query_map([], |row| Ok(Table { id: row.get(0)? }))?;
 

@@ -5,6 +5,8 @@ pub struct Table {
     //pub profile_id: i64,
 }
 
+// Low-level DB API
+
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_identity`

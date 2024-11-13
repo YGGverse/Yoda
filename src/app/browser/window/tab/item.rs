@@ -108,7 +108,7 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_id) {
+        match database::select(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -139,7 +139,7 @@ impl Item {
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
-        match database::records(transaction, app_browser_window_tab_id) {
+        match database::select(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
@@ -182,7 +182,7 @@ impl Item {
         is_selected: &bool,
         is_attention: &bool,
     ) -> Result<(), String> {
-        match database::add(
+        match database::insert(
             transaction,
             app_browser_window_tab_id,
             page_position,

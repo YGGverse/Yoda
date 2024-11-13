@@ -18,7 +18,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(
+pub fn insert(
     tx: &Transaction,
     app_browser_window_tab_item_page_id: &i64,
     title: Option<&str>,
@@ -32,7 +32,7 @@ pub fn add(
     )
 }
 
-pub fn records(
+pub fn select(
     tx: &Transaction,
     app_browser_window_tab_item_page_id: &i64,
 ) -> Result<Vec<Table>, Error> {

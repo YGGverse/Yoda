@@ -104,7 +104,7 @@ impl Browser {
     // Actions
 
     pub fn clean(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match database::records(transaction, app_id) {
+        match database::select(transaction, app_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -127,7 +127,7 @@ impl Browser {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match database::records(transaction, app_id) {
+        match database::select(transaction, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
@@ -145,7 +145,7 @@ impl Browser {
     }
 
     pub fn save(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
-        match database::add(transaction, app_id) {
+        match database::insert(transaction, app_id) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 

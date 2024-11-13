@@ -34,7 +34,7 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::select(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -57,7 +57,7 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::select(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to the item childs
@@ -75,7 +75,7 @@ impl Request {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
-        match database::add(transaction, app_browser_window_tab_item_page_navigation_id) {
+        match database::insert(transaction, app_browser_window_tab_item_page_navigation_id) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 

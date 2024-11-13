@@ -16,14 +16,14 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(tx: &Transaction, app_browser_id: &i64) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, app_browser_id: &i64) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window` (`app_browser_id`) VALUES (?)",
         [app_browser_id],
     )
 }
 
-pub fn records(tx: &Transaction, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_id: &i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_id` FROM `app_browser_window`

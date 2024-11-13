@@ -47,7 +47,7 @@ impl App {
                         match connection.unchecked_transaction() {
                             Ok(transaction) => {
                                 // Restore previous session from DB
-                                match database::records(&transaction) {
+                                match database::select(&transaction) {
                                     Ok(records) => {
                                         // Restore child components
                                         for record in records {
@@ -82,7 +82,7 @@ impl App {
                         // Create transaction
                         match connection.transaction() {
                             Ok(transaction) => {
-                                match database::records(&transaction) {
+                                match database::select(&transaction) {
                                     Ok(records) => {
                                         // Cleanup previous session records
                                         for record in records {
@@ -100,7 +100,7 @@ impl App {
                                         }
 
                                         // Save current session to DB
-                                        match database::add(&transaction) {
+                                        match database::insert(&transaction) {
                                             Ok(_) => {
                                                 // Delegate save action to childs
                                                 if let Err(e) = browser.save(

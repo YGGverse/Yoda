@@ -80,7 +80,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_request_id: &i64,
     ) -> Result<(), String> {
-        match database::records(
+        match database::select(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
         ) {
@@ -106,7 +106,7 @@ impl Widget {
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_request_id: &i64,
     ) -> Result<(), String> {
-        match database::records(
+        match database::select(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
         ) {
@@ -134,7 +134,7 @@ impl Widget {
         // Keep value in memory until operation complete
         let text = self.gobject.text();
 
-        match database::add(
+        match database::insert(
             transaction,
             app_browser_window_tab_item_page_navigation_request_id,
             match text.is_empty() {

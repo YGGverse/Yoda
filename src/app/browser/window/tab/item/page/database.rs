@@ -16,7 +16,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn add(tx: &Transaction, app_browser_window_tab_item_id: &i64) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, app_browser_window_tab_item_id: &i64) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item_page` (
             `app_browser_window_tab_item_id`
@@ -25,10 +25,7 @@ pub fn add(tx: &Transaction, app_browser_window_tab_item_id: &i64) -> Result<usi
     )
 }
 
-pub fn records(
-    tx: &Transaction,
-    app_browser_window_tab_item_id: &i64,
-) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_window_tab_item_id: &i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_tab_item_id`

@@ -248,7 +248,7 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_id) {
+        match database::select(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
                     match database::delete(transaction, &record.id) {
@@ -273,7 +273,7 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match database::records(transaction, app_browser_window_id) {
+        match database::select(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
@@ -306,7 +306,7 @@ impl Tab {
         transaction: &Transaction,
         app_browser_window_id: &i64,
     ) -> Result<(), String> {
-        match database::add(transaction, app_browser_window_id) {
+        match database::insert(transaction, app_browser_window_id) {
             Ok(_) => {
                 // Delegate save action to childs
                 let id = database::last_insert_id(transaction);
