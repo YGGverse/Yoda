@@ -40,6 +40,22 @@ impl Database {
         }
         None
     }
+
+    // Setters
+
+    pub fn add(&self, is_active: bool, time: &DateTime, name: Option<&str>) -> Result<i64, ()> {
+        let mut writable = self.connection.write().unwrap();
+        let tx = writable.transaction().unwrap();
+
+        add(&tx, is_active, time, name).unwrap();
+
+        let id = last_insert_id(&tx);
+
+        match tx.commit() {
+            Ok(_) => Ok(id),
+            Err(_) => Err(()), // @TODO
+        }
+    }
 }
 
 // Low-level DB API
