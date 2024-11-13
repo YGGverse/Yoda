@@ -1,6 +1,6 @@
 use adw::{
-    prelude::{AdwDialogExt, AlertDialogExtManual},
-    AlertDialog,
+    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
+    AlertDialog, ResponseAppearance,
 };
 use gtk::prelude::IsA;
 
@@ -22,10 +22,14 @@ impl Widget {
         let gobject = AlertDialog::builder()
             .heading(HEADING)
             .body(BODY)
-            .default_response(RESPONSE_QUIT.1)
+            .close_response(RESPONSE_QUIT.0)
+            .default_response(RESPONSE_CREATE.0)
             .build();
 
         gobject.add_responses(&[RESPONSE_QUIT, RESPONSE_CREATE]);
+
+        gobject.set_response_appearance(RESPONSE_CREATE.0, ResponseAppearance::Suggested);
+        gobject.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive);
 
         // Return new `Self`
         Self { gobject }
