@@ -42,6 +42,8 @@ impl Database {
     }
 }
 
+// Low-level DB API
+
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile`
