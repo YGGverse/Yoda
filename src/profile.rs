@@ -1,10 +1,15 @@
+mod bookmark;
 mod database;
-use database::Database;
+mod history;
+mod identity;
 
 use gtk::glib::user_config_dir;
+use sqlite::{Connection, Transaction};
 use std::{
     fs::create_dir_all,
     path::{Path, PathBuf},
+    rc::Rc,
+    sync::RwLock,
 };
 
 const VENDOR: &str = "YGGverse";
@@ -14,7 +19,7 @@ const BRANCH: &str = "master";
 const DB_NAME: &str = "profile.sqlite3";
 
 pub struct Profile {
-    database: Database,
+    database: Rc<RwLock<Connection>>,
     config_path: PathBuf,
 }
 
@@ -42,20 +47,68 @@ impl Profile {
         let mut database_path = config_path.clone();
         database_path.push(DB_NAME);
 
+        // Init database connection
+        let connection = match Connection::open(database_path.as_path()) {
+            Ok(connection) => Rc::new(RwLock::new(connection)),
+            Err(reason) => panic!("{reason}"),
+        };
+
+        // Init profile components
+        {
+            // Init writable connection
+            let mut connection = match connection.write() {
+                Ok(connection) => connection,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Init new transaction
+            let transaction = match connection.transaction() {
+                Ok(transaction) => transaction,
+                Err(e) => todo!("{e}"),
+            };
+
+            // Begin migration
+            match migrate(&transaction) {
+                Ok(_) => {
+                    // Confirm changes
+                    match transaction.commit() {
+                        Ok(_) => {} // @TODO
+                        Err(e) => todo!("{e}"),
+                    }
+                }
+                Err(e) => todo!("{e}"),
+            }
+        } // unlock database
+
         // Result
         Self {
-            database: Database::new(database_path.as_path()),
+            database: connection,
             config_path,
         }
     }
 
     // Getters
 
-    pub fn database(&self) -> &Database {
+    pub fn database(&self) -> &Rc<RwLock<Connection>> {
         &self.database
     }
 
     pub fn config_path(&self) -> &Path {
         self.config_path.as_path()
     }
+}
+
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = database::init(tx) {
+        return Err(e.to_string());
+    }
+
+    // Delegate migration to children components
+    bookmark::migrate(tx)?;
+    history::migrate(tx)?;
+    identity::migrate(tx)?;
+
+    // Success
+    Ok(())
 }

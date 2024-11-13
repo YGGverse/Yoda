@@ -21,10 +21,7 @@ pub struct App {
 
 impl App {
     // Construct
-    pub fn new() -> Self {
-        // Init profile
-        let profile = Rc::new(Profile::new());
-
+    pub fn new(profile: Rc<Profile>) -> Self {
         // Init GTK
         let gobject = Application::builder()
             .application_id(APPLICATION_ID)
@@ -44,7 +41,7 @@ impl App {
             let profile = profile.clone();
             move |this| {
                 // Init readable connection
-                match profile.database().connection().read() {
+                match profile.database().read() {
                     Ok(connection) => {
                         // Create transaction
                         match connection.unchecked_transaction() {
@@ -86,7 +83,7 @@ impl App {
             let profile = profile.clone();
             move |_| {
                 // Init writable connection
-                match profile.database().connection().write() {
+                match profile.database().write() {
                     Ok(mut connection) => {
                         // Create transaction
                         match connection.transaction() {
@@ -243,7 +240,7 @@ impl App {
         // Begin database migration @TODO
         {
             // Init writable connection
-            let mut connection = match self.profile.database().connection().try_write() {
+            let mut connection = match self.profile.database().try_write() {
                 Ok(connection) => connection,
                 Err(e) => todo!("{e}"),
             };
