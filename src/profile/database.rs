@@ -28,21 +28,16 @@ impl Database {
     pub fn records(&self) -> Vec<Table> {
         let binding = self.connection.read().unwrap();
         let tx = binding.unchecked_transaction().unwrap();
-
         records(&tx).unwrap()
     }
 
     /// Get selected profile record if exist
     pub fn selected(&self) -> Option<Table> {
-        let binding = self.connection.read().unwrap();
-        let tx = binding.unchecked_transaction().unwrap();
-
-        for record in records(&tx).unwrap() {
+        for record in self.records() {
             if record.is_active {
                 return Some(record);
             }
         }
-
         None
     }
 }
