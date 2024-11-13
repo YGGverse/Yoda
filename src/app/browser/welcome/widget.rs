@@ -26,8 +26,10 @@ impl Widget {
             .default_response(RESPONSE_CREATE.0)
             .build();
 
+        // Init response variants
         gobject.add_responses(&[RESPONSE_QUIT, RESPONSE_CREATE]);
 
+        // Decorate
         gobject.set_response_appearance(RESPONSE_CREATE.0, ResponseAppearance::Suggested);
         gobject.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive);
 
