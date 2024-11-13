@@ -7,7 +7,7 @@ use crate::profile::Profile;
 use adw::Application;
 use gtk::{
     glib::ExitCode,
-    prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt, GtkWindowExt},
+    prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt},
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -41,7 +41,7 @@ impl App {
             let profile = profile.clone();
             move |this| {
                 // Init readable connection
-                match profile.database().read() {
+                match profile.database.connection.read() {
                     Ok(connection) => {
                         // Create transaction
                         match connection.unchecked_transaction() {
@@ -57,9 +57,6 @@ impl App {
                                                 todo!("{e}")
                                             }
                                         }
-
-                                        // Run initial features
-                                        browser.init();
                                     }
                                     Err(e) => todo!("{e}"),
                                 }
@@ -70,11 +67,8 @@ impl App {
                     Err(e) => todo!("{e}"),
                 }
 
-                // Assign browser window to this application
-                browser.gobject().set_application(Some(this));
-
-                // Show main widget
-                browser.gobject().present();
+                // Run initial features, show widget
+                browser.init(Some(this)).present();
             }
         });
 
@@ -83,7 +77,7 @@ impl App {
             let profile = profile.clone();
             move |_| {
                 // Init writable connection
-                match profile.database().write() {
+                match profile.database.connection.write() {
                     Ok(mut connection) => {
                         // Create transaction
                         match connection.transaction() {
@@ -240,7 +234,7 @@ impl App {
         // Begin database migration @TODO
         {
             // Init writable connection
-            let mut connection = match self.profile.database().try_write() {
+            let mut connection = match self.profile.database.connection.write() {
                 Ok(connection) => connection,
                 Err(e) => todo!("{e}"),
             };

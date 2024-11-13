@@ -3,24 +3,21 @@ mod database;
 mod history;
 mod identity;
 
+use database::Database;
+
 use gtk::glib::user_config_dir;
 use sqlite::{Connection, Transaction};
-use std::{
-    fs::create_dir_all,
-    path::{Path, PathBuf},
-    rc::Rc,
-    sync::RwLock,
-};
+use std::{fs::create_dir_all, path::PathBuf, rc::Rc, sync::RwLock};
 
 const VENDOR: &str = "YGGverse";
 const APP_ID: &str = "Yoda";
 const BRANCH: &str = "master";
 
-const DB_NAME: &str = "profile.sqlite3";
+const DB_NAME: &str = "database.sqlite3";
 
 pub struct Profile {
-    database: Rc<RwLock<Connection>>,
-    config_path: PathBuf,
+    pub database: Rc<Database>,
+    pub config_path: PathBuf,
 }
 
 impl Profile {
@@ -82,19 +79,9 @@ impl Profile {
 
         // Result
         Self {
-            database: connection,
+            database: Rc::new(Database::new(connection)),
             config_path,
         }
-    }
-
-    // Getters
-
-    pub fn database(&self) -> &Rc<RwLock<Connection>> {
-        &self.database
-    }
-
-    pub fn config_path(&self) -> &Path {
-        self.config_path.as_path()
     }
 }
 

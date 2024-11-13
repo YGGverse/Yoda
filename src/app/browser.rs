@@ -12,11 +12,10 @@ use widget::Widget;
 use window::Window;
 
 use crate::profile::Profile;
-use adw::ApplicationWindow;
 use gtk::{
     gio::{Cancellable, File},
-    prelude::GtkWindowExt,
-    FileLauncher,
+    prelude::{GtkWindowExt, IsA},
+    Application, FileLauncher,
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -76,7 +75,7 @@ impl Browser {
         action.profile().connect_activate({
             let profile = profile.clone();
             move || {
-                FileLauncher::new(Some(&File::for_path(profile.config_path()))).launch(
+                FileLauncher::new(Some(&File::for_path(profile.config_path.as_path()))).launch(
                     None::<&gtk::Window>,
                     None::<&Cancellable>,
                     |result| {
@@ -163,12 +162,25 @@ impl Browser {
         Ok(())
     }
 
-    pub fn init(&self) {
-        // Show welcome dialog on profile not selected yet (e.g. first launch) @TODO
-        // Welcome::new(self.profile.clone()).present(Some(self.widget.gobject()));
+    pub fn init(&self, application: Option<&impl IsA<Application>>) -> &Self {
+        // Assign browser window to this application
+        self.widget.gobject().set_application(application); // @TODO
 
         // Init main window
         self.window.init();
+        self
+    }
+
+    pub fn present(&self) -> &Self {
+        // Show main window
+        self.widget.gobject().present();
+
+        // Show welcome dialog on profile not selected yet (e.g. first launch)
+        if self.profile.database.selected().is_none() {
+            Welcome::new(self.profile.clone()).present(Some(self.widget.gobject()));
+        }
+
+        self
     }
 
     pub fn update(&self) {
@@ -179,10 +191,6 @@ impl Browser {
 
     pub fn action(&self) -> &Rc<Action> {
         &self.action
-    }
-
-    pub fn gobject(&self) -> &ApplicationWindow {
-        self.widget.gobject()
     }
 
     pub fn window(&self) -> &Rc<Window> {
