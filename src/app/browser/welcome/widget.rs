@@ -6,9 +6,10 @@ use gtk::prelude::GtkWindowExt;
 use std::cell::RefCell;
 
 const HEADING: &str = "Welcome!";
-const BODY: &str = "Select profile for browser data";
+const BODY: &str = "Select profile for personal data";
 const RESPONSE_QUIT: (&str, &str) = ("quit", "Quit");
 const RESPONSE_CREATE: (&str, &str) = ("create", "Create new profile");
+const RESPONSE_IMPORT: (&str, &str) = ("import", "Import..");
 
 pub struct Widget {
     gobject: AlertDialog,
@@ -30,7 +31,10 @@ impl Widget {
             .build();
 
         // Set response variants
-        gobject.add_responses(&[RESPONSE_QUIT, RESPONSE_CREATE]);
+        gobject.add_responses(&[RESPONSE_QUIT, RESPONSE_CREATE, RESPONSE_IMPORT]);
+
+        // Deactivate not implemented feature @TODO
+        gobject.set_response_enabled(RESPONSE_IMPORT.0, false);
 
         // Decorate default response preset
         gobject.set_response_appearance(RESPONSE_CREATE.0, ResponseAppearance::Suggested);
