@@ -26,8 +26,8 @@ impl Database {
 
     /// Get all records
     pub fn records(&self) -> Vec<Table> {
-        let binding = self.connection.read().unwrap();
-        let tx = binding.unchecked_transaction().unwrap();
+        let readable = self.connection.read().unwrap();
+        let tx = readable.unchecked_transaction().unwrap();
         records(&tx).unwrap()
     }
 
