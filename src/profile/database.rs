@@ -4,6 +4,7 @@ use gtk::glib::DateTime;
 
 pub struct Table {
     pub id: i64,
+    pub active: bool,
     pub time: DateTime,
     pub name: Option<String>,
 }
@@ -12,25 +13,32 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile`
         (
-            `id`   INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            `time` INTEGER NOT NULL,
-            `name` VARCHAR(255)
+            `id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `active` INTEGER NOT NULL,
+            `time`   INTEGER NOT NULL,
+            `name`   VARCHAR(255)
         )",
         [],
     )
 }
 
-pub fn add(tx: &Transaction, time: &DateTime, name: Option<&str>) -> Result<usize, Error> {
-    tx.execute("INSERT INTO `profile`", (time.to_unix(), name))
+pub fn add(
+    tx: &Transaction,
+    active: bool,
+    time: &DateTime,
+    name: Option<&str>,
+) -> Result<usize, Error> {
+    tx.execute("INSERT INTO `profile`", (active, time.to_unix(), name))
 }
 
 pub fn records(tx: &Transaction) -> Result<Vec<Table>, Error> {
-    let mut stmt = tx.prepare("SELECT `id`, `time`, `name` FROM `profile`")?;
+    let mut stmt = tx.prepare("SELECT `id`, `active`, `time`, `name` FROM `profile`")?;
     let result = stmt.query_map([], |row| {
         Ok(Table {
             id: row.get(0)?,
-            time: DateTime::from_unix_local(row.get(1)?).unwrap(),
-            name: row.get(2)?,
+            active: row.get(1)?,
+            time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+            name: row.get(3)?,
         })
     })?;
 
