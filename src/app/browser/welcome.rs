@@ -25,15 +25,16 @@ impl Welcome {
             move |value| {
                 match value {
                     Some(id) => {
-                        // Select profile by record ID @TODO
+                        // Activate selected profile by record ID
+                        let _ = profile.database.activate(id);
                     }
                     None => {
                         // Create and select new profile
                         let _ = profile
                             .database
-                            .add(true, &DateTime::now_local().unwrap(), None);
+                            .add(true, DateTime::now_local().unwrap(), None);
                     }
-                }
+                } // @TODO handle result
             }
         });
 

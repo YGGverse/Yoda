@@ -43,7 +43,8 @@ impl Database {
 
     // Setters
 
-    pub fn add(&self, is_active: bool, time: &DateTime, name: Option<&str>) -> Result<i64, ()> {
+    /// Create new record in `Self` database connected
+    pub fn add(&self, is_active: bool, time: DateTime, name: Option<&str>) -> Result<i64, ()> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
@@ -56,7 +57,7 @@ impl Database {
                     &tx,
                     record.id,
                     false,
-                    &record.time,
+                    record.time,
                     record.name.as_ref().map(|x| x.as_str()),
                 );
             }
@@ -73,6 +74,31 @@ impl Database {
             Ok(_) => Ok(id),
             Err(_) => Err(()), // @TODO
         }
+    }
+
+    /// Set `is_active` status `true` for the record with given profile ID
+    /// * reset other records to `false`
+    pub fn activate(&self, id: i64) -> Result<(), ()> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap();
+        let tx = writable.transaction().unwrap();
+
+        // Deactivate other records as only one profile should be active
+        for record in select(&tx).unwrap() {
+            let _ = update(
+                &tx,
+                record.id,
+                if record.id == id { true } else { false },
+                record.time,
+                record.name.as_ref().map(|x| x.as_str()),
+            );
+        }
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(()),
+            Err(_) => Err(()),
+        } // @TODO make sure ID exist and was changed
     }
 }
 
@@ -94,7 +120,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 pub fn insert(
     tx: &Transaction,
     is_active: bool,
-    time: &DateTime,
+    time: DateTime,
     name: Option<&str>,
 ) -> Result<usize, Error> {
     tx.execute(
@@ -111,11 +137,11 @@ pub fn update(
     tx: &Transaction,
     id: i64,
     is_active: bool,
-    time: &DateTime,
+    time: DateTime,
     name: Option<&str>,
 ) -> Result<usize, Error> {
     tx.execute(
-        "UPDATE `profile` SET `is_active` = ?, `time` = ?, `name` = ? WHERE `id` = ? LIMIT 1",
+        "UPDATE `profile` SET `is_active` = ?, `time` = ?, `name` = ? WHERE `id` = ?",
         (is_active, time.to_unix(), name, id),
     )
 }
@@ -141,7 +167,7 @@ pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `profile` WHERE `id` = ?", [id])
 }
 
