@@ -83,13 +83,13 @@ impl Profile {
         let database = Rc::new(Database::new(connection.clone()));
 
         // Get active profile or create new one
-        let profile_id = match database.active() {
+        let profile_id = Rc::new(match database.active() {
             Some(profile) => profile.id,
             None => match database.add(true, DateTime::now_local().unwrap(), None) {
                 Ok(id) => id,
                 Err(_) => todo!(),
             },
-        };
+        });
 
         // Result
         Self {
