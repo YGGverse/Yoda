@@ -1,7 +1,9 @@
 mod database;
+mod error;
 mod memory;
 
 use database::Database;
+use error::Error;
 use memory::Memory;
 
 use gtk::glib::DateTime;
@@ -24,7 +26,9 @@ impl Bookmark {
 
         // Build initial index
         for record in database.records(None) {
-            memory.set(record.request, record.time)
+            if memory.add(record.request, record.time).is_err() {
+                todo!()
+            }
         }
 
         // Return new `Self`
@@ -44,21 +48,30 @@ impl Bookmark {
         }
     }
 
-    /// Toggle record in bookmarks database, update emory index
-    pub fn toggle(&self, request: &str) {
+    /// Toggle record in `database` and `memory` index
+    pub fn toggle(&self, request: &str) -> Result<(), Error> {
+        // Get current timestamp for new record
         let time = DateTime::now_local().unwrap();
 
+        // Delete record if exists
         if self.has_request(request, false) {
             match self.database.delete(request) {
-                Ok(_) => self.memory.delete(request),
-                Err(_) => todo!(),
+                Ok(_) => match self.memory.delete(request) {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(Error::MemoryDelete),
+                },
+                Err(_) => Err(Error::DatabaseDelete),
             }
+        // Otherwise, create new record
         } else {
             match self.database.add(time.clone(), request.into()) {
-                Ok(_) => self.memory.set(request.into(), time),
-                Err(_) => todo!(),
-            };
-        }
+                Ok(_) => match self.memory.add(request.into(), time) {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(Error::MemoryAdd),
+                },
+                Err(_) => Err(Error::DatabaseAdd),
+            }
+        } // @TODO return affected rows on success?
     }
 }
 

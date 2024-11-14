@@ -1,7 +1,10 @@
+mod error;
+use error::Error;
+
 use gtk::glib::DateTime;
 use std::{cell::RefCell, collections::HashMap};
 
-/// Reduce disk usage by cache results in memory
+/// Reduce disk usage by cache Bookmarks index in memory
 pub struct Memory {
     index: RefCell<HashMap<String, DateTime>>,
 }
@@ -18,33 +21,24 @@ impl Memory {
 
     // Actions
 
-    /// Set new record
-    /// * replace existing record with new value
-    pub fn set(&self, request: String, time: DateTime) {
-        // Borrow index to update
-        let mut index = self.index.borrow_mut();
-
-        // Cleanup previous record
-        if index.get(&request).is_some() {
-            index.remove(&request);
-        }
-
-        // Insert new record with actual data
-        index.insert(request, time);
-    }
-
-    /// Check request exist in memory index
-    pub fn delete(&self, request: &str) {
-        // Borrow index to update
-        let mut index = self.index.borrow_mut();
-
-        // Delete record (if exist)
-        if index.get(request).is_some() {
-            index.remove(request);
+    /// Add new record for given `request`
+    /// * validates record with same key does not exist yet
+    pub fn add(&self, request: String, time: DateTime) -> Result<(), Error> {
+        match self.index.borrow_mut().insert(request, time) {
+            Some(_) => Err(Error::Overwrite),
+            None => Ok(()),
         }
     }
 
-    /// Check request exist in memory index
+    /// Delete record from index by `request`
+    pub fn delete(&self, request: &str) -> Result<(), Error> {
+        match self.index.borrow_mut().remove(request) {
+            Some(_) => Ok(()),
+            None => Err(Error::NotFound),
+        }
+    }
+
+    /// Check `request` exist in memory index
     pub fn is_exist(&self, request: &str) -> bool {
         self.index.borrow().get(request).is_some()
     }
