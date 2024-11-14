@@ -43,7 +43,7 @@ impl Database {
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(&self, is_active: bool, time: DateTime, name: Option<&str>) -> Result<i64, ()> {
+    pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64, ()> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
@@ -52,13 +52,7 @@ impl Database {
         if is_active {
             // Deactivate other records as only one profile should be active
             for record in select(&tx).unwrap() {
-                let _ = update(
-                    &tx,
-                    record.id,
-                    false,
-                    record.time,
-                    record.name.as_ref().map(|x| x.as_str()),
-                );
+                let _ = update(&tx, record.id, false, record.time, record.name);
             }
         }
 
@@ -89,7 +83,7 @@ impl Database {
                 record.id,
                 if record.id == id { true } else { false },
                 record.time,
-                record.name.as_ref().map(|x| x.as_str()),
+                record.name,
             );
         }
 
@@ -120,7 +114,7 @@ pub fn insert(
     tx: &Transaction,
     is_active: bool,
     time: DateTime,
-    name: Option<&str>,
+    name: Option<String>,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile` (
@@ -137,7 +131,7 @@ pub fn update(
     id: i64,
     is_active: bool,
     time: DateTime,
-    name: Option<&str>,
+    name: Option<String>,
 ) -> Result<usize, Error> {
     tx.execute(
         "UPDATE `profile` SET `is_active` = ?, `time` = ?, `name` = ? WHERE `id` = ?",
