@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<WindowAction>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("view-refresh-symbolic")
@@ -20,7 +20,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| window_action.reload().activate());
+        gobject.connect_clicked(move |_| action.reload().activate());
 
         // Return activated `Self`
         Self { gobject }

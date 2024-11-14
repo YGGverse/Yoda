@@ -6,16 +6,16 @@ use crate::app::browser::window::action::Action as WindowAction;
 use std::rc::Rc;
 
 pub struct Reload {
-    window_action: Rc<WindowAction>,
+    action: Rc<WindowAction>,
     widget: Rc<Widget>,
 }
 
 impl Reload {
     // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<WindowAction>) -> Self {
         Self {
-            window_action: window_action.clone(),
-            widget: Rc::new(Widget::new(window_action)),
+            action: action.clone(),
+            widget: Rc::new(Widget::new(action)),
         }
     }
 
@@ -23,10 +23,7 @@ impl Reload {
 
     pub fn update(&self, is_enabled: bool) {
         // Update actions
-        self.window_action
-            .reload()
-            .gobject()
-            .set_enabled(is_enabled);
+        self.action.reload().gobject().set_enabled(is_enabled);
 
         // Update child components
         self.widget.update(is_enabled);

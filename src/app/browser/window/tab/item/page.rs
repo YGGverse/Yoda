@@ -15,6 +15,7 @@ use crate::app::browser::{
     window::{tab::item::Action as TabAction, Action as WindowAction},
     Action as BrowserAction,
 };
+use crate::Profile;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{Cancellable, SocketClient, SocketClientEvent, SocketProtocol, TlsCertificateFlags},
@@ -44,15 +45,18 @@ pub struct Page {
 impl Page {
     // Constructors
 
-    pub fn new(id: GString, action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn new(
+        id: GString,
+        profile: Rc<Profile>,
+        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
+    ) -> Self {
         // Init components
         let content = Rc::new(Content::new((action.1.clone(), action.2.clone())));
 
-        let navigation = Rc::new(Navigation::new((
-            action.0.clone(),
-            action.1.clone(),
-            action.2.clone(),
-        )));
+        let navigation = Rc::new(Navigation::new(
+            profile,
+            (action.0.clone(), action.1.clone(), action.2.clone()),
+        ));
 
         let input = Rc::new(Input::new());
 

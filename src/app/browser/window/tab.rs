@@ -11,6 +11,7 @@ use crate::app::browser::{
     window::action::{Action as WindowAction, Position},
     Action as BrowserAction,
 };
+use crate::Profile;
 use gtk::{
     glib::{GString, Propagation},
     prelude::WidgetExt,
@@ -20,6 +21,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
+    profile: Rc<Profile>,
     browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
@@ -28,12 +30,12 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new(browser_action: Rc<BrowserAction>, window_action: Rc<WindowAction>) -> Self {
+    pub fn new(profile: Rc<Profile>, action: (Rc<BrowserAction>, Rc<WindowAction>)) -> Self {
         // Init empty HashMap index
         let index: Rc<RefCell<HashMap<GString, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
-        let menu = Menu::new(window_action.clone());
+        let menu = Menu::new(action.1.clone());
 
         // Init widget
         let widget = Rc::new(Widget::new(menu.gobject()));
@@ -41,20 +43,20 @@ impl Tab {
         // Init events
 
         widget.gobject().connect_setup_menu({
-            let window_action = window_action.clone();
+            let action = action.1.clone();
             move |tab_view, tab_page| {
                 // Set new state for page selected on menu open
                 // * this action return default state (`None`) on menu close
                 let state = tab_page.map(|this| tab_view.page_position(this));
 
                 // Update actions with new state value
-                window_action.close_all().change_state(state);
-                window_action.close().change_state(state);
-                window_action.history_back().change_state(state);
-                window_action.history_forward().change_state(state);
-                window_action.home().change_state(state);
-                window_action.pin().change_state(state);
-                window_action.reload().change_state(state);
+                action.close_all().change_state(state);
+                action.close().change_state(state);
+                action.history_back().change_state(state);
+                action.history_forward().change_state(state);
+                action.home().change_state(state);
+                action.pin().change_state(state);
+                action.reload().change_state(state);
             }
         });
 
@@ -94,8 +96,9 @@ impl Tab {
 
         // Return activated `Self`
         Self {
-            browser_action,
-            window_action,
+            profile,
+            browser_action: action.0,
+            window_action: action.1,
             index,
             widget,
         }
@@ -114,6 +117,7 @@ impl Tab {
         // Init new tab item
         let item = Rc::new(Item::new(
             self.widget.gobject(),
+            self.profile.clone(),
             self.browser_action.clone(),
             self.window_action.clone(),
             // Options tuple
@@ -280,8 +284,8 @@ impl Tab {
                         self.widget.gobject(),
                         transaction,
                         &record.id,
-                        self.browser_action.clone(),
-                        self.window_action.clone(),
+                        self.profile.clone(),
+                        (self.browser_action.clone(), self.window_action.clone()),
                     ) {
                         Ok(items) => {
                             for item in items {

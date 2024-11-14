@@ -7,11 +7,11 @@ mod window;
 
 use about::About;
 use action::Action;
-use welcome::Welcome;
+//use welcome::Welcome;
 use widget::Widget;
 use window::Window;
 
-use crate::profile::Profile;
+use crate::Profile;
 use gtk::{
     gio::{Cancellable, File},
     prelude::{GtkWindowExt, IsA},
@@ -32,7 +32,7 @@ impl Browser {
     pub fn new(profile: Rc<Profile>) -> Browser {
         // Init components
         let action = Rc::new(Action::new());
-        let window = Rc::new(Window::new(action.clone()));
+        let window = Rc::new(Window::new(profile.clone(), action.clone()));
 
         // Init widget
         let widget = Rc::new(Widget::new(

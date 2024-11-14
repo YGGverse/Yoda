@@ -11,6 +11,7 @@ use crate::app::browser::{
     window::action::{Action as WindowAction, Position},
     Action as BrowserAction,
 };
+use crate::Profile;
 use adw::TabView;
 use gtk::{
     glib::{uuid_string_random, GString},
@@ -32,6 +33,7 @@ impl Item {
     // Construct
     pub fn new(
         tab_view: &TabView,
+        profile: Rc<Profile>,
         // Actions
         browser_action: Rc<BrowserAction>,
         window_action: Rc<WindowAction>,
@@ -50,6 +52,7 @@ impl Item {
 
         let page = Rc::new(Page::new(
             id.clone(),
+            profile,
             (browser_action, window_action, action.clone()),
         ));
 
@@ -133,9 +136,9 @@ impl Item {
         tab_view: &TabView,
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
+        profile: Rc<Profile>,
         // Actions
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
+        action: (Rc<BrowserAction>, Rc<WindowAction>),
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -145,9 +148,10 @@ impl Item {
                     // Construct new item object
                     let item = Rc::new(Item::new(
                         tab_view,
+                        profile.clone(),
                         // Actions
-                        browser_action.clone(),
-                        window_action.clone(),
+                        action.0.clone(),
+                        action.1.clone(),
                         // Options tuple
                         (
                             Position::End,

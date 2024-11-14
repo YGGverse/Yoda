@@ -16,11 +16,13 @@ use widget::Widget;
 use crate::app::browser::window::tab::item::Action as TabAction;
 use crate::app::browser::window::Action as WindowAction;
 use crate::app::browser::Action as BrowserAction;
+use crate::Profile;
 use gtk::prelude::EditableExt;
 use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Navigation {
+    profile: Rc<Profile>,
     bookmark: Rc<Bookmark>,
     history: Rc<History>,
     home: Rc<Home>,
@@ -30,7 +32,10 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new(action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn new(
+        profile: Rc<Profile>,
+        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
+    ) -> Self {
         // Init components
         let home = Rc::new(Home::new(action.1.clone()));
         let history = Rc::new(History::new(action.1.clone()));
@@ -49,6 +54,7 @@ impl Navigation {
 
         // Done
         Self {
+            profile,
             bookmark,
             history,
             home,
@@ -61,11 +67,13 @@ impl Navigation {
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        self.bookmark.update(false); // @TODO DB from request
+        let request = self.request.widget().gobject().text();
+
+        self.bookmark
+            .update(!self.profile.bookmark.has_request(&request, true));
         self.history.update();
         self.home.update(self.request.uri());
-        self.reload
-            .update(!self.request.widget().gobject().text().is_empty());
+        self.reload.update(!request.is_empty());
         self.request.update(progress_fraction);
     }
 

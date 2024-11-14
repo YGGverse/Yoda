@@ -7,18 +7,18 @@ use gtk::glib::{gformat, GString, Uri};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
-    window_action: Rc<WindowAction>,
+    action: Rc<WindowAction>,
     uri: RefCell<Option<Uri>>,
     widget: Rc<Widget>,
 }
 
 impl Home {
     // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<WindowAction>) -> Self {
         Self {
-            window_action: window_action.clone(),
+            action: action.clone(),
             uri: RefCell::new(None),
-            widget: Rc::new(Widget::new(window_action)),
+            widget: Rc::new(Widget::new(action)),
         }
     }
 
@@ -34,7 +34,7 @@ impl Home {
         self.uri.replace(uri);
 
         // Update action status
-        self.window_action.home().gobject().set_enabled(status);
+        self.action.home().gobject().set_enabled(status);
 
         // Update child components
         self.widget.update(status);

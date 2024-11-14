@@ -11,6 +11,7 @@ use tab::Tab;
 use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
+use crate::Profile;
 use gtk::glib::GString;
 use std::rc::Rc;
 
@@ -22,15 +23,12 @@ pub struct Window {
 
 impl Window {
     // Construct
-    pub fn new(
-        // Actions
-        browser_action: Rc<BrowserAction>,
-    ) -> Self {
+    pub fn new(profile: Rc<Profile>, browser_action: Rc<BrowserAction>) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Rc::new(Tab::new(browser_action.clone(), action.clone()));
+        let tab = Rc::new(Tab::new(profile, (browser_action.clone(), action.clone())));
         let header = Header::new(browser_action, action.clone(), tab.widget().gobject());
         let widget = Rc::new(Widget::new(header.gobject(), tab.widget().gobject()));
 
@@ -52,7 +50,7 @@ impl Window {
         action.bookmark().connect_activate({
             let tab = tab.clone();
             move |position| tab.bookmark(position)
-        });
+        }); // @TODO
 
         action.pin().connect_activate({
             let tab = tab.clone();
