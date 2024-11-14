@@ -176,9 +176,12 @@ impl Browser {
         self.widget.gobject().present();
 
         // Show welcome dialog on profile not selected yet (e.g. first launch)
-        if self.profile.database.selected().is_none() {
+        /* @TODO
+            currently this feature inactive, because profile auto-generated on first application launch
+            see also: src/app/browser/welcome.rs
+        if self.profile.database.active().is_none() {
             Welcome::new(self.profile.clone(), self.widget.gobject().clone()).present();
-        }
+        } */
 
         self
     }

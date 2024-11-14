@@ -1,5 +1,6 @@
 use gtk::glib::DateTime;
-use sqlite::{Error, Transaction};
+use sqlite::{Connection, Error, Transaction};
+use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
     pub id: i64,
@@ -8,8 +9,20 @@ pub struct Table {
     pub request: String,
 }
 
-pub struct Bookmark {
-    // nothing yet..
+pub struct Database {
+    pub connection: Rc<RwLock<Connection>>,
+    profile_id: i64, // @TODO multi-profile implementation
+}
+
+impl Database {
+    // Constructors
+
+    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: i64) -> Self {
+        Self {
+            connection,
+            profile_id,
+        }
+    }
 }
 
 // Low-level DB API
@@ -29,9 +42,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 
 pub fn insert(
     tx: &Transaction,
-    profile_id: &i64,
-    time: &DateTime,
-    request: &str,
+    profile_id: i64,
+    time: DateTime,
+    request: String,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_bookmark` (
@@ -45,8 +58,8 @@ pub fn insert(
 
 pub fn select(
     tx: &Transaction,
-    profile_id: &i64,
-    request: Option<&str>,
+    profile_id: i64,
+    request: Option<String>,
 ) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`, `profile_id`, `time`, `request`
@@ -56,7 +69,7 @@ pub fn select(
 
     let filter = match request {
         Some(value) => value,
-        None => "%",
+        None => format!("%"),
     };
 
     let result = stmt.query_map((profile_id, filter), |row| {
@@ -78,6 +91,6 @@ pub fn select(
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `profile_bookmark` WHERE `id` = ?", [id])
 }

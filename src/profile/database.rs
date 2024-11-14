@@ -30,8 +30,8 @@ impl Database {
         select(&tx).unwrap()
     }
 
-    /// Get selected profile record if exist
-    pub fn selected(&self) -> Option<Table> {
+    /// Get active profile record if exist
+    pub fn active(&self) -> Option<Table> {
         for record in self.records() {
             if record.is_active {
                 return Some(record);

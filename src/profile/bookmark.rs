@@ -1,6 +1,22 @@
 mod database;
+use database::Database;
 
-use sqlite::Transaction;
+use sqlite::{Connection, Transaction};
+use std::{rc::Rc, sync::RwLock};
+
+pub struct Bookmark {
+    pub database: Rc<Database>,
+}
+
+impl Bookmark {
+    // Constructors
+
+    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: i64) -> Self {
+        Self {
+            database: Rc::new(Database::new(connection, profile_id)),
+        }
+    }
+}
 
 // Tools
 

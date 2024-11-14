@@ -1,3 +1,6 @@
+// @TODO prototype
+// do not use it as currently profile get auto-generating on application startup!
+
 mod widget;
 use gtk::glib::DateTime;
 use widget::Widget;

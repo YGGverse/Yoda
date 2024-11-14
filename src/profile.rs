@@ -3,9 +3,10 @@ mod database;
 mod history;
 mod identity;
 
+use bookmark::Bookmark;
 use database::Database;
 
-use gtk::glib::user_config_dir;
+use gtk::glib::{user_config_dir, DateTime};
 use sqlite::{Connection, Transaction};
 use std::{fs::create_dir_all, path::PathBuf, rc::Rc, sync::RwLock};
 
@@ -16,6 +17,7 @@ const BRANCH: &str = "master";
 const DB_NAME: &str = "database.sqlite3";
 
 pub struct Profile {
+    pub bookmark: Rc<Bookmark>,
     pub database: Rc<Database>,
     pub config_path: PathBuf,
 }
@@ -77,9 +79,22 @@ impl Profile {
             }
         } // unlock database
 
+        // Init model
+        let database = Rc::new(Database::new(connection.clone()));
+
+        // Get active profile or create new one
+        let profile_id = match database.active() {
+            Some(profile) => profile.id,
+            None => match database.add(true, DateTime::now_local().unwrap(), None) {
+                Ok(id) => id,
+                Err(_) => todo!(),
+            },
+        };
+
         // Result
         Self {
-            database: Rc::new(Database::new(connection)),
+            bookmark: Rc::new(Bookmark::new(connection, profile_id)),
+            database,
             config_path,
         }
     }

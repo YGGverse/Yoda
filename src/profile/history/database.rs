@@ -8,7 +8,7 @@ pub struct Table {
     pub request: String,
 }
 
-pub struct History {
+pub struct Database {
     // nothing yet..
 }
 
@@ -29,9 +29,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 
 pub fn insert(
     tx: &Transaction,
-    profile_id: &i64,
-    time: &DateTime,
-    request: &str,
+    profile_id: i64,
+    time: DateTime,
+    request: String,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `history` (
@@ -45,8 +45,8 @@ pub fn insert(
 
 pub fn select(
     tx: &Transaction,
-    profile_id: &i64,
-    request: Option<&str>,
+    profile_id: i64,
+    request: Option<String>,
 ) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`, `profile_id`, `time`, `request`
@@ -56,7 +56,7 @@ pub fn select(
 
     let filter = match request {
         Some(value) => value,
-        None => "%",
+        None => format!("%"),
     };
 
     let result = stmt.query_map((profile_id, filter), |row| {
@@ -78,6 +78,6 @@ pub fn select(
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `profile_history` WHERE `id` = ?", [id])
 }
