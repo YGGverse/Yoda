@@ -1,11 +1,13 @@
 mod content;
 mod database;
+mod error;
 mod input;
 mod meta;
 mod navigation;
 mod widget;
 
 use content::Content;
+use error::Error;
 use input::Input;
 use meta::{Meta, Status};
 use navigation::Navigation;
@@ -89,12 +91,19 @@ impl Page {
 
     // Actions
 
-    /// Toggle bookmark for navigation request in profile database
-    pub fn bookmark(&self) {
-        self.profile
+    /// Toggle bookmark for current `profile` by navigation request value
+    /// * return `true` on bookmark created, `false` on deleted
+    pub fn bookmark(&self) -> Result<bool, Error> {
+        let result = match self
+            .profile
             .bookmark
-            .toggle(self.navigation.request().widget().gobject().text().as_str());
+            .toggle(self.navigation.request().widget().gobject().text().as_str())
+        {
+            Ok(result) => Ok(result),
+            Err(_) => Err(Error::Bookmark),
+        };
         self.update();
+        result
     }
 
     /// Navigate home URL (parsed from current navigation entry)

@@ -1,8 +1,10 @@
 mod database;
+mod error;
 mod item;
 mod menu;
 mod widget;
 
+use error::Error;
 use item::Item;
 use menu::Menu;
 use widget::Widget;
@@ -157,14 +159,20 @@ impl Tab {
         self.widget.close_all();
     }
 
-    pub fn bookmark(&self, page_position: Option<i32>) {
+    /// Toggle bookmark for page at position or current page on `None`
+    /// * return `true` on bookmark created, `false` on deleted
+    pub fn bookmark(&self, page_position: Option<i32>) -> Result<bool, Error> {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page().bookmark();
+                    return match item.page().bookmark() {
+                        Ok(result) => Ok(result),
+                        Err(_) => Err(Error::Bookmark),
+                    };
                 }
             }
         }
+        Err(Error::PageNotFound)
     }
 
     // Toggle pin status for active tab

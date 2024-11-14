@@ -46,12 +46,13 @@ impl Bookmark {
     }
 
     /// Toggle record in `database` and `memory` index
-    pub fn toggle(&self, request: &str) -> Result<(), Error> {
+    /// * return `true` on bookmark created, `false` on deleted
+    pub fn toggle(&self, request: &str) -> Result<bool, Error> {
         // Delete record if exists
         if let Ok(id) = self.get(request) {
             match self.database.delete(id) {
                 Ok(_) => match self.memory.delete(request) {
-                    Ok(_) => Ok(()),
+                    Ok(_) => Ok(false),
                     Err(_) => Err(Error::MemoryDelete),
                 },
                 Err(_) => Err(Error::DatabaseDelete),
@@ -63,7 +64,7 @@ impl Bookmark {
                 .add(DateTime::now_local().unwrap(), request.into())
             {
                 Ok(id) => match self.memory.add(request.into(), id) {
-                    Ok(_) => Ok(()),
+                    Ok(_) => Ok(true),
                     Err(_) => Err(Error::MemoryAdd),
                 },
                 Err(_) => Err(Error::DatabaseAdd),
