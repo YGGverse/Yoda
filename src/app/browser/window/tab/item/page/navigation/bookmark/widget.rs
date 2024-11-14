@@ -1,10 +1,10 @@
-use gtk::{
-    prelude::{ButtonExt, WidgetExt},
-    Button,
-};
+use gtk::{prelude::ButtonExt, Button};
 
 use crate::app::browser::window::action::Action as WindowAction;
 use std::rc::Rc;
+
+const ICON_YES: &str = "starred-symbolic";
+const ICON_NON: &str = "non-starred-symbolic";
 
 pub struct Widget {
     gobject: Button,
@@ -16,13 +16,12 @@ impl Widget {
     pub fn new(action: Rc<WindowAction>) -> Self {
         // Init gobject
         let gobject = Button::builder()
-            .icon_name("starred-symbolic")
+            .icon_name(ICON_NON)
             .tooltip_text("Bookmark")
-            .sensitive(false)
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| action.home().activate());
+        gobject.connect_clicked(move |_| action.bookmark().activate());
 
         // Return activated `Self`
         Self { gobject }
@@ -30,8 +29,9 @@ impl Widget {
 
     // Actions
 
-    pub fn update(&self, is_sensitive: bool) {
-        self.gobject.set_sensitive(is_sensitive);
+    pub fn update(&self, has_bookmark: bool) {
+        self.gobject
+            .set_icon_name(if has_bookmark { ICON_YES } else { ICON_NON });
     }
 
     // Getters
