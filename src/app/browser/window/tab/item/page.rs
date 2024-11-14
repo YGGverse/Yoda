@@ -490,10 +490,9 @@ impl Page {
                                                 gemini::client::response::meta::Status::SensitiveInput => {
                                                     // Format response
                                                     let status = Status::Input;
-                                                    let title = "Input expected";
-                                                    let description = match response.data() {
+                                                    let title = match response.data() {
                                                         Some(data) => data.value().as_str(),
-                                                        None => title,
+                                                        None => "Input expected",
                                                     };
 
                                                     // Toggle input form variant
@@ -502,14 +501,14 @@ impl Page {
                                                             input.set_new_sensitive(
                                                                 tab_action,
                                                                 uri,
-                                                                Some(description),
+                                                                Some(title),
                                                                 Some(1024),
                                                             ),
                                                         _ =>
                                                             input.set_new_response(
                                                                 tab_action,
                                                                 uri,
-                                                                Some(description),
+                                                                Some(title),
                                                                 Some(1024),
                                                             ),
                                                     }
