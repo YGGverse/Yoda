@@ -34,10 +34,7 @@ impl Item {
     pub fn new(
         tab_view: &TabView,
         profile: Rc<Profile>,
-        // Actions
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
-        // Options tuple @TODO struct?
+        actions: (Rc<BrowserAction>, Rc<WindowAction>),
         options: (Position, Option<String>, bool, bool, bool, bool),
     ) -> Self {
         // Get item options from tuple
@@ -53,7 +50,7 @@ impl Item {
         let page = Rc::new(Page::new(
             id.clone(),
             profile,
-            (browser_action, window_action, action.clone()),
+            (actions.0, actions.1, action.clone()),
         ));
 
         let widget = Rc::new(Widget::new(
@@ -154,8 +151,7 @@ impl Item {
                         tab_view,
                         profile.clone(),
                         // Actions
-                        action.0.clone(),
-                        action.1.clone(),
+                        (action.0.clone(), action.1.clone()),
                         // Options tuple
                         (
                             Position::End,

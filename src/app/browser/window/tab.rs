@@ -24,8 +24,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 // Main
 pub struct Tab {
     profile: Rc<Profile>,
-    browser_action: Rc<BrowserAction>,
-    window_action: Rc<WindowAction>,
+    actions: (Rc<BrowserAction>, Rc<WindowAction>),
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
     widget: Rc<Widget>,
 }
@@ -100,8 +99,7 @@ impl Tab {
         // Return activated `Self`
         Self {
             profile,
-            browser_action: action.0,
-            window_action: action.1,
+            actions: (action.0, action.1),
             index,
             widget,
         }
@@ -121,9 +119,9 @@ impl Tab {
         let item = Rc::new(Item::new(
             self.widget.gobject(),
             self.profile.clone(),
-            self.browser_action.clone(),
-            self.window_action.clone(),
-            // Options tuple
+            // Actions
+            (self.actions.0.clone(), self.actions.1.clone()),
+            // Options
             (
                 position,
                 request,
@@ -294,7 +292,7 @@ impl Tab {
                         transaction,
                         &record.id,
                         self.profile.clone(),
-                        (self.browser_action.clone(), self.window_action.clone()),
+                        (self.actions.0.clone(), self.actions.1.clone()),
                     ) {
                         Ok(items) => {
                             for item in items {
