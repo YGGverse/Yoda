@@ -32,12 +32,7 @@ impl Database {
 
     /// Get active profile record if exist
     pub fn active(&self) -> Option<Table> {
-        for record in self.records() {
-            if record.is_active {
-                return Some(record);
-            }
-        }
-        None
+        self.records().into_iter().find(|record| record.is_active)
     }
 
     // Setters
@@ -69,6 +64,7 @@ impl Database {
         }
     }
 
+    /* @TODO not in use
     /// Set `is_active` status `true` for the record with given profile ID
     /// * reset other records to `false`
     pub fn activate(&self, id: i64) -> Result<(), ()> {
@@ -92,7 +88,7 @@ impl Database {
             Ok(_) => Ok(()),
             Err(_) => Err(()),
         } // @TODO make sure ID exist and was changed
-    }
+    } */
 }
 
 // Low-level DB API

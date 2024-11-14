@@ -4,7 +4,7 @@ use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
     pub id: i64,
-    pub profile_id: i64,
+    //pub profile_id: i64,
     pub time: DateTime,
     pub request: String,
 }
@@ -112,15 +112,10 @@ pub fn select(
             WHERE `profile_id` = ? AND `request` LIKE ?",
     )?;
 
-    let filter = match request {
-        Some(value) => value,
-        None => "%",
-    };
-
-    let result = stmt.query_map((profile_id, filter), |row| {
+    let result = stmt.query_map((profile_id, request.unwrap_or("%")), |row| {
         Ok(Table {
             id: row.get(0)?,
-            profile_id: row.get(1)?,
+            //profile_id: row.get(1)?,
             time: DateTime::from_unix_local(row.get(2)?).unwrap(),
             request: row.get(3)?,
         })

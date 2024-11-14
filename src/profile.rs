@@ -1,7 +1,7 @@
 mod bookmark;
 mod database;
-mod history;
-mod identity;
+//mod history;
+//mod identity;
 
 use bookmark::Bookmark;
 use database::Database;
@@ -108,8 +108,9 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Delegate migration to children components
     bookmark::migrate(tx)?;
-    history::migrate(tx)?;
-    identity::migrate(tx)?;
+    // @TODO not in use yet
+    // history::migrate(tx)?;
+    // identity::migrate(tx)?;
 
     // Success
     Ok(())

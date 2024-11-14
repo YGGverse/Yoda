@@ -1,13 +1,11 @@
 mod about;
 mod action;
 mod database;
-mod welcome;
 mod widget;
 mod window;
 
 use about::About;
 use action::Action;
-//use welcome::Welcome;
 use widget::Widget;
 use window::Window;
 
@@ -22,7 +20,6 @@ use std::rc::Rc;
 
 pub struct Browser {
     action: Rc<Action>,
-    profile: Rc<Profile>,
     widget: Rc<Widget>,
     window: Rc<Window>,
 }
@@ -95,7 +92,6 @@ impl Browser {
         // Return new activated `Self`
         Self {
             action,
-            profile,
             widget,
             window,
         }
@@ -172,17 +168,7 @@ impl Browser {
     }
 
     pub fn present(&self) -> &Self {
-        // Show main window
         self.widget.gobject().present();
-
-        // Show welcome dialog on profile not selected yet (e.g. first launch)
-        /* @TODO
-            currently this feature inactive, because profile auto-generated on first application launch
-            see also: src/app/browser/welcome.rs
-        if self.profile.database.active().is_none() {
-            Welcome::new(self.profile.clone(), self.widget.gobject().clone()).present();
-        } */
-
         self
     }
 

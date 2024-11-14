@@ -50,6 +50,7 @@ impl Tab {
                 let state = tab_page.map(|this| tab_view.page_position(this));
 
                 // Update actions with new state value
+                action.bookmark().change_state(state);
                 action.close_all().change_state(state);
                 action.close().change_state(state);
                 action.history_back().change_state(state);
