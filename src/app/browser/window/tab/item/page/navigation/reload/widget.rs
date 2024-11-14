@@ -1,4 +1,4 @@
-use crate::app::browser::window::action::Action as WindowAction;
+use crate::app::browser::window::Action;
 use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<Action>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("view-refresh-symbolic")

@@ -1,4 +1,4 @@
-use crate::app::browser::window::action::Action as WindowAction;
+use crate::app::browser::window::Action;
 use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
@@ -11,7 +11,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<Action>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("go-next-symbolic")
@@ -20,7 +20,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| window_action.history_forward().activate());
+        gobject.connect_clicked(move |_| action.history_forward().activate());
 
         // Return activated `Self`
         Self { gobject }

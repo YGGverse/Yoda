@@ -1,6 +1,6 @@
 use gtk::{prelude::ButtonExt, Button};
 
-use crate::app::browser::window::action::Action as WindowAction;
+use crate::app::browser::window::Action;
 use std::rc::Rc;
 
 const ICON_YES: &str = "starred-symbolic";
@@ -13,7 +13,7 @@ pub struct Widget {
 impl Widget {
     // Constructors
 
-    pub fn new(action: Rc<WindowAction>) -> Self {
+    pub fn new(action: Rc<Action>) -> Self {
         // Init gobject
         let gobject = Button::builder()
             .icon_name(ICON_NON)
