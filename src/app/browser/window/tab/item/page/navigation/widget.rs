@@ -13,6 +13,7 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new(
+        auth: &impl IsA<gtk::Widget>,
         base: &impl IsA<gtk::Widget>,
         history: &impl IsA<gtk::Widget>,
         reload: &impl IsA<gtk::Widget>,
@@ -32,6 +33,7 @@ impl Widget {
         gobject.append(reload);
         gobject.append(request);
         gobject.append(bookmark);
+        gobject.append(auth);
 
         Self { gobject }
     }

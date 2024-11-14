@@ -1,3 +1,4 @@
+mod auth;
 mod bookmark;
 mod database;
 mod history;
@@ -6,6 +7,7 @@ mod reload;
 mod request;
 mod widget;
 
+use auth::Auth;
 use bookmark::Bookmark;
 use history::History;
 use home::Home;
@@ -22,6 +24,7 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Navigation {
+    auth: Rc<Auth>,
     profile: Rc<Profile>,
     bookmark: Rc<Bookmark>,
     history: Rc<History>,
@@ -37,6 +40,7 @@ impl Navigation {
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
         // Init components
+        let auth = Rc::new(Auth::new(action.1.clone()));
         let home = Rc::new(Home::new(action.1.clone()));
         let history = Rc::new(History::new(action.1.clone()));
         let reload = Rc::new(Reload::new(action.1.clone()));
@@ -45,6 +49,7 @@ impl Navigation {
 
         // Init widget
         let widget = Rc::new(Widget::new(
+            auth.widget().gobject(),
             home.widget().gobject(),
             history.widget().gobject(),
             reload.widget().gobject(),
@@ -54,6 +59,7 @@ impl Navigation {
 
         // Done
         Self {
+            auth,
             profile,
             bookmark,
             history,
@@ -69,6 +75,7 @@ impl Navigation {
     pub fn update(&self, progress_fraction: Option<f64>) {
         let request = self.request.widget().gobject().text();
 
+        self.auth.update();
         self.bookmark
             .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
