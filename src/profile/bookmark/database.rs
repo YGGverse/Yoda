@@ -29,7 +29,7 @@ impl Database {
 
     /// Get bookmark records from database with optional filter by `request`
     pub fn records(&self, request: Option<&str>) -> Result<Vec<Table>, Error> {
-        let readable = self.connection.read().unwrap();
+        let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
         select(&tx, *self.profile_id, request)
     }
@@ -40,7 +40,7 @@ impl Database {
     /// * return last insert ID on success
     pub fn add(&self, time: DateTime, request: String) -> Result<i64, Error> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap();
+        let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
 
         // Create new record
@@ -59,8 +59,8 @@ impl Database {
     /// Delete bookmark record from database
     pub fn delete(&self, id: i64) -> Result<(), Error> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap();
-        let tx = writable.transaction().unwrap();
+        let mut writable = self.connection.write().unwrap(); // @TODO
+        let tx = writable.transaction()?;
 
         // Delete record by ID
         match delete(&tx, id) {
