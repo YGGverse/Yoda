@@ -40,7 +40,7 @@ impl Navigation {
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
         // Init components
-        let auth = Rc::new(Auth::new(action.1.clone()));
+        let auth = Rc::new(Auth::new(action.2.clone()));
         let home = Rc::new(Home::new(action.1.clone()));
         let history = Rc::new(History::new(action.1.clone()));
         let reload = Rc::new(Reload::new(action.1.clone()));

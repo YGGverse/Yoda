@@ -1,4 +1,4 @@
-use crate::app::browser::window::Action;
+use crate::app::browser::window::tab::item::Action;
 use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
@@ -19,7 +19,7 @@ impl Widget {
             .sensitive(false)
             .build();
 
-        // Init events @TODO
+        // Init events @TODO dialog window required
         // gobject.connect_clicked(move |_| action.auth().activate());
 
         // Return activated `Self`

@@ -79,6 +79,10 @@ impl Item {
             }
         }
 
+        action.auth().connect_activate(|request| {
+            // @TODO
+        });
+
         action.load().connect_activate({
             let page = page.clone();
             move |request, is_history| {

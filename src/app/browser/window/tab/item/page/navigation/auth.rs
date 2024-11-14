@@ -1,8 +1,7 @@
 mod widget;
-
 use widget::Widget;
 
-use crate::app::browser::window::Action;
+use crate::app::browser::window::tab::item::Action;
 use std::rc::Rc;
 
 pub struct Auth {
