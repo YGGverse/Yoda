@@ -11,7 +11,7 @@ pub struct Table {
 
 pub struct Database {
     pub connection: Rc<RwLock<Connection>>,
-    profile_id: i64, // @TODO multi-profile implementation
+    profile_id: i64, // multi-profile relationship @TODO
 }
 
 impl Database {
