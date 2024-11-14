@@ -1,12 +1,11 @@
 mod error;
 use error::Error;
 
-use gtk::glib::DateTime;
 use std::{cell::RefCell, collections::HashMap};
 
 /// Reduce disk usage by cache Bookmarks index in memory
 pub struct Memory {
-    index: RefCell<HashMap<String, DateTime>>,
+    index: RefCell<HashMap<String, i64>>,
 }
 
 impl Memory {
@@ -21,16 +20,17 @@ impl Memory {
 
     // Actions
 
-    /// Add new record for given `request`
-    /// * validates record with same key does not exist yet
-    pub fn add(&self, request: String, time: DateTime) -> Result<(), Error> {
-        match self.index.borrow_mut().insert(request, time) {
+    /// Add new record with `request` as key and `id` as value
+    /// * validate record with same key does not exist yet
+    pub fn add(&self, request: String, id: i64) -> Result<(), Error> {
+        match self.index.borrow_mut().insert(request, id) {
             Some(_) => Err(Error::Overwrite),
             None => Ok(()),
         }
     }
 
     /// Delete record from index by `request`
+    /// * validate record key is exist
     pub fn delete(&self, request: &str) -> Result<(), Error> {
         match self.index.borrow_mut().remove(request) {
             Some(_) => Ok(()),
@@ -38,8 +38,11 @@ impl Memory {
         }
     }
 
-    /// Check `request` exist in memory index
-    pub fn is_exist(&self, request: &str) -> bool {
-        self.index.borrow().get(request).is_some()
+    /// Get `id` by `request` from memory index
+    pub fn get(&self, request: &str) -> Result<i64, Error> {
+        match self.index.borrow().get(request) {
+            Some(&id) => Ok(id),
+            None => Err(Error::NotFound),
+        }
     }
 }

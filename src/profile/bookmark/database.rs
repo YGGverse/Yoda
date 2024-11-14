@@ -5,7 +5,7 @@ use std::{rc::Rc, sync::RwLock};
 pub struct Table {
     pub id: i64,
     //pub profile_id: i64,
-    pub time: DateTime,
+    //pub time: DateTime,
     pub request: String,
 }
 
@@ -52,21 +52,20 @@ impl Database {
         }
     }
 
-    pub fn delete(&self, request: &str) -> Result<(), ()> {
+    pub fn delete(&self, id: i64) -> Result<(), ()> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
 
         // Delete records match request
-        for record in select(&tx, self.profile_id, Some(request)).unwrap() {
-            let _ = delete(&tx, record.id);
-        }
-
-        // Done
-        match tx.commit() {
-            Ok(_) => Ok(()),
+        match delete(&tx, id) {
+            Ok(_) => match tx.commit() {
+                Ok(_) => Ok(()),
+                Err(_) => Err(()),
+            },
             Err(_) => Err(()),
-        } // @TODO handle result
+        }
+        // @TODO handle result
     }
 }
 
@@ -116,7 +115,7 @@ pub fn select(
         Ok(Table {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
-            time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+            //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
             request: row.get(3)?,
         })
     })?;

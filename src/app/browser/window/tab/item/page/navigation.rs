@@ -70,7 +70,7 @@ impl Navigation {
         let request = self.request.widget().gobject().text();
 
         self.bookmark
-            .update(self.profile.bookmark.has_request(&request, true));
+            .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
         self.home.update(self.request.uri());
         self.reload.update(!request.is_empty());

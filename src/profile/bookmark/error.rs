@@ -3,4 +3,5 @@ pub enum Error {
     DatabaseDelete,
     MemoryAdd,
     MemoryDelete,
+    MemoryNotFound,
 }

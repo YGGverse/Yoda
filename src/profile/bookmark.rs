@@ -26,7 +26,7 @@ impl Bookmark {
 
         // Build initial index
         for record in database.records(None) {
-            if memory.add(record.request, record.time).is_err() {
+            if memory.add(record.request, record.id).is_err() {
                 todo!()
             }
         }
@@ -37,25 +37,19 @@ impl Bookmark {
 
     // Actions
 
-    /// Check request exist in:
-    /// * memory if `is_memory` is `true` (fast)
-    /// * database if `is_memory` is `false` (slow)
-    pub fn has_request(&self, request: &str, is_memory: bool) -> bool {
-        if is_memory {
-            self.memory.is_exist(request)
-        } else {
-            !self.database.records(Some(request)).is_empty()
+    /// Get record `id` by `request` from memory index
+    pub fn get(&self, request: &str) -> Result<i64, Error> {
+        match self.memory.get(request) {
+            Ok(id) => Ok(id),
+            Err(_) => Err(Error::MemoryNotFound),
         }
     }
 
     /// Toggle record in `database` and `memory` index
     pub fn toggle(&self, request: &str) -> Result<(), Error> {
-        // Get current timestamp for new record
-        let time = DateTime::now_local().unwrap();
-
         // Delete record if exists
-        if self.has_request(request, false) {
-            match self.database.delete(request) {
+        if let Ok(id) = self.get(request) {
+            match self.database.delete(id) {
                 Ok(_) => match self.memory.delete(request) {
                     Ok(_) => Ok(()),
                     Err(_) => Err(Error::MemoryDelete),
@@ -64,8 +58,11 @@ impl Bookmark {
             }
         // Otherwise, create new record
         } else {
-            match self.database.add(time.clone(), request.into()) {
-                Ok(_) => match self.memory.add(request.into(), time) {
+            match self
+                .database
+                .add(DateTime::now_local().unwrap(), request.into())
+            {
+                Ok(id) => match self.memory.add(request.into(), id) {
                     Ok(_) => Ok(()),
                     Err(_) => Err(Error::MemoryAdd),
                 },
