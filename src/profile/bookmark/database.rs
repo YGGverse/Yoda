@@ -31,6 +31,26 @@ impl Database {
         let tx = readable.unchecked_transaction().unwrap();
         select(&tx, self.profile_id, request).unwrap()
     }
+
+    // Setters
+
+    pub fn add(&self, time: DateTime, request: String) -> Result<i64, ()> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap();
+        let tx = writable.transaction().unwrap();
+
+        // Create new record
+        insert(&tx, self.profile_id, time, request).unwrap();
+
+        // Hold insert ID for result
+        let id = last_insert_id(&tx);
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(id),
+            Err(_) => Err(()), // @TODO
+        }
+    }
 }
 
 // Low-level DB API
@@ -101,4 +121,8 @@ pub fn select(
 
 pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `profile_bookmark` WHERE `id` = ?", [id])
+}
+
+pub fn last_insert_id(tx: &Transaction) -> i64 {
+    tx.last_insert_rowid()
 }

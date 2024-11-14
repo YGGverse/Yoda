@@ -31,6 +31,7 @@ use std::{cell::RefCell, rc::Rc, time::Duration};
 pub struct Page {
     id: GString,
     cancellable: RefCell<Cancellable>,
+    profile: Rc<Profile>,
     // Actions
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
@@ -54,7 +55,7 @@ impl Page {
         let content = Rc::new(Content::new((action.1.clone(), action.2.clone())));
 
         let navigation = Rc::new(Navigation::new(
-            profile,
+            profile.clone(),
             (action.0.clone(), action.1.clone(), action.2.clone()),
         ));
 
@@ -73,6 +74,7 @@ impl Page {
         Self {
             cancellable: RefCell::new(Cancellable::new()),
             id,
+            profile,
             // Actions
             browser_action: action.0,
             tab_action: action.2,
@@ -87,8 +89,11 @@ impl Page {
 
     // Actions
 
+    /// Toggle bookmark for navigation request in profile database
     pub fn bookmark(&self) {
-        // @TODO self.navigation.request().widget().gobject().text()
+        self.profile
+            .bookmark
+            .toggle(self.navigation.request().widget().gobject().text().as_str())
     }
 
     /// Navigate home URL (parsed from current navigation entry)

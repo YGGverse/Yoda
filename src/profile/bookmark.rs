@@ -4,12 +4,13 @@ mod memory;
 use database::Database;
 use memory::Memory;
 
+use gtk::glib::DateTime;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Bookmark {
-    database: Rc<Database>,
-    memory: Rc<Memory>,
+    database: Rc<Database>, // permanent storage
+    memory: Rc<Memory>,     // fast search index
 }
 
 impl Bookmark {
@@ -43,7 +44,19 @@ impl Bookmark {
         }
     }
 
-    // @TODO add new record with index update
+    /// Toggle record in bookmarks database, update emory index
+    pub fn toggle(&self, request: &str) {
+        let time = DateTime::now_local().unwrap();
+
+        if self.has_request(request, false) {
+            // @TODO
+        } else {
+            match self.database.add(time.clone(), request.into()) {
+                Ok(_) => self.memory.set(request.into(), time),
+                Err(_) => todo!(),
+            };
+        }
+    }
 }
 
 // Tools

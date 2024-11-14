@@ -9,6 +9,7 @@ pub struct Memory {
 impl Memory {
     // Constructors
 
+    /// Create new `Self`
     pub fn new() -> Self {
         Self {
             index: RefCell::new(HashMap::new()),
@@ -32,6 +33,7 @@ impl Memory {
         index.insert(request, time);
     }
 
+    /// Check request exist in memory index
     pub fn is_exist(&self, request: &str) -> bool {
         self.index.borrow().get(request).is_some()
     }
