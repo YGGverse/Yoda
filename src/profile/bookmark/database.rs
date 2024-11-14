@@ -11,12 +11,13 @@ pub struct Table {
 
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
-    profile_id: i64, // multi-profile relationship @TODO
+    profile_id: i64, // multi-profile relationship @TODO shared reference?
 }
 
 impl Database {
     // Constructors
 
+    /// Create new `Self`
     pub fn new(connection: Rc<RwLock<Connection>>, profile_id: i64) -> Self {
         Self {
             connection,
@@ -26,6 +27,7 @@ impl Database {
 
     // Getters
 
+    /// Get bookmark records from database with optional filter by `request`
     pub fn records(&self, request: Option<&str>) -> Vec<Table> {
         let readable = self.connection.read().unwrap();
         let tx = readable.unchecked_transaction().unwrap();
@@ -34,7 +36,9 @@ impl Database {
 
     // Setters
 
-    pub fn add(&self, time: DateTime, request: String) -> Result<i64, ()> {
+    /// Create new bookmark record in database
+    /// * return last insert ID on success
+    pub fn add(&self, time: DateTime, request: String) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
@@ -48,24 +52,24 @@ impl Database {
         // Done
         match tx.commit() {
             Ok(_) => Ok(id),
-            Err(_) => Err(()), // @TODO
+            Err(reason) => Err(reason),
         }
     }
 
-    pub fn delete(&self, id: i64) -> Result<(), ()> {
+    /// Delete bookmark record from database
+    pub fn delete(&self, id: i64) -> Result<(), Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
 
-        // Delete records match request
+        // Delete record by ID
         match delete(&tx, id) {
             Ok(_) => match tx.commit() {
                 Ok(_) => Ok(()),
-                Err(_) => Err(()),
+                Err(reason) => Err(reason),
             },
-            Err(_) => Err(()),
+            Err(reason) => Err(reason),
         }
-        // @TODO handle result
     }
 }
 
