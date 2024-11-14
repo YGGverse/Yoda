@@ -34,6 +34,17 @@ impl Memory {
     }
 
     /// Check request exist in memory index
+    pub fn delete(&self, request: &str) {
+        // Borrow index to update
+        let mut index = self.index.borrow_mut();
+
+        // Delete record (if exist)
+        if index.get(request).is_some() {
+            index.remove(request);
+        }
+    }
+
+    /// Check request exist in memory index
     pub fn is_exist(&self, request: &str) -> bool {
         self.index.borrow().get(request).is_some()
     }

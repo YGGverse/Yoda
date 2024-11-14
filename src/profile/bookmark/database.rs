@@ -51,6 +51,23 @@ impl Database {
             Err(_) => Err(()), // @TODO
         }
     }
+
+    pub fn delete(&self, request: &str) -> Result<(), ()> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap();
+        let tx = writable.transaction().unwrap();
+
+        // Delete records match request
+        for record in select(&tx, self.profile_id, Some(request)).unwrap() {
+            let _ = delete(&tx, record.id);
+        }
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(()),
+            Err(_) => Err(()),
+        } // @TODO handle result
+    }
 }
 
 // Low-level DB API

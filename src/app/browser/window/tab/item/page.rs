@@ -93,7 +93,8 @@ impl Page {
     pub fn bookmark(&self) {
         self.profile
             .bookmark
-            .toggle(self.navigation.request().widget().gobject().text().as_str())
+            .toggle(self.navigation.request().widget().gobject().text().as_str());
+        self.update();
     }
 
     /// Navigate home URL (parsed from current navigation entry)

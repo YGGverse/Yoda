@@ -49,7 +49,10 @@ impl Bookmark {
         let time = DateTime::now_local().unwrap();
 
         if self.has_request(request, false) {
-            // @TODO
+            match self.database.delete(request) {
+                Ok(_) => self.memory.delete(request),
+                Err(_) => todo!(),
+            }
         } else {
             match self.database.add(time.clone(), request.into()) {
                 Ok(_) => self.memory.set(request.into(), time),
