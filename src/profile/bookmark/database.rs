@@ -23,6 +23,14 @@ impl Database {
             profile_id,
         }
     }
+
+    // Getters
+
+    pub fn records(&self, request: Option<&str>) -> Vec<Table> {
+        let readable = self.connection.read().unwrap();
+        let tx = readable.unchecked_transaction().unwrap();
+        select(&tx, self.profile_id, request).unwrap()
+    }
 }
 
 // Low-level DB API
@@ -59,7 +67,7 @@ pub fn insert(
 pub fn select(
     tx: &Transaction,
     profile_id: i64,
-    request: Option<String>,
+    request: Option<&str>,
 ) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`, `profile_id`, `time`, `request`
@@ -69,7 +77,7 @@ pub fn select(
 
     let filter = match request {
         Some(value) => value,
-        None => format!("%"),
+        None => "%",
     };
 
     let result = stmt.query_map((profile_id, filter), |row| {
