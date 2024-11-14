@@ -159,8 +159,8 @@ impl Tab {
         self.widget.close_all();
     }
 
-    /// Toggle bookmark for page at position or current page on `None`
-    /// * return `true` on bookmark created, `false` on deleted
+    /// Toggle `Bookmark` in current `Profile` for `Page` at given `position` (current page on `None`)
+    /// * return `true` on bookmark created, `false` on deleted; `Error` otherwise.
     pub fn bookmark(&self, page_position: Option<i32>) -> Result<bool, Error> {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
