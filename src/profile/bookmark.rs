@@ -25,10 +25,15 @@ impl Bookmark {
         let memory = Rc::new(Memory::new());
 
         // Build initial index
-        for record in database.records(None) {
-            if memory.add(record.request, record.id).is_err() {
-                todo!()
+        match database.records(None) {
+            Ok(records) => {
+                for record in records {
+                    if memory.add(record.request, record.id).is_err() {
+                        todo!()
+                    }
+                }
             }
+            Err(reason) => todo!("{reason}"),
         }
 
         // Return new `Self`
