@@ -33,11 +33,10 @@ impl Memory {
         }
     }
 
-    /* @TODO update feature
     /// Cleanup index
-    pub fn clear(&self, url: &str) {
+    pub fn clear(&self) {
         self.index.borrow_mut().clear()
-    } */
+    }
 
     /// Get `profile_identity_gemini_id` vector match given `request`
     /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)

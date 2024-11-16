@@ -1,9 +1,11 @@
 mod auth;
 mod database;
+mod error;
 mod memory;
 
 use auth::Auth;
 use database::Database;
+use error::Error;
 use memory::Memory;
 
 use sqlite::{Connection, Transaction};
@@ -14,7 +16,7 @@ use std::{rc::Rc, sync::RwLock};
 /// https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
 pub struct Gemini {
     pub auth: Rc<Auth>,
-    // pub database: Rc<Database>,
+    pub database: Rc<Database>,
     pub memory: Rc<Memory>,
 }
 
@@ -22,29 +24,50 @@ impl Gemini {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_identity_id: Rc<i64>) -> Self {
-        // Init children components
-        let auth = Rc::new(Auth::new(connection.clone()));
+    pub fn new(
+        connection: Rc<RwLock<Connection>>,
+        profile_identity_id: Rc<i64>,
+    ) -> Result<Self, Error> {
+        // Init components
+        let auth = match Auth::new(connection.clone()) {
+            Ok(auth) => Rc::new(auth),
+            Err(_) => return Err(Error::AuthInit), // @TODO
+        };
         let database = Rc::new(Database::new(connection, profile_identity_id));
         let memory = Rc::new(Memory::new());
 
+        // Init `Self`
+        let this = Self {
+            auth,
+            database,
+            memory,
+        };
+
         // Build initial index
-        match database.records() {
+        Self::index(&this)?;
+
+        Ok(this)
+    }
+
+    // Actions
+
+    /// Create new `Memory` index from `Database` for `Self`
+    pub fn index(&self) -> Result<(), Error> {
+        // Cleanup previous records
+        self.memory.clear();
+
+        // Build new index
+        match self.database.records() {
             Ok(records) => {
                 for record in records {
-                    if memory.add(record.id, record.pem).is_err() {
-                        todo!()
+                    if self.memory.add(record.id, record.pem).is_err() {
+                        return Err(Error::MemoryIndex); // @TODO
                     }
                 }
             }
-            Err(reason) => todo!("{reason}"),
-        }
-
-        Self {
-            auth,
-            // database,
-            memory,
-        }
+            Err(_) => return Err(Error::DatabaseIndex), // @TODO
+        };
+        Ok(()) // @TODO
     }
 
     // @TODO create new identity API

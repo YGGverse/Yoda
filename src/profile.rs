@@ -96,7 +96,7 @@ impl Profile {
         // Result
         Self {
             bookmark: Rc::new(Bookmark::new(connection.clone(), profile_id.clone())),
-            identity: Rc::new(Identity::new(connection, profile_id)),
+            identity: Rc::new(Identity::new(connection, profile_id).unwrap()), // @TODO handle
             database,
             config_path,
         }

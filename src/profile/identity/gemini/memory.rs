@@ -36,4 +36,9 @@ impl Memory {
             None => Err(Error::NotFound),
         }
     }
+
+    /// Cleanup index
+    pub fn clear(&self) {
+        self.index.borrow_mut().clear()
+    }
 }

@@ -1,7 +1,9 @@
 mod database;
+mod error;
 mod gemini;
 
 use database::Database;
+use error::Error;
 use gemini::Gemini;
 
 use gtk::glib::DateTime;
@@ -18,7 +20,7 @@ impl Identity {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Self {
+    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Result<Self, Error> {
         // Init identity database
         let database = Rc::new(Database::new(connection.clone()));
 
@@ -27,14 +29,21 @@ impl Identity {
             Some(identity) => identity.id,
             None => match database.add(profile_id, true, DateTime::now_local().unwrap(), None) {
                 Ok(id) => id,
-                Err(_) => todo!(),
+                Err(_) => return Err(Error::Database),
             },
         });
 
-        Self {
+        // Init gemini component
+        let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
+            Ok(result) => result,
+            Err(_) => return Err(Error::Gemini),
+        });
+
+        // Done
+        Ok(Self {
             // database,
-            gemini: Rc::new(Gemini::new(connection, profile_identity_id)),
-        }
+            gemini,
+        })
     }
 
     /// Get `pem` record match `request`
