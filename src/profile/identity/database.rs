@@ -13,8 +13,6 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
-            `time`       INTEGER NOT NULL,
-            `name`       VARCHAR(255),
             `pem`        TEXT NOT NULL
         )",
         [],
