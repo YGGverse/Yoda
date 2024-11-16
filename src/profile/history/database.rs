@@ -21,7 +21,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
             `time`       INTEGER NOT NULL,
-            `request`    TEXT NOT NULL
+            `request`    TEXT NOT NULL,
+
+            FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
         )",
         [],
     )

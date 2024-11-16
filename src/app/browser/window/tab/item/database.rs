@@ -17,7 +17,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `page_position` INTEGER NOT NULL,
             `is_pinned` INTEGER NOT NULL,
             `is_selected` INTEGER NOT NULL,
-            `is_attention` INTEGER NOT NULL
+            `is_attention` INTEGER NOT NULL,
+
+            FOREIGN KEY (`app_browser_window_tab_id`) REFERENCES `app_browser_window_tab`(`id`)
         )",
         [],
     )

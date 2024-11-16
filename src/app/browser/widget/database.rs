@@ -16,7 +16,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `app_browser_id` INTEGER NOT NULL,
             `default_width`  INTEGER NOT NULL,
             `default_height` INTEGER NOT NULL,
-            `is_maximized`   INTEGER NOT NULL
+            `is_maximized`   INTEGER NOT NULL,
+
+            FOREIGN KEY (`app_browser_id`) REFERENCES `app_browser`(`id`)
         )",
         [],
     )

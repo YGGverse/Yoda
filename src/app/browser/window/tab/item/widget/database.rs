@@ -12,7 +12,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `app_browser_window_tab_item_id` INTEGER NOT NULL,
-            `title` VARCHAR(1024)
+            `title` VARCHAR(1024),
+
+            FOREIGN KEY (`app_browser_window_tab_item_id`) REFERENCES `app_browser_window_tab_item`(`id`)
         )",
         [],
     )

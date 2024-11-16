@@ -10,7 +10,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         "CREATE TABLE IF NOT EXISTS `app_browser`
         (
             `id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            `app_id` INTEGER NOT NULL
+            `app_id` INTEGER NOT NULL,
+
+            FOREIGN KEY (`app_id`) REFERENCES `app`(`id`)
         )",
         [],
     )

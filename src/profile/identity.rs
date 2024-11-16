@@ -27,7 +27,7 @@ impl Identity {
             for auth_record in auth_records {
                 if let Ok(gemini_records) = self.gemini.database.records() {
                     for gemini_record in gemini_records {
-                        if gemini_record.id == auth_record.gemini_id {
+                        if gemini_record.id == auth_record.profile_identity_gemini_id {
                             return Some(gemini_record.pem);
                         }
                     }
