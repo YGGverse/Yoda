@@ -4,11 +4,11 @@ use widget::Widget;
 use crate::app::browser::window::tab::item::Action;
 use std::rc::Rc;
 
-pub struct Auth {
+pub struct Identity {
     widget: Rc<Widget>,
 }
 
-impl Auth {
+impl Identity {
     // Construct
     pub fn new(action: Rc<Action>) -> Self {
         Self {
@@ -18,7 +18,7 @@ impl Auth {
 
     // Actions
     pub fn update(&self) {
-        // @TODO
+        self.widget.update(false) // @TODO
     }
 
     // Getters

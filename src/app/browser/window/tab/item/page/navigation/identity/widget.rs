@@ -15,7 +15,7 @@ impl Widget {
         // Init gobject
         let gobject = Button::builder()
             .icon_name("avatar-default-symbolic")
-            .tooltip_text("Auth")
+            .tooltip_text("Identity")
             .sensitive(false)
             .build();
 
