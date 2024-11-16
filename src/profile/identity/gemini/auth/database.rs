@@ -8,7 +8,7 @@ pub struct Table {
     pub gemini_id: i64,
 }
 
-/// Storage for `gemini_id` + `request` auth pairs
+/// Storage for `gemini_id` + `url` auth pairs
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
     profile_id: Rc<i64>, // multi-profile relationship
@@ -27,11 +27,11 @@ impl Database {
 
     // Getters
 
-    /// Get records from database match current `profile_id` optionally filtered by `request`
-    pub fn records(&self, request: Option<&str>) -> Result<Vec<Table>, Error> {
+    /// Get records from database match current `profile_id` optionally filtered by `url`
+    pub fn records(&self, url: Option<&str>) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, *self.profile_id, request)
+        select(&tx, *self.profile_id, url)
     }
 }
 
@@ -44,25 +44,29 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
             `gemini_id`  INTEGER NOT NULL,
-            `request`    TEXT NOT NULL
+            `is_active`  INTEGER NOT NULL,
+            `url`        TEXT NOT NULL,
+
+            UNIQUE (
+                `profile_id`,
+                `gemini_id`,
+                `is_active`,
+                `url`
+            )
         )",
         [],
     )
 }
 
-pub fn select(
-    tx: &Transaction,
-    profile_id: i64,
-    request: Option<&str>,
-) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, profile_id: i64, url: Option<&str>) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_id`,
                 `gemini_id` FROM `profile_identity_gemini_auth`
-                            WHERE `profile_id` = ? AND `request` LIKE ?",
+                            WHERE `profile_id` = ? AND `url` LIKE ?",
     )?;
 
-    let result = stmt.query_map((profile_id, request.unwrap_or("%")), |row| {
+    let result = stmt.query_map((profile_id, url.unwrap_or("%")), |row| {
         Ok(Table {
             //id: row.get(0)?,
             //profile_id: row.get(1)?,
