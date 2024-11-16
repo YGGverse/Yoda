@@ -5,7 +5,7 @@ use database::Database;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
-/// API for `gemini_id` + `request` auth pairs operations
+/// API for `profile_identity_gemini_id` + `url` auth pairs operations
 pub struct Auth {
     pub database: Rc<Database>,
 }
@@ -14,9 +14,9 @@ impl Auth {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Self {
+    pub fn new(connection: Rc<RwLock<Connection>>) -> Self {
         Self {
-            database: Rc::new(Database::new(connection, profile_id)),
+            database: Rc::new(Database::new(connection)),
         }
     }
 }

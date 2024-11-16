@@ -21,7 +21,7 @@ impl Gemini {
     /// Create new `Self`
     pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Self {
         Self {
-            auth: Rc::new(Auth::new(connection.clone(), profile_id.clone())),
+            auth: Rc::new(Auth::new(connection.clone())),
             database: Rc::new(Database::new(connection, profile_id)),
         }
     }
