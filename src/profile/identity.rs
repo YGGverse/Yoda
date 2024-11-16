@@ -1,11 +1,16 @@
+mod database;
 mod gemini;
+
+use database::Database;
 use gemini::Gemini;
 
+use gtk::glib::DateTime;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 /// Authorization wrapper for different protocols
 pub struct Identity {
+    // database: Rc<Database>,
     gemini: Rc<Gemini>,
 }
 
@@ -14,8 +19,21 @@ impl Identity {
 
     /// Create new `Self`
     pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Self {
+        // Init identity database
+        let database = Rc::new(Database::new(connection.clone()));
+
+        // Get active identity set for profile or create new one
+        let profile_identity_id = Rc::new(match database.active() {
+            Some(identity) => identity.id,
+            None => match database.add(profile_id, true, DateTime::now_local().unwrap(), None) {
+                Ok(id) => id,
+                Err(_) => todo!(),
+            },
+        });
+
         Self {
-            gemini: Rc::new(Gemini::new(connection, profile_id)),
+            // database,
+            gemini: Rc::new(Gemini::new(connection, profile_identity_id)),
         }
     }
 
@@ -42,7 +60,9 @@ impl Identity {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    // nothing yet..
+    if let Err(e) = database::init(tx) {
+        return Err(e.to_string());
+    }
 
     // Delegate migration to childs
     gemini::migrate(tx)?;
