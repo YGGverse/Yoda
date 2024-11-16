@@ -41,13 +41,11 @@ impl Identity {
     ///
     /// https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
     pub fn gemini(&self, request: &str) -> Option<String> {
-        if let Ok(auth_records) = self.gemini.auth.database.records(Some(request)) {
-            for auth_record in auth_records {
-                if let Ok(gemini_records) = self.gemini.database.records() {
-                    for gemini_record in gemini_records {
-                        if gemini_record.id == auth_record.profile_identity_gemini_id {
-                            return Some(gemini_record.pem);
-                        }
+        for profile_identity_gemini_id in self.gemini.auth.memory.starts_with(request) {
+            if let Ok(gemini_records) = self.gemini.database.records() {
+                for gemini_record in gemini_records {
+                    if gemini_record.id == profile_identity_gemini_id {
+                        return Some(gemini_record.pem);
                     }
                 }
             }

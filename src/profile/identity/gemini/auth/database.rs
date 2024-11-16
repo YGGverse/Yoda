@@ -5,6 +5,8 @@ use sqlite::{Connection, Error, Transaction};
 pub struct Table {
     //pub id: i64,
     pub profile_identity_gemini_id: i64,
+    pub is_active: bool,
+    pub url: String,
 }
 
 /// Storage for `profile_identity_gemini_id` + `url` auth pairs
@@ -56,7 +58,9 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 pub fn select(tx: &Transaction, url: Option<&str>) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
-                `profile_identity_gemini_id`
+                `profile_identity_gemini_id`,
+                `is_active`,
+                `url`
 
                 FROM `profile_identity_gemini_auth`
                 WHERE `url` LIKE ?",
@@ -66,6 +70,8 @@ pub fn select(tx: &Transaction, url: Option<&str>) -> Result<Vec<Table>, Error> 
         Ok(Table {
             //id: row.get(0)?,
             profile_identity_gemini_id: row.get(1)?,
+            is_active: row.get(2)?,
+            url: row.get(3)?,
         })
     })?;
 
