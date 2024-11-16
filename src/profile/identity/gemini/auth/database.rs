@@ -1,6 +1,5 @@
-use std::{rc::Rc, sync::RwLock};
-
 use sqlite::{Connection, Error, Transaction};
+use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
     //pub id: i64,
