@@ -476,7 +476,7 @@ impl Page {
                         move |request| match request {
                             Ok(_) => {
                                 // Read meta from input stream
-                                gemini::client::response::Meta::from_socket_connection_async(
+                                gemini::client::response::Meta::from_stream_async(
                                     connection.clone(),
                                     Some(Priority::DEFAULT),
                                     Some(cancellable.clone()),
@@ -525,7 +525,7 @@ impl Page {
                                                     match response.mime() {
                                                         Some(gemini::client::response::meta::Mime::TextGemini) => {
                                                             // Read entire input stream to buffer
-                                                            gemini::client::response::data::Text::from_socket_connection_async(
+                                                            gemini::client::response::data::Text::from_stream_async(
                                                                 connection,
                                                                 Some(Priority::DEFAULT),
                                                                 Some(cancellable.clone()),
@@ -593,7 +593,7 @@ impl Page {
 
                                                             // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
                                                             // this action allows to count the bytes for loading widget and validate max size for incoming data
-                                                            gemini::gio::memory_input_stream::from_socket_connection_async(
+                                                            gemini::gio::memory_input_stream::from_stream_async(
                                                                 connection,
                                                                 Some(cancellable.clone()),
                                                                 Priority::DEFAULT,

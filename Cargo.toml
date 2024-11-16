@@ -17,7 +17,7 @@ features = ["v1_6"]
 
 [dependencies.gemini]
 package = "ggemini"
-version = "0.9.0"
+version = "0.10.0"
 
 [dependencies.gemtext]
 package = "ggemtext"
