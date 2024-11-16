@@ -20,12 +20,18 @@ use crate::app::browser::{
 use crate::Profile;
 use gtk::{
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClient, SocketClientEvent, SocketProtocol, TlsCertificateFlags},
+    gio::{
+        Cancellable, SocketClient, SocketClientEvent, SocketConnectable, SocketProtocol,
+        TlsCertificate, TlsCertificateFlags, TlsClientConnection,
+    },
     glib::{
         gformat, Bytes, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
         UriFlags, UriHideFlags,
     },
-    prelude::{CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt},
+    prelude::{
+        CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
+        TlsConnectionExt,
+    },
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc, time::Duration};
@@ -434,10 +440,24 @@ impl Page {
 
         // Init socket
         let client = SocketClient::new();
-
         client.set_protocol(SocketProtocol::Tcp);
-        client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
-        client.set_tls(true);
+
+        // Check request match configured identity in profile database
+        let auth = if let Some(pem) = self
+            .profile
+            .identity
+            .gemini(&self.navigation.request().widget().gobject().text())
+        {
+            match TlsCertificate::from_pem(&pem) {
+                Ok(certificate) => Some(certificate),
+                Err(_) => todo!(),
+            }
+        } else {
+            // Use unauthorized connection
+            client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
+            client.set_tls(true);
+            None
+        };
 
         // Listen for connection status updates
         client.connect_event({
@@ -468,6 +488,21 @@ impl Page {
             Some(&cancellable.clone()),
             move |connect| match connect {
                 Ok(connection) => {
+                    // Wrap connection with TLS
+                    if let Some(certificate) = auth {
+                        let connection = TlsClientConnection::new(
+                            &connection.clone(),
+                            None::<&SocketConnectable>,
+                        )
+                        .unwrap(); // @TODO handle
+                        // Apply authorization
+                        connection.set_certificate(
+                            &certificate,
+                        );
+                        // Validate @TODO
+                        // connection.connect_accept_certificate(|_, _, _| true);
+                    }
+
                     // Send request
                     connection.output_stream().write_bytes_async(
                         &Bytes::from(gformat!("{url}\r\n").as_bytes()),

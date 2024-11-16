@@ -1,10 +1,11 @@
 mod bookmark;
 mod database;
 //mod history;
-//mod identity;
+mod identity;
 
 use bookmark::Bookmark;
 use database::Database;
+use identity::Identity;
 
 use gtk::glib::{user_config_dir, DateTime};
 use sqlite::{Connection, Transaction};
@@ -19,6 +20,7 @@ const DB_NAME: &str = "database.sqlite3";
 pub struct Profile {
     pub bookmark: Rc<Bookmark>,
     pub database: Rc<Database>,
+    pub identity: Rc<Identity>,
     pub config_path: PathBuf,
 }
 
@@ -93,7 +95,8 @@ impl Profile {
 
         // Result
         Self {
-            bookmark: Rc::new(Bookmark::new(connection, profile_id)),
+            bookmark: Rc::new(Bookmark::new(connection.clone(), profile_id.clone())),
+            identity: Rc::new(Identity::new(connection, profile_id)),
             database,
             config_path,
         }
@@ -108,9 +111,9 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Delegate migration to children components
     bookmark::migrate(tx)?;
+    identity::migrate(tx)?;
     // @TODO not in use yet
     // history::migrate(tx)?;
-    // identity::migrate(tx)?;
 
     // Success
     Ok(())
