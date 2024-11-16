@@ -1,4 +1,5 @@
 mod failure;
+mod identity;
 mod loading;
 
 use adw::StatusPage;
@@ -17,6 +18,16 @@ impl Status {
     pub fn new_failure() -> Self {
         Self {
             gobject: failure::new_gobject(),
+        }
+    }
+
+    /// Create new identity preset
+    ///
+    /// Useful as placeholder for 60 status code
+    /// https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
+    pub fn new_identity() -> Self {
+        Self {
+            gobject: identity::new_gobject(),
         }
     }
 

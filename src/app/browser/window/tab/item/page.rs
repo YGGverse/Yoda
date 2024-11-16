@@ -848,6 +848,24 @@ impl Page {
 
                                                     update.activate(Some(&id));
                                                 },
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
+                                                gemini::client::response::meta::Status::CertificateRequest => {
+                                                    // Define common data
+                                                    let status = Status::Success;
+                                                    let title = "Identity";
+
+                                                    // Update widget
+                                                    content
+                                                        .to_status_identity()
+                                                        .set_title(title);
+
+                                                    // Update meta
+                                                    meta.set_status(status)
+                                                        .set_title(title);
+
+                                                    // Update window
+                                                    update.activate(Some(&id));
+                                                }
                                                 _ => {
                                                     // Define common data
                                                     let status = Status::Failure;
