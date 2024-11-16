@@ -425,10 +425,7 @@ impl Page {
 
     // Private helpers @TODO move outside
     fn load_gemini(&self, uri: Uri) {
-        // Use local namespaces @TODO
-        // use gemini::client::response::
-
-        // Wrapper for TLS connection
+        // Stream wrapper for TLS connections
         fn auth(
             connection: impl IsA<IOStream>,
             certificate: Option<TlsCertificate>,
@@ -465,7 +462,7 @@ impl Page {
         {
             Some(pem) => match TlsCertificate::from_pem(&pem) {
                 Ok(certificate) => Some(certificate),
-                Err(_) => todo!(),
+                Err(reason) => todo!("{reason}"),
             },
             None => {
                 // Use unauthorized connection
