@@ -21,7 +21,7 @@ use crate::Profile;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{
-        Cancellable, SocketClient, SocketClientEvent, SocketConnectable, SocketProtocol,
+        Cancellable, IOStream, SocketClient, SocketClientEvent, SocketConnectable, SocketProtocol,
         TlsCertificate, TlsCertificateFlags, TlsClientConnection,
     },
     glib::{
@@ -29,7 +29,7 @@ use gtk::{
         UriFlags, UriHideFlags,
     },
     prelude::{
-        CancellableExt, EditableExt, IOStreamExt, OutputStreamExt, SocketClientExt,
+        CancellableExt, Cast, EditableExt, IOStreamExt, IsA, OutputStreamExt, SocketClientExt,
         TlsConnectionExt,
     },
 };
@@ -428,6 +428,21 @@ impl Page {
         // Use local namespaces @TODO
         // use gemini::client::response::
 
+        // Wrapper for TLS connection
+        fn auth(
+            connection: impl IsA<IOStream>,
+            certificate: Option<TlsCertificate>,
+        ) -> impl IsA<IOStream> {
+            if let Some(certificate) = certificate {
+                let tls_connection =
+                    TlsClientConnection::new(&connection, None::<&SocketConnectable>).unwrap(); // @TODO handle
+                tls_connection.set_certificate(&certificate);
+                tls_connection.upcast::<IOStream>()
+            } else {
+                connection.upcast::<IOStream>()
+            }
+        }
+
         // Init shared objects (async)
         let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
@@ -443,20 +458,21 @@ impl Page {
         client.set_protocol(SocketProtocol::Tcp);
 
         // Check request match configured identity in profile database
-        let auth = if let Some(pem) = self
+        let certificate = match self
             .profile
             .identity
             .gemini(&self.navigation.request().widget().gobject().text())
         {
-            match TlsCertificate::from_pem(&pem) {
+            Some(pem) => match TlsCertificate::from_pem(&pem) {
                 Ok(certificate) => Some(certificate),
                 Err(_) => todo!(),
+            },
+            None => {
+                // Use unauthorized connection
+                client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
+                client.set_tls(true);
+                None
             }
-        } else {
-            // Use unauthorized connection
-            client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
-            client.set_tls(true);
-            None
         };
 
         // Listen for connection status updates
@@ -488,23 +504,11 @@ impl Page {
             Some(&cancellable.clone()),
             move |connect| match connect {
                 Ok(connection) => {
-                    // Wrap connection with TLS
-                    if let Some(certificate) = auth {
-                        let connection = TlsClientConnection::new(
-                            &connection.clone(),
-                            None::<&SocketConnectable>,
-                        )
-                        .unwrap(); // @TODO handle
-                        // Apply authorization
-                        connection.set_certificate(
-                            &certificate,
-                        );
-                        // Validate @TODO
-                        // connection.connect_accept_certificate(|_, _, _| true);
-                    }
+                    // Encrypt stream using authorization TLS
+                    let stream = auth(connection, certificate);
 
                     // Send request
-                    connection.output_stream().write_bytes_async(
+                    stream.output_stream().write_bytes_async(
                         &Bytes::from(gformat!("{url}\r\n").as_bytes()),
                         Priority::DEFAULT,
                         Some(&cancellable.clone()),
@@ -512,7 +516,7 @@ impl Page {
                             Ok(_) => {
                                 // Read meta from input stream
                                 gemini::client::response::Meta::from_stream_async(
-                                    connection.clone(),
+                                    stream.clone(),
                                     Some(Priority::DEFAULT),
                                     Some(cancellable.clone()),
                                     move |result| match result
@@ -561,7 +565,7 @@ impl Page {
                                                         Some(gemini::client::response::meta::Mime::TextGemini) => {
                                                             // Read entire input stream to buffer
                                                             gemini::client::response::data::Text::from_stream_async(
-                                                                connection,
+                                                                stream,
                                                                 Some(Priority::DEFAULT),
                                                                 Some(cancellable.clone()),
                                                                 move |result|{
@@ -629,7 +633,7 @@ impl Page {
                                                             // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
                                                             // this action allows to count the bytes for loading widget and validate max size for incoming data
                                                             gemini::gio::memory_input_stream::from_stream_async(
-                                                                connection,
+                                                                stream,
                                                                 Some(cancellable.clone()),
                                                                 Priority::DEFAULT,
                                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
