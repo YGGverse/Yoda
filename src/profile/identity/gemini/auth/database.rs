@@ -45,7 +45,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `profile_id`                 INTEGER NOT NULL,
             `profile_identity_gemini_id` INTEGER NOT NULL,
             `is_active`                  INTEGER NOT NULL,
-            `url`                        TEXT NOT NULL,
+            `url`                        VARCHAR(1024) NOT NULL,
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`),
             FOREIGN KEY (`profile_identity_gemini_id`) REFERENCES `profile_identity_gemini`(`id`),
