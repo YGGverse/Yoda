@@ -39,14 +39,26 @@ impl Memory {
         self.index.borrow_mut().clear()
     } */
 
-    /// Search for `profile_identity_gemini_id` by `url` starts with given substring
-    pub fn starts_with(&self, prefix: &str) -> Vec<i64> {
+    /// Get `profile_identity_gemini_id` vector match given `request`
+    /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
+    /// * contain unspecified length priority implementation @TODO
+    pub fn match_priority(&self, request: &str) -> Option<i64> {
         let mut result = Vec::new();
+
+        // Get all records starts with URL cached, collect length for priority
         for (url, &profile_identity_gemini_id) in self.index.borrow().iter() {
-            if url.starts_with(prefix) {
-                result.push(profile_identity_gemini_id)
+            if request.starts_with(url) {
+                result.push((profile_identity_gemini_id, url.len()))
             }
         }
-        result
+
+        // Sort by length desc @TODO
+        result.sort_by(|a, b| b.1.cmp(&a.1));
+
+        // Get first match ID
+        match result.get(0) {
+            Some(value) => Some(value.0),
+            None => None,
+        }
     }
 }
