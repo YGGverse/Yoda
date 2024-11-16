@@ -6,6 +6,7 @@ const DEFAULT_ICON_NAME: &str = "avatar-default-symbolic";
 const DEFAULT_TITLE: &str = "Identity";
 const DEFAULT_DESCRIPTION: &str = "Client certificate required to continue!";
 const DEFAULT_BUTTON_LABEL: &str = "Select";
+const DEFAULT_BUTTON_TOOLTIP_TEXT: &str = "Select certificate";
 const DEFAULT_BUTTON_CLASS: &str = "suggested-action";
 
 /// Create new default preset for `Identity`
@@ -15,6 +16,7 @@ pub fn new_gobject() -> StatusPage {
     let button = &Button::builder()
         .css_classes([DEFAULT_BUTTON_CLASS])
         .label(DEFAULT_BUTTON_LABEL)
+        .tooltip_text(DEFAULT_BUTTON_TOOLTIP_TEXT)
         .halign(Align::Center)
         .build();
 
