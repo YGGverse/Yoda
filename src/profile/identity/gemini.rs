@@ -1,8 +1,10 @@
 mod auth;
 mod database;
+mod memory;
 
 use auth::Auth;
 use database::Database;
+use memory::Memory;
 
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
@@ -12,7 +14,8 @@ use std::{rc::Rc, sync::RwLock};
 /// https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
 pub struct Gemini {
     pub auth: Rc<Auth>,
-    pub database: Rc<Database>,
+    // pub database: Rc<Database>,
+    pub memory: Rc<Memory>,
 }
 
 impl Gemini {
@@ -20,9 +23,27 @@ impl Gemini {
 
     /// Create new `Self`
     pub fn new(connection: Rc<RwLock<Connection>>, profile_identity_id: Rc<i64>) -> Self {
+        // Init children components
+        let auth = Rc::new(Auth::new(connection.clone()));
+        let database = Rc::new(Database::new(connection, profile_identity_id));
+        let memory = Rc::new(Memory::new());
+
+        // Build initial index
+        match database.records() {
+            Ok(records) => {
+                for record in records {
+                    if memory.add(record.id, record.pem).is_err() {
+                        todo!()
+                    }
+                }
+            }
+            Err(reason) => todo!("{reason}"),
+        }
+
         Self {
-            auth: Rc::new(Auth::new(connection.clone())),
-            database: Rc::new(Database::new(connection, profile_identity_id)),
+            auth,
+            // database,
+            memory,
         }
     }
 
