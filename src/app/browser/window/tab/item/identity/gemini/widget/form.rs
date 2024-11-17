@@ -28,6 +28,9 @@ impl Form {
         gobject.append(list.gobject());
         gobject.append(name.gobject());
 
+        // Connect events
+        list.on_select(move |key| name.gobject().set_visible(key.is_none()));
+
         // Return activated `Self`
         Self { gobject }
     }

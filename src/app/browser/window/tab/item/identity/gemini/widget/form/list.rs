@@ -42,27 +42,45 @@ impl List {
         self.model.append(&item);
     }
 
+    /* @TODO not in use
     /// Get selected `key` or panic on selection not found
     /// * return `None` if current selection key match `PROPERTY_KEY_NONE_VALUE`
     pub fn selected(&self) -> Option<i64> {
-        match self.gobject.selected_item() {
-            Some(gobject) => {
-                // Convert back from C-based GObject type
-                let key = gobject.property::<i64>(PROPERTY_KEY_NAME);
+        selected(&self.gobject)
+    }*/
 
-                if key == PROPERTY_KEY_NONE_VALUE {
-                    None
-                } else {
-                    Some(key)
-                }
-            }
-            None => panic!(),
-        }
+    // Events
+
+    /// Run callback function on `connect_selected_notify`
+    /// * return formatted key as result
+    pub fn on_select(&self, callback: impl Fn(Option<i64>) + 'static) {
+        self.gobject
+            .connect_selected_notify(move |this| callback(selected(this)));
     }
 
     // Getters
 
     pub fn gobject(&self) -> &DropDown {
         &self.gobject
+    }
+}
+
+// Tools
+
+/// Get selected `key` or panic on selection not found
+/// * return `None` if current selection key match `PROPERTY_KEY_NONE_VALUE`
+fn selected(list: &DropDown) -> Option<i64> {
+    match list.selected_item() {
+        Some(this) => {
+            // Convert back from C-based GObject type
+            let key = this.property::<i64>(PROPERTY_KEY_NAME);
+
+            if key == PROPERTY_KEY_NONE_VALUE {
+                None
+            } else {
+                Some(key)
+            }
+        }
+        None => panic!(),
     }
 }
