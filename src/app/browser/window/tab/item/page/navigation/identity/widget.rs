@@ -16,11 +16,11 @@ impl Widget {
         let gobject = Button::builder()
             .icon_name("avatar-default-symbolic")
             .tooltip_text("Identity")
-            .sensitive(false)
+            //.sensitive(false)
             .build();
 
         // Init events @TODO dialog window required
-        // gobject.connect_clicked(move |_| action.auth().activate());
+        gobject.connect_clicked(move |_| action.ident().activate());
 
         // Return activated `Self`
         Self { gobject }
@@ -28,7 +28,7 @@ impl Widget {
 
     // Actions
     pub fn update(&self, is_sensitive: bool) {
-        self.gobject.set_sensitive(is_sensitive);
+        //self.gobject.set_sensitive(is_sensitive);
     }
 
     // Getters

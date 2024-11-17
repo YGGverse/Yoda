@@ -2,8 +2,9 @@ mod failure;
 mod identity;
 mod loading;
 
+use crate::app::browser::window::tab::item::Action;
 use adw::StatusPage;
-use std::time::Duration;
+use std::{rc::Rc, time::Duration};
 
 pub struct Status {
     gobject: StatusPage,
@@ -25,9 +26,9 @@ impl Status {
     ///
     /// Useful as placeholder for 60 status code
     /// https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-    pub fn new_identity() -> Self {
+    pub fn new_identity(action: Rc<Action>) -> Self {
         Self {
-            gobject: identity::new_gobject(),
+            gobject: identity::new_gobject(action),
         }
     }
 

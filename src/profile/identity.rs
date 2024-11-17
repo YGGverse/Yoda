@@ -13,7 +13,7 @@ use std::{rc::Rc, sync::RwLock};
 /// Authorization wrapper for different protocols
 pub struct Identity {
     // database: Rc<Database>,
-    gemini: Rc<Gemini>,
+    pub gemini: Rc<Gemini>,
 }
 
 impl Identity {

@@ -1,5 +1,6 @@
 mod action;
 mod database;
+mod identity;
 mod page;
 mod widget;
 
@@ -15,7 +16,7 @@ use crate::Profile;
 use adw::TabView;
 use gtk::{
     glib::{uuid_string_random, GString},
-    prelude::EditableExt,
+    prelude::{Cast, EditableExt},
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -49,7 +50,7 @@ impl Item {
 
         let page = Rc::new(Page::new(
             id.clone(),
-            profile,
+            profile.clone(),
             (actions.0, actions.1, action.clone()),
         ));
 
@@ -76,10 +77,24 @@ impl Item {
             }
         }
 
-        action.auth().connect_activate(|request| {
-            // @TODO
+        // Show identity selection for item
+        action.ident().connect_activate({
+            let page = page.clone();
+            let parent = tab_view.clone().upcast::<gtk::Widget>();
+            move || {
+                // Request should match valid URI for all drivers supported
+                if let Some(uri) = page.navigation().request().uri() {
+                    // Rout by scheme
+                    if uri.scheme().to_lowercase() == "gemini" {
+                        return identity::new_gemini(profile.clone(), uri).present(Some(&parent));
+                    }
+                }
+                // Show dialog with unsupported request message
+                identity::new_unsupported().present(Some(&parent));
+            }
         });
 
+        // Load new request for item
         action.load().connect_activate({
             let page = page.clone();
             move |request, is_history| {

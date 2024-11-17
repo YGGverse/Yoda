@@ -1,10 +1,13 @@
 use sqlite::{Connection, Error, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
+pub const NAME_MAX_LEN: i32 = 36;
+
 pub struct Table {
     pub id: i64,
     //pub profile_identity_id: i64,
     pub pem: String,
+    pub name: String,
 }
 
 /// Storage for Gemini auth certificates
@@ -36,14 +39,19 @@ impl Database {
 
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
-        "CREATE TABLE IF NOT EXISTS `profile_identity_gemini`
-        (
-            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            `profile_identity_id` INTEGER NOT NULL,
-            `pem`                 TEXT NOT NULL,
+        format!(
+            "CREATE TABLE IF NOT EXISTS `profile_identity_gemini`
+            (
+                `id`                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `profile_identity_id` INTEGER NOT NULL,
+                `pem`                 TEXT NOT NULL,
+                `name`                VARCHAR({}),
 
-            FOREIGN KEY (`profile_identity_id`) REFERENCES `profile_identity`(`id`)
-        )",
+                FOREIGN KEY (`profile_identity_id`) REFERENCES `profile_identity`(`id`)
+            )",
+            NAME_MAX_LEN
+        )
+        .as_str(),
         [],
     )
 }
@@ -52,7 +60,8 @@ pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_id`,
-                `pem`
+                `pem`,
+                `name`
 
         FROM `profile_identity_gemini` WHERE `profile_identity_id` = ?",
     )?;
@@ -62,6 +71,7 @@ pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
             id: row.get(0)?,
             //profile_identity_id: row.get(1)?,
             pem: row.get(2)?,
+            name: row.get(3)?,
         })
     })?;
 

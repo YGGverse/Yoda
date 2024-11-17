@@ -60,7 +60,7 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_identity(&self) -> Status {
         self.clean();
-        let status = Status::new_identity();
+        let status = Status::new_identity(self.tab_action.clone());
         self.gobject.append(status.gobject());
         status
     }
