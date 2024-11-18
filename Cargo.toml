@@ -26,12 +26,7 @@ version = "0.2.1"
 [dependencies.gtk]
 package = "gtk4"
 version = "0.9.1"
-features = ["v4_10"]
-
-[dependencies.gio]
-package = "gio"
-version = "0.20.4"
-features = ["v2_70"]
+features = ["gnome_47"]
 
 [dependencies.sqlite]
 package = "rusqlite"
