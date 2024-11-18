@@ -23,7 +23,7 @@ impl Gemini {
         let widget = Rc::new(Widget::new());
 
         // Add new identity option
-        widget.form.list.append(None, "Create new..");
+        widget.form.list.append(None, "Create new..", true);
 
         // Collect additional options from database
         match profile.identity.gemini.database.records() {
@@ -49,6 +49,7 @@ impl Gemini {
                             Some(name) => format!("{name} ({expires})"),
                             None => format!("{expires}"),
                         },
+                        true,
                     );
                 }
             }
