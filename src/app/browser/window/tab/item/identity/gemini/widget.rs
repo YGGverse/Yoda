@@ -7,6 +7,7 @@ use adw::{
     AlertDialog, ResponseAppearance,
 };
 use gtk::prelude::IsA;
+use std::rc::Rc;
 
 // Defaults
 const HEADING: &str = "Ident";
@@ -17,13 +18,11 @@ const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");
 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 // const RESPONSE_MANAGE: (&str, &str) = ("manage", "Manage");
 
-// List options
-const OPTION_CREATE: (Option<i64>, &str) = (None, "Create new..");
-
 // Select options
 
 pub struct Widget {
-    gobject: AlertDialog,
+    pub form: Rc<Form>,
+    pub gobject: AlertDialog,
 }
 
 impl Widget {
@@ -31,12 +30,8 @@ impl Widget {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        // Collect identity certificates
-        let mut options: Vec<(Option<i64>, String, bool)> = Vec::new();
-        options.push((OPTION_CREATE.0, OPTION_CREATE.1.to_owned(), false));
-
         // Init child container
-        let form = Form::new(options);
+        let form = Rc::new(Form::new());
 
         // Init main `GObject`
         let gobject = AlertDialog::builder()
@@ -44,7 +39,7 @@ impl Widget {
             .body(BODY)
             .close_response(RESPONSE_CANCEL.0)
             .default_response(RESPONSE_APPLY.0)
-            .extra_child(form.gobject())
+            .extra_child(&form.gobject)
             .build();
 
         // Set response variants
@@ -62,7 +57,7 @@ impl Widget {
         gobject.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
 
         // Return new activated `Self`
-        Self { gobject }
+        Self { form, gobject }
     }
 
     // Actions

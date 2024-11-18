@@ -8,36 +8,37 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Orientation,
 };
+use std::rc::Rc;
 
 pub struct Form {
-    gobject: Box,
+    pub gobject: Box,
+    pub list: Rc<List>,
+    // pub name: Rc<Name>,
 }
 
 impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(items: Vec<(Option<i64>, String, bool)>) -> Self {
+    pub fn new() -> Self {
         // Init components
-        let list = List::new();
-        let name = Name::new();
+        let list = Rc::new(List::new());
+        let name = Rc::new(Name::new());
 
         // Init main container
         let gobject = Box::builder().orientation(Orientation::Vertical).build();
 
-        gobject.append(list.gobject());
-        gobject.append(name.gobject());
+        gobject.append(&list.gobject);
+        gobject.append(&name.gobject);
 
         // Connect events
-        list.on_select(move |key| name.gobject().set_visible(key.is_none()));
+        list.connect_selected_notify(move |key| name.gobject.set_visible(key.is_none()));
 
         // Return activated `Self`
-        Self { gobject }
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
+        Self {
+            gobject,
+            list,
+            // name,
+        }
     }
 }

@@ -2,11 +2,15 @@ mod widget;
 use widget::Widget;
 
 use crate::profile::Profile;
-use gtk::{glib::Uri, prelude::IsA};
+use gtk::{
+    gio::{prelude::TlsCertificateExt, TlsCertificate},
+    glib::Uri,
+    prelude::IsA,
+};
 use std::rc::Rc;
 
 pub struct Gemini {
-    profile: Rc<Profile>,
+    // profile: Rc<Profile>,
     widget: Rc<Widget>,
 }
 
@@ -15,7 +19,41 @@ impl Gemini {
 
     /// Create new `Self` for given Profile
     pub fn new(profile: Rc<Profile>, auth_uri: Uri) -> Self {
+        // Init widget
         let widget = Rc::new(Widget::new());
+
+        // Add new identity option
+        widget.form.list.append(None, "Create new..");
+
+        // Collect additional options from database
+        match profile.identity.gemini.database.records() {
+            Ok(identities) => {
+                for identity in identities {
+                    // Get certificate details
+                    let certificate = match TlsCertificate::from_pem(&identity.pem) {
+                        Ok(certificate) => certificate,
+                        Err(reason) => todo!("{reason}"),
+                    };
+
+                    // Get expiration time
+                    let expires = certificate
+                        .not_valid_after()
+                        .unwrap()
+                        .format_iso8601()
+                        .unwrap();
+
+                    // Append record option
+                    widget.form.list.append(
+                        Some(identity.id),
+                        &match identity.name {
+                            Some(name) => format!("{name} ({expires})"),
+                            None => format!("{expires}"),
+                        },
+                    );
+                }
+            }
+            Err(_) => todo!(),
+        }
 
         // Init events
         widget.connect_response({
@@ -33,7 +71,10 @@ impl Gemini {
         });
 
         // Return activated `Self`
-        Self { profile, widget }
+        Self {
+            // profile,
+            widget,
+        }
     }
 
     // Actions

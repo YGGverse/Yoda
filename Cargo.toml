@@ -28,6 +28,11 @@ package = "gtk4"
 version = "0.9.1"
 features = ["v4_10"]
 
+[dependencies.gio]
+package = "gio"
+version = "0.20.4"
+features = ["v2_70"]
+
 [dependencies.sqlite]
 package = "rusqlite"
 version = "0.32.1"

@@ -7,7 +7,7 @@ pub struct Table {
     pub id: i64,
     //pub profile_identity_id: i64,
     pub pem: String,
-    pub name: String,
+    pub name: Option<String>,
 }
 
 /// Storage for Gemini auth certificates

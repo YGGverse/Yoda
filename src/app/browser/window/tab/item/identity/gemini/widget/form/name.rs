@@ -4,7 +4,7 @@ const PLACEHOLDER_TEXT: &str = "Identity name (optional)";
 const MARGIN: i32 = 8;
 
 pub struct Name {
-    gobject: Entry,
+    pub gobject: Entry,
 }
 
 impl Name {
@@ -19,11 +19,5 @@ impl Name {
                 .margin_top(MARGIN)
                 .build(),
         }
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Entry {
-        &self.gobject
     }
 }
