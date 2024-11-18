@@ -56,7 +56,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_id`,
@@ -66,7 +66,7 @@ pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
         FROM `profile_identity_gemini` WHERE `profile_identity_id` = ?",
     )?;
 
-    let result = stmt.query_map([profile_id], |row| {
+    let result = stmt.query_map([profile_identity_id], |row| {
         Ok(Table {
             id: row.get(0)?,
             //profile_identity_id: row.get(1)?,
