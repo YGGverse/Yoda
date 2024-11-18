@@ -30,13 +30,13 @@ impl List {
         // Create new label for item
         let item = Label::new(Some(label));
 
+        // Append formatted record
+        self.model.append(&item);
+
         // Register ID in hash map index
         self.index
             .borrow_mut()
-            .insert(item.clone(), profile_identity_gemini_id);
-
-        // Append formatted record
-        self.model.append(&item);
+            .insert(item, profile_identity_gemini_id);
     }
 
     // Events
