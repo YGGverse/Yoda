@@ -113,12 +113,12 @@ GTK 4 / Libadwaita client written in Rust
 
 Make sure your system support:
 
-* Cairo 1.16^
-* Gio 2.82^
-* Glib 2.56^
-* GTK 4.16^
-* Libadwaita 1.6^
-* PixBuf 2.42^
+* Cairo `1.16^`
+* Gio `2.82^`
+* Glib `2.56^`
+* GTK `4.16^`
+* Libadwaita `1.6^`
+* PixBuf `2.42^`
 
 Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
 
