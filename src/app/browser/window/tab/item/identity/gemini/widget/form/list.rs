@@ -1,8 +1,14 @@
 mod item;
 use item::Item;
 
-use gio::prelude::{Cast, CastNone};
-use gtk::{gio::ListStore, prelude::ListItemExt, DropDown, Label, ListItem, SignalListItemFactory};
+use gtk::{
+    gio::{
+        prelude::{Cast, CastNone},
+        ListStore,
+    },
+    prelude::ListItemExt,
+    DropDown, Label, ListItem, SignalListItemFactory,
+};
 
 pub struct List {
     pub gobject: DropDown,
