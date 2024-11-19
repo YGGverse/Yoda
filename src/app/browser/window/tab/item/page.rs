@@ -22,7 +22,7 @@ use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{
         Cancellable, IOStream, SocketClient, SocketClientEvent, SocketConnectable, SocketProtocol,
-        TlsCertificate, TlsCertificateFlags, TlsClientConnection,
+        TlsCertificate, TlsClientConnection,
     },
     glib::{
         gformat, Bytes, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
@@ -466,8 +466,7 @@ impl Page {
                 Err(reason) => todo!("{reason}"),
             },
             None => {
-                // Use unauthorized connection
-                client.set_tls_validation_flags(TlsCertificateFlags::INSECURE);
+                // Use unauthorized TLS connection
                 client.set_tls(true);
                 None
             }
@@ -478,7 +477,7 @@ impl Page {
             let update = update.clone();
             let id = id.clone();
             let meta = meta.clone();
-            move |_, event, _, _| {
+            move |_, event, _, stream| {
                 meta.set_status(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
                     SocketClientEvent::Resolved => Status::Resolved,
@@ -486,7 +485,17 @@ impl Page {
                     SocketClientEvent::Connected => Status::Connected,
                     SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
                     SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
-                    SocketClientEvent::TlsHandshaking => Status::TlsHandshaking,
+                    SocketClientEvent::TlsHandshaking => {
+                        // Handle certificate errors here
+                        stream
+                            .unwrap()
+                            .dynamic_cast_ref::<TlsClientConnection>()
+                            .unwrap()
+                            .connect_accept_certificate(|_, _, _| {
+                                true // @TODO
+                            });
+                        Status::TlsHandshaking
+                    }
                     SocketClientEvent::TlsHandshaked => Status::TlsHandshaked,
                     SocketClientEvent::Complete => Status::Complete,
                     _ => todo!(), // notice on API change
