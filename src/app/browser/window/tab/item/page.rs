@@ -434,6 +434,7 @@ impl Page {
                 let tls_connection =
                     TlsClientConnection::new(&connection, None::<&SocketConnectable>).unwrap(); // @TODO handle
                 tls_connection.set_certificate(&certificate);
+                tls_connection.connect_accept_certificate(move |_, _, _| true); // @TODO manual validation
                 tls_connection.upcast::<IOStream>()
             } else {
                 connection.upcast::<IOStream>()
