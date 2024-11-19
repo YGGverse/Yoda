@@ -32,6 +32,9 @@ features = ["gnome_47"]
 package = "rusqlite"
 version = "0.32.1"
 
+[dependencies.openssl]
+version = "0.10.68"
+
 [patch.crates-io]
 #ggemini = { path = "ggemini" }
 #ggemtext = { path = "ggemtext" }
