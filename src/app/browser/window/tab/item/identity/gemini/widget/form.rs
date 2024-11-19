@@ -13,7 +13,7 @@ use std::rc::Rc;
 pub struct Form {
     pub gobject: Box,
     pub list: Rc<List>,
-    // pub name: Rc<Name>,
+    pub name: Rc<Name>,
 }
 
 impl Form {
@@ -32,13 +32,16 @@ impl Form {
         gobject.append(&name.gobject);
 
         // Connect events
-        list.on_select(move |key| name.gobject.set_visible(key.is_none()));
+        list.on_select({
+            let name = name.clone();
+            move |key| name.gobject.set_visible(key.is_none())
+        });
 
         // Return activated `Self`
         Self {
             gobject,
             list,
-            // name,
+            name,
         }
     }
 }

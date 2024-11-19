@@ -1,4 +1,5 @@
 mod auth;
+mod certificate;
 mod database;
 mod error;
 mod memory;
@@ -6,8 +7,10 @@ mod memory;
 use auth::Auth;
 use database::Database;
 use error::Error;
+
 use memory::Memory;
 
+use gtk::glib::DateTime;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -18,7 +21,6 @@ pub struct Gemini {
     pub auth: Rc<Auth>,
     pub database: Rc<Database>,
     pub memory: Rc<Memory>,
-    profile_identity_id: Rc<i64>,
 }
 
 impl Gemini {
@@ -42,7 +44,6 @@ impl Gemini {
             auth,
             database,
             memory,
-            profile_identity_id,
         };
 
         // Build initial index
@@ -52,6 +53,38 @@ impl Gemini {
     }
 
     // Actions
+
+    /// Create new record
+    /// * return new `profile_identity_gemini_id` on success
+    pub fn create(
+        &self,
+        time: Option<(DateTime, DateTime)>,
+        name: Option<&str>,
+    ) -> Result<i64, Error> {
+        // Generate new certificate
+        match certificate::generate(
+            match time {
+                Some(value) => value,
+                None => (
+                    DateTime::now_local().unwrap(),
+                    DateTime::from_local(9999, 12, 31, 23, 59, 59.9).unwrap(), // max @TODO
+                ),
+            },
+            match name {
+                Some(value) => value, // @TODO make sure it's unique
+                None => "unknown",    // @TODO randomize
+            },
+        ) {
+            Ok(pem) => match self.database.add(&pem, name) {
+                Ok(profile_identity_gemini_id) => {
+                    self.index()?;
+                    Ok(profile_identity_gemini_id)
+                }
+                Err(_) => Err(Error::DatabaseRecordCreate),
+            },
+            Err(reason) => Err(Error::Certificate(reason)),
+        }
+    }
 
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {

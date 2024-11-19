@@ -1,4 +1,4 @@
-use gtk::Entry;
+use gtk::{glib::GString, prelude::EditableExt, Entry};
 
 const PLACEHOLDER_TEXT: &str = "Identity name (optional)";
 const MARGIN: i32 = 8;
@@ -18,6 +18,17 @@ impl Name {
                 .placeholder_text(PLACEHOLDER_TEXT)
                 .margin_top(MARGIN)
                 .build(),
+        }
+    }
+
+    // Getters
+
+    pub fn value(&self) -> Option<GString> {
+        let text = self.gobject.text();
+        if text.is_empty() {
+            None
+        } else {
+            Some(text)
         }
     }
 }

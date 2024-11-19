@@ -1,6 +1,8 @@
 #[derive(Debug)]
 pub enum Error {
     AuthInit,
-    MemoryIndex,
     DatabaseIndex,
+    DatabaseRecordCreate,
+    MemoryIndex,
+    Certificate(Box<dyn std::error::Error>),
 }
