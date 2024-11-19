@@ -1,3 +1,5 @@
+//! Controller for children `database` and `memory` components
+
 mod database;
 mod error;
 mod memory;
@@ -35,6 +37,45 @@ impl Auth {
 
     // Actions
 
+    /// Apply `profile_identity_gemini_id` certificate as the auth for `url`
+    /// * deactivate active auth by remove previous records from `Self` database
+    /// * reindex `Self` memory index on success
+    /// * return last insert `profile_identity_gemini_auth_id` on success
+    pub fn apply(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
+        // Get all records match request
+        match self.database.records(Some(url)) {
+            Ok(records) => {
+                // Cleanup records match `profile_identity_gemini_id` (unauth)
+                for record in records {
+                    if record.profile_identity_gemini_id == profile_identity_gemini_id {
+                        if self.database.delete(record.id).is_err() {
+                            return Err(Error::DatabaseRecordDelete(record.id));
+                        }
+                    }
+                }
+
+                // Create new record (auth)
+                let profile_identity_gemini_auth_id =
+                    match self.database.add(profile_identity_gemini_id, url) {
+                        Ok(id) => id,
+                        Err(_) => {
+                            return Err(Error::DatabaseRecordCreate(
+                                profile_identity_gemini_id,
+                                url.to_string(),
+                            ))
+                        }
+                    };
+
+                // Reindex
+                self.index()?;
+
+                // Done
+                Ok(profile_identity_gemini_auth_id)
+            }
+            Err(_) => return Err(Error::DatabaseRecordsRead(url.to_string())),
+        }
+    }
+
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
@@ -44,14 +85,12 @@ impl Auth {
         match self.database.records(None) {
             Ok(records) => {
                 for record in records {
-                    if record.is_active {
-                        if self
-                            .memory
-                            .add(record.url, record.profile_identity_gemini_id)
-                            .is_err()
-                        {
-                            return Err(Error::MemoryIndex);
-                        }
+                    if self
+                        .memory
+                        .add(record.url, record.profile_identity_gemini_id)
+                        .is_err()
+                    {
+                        return Err(Error::MemoryIndex);
                     }
                 }
             }

@@ -59,8 +59,8 @@ impl List {
     // Events
 
     /// Run callback function on `connect_selected_notify` event
-    /// * return formatted `profile_identity_gemini_id` match selected
-    pub fn connect_selected_notify(&self, callback: impl Fn(Option<i64>) + 'static) {
+    /// * return formatted `profile_identity_gemini_id` match selected item
+    pub fn on_select(&self, callback: impl Fn(Option<i64>) + 'static) {
         self.gobject.connect_selected_notify(move |list| {
             callback(
                 list.selected_item()
@@ -69,5 +69,16 @@ impl List {
                     .profile_identity_gemini_id_option(),
             )
         });
+    }
+
+    // Getters
+
+    /// Get formatted `profile_identity_gemini_id` **option** match selected item
+    pub fn selected(&self) -> Option<i64> {
+        self.gobject
+            .selected_item()
+            .and_downcast::<Item>()
+            .unwrap()
+            .profile_identity_gemini_id_option()
     }
 }

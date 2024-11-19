@@ -57,18 +57,18 @@ impl Gemini {
         }
 
         // Init events
-        widget.connect_response({
-            let profile = profile.clone();
-            move |value| {
-                match value {
-                    Some(id) => {
-                        // Activate selected identity ID
-                    }
-                    None => {
-                        // Create and select new identity
-                    }
-                } // @TODO handle result
+        widget.on_apply(move |response| match response {
+            // Apply selected identity for `auth_uri`
+            Some(profile_identity_gemini_id) => {
+                profile
+                    .identity
+                    .gemini
+                    .auth
+                    .apply(profile_identity_gemini_id, auth_uri.to_string().as_str())
+                    .unwrap(); //@TODO handle errors
             }
+            // Create new certificate, then apply it to the new identity for `auth_uri`
+            None => {}
         });
 
         // Return activated `Self`

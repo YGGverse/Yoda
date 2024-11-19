@@ -27,6 +27,27 @@ impl Database {
         }
     }
 
+    // Actions
+
+    /// Create new record in database
+    pub fn add(&self, pem: &str, name: Option<&str>) -> Result<i64, Error> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap(); // @TODO
+        let tx = writable.transaction()?;
+
+        // Create new record
+        insert(&tx, *self.profile_identity_id, pem, name)?;
+
+        // Hold insert ID for result
+        let id = last_insert_id(&tx);
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(id),
+            Err(reason) => Err(reason),
+        }
+    }
+
     /// Get all records match current `profile_identity_id`
     pub fn records(&self) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO
@@ -53,6 +74,22 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         )
         .as_str(),
         [],
+    )
+}
+
+pub fn insert(
+    tx: &Transaction,
+    profile_identity_id: i64,
+    pem: &str,
+    name: Option<&str>,
+) -> Result<usize, Error> {
+    tx.execute(
+        "INSERT INTO `profile_identity_gemini` (
+            `profile_identity_id`,
+            `pem`,
+            `name`
+        ) VALUES (?, ?, ?)",
+        (profile_identity_id, pem, name),
     )
 }
 
@@ -83,4 +120,8 @@ pub fn select(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, 
     }
 
     Ok(records)
+}
+
+pub fn last_insert_id(tx: &Transaction) -> i64 {
+    tx.last_insert_rowid()
 }

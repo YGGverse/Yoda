@@ -18,6 +18,7 @@ pub struct Gemini {
     pub auth: Rc<Auth>,
     pub database: Rc<Database>,
     pub memory: Rc<Memory>,
+    profile_identity_id: Rc<i64>,
 }
 
 impl Gemini {
@@ -33,7 +34,7 @@ impl Gemini {
             Ok(auth) => Rc::new(auth),
             Err(_) => return Err(Error::AuthInit), // @TODO
         };
-        let database = Rc::new(Database::new(connection, profile_identity_id));
+        let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
         let memory = Rc::new(Memory::new());
 
         // Init `Self`
@@ -41,6 +42,7 @@ impl Gemini {
             auth,
             database,
             memory,
+            profile_identity_id,
         };
 
         // Build initial index
@@ -69,8 +71,6 @@ impl Gemini {
         };
         Ok(()) // @TODO
     }
-
-    // @TODO create new identity API
 }
 
 // Tools

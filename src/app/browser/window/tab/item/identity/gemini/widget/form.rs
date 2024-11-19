@@ -32,7 +32,7 @@ impl Form {
         gobject.append(&name.gobject);
 
         // Connect events
-        list.connect_selected_notify(move |key| name.gobject.set_visible(key.is_none()));
+        list.on_select(move |key| name.gobject.set_visible(key.is_none()));
 
         // Return activated `Self`
         Self {

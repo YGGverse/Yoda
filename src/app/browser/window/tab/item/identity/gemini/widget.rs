@@ -62,15 +62,12 @@ impl Widget {
 
     // Actions
 
-    /// Wrapper for default [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html) signal
+    /// Callback wrapper for `apply` [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
     /// * return `profile_identity_gemini_id` or new record request on `None`
-    pub fn connect_response(&self, callback: impl Fn(Option<i64>) + 'static) {
-        self.gobject.connect_response(None, move |_, response| {
-            if response == RESPONSE_APPLY.0 {
-                callback(None)
-            } else {
-                callback(None)
-            } // @TODO
+    pub fn on_apply(&self, callback: impl Fn(Option<i64>) + 'static) {
+        self.gobject.connect_response(Some(RESPONSE_APPLY.0), {
+            let form = self.form.clone();
+            move |_, _| callback(form.list.selected())
         });
     }
 
