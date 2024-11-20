@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub enum Error {
     AuthInit(super::auth::Error),
-    DatabaseIndex,
-    DatabaseRecordCreate,
-    MemoryIndex,
+    DatabaseIndex(sqlite::Error),
+    DatabaseRecordCreate(sqlite::Error),
+    MemoryIndex(i64),
     Certificate(Box<dyn std::error::Error>),
 }

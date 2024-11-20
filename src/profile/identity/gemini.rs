@@ -80,7 +80,7 @@ impl Gemini {
                     self.index()?;
                     Ok(profile_identity_gemini_id)
                 }
-                Err(_) => Err(Error::DatabaseRecordCreate),
+                Err(reason) => Err(Error::DatabaseRecordCreate(reason)),
             },
             Err(reason) => Err(Error::Certificate(reason)),
         }
@@ -96,11 +96,11 @@ impl Gemini {
             Ok(records) => {
                 for record in records {
                     if self.memory.add(record.id, record.pem).is_err() {
-                        return Err(Error::MemoryIndex); // @TODO
+                        return Err(Error::MemoryIndex(record.id));
                     }
                 }
             }
-            Err(_) => return Err(Error::DatabaseIndex), // @TODO
+            Err(reason) => return Err(Error::DatabaseIndex(reason)),
         };
         Ok(()) // @TODO
     }
