@@ -55,7 +55,7 @@ impl Gemini {
                         Value::PROFILE_IDENTITY_GEMINI_ID(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
-                            "valid: {} | auth: {}",
+                            "valid until {} | auth: {}",
                             certificate
                                 .not_valid_after()
                                 .unwrap()
