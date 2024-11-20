@@ -1,5 +1,5 @@
 #[derive(Debug)]
 pub enum Error {
-    NotFound,
-    Overwrite,
+    NotFound(i64),
+    Overwrite(i64),
 }
