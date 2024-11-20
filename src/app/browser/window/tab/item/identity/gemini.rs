@@ -66,7 +66,7 @@ impl Gemini {
                                 .gemini
                                 .auth
                                 .database
-                                .records(Some(auth_url.as_str()))
+                                .records(None)
                                 .unwrap()
                                 .iter()
                                 .filter(|this| this.profile_identity_gemini_id == identity.id)
