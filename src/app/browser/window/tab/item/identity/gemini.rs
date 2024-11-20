@@ -22,6 +22,9 @@ impl Gemini {
         // Init widget
         let widget = Rc::new(Widget::new());
 
+        // Init shared components
+        let auth_url = auth_uri.to_string();
+
         // Add new identity option
         widget
             .form
@@ -42,11 +45,24 @@ impl Gemini {
                     widget.form.list.append(
                         Some(identity.id),
                         &certificate.subject_name().unwrap(),
-                        &certificate
-                            .not_valid_after()
-                            .unwrap()
-                            .format_iso8601()
-                            .unwrap(),
+                        &format!(
+                            "valid until {} | auth: {}",
+                            certificate
+                                .not_valid_after()
+                                .unwrap()
+                                .format("%Y-%m-%d")
+                                .unwrap(),
+                            profile
+                                .identity
+                                .gemini
+                                .auth
+                                .database
+                                .records(Some(auth_url.as_str()))
+                                .unwrap()
+                                .iter()
+                                .filter(|this| this.profile_identity_gemini_id == identity.id)
+                                .count(),
+                        ),
                     );
                 }
             }
@@ -74,7 +90,7 @@ impl Gemini {
                     .identity
                     .gemini
                     .auth
-                    .apply(profile_identity_gemini_id, auth_uri.to_string().as_str())
+                    .apply(profile_identity_gemini_id, auth_url.as_str())
                     .unwrap(); //@TODO handle errors
 
                 // Reload page
