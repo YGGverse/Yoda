@@ -60,7 +60,7 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] `53` Proxy request refused
       * [ ] `59` Bad request
     * [ ] Client certificates
-      * [ ] `60` Certificate requested
+      * [x] `60` Certificate requested
       * [ ] `61` Certificate not authorized
       * [ ] `62` Certificate not valid
   * [x] [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) (by [ggemtext](https://github.com/YGGverse/ggemtext))
@@ -154,52 +154,6 @@ cargo build
 
 ## Development
 
-Quick start guide and maintenance protocol
-
-### `browser`
-
-#### Filesystem
-
-* Use [modern path pattern](https://doc.rust-lang.org/edition-guide/rust-2018/path-changes.html#no-more-modrs)
-* One module implements one GTK widget, it may include additional helper files in same location (like template, CSS or DB API)
-* For children widget - create children module, located according to hierarchy
-
-#### Codebase
-
-* Every module should be as minimal as possible, separate:
-  * different tasks
-  * massive structures
-  * structures with implementation
-* Every module must:
-  * encapsulate members - use objects, not static names (unlike native GTK actions API)
-  * implement only one public API `struct` per file (same as one file for one class)
-    * implementable `struct` is public, where it members - private
-  * contain main `struct` implementation:
-    * at least one constructor that must:
-      * have common for application names: `from`, `new` or/and `new_rc`, `new_mutex`, etc - on return object in container
-      * grant ownership for new `Self` object created
-    * public `activate` action if the new object can not be activated on construct
-    * public `link` getter for GTK `widget` (parental composition)
-* Public API oriented to simple (`integer`, `boolean`), standard (`std::*`) or system-wide (`gio`, `glib`, etc) data types usage to reduce internal dependencies from app implementation
-
-#### Database
-
-* [SQLite](https://sqlite.org) used to operate with user profile: for example, restore and save widget sessions, manage auth, history, bookmarks, etc
-* Database stored in system config directory (could be detected simply using browser tools menu)
-* Structure of table should not be modified on `CARGO_PKG_VERSION_PATCH` change
-* Every `browser` mod may have own table, where table must:
-  * contain same name as mod location, for example `app_browser_widget` for `src/app/browser/widget.rs`
-  * every table include autoincrement `id` column and parental primary ID if exist
-    * column name for parental ID must have absolute namespace prefix, for example `app_browser_id` column for `app_browser_widget` table. For example, if the table has few parental keys, column set could be `id`, `parent_one_id`, `parent_two_id`, `some_data`
-* _todo_
-  * [ ] version control for auto-migrations
-  * [x] transactions support for update operations
-
-#### GTK
-
-* Operate with [action objects](https://docs.gtk.org/gio/class.SimpleAction.html) instead of names like `win.action`. This allows to follow encapsulation, by the our goal, module must know nothing about parent presets. For example, define some action in parent, then delegate object created as construction argument
-* Started refactory on separate widgets implementation to separated mods, because widgets may contain own tables in database and require additional mods dependencies like ORM API _todo_
-
 ### Contribution
 
 * Before commit, please make sure:
@@ -213,8 +167,8 @@ Quick start guide and maintenance protocol
 
 ### Releases
 
-* Package version in repository should be increased immediately after stable release on [crates.io](https://crates.io/crates/yoda) and before apply new changes
-* Currently, profile data stored in separated sub-directories, auto-created on every `CARGO_PKG_VERSION_MAJOR` or/and `CARGO_PKG_VERSION_MINOR` change
+* Package version in repository increase after push release to [crates.io](https://crates.io/crates/yoda)
+* Until dev state, profile data stored in sub-dir match `CARGO_PKG_VERSION_MAJOR`.`CARGO_PKG_VERSION_MINOR`
 
 ### See also
 
