@@ -27,7 +27,7 @@ impl List {
         // * wanted only to append items after `DropDown` init
         let factory = SignalListItemFactory::new();
 
-        factory.connect_setup(move |_, gobject| {
+        factory.connect_setup(|_, gobject| {
             // Init row widget for dropdown item
             let widget = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
@@ -51,7 +51,7 @@ impl List {
                 .set_child(Some(&widget));
         });
 
-        factory.connect_bind(move |_, gobject| {
+        factory.connect_bind(|_, gobject| {
             // Downcast requirements
             let list_item = gobject.downcast_ref::<ListItem>().unwrap();
             let item = list_item.item().and_downcast::<Item>().unwrap();
