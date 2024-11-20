@@ -5,7 +5,7 @@ mod error;
 mod memory;
 
 use database::Database;
-use error::Error;
+pub use error::Error;
 use memory::Memory;
 
 use sqlite::{Connection, Transaction};
@@ -85,12 +85,11 @@ impl Auth {
         match self.database.records(None) {
             Ok(records) => {
                 for record in records {
-                    if self
+                    if let Err(reason) = self
                         .memory
                         .add(record.url, record.profile_identity_gemini_id)
-                        .is_err()
                     {
-                        return Err(Error::MemoryIndex);
+                        return Err(Error::Memory(reason));
                     }
                 }
             }

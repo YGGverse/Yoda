@@ -4,5 +4,5 @@ pub enum Error {
     DatabaseRecordCreate(i64, String),
     DatabaseRecordDelete(i64),
     DatabaseRecordsRead(String),
-    MemoryIndex,
+    Memory(super::memory::Error),
 }

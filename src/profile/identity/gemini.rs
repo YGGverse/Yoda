@@ -6,7 +6,7 @@ mod memory;
 
 use auth::Auth;
 use database::Database;
-use error::Error;
+pub use error::Error;
 
 use memory::Memory;
 
@@ -34,7 +34,7 @@ impl Gemini {
         // Init components
         let auth = match Auth::new(connection.clone()) {
             Ok(auth) => Rc::new(auth),
-            Err(_) => return Err(Error::AuthInit), // @TODO
+            Err(reason) => return Err(Error::AuthInit(reason)), // @TODO
         };
         let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
         let memory = Rc::new(Memory::new());

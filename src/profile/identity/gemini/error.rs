@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum Error {
-    AuthInit,
+    AuthInit(super::auth::Error),
     DatabaseIndex,
     DatabaseRecordCreate,
     MemoryIndex,

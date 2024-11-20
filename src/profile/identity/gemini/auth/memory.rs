@@ -1,5 +1,5 @@
 mod error;
-use error::Error;
+pub use error::Error;
 
 use std::{cell::RefCell, collections::HashMap};
 

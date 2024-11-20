@@ -3,7 +3,7 @@ mod error;
 mod gemini;
 
 use database::Database;
-use error::Error;
+pub use error::Error;
 use gemini::Gemini;
 
 use sqlite::{Connection, Transaction};
@@ -35,7 +35,7 @@ impl Identity {
         // Init gemini component
         let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
             Ok(result) => result,
-            Err(_) => return Err(Error::Gemini),
+            Err(reason) => return Err(Error::Gemini(reason)),
         });
 
         // Done

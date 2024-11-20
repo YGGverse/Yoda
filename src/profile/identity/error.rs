@@ -1,5 +1,5 @@
 #[derive(Debug)]
 pub enum Error {
     Database,
-    Gemini,
+    Gemini(super::gemini::Error),
 }
