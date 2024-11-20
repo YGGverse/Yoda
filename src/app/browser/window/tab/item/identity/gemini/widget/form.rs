@@ -34,6 +34,7 @@ impl Form {
         // Connect events
         list.on_select({
             let name = name.clone();
+            // Show name entry on new identity option selected
             move |key| name.gobject.set_visible(key.is_none())
         });
 
