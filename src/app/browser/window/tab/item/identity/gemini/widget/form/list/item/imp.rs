@@ -14,9 +14,9 @@ pub struct Item {
     #[property(get, set)]
     profile_identity_gemini_id: Cell<i64>,
     #[property(get, set)]
-    label: RefCell<String>,
+    title: RefCell<String>,
     #[property(get, set)]
-    is_enabled: Cell<bool>,
+    subtitle: RefCell<String>,
 }
 
 #[glib::object_subclass]

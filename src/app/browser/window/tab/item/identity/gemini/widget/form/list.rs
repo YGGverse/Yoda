@@ -1,13 +1,14 @@
 mod item;
 use item::Item;
 
+use adw::ActionRow;
 use gtk::{
     gio::{
         prelude::{Cast, CastNone},
         ListStore,
     },
     prelude::ListItemExt,
-    DropDown, Label, ListItem, SignalListItemFactory,
+    DropDown, ListItem, SignalListItemFactory,
 };
 
 pub struct List {
@@ -33,12 +34,12 @@ impl List {
             let item = list_item.item().and_downcast::<Item>().unwrap();
 
             // Update menu item
-            list_item.set_child(Some(&Label::new(Some(&item.label()))));
-
-            // @TODO
-            println!("{:?}", item.profile_identity_gemini_id_option());
-            println!("{:?}", item.label());
-            println!("{:?}", item.is_enabled());
+            list_item.set_child(Some(
+                &ActionRow::builder()
+                    .title(item.title())
+                    .subtitle(item.subtitle())
+                    .build(),
+            ));
         });
 
         // Init list `GObject`
@@ -50,10 +51,10 @@ impl List {
 
     // Actions
 
-    /// Append new item with `profile_identity_gemini_id` as `key` and label as `value`
-    pub fn append(&self, profile_identity_gemini_id: Option<i64>, label: &str, is_enabled: bool) {
+    /// Append new item
+    pub fn append(&self, profile_identity_gemini_id: Option<i64>, title: &str, subtitle: &str) {
         self.model
-            .append(&Item::new(profile_identity_gemini_id, label, is_enabled));
+            .append(&Item::new(profile_identity_gemini_id, title, subtitle));
     }
 
     // Events

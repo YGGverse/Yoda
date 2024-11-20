@@ -23,7 +23,10 @@ impl Gemini {
         let widget = Rc::new(Widget::new());
 
         // Add new identity option
-        widget.form.list.append(None, "Create new..", true);
+        widget
+            .form
+            .list
+            .append(None, "Create new..", "Auto-generated certificate");
 
         // Collect additional options from database
         match profile.identity.gemini.database.records() {
@@ -35,21 +38,15 @@ impl Gemini {
                         Err(reason) => todo!("{reason}"),
                     };
 
-                    // Get name from subject
-                    let name = certificate.subject_name().unwrap();
-
-                    // Get expiration time
-                    let expires = certificate
-                        .not_valid_after()
-                        .unwrap()
-                        .format_iso8601()
-                        .unwrap();
-
                     // Append record option
                     widget.form.list.append(
                         Some(identity.id),
-                        &format!("{name} ({expires})"),
-                        true,
+                        &certificate.subject_name().unwrap(),
+                        &certificate
+                            .not_valid_after()
+                            .unwrap()
+                            .format_iso8601()
+                            .unwrap(),
                     );
                 }
             }

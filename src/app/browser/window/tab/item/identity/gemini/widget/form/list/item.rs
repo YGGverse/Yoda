@@ -12,7 +12,7 @@ impl Item {
     // Constructors
 
     /// Create new `GObject` with formatted properties
-    pub fn new(profile_identity_gemini_id: Option<i64>, label: &str, is_enabled: bool) -> Self {
+    pub fn new(profile_identity_gemini_id: Option<i64>, title: &str, subtitle: &str) -> Self {
         Object::builder()
             .property(
                 "profile_identity_gemini_id",
@@ -21,8 +21,8 @@ impl Item {
                     None => PROFILE_IDENTITY_GEMINI_ID_NONE,
                 },
             )
-            .property("label", label)
-            .property("is_enabled", is_enabled)
+            .property("title", title)
+            .property("subtitle", subtitle)
             .build()
     }
 
