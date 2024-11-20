@@ -10,8 +10,8 @@ glib::wrapper! {
 
 // C-type property `value` conversion for `Item`
 // * values > 0 reserved for `profile_identity_gemini_id`
-const G_VALUE_CREATE_NEW_AUTH: i64 = 0;
-const G_VALUE_REMOVE_CURRENT_AUTH: i64 = -1;
+const G_VALUE_GENERATE_NEW_AUTH: i64 = 0;
+const G_VALUE_USE_GUEST_SESSION: i64 = -1;
 
 impl Item {
     // Constructors
@@ -22,8 +22,8 @@ impl Item {
             .property(
                 "value",
                 match value {
-                    Value::CREATE_NEW_AUTH => G_VALUE_CREATE_NEW_AUTH,
-                    Value::REMOVE_CURRENT_AUTH => G_VALUE_REMOVE_CURRENT_AUTH,
+                    Value::GENERATE_NEW_AUTH => G_VALUE_GENERATE_NEW_AUTH,
+                    Value::USE_GUEST_SESSION => G_VALUE_USE_GUEST_SESSION,
                     Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
                 },
             )
@@ -37,8 +37,8 @@ impl Item {
     /// Get `value` as enum `Value`
     pub fn value_enum(&self) -> Value {
         match self.value() {
-            G_VALUE_CREATE_NEW_AUTH => Value::CREATE_NEW_AUTH,
-            G_VALUE_REMOVE_CURRENT_AUTH => Value::REMOVE_CURRENT_AUTH,
+            G_VALUE_GENERATE_NEW_AUTH => Value::GENERATE_NEW_AUTH,
+            G_VALUE_USE_GUEST_SESSION => Value::USE_GUEST_SESSION,
             value => Value::PROFILE_IDENTITY_GEMINI_ID(value),
         }
     }

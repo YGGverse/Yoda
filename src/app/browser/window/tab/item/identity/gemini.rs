@@ -28,9 +28,16 @@ impl Gemini {
 
         // Add new identity option
         widget.form.list.append(
-            Value::CREATE_NEW_AUTH,
-            "Create new..",
-            "Auto-generated certificate",
+            Value::GENERATE_NEW_AUTH,
+            "Create new",
+            "Generate long-term certificate",
+        );
+
+        // Add guest option
+        widget.form.list.append(
+            Value::USE_GUEST_SESSION,
+            "Guest session",
+            "No identity for this request",
         );
 
         // Collect additional options from database
@@ -78,8 +85,8 @@ impl Gemini {
                 // Get record ID depending of user selection
                 let profile_identity_gemini_id = match response {
                     Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
-                    Value::REMOVE_CURRENT_AUTH => todo!(),
-                    Value::CREATE_NEW_AUTH => profile
+                    Value::USE_GUEST_SESSION => todo!(),
+                    Value::GENERATE_NEW_AUTH => profile
                         .identity
                         .gemini
                         .create(None, widget.form.name.value().as_deref())

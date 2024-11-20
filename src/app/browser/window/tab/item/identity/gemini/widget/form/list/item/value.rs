@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum Value {
-    CREATE_NEW_AUTH,
-    REMOVE_CURRENT_AUTH,
+    GENERATE_NEW_AUTH,
+    USE_GUEST_SESSION,
     PROFILE_IDENTITY_GEMINI_ID(i64),
 }

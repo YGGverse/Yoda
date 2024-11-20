@@ -36,7 +36,7 @@ impl Form {
             let name = name.clone();
             move |key| {
                 name.gobject.set_visible(match key {
-                    Value::CREATE_NEW_AUTH => true,
+                    Value::GENERATE_NEW_AUTH => true,
                     _ => false,
                 })
             }
