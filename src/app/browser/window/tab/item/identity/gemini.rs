@@ -29,18 +29,18 @@ impl Gemini {
         // Set first record selected by default
         let mut selected: u32 = 0;
 
-        // Add new identity option
-        widget.form.list.append(
-            Value::GENERATE_NEW_AUTH,
-            "Create new",
-            "Generate long-term certificate",
-        );
-
         // Add guest option
         widget.form.list.append(
             Value::USE_GUEST_SESSION,
             "Guest session",
             "No identity for this request",
+        );
+
+        // Add new identity option
+        widget.form.list.append(
+            Value::GENERATE_NEW_AUTH,
+            "Create new",
+            "Generate long-term certificate",
         );
 
         // Collect additional options from database
