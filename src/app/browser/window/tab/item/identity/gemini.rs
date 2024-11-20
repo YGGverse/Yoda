@@ -35,6 +35,9 @@ impl Gemini {
                         Err(reason) => todo!("{reason}"),
                     };
 
+                    // Get name from subject
+                    let name = certificate.subject_name().unwrap();
+
                     // Get expiration time
                     let expires = certificate
                         .not_valid_after()
@@ -45,10 +48,7 @@ impl Gemini {
                     // Append record option
                     widget.form.list.append(
                         Some(identity.id),
-                        &match identity.name {
-                            Some(name) => format!("{name} ({expires})"),
-                            None => format!("{expires}"),
-                        },
+                        &format!("{name} ({expires})"),
                         true,
                     );
                 }
@@ -60,6 +60,7 @@ impl Gemini {
         widget.on_apply({
             let widget = widget.clone();
             move |response| {
+                // Get record ID depending of user selection
                 let profile_identity_gemini_id = match response {
                     // Use selected identity
                     Some(id) => id,
@@ -78,6 +79,9 @@ impl Gemini {
                     .auth
                     .apply(profile_identity_gemini_id, auth_uri.to_string().as_str())
                     .unwrap(); //@TODO handle errors
+
+                // Reload page
+                // @TODO
             }
         });
 

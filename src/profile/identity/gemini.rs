@@ -75,7 +75,7 @@ impl Gemini {
                 None => "unknown",    // @TODO randomize
             },
         ) {
-            Ok(pem) => match self.database.add(&pem, name) {
+            Ok(pem) => match self.database.add(&pem) {
                 Ok(profile_identity_gemini_id) => {
                     self.index()?;
                     Ok(profile_identity_gemini_id)

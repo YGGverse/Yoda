@@ -6,7 +6,6 @@ use database::Database;
 use error::Error;
 use gemini::Gemini;
 
-use gtk::glib::DateTime;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -27,7 +26,7 @@ impl Identity {
         // Get active identity set for profile or create new one
         let profile_identity_id = Rc::new(match database.active() {
             Some(identity) => identity.id,
-            None => match database.add(profile_id, true, DateTime::now_local().unwrap(), None) {
+            None => match database.add(profile_id, true) {
                 Ok(id) => id,
                 Err(_) => return Err(Error::Database),
             },

@@ -1,13 +1,10 @@
 use sqlite::{Connection, Error, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
-pub const NAME_MAX_LEN: i32 = 36;
-
 pub struct Table {
     pub id: i64,
     //pub profile_identity_id: i64,
     pub pem: String,
-    pub name: Option<String>,
 }
 
 /// Storage for Gemini auth certificates
@@ -30,13 +27,13 @@ impl Database {
     // Actions
 
     /// Create new record in database
-    pub fn add(&self, pem: &str, name: Option<&str>) -> Result<i64, Error> {
+    pub fn add(&self, pem: &str) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
 
         // Create new record
-        insert(&tx, *self.profile_identity_id, pem, name)?;
+        insert(&tx, *self.profile_identity_id, pem)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -60,36 +57,25 @@ impl Database {
 
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
     tx.execute(
-        format!(
-            "CREATE TABLE IF NOT EXISTS `profile_identity_gemini`
-            (
-                `id`                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `profile_identity_id` INTEGER NOT NULL,
-                `pem`                 TEXT NOT NULL,
-                `name`                VARCHAR({}),
+        "CREATE TABLE IF NOT EXISTS `profile_identity_gemini`
+        (
+            `id`                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `profile_identity_id` INTEGER NOT NULL,
+            `pem`                 TEXT NOT NULL,
 
-                FOREIGN KEY (`profile_identity_id`) REFERENCES `profile_identity`(`id`)
-            )",
-            NAME_MAX_LEN
-        )
-        .as_str(),
+            FOREIGN KEY (`profile_identity_id`) REFERENCES `profile_identity`(`id`)
+        )",
         [],
     )
 }
 
-pub fn insert(
-    tx: &Transaction,
-    profile_identity_id: i64,
-    pem: &str,
-    name: Option<&str>,
-) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_identity_id: i64, pem: &str) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_identity_gemini` (
             `profile_identity_id`,
-            `pem`,
-            `name`
-        ) VALUES (?, ?, ?)",
-        (profile_identity_id, pem, name),
+            `pem`
+        ) VALUES (?, ?)",
+        (profile_identity_id, pem),
     )
 }
 
@@ -97,8 +83,7 @@ pub fn select(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, 
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_id`,
-                `pem`,
-                `name`
+                `pem`
 
         FROM `profile_identity_gemini` WHERE `profile_identity_id` = ?",
     )?;
@@ -108,7 +93,6 @@ pub fn select(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, 
             id: row.get(0)?,
             //profile_identity_id: row.get(1)?,
             pem: row.get(2)?,
-            name: row.get(3)?,
         })
     })?;
 

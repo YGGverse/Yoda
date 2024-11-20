@@ -1,4 +1,3 @@
-use gtk::glib::DateTime;
 use sqlite::{Connection, Error, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -6,8 +5,6 @@ pub struct Table {
     pub id: i64,
     pub profile_id: i64,
     pub is_active: bool,
-    pub time: DateTime,
-    pub name: Option<String>,
 }
 
 pub struct Database {
@@ -39,13 +36,7 @@ impl Database {
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(
-        &self,
-        profile_id: Rc<i64>,
-        is_active: bool,
-        time: DateTime,
-        name: Option<String>,
-    ) -> Result<i64, ()> {
+    pub fn add(&self, profile_id: Rc<i64>, is_active: bool) -> Result<i64, ()> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction().unwrap();
@@ -54,19 +45,12 @@ impl Database {
         if is_active {
             // Deactivate other records as only one profile should be active
             for record in select(&tx).unwrap() {
-                let _ = update(
-                    &tx,
-                    record.profile_id,
-                    record.id,
-                    false,
-                    record.time,
-                    record.name,
-                );
+                let _ = update(&tx, record.profile_id, record.id, false);
             }
         }
 
         // Create new record
-        insert(&tx, profile_id, is_active, time, name).unwrap();
+        insert(&tx, profile_id, is_active).unwrap();
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -88,8 +72,6 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
             `is_active`  INTEGER NOT NULL,
-            `time`       INTEGER NOT NULL,
-            `name`       VARCHAR(255),
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
         )",
@@ -97,55 +79,34 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(
-    tx: &Transaction,
-    profile_id: Rc<i64>,
-    is_active: bool,
-    time: DateTime,
-    name: Option<String>,
-) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_id: Rc<i64>, is_active: bool) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_identity` (
             `profile_id`,
-            `is_active`,
-            `time`,
-            `name`
-        ) VALUES (?, ?, ?, ?)",
-        (profile_id, is_active, time.to_unix(), name),
+            `is_active`
+        ) VALUES (?, ?)",
+        (profile_id, is_active),
     )
 }
 
-pub fn update(
-    tx: &Transaction,
-    id: i64,
-    profile_id: i64,
-    is_active: bool,
-    time: DateTime,
-    name: Option<String>,
-) -> Result<usize, Error> {
+pub fn update(tx: &Transaction, id: i64, profile_id: i64, is_active: bool) -> Result<usize, Error> {
     tx.execute(
         "UPDATE `profile_identity`
         SET `profile_id` = ?,
-            `is_active`  = ?,
-            `time`       = ?,
-            `name`       = ?
+            `is_active`  = ?
         WHERE
             `id` = ?",
-        (profile_id, is_active, time.to_unix(), name, id),
+        (profile_id, is_active, id),
     )
 }
 
 pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
-    let mut stmt = tx.prepare(
-        "SELECT `id`, `profile_id`, `is_active`, `time`, `name` FROM `profile_identity`",
-    )?;
+    let mut stmt = tx.prepare("SELECT `id`, `profile_id`, `is_active` FROM `profile_identity`")?;
     let result = stmt.query_map([], |row| {
         Ok(Table {
             id: row.get(0)?,
             profile_id: row.get(1)?,
             is_active: row.get(2)?,
-            time: DateTime::from_unix_local(row.get(3)?).unwrap(),
-            name: row.get(4)?,
         })
     })?;
 
