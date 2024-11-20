@@ -34,7 +34,7 @@ impl Gemini {
         // Init components
         let auth = match Auth::new(connection.clone()) {
             Ok(auth) => Rc::new(auth),
-            Err(reason) => return Err(Error::AuthInit(reason)), // @TODO
+            Err(reason) => return Err(Error::AuthInit(reason)),
         };
         let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
         let memory = Rc::new(Memory::new());

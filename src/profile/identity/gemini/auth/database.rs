@@ -78,11 +78,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `url`                        VARCHAR(1024) NOT NULL,
 
             FOREIGN KEY (`profile_identity_gemini_id`) REFERENCES `profile_identity_gemini`(`id`),
-
-            UNIQUE (
-                `profile_identity_gemini_id`,
-                `url`
-            )
+            UNIQUE (`url`)
         )",
         [],
     )

@@ -89,7 +89,7 @@ impl Auth {
                         .memory
                         .add(record.url, record.profile_identity_gemini_id)
                     {
-                        return Err(Error::Memory(reason));
+                        return Err(Error::MemoryIndex(reason));
                     }
                 }
             }
