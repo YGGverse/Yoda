@@ -1,5 +1,5 @@
-mod item;
-use item::Item;
+pub mod item;
+use item::{value::Value, Item};
 
 use gtk::{
     gio::{
@@ -84,34 +84,33 @@ impl List {
     // Actions
 
     /// Append new item
-    pub fn append(&self, profile_identity_gemini_id: Option<i64>, title: &str, subtitle: &str) {
-        self.model
-            .append(&Item::new(profile_identity_gemini_id, title, subtitle));
+    pub fn append(&self, value: Value, title: &str, subtitle: &str) {
+        self.model.append(&Item::new(value, title, subtitle));
     }
 
     // Events
 
     /// Run callback function on `connect_selected_notify` event
-    /// * return formatted `profile_identity_gemini_id` match selected item
-    pub fn on_select(&self, callback: impl Fn(Option<i64>) + 'static) {
+    /// * return `Value` enum match selected item
+    pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
         self.gobject.connect_selected_notify(move |list| {
             callback(
                 list.selected_item()
                     .and_downcast::<Item>()
                     .unwrap()
-                    .profile_identity_gemini_id_option(),
+                    .value_enum(),
             )
         });
     }
 
     // Getters
 
-    /// Get formatted `profile_identity_gemini_id` **option** match selected item
-    pub fn selected(&self) -> Option<i64> {
+    /// Get formatted `value` match selected item
+    pub fn selected(&self) -> Value {
         self.gobject
             .selected_item()
             .and_downcast::<Item>()
             .unwrap()
-            .profile_identity_gemini_id_option()
+            .value_enum()
     }
 }

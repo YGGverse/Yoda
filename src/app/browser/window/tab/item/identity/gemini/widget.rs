@@ -1,6 +1,5 @@
-mod form;
-
-use form::Form;
+pub mod form;
+use form::{list::item::value::Value, Form};
 
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
@@ -63,8 +62,8 @@ impl Widget {
     // Actions
 
     /// Callback wrapper for `apply` [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
-    /// * return `profile_identity_gemini_id` or new record request on `None`
-    pub fn on_apply(&self, callback: impl Fn(Option<i64>) + 'static) {
+    /// * return `Value` enum or new record request on `None`
+    pub fn on_apply(&self, callback: impl Fn(Value) + 'static) {
         self.gobject.connect_response(Some(RESPONSE_APPLY.0), {
             let form = self.form.clone();
             move |_, _| callback(form.list.selected())

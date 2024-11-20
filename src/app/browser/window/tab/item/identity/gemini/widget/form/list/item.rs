@@ -1,24 +1,29 @@
 mod imp;
+pub mod value;
+
 use gtk::glib::{self, Object};
+use value::Value;
 
 glib::wrapper! {
     pub struct Item(ObjectSubclass<imp::Item>);
 }
 
-// C-type conversion
-const OPTION_NEW: i64 = -1;
+// C-type property `value` conversion for `Item`
+const CREATE_NEW_AUTH: i64 = 0;
+const REMOVE_CURRENT_AUTH: i64 = -1;
 
 impl Item {
     // Constructors
 
     /// Create new `GObject` with formatted properties
-    pub fn new(profile_identity_gemini_id: Option<i64>, title: &str, subtitle: &str) -> Self {
+    pub fn new(value: Value, title: &str, subtitle: &str) -> Self {
         Object::builder()
             .property(
-                "profile_identity_gemini_id",
-                match profile_identity_gemini_id {
-                    Some(value) => value,
-                    None => OPTION_NEW,
+                "value",
+                match value {
+                    Value::CREATE_NEW_AUTH => CREATE_NEW_AUTH,
+                    Value::REMOVE_CURRENT_AUTH => REMOVE_CURRENT_AUTH,
+                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
                 },
             )
             .property("title", title)
@@ -28,11 +33,12 @@ impl Item {
 
     // Getters
 
-    /// Additional `profile_identity_gemini_id` wrapper with `Option` value support
-    pub fn profile_identity_gemini_id_option(&self) -> Option<i64> {
-        match self.profile_identity_gemini_id() {
-            OPTION_NEW => None,
-            value => Some(value),
+    /// Get `value` as enum `Value`
+    pub fn value_enum(&self) -> Value {
+        match self.value() {
+            CREATE_NEW_AUTH => Value::CREATE_NEW_AUTH,
+            REMOVE_CURRENT_AUTH => Value::REMOVE_CURRENT_AUTH,
+            value => Value::PROFILE_IDENTITY_GEMINI_ID(value),
         }
     }
 }

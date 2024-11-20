@@ -1,5 +1,5 @@
 mod widget;
-use widget::Widget;
+use widget::{form::list::item::value::Value, Widget};
 
 use crate::app::browser::window::Action;
 use crate::profile::Profile;
@@ -27,10 +27,11 @@ impl Gemini {
         let auth_url = auth_uri.to_string();
 
         // Add new identity option
-        widget
-            .form
-            .list
-            .append(None, "Create new..", "Auto-generated certificate");
+        widget.form.list.append(
+            Value::CREATE_NEW_AUTH,
+            "Create new..",
+            "Auto-generated certificate",
+        );
 
         // Collect additional options from database
         match profile.identity.gemini.database.records() {
@@ -44,7 +45,7 @@ impl Gemini {
 
                     // Append record option
                     widget.form.list.append(
-                        Some(identity.id),
+                        Value::PROFILE_IDENTITY_GEMINI_ID(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
                             "valid: {} | auth: {}",
@@ -76,10 +77,9 @@ impl Gemini {
             move |response| {
                 // Get record ID depending of user selection
                 let profile_identity_gemini_id = match response {
-                    // Use selected identity
-                    Some(id) => id,
-                    // Create new identity, get last insert ID
-                    None => profile
+                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
+                    Value::REMOVE_CURRENT_AUTH => todo!(),
+                    Value::CREATE_NEW_AUTH => profile
                         .identity
                         .gemini
                         .create(None, widget.form.name.value().as_deref())

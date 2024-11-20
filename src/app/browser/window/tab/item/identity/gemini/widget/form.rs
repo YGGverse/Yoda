@@ -1,7 +1,7 @@
-mod list;
+pub mod list;
 mod name;
 
-use list::List;
+use list::{item::value::Value, List};
 use name::Name;
 
 use gtk::{
@@ -34,8 +34,12 @@ impl Form {
         // Connect events
         list.on_select({
             let name = name.clone();
-            // Show name entry on new identity option selected
-            move |key| name.gobject.set_visible(key.is_none())
+            move |key| {
+                name.gobject.set_visible(match key {
+                    Value::CREATE_NEW_AUTH => true,
+                    _ => false,
+                })
+            }
         });
 
         // Return activated `Self`

@@ -12,7 +12,7 @@ use std::cell::{Cell, RefCell};
 #[properties(wrapper_type = super::Item)]
 pub struct Item {
     #[property(get, set)]
-    profile_identity_gemini_id: Cell<i64>,
+    value: Cell<i64>,
     #[property(get, set)]
     title: RefCell<String>,
     #[property(get, set)]
