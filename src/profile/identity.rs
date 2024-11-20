@@ -35,7 +35,7 @@ impl Identity {
         // Init gemini component
         let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
             Ok(result) => result,
-            Err(reason) => return Err(Error::Gemini(reason)),
+            Err(reason) => return Err(Error::GeminiInit(reason)),
         });
 
         // Done
