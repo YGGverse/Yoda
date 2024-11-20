@@ -6,7 +6,7 @@ use gtk::{
         prelude::{Cast, CastNone},
         ListStore,
     },
-    prelude::{BoxExt, ListItemExt},
+    prelude::{BoxExt, ListItemExt, WidgetExt},
     Align, Box, DropDown, Label, ListItem, SignalListItemFactory,
 };
 
@@ -23,39 +23,58 @@ impl List {
         // Init model with custom `GObject` properties
         let model = ListStore::new::<Item>();
 
-        // Setup item factory to append items after `DropDown` init
+        // Setup item factory
+        // * wanted only to append items after `DropDown` init
         let factory = SignalListItemFactory::new();
 
-        // @TODO factory.connect_setup(move |_, gobject| {});
-        factory.connect_bind(move |_, gobject| {
-            // Cast components
-            let list_item = gobject.downcast_ref::<ListItem>().unwrap();
-            let item = list_item.item().and_downcast::<Item>().unwrap();
-
-            // Build row widget
-            let child = Box::builder()
+        factory.connect_setup(move |_, gobject| {
+            // Init row widget for dropdown item
+            let widget = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
                 .build();
 
-            child.append(
-                &Label::builder()
-                    .halign(Align::Start)
-                    .label(item.title())
-                    .build(),
-            );
+            // Title
+            widget.append(&Label::builder().halign(Align::Start).build());
 
-            child.append(
+            // Subtitle
+            widget.append(
                 &Label::builder()
                     .halign(Align::Start)
-                    .label(item.subtitle())
                     .css_classes(["caption", "dim-label"])
                     .build(),
             );
+
             // Update menu item
-            list_item.set_child(Some(&child));
+            gobject
+                .downcast_ref::<ListItem>()
+                .unwrap()
+                .set_child(Some(&widget));
         });
 
-        // Init list `GObject`
+        factory.connect_bind(move |_, gobject| {
+            // Downcast requirements
+            let list_item = gobject.downcast_ref::<ListItem>().unwrap();
+            let item = list_item.item().and_downcast::<Item>().unwrap();
+            let container = list_item.child().and_downcast::<Box>().unwrap();
+
+            // Update Title (expected as the first child)
+            container
+                .first_child()
+                .unwrap()
+                .downcast::<Label>()
+                .unwrap()
+                .set_label(&item.title());
+
+            // Update Subtitle (expected as the last child)
+            container
+                .last_child()
+                .unwrap()
+                .downcast::<Label>()
+                .unwrap()
+                .set_label(&item.subtitle());
+        });
+
+        // Init main `GObject`
         let gobject = DropDown::builder().model(&model).factory(&factory).build();
 
         // Return activated `Self`
