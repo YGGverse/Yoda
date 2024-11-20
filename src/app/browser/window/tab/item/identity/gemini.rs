@@ -46,7 +46,7 @@ impl Gemini {
                         Some(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
-                            "valid until {} | auth: {}",
+                            "valid: {} | auth: {}",
                             certificate
                                 .not_valid_after()
                                 .unwrap()
