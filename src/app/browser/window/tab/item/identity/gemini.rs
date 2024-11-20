@@ -85,12 +85,12 @@ impl Gemini {
                         .unwrap(), // @TODO
                 };
 
-                // Apply identity for given `auth_uri`
+                // Activate identity for given `auth_uri`
                 profile
                     .identity
                     .gemini
                     .auth
-                    .apply(profile_identity_gemini_id, auth_url.as_str())
+                    .activate(profile_identity_gemini_id, auth_url.as_str())
                     .unwrap(); //@TODO handle errors
 
                 // Reload page
