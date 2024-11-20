@@ -51,7 +51,7 @@ impl Item {
         let page = Rc::new(Page::new(
             id.clone(),
             profile.clone(),
-            (actions.0, actions.1, action.clone()),
+            (actions.0, actions.1.clone(), action.clone()),
         ));
 
         let widget = Rc::new(Widget::new(
@@ -86,7 +86,8 @@ impl Item {
                 if let Some(uri) = page.navigation().request().uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
-                        return identity::new_gemini(profile.clone(), uri).present(Some(&parent));
+                        return identity::new_gemini(profile.clone(), actions.1.clone(), uri)
+                            .present(Some(&parent));
                     }
                 }
                 // Show dialog with unsupported request message

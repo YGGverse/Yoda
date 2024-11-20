@@ -1,6 +1,7 @@
 mod widget;
 use widget::Widget;
 
+use crate::app::browser::window::Action;
 use crate::profile::Profile;
 use gtk::{
     gio::{prelude::TlsCertificateExt, TlsCertificate},
@@ -18,7 +19,7 @@ impl Gemini {
     // Construct
 
     /// Create new `Self` for given Profile
-    pub fn new(profile: Rc<Profile>, auth_uri: Uri) -> Self {
+    pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_uri: Uri) -> Self {
         // Init widget
         let widget = Rc::new(Widget::new());
 
@@ -86,15 +87,15 @@ impl Gemini {
                 };
 
                 // Activate identity for given `auth_uri`
-                profile
+                match profile
                     .identity
                     .gemini
                     .auth
                     .activate(profile_identity_gemini_id, auth_url.as_str())
-                    .unwrap(); //@TODO handle errors
-
-                // Reload page
-                // @TODO
+                {
+                    Ok(_) => action.reload().activate(),
+                    Err(reason) => todo!("{:?}", reason),
+                }
             }
         });
 
