@@ -44,7 +44,7 @@ impl Gemini {
                     // Append record option
                     widget.form.list.append(
                         Some(identity.id),
-                        &certificate.subject_name().unwrap(),
+                        &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
                             "valid until {} | auth: {}",
                             certificate
