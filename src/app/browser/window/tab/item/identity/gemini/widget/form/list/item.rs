@@ -9,20 +9,21 @@ glib::wrapper! {
 }
 
 // C-type property `value` conversion for `Item`
-const CREATE_NEW_AUTH: i64 = 0;
-const REMOVE_CURRENT_AUTH: i64 = -1;
+// * values > 0 reserved for `profile_identity_gemini_id`
+const G_VALUE_CREATE_NEW_AUTH: i64 = 0;
+const G_VALUE_REMOVE_CURRENT_AUTH: i64 = -1;
 
 impl Item {
     // Constructors
 
-    /// Create new `GObject` with formatted properties
+    /// Create new `GObject`
     pub fn new(value: Value, title: &str, subtitle: &str) -> Self {
         Object::builder()
             .property(
                 "value",
                 match value {
-                    Value::CREATE_NEW_AUTH => CREATE_NEW_AUTH,
-                    Value::REMOVE_CURRENT_AUTH => REMOVE_CURRENT_AUTH,
+                    Value::CREATE_NEW_AUTH => G_VALUE_CREATE_NEW_AUTH,
+                    Value::REMOVE_CURRENT_AUTH => G_VALUE_REMOVE_CURRENT_AUTH,
                     Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
                 },
             )
@@ -36,8 +37,8 @@ impl Item {
     /// Get `value` as enum `Value`
     pub fn value_enum(&self) -> Value {
         match self.value() {
-            CREATE_NEW_AUTH => Value::CREATE_NEW_AUTH,
-            REMOVE_CURRENT_AUTH => Value::REMOVE_CURRENT_AUTH,
+            G_VALUE_CREATE_NEW_AUTH => Value::CREATE_NEW_AUTH,
+            G_VALUE_REMOVE_CURRENT_AUTH => Value::REMOVE_CURRENT_AUTH,
             value => Value::PROFILE_IDENTITY_GEMINI_ID(value),
         }
     }
