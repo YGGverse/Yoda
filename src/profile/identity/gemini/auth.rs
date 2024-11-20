@@ -41,38 +41,44 @@ impl Auth {
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_gemini_auth_id` on success
-    pub fn activate(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
-        // Get all records match request
+    pub fn add(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
+        // Cleanup records match `url` (unauthorize)
+        self.remove(url)?;
+
+        // Create new record (auth)
+        let profile_identity_gemini_auth_id =
+            match self.database.add(profile_identity_gemini_id, url) {
+                Ok(id) => id,
+                Err(reason) => {
+                    return Err(Error::DatabaseRecordCreate(
+                        profile_identity_gemini_id,
+                        url.to_string(),
+                        reason,
+                    ))
+                }
+            };
+
+        // Reindex
+        self.index()?;
+
+        // Done
+        Ok(profile_identity_gemini_auth_id)
+    }
+
+    /// Remove all records match request (unauthorize)
+    pub fn remove(&self, url: &str) -> Result<(), Error> {
         match self.database.records(Some(url)) {
             Ok(records) => {
-                // Cleanup records match `url` (unauth)
                 for record in records {
                     if let Err(reason) = self.database.delete(record.id) {
                         return Err(Error::DatabaseRecordDelete(record.id, reason));
                     }
                 }
-
-                // Create new record (auth)
-                let profile_identity_gemini_auth_id =
-                    match self.database.add(profile_identity_gemini_id, url) {
-                        Ok(id) => id,
-                        Err(reason) => {
-                            return Err(Error::DatabaseRecordCreate(
-                                profile_identity_gemini_id,
-                                url.to_string(),
-                                reason,
-                            ))
-                        }
-                    };
-
-                // Reindex
-                self.index()?;
-
-                // Done
-                Ok(profile_identity_gemini_auth_id)
             }
             Err(reason) => return Err(Error::DatabaseRecordsRead(url.to_string(), reason)),
         }
+        self.index()?;
+        Ok(())
     }
 
     /// Create new `Memory` index from `Database` for `Self`

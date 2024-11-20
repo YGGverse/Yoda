@@ -82,27 +82,43 @@ impl Gemini {
         widget.on_apply({
             let widget = widget.clone();
             move |response| {
-                // Get record ID depending of user selection
-                let profile_identity_gemini_id = match response {
-                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
-                    Value::USE_GUEST_SESSION => todo!(),
-                    Value::GENERATE_NEW_AUTH => profile
-                        .identity
-                        .gemini
-                        .create(None, widget.form.name.value().as_deref())
-                        .unwrap(), // @TODO
+                // Get option match user choice
+                let option = match response {
+                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => Some(value),
+                    Value::USE_GUEST_SESSION => None,
+                    Value::GENERATE_NEW_AUTH => Some(
+                        profile
+                            .identity
+                            .gemini
+                            .create(None, widget.form.name.value().as_deref())
+                            .unwrap(), // @TODO handle result,
+                    ),
                 };
 
-                // Activate identity for given `auth_uri`
-                match profile
-                    .identity
-                    .gemini
-                    .auth
-                    .activate(profile_identity_gemini_id, auth_url.as_str())
-                {
-                    Ok(_) => action.reload().activate(),
-                    Err(reason) => todo!("{:?}", reason),
+                // Apply
+                match option {
+                    // Activate identity for `auth_uri`
+                    Some(profile_identity_gemini_id) => {
+                        profile
+                            .identity
+                            .gemini
+                            .auth
+                            .add(profile_identity_gemini_id, auth_url.as_str())
+                            .unwrap();
+                    }
+                    // Remove all identity auths for `auth_uri`
+                    None => {
+                        profile
+                            .identity
+                            .gemini
+                            .auth
+                            .remove(auth_url.as_str())
+                            .unwrap();
+                    }
                 }
+
+                // Update page
+                action.reload().activate();
             }
         });
 
