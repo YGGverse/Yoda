@@ -28,7 +28,7 @@ impl Memory {
             .borrow_mut()
             .insert(url, profile_identity_gemini_id)
         {
-            Some(_) => Err(Error::Overwrite), // @TODO prevent?
+            Some(key) => Err(Error::Overwrite(key)), // @TODO prevent?
             None => Ok(()),
         }
     }
