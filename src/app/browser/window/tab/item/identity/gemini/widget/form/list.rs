@@ -1,14 +1,13 @@
 mod item;
 use item::Item;
 
-use adw::ActionRow;
 use gtk::{
     gio::{
         prelude::{Cast, CastNone},
         ListStore,
     },
-    prelude::ListItemExt,
-    DropDown, ListItem, SignalListItemFactory,
+    prelude::{BoxExt, ListItemExt},
+    Align, Box, DropDown, Label, ListItem, SignalListItemFactory,
 };
 
 pub struct List {
@@ -33,13 +32,27 @@ impl List {
             let list_item = gobject.downcast_ref::<ListItem>().unwrap();
             let item = list_item.item().and_downcast::<Item>().unwrap();
 
-            // Update menu item
-            list_item.set_child(Some(
-                &ActionRow::builder()
-                    .title(item.title())
-                    .subtitle(item.subtitle())
+            // Build row widget
+            let child = Box::builder()
+                .orientation(gtk::Orientation::Vertical)
+                .build();
+
+            child.append(
+                &Label::builder()
+                    .halign(Align::Start)
+                    .label(item.title())
                     .build(),
-            ));
+            );
+
+            child.append(
+                &Label::builder()
+                    .halign(Align::Start)
+                    .label(item.subtitle())
+                    .css_classes(["caption", "dim-label"])
+                    .build(),
+            );
+            // Update menu item
+            list_item.set_child(Some(&child));
         });
 
         // Init list `GObject`
