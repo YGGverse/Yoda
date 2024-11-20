@@ -45,12 +45,10 @@ impl Auth {
         // Get all records match request
         match self.database.records(Some(url)) {
             Ok(records) => {
-                // Cleanup records match `profile_identity_gemini_id` (unauth)
+                // Cleanup records match `url` (unauth)
                 for record in records {
-                    if record.profile_identity_gemini_id == profile_identity_gemini_id {
-                        if self.database.delete(record.id).is_err() {
-                            return Err(Error::DatabaseRecordDelete(record.id));
-                        }
+                    if let Err(reason) = self.database.delete(record.id) {
+                        return Err(Error::DatabaseRecordDelete(record.id, reason));
                     }
                 }
 
@@ -58,10 +56,11 @@ impl Auth {
                 let profile_identity_gemini_auth_id =
                     match self.database.add(profile_identity_gemini_id, url) {
                         Ok(id) => id,
-                        Err(_) => {
+                        Err(reason) => {
                             return Err(Error::DatabaseRecordCreate(
                                 profile_identity_gemini_id,
                                 url.to_string(),
+                                reason,
                             ))
                         }
                     };
