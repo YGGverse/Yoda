@@ -71,7 +71,7 @@ impl Auth {
                 // Done
                 Ok(profile_identity_gemini_auth_id)
             }
-            Err(_) => return Err(Error::DatabaseRecordsRead(url.to_string())),
+            Err(reason) => return Err(Error::DatabaseRecordsRead(url.to_string(), reason)),
         }
     }
 
@@ -92,7 +92,7 @@ impl Auth {
                     }
                 }
             }
-            Err(_) => return Err(Error::DatabaseIndex),
+            Err(reason) => return Err(Error::DatabaseIndex(reason)),
         }
         Ok(())
     }
