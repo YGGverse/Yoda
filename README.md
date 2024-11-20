@@ -167,8 +167,8 @@ cargo build
 
 ### Releases
 
-* Package version in repository increase after push release to [crates.io](https://crates.io/crates/yoda)
-* Until dev state, profile data stored in sub-dir match `CARGO_PKG_VERSION_MAJOR`.`CARGO_PKG_VERSION_MINOR`
+* Package version in repository increase after [crates.io](https://crates.io/crates/yoda) release
+* Until DB migration not implemented, app will create new profile on `CARGO_PKG_VERSION_MAJOR`.`CARGO_PKG_VERSION_MINOR` change
 
 ### See also
 
