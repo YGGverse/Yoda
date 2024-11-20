@@ -26,6 +26,9 @@ impl Gemini {
         // Init shared components
         let auth_url = auth_uri.to_string();
 
+        // Set first record selected by default
+        let mut selected: u32 = 0;
+
         // Add new identity option
         widget.form.list.append(
             Value::GENERATE_NEW_AUTH,
@@ -41,9 +44,12 @@ impl Gemini {
         );
 
         // Collect additional options from database
+        let mut i = 1; // start from 2'th
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
+                    i += 1;
+
                     // Get certificate details
                     let certificate = match TlsCertificate::from_pem(&identity.pem) {
                         Ok(certificate) => certificate,
@@ -73,7 +79,26 @@ impl Gemini {
                                 .count(),
                         ),
                     );
+
+                    // Is selected?
+                    if profile
+                        .identity
+                        .gemini
+                        .auth
+                        .database
+                        .records(Some(auth_url.as_str()))
+                        .unwrap()
+                        .iter()
+                        .filter(|this| this.profile_identity_gemini_id == identity.id)
+                        .count()
+                        > 0
+                    {
+                        selected = i;
+                    }
                 }
+
+                // Select list item
+                widget.form.list.gobject.set_selected(selected);
             }
             Err(_) => todo!(),
         }
