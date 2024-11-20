@@ -28,7 +28,7 @@ impl List {
         let factory = SignalListItemFactory::new();
 
         factory.connect_setup(|_, gobject| {
-            // Init row widget for dropdown item
+            // Init widget for dropdown item
             let widget = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
                 .build();
@@ -44,7 +44,7 @@ impl List {
                     .build(),
             );
 
-            // Update menu item
+            // Done
             gobject
                 .downcast_ref::<ListItem>()
                 .unwrap()
@@ -57,7 +57,7 @@ impl List {
             let item = list_item.item().and_downcast::<Item>().unwrap();
             let container = list_item.child().and_downcast::<Box>().unwrap();
 
-            // Update Title (expected as the first child)
+            // Update `title` (expected as the first child)
             container
                 .first_child()
                 .unwrap()
@@ -65,7 +65,7 @@ impl List {
                 .unwrap()
                 .set_label(&item.title());
 
-            // Update Subtitle (expected as the last child)
+            // Update `subtitle` (expected as the last child)
             container
                 .last_child()
                 .unwrap()
