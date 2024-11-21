@@ -19,7 +19,11 @@ impl File {
     /// Create new `Self`
     pub fn new(action: Rc<Action>) -> Self {
         // Init `GObject`
-        let gobject = Button::builder().label(LABEL).margin_top(MARGIN).build();
+        let gobject = Button::builder()
+            .label(LABEL)
+            .margin_top(MARGIN)
+            .visible(false)
+            .build();
 
         // Init events
         gobject.connect_clicked(move |_| todo!());
