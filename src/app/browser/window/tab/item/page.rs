@@ -435,7 +435,11 @@ impl Page {
                 let tls_connection =
                     TlsClientConnection::new(&connection, Some(&connectable)).unwrap(); // @TODO handle
                 tls_connection.set_certificate(&certificate);
-                tls_connection.connect_accept_certificate(move |_, _, _| true); // @TODO manual validation
+
+                // @TODO manual validation
+                // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
+                tls_connection.connect_accept_certificate(move |_, _, _| true);
+
                 tls_connection.upcast::<IOStream>()
             } else {
                 connection.upcast::<IOStream>()
@@ -487,14 +491,13 @@ impl Page {
                     SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
                     SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
                     SocketClientEvent::TlsHandshaking => {
-                        // Handle certificate errors here
+                        // Handle certificate errors @TODO
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
                         stream
                             .unwrap()
                             .dynamic_cast_ref::<TlsClientConnection>()
                             .unwrap()
-                            .connect_accept_certificate(|_, _, _| {
-                                true // @TODO
-                            });
+                            .connect_accept_certificate(|_, _, _| true);
                         Status::TlsHandshaking
                     }
                     SocketClientEvent::TlsHandshaked => Status::TlsHandshaked,
