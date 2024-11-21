@@ -1,9 +1,9 @@
 use super::Action;
 use gtk::{
-    gio::{Cancellable, TlsCertificate},
+    gio::{Cancellable, ListStore, TlsCertificate},
     glib::{gformat, GString},
     prelude::{ButtonExt, FileExt, TlsCertificateExt, WidgetExt},
-    Button, FileDialog, Window,
+    Button, FileDialog, FileFilter, Window,
 };
 
 use std::{cell::RefCell, rc::Rc};
@@ -37,37 +37,55 @@ impl File {
             let pem = pem.clone();
             let update = action.update.clone();
             move |_| {
-                FileDialog::new().open(None::<&Window>, None::<&Cancellable>, {
-                    let gobject = gobject.clone();
-                    let pem = pem.clone();
-                    let update = update.clone();
-                    move |result| {
-                        match result {
-                            Ok(file) => match file.path() {
-                                Some(path) => {
-                                    let filename = path.to_str().unwrap();
-                                    match TlsCertificate::from_file(&filename) {
-                                        Ok(certificate) => {
-                                            pem.replace(to_pem(certificate));
-                                            gobject.set_css_classes(&["success"]);
-                                            gobject.set_label(filename)
-                                        }
-                                        Err(reason) => {
-                                            gobject.set_css_classes(&["error"]);
-                                            gobject.set_label(reason.message())
+                // Init file filters related with PEM extension
+                let filters = ListStore::new::<FileFilter>();
+
+                let filter_all = FileFilter::new();
+                filter_all.add_pattern("*.*");
+                filter_all.set_name(Some("All files"));
+                filters.append(&filter_all);
+
+                let filter_pem = FileFilter::new();
+                filter_pem.add_mime_type("application/x-x509-ca-cert");
+                filter_pem.set_name(Some("Certificates (*.pem)"));
+                filters.append(&filter_pem);
+
+                // Init file dialog
+                FileDialog::builder()
+                    .filters(&filters)
+                    .default_filter(&filter_pem)
+                    .build()
+                    .open(None::<&Window>, None::<&Cancellable>, {
+                        let gobject = gobject.clone();
+                        let pem = pem.clone();
+                        let update = update.clone();
+                        move |result| {
+                            match result {
+                                Ok(file) => match file.path() {
+                                    Some(path) => {
+                                        let filename = path.to_str().unwrap();
+                                        match TlsCertificate::from_file(&filename) {
+                                            Ok(certificate) => {
+                                                pem.replace(to_pem(certificate));
+                                                gobject.set_css_classes(&["success"]);
+                                                gobject.set_label(filename)
+                                            }
+                                            Err(reason) => {
+                                                gobject.set_css_classes(&["error"]);
+                                                gobject.set_label(reason.message())
+                                            }
                                         }
                                     }
+                                    None => todo!(),
+                                },
+                                Err(reason) => {
+                                    gobject.set_css_classes(&["error"]);
+                                    gobject.set_label(reason.message())
                                 }
-                                None => todo!(),
-                            },
-                            Err(reason) => {
-                                gobject.set_css_classes(&["error"]);
-                                gobject.set_label(reason.message())
                             }
+                            update.activate()
                         }
-                        update.activate()
-                    }
-                });
+                    });
             }
         });
 
