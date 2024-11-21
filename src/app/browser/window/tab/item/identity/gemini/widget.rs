@@ -1,4 +1,7 @@
+mod action;
 pub mod form;
+
+use action::Action;
 use form::{list::item::value::Value, Form};
 
 use adw::{
@@ -20,6 +23,7 @@ const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 // Select options
 
 pub struct Widget {
+    // pub action: Rc<Action>,
     pub form: Rc<Form>,
     pub gobject: AlertDialog,
 }
@@ -29,8 +33,11 @@ impl Widget {
 
     /// Create new `Self`
     pub fn new() -> Self {
+        // Init actions
+        let action = Rc::new(Action::new());
+
         // Init child container
-        let form = Rc::new(Form::new());
+        let form = Rc::new(Form::new(action.clone()));
 
         // Init main `GObject`
         let gobject = AlertDialog::builder()
@@ -55,8 +62,22 @@ impl Widget {
         gobject.set_response_appearance(RESPONSE_APPLY.0, ResponseAppearance::Suggested);
         gobject.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
 
+        // Init events
+        action.update.connect_activate({
+            let form = form.clone();
+            let gobject = gobject.clone();
+            move || {
+                // Deactivate apply button if the form values could not be processed
+                gobject.set_response_enabled(RESPONSE_APPLY.0, form.is_valid());
+            }
+        });
+
         // Return new activated `Self`
-        Self { form, gobject }
+        Self {
+            // action,
+            form,
+            gobject,
+        }
     }
 
     // Actions
