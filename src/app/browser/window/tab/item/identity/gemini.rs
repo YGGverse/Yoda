@@ -134,7 +134,7 @@ impl Gemini {
                     ),
                 };
 
-                // Apply
+                // Apply auth
                 match option {
                     // Activate identity for `auth_uri`
                     Some(profile_identity_gemini_id) => {
@@ -156,7 +156,7 @@ impl Gemini {
                     }
                 }
 
-                // Update page
+                // Reload page to apply changes
                 action.reload().activate();
             }
         });
