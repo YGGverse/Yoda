@@ -37,6 +37,9 @@ impl File {
             let pem = pem.clone();
             let update = action.update.clone();
             move |_| {
+                // Lock open button (prevent double click)
+                gobject.set_sensitive(false);
+
                 // Init file filters related with PEM extension
                 let filters = ListStore::new::<FileFilter>();
 
@@ -83,6 +86,7 @@ impl File {
                                     gobject.set_label(reason.message())
                                 }
                             }
+                            gobject.set_sensitive(true); // unlock
                             update.activate()
                         }
                     });
