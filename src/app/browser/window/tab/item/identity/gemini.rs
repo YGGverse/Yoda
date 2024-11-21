@@ -115,7 +115,7 @@ impl Gemini {
                         profile
                             .identity
                             .gemini
-                            .create(None, widget.form.name.value().as_deref())
+                            .create(None, &widget.form.name.value().unwrap())
                             .unwrap(), // @TODO handle result,
                     ),
                 };

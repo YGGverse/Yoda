@@ -56,11 +56,7 @@ impl Gemini {
 
     /// Create new record
     /// * return new `profile_identity_gemini_id` on success
-    pub fn create(
-        &self,
-        time: Option<(DateTime, DateTime)>,
-        name: Option<&str>,
-    ) -> Result<i64, Error> {
+    pub fn create(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64, Error> {
         // Generate new certificate
         match certificate::generate(
             match time {
@@ -70,10 +66,7 @@ impl Gemini {
                     DateTime::from_local(9999, 12, 31, 23, 59, 59.9).unwrap(), // max @TODO
                 ),
             },
-            match name {
-                Some(value) => value, // @TODO make sure it's unique
-                None => "unknown",    // @TODO randomize
-            },
+            name,
         ) {
             Ok(pem) => match self.database.add(&pem) {
                 Ok(profile_identity_gemini_id) => {
