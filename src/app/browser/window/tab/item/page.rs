@@ -887,7 +887,7 @@ impl Page {
                                                             None => match response.status() {
                                                                 gemini::client::response::meta::Status::CertificateUnauthorized => Some("Certificate not authorized"),
                                                                 gemini::client::response::meta::Status::CertificateInvalid => Some("Certificate not valid"),
-                                                                _ => None
+                                                                _ => Some("Client certificate required")
                                                             },
                                                         });
 
