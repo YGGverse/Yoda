@@ -57,7 +57,11 @@ impl Form {
 
     // Actions
 
+    /// Validate form in current set
     pub fn is_valid(&self) -> bool {
-        self.name.is_valid() // @TODO
+        match self.list.selected() {
+            Value::GENERATE_NEW_AUTH => self.name.is_valid(),
+            _ => true,
+        }
     }
 }
