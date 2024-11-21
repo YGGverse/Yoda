@@ -74,6 +74,7 @@ impl Form {
     pub fn is_valid(&self) -> bool {
         match self.list.selected() {
             Value::GENERATE_NEW_AUTH => self.name.is_valid(),
+            Value::IMPORT_PEM => self.file.is_valid(),
             _ => true,
         }
     }

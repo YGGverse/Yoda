@@ -4,12 +4,13 @@ use gtk::{
     Button,
 };
 
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 const LABEL: &str = "Select file..";
 const MARGIN: i32 = 8;
 
 pub struct File {
+    pem: RefCell<Option<String>>,
     pub gobject: Button,
 }
 
@@ -18,6 +19,9 @@ impl File {
 
     /// Create new `Self`
     pub fn new(action: Rc<Action>) -> Self {
+        // Init PEM
+        let pem = RefCell::new(None);
+
         // Init `GObject`
         let gobject = Button::builder()
             .label(LABEL)
@@ -29,7 +33,7 @@ impl File {
         gobject.connect_clicked(move |_| todo!());
 
         // Return activated `Self`
-        Self { gobject }
+        Self { pem, gobject }
     }
 
     // Actions
@@ -41,5 +45,11 @@ impl File {
         if is_visible {
             self.gobject.grab_focus();
         }
+    }
+
+    // Getters
+
+    pub fn is_valid(&self) -> bool {
+        self.pem.borrow().is_some()
     }
 }
