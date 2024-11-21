@@ -27,8 +27,10 @@ impl Widget {
     }
 
     // Actions
-    pub fn update(&self, is_sensitive: bool) {
-        //self.gobject.set_sensitive(is_sensitive);
+    pub fn update(&self, is_auth: bool, is_enabled: bool) {
+        self.gobject.set_sensitive(is_enabled);
+        self.gobject
+            .set_css_classes(if is_auth { &["success"] } else { &[] });
     }
 
     // Getters

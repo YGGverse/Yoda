@@ -5,6 +5,7 @@ use crate::app::browser::window::tab::item::Action;
 use std::rc::Rc;
 
 pub struct Identity {
+    action: Rc<Action>,
     widget: Rc<Widget>,
 }
 
@@ -12,13 +13,18 @@ impl Identity {
     // Construct
     pub fn new(action: Rc<Action>) -> Self {
         Self {
-            widget: Rc::new(Widget::new(action.clone())),
+            action: action.clone(),
+            widget: Rc::new(Widget::new(action)),
         }
     }
 
     // Actions
-    pub fn update(&self) {
-        self.widget.update(false) // @TODO
+    pub fn update(&self, is_auth: bool, is_enabled: bool) {
+        // Update action status
+        self.action.ident().gobject().set_enabled(is_enabled);
+
+        // Update widget
+        self.widget.update(is_auth, is_enabled)
     }
 
     // Getters

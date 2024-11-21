@@ -30,4 +30,10 @@ impl Ident {
     pub fn connect_activate(&self, callback: impl Fn() + 'static) {
         self.gobject.connect_activate(move |_, _| callback());
     }
+
+    // Getters
+
+    pub fn gobject(&self) -> &SimpleAction {
+        &self.gobject
+    }
 }

@@ -73,14 +73,23 @@ impl Navigation {
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        let request = self.request.widget().gobject().text();
+        let request_text = self.request.widget().gobject().text();
 
-        self.identity.update();
+        self.identity.update(
+            self.profile
+                .identity
+                .gemini
+                .auth
+                .memory
+                .match_priority(&request_text)
+                .is_some(),
+            !request_text.is_empty() && request_text.starts_with("gemini"),
+        );
         self.bookmark
-            .update(self.profile.bookmark.get(&request).is_ok());
+            .update(self.profile.bookmark.get(&request_text).is_ok());
         self.history.update();
         self.home.update(self.request.uri());
-        self.reload.update(!request.is_empty());
+        self.reload.update(!request_text.is_empty());
         self.request.update(progress_fraction);
     }
 
