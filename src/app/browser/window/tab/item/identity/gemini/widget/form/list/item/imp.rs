@@ -21,7 +21,7 @@ pub struct Item {
 
 #[glib::object_subclass]
 impl ObjectSubclass for Item {
-    const NAME: &str = "Item"; // @TODO make globally unique
+    const NAME: &'static str = "Item"; // @TODO make globally unique
     type Type = super::Item;
     type ParentType = Object;
 }
