@@ -47,7 +47,7 @@ impl Form {
                     _ => false,
                 });
 
-                // Change name entry visibility
+                // Change file choose button visibility
                 file.show(match key {
                     Value::IMPORT_PEM => true,
                     _ => false,
