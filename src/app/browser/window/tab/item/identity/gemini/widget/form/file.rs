@@ -12,7 +12,7 @@ const LABEL: &str = "Choose file..";
 const MARGIN: i32 = 8;
 
 pub struct File {
-    pem: Rc<RefCell<Option<GString>>>,
+    pub pem: Rc<RefCell<Option<GString>>>,
     pub gobject: Button,
 }
 

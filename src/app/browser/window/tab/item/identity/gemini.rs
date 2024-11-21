@@ -122,10 +122,16 @@ impl Gemini {
                         profile
                             .identity
                             .gemini
-                            .create(None, &widget.form.name.value().unwrap())
-                            .unwrap(), // @TODO handle result,
+                            .make(None, &widget.form.name.value().unwrap())
+                            .unwrap(),
                     ),
-                    Value::IMPORT_PEM => Some(0), // @TODO
+                    Value::IMPORT_PEM => Some(
+                        profile
+                            .identity
+                            .gemini
+                            .add(&widget.form.file.pem.take().unwrap())
+                            .unwrap(),
+                    ),
                 };
 
                 // Apply

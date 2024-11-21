@@ -54,9 +54,21 @@ impl Gemini {
 
     // Actions
 
-    /// Create new record
+    /// Add new record to database, update memory index
     /// * return new `profile_identity_gemini_id` on success
-    pub fn create(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64, Error> {
+    pub fn add(&self, pem: &str) -> Result<i64, Error> {
+        match self.database.add(pem) {
+            Ok(profile_identity_gemini_id) => {
+                self.index()?;
+                Ok(profile_identity_gemini_id)
+            }
+            Err(reason) => Err(Error::DatabaseRecordCreate(reason)),
+        }
+    }
+
+    /// Generate new certificate and insert record to DB, update memory index
+    /// * return new `profile_identity_gemini_id` on success
+    pub fn make(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64, Error> {
         // Generate new certificate
         match certificate::generate(
             match time {
@@ -68,13 +80,7 @@ impl Gemini {
             },
             name,
         ) {
-            Ok(pem) => match self.database.add(&pem) {
-                Ok(profile_identity_gemini_id) => {
-                    self.index()?;
-                    Ok(profile_identity_gemini_id)
-                }
-                Err(reason) => Err(Error::DatabaseRecordCreate(reason)),
-            },
+            Ok(pem) => self.add(&pem),
             Err(reason) => Err(Error::Certificate(reason)),
         }
     }

@@ -40,15 +40,15 @@ impl Form {
             let file = file.clone();
             let name = name.clone();
             let update = action.update.clone();
-            move |key| {
+            move |item| {
                 // Change name entry visibility
-                name.show(match key {
+                name.show(match item {
                     Value::GENERATE_NEW_AUTH => true,
                     _ => false,
                 });
 
                 // Change file choose button visibility
-                file.show(match key {
+                file.show(match item {
                     Value::IMPORT_PEM => true,
                     _ => false,
                 });
@@ -70,7 +70,7 @@ impl Form {
 
     // Actions
 
-    /// Validate form in current set
+    /// Validate `Self` components match current selection
     pub fn is_valid(&self) -> bool {
         match self.list.selected() {
             Value::GENERATE_NEW_AUTH => self.name.is_valid(),
