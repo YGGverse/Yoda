@@ -59,10 +59,10 @@ GTK 4 / Libadwaita client written in Rust
       * [ ] `52` Gone
       * [ ] `53` Proxy request refused
       * [ ] `59` Bad request
-    * [ ] Client certificates
+    * [x] Client certificates
       * [x] `60` Certificate requested
-      * [ ] `61` Certificate not authorized
-      * [ ] `62` Certificate not valid
+      * [x] `61` Certificate not authorized
+      * [x] `62` Certificate not valid
   * [x] [Gemtext](https://geminiprotocol.net/docs/gemtext-specification.gmi) (by [ggemtext](https://github.com/YGGverse/ggemtext))
     * [x] Code (inline/multiline)
       * [x] Inline

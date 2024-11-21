@@ -859,7 +859,11 @@ impl Page {
                                                     update.activate(Some(&id));
                                                 },
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                                                gemini::client::response::meta::Status::CertificateRequest => {
+                                                gemini::client::response::meta::Status::CertificateRequest |
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61
+                                                gemini::client::response::meta::Status::CertificateUnauthorized |
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62
+                                                gemini::client::response::meta::Status::CertificateInvalid => {
                                                     // Define common data
                                                     let status = Status::Success;
                                                     let title = "Identity";
@@ -867,7 +871,11 @@ impl Page {
                                                     // Update widget
                                                     content
                                                         .to_status_identity()
-                                                        .set_title(title);
+                                                        .set_title(title)
+                                                        .set_description(match response.data() {
+                                                            Some(data) => Some(data.value().as_str()),
+                                                            None => None,
+                                                        });
 
                                                     // Update meta
                                                     meta.set_status(status)
@@ -885,7 +893,10 @@ impl Page {
                                                     content
                                                         .to_status_failure()
                                                         .set_title(title)
-                                                        .set_description(Some("Status code yet not supported"));
+                                                        .set_description(Some(match response.data() {
+                                                            Some(data) => data.value().as_str(),
+                                                            None => "Status code yet not supported", // @TODO
+                                                        }));
 
                                                     // Update meta
                                                     meta.set_status(status)
