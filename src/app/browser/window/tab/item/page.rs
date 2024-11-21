@@ -574,6 +574,7 @@ impl Page {
                                                     // Update page
                                                     update.activate(Some(&id));
                                                 },
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                                                 gemini::client::response::meta::Status::Success => {
                                                     // Route by MIME
                                                     match response.mime() {
@@ -756,8 +757,9 @@ impl Page {
                                                         },
                                                     }
                                                 },
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                                                 gemini::client::response::meta::Status::Redirect |
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                                                 gemini::client::response::meta::Status::PermanentRedirect => {
                                                     // Extract redirection URL from response data
                                                     match response.data() {
