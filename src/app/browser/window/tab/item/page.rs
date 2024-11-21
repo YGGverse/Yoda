@@ -505,7 +505,8 @@ impl Page {
             }
         });
 
-        // https://geminiprotocol.net/docs/protocol-specification.gmi#server-name-indication
+        // Implement shared [SocketConnectable](https://docs.gtk.org/gio/iface.SocketConnectable.html) interface
+        // * required also on `auth` step ([SNI](https://geminiprotocol.net/docs/protocol-specification.gmi#server-name-indication))
         let connectable = NetworkAddress::new(&uri.host().unwrap(), 1965);
 
         // Create connection
