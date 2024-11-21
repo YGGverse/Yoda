@@ -43,8 +43,15 @@ impl Gemini {
             "Generate long-term certificate",
         );
 
+        // Add import existing identity option
+        widget.form.list.append(
+            Value::IMPORT_PEM,
+            "Import identity",
+            "Use existing certificate",
+        );
+
         // Collect additional options from database
-        let mut i = 1; // start from 2'th
+        let mut i = 2; // start from 3'th
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
@@ -118,6 +125,7 @@ impl Gemini {
                             .create(None, &widget.form.name.value().unwrap())
                             .unwrap(), // @TODO handle result,
                     ),
+                    Value::IMPORT_PEM => Some(0), // @TODO
                 };
 
                 // Apply
