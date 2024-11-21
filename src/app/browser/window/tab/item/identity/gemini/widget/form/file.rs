@@ -42,12 +42,12 @@ impl File {
 
                 let filter_all = FileFilter::new();
                 filter_all.add_pattern("*.*");
-                filter_all.set_name(Some("All files"));
+                filter_all.set_name(Some("All"));
                 filters.append(&filter_all);
 
                 let filter_pem = FileFilter::new();
                 filter_pem.add_mime_type("application/x-x509-ca-cert");
-                filter_pem.set_name(Some("Certificates (*.pem)"));
+                filter_pem.set_name(Some("Certificate (*.pem)"));
                 filters.append(&filter_pem);
 
                 // Init file dialog
