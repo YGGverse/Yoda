@@ -21,8 +21,8 @@ use crate::Profile;
 use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{
-        Cancellable, IOStream, SocketClient, SocketClientEvent, SocketConnectable, SocketProtocol,
-        TlsCertificate, TlsClientConnection,
+        Cancellable, IOStream, NetworkAddress, SocketClient, SocketClientEvent, SocketConnectable,
+        SocketProtocol, TlsCertificate, TlsClientConnection,
     },
     glib::{
         gformat, Bytes, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
@@ -428,11 +428,12 @@ impl Page {
         // Stream wrapper for TLS connections
         fn auth(
             connection: impl IsA<IOStream>,
+            connectable: impl IsA<SocketConnectable>,
             certificate: Option<TlsCertificate>,
         ) -> impl IsA<IOStream> {
             if let Some(certificate) = certificate {
                 let tls_connection =
-                    TlsClientConnection::new(&connection, None::<&SocketConnectable>).unwrap(); // @TODO handle
+                    TlsClientConnection::new(&connection, Some(&connectable)).unwrap(); // @TODO handle
                 tls_connection.set_certificate(&certificate);
                 tls_connection.connect_accept_certificate(move |_, _, _| true); // @TODO manual validation
                 tls_connection.upcast::<IOStream>()
@@ -504,15 +505,18 @@ impl Page {
             }
         });
 
+        // https://geminiprotocol.net/docs/protocol-specification.gmi#server-name-indication
+        let connectable = NetworkAddress::new(&uri.host().unwrap(), 1965);
+
         // Create connection
-        client.clone().connect_to_uri_async(
-            url.clone().as_str(),
-            1965,
+        client.clone().connect_async(
+            &connectable.clone(),
             Some(&cancellable.clone()),
             move |connect| match connect {
                 Ok(connection) => {
+
                     // Encrypt stream using authorization TLS
-                    let stream = auth(connection, certificate);
+                    let stream = auth(connection, connectable, certificate);
 
                     // Send request
                     stream.output_stream().write_bytes_async(
