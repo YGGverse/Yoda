@@ -870,9 +870,9 @@ impl Page {
                                                 },
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
                                                 gemini::client::response::meta::Status::CertificateRequest |
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
                                                 gemini::client::response::meta::Status::CertificateUnauthorized |
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62
+                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                                                 gemini::client::response::meta::Status::CertificateInvalid => {
                                                     // Define common data
                                                     let status = Status::Success;
@@ -884,7 +884,11 @@ impl Page {
                                                         .set_title(title)
                                                         .set_description(match response.data() {
                                                             Some(data) => Some(data.value().as_str()),
-                                                            None => None,
+                                                            None => match response.status() {
+                                                                gemini::client::response::meta::Status::CertificateUnauthorized => Some("Certificate not authorized"),
+                                                                gemini::client::response::meta::Status::CertificateInvalid => Some("Certificate not valid"),
+                                                                _ => None
+                                                            },
                                                         });
 
                                                     // Update meta
