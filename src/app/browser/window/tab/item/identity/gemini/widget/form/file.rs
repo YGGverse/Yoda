@@ -1,16 +1,18 @@
 use super::Action;
 use gtk::{
-    prelude::{ButtonExt, WidgetExt},
-    Button,
+    gio::{Cancellable, TlsCertificate},
+    glib::{gformat, GString},
+    prelude::{ButtonExt, FileExt, TlsCertificateExt, WidgetExt},
+    Button, FileDialog, Window,
 };
 
 use std::{cell::RefCell, rc::Rc};
 
-const LABEL: &str = "Select file..";
+const LABEL: &str = "Choose file..";
 const MARGIN: i32 = 8;
 
 pub struct File {
-    pem: RefCell<Option<String>>,
+    pem: Rc<RefCell<Option<GString>>>,
     pub gobject: Button,
 }
 
@@ -20,7 +22,7 @@ impl File {
     /// Create new `Self`
     pub fn new(action: Rc<Action>) -> Self {
         // Init PEM
-        let pem = RefCell::new(None);
+        let pem = Rc::new(RefCell::new(None));
 
         // Init `GObject`
         let gobject = Button::builder()
@@ -30,7 +32,44 @@ impl File {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| todo!());
+        gobject.connect_clicked({
+            let gobject = gobject.clone();
+            let pem = pem.clone();
+            let update = action.update.clone();
+            move |_| {
+                FileDialog::new().open(None::<&Window>, None::<&Cancellable>, {
+                    let gobject = gobject.clone();
+                    let pem = pem.clone();
+                    let update = update.clone();
+                    move |result| {
+                        match result {
+                            Ok(file) => match file.path() {
+                                Some(path) => {
+                                    let filename = path.to_str().unwrap();
+                                    match TlsCertificate::from_file(&filename) {
+                                        Ok(certificate) => {
+                                            pem.replace(to_pem(certificate));
+                                            gobject.set_css_classes(&["success"]);
+                                            gobject.set_label(filename)
+                                        }
+                                        Err(reason) => {
+                                            gobject.set_css_classes(&["error"]);
+                                            gobject.set_label(reason.message())
+                                        }
+                                    }
+                                }
+                                None => todo!(),
+                            },
+                            Err(reason) => {
+                                gobject.set_css_classes(&["error"]);
+                                gobject.set_label(reason.message())
+                            }
+                        }
+                        update.activate()
+                    }
+                });
+            }
+        });
 
         // Return activated `Self`
         Self { pem, gobject }
@@ -52,4 +91,13 @@ impl File {
     pub fn is_valid(&self) -> bool {
         self.pem.borrow().is_some()
     }
+}
+
+// Private helpers
+
+/// Convert [TlsCertificate](https://docs.gtk.org/gio/class.TlsCertificate.html) to GString
+fn to_pem(certificate: TlsCertificate) -> Option<GString> {
+    let certificate_pem = certificate.certificate_pem()?;
+    let private_key_pem = certificate.private_key_pem()?;
+    Some(gformat!("{certificate_pem}{private_key_pem}"))
 }
