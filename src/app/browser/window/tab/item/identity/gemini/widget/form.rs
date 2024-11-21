@@ -5,10 +5,7 @@ use list::{item::value::Value, List};
 use name::Name;
 
 use super::Action;
-use gtk::{
-    prelude::{BoxExt, WidgetExt},
-    Box, Orientation,
-};
+use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Form {
@@ -39,7 +36,7 @@ impl Form {
             let update = action.update.clone();
             move |key| {
                 // Change name entry visibility
-                name.gobject.set_visible(match key {
+                name.show(match key {
                     Value::GENERATE_NEW_AUTH => true,
                     _ => false,
                 });

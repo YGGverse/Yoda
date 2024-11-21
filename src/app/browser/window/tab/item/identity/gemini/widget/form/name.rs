@@ -1,7 +1,7 @@
 use super::Action;
 use gtk::{
     glib::GString,
-    prelude::{EditableExt, EntryExt},
+    prelude::{EditableExt, EntryExt, WidgetExt},
     Entry,
 };
 use std::rc::Rc;
@@ -22,9 +22,10 @@ impl Name {
     pub fn new(action: Rc<Action>) -> Self {
         // Init `GObject`
         let gobject = Entry::builder()
+            .margin_top(MARGIN)
             .max_length(MAX_LENGTH as i32)
             .placeholder_text(PLACEHOLDER_TEXT)
-            .margin_top(MARGIN)
+            .visible(false)
             .build();
 
         // Init events
@@ -36,11 +37,20 @@ impl Name {
 
     // Actions
 
-    pub fn is_valid(&self) -> bool {
-        self.gobject.text_length() >= MIN_LENGTH && self.gobject.text_length() <= MAX_LENGTH
+    /// Change visibility status
+    /// * grab focus on `is_visible`
+    pub fn show(&self, is_visible: bool) {
+        self.gobject.set_visible(is_visible);
+        if is_visible {
+            self.gobject.grab_focus();
+        }
     }
 
     // Getters
+
+    pub fn is_valid(&self) -> bool {
+        self.gobject.text_length() >= MIN_LENGTH && self.gobject.text_length() <= MAX_LENGTH
+    }
 
     pub fn value(&self) -> Option<GString> {
         let text = self.gobject.text();
