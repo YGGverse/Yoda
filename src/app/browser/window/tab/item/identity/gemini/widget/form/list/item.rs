@@ -23,10 +23,10 @@ impl Item {
             .property(
                 "value",
                 match value {
-                    Value::GENERATE_NEW_AUTH => G_VALUE_GENERATE_NEW_AUTH,
-                    Value::IMPORT_PEM => G_VALUE_IMPORT_PEM,
-                    Value::USE_GUEST_SESSION => G_VALUE_USE_GUEST_SESSION,
-                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => value,
+                    Value::GenerateNewAuth => G_VALUE_GENERATE_NEW_AUTH,
+                    Value::ImportPem => G_VALUE_IMPORT_PEM,
+                    Value::UseGuestSession => G_VALUE_USE_GUEST_SESSION,
+                    Value::ProfileIdentityGeminiId(value) => value,
                 },
             )
             .property("title", title)
@@ -39,10 +39,10 @@ impl Item {
     /// Get `value` as enum `Value`
     pub fn value_enum(&self) -> Value {
         match self.value() {
-            G_VALUE_GENERATE_NEW_AUTH => Value::GENERATE_NEW_AUTH,
-            G_VALUE_IMPORT_PEM => Value::IMPORT_PEM,
-            G_VALUE_USE_GUEST_SESSION => Value::USE_GUEST_SESSION,
-            value => Value::PROFILE_IDENTITY_GEMINI_ID(value),
+            G_VALUE_GENERATE_NEW_AUTH => Value::GenerateNewAuth,
+            G_VALUE_IMPORT_PEM => Value::ImportPem,
+            G_VALUE_USE_GUEST_SESSION => Value::UseGuestSession,
+            value => Value::ProfileIdentityGeminiId(value),
         }
     }
 }

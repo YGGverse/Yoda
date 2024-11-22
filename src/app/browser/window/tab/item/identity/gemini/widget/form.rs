@@ -43,13 +43,13 @@ impl Form {
             move |item| {
                 // Change name entry visibility
                 name.show(match item {
-                    Value::GENERATE_NEW_AUTH => true,
+                    Value::GenerateNewAuth => true,
                     _ => false,
                 });
 
                 // Change file choose button visibility
                 file.show(match item {
-                    Value::IMPORT_PEM => true,
+                    Value::ImportPem => true,
                     _ => false,
                 });
 
@@ -73,8 +73,8 @@ impl Form {
     /// Validate `Self` components match current selection
     pub fn is_valid(&self) -> bool {
         match self.list.selected() {
-            Value::GENERATE_NEW_AUTH => self.name.is_valid(),
-            Value::IMPORT_PEM => self.file.is_valid(),
+            Value::GenerateNewAuth => self.name.is_valid(),
+            Value::ImportPem => self.file.is_valid(),
             _ => true,
         }
     }

@@ -31,21 +31,21 @@ impl Gemini {
 
         // Add guest option
         widget.form.list.append(
-            Value::USE_GUEST_SESSION,
+            Value::UseGuestSession,
             "Guest session",
             "No identity for this request",
         );
 
         // Add new identity option
         widget.form.list.append(
-            Value::GENERATE_NEW_AUTH,
+            Value::GenerateNewAuth,
             "Create new",
             "Generate long-term certificate",
         );
 
         // Add import existing identity option
         widget.form.list.append(
-            Value::IMPORT_PEM,
+            Value::ImportPem,
             "Import identity",
             "Use existing certificate",
         );
@@ -65,7 +65,7 @@ impl Gemini {
 
                     // Append record option
                     widget.form.list.append(
-                        Value::PROFILE_IDENTITY_GEMINI_ID(identity.id),
+                        Value::ProfileIdentityGeminiId(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
                             "valid until {} | auth: {}",
@@ -116,16 +116,16 @@ impl Gemini {
             move |response| {
                 // Get option match user choice
                 let option = match response {
-                    Value::PROFILE_IDENTITY_GEMINI_ID(value) => Some(value),
-                    Value::USE_GUEST_SESSION => None,
-                    Value::GENERATE_NEW_AUTH => Some(
+                    Value::ProfileIdentityGeminiId(value) => Some(value),
+                    Value::UseGuestSession => None,
+                    Value::GenerateNewAuth => Some(
                         profile
                             .identity
                             .gemini
                             .make(None, &widget.form.name.value().unwrap())
                             .unwrap(),
                     ),
-                    Value::IMPORT_PEM => Some(
+                    Value::ImportPem => Some(
                         profile
                             .identity
                             .gemini
