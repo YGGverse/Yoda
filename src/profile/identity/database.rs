@@ -22,35 +22,36 @@ impl Database {
     // Getters
 
     /// Get all records
-    pub fn records(&self) -> Vec<Table> {
+    pub fn records(&self) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap();
-        let tx = readable.unchecked_transaction().unwrap();
-        select(&tx).unwrap()
+        let tx = readable.unchecked_transaction()?;
+        select(&tx)
     }
 
     /// Get active identity record if exist
-    pub fn active(&self) -> Option<Table> {
-        self.records().into_iter().find(|record| record.is_active)
+    pub fn active(&self) -> Result<Option<Table>, Error> {
+        let records = self.records()?;
+        Ok(records.into_iter().find(|record| record.is_active))
     }
 
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(&self, profile_id: Rc<i64>, is_active: bool) -> Result<i64, ()> {
+    pub fn add(&self, profile_id: Rc<i64>, is_active: bool) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
-        let tx = writable.transaction().unwrap();
+        let tx = writable.transaction()?;
 
         // New record has active status
         if is_active {
             // Deactivate other records as only one profile should be active
-            for record in select(&tx).unwrap() {
-                let _ = update(&tx, record.profile_id, record.id, false);
+            for record in select(&tx)? {
+                update(&tx, record.profile_id, record.id, false)?;
             }
         }
 
         // Create new record
-        insert(&tx, profile_id, is_active).unwrap();
+        insert(&tx, profile_id, is_active)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -58,7 +59,7 @@ impl Database {
         // Done
         match tx.commit() {
             Ok(_) => Ok(id),
-            Err(_) => Err(()), // @TODO
+            Err(reason) => Err(reason),
         }
     }
 }

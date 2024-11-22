@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub enum Error {
-    Database,
+    DatabaseActive(sqlite::Error),
+    DatabaseAdd(sqlite::Error),
     GeminiInit(super::gemini::Error),
 }

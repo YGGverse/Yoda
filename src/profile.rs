@@ -59,25 +59,24 @@ impl Profile {
             // Init writable connection
             let mut connection = match connection.write() {
                 Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
+                Err(reason) => todo!("{reason}"),
             };
 
             // Init new transaction
             let transaction = match connection.transaction() {
                 Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
+                Err(reason) => todo!("{reason}"),
             };
 
             // Begin migration
             match migrate(&transaction) {
                 Ok(_) => {
                     // Confirm changes
-                    match transaction.commit() {
-                        Ok(_) => {} // @TODO
-                        Err(e) => todo!("{e}"),
+                    if let Err(reason) = transaction.commit() {
+                        todo!("{reason}")
                     }
                 }
-                Err(e) => todo!("{e}"),
+                Err(reason) => todo!("{reason}"),
             }
         } // unlock database
 
@@ -85,18 +84,27 @@ impl Profile {
         let database = Rc::new(Database::new(connection.clone()));
 
         // Get active profile or create new one
-        let profile_id = Rc::new(match database.active() {
+        let profile_id = Rc::new(match database.active().unwrap() {
             Some(profile) => profile.id,
             None => match database.add(true, DateTime::now_local().unwrap(), None) {
                 Ok(id) => id,
-                Err(_) => todo!(),
+                Err(reason) => todo!("{:?}", reason),
             },
+        });
+
+        // Init bookmark component @TODO handle errors
+        let bookmark = Rc::new(Bookmark::new(connection.clone(), profile_id.clone()));
+
+        // Init identity component
+        let identity = Rc::new(match Identity::new(connection, profile_id) {
+            Ok(result) => result,
+            Err(reason) => todo!("{:?}", reason),
         });
 
         // Result
         Self {
-            bookmark: Rc::new(Bookmark::new(connection.clone(), profile_id.clone())),
-            identity: Rc::new(Identity::new(connection, profile_id).unwrap()), // @TODO handle
+            bookmark,
+            identity,
             database,
             config_path,
         }
@@ -105,8 +113,8 @@ impl Profile {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
+    if let Err(reason) = database::init(tx) {
+        return Err(reason.to_string());
     }
 
     // Delegate migration to children components

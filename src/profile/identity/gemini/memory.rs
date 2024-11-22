@@ -24,7 +24,7 @@ impl Memory {
     /// * validate record with same key does not exist yet
     pub fn add(&self, id: i64, pem: String) -> Result<(), Error> {
         match self.index.borrow_mut().insert(id, pem) {
-            Some(_) => Err(Error::Overwrite(id)), // @TODO prevent?
+            Some(key) => Err(Error::Overwrite(key)), // @TODO prevent?
             None => Ok(()),
         }
     }

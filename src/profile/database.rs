@@ -24,71 +24,45 @@ impl Database {
     // Getters
 
     /// Get all records
-    pub fn records(&self) -> Vec<Table> {
+    pub fn records(&self) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap();
-        let tx = readable.unchecked_transaction().unwrap();
-        select(&tx).unwrap()
+        let tx = readable.unchecked_transaction()?;
+        select(&tx)
     }
 
     /// Get active profile record if exist
-    pub fn active(&self) -> Option<Table> {
-        self.records().into_iter().find(|record| record.is_active)
+    pub fn active(&self) -> Result<Option<Table>, Error> {
+        let records = self.records()?;
+        Ok(records.into_iter().find(|record| record.is_active))
     }
 
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64, ()> {
+    pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
-        let tx = writable.transaction().unwrap();
+        let tx = writable.transaction()?;
 
         // New record has active status
         if is_active {
             // Deactivate other records as only one profile should be active
-            for record in select(&tx).unwrap() {
-                let _ = update(&tx, record.id, false, record.time, record.name);
+            for record in select(&tx)? {
+                update(&tx, record.id, false, record.time, record.name)?;
             }
         }
 
         // Create new record
-        insert(&tx, is_active, time, name).unwrap();
+        insert(&tx, is_active, time, name)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
 
         // Done
-        match tx.commit() {
-            Ok(_) => Ok(id),
-            Err(_) => Err(()), // @TODO
-        }
+        tx.commit()?;
+
+        Ok(id)
     }
-
-    /* @TODO not in use
-    /// Set `is_active` status `true` for the record with given profile ID
-    /// * reset other records to `false`
-    pub fn activate(&self, id: i64) -> Result<(), ()> {
-        // Begin new transaction
-        let mut writable = self.connection.write().unwrap();
-        let tx = writable.transaction().unwrap();
-
-        // Deactivate other records as only one profile should be active
-        for record in select(&tx).unwrap() {
-            let _ = update(
-                &tx,
-                record.id,
-                if record.id == id { true } else { false },
-                record.time,
-                record.name,
-            );
-        }
-
-        // Done
-        match tx.commit() {
-            Ok(_) => Ok(()),
-            Err(_) => Err(()),
-        } // @TODO make sure ID exist and was changed
-    } */
 }
 
 // Low-level DB API

@@ -25,11 +25,14 @@ impl Identity {
 
         // Get active identity set for profile or create new one
         let profile_identity_id = Rc::new(match database.active() {
-            Some(identity) => identity.id,
-            None => match database.add(profile_id, true) {
-                Ok(id) => id,
-                Err(_) => return Err(Error::Database),
+            Ok(result) => match result {
+                Some(identity) => identity.id,
+                None => match database.add(profile_id, true) {
+                    Ok(id) => id,
+                    Err(reason) => return Err(Error::DatabaseAdd(reason)),
+                },
             },
+            Err(reason) => return Err(Error::DatabaseActive(reason)),
         });
 
         // Init gemini component
@@ -63,8 +66,8 @@ impl Identity {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
+    if let Err(reason) = database::init(tx) {
+        return Err(reason.to_string());
     }
 
     // Delegate migration to childs
