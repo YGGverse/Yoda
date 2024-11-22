@@ -42,16 +42,10 @@ impl Form {
             let update = action.update.clone();
             move |item| {
                 // Change name entry visibility
-                name.show(match item {
-                    Value::GenerateNewAuth => true,
-                    _ => false,
-                });
+                name.show(matches!(item, Value::GenerateNewAuth));
 
                 // Change file choose button visibility
-                file.show(match item {
-                    Value::ImportPem => true,
-                    _ => false,
-                });
+                file.show(matches!(item, Value::ImportPem));
 
                 // Update widget
                 update.activate();

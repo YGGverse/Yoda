@@ -55,9 +55,6 @@ impl Memory {
         result.sort_by(|a, b| b.1.cmp(&a.1));
 
         // Get first match ID
-        match result.get(0) {
-            Some(value) => Some(value.0),
-            None => None,
-        }
+        result.first().map(|value| value.0)
     }
 }

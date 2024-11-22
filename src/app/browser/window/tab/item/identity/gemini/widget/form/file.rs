@@ -67,7 +67,7 @@ impl File {
                                 Ok(file) => match file.path() {
                                     Some(path) => {
                                         let filename = path.to_str().unwrap();
-                                        match TlsCertificate::from_file(&filename) {
+                                        match TlsCertificate::from_file(filename) {
                                             Ok(certificate) => {
                                                 pem.replace(to_pem(certificate));
                                                 gobject.set_css_classes(&["success"]);
