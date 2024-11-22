@@ -1,4 +1,8 @@
-use gtk::{gdk_pixbuf::Pixbuf, prelude::WidgetExt, ContentFit, Picture};
+use gtk::{
+    gdk::Paintable,
+    prelude::{IsA, WidgetExt},
+    ContentFit, Picture,
+};
 
 pub struct Image {
     gobject: Picture,
@@ -12,8 +16,8 @@ impl Image {
 
     // Constructors
 
-    pub fn new_from_pixbuf(buffer: &Pixbuf) -> Self {
-        let gobject = Picture::for_pixbuf(buffer);
+    pub fn new_from_paintable(paintable: &impl IsA<Paintable>) -> Self {
+        let gobject = Picture::for_paintable(paintable);
 
         gobject.set_content_fit(Self::DEFAULT_CONTENT_FIT);
         gobject.set_margin_end(Self::DEFAULT_MARGIN);

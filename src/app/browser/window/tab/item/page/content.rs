@@ -8,9 +8,9 @@ use text::Text;
 
 use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use gtk::{
-    gdk_pixbuf::Pixbuf,
+    gdk::Paintable,
     glib::Uri,
-    prelude::{BoxExt, WidgetExt},
+    prelude::{BoxExt, IsA, WidgetExt},
     Box, Orientation,
 };
 use std::{rc::Rc, time::Duration};
@@ -38,9 +38,9 @@ impl Content {
     /// Set new `content::Image` component for `Self`
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_image(&self, buffer: &Pixbuf) -> Image {
+    pub fn to_image(&self, paintable: &impl IsA<Paintable>) -> Image {
         self.clean();
-        let image = Image::new_from_pixbuf(buffer);
+        let image = Image::new_from_paintable(paintable);
         self.gobject.append(image.gobject());
         image
     }

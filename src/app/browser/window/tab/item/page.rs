@@ -19,6 +19,7 @@ use crate::app::browser::{
 };
 use crate::Profile;
 use gtk::{
+    gdk::Texture,
     gdk_pixbuf::Pixbuf,
     gio::{
         Cancellable, IOStream, NetworkAddress, SocketClient, SocketClientEvent, SocketConnectable,
@@ -673,7 +674,7 @@ impl Page {
                                                                                             .set_title(uri_to_title(&uri).as_str());
 
                                                                                         // Update page content
-                                                                                        content.to_image(&buffer);
+                                                                                        content.to_image(&Texture::for_pixbuf(&buffer));
 
                                                                                         // Update window components
                                                                                         update.activate(Some(&id));
