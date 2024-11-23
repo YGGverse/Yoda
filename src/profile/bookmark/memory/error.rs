@@ -10,7 +10,7 @@ impl Error {
             Self::Overwrite(key) => {
                 format!("Overwrite attempt for existing record `{key}`")
             }
-            Self::Unexpected => format!("Unexpected error"),
+            Self::Unexpected => "Unexpected error".to_string(),
         }
     }
 }

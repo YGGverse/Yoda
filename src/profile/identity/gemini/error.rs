@@ -11,10 +11,10 @@ impl Error {
         match self {
             Self::Auth(reason) => format!("Could not create auth: {}", reason.to_string()),
             Self::Certificate(reason) => {
-                format!("Could not create certificate: {}", reason.to_string())
+                format!("Could not create certificate: {}", reason)
             }
             Self::Database(reason) => {
-                format!("Database error: {}", reason.to_string())
+                format!("Database error: {}", reason)
             }
             Self::Memory(reason) => format!("Memory error: {}", reason.to_string()),
         }

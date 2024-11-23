@@ -9,14 +9,14 @@ pub enum Error {
 impl Error {
     pub fn to_string(&self) -> String {
         match self {
-            Self::Clear => format!("Could not cleanup memory index"),
+            Self::Clear => "Could not cleanup memory index".to_string(),
             Self::NotFound(key) => {
                 format!("Record `{key}` not found in memory index")
             }
             Self::Overwrite(key) => {
                 format!("Overwrite attempt for existing record `{key}`")
             }
-            Self::Unexpected => format!("Unexpected error"),
+            Self::Unexpected => "Unexpected error".to_string(),
         }
     }
 }
