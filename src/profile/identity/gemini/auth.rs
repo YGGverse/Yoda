@@ -41,7 +41,7 @@ impl Auth {
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_gemini_auth_id` on success
-    pub fn add(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
+    pub fn apply(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
         // Cleanup records match `url` (unauthorize)
         self.remove(url)?;
 

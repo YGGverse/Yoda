@@ -142,7 +142,7 @@ impl Gemini {
                             .identity
                             .gemini
                             .auth
-                            .add(profile_identity_gemini_id, auth_url.as_str())
+                            .apply(profile_identity_gemini_id, auth_url.as_str())
                             .unwrap();
                     }
                     // Remove all identity auths for `auth_uri`
