@@ -96,8 +96,8 @@ impl Gemini {
         match self.database.records() {
             Ok(records) => {
                 for record in records {
-                    if self.memory.add(record.id, record.pem).is_err() {
-                        return Err(Error::MemoryIndex(record.id));
+                    if let Err(reason) = self.memory.add(record.id, record.pem) {
+                        return Err(Error::MemoryIndex(reason));
                     }
                 }
             }
