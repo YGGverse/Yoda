@@ -1,4 +1,4 @@
-mod error;
+pub mod error;
 pub use error::Error;
 
 use std::{cell::RefCell, collections::HashMap};
@@ -34,8 +34,14 @@ impl Memory {
     }
 
     /// Cleanup index
-    pub fn clear(&self) {
-        self.index.borrow_mut().clear()
+    pub fn clear(&self) -> Result<(), Error> {
+        let mut index = self.index.borrow_mut();
+        index.clear();
+        if index.is_empty() {
+            Ok(())
+        } else {
+            Err(Error::Clear)
+        }
     }
 
     /// Get `profile_identity_gemini_id` vector match given `request`

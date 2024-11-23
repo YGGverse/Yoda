@@ -84,7 +84,9 @@ impl Auth {
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
-        self.memory.clear();
+        if let Err(reason) = self.memory.clear() {
+            return Err(Error::MemoryClear(reason));
+        }
 
         // Build new index
         match self.database.records(None) {
@@ -100,6 +102,7 @@ impl Auth {
             }
             Err(reason) => return Err(Error::DatabaseIndex(reason)),
         }
+
         Ok(())
     }
 }

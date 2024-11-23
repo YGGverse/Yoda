@@ -87,8 +87,10 @@ impl Gemini {
 
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {
-        // Cleanup previous records
-        self.memory.clear();
+        // Clear previous records
+        if let Err(reason) = self.memory.clear() {
+            return Err(Error::MemoryClear(reason));
+        }
 
         // Build new index
         match self.database.records() {
@@ -101,7 +103,8 @@ impl Gemini {
             }
             Err(reason) => return Err(Error::DatabaseIndex(reason)),
         };
-        Ok(()) // @TODO
+
+        Ok(())
     }
 }
 
