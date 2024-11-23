@@ -98,7 +98,7 @@ impl Profile {
         // Init identity component
         let identity = Rc::new(match Identity::new(connection, profile_id) {
             Ok(result) => result,
-            Err(reason) => todo!("{:?}", reason),
+            Err(reason) => todo!("{:?}", reason.to_string()),
         });
 
         // Result

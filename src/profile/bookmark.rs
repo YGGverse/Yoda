@@ -28,12 +28,12 @@ impl Bookmark {
         match database.records(None) {
             Ok(records) => {
                 for record in records {
-                    if memory.add(record.request, record.id).is_err() {
-                        todo!()
+                    if let Err(reason) = memory.add(record.request, record.id) {
+                        todo!("{}", reason.to_string())
                     }
                 }
             }
-            Err(reason) => todo!("{reason}"),
+            Err(reason) => todo!("{}", reason.to_string()),
         }
 
         // Return new `Self`

@@ -1,5 +1,16 @@
 #[derive(Debug)]
 pub enum Error {
-    NotFound,
-    Overwrite(i64),
+    Overwrite(String),
+    Unexpected,
+}
+
+impl Error {
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::Overwrite(key) => {
+                format!("Overwrite attempt for existing record `{key}`")
+            }
+            Self::Unexpected => format!("Unexpected error"),
+        }
+    }
 }

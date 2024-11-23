@@ -119,18 +119,24 @@ impl Gemini {
                     Value::ProfileIdentityGeminiId(value) => Some(value),
                     Value::UseGuestSession => None,
                     Value::GenerateNewAuth => Some(
-                        profile
+                        match profile
                             .identity
                             .gemini
                             .make(None, &widget.form.name.value().unwrap())
-                            .unwrap(),
+                        {
+                            Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
+                            Err(reason) => todo!("{}", reason.to_string()),
+                        },
                     ),
                     Value::ImportPem => Some(
-                        profile
+                        match profile
                             .identity
                             .gemini
                             .add(&widget.form.file.pem.take().unwrap())
-                            .unwrap(),
+                        {
+                            Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
+                            Err(reason) => todo!("{}", reason.to_string()),
+                        },
                     ),
                 };
 

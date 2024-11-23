@@ -55,7 +55,7 @@ impl Identity {
         if let Some(id) = self.gemini.auth.memory.match_priority(request) {
             match self.gemini.memory.get(id) {
                 Ok(pem) => return Some(pem),
-                Err(reason) => todo!("{:?}", reason),
+                Err(reason) => todo!("{:?}", reason.to_string()),
             }
         }
         None
