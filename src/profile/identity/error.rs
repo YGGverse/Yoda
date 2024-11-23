@@ -1,17 +1,19 @@
+use std::fmt::{Display, Formatter, Result};
+
 #[derive(Debug)]
 pub enum Error {
     Database(sqlite::Error),
     Gemini(super::gemini::Error),
 }
 
-impl Error {
-    pub fn to_string(&self) -> String {
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
             Self::Database(reason) => {
-                format!("Database error: {}", reason)
+                write!(f, "Database error: {reason}")
             }
             Self::Gemini(reason) => {
-                format!("Could not init Gemini identity: {}", reason.to_string())
+                write!(f, "Could not init Gemini identity: {reason}")
             }
         }
     }

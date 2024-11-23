@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result};
+
 #[derive(Debug)]
 pub enum Error {
     Clear,
@@ -5,14 +7,14 @@ pub enum Error {
     Unexpected,
 }
 
-impl Error {
-    pub fn to_string(&self) -> String {
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Clear => "Could not cleanup memory index".to_string(),
+            Self::Clear => write!(f, "Could not cleanup memory index"),
             Self::Overwrite(key) => {
-                format!("Overwrite attempt for existing record `{key}`")
+                write!(f, "Overwrite attempt for existing record `{key}`")
             }
-            Self::Unexpected => "Unexpected error".to_string(),
+            Self::Unexpected => write!(f, "Unexpected error"),
         }
     }
 }

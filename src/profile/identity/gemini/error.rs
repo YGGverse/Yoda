@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result};
+
 #[derive(Debug)]
 pub enum Error {
     Auth(super::auth::Error),
@@ -6,17 +8,17 @@ pub enum Error {
     Memory(super::memory::Error),
 }
 
-impl Error {
-    pub fn to_string(&self) -> String {
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Auth(reason) => format!("Could not create auth: {}", reason.to_string()),
+            Self::Auth(reason) => write!(f, "Could not create auth: {reason}"),
             Self::Certificate(reason) => {
-                format!("Could not create certificate: {}", reason)
+                write!(f, "Could not create certificate: {reason}")
             }
             Self::Database(reason) => {
-                format!("Database error: {}", reason)
+                write!(f, "Database error: {reason}")
             }
-            Self::Memory(reason) => format!("Memory error: {}", reason.to_string()),
+            Self::Memory(reason) => write!(f, "Memory error: {reason}"),
         }
     }
 }

@@ -1,14 +1,16 @@
+use std::fmt::{Display, Formatter, Result};
+
 #[derive(Debug)]
 pub enum Error {
     Database(sqlite::Error),
     Memory(super::memory::Error),
 }
 
-impl Error {
-    pub fn to_string(&self) -> String {
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Database(reason) => format!("Database error: {}", reason),
-            Self::Memory(reason) => format!("Memory error: {}", reason.to_string()),
+            Self::Database(reason) => write!(f, "Database error: {reason}"),
+            Self::Memory(reason) => write!(f, "Memory error: {reason}"),
         }
     }
 }
