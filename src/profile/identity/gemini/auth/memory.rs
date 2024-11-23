@@ -33,7 +33,7 @@ impl Memory {
 
         // Slot should be free, let check it twice
         match index.insert(url, profile_identity_gemini_id) {
-            Some(_) => return Err(Error::Unexpected),
+            Some(_) => Err(Error::Unexpected),
             None => Ok(()),
         }
     }
