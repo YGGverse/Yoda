@@ -461,7 +461,7 @@ impl Page {
         let client = SocketClient::new();
         client.set_protocol(SocketProtocol::Tcp);
 
-        // Return PEM string match `uri`
+        // Return PEM string match request
         let certificate = match self
             .profile
             .identity
