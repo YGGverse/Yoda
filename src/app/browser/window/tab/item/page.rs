@@ -433,16 +433,25 @@ impl Page {
             certificate: Option<TlsCertificate>,
         ) -> impl IsA<IOStream> {
             if let Some(certificate) = certificate {
+                // https://geminiprotocol.net/docs/protocol-specification.gmi#the-use-of-tls
                 let tls_connection =
                     TlsClientConnection::new(&connection, Some(&connectable)).unwrap(); // @TODO handle
+
+                // https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
                 tls_connection.set_certificate(&certificate);
+
+                // @TODO handle exceptions
+                // https://geminiprotocol.net/docs/protocol-specification.gmi#closing-connections
+                tls_connection.set_require_close_notify(true);
 
                 // @TODO manual validation
                 // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
                 tls_connection.connect_accept_certificate(move |_, _, _| true);
 
+                // Take encrypted I/O stream
                 tls_connection.upcast::<IOStream>()
             } else {
+                // Take default I/O stream
                 connection.upcast::<IOStream>()
             }
         }
