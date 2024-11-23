@@ -138,21 +138,21 @@ impl Gemini {
                 match option {
                     // Activate identity for `auth_uri`
                     Some(profile_identity_gemini_id) => {
-                        profile
+                        if let Err(reason) = profile
                             .identity
                             .gemini
                             .auth
                             .apply(profile_identity_gemini_id, auth_url.as_str())
-                            .unwrap();
+                        {
+                            todo!("{}", reason.to_string())
+                        };
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        profile
-                            .identity
-                            .gemini
-                            .auth
-                            .remove(auth_url.as_str())
-                            .unwrap();
+                        if let Err(reason) = profile.identity.gemini.auth.remove(auth_url.as_str())
+                        {
+                            todo!("{}", reason.to_string())
+                        };
                     }
                 }
 

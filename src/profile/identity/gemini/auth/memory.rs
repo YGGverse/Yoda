@@ -23,12 +23,17 @@ impl Memory {
     /// Add new record with `url` as key and `profile_identity_gemini_id` as value
     /// * validate record with same key does not exist yet
     pub fn add(&self, url: String, profile_identity_gemini_id: i64) -> Result<(), Error> {
-        match self
-            .index
-            .borrow_mut()
-            .insert(url, profile_identity_gemini_id)
-        {
-            Some(key) => Err(Error::Overwrite(key)), // @TODO prevent?
+        // Borrow shared index access
+        let mut index = self.index.borrow_mut();
+
+        // Prevent existing key overwrite
+        if index.contains_key(&url) {
+            return Err(Error::Overwrite(url));
+        }
+
+        // Slot should be free, let check it twice
+        match index.insert(url, profile_identity_gemini_id) {
+            Some(_) => return Err(Error::Unexpected),
             None => Ok(()),
         }
     }
