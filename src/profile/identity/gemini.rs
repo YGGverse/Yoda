@@ -34,7 +34,7 @@ impl Gemini {
         // Init components
         let auth = match Auth::new(connection.clone()) {
             Ok(auth) => Rc::new(auth),
-            Err(reason) => return Err(Error::AuthInit(reason)),
+            Err(reason) => return Err(Error::Auth(reason)),
         };
         let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
         let memory = Rc::new(Memory::new());
@@ -62,7 +62,7 @@ impl Gemini {
                 self.index()?;
                 Ok(profile_identity_gemini_id)
             }
-            Err(reason) => Err(Error::DatabaseRecordCreate(reason)),
+            Err(reason) => Err(Error::Database(reason)),
         }
     }
 
@@ -89,7 +89,7 @@ impl Gemini {
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
         if let Err(reason) = self.memory.clear() {
-            return Err(Error::MemoryClear(reason));
+            return Err(Error::Memory(reason));
         }
 
         // Build new index
@@ -97,11 +97,11 @@ impl Gemini {
             Ok(records) => {
                 for record in records {
                     if let Err(reason) = self.memory.add(record.id, record.pem) {
-                        return Err(Error::MemoryIndex(reason));
+                        return Err(Error::Memory(reason));
                     }
                 }
             }
-            Err(reason) => return Err(Error::DatabaseIndex(reason)),
+            Err(reason) => return Err(Error::Database(reason)),
         };
 
         Ok(())

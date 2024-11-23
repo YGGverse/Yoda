@@ -29,16 +29,16 @@ impl Identity {
                 Some(identity) => identity.id,
                 None => match database.add(profile_id, true) {
                     Ok(id) => id,
-                    Err(reason) => return Err(Error::DatabaseAdd(reason)),
+                    Err(reason) => return Err(Error::Database(reason)),
                 },
             },
-            Err(reason) => return Err(Error::DatabaseActive(reason)),
+            Err(reason) => return Err(Error::Database(reason)),
         });
 
         // Init gemini component
         let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
             Ok(result) => result,
-            Err(reason) => return Err(Error::GeminiInit(reason)),
+            Err(reason) => return Err(Error::Gemini(reason)),
         });
 
         // Done

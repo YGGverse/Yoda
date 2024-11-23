@@ -49,13 +49,7 @@ impl Auth {
         let profile_identity_gemini_auth_id =
             match self.database.add(profile_identity_gemini_id, url) {
                 Ok(id) => id,
-                Err(reason) => {
-                    return Err(Error::DatabaseRecordCreate(
-                        profile_identity_gemini_id,
-                        url.to_string(),
-                        reason,
-                    ))
-                }
+                Err(reason) => return Err(Error::Database(reason)),
             };
 
         // Reindex
@@ -71,11 +65,11 @@ impl Auth {
             Ok(records) => {
                 for record in records {
                     if let Err(reason) = self.database.delete(record.id) {
-                        return Err(Error::DatabaseRecordDelete(record.id, reason));
+                        return Err(Error::Database(reason));
                     }
                 }
             }
-            Err(reason) => return Err(Error::DatabaseRecordsRead(url.to_string(), reason)),
+            Err(reason) => return Err(Error::Database(reason)),
         }
         self.index()?;
         Ok(())
@@ -85,7 +79,7 @@ impl Auth {
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
         if let Err(reason) = self.memory.clear() {
-            return Err(Error::MemoryClear(reason));
+            return Err(Error::Memory(reason));
         }
 
         // Build new index
@@ -96,11 +90,11 @@ impl Auth {
                         .memory
                         .add(record.url, record.profile_identity_gemini_id)
                     {
-                        return Err(Error::MemoryIndex(reason));
+                        return Err(Error::Memory(reason));
                     }
                 }
             }
-            Err(reason) => return Err(Error::DatabaseIndex(reason)),
+            Err(reason) => return Err(Error::Database(reason)),
         }
 
         Ok(())
