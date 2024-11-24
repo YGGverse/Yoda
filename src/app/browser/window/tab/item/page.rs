@@ -482,7 +482,7 @@ impl Page {
                 Err(reason) => todo!("{reason}"),
             },
             None => {
-                // Use unauthorized TLS connection
+                // Use unauthorized (random) TLS connection
                 client.set_tls(true);
                 None
             }
@@ -501,6 +501,8 @@ impl Page {
                     SocketClientEvent::Connected => Status::Connected,
                     SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
                     SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
+                    // This case have effect only for unauthorized (random) TLS connection
+                    // * see `fn auth` above to handle custom certificates
                     SocketClientEvent::TlsHandshaking => {
                         // Handle certificate errors @TODO
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
