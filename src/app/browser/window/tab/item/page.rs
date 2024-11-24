@@ -469,6 +469,7 @@ impl Page {
         // Init socket
         let client = SocketClient::new();
         client.set_protocol(SocketProtocol::Tcp);
+        client.set_timeout(10); // @TODO
 
         // Return PEM string match request
         let certificate = match self
