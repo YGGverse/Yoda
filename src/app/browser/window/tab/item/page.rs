@@ -526,7 +526,7 @@ impl Page {
         let connectable = NetworkAddress::new(&uri.host().unwrap(), 1965);
 
         // Create connection
-        client.clone().connect_async(
+        client.connect_async(
             &connectable.clone(),
             Some(&cancellable.clone()),
             move |connect| match connect {
