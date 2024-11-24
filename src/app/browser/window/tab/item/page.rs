@@ -444,7 +444,7 @@ impl Page {
                 // https://geminiprotocol.net/docs/protocol-specification.gmi#closing-connections
                 tls_connection.set_require_close_notify(true);
 
-                // @TODO manual validation
+                // @TODO host validation
                 // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
                 tls_connection.connect_accept_certificate(move |_, _, _| true);
 
