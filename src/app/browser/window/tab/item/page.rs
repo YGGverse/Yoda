@@ -162,7 +162,7 @@ impl Page {
 
     /// Main loader for different protocols, that routed by scheme
     /// * every protocol has it own (children) method implementation
-    pub fn load(&self, history: bool) {
+    pub fn load(&self, is_history: bool) {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
         const DEFAULT_MAX_REDIRECT_COUNT: i8 = 10;
@@ -219,15 +219,8 @@ impl Page {
         };
 
         // Add history record
-        if history {
-            match self.navigation.history().current() {
-                Some(current) => {
-                    if current != request {
-                        self.navigation.history().add(request.clone(), true);
-                    }
-                }
-                None => self.navigation.history().add(request.clone(), true),
-            }
+        if is_history {
+            self.add_history(Some(request.clone()));
         }
 
         // Update
@@ -424,7 +417,28 @@ impl Page {
         &self.widget
     }
 
-    // Private helpers @TODO move outside
+    // Private helpers
+
+    /// Make new history record match shared conditions
+    /// * use `request` value from `navigation` entry if `None`
+    fn add_history(&self, request: Option<GString>) {
+        // Get request from argument or use navigation entry value
+        let request = match request {
+            Some(value) => value,
+            None => self.navigation.request().widget().gobject().text(),
+        };
+
+        // Apply additional filters
+        if match self.navigation.history().current() {
+            Some(current) => current != request,
+            None => true,
+        } {
+            // Add new record match conditions
+            self.navigation.history().add(request, true)
+        }
+    }
+
+    // @TODO move outside
     fn load_gemini(&self, uri: Uri) {
         // Stream wrapper for TLS connections
         fn auth(
