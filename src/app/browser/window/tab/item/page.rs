@@ -218,11 +218,6 @@ impl Page {
             self.navigation.request().widget().gobject().text()
         };
 
-        // Add history record
-        if is_history {
-            self.add_history(Some(request.clone()));
-        }
-
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
         self.browser_action.update().activate(Some(&id));
@@ -233,11 +228,16 @@ impl Page {
                 // Route by scheme
                 match uri.scheme().as_str() {
                     "file" => todo!(),
-                    "gemini" => self.load_gemini(uri), // @TODO
+                    "gemini" => self.load_gemini(uri, is_history), // @TODO
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
                         let title = "Oops";
+
+                        // Add history record
+                        if is_history {
+                            snap_history(self.navigation.clone());
+                        }
 
                         // Update widget
                         self.content
@@ -419,27 +419,8 @@ impl Page {
 
     // Private helpers
 
-    /// Make new history record match shared conditions
-    /// * use `request` value from `navigation` entry if `None`
-    fn add_history(&self, request: Option<GString>) {
-        // Get request from argument or use navigation entry value
-        let request = match request {
-            Some(value) => value,
-            None => self.navigation.request().widget().gobject().text(),
-        };
-
-        // Apply additional filters
-        if match self.navigation.history().current() {
-            Some(current) => current != request,
-            None => true,
-        } {
-            // Add new record match conditions
-            self.navigation.history().add(request, true)
-        }
-    }
-
     // @TODO move outside
-    fn load_gemini(&self, uri: Uri) {
+    fn load_gemini(&self, uri: Uri, is_history: bool) {
         // Stream wrapper for TLS connections
         fn auth(
             connection: impl IsA<IOStream>,
@@ -474,6 +455,7 @@ impl Page {
         let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
         let tab_action = self.tab_action.clone();
+        let navigation = self.navigation.clone();
         let content = self.content.clone();
         let id = self.id.clone();
         let input = self.input.clone();
@@ -610,6 +592,11 @@ impl Page {
                                                 },
                                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                                                 gemini::client::response::meta::Status::Success => {
+                                                    // Add history record
+                                                    if is_history {
+                                                        snap_history(navigation);
+                                                    }
+
                                                     // Route by MIME
                                                     match response.mime() {
                                                         Some(gemini::client::response::meta::Mime::TextGemini) => {
@@ -912,6 +899,11 @@ impl Page {
                                                     let status = Status::Success;
                                                     let title = "Identity";
 
+                                                    // Add history record
+                                                    if is_history {
+                                                        snap_history(navigation);
+                                                    }
+
                                                     // Update widget
                                                     content
                                                         .to_status_identity()
@@ -936,6 +928,11 @@ impl Page {
                                                     // Define common data
                                                     let status = Status::Failure;
                                                     let title = "Oops";
+
+                                                    // Add history record
+                                                    if is_history {
+                                                        snap_history(navigation);
+                                                    }
 
                                                     // Update widget
                                                     content
@@ -1006,6 +1003,11 @@ impl Page {
                                                 },
                                             };
 
+                                            // Add history record
+                                            if is_history {
+                                                snap_history(navigation);
+                                            }
+
                                             // Update widget
                                             content
                                                 .to_status_failure()
@@ -1027,6 +1029,11 @@ impl Page {
                                 let status = Status::Failure;
                                 let title = "Oops";
 
+                                // Add history record
+                                if is_history {
+                                    snap_history(navigation);
+                                }
+
                                 // Update widget
                                 content
                                     .to_status_failure()
@@ -1047,6 +1054,11 @@ impl Page {
                     // Define common data
                     let status = Status::Failure;
                     let title = "Oops";
+
+                    // Add history record
+                    if is_history {
+                        snap_history(navigation);
+                    }
 
                     // Update widget
                     content
@@ -1110,4 +1122,19 @@ fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
         return true;
     }
     subject.host() != base.host()
+}
+
+/// Make new history record for given `navigation` object
+/// * applies on shared conditions match only
+fn snap_history(navigation: Rc<Navigation>) {
+    let request = navigation.request().widget().gobject().text();
+
+    // Apply additional filters
+    if match navigation.history().current() {
+        Some(current) => current != request,
+        None => true,
+    } {
+        // Add new record match conditions
+        navigation.history().add(request, true)
+    }
 }
