@@ -49,12 +49,12 @@ impl Navigation {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            identity.widget().gobject(),
-            home.widget().gobject(),
-            history.widget().gobject(),
-            reload.widget().gobject(),
-            &request.widget.entry, // @TODO remove extra getters from other components
-            bookmark.widget().gobject(),
+            &identity.widget.gobject,
+            &home.widget.gobject,
+            &history.widget.gobject,
+            &reload.widget.gobject,
+            &request.widget.entry,
+            &bookmark.widget.gobject,
         ));
 
         // Done

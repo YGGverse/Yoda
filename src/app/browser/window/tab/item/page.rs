@@ -210,7 +210,7 @@ impl Page {
 
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
-        self.browser_action.update().activate(Some(&id));
+        self.browser_action.update.activate(Some(&id));
 
         // Route by request
         match Uri::parse(&request, UriFlags::NONE) {
@@ -241,7 +241,7 @@ impl Page {
                         self.meta.set_status(status).set_title(title);
 
                         // Update window
-                        self.browser_action.update().activate(Some(&id));
+                        self.browser_action.update.activate(Some(&id));
                     }
                 }
             }
@@ -393,7 +393,7 @@ impl Page {
     fn load_gemini(&self, uri: Uri, is_history: bool) {
         // Init shared clones
         let cancellable = self.cancellable.borrow().clone();
-        let update = self.browser_action.update().clone();
+        let update = self.browser_action.update.clone();
         let tab_action = self.tab_action.clone();
         let navigation = self.navigation.clone();
         let content = self.content.clone();

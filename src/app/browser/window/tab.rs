@@ -26,7 +26,7 @@ pub struct Tab {
     profile: Rc<Profile>,
     actions: (Rc<BrowserAction>, Rc<WindowAction>),
     index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Tab {
@@ -39,11 +39,11 @@ impl Tab {
         let menu = Menu::new(action.1.clone());
 
         // Init widget
-        let widget = Rc::new(Widget::new(menu.gobject()));
+        let widget = Rc::new(Widget::new(&menu.gobject));
 
         // Init events
 
-        widget.gobject().connect_setup_menu({
+        widget.gobject.connect_setup_menu({
             let action = action.1.clone();
             move |tab_view, tab_page| {
                 // Set new state for page selected on menu open
@@ -51,18 +51,18 @@ impl Tab {
                 let state = tab_page.map(|this| tab_view.page_position(this));
 
                 // Update actions with new state value
-                action.bookmark().change_state(state);
-                action.close_all().change_state(state);
-                action.close().change_state(state);
-                action.history_back().change_state(state);
-                action.history_forward().change_state(state);
-                action.home().change_state(state);
-                action.pin().change_state(state);
-                action.reload().change_state(state);
+                action.bookmark.change_state(state);
+                action.close_all.change_state(state);
+                action.close.change_state(state);
+                action.history_back.change_state(state);
+                action.history_forward.change_state(state);
+                action.home.change_state(state);
+                action.pin.change_state(state);
+                action.reload.change_state(state);
             }
         });
 
-        widget.gobject().connect_close_page({
+        widget.gobject.connect_close_page({
             let index = index.clone();
             move |_, item| {
                 // Get index ID by keyword saved
@@ -81,7 +81,7 @@ impl Tab {
             }
         });
 
-        widget.gobject().connect_selected_page_notify({
+        widget.gobject.connect_selected_page_notify({
             let index = index.clone();
             move |this| {
                 if let Some(page) = this.selected_page() {
@@ -117,7 +117,7 @@ impl Tab {
     ) -> Rc<Item> {
         // Init new tab item
         let item = Rc::new(Item::new(
-            self.widget.gobject(),
+            &self.widget.gobject,
             self.profile.clone(),
             // Actions
             (self.actions.0.clone(), self.actions.1.clone()),
@@ -228,7 +228,7 @@ impl Tab {
                 // Update tab title on loading indicator inactive
                 if !item.page.is_loading() {
                     item.widget
-                        .gobject()
+                        .gobject
                         .set_title(item.page.meta.title().as_str())
                 }
             }
@@ -241,7 +241,7 @@ impl Tab {
                     // Update tab title on loading indicator inactive
                     if !item.page.is_loading() {
                         item.widget
-                            .gobject()
+                            .gobject
                             .set_title(item.page.meta.title().as_str())
                     }
                 }
@@ -283,7 +283,7 @@ impl Tab {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
-                        self.widget.gobject(),
+                        &self.widget.gobject,
                         transaction,
                         &record.id,
                         self.profile.clone(),
@@ -322,10 +322,10 @@ impl Tab {
                     item.save(
                         transaction,
                         &id,
-                        &self.widget.gobject().page_position(item.widget.gobject()),
-                        &item.widget.gobject().is_pinned(),
-                        &item.widget.gobject().is_selected(),
-                        &item.widget.gobject().needs_attention(),
+                        &self.widget.gobject.page_position(&item.widget.gobject),
+                        &item.widget.gobject.is_pinned(),
+                        &item.widget.gobject.is_selected(),
+                        &item.widget.gobject.needs_attention(),
                     )?;
                 }
             }
@@ -342,12 +342,6 @@ impl Tab {
         }
 
         // @TODO other/child features..
-    }
-
-    // Getters
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }
 

@@ -8,7 +8,7 @@ use sqlite::Transaction;
 const DEFAULT_TITLE: &str = "New page";
 
 pub struct Widget {
-    gobject: TabPage,
+    pub gobject: TabPage,
 }
 
 impl Widget {
@@ -127,12 +127,6 @@ impl Widget {
         }
 
         Ok(())
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &TabPage {
-        &self.gobject
     }
 }
 

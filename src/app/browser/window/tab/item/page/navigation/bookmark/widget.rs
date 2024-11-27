@@ -7,7 +7,7 @@ const ICON_YES: &str = "starred-symbolic";
 const ICON_NON: &str = "non-starred-symbolic";
 
 pub struct Widget {
-    gobject: Button,
+    pub gobject: Button,
 }
 
 impl Widget {
@@ -21,7 +21,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| action.bookmark().activate());
+        gobject.connect_clicked(move |_| action.bookmark.activate());
 
         // Return activated `Self`
         Self { gobject }
@@ -32,11 +32,5 @@ impl Widget {
     pub fn update(&self, has_bookmark: bool) {
         self.gobject
             .set_icon_name(if has_bookmark { ICON_YES } else { ICON_NON });
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Button {
-        &self.gobject
     }
 }

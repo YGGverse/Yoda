@@ -2,7 +2,7 @@ use adw::ToolbarView;
 use gtk::Box;
 
 pub struct Widget {
-    gobject: ToolbarView,
+    pub gobject: ToolbarView,
 }
 
 impl Widget {
@@ -13,10 +13,5 @@ impl Widget {
         gobject.add_top_bar(top_bar);
 
         Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &ToolbarView {
-        &self.gobject
     }
 }

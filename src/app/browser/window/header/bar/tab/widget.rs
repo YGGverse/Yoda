@@ -2,7 +2,7 @@ use adw::{TabBar, TabView};
 use gtk::prelude::IsA;
 
 pub struct Widget {
-    gobject: TabBar,
+    pub gobject: TabBar,
 }
 
 impl Widget {
@@ -16,10 +16,5 @@ impl Widget {
                 .view(view)
                 .build(),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &TabBar {
-        &self.gobject
     }
 }

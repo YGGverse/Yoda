@@ -23,7 +23,7 @@ pub struct History {
     memory: RefCell<Vec<Memory>>,
     index: RefCell<Option<usize>>,
     // GTK
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl History {
@@ -34,10 +34,7 @@ impl History {
         let forward = Rc::new(Forward::new(window_action));
 
         // Init widget
-        let widget = Rc::new(Widget::new(
-            back.widget().gobject(),
-            forward.widget().gobject(),
-        ));
+        let widget = Rc::new(Widget::new(&back.widget.gobject, &forward.widget.gobject));
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -122,11 +119,5 @@ impl History {
             Some(_) => self.forward.update(true),
             None => self.forward.update(false),
         };
-    }
-
-    // Getters
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }

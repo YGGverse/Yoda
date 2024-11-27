@@ -7,7 +7,7 @@ use crate::profile::Profile;
 use adw::Application;
 use gtk::{
     glib::ExitCode,
-    prelude::{ApplicationExt, ApplicationExtManual, GtkApplicationExt},
+    prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt},
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -135,24 +135,24 @@ impl App {
             (
                 format!(
                     "{}.{}",
-                    browser.action().id(),
-                    browser.action().close().id()
+                    browser.action.id,
+                    browser.action.close.gobject.name()
                 ),
                 &["<Primary>Escape"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.action().id(),
-                    browser.action().debug().id()
+                    browser.action.id,
+                    browser.action.debug.gobject.name()
                 ),
                 &["<Primary>i"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.action().id(),
-                    browser.action().update().id()
+                    browser.action.id,
+                    browser.action.update.gobject.name()
                 ),
                 &["<Primary>u"],
             ),
@@ -160,64 +160,64 @@ impl App {
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().append().id()
+                    browser.window.action.id,
+                    browser.window.action.append.gobject.name()
                 ),
                 &["<Primary>t"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().bookmark().id()
+                    browser.window.action.id,
+                    browser.window.action.bookmark.gobject.name()
                 ),
                 &["<Primary>b"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().pin().id()
+                    browser.window.action.id,
+                    browser.window.action.pin.gobject.name()
                 ),
                 &["<Primary>p"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().reload().id()
+                    browser.window.action.id,
+                    browser.window.action.reload.gobject.name()
                 ),
                 &["<Primary>r"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().home().id()
+                    browser.window.action.id,
+                    browser.window.action.home.gobject.name()
                 ),
                 &["<Primary>h"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().history_back().id()
+                    browser.window.action.id,
+                    browser.window.action.history_back.gobject.name()
                 ),
                 &["<Primary>Left"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().history_forward().id()
+                    browser.window.action.id,
+                    browser.window.action.history_forward.gobject.name()
                 ),
                 &["<Primary>Right"],
             ),
             (
                 format!(
                     "{}.{}",
-                    browser.window().action().id(),
-                    browser.window().action().close().id()
+                    browser.window.action.id,
+                    browser.window.action.close.gobject.name()
                 ),
                 &["<Primary>q"],
             ),

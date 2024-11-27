@@ -1,11 +1,12 @@
 use crate::app::browser::window::action::Action as WindowAction;
+use gtk::prelude::ActionExt;
 use std::rc::Rc;
 
 /// Context menu wrapper
 ///
 /// https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/method.TabView.get_menu_model.html
 pub struct Menu {
-    gobject: gtk::gio::Menu,
+    pub gobject: gtk::gio::Menu,
 }
 
 impl Menu {
@@ -19,8 +20,8 @@ impl Menu {
             Some("Reload"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.reload().id()
+                window_action.id,
+                window_action.reload.gobject.name()
             )),
         );
 
@@ -30,8 +31,8 @@ impl Menu {
             Some("Bookmark"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.bookmark().id()
+                window_action.id,
+                window_action.bookmark.gobject.name()
             )),
         );
 
@@ -39,8 +40,8 @@ impl Menu {
             Some("Pin"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.pin().id()
+                window_action.id,
+                window_action.pin.gobject.name()
             )),
         );
 
@@ -52,8 +53,8 @@ impl Menu {
             Some("Home"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.home().id()
+                window_action.id,
+                window_action.home.gobject.name()
             )),
         );
 
@@ -65,8 +66,8 @@ impl Menu {
             Some("Back"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.history_back().id()
+                window_action.id,
+                window_action.history_back.gobject.name()
             )),
         );
 
@@ -74,8 +75,8 @@ impl Menu {
             Some("Forward"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.history_forward().id()
+                window_action.id,
+                window_action.history_forward.gobject.name()
             )),
         );
 
@@ -87,8 +88,8 @@ impl Menu {
             Some("Current"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.close().id()
+                window_action.id,
+                window_action.close.gobject.name()
             )),
         );
 
@@ -96,18 +97,13 @@ impl Menu {
             Some("All"),
             Some(&format!(
                 "{}.{}",
-                window_action.id(),
-                window_action.close_all().id()
+                window_action.id,
+                window_action.close_all.gobject.name()
             )),
         );
 
         main.append_submenu(Some("Close"), &close);
 
         Self { gobject: main }
-    }
-
-    /// Get reference to [Menu](https://docs.gtk.org/gio/class.Menu.html) `GObject`
-    pub fn gobject(&self) -> &gtk::gio::Menu {
-        &self.gobject
     }
 }

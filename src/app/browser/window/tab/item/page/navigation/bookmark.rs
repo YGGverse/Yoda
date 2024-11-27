@@ -6,7 +6,7 @@ use crate::app::browser::window::action::Action as WindowAction;
 use std::rc::Rc;
 
 pub struct Bookmark {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Bookmark {
@@ -20,11 +20,5 @@ impl Bookmark {
     // Actions
     pub fn update(&self, has_bookmark: bool) {
         self.widget.update(has_bookmark);
-    }
-
-    // Getters
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }

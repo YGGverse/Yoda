@@ -19,9 +19,9 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Browser {
-    action: Rc<Action>,
-    widget: Rc<Widget>,
-    window: Rc<Window>,
+    pub action: Rc<Action>,
+    pub widget: Rc<Widget>,
+    pub window: Rc<Window>,
 }
 
 impl Browser {
@@ -33,43 +33,43 @@ impl Browser {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            window.widget().gobject(),
+            &window.widget.gobject,
             &[
                 // Connect action groups (to apply accels)
                 (
                     // Browser
-                    action.id(),
-                    action.gobject().clone(),
+                    &action.id,
+                    action.gobject.clone(),
                 ),
                 (
                     // Window
-                    window.action().id(),
-                    window.action().gobject().clone(),
+                    &window.action.id,
+                    window.action.gobject.clone(),
                 ),
             ],
         ));
 
         // Connect events
-        action.about().connect_activate({
+        action.about.connect_activate({
             let window = window.clone();
             move || {
-                About::new().present(Some(window.widget().gobject()));
+                About::new().present(Some(&window.widget.gobject));
             }
         });
 
-        action.close().connect_activate({
+        action.close.connect_activate({
             let widget = widget.clone();
             move || widget.gobject().close()
         });
 
-        action.debug().connect_activate({
+        action.debug.connect_activate({
             let widget = widget.clone();
             move || {
                 widget.gobject().emit_enable_debugging(true);
             }
         });
 
-        action.profile().connect_activate({
+        action.profile.connect_activate({
             let profile = profile.clone();
             move || {
                 FileLauncher::new(Some(&File::for_path(profile.config_path.as_path()))).launch(
@@ -84,7 +84,7 @@ impl Browser {
             }
         });
 
-        action.update().connect_activate({
+        action.update.connect_activate({
             let window = window.clone();
             move |tab_item_id| window.update(tab_item_id)
         });
@@ -174,16 +174,6 @@ impl Browser {
 
     pub fn update(&self) {
         self.window.update(None);
-    }
-
-    // Getters
-
-    pub fn action(&self) -> &Rc<Action> {
-        &self.action
-    }
-
-    pub fn window(&self) -> &Rc<Window> {
-        &self.window
     }
 }
 

@@ -3,7 +3,7 @@ use gtk::{prelude::ButtonExt, Align, Button};
 use std::rc::Rc;
 
 pub struct Widget {
-    gobject: Button,
+    pub gobject: Button,
 }
 
 impl Widget {
@@ -18,13 +18,8 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| window_action.append().activate_default_once());
+        gobject.connect_clicked(move |_| window_action.append.activate_default_once());
 
         Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Button {
-        &self.gobject
     }
 }

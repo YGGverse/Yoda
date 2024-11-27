@@ -1,7 +1,7 @@
 use gtk::{PackType, WindowControls};
 
 pub struct Widget {
-    gobject: WindowControls,
+    pub gobject: WindowControls,
 }
 
 impl Widget {
@@ -13,10 +13,5 @@ impl Widget {
                 .margin_end(4)
                 .build(),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &WindowControls {
-        &self.gobject
     }
 }

@@ -6,7 +6,7 @@ use gtk::{
 use std::rc::Rc;
 
 pub struct Widget {
-    gobject: Button,
+    pub gobject: Button,
 }
 
 impl Widget {
@@ -20,7 +20,7 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| action.history_back().activate());
+        gobject.connect_clicked(move |_| action.history_back.activate());
 
         // Return activated `Self`
         Self { gobject }
@@ -29,10 +29,5 @@ impl Widget {
     // Actions
     pub fn update(&self, is_sensitive: bool) {
         self.gobject.set_sensitive(is_sensitive);
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Button {
-        &self.gobject
     }
 }

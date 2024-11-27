@@ -1,6 +1,6 @@
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, GString},
+    glib::uuid_string_random,
     prelude::{ActionExt, ToVariant},
 };
 
@@ -11,7 +11,7 @@ const DEFAULT_STATE: i32 = -1;
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Home` action of `Window` group
 pub struct Home {
-    gobject: SimpleAction,
+    pub gobject: SimpleAction,
 }
 
 impl Home {
@@ -65,17 +65,5 @@ impl Home {
                 Some(state)
             })
         });
-    }
-
-    // Getters
-
-    /// Get reference to [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) GObject
-    pub fn gobject(&self) -> &SimpleAction {
-        &self.gobject
-    }
-
-    /// Get auto-generated [action name](https://docs.gtk.org/gio/property.SimpleAction.name.html)
-    pub fn id(&self) -> GString {
-        self.gobject.name()
     }
 }

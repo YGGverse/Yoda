@@ -11,11 +11,10 @@ use widget::Widget;
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use adw::TabView;
-use gtk::Box;
 use std::rc::Rc;
 
 pub struct Bar {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Bar {
@@ -31,16 +30,10 @@ impl Bar {
         let menu = Menu::new(browser_action, window_action);
         Self {
             widget: Rc::new(Widget::new(
-                control.gobject(),
-                menu.gobject(),
-                tab.gobject(),
+                &control.widget.gobject,
+                &menu.widget.gobject,
+                &tab.widget.gobject,
             )),
         }
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
     }
 }

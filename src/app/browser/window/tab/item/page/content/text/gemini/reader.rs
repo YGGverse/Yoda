@@ -284,7 +284,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    actions.0.append().activate_stateful_once(
+                                    actions.0.append.activate_stateful_once(
                                         Position::After,
                                         Some(uri.to_string()),
                                         false,

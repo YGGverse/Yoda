@@ -9,7 +9,7 @@ const DEFAULT_TAB_ICON: &str = "view-pin-symbolic";
 
 /// Wrapper for [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) GObject
 pub struct Widget {
-    gobject: TabView,
+    pub gobject: TabView,
 }
 
 impl Widget {
@@ -71,10 +71,5 @@ impl Widget {
             Some(value) => Some(self.gobject.nth_page(value)),
             None => self.gobject.selected_page(),
         }
-    }
-
-    /// Get reference of [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) `GObject`
-    pub fn gobject(&self) -> &TabView {
-        &self.gobject
     }
 }

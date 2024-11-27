@@ -9,7 +9,7 @@ use std::{cell::RefCell, rc::Rc};
 pub struct Home {
     action: Rc<WindowAction>,
     uri: RefCell<Option<Uri>>,
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Home {
@@ -34,16 +34,13 @@ impl Home {
         self.uri.replace(uri);
 
         // Update action status
-        self.action.home().gobject().set_enabled(status);
+        self.action.home.gobject.set_enabled(status);
 
         // Update child components
         self.widget.update(status);
     }
 
     // Getters
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
-    }
 
     pub fn url(&self) -> Option<GString> {
         // Build URL from parsed URI cache

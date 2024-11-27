@@ -6,12 +6,12 @@ use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use gtk::{
     gio::{self},
-    MenuButton,
+    prelude::ActionExt,
 };
 use std::rc::Rc;
 
 pub struct Menu {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
@@ -26,14 +26,14 @@ impl Menu {
             let main_page = gio::Menu::new();
                 main_page.append(Some("New"), Some(&format!(
                     "{}.{}",
-                    window_action.id(),
-                    window_action.append().id()
+                    window_action.id,
+                    window_action.append.gobject.name()
                 )));
 
                 main_page.append(Some("Reload"), Some(&format!(
                     "{}.{}",
-                    window_action.id(),
-                    window_action.reload().id()
+                    window_action.id,
+                    window_action.reload.gobject.name()
                 )));
 
                 // Main > Page > Mark
@@ -41,14 +41,14 @@ impl Menu {
 
                     main_page_mark.append(Some("Bookmark"), Some(&format!(
                         "{}.{}",
-                        window_action.id(),
-                        window_action.bookmark().id()
+                        window_action.id,
+                        window_action.bookmark.gobject.name()
                     )));
 
                     main_page_mark.append(Some("Pin"), Some(&format!(
                         "{}.{}",
-                        window_action.id(),
-                        window_action.pin().id()
+                        window_action.id,
+                        window_action.pin.gobject.name()
                     )));
 
                 main_page.append_section(None, &main_page_mark);
@@ -58,8 +58,8 @@ impl Menu {
 
                     main_page_navigation.append(Some("Home"), Some(&format!(
                         "{}.{}",
-                        window_action.id(),
-                        window_action.home().id()
+                        window_action.id,
+                        window_action.home.gobject.name()
                     )));
 
                     // Main > Page > Navigation > History
@@ -67,14 +67,14 @@ impl Menu {
 
                         main_page_navigation_history.append(Some("Back"), Some(&format!(
                             "{}.{}",
-                            window_action.id(),
-                            window_action.history_back().id()
+                            window_action.id,
+                            window_action.history_back.gobject.name()
                         )));
 
                         main_page_navigation_history.append(Some("Forward"), Some(&format!(
                             "{}.{}",
-                            window_action.id(),
-                            window_action.history_forward().id()
+                            window_action.id,
+                            window_action.history_forward.gobject.name()
                         )));
 
                     main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
@@ -86,14 +86,14 @@ impl Menu {
 
                     main_page_close.append(Some("Current"), Some(&format!(
                         "{}.{}",
-                        window_action.id(),
-                        window_action.close().id()
+                        window_action.id,
+                        window_action.close.gobject.name()
                     )));
 
                     main_page_close.append(Some("All"), Some(&format!(
                         "{}.{}",
-                        window_action.id(),
-                        window_action.close_all().id()
+                        window_action.id,
+                        window_action.close_all.gobject.name()
                     )));
 
                     main_page.append_submenu(Some("Close"), &main_page_close);
@@ -106,36 +106,31 @@ impl Menu {
                 // Debug
                 main_tool.append(Some("Debug"), Some(&format!(
                     "{}.{}",
-                    browser_action.id(),
-                    browser_action.debug().id()
+                    browser_action.id,
+                    browser_action.debug.gobject.name()
                 )));
 
                 main_tool.append(Some("Profile"), Some(&format!(
                     "{}.{}",
-                    browser_action.id(),
-                    browser_action.profile().id()
+                    browser_action.id,
+                    browser_action.profile.gobject.name()
                 )));
 
                 main_tool.append(Some("About"), Some(&format!(
                     "{}.{}",
-                    browser_action.id(),
-                    browser_action.about().id()
+                    browser_action.id,
+                    browser_action.about.gobject.name()
                 )));
 
         main.append_submenu(Some("Tool"), &main_tool);
 
         main.append(Some("Quit"), Some(&format!(
             "{}.{}",
-            browser_action.id(),
-            browser_action.close().id()
+            browser_action.id,
+            browser_action.close.gobject.name()
         )));
 
         // Result
         Self { widget:Rc::new(Widget::new(&main)) }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &MenuButton {
-        self.widget.gobject()
     }
 }

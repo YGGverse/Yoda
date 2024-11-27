@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 pub struct Identity {
     action: Rc<Action>,
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Identity {
@@ -25,11 +25,5 @@ impl Identity {
 
         // Update widget
         self.widget.update(is_auth, is_enabled)
-    }
-
-    // Getters
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }

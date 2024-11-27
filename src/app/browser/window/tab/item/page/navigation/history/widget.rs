@@ -4,7 +4,7 @@ use gtk::{
 };
 
 pub struct Widget {
-    gobject: Box,
+    pub gobject: Box,
 }
 
 impl Widget {
@@ -24,10 +24,5 @@ impl Widget {
 
         // Return activated `Self`
         Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
     }
 }

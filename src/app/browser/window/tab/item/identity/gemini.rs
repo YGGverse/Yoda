@@ -163,7 +163,7 @@ impl Gemini {
                 }
 
                 // Reload page to apply changes
-                action.reload().activate();
+                action.reload.activate();
             }
         });
 

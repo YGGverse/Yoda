@@ -42,7 +42,7 @@ impl Widget {
 
         // Connect events
         entry.connect_changed(move |_| {
-            action.0.update().activate(None);
+            action.0.update.activate(None);
         });
 
         entry.connect_activate(move |this| {

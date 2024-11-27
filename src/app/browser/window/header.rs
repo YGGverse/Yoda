@@ -6,11 +6,11 @@ use widget::Widget;
 
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
-use adw::{TabView, ToolbarView};
+use adw::TabView;
 use std::rc::Rc;
 
 pub struct Header {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Header {
@@ -27,12 +27,7 @@ impl Header {
 
         // Return new struct
         Self {
-            widget: Rc::new(Widget::new(bar.gobject())),
+            widget: Rc::new(Widget::new(&bar.widget.gobject)),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &ToolbarView {
-        self.widget.gobject()
     }
 }

@@ -16,9 +16,9 @@ use gtk::glib::GString;
 use std::rc::Rc;
 
 pub struct Window {
-    action: Rc<Action>,
-    tab: Rc<Tab>,
-    widget: Rc<Widget>,
+    pub action: Rc<Action>,
+    pub tab: Rc<Tab>,
+    pub widget: Rc<Widget>,
 }
 
 impl Window {
@@ -29,11 +29,11 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::new(profile, (browser_action.clone(), action.clone())));
-        let header = Header::new(browser_action, action.clone(), tab.widget().gobject());
-        let widget = Rc::new(Widget::new(header.gobject(), tab.widget().gobject()));
+        let header = Header::new(browser_action, action.clone(), &tab.widget.gobject);
+        let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.gobject));
 
         // Init events
-        action.append().connect_activate({
+        action.append.connect_activate({
             let tab = tab.clone();
             move |position, request, is_pinned, is_selected, is_attention, is_load| {
                 tab.append(
@@ -47,7 +47,7 @@ impl Window {
             }
         });
 
-        action.bookmark().connect_activate({
+        action.bookmark.connect_activate({
             let tab = tab.clone();
             move |position| {
                 if tab.bookmark(position).is_err() {
@@ -56,39 +56,39 @@ impl Window {
             }
         });
 
-        action.pin().connect_activate({
+        action.pin.connect_activate({
             let tab = tab.clone();
             move |position| tab.pin(position)
         });
 
-        action.reload().connect_activate({
+        action.reload.connect_activate({
             let tab = tab.clone();
             move |position| tab.page_reload(position)
         });
 
-        action.home().connect_activate({
+        action.home.connect_activate({
             let tab = tab.clone();
             move |position| tab.page_home(position)
         });
 
-        action.close().connect_activate({
+        action.close.connect_activate({
             let tab = tab.clone();
             move |position| tab.close(position)
         });
 
-        action.close_all().connect_activate({
+        action.close_all.connect_activate({
             let tab = tab.clone();
             move |_| tab.close_all()
         });
 
-        action.history_back().connect_activate({
+        action.history_back.connect_activate({
             let tab = tab.clone();
             move |position| {
                 tab.page_history_back(position);
             } // @TODO rename destination method
         });
 
-        action.history_forward().connect_activate({
+        action.history_forward.connect_activate({
             let tab = tab.clone();
             move |position| {
                 tab.page_history_forward(position);
@@ -160,16 +160,6 @@ impl Window {
 
     pub fn init(&self) {
         self.tab.init();
-    }
-
-    // Getters
-
-    pub fn action(&self) -> &Rc<Action> {
-        &self.action
-    }
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }
 

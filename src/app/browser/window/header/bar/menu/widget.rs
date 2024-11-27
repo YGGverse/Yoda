@@ -1,7 +1,7 @@
 use gtk::{gio::Menu, Align, MenuButton};
 
 pub struct Widget {
-    gobject: MenuButton,
+    pub gobject: MenuButton,
 }
 
 impl Widget {
@@ -16,10 +16,5 @@ impl Widget {
                 .valign(Align::Center)
                 .build(),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &MenuButton {
-        &self.gobject
     }
 }

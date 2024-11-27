@@ -6,7 +6,7 @@ use gtk::{
 use std::rc::Rc;
 
 pub struct Widget {
-    gobject: Button,
+    pub gobject: Button,
 }
 
 impl Widget {
@@ -31,10 +31,5 @@ impl Widget {
         self.gobject.set_sensitive(is_enabled);
         self.gobject
             .set_css_classes(if is_auth { &["success"] } else { &[] });
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Button {
-        &self.gobject
     }
 }

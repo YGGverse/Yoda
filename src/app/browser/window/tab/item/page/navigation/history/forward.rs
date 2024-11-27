@@ -6,8 +6,8 @@ use crate::app::browser::window::Action;
 use std::rc::Rc;
 
 pub struct Forward {
-    action: Rc<Action>,
-    widget: Rc<Widget>,
+    pub action: Rc<Action>,
+    pub widget: Rc<Widget>,
 }
 
 impl Forward {
@@ -22,15 +22,9 @@ impl Forward {
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action.history_forward().gobject().set_enabled(status);
+        self.action.history_forward.gobject.set_enabled(status);
 
         // Update child components
         self.widget.update(status);
-    }
-
-    // Getters
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }

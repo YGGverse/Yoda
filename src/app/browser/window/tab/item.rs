@@ -112,7 +112,7 @@ impl Item {
         self.page.update();
 
         // Update tab loading indicator
-        self.widget.gobject().set_loading(self.page.is_loading());
+        self.widget.gobject.set_loading(self.page.is_loading());
     }
 
     pub fn clean(

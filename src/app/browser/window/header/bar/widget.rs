@@ -2,7 +2,7 @@ use adw::TabBar;
 use gtk::{prelude::BoxExt, Box, MenuButton, Orientation, WindowControls};
 
 pub struct Widget {
-    gobject: Box,
+    pub gobject: Box,
 }
 
 impl Widget {
@@ -18,10 +18,5 @@ impl Widget {
         gobject.append(control);
 
         Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
     }
 }
