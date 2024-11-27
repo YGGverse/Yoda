@@ -47,19 +47,6 @@ impl Identity {
             gemini,
         })
     }
-
-    /// Get `pem` record match `request`
-    /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
-    /// * this function work with memory cache collected (not database)
-    pub fn gemini(&self, request: &str) -> Option<String> {
-        if let Some(id) = self.gemini.auth.memory.match_priority(request) {
-            match self.gemini.memory.get(id) {
-                Ok(pem) => return Some(pem),
-                Err(reason) => todo!("{:?}", reason.to_string()),
-            }
-        }
-        None
-    }
 }
 
 // Tools

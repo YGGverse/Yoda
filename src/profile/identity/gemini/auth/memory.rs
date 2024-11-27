@@ -1,4 +1,7 @@
+pub mod auth;
 pub mod error;
+
+pub use auth::Auth;
 pub use error::Error;
 
 use std::{cell::RefCell, collections::HashMap};
@@ -49,23 +52,26 @@ impl Memory {
         }
     }
 
-    /// Get `profile_identity_gemini_id` vector match given `request`
+    /// Get identity match `request`
     /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
     /// * contain unspecified length priority implementation @TODO
-    pub fn match_priority(&self, request: &str) -> Option<i64> {
+    pub fn match_priority(&self, request: &str) -> Option<Auth> {
         let mut result = Vec::new();
 
         // Get all records starts with URL cached, collect length for priority
-        for (url, &profile_identity_gemini_id) in self.index.borrow().iter() {
-            if request.starts_with(url) {
-                result.push((profile_identity_gemini_id, url.len()))
+        for (scope, &profile_identity_gemini_id) in self.index.borrow().iter() {
+            if request.starts_with(scope) {
+                result.push(Auth {
+                    profile_identity_gemini_id,
+                    scope: scope.clone(),
+                })
             }
         }
 
         // Sort by length desc @TODO
-        result.sort_by(|a, b| b.1.cmp(&a.1));
+        result.sort_by(|a, b| b.scope.len().cmp(&a.scope.len()));
 
-        // Get first match ID
-        result.first().map(|value| value.0)
+        // Get first copy
+        result.first().cloned()
     }
 }

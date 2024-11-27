@@ -2,11 +2,13 @@ mod auth;
 mod certificate;
 mod database;
 mod error;
+mod identity;
 mod memory;
 
 use auth::Auth;
 use database::Database;
 pub use error::Error;
+use identity::Identity;
 
 use memory::Memory;
 
@@ -105,6 +107,24 @@ impl Gemini {
         };
 
         Ok(())
+    }
+
+    /// Get `pem` record match `request`
+    /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
+    /// * this function work with memory cache collected (not database)
+    pub fn match_priority(&self, request: &str) -> Option<Identity> {
+        if let Some(auth) = self.auth.memory.match_priority(request) {
+            match self.memory.get(auth.profile_identity_gemini_id) {
+                Ok(pem) => {
+                    return Some(Identity {
+                        scope: auth.scope,
+                        pem,
+                    })
+                }
+                Err(reason) => todo!("{:?}", reason.to_string()),
+            }
+        }
+        None
     }
 }
 

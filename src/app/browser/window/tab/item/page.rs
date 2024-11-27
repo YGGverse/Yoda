@@ -23,7 +23,7 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent, TlsCertificate},
+    gio::{Cancellable, SocketClientEvent},
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
@@ -417,17 +417,19 @@ impl Page {
         let input = self.input.clone();
         let meta = self.meta.clone();
 
-        // Return PEM string match request
+        // Find identity match request
         let certificate = match self
             .profile
             .identity
-            .gemini(&self.navigation.request().widget().gobject().text())
+            .gemini
+            .match_priority(&self.navigation.request().widget().gobject().text())
         {
-            // @TODO delegate to client
-            Some(pem) => match TlsCertificate::from_pem(&pem) {
-                Ok(certificate) => Some(certificate),
-                Err(reason) => todo!("{reason}"),
-            },
+            Some(identity) => {
+                match gemini::client::Certificate::from_pem(&identity.pem, &identity.scope) {
+                    Ok(certificate) => Some(certificate),
+                    Err(reason) => todo!("{reason}"),
+                }
+            }
             None => None,
         };
 
