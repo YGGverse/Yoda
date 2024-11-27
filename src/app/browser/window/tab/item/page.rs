@@ -426,11 +426,7 @@ impl Page {
                 Ok(certificate) => Some(certificate),
                 Err(reason) => todo!("{reason}"),
             },
-            None => {
-                // Use unauthorized (random) TLS connection
-                client.socket.set_tls(true);
-                None
-            }
+            None => None,
         };
 
         // Listen for connection status updates
