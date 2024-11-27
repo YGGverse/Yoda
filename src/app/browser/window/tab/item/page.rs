@@ -405,7 +405,7 @@ impl Page {
 
     // Private helpers
 
-    // @TODO move outside
+    // @TODO move somewhere outside
     fn load_gemini(&self, uri: Uri, is_history: bool) {
         // Init shared clones
         let cancellable = self.cancellable.borrow().clone();
@@ -423,6 +423,7 @@ impl Page {
             .identity
             .gemini(&self.navigation.request().widget().gobject().text())
         {
+            // @TODO delegate to client
             Some(pem) => match TlsCertificate::from_pem(&pem) {
                 Ok(certificate) => Some(certificate),
                 Err(reason) => todo!("{reason}"),
