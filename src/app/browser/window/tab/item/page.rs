@@ -21,18 +21,12 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{
-        Cancellable, IOStream, NetworkAddress, SocketClient, SocketClientEvent, SocketConnectable,
-        SocketProtocol, TlsCertificate, TlsClientConnection,
-    },
+    gio::{Cancellable, SocketClientEvent, TlsCertificate, TlsClientConnection},
     glib::{
-        gformat, Bytes, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri,
-        UriFlags, UriHideFlags,
+        gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
+        UriHideFlags,
     },
-    prelude::{
-        CancellableExt, Cast, EditableExt, IOStreamExt, IsA, OutputStreamExt, SocketClientExt,
-        TlsConnectionExt,
-    },
+    prelude::{CancellableExt, Cast, EditableExt, SocketClientExt, TlsConnectionExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc, time::Duration};
@@ -45,11 +39,11 @@ pub struct Page {
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
     // Components
-    navigation: Rc<Navigation>,
-    content: Rc<Content>,
-    input: Rc<Input>,
-    meta: Rc<Meta>,
-    widget: Rc<Widget>,
+    pub navigation: Rc<Navigation>,
+    pub content: Rc<Content>,
+    pub input: Rc<Input>,
+    pub meta: Rc<Meta>,
+    pub widget: Rc<Widget>,
 }
 
 impl Page {
@@ -107,7 +101,7 @@ impl Page {
             .toggle(self.navigation.request().widget().gobject().text().as_str())
         {
             Ok(result) => Ok(result),
-            Err(_) => Err(Error::Bookmark),
+            Err(_) => Err(Error::Bookmark), // @TODO
         };
         self.update();
         result
@@ -405,53 +399,11 @@ impl Page {
         }
     }
 
-    pub fn meta(&self) -> &Rc<Meta> {
-        &self.meta
-    }
-
-    pub fn navigation(&self) -> &Rc<Navigation> {
-        &self.navigation
-    }
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
-    }
-
     // Private helpers
 
     // @TODO move outside
     fn load_gemini(&self, uri: Uri, is_history: bool) {
-        // Stream wrapper for TLS connections
-        fn auth(
-            connection: impl IsA<IOStream>,
-            connectable: impl IsA<SocketConnectable>,
-            certificate: Option<TlsCertificate>,
-        ) -> impl IsA<IOStream> {
-            if let Some(certificate) = certificate {
-                // https://geminiprotocol.net/docs/protocol-specification.gmi#the-use-of-tls
-                let tls_connection =
-                    TlsClientConnection::new(&connection, Some(&connectable)).unwrap(); // @TODO handle
-
-                // https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
-                tls_connection.set_certificate(&certificate);
-
-                // @TODO handle exceptions
-                // https://geminiprotocol.net/docs/protocol-specification.gmi#closing-connections
-                tls_connection.set_require_close_notify(true);
-
-                // @TODO host validation
-                // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
-                tls_connection.connect_accept_certificate(move |_, _, _| true);
-
-                // Take encrypted I/O stream
-                tls_connection.upcast::<IOStream>()
-            } else {
-                // Take default I/O stream
-                connection.upcast::<IOStream>()
-            }
-        }
-
-        // Init shared objects (async)
+        // Init shared clones
         let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update().clone();
         let tab_action = self.tab_action.clone();
@@ -460,12 +412,9 @@ impl Page {
         let id = self.id.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
-        let url = uri.clone().to_str();
 
         // Init socket
-        let client = SocketClient::new();
-        client.set_protocol(SocketProtocol::Tcp);
-        client.set_timeout(10); // @TODO
+        let client = gemini::Client::new();
 
         // Return PEM string match request
         let certificate = match self
@@ -479,16 +428,16 @@ impl Page {
             },
             None => {
                 // Use unauthorized (random) TLS connection
-                client.set_tls(true);
+                client.socket.set_tls(true);
                 None
             }
         };
 
         // Listen for connection status updates
-        client.connect_event({
-            let update = update.clone();
+        client.socket.connect_event({
             let id = id.clone();
             let meta = meta.clone();
+            let update = update.clone();
             move |_, event, _, stream| {
                 meta.set_status(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
@@ -497,8 +446,7 @@ impl Page {
                     SocketClientEvent::Connected => Status::Connected,
                     SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
                     SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
-                    // This case have effect only for unauthorized (random) TLS connection
-                    // * see `fn auth` above to handle custom certificates
+                    // This match have effect only for unauthorized (random) TLS connection
                     SocketClientEvent::TlsHandshaking => {
                         // Handle certificate errors @TODO
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
@@ -517,554 +465,423 @@ impl Page {
             }
         });
 
-        // Implement shared [SocketConnectable](https://docs.gtk.org/gio/iface.SocketConnectable.html) interface
-        // * required also on `auth` step ([SNI](https://geminiprotocol.net/docs/protocol-specification.gmi#server-name-indication))
-        let connectable = NetworkAddress::new(
-            &uri.host().unwrap(),
-            if uri.port().is_positive() {
-                uri.port() as u16
-            } else {
-                1965
-            },
-        );
-
         // Create connection
-        client.connect_async(
-            &connectable.clone(),
-            Some(&cancellable.clone()),
-            move |connect| match connect {
-                Ok(connection) => {
+        client.request_async(
+            uri.clone(),
+            None,
+            Some(cancellable.clone()),
+            certificate,
+            move |result| match result {
+                Ok(response) => {
+                    // Route by status
+                    match response.meta.status {
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
+                        gemini::client::response::meta::Status::Input |
+                        gemini::client::response::meta::Status::SensitiveInput => {
+                            // Format response
+                            let status = Status::Input;
+                            let title = match response.meta.data {
+                                Some(data) => data.value,
+                                None => gformat!("Input expected"),
+                            };
 
-                    // Encrypt stream using authorization TLS
-                    let stream = auth(connection, connectable, certificate);
+                            // Toggle input form variant
+                            match response.meta.status {
+                                gemini::client::response::meta::Status::SensitiveInput =>
+                                    input.set_new_sensitive(
+                                        tab_action.clone(),
+                                        uri.clone(),
+                                        Some(&title),
+                                        Some(1024),
+                                    ),
+                                _ =>
+                                    input.set_new_response(
+                                        tab_action.clone(),
+                                        uri.clone(),
+                                        Some(&title),
+                                        Some(1024),
+                                    ),
+                            }
 
-                    // Send request
-                    stream.output_stream().write_bytes_async(
-                        &Bytes::from(gformat!("{url}\r\n").as_bytes()),
-                        Priority::DEFAULT,
-                        Some(&cancellable.clone()),
-                        move |request| match request {
-                            Ok(_) => {
-                                // Read meta from input stream
-                                gemini::client::response::Meta::from_stream_async(
-                                    stream.clone(),
-                                    Some(Priority::DEFAULT),
-                                    Some(cancellable.clone()),
-                                    move |result| match result
-                                    {
-                                        Ok(response) => {
-                                            // Route by status
-                                            match response.status() {
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                                                gemini::client::response::meta::Status::Input |
-                                                gemini::client::response::meta::Status::SensitiveInput => {
-                                                    // Format response
-                                                    let status = Status::Input;
-                                                    let title = match response.data() {
-                                                        Some(data) => data.value().as_str(),
-                                                        None => "Input expected",
-                                                    };
+                            // Update meta
+                            meta.set_status(status)
+                                .set_title(&title);
 
-                                                    // Toggle input form variant
-                                                    match response.status() {
-                                                        gemini::client::response::meta::Status::SensitiveInput =>
-                                                            input.set_new_sensitive(
-                                                                tab_action,
-                                                                uri,
-                                                                Some(title),
-                                                                Some(1024),
-                                                            ),
-                                                        _ =>
-                                                            input.set_new_response(
-                                                                tab_action,
-                                                                uri,
-                                                                Some(title),
-                                                                Some(1024),
-                                                            ),
+                            // Update page
+                            update.activate(Some(&id));
+                        },
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
+                        gemini::client::response::meta::Status::Success => {
+                            // Add history record
+                            if is_history {
+                                snap_history(navigation.clone());
+                            }
+
+                            // Route by MIME
+                            match response.meta.mime {
+                                Some(gemini::client::response::meta::Mime::TextGemini) => {
+                                    // Read entire input stream to buffer
+                                    gemini::client::response::data::Text::from_stream_async(
+                                        response.connection.stream(),
+                                        Some(Priority::DEFAULT),
+                                        Some(cancellable.clone()),
+                                        {
+                                            let content = content.clone();
+                                            let id = id.clone();
+                                            let meta = meta.clone();
+                                            let update = update.clone();
+                                            let uri = uri.clone();
+                                            move |result|{
+                                                match result {
+                                                    Ok(buffer) => {
+                                                        // Set children component
+                                                        let text_gemini = content.to_text_gemini(
+                                                            &uri,
+                                                            &buffer.data
+                                                        );
+
+                                                        let title = match text_gemini.meta_title() {
+                                                            Some(title) => title,
+                                                            None => &uri_to_title(&uri)
+                                                        };
+
+                                                        // Update page meta
+                                                        meta.set_status(Status::Success)
+                                                            .set_title(title);
+
+                                                        // Update window components
+                                                        update.activate(Some(&id));
                                                     }
+                                                    Err(reason) => {
+                                                        // Define common data
+                                                        let status = Status::Failure;
+                                                        let title = "Oops";
+                                                        let description = reason.to_string();
 
-                                                    // Update meta
-                                                    meta.set_status(status)
-                                                        .set_title(title);
+                                                        // Update widget
+                                                        content
+                                                            .to_status_failure()
+                                                            .set_title(title)
+                                                            .set_description(Some(&description));
 
-                                                    // Update page
-                                                    update.activate(Some(&id));
-                                                },
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-                                                gemini::client::response::meta::Status::Success => {
-                                                    // Add history record
-                                                    if is_history {
-                                                        snap_history(navigation);
-                                                    }
+                                                        // Update meta
+                                                        meta.set_status(status)
+                                                            .set_title(title);
 
-                                                    // Route by MIME
-                                                    match response.mime() {
-                                                        Some(gemini::client::response::meta::Mime::TextGemini) => {
-                                                            // Read entire input stream to buffer
-                                                            gemini::client::response::data::Text::from_stream_async(
-                                                                stream,
-                                                                Some(Priority::DEFAULT),
-                                                                Some(cancellable.clone()),
-                                                                move |result|{
-                                                                    match result {
-                                                                        Ok(buffer) => {
-                                                                            // Set children component
-                                                                            let text_gemini = content.to_text_gemini(
-                                                                                &uri,
-                                                                                buffer.data()
-                                                                            );
+                                                        // Update window
+                                                        update.activate(Some(&id));
+                                                    },
+                                                }
+                                            }
+                                        }
+                                    );
+                                },
+                                Some(
+                                    gemini::client::response::meta::Mime::ImagePng  |
+                                    gemini::client::response::meta::Mime::ImageGif  |
+                                    gemini::client::response::meta::Mime::ImageJpeg |
+                                    gemini::client::response::meta::Mime::ImageWebp
+                                ) => {
+                                    // Final image size unknown, show loading widget
+                                    let status = content.to_status_loading(
+                                        Some(Duration::from_secs(1)) // show if download time > 1 second
+                                    );
 
-                                                                            let title = match text_gemini.meta_title() {
-                                                                                Some(title) => title,
-                                                                                None => &uri_to_title(&uri)
-                                                                            };
+                                    // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
+                                    // this action allows to count the bytes for loading widget and validate max size for incoming data
+                                    gemini::gio::memory_input_stream::from_stream_async(
+                                        response.connection.stream(),
+                                        Some(cancellable.clone()),
+                                        Priority::DEFAULT,
+                                        0x400, // 1024 bytes per chunk, optional step for images download tracking
+                                        0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
+                                        move |(_, total)| {
+                                            // Update loading progress
+                                            status.set_description(
+                                                Some(&gformat!("Download: {total} bytes"))
+                                            );
+                                        },
+                                        {
+                                            let cancellable = cancellable.clone();
+                                            let content = content.clone();
+                                            let id = id.clone();
+                                            let meta = meta.clone();
+                                            let update = update.clone();
+                                            let uri = uri.clone();
+                                            move |result| match result {
+                                                Ok(memory_input_stream) => {
+                                                    Pixbuf::from_stream_async(
+                                                        &memory_input_stream,
+                                                        Some(&cancellable),
+                                                        move |result| {
+                                                            match result {
+                                                                Ok(buffer) => {
+                                                                    // Update page meta
+                                                                    meta.set_status(Status::Success)
+                                                                        .set_title(uri_to_title(&uri).as_str());
 
-                                                                            // Update page meta
-                                                                            meta.set_status(Status::Success)
-                                                                                .set_title(title);
+                                                                    // Update page content
+                                                                    content.to_image(&Texture::for_pixbuf(&buffer));
 
-                                                                            // Update window components
-                                                                            update.activate(Some(&id));
-                                                                        }
-                                                                        Err((reason, message)) => {
-                                                                            // Define common data
-                                                                            let status = Status::Failure;
-                                                                            let title = "Oops";
-                                                                            let description = match reason {
-                                                                                gemini::client::response::data::text::Error::InputStream => match message {
-                                                                                    Some(error) => gformat!("{error}"),
-                                                                                    None => gformat!("Undefined connection error")
-                                                                                } ,
-                                                                                gemini::client::response::data::text::Error::BufferOverflow => gformat!("Buffer overflow"),
-                                                                                gemini::client::response::data::text::Error::Decode => gformat!("Buffer decode error"),
-                                                                            };
-
-                                                                            // Update widget
-                                                                            content
-                                                                                .to_status_failure()
-                                                                                .set_title(title)
-                                                                                .set_description(Some(description.as_str()));
-
-                                                                            // Update meta
-                                                                            meta.set_status(status)
-                                                                                .set_title(title);
-
-                                                                            // Update window
-                                                                            update.activate(Some(&id));
-                                                                        },
-                                                                    }
-                                                                }
-                                                            );
-                                                        },
-                                                        Some(
-                                                            gemini::client::response::meta::Mime::ImagePng  |
-                                                            gemini::client::response::meta::Mime::ImageGif  |
-                                                            gemini::client::response::meta::Mime::ImageJpeg |
-                                                            gemini::client::response::meta::Mime::ImageWebp
-                                                        ) => {
-                                                            // Final image size unknown, show loading widget
-                                                            let status = content.to_status_loading(
-                                                                Some(Duration::from_secs(1)) // show if download time > 1 second
-                                                            );
-
-                                                            // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
-                                                            // this action allows to count the bytes for loading widget and validate max size for incoming data
-                                                            gemini::gio::memory_input_stream::from_stream_async(
-                                                                stream,
-                                                                Some(cancellable.clone()),
-                                                                Priority::DEFAULT,
-                                                                0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                                                0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                                                move |(_, total)| {
-                                                                    // Update loading progress
-                                                                    status.set_description(
-                                                                        Some(&gformat!("Download: {total} bytes"))
-                                                                    );
-                                                                },
-                                                                move |result| match result {
-                                                                    Ok(memory_input_stream) => {
-                                                                        Pixbuf::from_stream_async(
-                                                                            &memory_input_stream,
-                                                                            Some(&cancellable),
-                                                                            move |result| {
-                                                                                match result {
-                                                                                    Ok(buffer) => {
-                                                                                        // Update page meta
-                                                                                        meta.set_status(Status::Success)
-                                                                                            .set_title(uri_to_title(&uri).as_str());
-
-                                                                                        // Update page content
-                                                                                        content.to_image(&Texture::for_pixbuf(&buffer));
-
-                                                                                        // Update window components
-                                                                                        update.activate(Some(&id));
-                                                                                    }
-                                                                                    Err(reason) => {
-                                                                                        // Define common data
-                                                                                        let status = Status::Failure;
-                                                                                        let title = "Oops";
-
-                                                                                        // Update widget
-                                                                                        content
-                                                                                            .to_status_failure()
-                                                                                            .set_title(title)
-                                                                                            .set_description(Some(reason.message()));
-
-                                                                                        // Update meta
-                                                                                        meta.set_status(status)
-                                                                                            .set_title(title);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        );
-                                                                    },
-                                                                    Err((error, reason)) => {
-                                                                        // Define common data
-                                                                        let status = Status::Failure;
-                                                                        let title = "Oops";
-                                                                        let description = match reason {
-                                                                            Some(message) => gformat!("{message}"),
-                                                                            None => match error {
-                                                                                gemini::gio::memory_input_stream::Error::BytesTotal => gformat!("Allowed size reached"),
-                                                                                gemini::gio::memory_input_stream::Error::InputStream => gformat!("Input stream error"),
-                                                                            },
-                                                                        };
-
-                                                                        // Update widget
-                                                                        content
-                                                                            .to_status_failure()
-                                                                            .set_title(title)
-                                                                            .set_description(Some(description.as_str()));
-
-                                                                        // Update meta
-                                                                        meta.set_status(status)
-                                                                            .set_title(title);
-                                                                    }
-                                                                },
-                                                            );
-                                                        },
-                                                        /* @TODO stream or download
-                                                        Some(
-                                                            ClientMime::AudioFlac | ClientMime::AudioMpeg | ClientMime::AudioOgg
-                                                        ) => {
-                                                            // Update page meta
-                                                            meta.borrow_mut().status = Some(Status::Success);
-                                                            meta.borrow_mut().title = Some(gformat!("Stream"));
-
-                                                            // Update page content
-                                                            // content.to_stream();
-
-                                                            // Update window components
-                                                            update.activate(Some(&id));
-                                                        }, */
-                                                        _ => {
-                                                            // Define common data
-                                                            let status = Status::Failure;
-                                                            let title = "Oops";
-                                                            let description = gformat!("Content type not supported");
-
-                                                            // Update widget
-                                                            content
-                                                                .to_status_failure()
-                                                                .set_title(title)
-                                                                .set_description(Some(description.as_str()));
-
-                                                            // Update meta
-                                                            meta.set_status(status)
-                                                                .set_title(title);
-
-                                                            // Update window
-                                                            update.activate(Some(&id));
-                                                        },
-                                                    }
-                                                },
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                                                gemini::client::response::meta::Status::Redirect |
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                                                gemini::client::response::meta::Status::PermanentRedirect => {
-                                                    // Extract redirection URL from response data
-                                                    match response.data() {
-                                                        Some(unresolved_url) => {
-                                                            // New URL from server MAY to be relative (according to the protocol specification),
-                                                            // resolve to absolute URI gobject using current request as the base for parser:
-                                                            // https://docs.gtk.org/glib/type_func.Uri.resolve_relative.html
-                                                            match Uri::resolve_relative(
-                                                                Some(&uri.to_string()),
-                                                                unresolved_url.value(),
-                                                                UriFlags::NONE,
-                                                            ) {
-                                                                Ok(resolved_url) => {
-                                                                    // Build valid URI from resolved URL string
-                                                                    // this conversion wanted to simply exclude `query` and `fragment` later (as restricted by protocol specification)
-                                                                    match Uri::parse(resolved_url.as_str(), UriFlags::NONE) {
-                                                                        Ok(resolved_uri) => {
-                                                                            // Client MUST prevent external redirects (by protocol specification)
-                                                                            if is_external_uri(&resolved_uri, &uri) {
-                                                                                // Update meta
-                                                                                meta.set_status(Status::Failure)
-                                                                                    .set_title("Oops");
-
-                                                                                // Show placeholder with manual confirmation to continue @TODO status page?
-                                                                                content.to_text_gemini(
-                                                                                    &uri,
-                                                                                    &gformat!(
-                                                                                        "# Redirect issue\n\nExternal redirects not allowed by protocol\n\nContinue:\n\n=> {}",
-                                                                                        resolved_uri.to_string()
-                                                                                    )
-                                                                                );
-                                                                            // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
-                                                                            } else if meta.redirect_count() > Some(5) {
-                                                                                // Update meta
-                                                                                meta.set_status(Status::Failure)
-                                                                                    .set_title("Oops");
-
-                                                                                // Show placeholder with manual confirmation to continue @TODO status page?
-                                                                                content.to_text_gemini(
-                                                                                    &uri,
-                                                                                    &gformat!(
-                                                                                        "# Redirect issue\n\nLimit the number of redirects reached\n\nContinue:\n\n=> {}",
-                                                                                        resolved_uri.to_string()
-                                                                                    )
-                                                                                );
-                                                                            // Redirection value looks valid, create new redirect (stored in meta `Redirect` holder)
-                                                                            // then call page reload action to apply it by the parental controller
-                                                                            } else {
-                                                                                meta.set_redirect(
-                                                                                    // Skip query and fragment by protocol requirements
-                                                                                    // @TODO review fragment specification
-                                                                                    resolved_uri.to_string_partial(
-                                                                                        UriHideFlags::FRAGMENT | UriHideFlags::QUERY
-                                                                                    ),
-                                                                                    // Set follow policy based on status code
-                                                                                    matches!(response.status(), gemini::client::response::meta::Status::PermanentRedirect),
-                                                                                )
-                                                                                    .set_status(Status::Redirect) // @TODO is this status really wanted?
-                                                                                    .set_title("Redirect");
-
-                                                                                // Reload page to apply redirection (without history record request)
-                                                                                tab_action.load().activate(None, false);
-                                                                            }
-                                                                        },
-                                                                        Err(reason) => {
-                                                                            let status = Status::Failure;
-                                                                            let title = "Oops";
-
-                                                                            meta.set_status(status)
-                                                                                .set_title(title);
-
-                                                                            content
-                                                                                .to_status_failure()
-                                                                                .set_title(title)
-                                                                                .set_description(Some(reason.message()));
-                                                                        }
-                                                                    }
+                                                                    // Update window components
+                                                                    update.activate(Some(&id));
                                                                 }
                                                                 Err(reason) => {
+                                                                    // Define common data
                                                                     let status = Status::Failure;
                                                                     let title = "Oops";
 
-                                                                    meta.set_status(status)
-                                                                        .set_title(title);
-
+                                                                    // Update widget
                                                                     content
                                                                         .to_status_failure()
                                                                         .set_title(title)
                                                                         .set_description(Some(reason.message()));
-                                                                },
+
+                                                                    // Update meta
+                                                                    meta.set_status(status)
+                                                                        .set_title(title);
+                                                                }
                                                             }
-                                                        },
-                                                        None => {
-                                                            let status = Status::Failure;
-                                                            let title = "Oops";
-
-                                                            meta.set_status(status)
-                                                                .set_title(title);
-
-                                                            content
-                                                                .to_status_failure()
-                                                                .set_title(title)
-                                                                .set_description(Some("Redirection target not defined"));
-                                                        },
-                                                    }
-
-                                                    update.activate(Some(&id));
+                                                        }
+                                                    );
                                                 },
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                                                gemini::client::response::meta::Status::CertificateRequest |
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                                                gemini::client::response::meta::Status::CertificateUnauthorized |
-                                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                                                gemini::client::response::meta::Status::CertificateInvalid => {
-                                                    // Define common data
-                                                    let status = Status::Success;
-                                                    let title = "Identity";
-
-                                                    // Add history record
-                                                    if is_history {
-                                                        snap_history(navigation);
-                                                    }
-
-                                                    // Update widget
-                                                    content
-                                                        .to_status_identity()
-                                                        .set_title(title)
-                                                        .set_description(match response.data() {
-                                                            Some(data) => Some(data.value().as_str()),
-                                                            None => match response.status() {
-                                                                gemini::client::response::meta::Status::CertificateUnauthorized => Some("Certificate not authorized"),
-                                                                gemini::client::response::meta::Status::CertificateInvalid => Some("Certificate not valid"),
-                                                                _ => Some("Client certificate required")
-                                                            },
-                                                        });
-
-                                                    // Update meta
-                                                    meta.set_status(status)
-                                                        .set_title(title);
-
-                                                    // Update window
-                                                    update.activate(Some(&id));
-                                                }
-                                                _ => {
+                                                Err((error, reason)) => {
                                                     // Define common data
                                                     let status = Status::Failure;
                                                     let title = "Oops";
-
-                                                    // Add history record
-                                                    if is_history {
-                                                        snap_history(navigation);
-                                                    }
+                                                    let description = match reason {
+                                                        Some(message) => gformat!("{message}"),
+                                                        None => match error {
+                                                            gemini::gio::memory_input_stream::Error::BytesTotal => gformat!("Allowed size reached"),
+                                                            gemini::gio::memory_input_stream::Error::InputStream => gformat!("Input stream error"),
+                                                        },
+                                                    };
 
                                                     // Update widget
                                                     content
                                                         .to_status_failure()
                                                         .set_title(title)
-                                                        .set_description(Some(match response.data() {
-                                                            Some(data) => data.value().as_str(),
-                                                            None => "Status code yet not supported", // @TODO
-                                                        }));
+                                                        .set_description(Some(&description));
 
                                                     // Update meta
                                                     meta.set_status(status)
                                                         .set_title(title);
-
-                                                    // Update window
-                                                    update.activate(Some(&id));
                                                 }
                                             }
-                                        },
-                                        Err((reason, message)) => {
-                                            // Define common data
+                                            }
+                                        );
+                                },
+                                _ => {
+                                    // Define common data
+                                    let status = Status::Failure;
+                                    let title = "Oops";
+                                    let description = gformat!("Content type not supported");
+
+                                    // Update widget
+                                    content
+                                        .to_status_failure()
+                                        .set_title(title)
+                                        .set_description(Some(&description));
+
+                                    // Update meta
+                                    meta.set_status(status)
+                                        .set_title(title);
+
+                                    // Update window
+                                    update.activate(Some(&id));
+                                },
+                            }
+                        },
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
+                        gemini::client::response::meta::Status::Redirect |
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
+                        gemini::client::response::meta::Status::PermanentRedirect => {
+                            // Extract redirection URL from response data
+                            match response.meta.data {
+                                Some(unresolved_url) => {
+                                    // New URL from server MAY to be relative (according to the protocol specification),
+                                    // resolve to absolute URI gobject using current request as the base for parser:
+                                    // https://docs.gtk.org/glib/type_func.Uri.resolve_relative.html
+                                    match Uri::resolve_relative(
+                                        Some(&uri.to_string()),
+                                        unresolved_url.value.as_str(),
+                                        UriFlags::NONE,
+                                    ) {
+                                        Ok(resolved_url) => {
+                                            // Build valid URI from resolved URL string
+                                            // this conversion wanted to simply exclude `query` and `fragment` later (as restricted by protocol specification)
+                                            match Uri::parse(resolved_url.as_str(), UriFlags::NONE) {
+                                                Ok(resolved_uri) => {
+                                                    // Client MUST prevent external redirects (by protocol specification)
+                                                    if is_external_uri(&resolved_uri, &uri) {
+                                                        // Update meta
+                                                        meta.set_status(Status::Failure)
+                                                            .set_title("Oops");
+
+                                                        // Show placeholder with manual confirmation to continue @TODO status page?
+                                                        content.to_text_gemini(
+                                                            &uri,
+                                                            &gformat!(
+                                                                "# Redirect issue\n\nExternal redirects not allowed by protocol\n\nContinue:\n\n=> {}",
+                                                                resolved_uri.to_string()
+                                                            )
+                                                        );
+                                                    // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
+                                                    } else if meta.redirect_count() > Some(5) {
+                                                        // Update meta
+                                                        meta.set_status(Status::Failure)
+                                                            .set_title("Oops");
+
+                                                        // Show placeholder with manual confirmation to continue @TODO status page?
+                                                        content.to_text_gemini(
+                                                            &uri,
+                                                            &gformat!(
+                                                                "# Redirect issue\n\nLimit the number of redirects reached\n\nContinue:\n\n=> {}",
+                                                                resolved_uri.to_string()
+                                                            )
+                                                        );
+                                                    // Redirection value looks valid, create new redirect (stored in meta `Redirect` holder)
+                                                    // then call page reload action to apply it by the parental controller
+                                                    } else {
+                                                        meta.set_redirect(
+                                                            // Skip query and fragment by protocol requirements
+                                                            // @TODO review fragment specification
+                                                            resolved_uri.to_string_partial(
+                                                                UriHideFlags::FRAGMENT | UriHideFlags::QUERY
+                                                            ),
+                                                            // Set follow policy based on status code
+                                                            matches!(response.meta.status, gemini::client::response::meta::Status::PermanentRedirect),
+                                                        )
+                                                            .set_status(Status::Redirect) // @TODO is this status really wanted?
+                                                            .set_title("Redirect");
+
+                                                        // Reload page to apply redirection (without history record request)
+                                                        tab_action.load().activate(None, false);
+                                                    }
+                                                },
+                                                Err(reason) => {
+                                                    let status = Status::Failure;
+                                                    let title = "Oops";
+
+                                                    meta.set_status(status)
+                                                        .set_title(title);
+
+                                                    content
+                                                        .to_status_failure()
+                                                        .set_title(title)
+                                                        .set_description(Some(reason.message()));
+                                                }
+                                            }
+                                        }
+                                        Err(reason) => {
                                             let status = Status::Failure;
                                             let title = "Oops";
-                                            let description = match reason {
-                                                // Common
-                                                gemini::client::response::meta::Error::InputStream => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Input stream reading error")
-                                                },
-                                                gemini::client::response::meta::Error::Protocol => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect protocol")
-                                                },
-                                                // Status
-                                                gemini::client::response::meta::Error::StatusDecode => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Could not detect status code")
-                                                },
-                                                gemini::client::response::meta::Error::StatusUndefined => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Status code yet not supported")
-                                                },
-                                                gemini::client::response::meta::Error::StatusProtocol => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect status code protocol")
-                                                },
-                                                // Data
-                                                gemini::client::response::meta::Error::DataDecode => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect data encoding")
-                                                },
-                                                gemini::client::response::meta::Error::DataProtocol => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect data protocol")
-                                                },
-                                                // MIME
-                                                gemini::client::response::meta::Error::MimeDecode => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect MIME encoding")
-                                                },
-                                                gemini::client::response::meta::Error::MimeProtocol => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("Incorrect MIME protocol")
-                                                },
-                                                gemini::client::response::meta::Error::MimeUndefined => match message {
-                                                    Some(error) => gformat!("{error}"),
-                                                    None => gformat!("MIME type yet not supported (by library)")
-                                                },
-                                            };
 
-                                            // Add history record
-                                            if is_history {
-                                                snap_history(navigation);
-                                            }
-
-                                            // Update widget
-                                            content
-                                                .to_status_failure()
-                                                .set_title(title)
-                                                .set_description(Some(description.as_str()));
-
-                                            // Update meta
                                             meta.set_status(status)
                                                 .set_title(title);
 
-                                            // Update window
-                                            update.activate(Some(&id));
-                                        } // Header::from_socket_connection_async
+                                            content
+                                                .to_status_failure()
+                                                .set_title(title)
+                                                .set_description(Some(reason.message()));
+                                        },
                                     }
-                                );
+                                },
+                                None => {
+                                    let status = Status::Failure;
+                                    let title = "Oops";
+
+                                    meta.set_status(status)
+                                        .set_title(title);
+
+                                    content
+                                        .to_status_failure()
+                                        .set_title(title)
+                                        .set_description(Some("Redirection target not defined"));
+                                },
                             }
-                            Err(reason) => {
-                                // Define common data
-                                let status = Status::Failure;
-                                let title = "Oops";
 
-                                // Add history record
-                                if is_history {
-                                    snap_history(navigation);
-                                }
-
-                                // Update widget
-                                content
-                                    .to_status_failure()
-                                    .set_title(title)
-                                    .set_description(Some(reason.message()));
-
-                                // Update meta
-                                meta.set_status(status)
-                                    .set_title(title);
-
-                                // Update window
-                                update.activate(Some(&id));
-                            },
+                            update.activate(Some(&id));
                         },
-                    );
-                }
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
+                        gemini::client::response::meta::Status::CertificateRequest |
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
+                        gemini::client::response::meta::Status::CertificateUnauthorized |
+                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
+                        gemini::client::response::meta::Status::CertificateInvalid => {
+                            // Define common data
+                            let status = Status::Success;
+                            let title = "Identity";
+
+                            // Add history record
+                            if is_history {
+                                snap_history(navigation.clone());
+                            }
+
+                            // Update widget
+                            content
+                                .to_status_identity()
+                                .set_title(title)
+                                .set_description(Some(&match response.meta.data {
+                                    Some(data) => data.value,
+                                    None => match response.meta.status {
+                                        gemini::client::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
+                                        gemini::client::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
+                                        _ => gformat!("Client certificate required")
+                                    },
+                                }));
+
+                            // Update meta
+                            meta.set_status(status)
+                                .set_title(title);
+
+                            // Update window
+                            update.activate(Some(&id));
+                        }
+                        _ => {
+                            // Define common data
+                            let status = Status::Failure;
+                            let title = "Oops";
+
+                            // Add history record
+                            if is_history {
+                                snap_history(navigation.clone());
+                            }
+
+                            // Update widget
+                            content
+                                .to_status_failure()
+                                .set_title(title)
+                                .set_description(Some(&match response.meta.data {
+                                    Some(data) => data.value,
+                                    None => gformat!("Status code yet not supported"),
+                                }));
+
+                            // Update meta
+                            meta.set_status(status)
+                                .set_title(title);
+
+                            // Update window
+                            update.activate(Some(&id));
+                        }
+                    }
+                },
                 Err(reason) => {
                     // Define common data
                     let status = Status::Failure;
                     let title = "Oops";
+                    let description = reason.to_string();
 
                     // Add history record
                     if is_history {
-                        snap_history(navigation);
+                        snap_history(navigation.clone());
                     }
 
                     // Update widget
                     content
                         .to_status_failure()
                         .set_title(title)
-                        .set_description(Some(reason.message()));
+                        .set_description(Some(&description));
 
                     // Update meta
                     meta.set_status(status)
@@ -1072,8 +889,8 @@ impl Page {
 
                     // Update window
                     update.activate(Some(&id));
-                },
-            },
+                } // Header::from_socket_connection_async
+            }
         );
     }
 }

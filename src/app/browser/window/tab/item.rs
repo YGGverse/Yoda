@@ -24,10 +24,10 @@ use std::rc::Rc;
 pub struct Item {
     // Auto-generated unique item ID
     // useful as widget name in GTK actions callback
-    id: GString,
+    pub id: GString,
     // Components
-    page: Rc<Page>,
-    widget: Rc<Widget>,
+    pub page: Rc<Page>,
+    pub widget: Rc<Widget>,
 }
 
 impl Item {
@@ -57,7 +57,7 @@ impl Item {
         let widget = Rc::new(Widget::new(
             id.as_str(),
             tab_view,
-            page.widget().gobject(),
+            page.widget.gobject(),
             None,
             position,
             (is_pinned, is_selected, is_attention),
@@ -66,11 +66,7 @@ impl Item {
         // Init events
 
         if let Some(text) = request {
-            page.navigation()
-                .request()
-                .widget()
-                .gobject()
-                .set_text(&text);
+            page.navigation.request().widget().gobject().set_text(&text);
 
             if is_load {
                 page.load(true);
@@ -83,7 +79,7 @@ impl Item {
             let parent = tab_view.clone().upcast::<gtk::Widget>();
             move || {
                 // Request should match valid URI for all drivers supported
-                if let Some(uri) = page.navigation().request().uri() {
+                if let Some(uri) = page.navigation.request().uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
                         return identity::new_gemini(profile.clone(), actions.1.clone(), uri)
@@ -100,11 +96,7 @@ impl Item {
             let page = page.clone();
             move |request, is_history| {
                 if let Some(text) = request {
-                    page.navigation()
-                        .request()
-                        .widget()
-                        .gobject()
-                        .set_text(&text);
+                    page.navigation.request().widget().gobject().set_text(&text);
                 }
                 page.load(is_history);
             }
@@ -120,7 +112,7 @@ impl Item {
         self.page.update();
 
         // Update tab loading indicator
-        self.widget.gobject().set_loading(self.page().is_loading());
+        self.widget.gobject().set_loading(self.page.is_loading());
     }
 
     pub fn clean(
@@ -221,20 +213,6 @@ impl Item {
         }
 
         Ok(())
-    }
-
-    // Getters
-
-    pub fn id(&self) -> &GString {
-        &self.id
-    }
-
-    pub fn page(&self) -> &Rc<Page> {
-        &self.page
-    }
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }
 

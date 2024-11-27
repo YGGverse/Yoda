@@ -135,10 +135,10 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
-            .insert(item.id().clone(), item.clone());
+            .insert(item.id.clone(), item.clone());
 
-        item.page()
-            .navigation()
+        item.page
+            .navigation
             .request()
             .widget()
             .gobject()
@@ -163,7 +163,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    return match item.page().bookmark() {
+                    return match item.page.bookmark() {
                         Ok(result) => Ok(result),
                         Err(_) => Err(Error::Bookmark),
                     };
@@ -182,7 +182,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page().home();
+                    item.page.home();
                 }
             }
         }
@@ -192,7 +192,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page().history_back();
+                    item.page.history_back();
                 }
             }
         }
@@ -202,7 +202,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page().history_forward();
+                    item.page.history_forward();
                 }
             }
         }
@@ -213,7 +213,7 @@ impl Tab {
         if let Some(page) = self.widget.page(page_position) {
             if let Some(id) = page.keyword() {
                 if let Some(item) = self.index.borrow().get(&id) {
-                    item.page().reload();
+                    item.page.reload();
                 }
             }
         }
@@ -231,10 +231,10 @@ impl Tab {
                 item.update();
 
                 // Update tab title on loading indicator inactive
-                if !item.page().is_loading() {
-                    item.widget()
+                if !item.page.is_loading() {
+                    item.widget
                         .gobject()
-                        .set_title(item.page().meta().title().as_str())
+                        .set_title(item.page.meta.title().as_str())
                 }
             }
             // Update all tabs on ID not found @TODO change initial update method
@@ -244,10 +244,10 @@ impl Tab {
                     item.update();
 
                     // Update tab title on loading indicator inactive
-                    if !item.page().is_loading() {
-                        item.widget()
+                    if !item.page.is_loading() {
+                        item.widget
                             .gobject()
-                            .set_title(item.page().meta().title().as_str())
+                            .set_title(item.page.meta.title().as_str())
                     }
                 }
             }
@@ -299,7 +299,7 @@ impl Tab {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index
                                     .borrow_mut()
-                                    .insert(item.id().clone(), item.clone());
+                                    .insert(item.id.clone(), item.clone());
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -327,10 +327,10 @@ impl Tab {
                     item.save(
                         transaction,
                         &id,
-                        &self.widget.gobject().page_position(item.widget().gobject()),
-                        &item.widget().gobject().is_pinned(),
-                        &item.widget().gobject().is_selected(),
-                        &item.widget().gobject().needs_attention(),
+                        &self.widget.gobject().page_position(item.widget.gobject()),
+                        &item.widget.gobject().is_pinned(),
+                        &item.widget.gobject().is_selected(),
+                        &item.widget.gobject().needs_attention(),
                     )?;
                 }
             }
