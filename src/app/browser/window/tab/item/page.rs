@@ -23,12 +23,12 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent, TlsCertificate, TlsClientConnection},
+    gio::{Cancellable, SocketClientEvent, TlsCertificate},
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{CancellableExt, Cast, EditableExt, SocketClientExt, TlsConnectionExt},
+    prelude::{CancellableExt, EditableExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc, time::Duration};
@@ -436,7 +436,7 @@ impl Page {
             let id = id.clone();
             let meta = meta.clone();
             let update = update.clone();
-            move |_, event, _, stream| {
+            move |_, event, _, _| {
                 meta.set_status(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
                     SocketClientEvent::Resolved => Status::Resolved,
@@ -444,17 +444,8 @@ impl Page {
                     SocketClientEvent::Connected => Status::Connected,
                     SocketClientEvent::ProxyNegotiating => Status::ProxyNegotiating,
                     SocketClientEvent::ProxyNegotiated => Status::ProxyNegotiated,
-                    // This match have effect only for unauthorized (random) TLS connection
-                    SocketClientEvent::TlsHandshaking => {
-                        // Handle certificate errors @TODO
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
-                        stream
-                            .unwrap()
-                            .dynamic_cast_ref::<TlsClientConnection>()
-                            .unwrap()
-                            .connect_accept_certificate(|_, _, _| true);
-                        Status::TlsHandshaking
-                    }
+                    // TlsHandshaking have effect only for guest connections!
+                    SocketClientEvent::TlsHandshaking => Status::TlsHandshaking,
                     SocketClientEvent::TlsHandshaked => Status::TlsHandshaked,
                     SocketClientEvent::Complete => Status::Complete,
                     _ => todo!(), // notice on API change
