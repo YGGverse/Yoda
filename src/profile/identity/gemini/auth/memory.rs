@@ -58,7 +58,7 @@ impl Memory {
     pub fn match_priority(&self, request: &str) -> Option<Auth> {
         let mut result = Vec::new();
 
-        // Get all records starts with `scope` cached
+        // Get all records starts with `scope`
         for (scope, &profile_identity_gemini_id) in self.index.borrow().iter() {
             if request.starts_with(scope) {
                 result.push(Auth {
