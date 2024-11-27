@@ -4,10 +4,10 @@ use std::{rc::Rc, sync::RwLock};
 pub struct Table {
     pub id: i64,
     pub profile_identity_gemini_id: i64,
-    pub url: String,
+    pub scope: String,
 }
 
-/// Storage for `profile_identity_gemini_id` + `url` auth pairs
+/// Storage for `profile_identity_gemini_id` + `scope` auth pairs
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
 }
@@ -23,13 +23,13 @@ impl Database {
     // Actions
 
     /// Create new record in database
-    pub fn add(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
+    pub fn add(&self, profile_identity_gemini_id: i64, scope: &str) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
 
         // Create new record
-        insert(&tx, profile_identity_gemini_id, url)?;
+        insert(&tx, profile_identity_gemini_id, scope)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -59,11 +59,11 @@ impl Database {
 
     // Getters
 
-    /// Get records from database match current `profile_id` optionally filtered by `url`
-    pub fn records(&self, url: Option<&str>) -> Result<Vec<Table>, Error> {
+    /// Get records from database match current `profile_id` optionally filtered by `scope`
+    pub fn records(&self, scope: Option<&str>) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, url)
+        select(&tx, scope)
     }
 }
 
@@ -75,10 +75,10 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id`                         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_identity_gemini_id` INTEGER NOT NULL,
-            `url`                        VARCHAR(1024) NOT NULL,
+            `scope`                      VARCHAR(1024) NOT NULL,
 
             FOREIGN KEY (`profile_identity_gemini_id`) REFERENCES `profile_identity_gemini`(`id`),
-            UNIQUE (`url`)
+            UNIQUE (`scope`)
         )",
         [],
     )
@@ -87,14 +87,14 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 pub fn insert(
     tx: &Transaction,
     profile_identity_gemini_id: i64,
-    url: &str,
+    scope: &str,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_identity_gemini_auth` (
             `profile_identity_gemini_id`,
-            `url`
+            `scope`
         ) VALUES (?, ?)",
-        (profile_identity_gemini_id, url),
+        (profile_identity_gemini_id, scope),
     )
 }
 
@@ -105,21 +105,21 @@ pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     )
 }
 
-pub fn select(tx: &Transaction, url: Option<&str>) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_gemini_id`,
-                `url`
+                `scope`
 
                 FROM `profile_identity_gemini_auth`
-                WHERE `url` LIKE ?",
+                WHERE `scope` LIKE ?",
     )?;
 
-    let result = stmt.query_map([url.unwrap_or("%")], |row| {
+    let result = stmt.query_map([scope.unwrap_or("%")], |row| {
         Ok(Table {
             id: row.get(0)?,
             profile_identity_gemini_id: row.get(1)?,
-            url: row.get(2)?,
+            scope: row.get(2)?,
         })
     })?;
 

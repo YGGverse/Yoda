@@ -11,7 +11,7 @@ use memory::Memory;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
-/// API for `profile_identity_gemini_id` + `url` auth pairs operations
+/// API for `profile_identity_gemini_id` + `scope` auth pairs operations
 pub struct Auth {
     pub database: Rc<Database>,
     pub memory: Rc<Memory>,
@@ -37,17 +37,17 @@ impl Auth {
 
     // Actions
 
-    /// Apply `profile_identity_gemini_id` certificate as the auth for `url`
+    /// Apply `profile_identity_gemini_id` certificate as the auth for `scope`
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_gemini_auth_id` on success
-    pub fn apply(&self, profile_identity_gemini_id: i64, url: &str) -> Result<i64, Error> {
-        // Cleanup records match `url` (unauthorize)
-        self.remove(url)?;
+    pub fn apply(&self, profile_identity_gemini_id: i64, scope: &str) -> Result<i64, Error> {
+        // Cleanup records match `scope` (unauthorize)
+        self.remove(scope)?;
 
         // Create new record (auth)
         let profile_identity_gemini_auth_id =
-            match self.database.add(profile_identity_gemini_id, url) {
+            match self.database.add(profile_identity_gemini_id, scope) {
                 Ok(id) => id,
                 Err(reason) => return Err(Error::Database(reason)),
             };
@@ -60,8 +60,8 @@ impl Auth {
     }
 
     /// Remove all records match request (unauthorize)
-    pub fn remove(&self, url: &str) -> Result<(), Error> {
-        match self.database.records(Some(url)) {
+    pub fn remove(&self, scope: &str) -> Result<(), Error> {
+        match self.database.records(Some(scope)) {
             Ok(records) => {
                 for record in records {
                     if let Err(reason) = self.database.delete(record.id) {
@@ -88,7 +88,7 @@ impl Auth {
                 for record in records {
                     if let Err(reason) = self
                         .memory
-                        .add(record.url, record.profile_identity_gemini_id)
+                        .add(record.scope, record.profile_identity_gemini_id)
                     {
                         return Err(Error::Memory(reason));
                     }
