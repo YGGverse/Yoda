@@ -69,7 +69,7 @@ impl Page {
 
         let widget = Rc::new(Widget::new(
             &id,
-            navigation.widget().gobject(),
+            &navigation.widget.gobject,
             content.gobject(),
             input.gobject(),
         ));
@@ -102,7 +102,7 @@ impl Page {
         let result = match self
             .profile
             .bookmark
-            .toggle(self.navigation.request().widget().gobject().text().as_str())
+            .toggle(self.navigation.request.widget.entry.text().as_str())
         {
             Ok(result) => Ok(result),
             Err(_) => Err(Error::Bookmark), // @TODO
@@ -114,7 +114,7 @@ impl Page {
     /// Navigate home URL (parsed from current navigation entry)
     /// * this method create new history record in memory as defined in `action_page_open` action
     pub fn home(&self) {
-        if let Some(url) = self.navigation.home().url() {
+        if let Some(url) = self.navigation.home.url() {
             // Update with history record
             self.tab_action.load().activate(Some(&url), true);
         }
@@ -123,13 +123,9 @@ impl Page {
     /// Navigate back in history
     /// * this method does not create new history record in memory
     pub fn history_back(&self) {
-        if let Some(request) = self.navigation.history().back(true) {
+        if let Some(request) = self.navigation.history.back(true) {
             // Update navigation entry
-            self.navigation
-                .request()
-                .widget()
-                .gobject()
-                .set_text(&request);
+            self.navigation.request.widget.entry.set_text(&request);
 
             // Load page (without history record)
             self.load(false);
@@ -139,13 +135,9 @@ impl Page {
     /// Navigate forward in history
     /// * this method does not create new history record in memory
     pub fn history_forward(&self) {
-        if let Some(request) = self.navigation.history().forward(true) {
+        if let Some(request) = self.navigation.history.forward(true) {
             // Update navigation entry
-            self.navigation
-                .request()
-                .widget()
-                .gobject()
-                .set_text(&request);
+            self.navigation.request.widget.entry.set_text(&request);
 
             // Load page (without history record)
             self.load(false);
@@ -200,9 +192,9 @@ impl Page {
             // Update navigation on redirect `is_foreground`
             if redirect.is_foreground() {
                 self.navigation
-                    .request()
-                    .widget()
-                    .gobject()
+                    .request
+                    .widget
+                    .entry
                     .set_text(redirect.request().as_str());
             }
 
@@ -213,7 +205,7 @@ impl Page {
             self.meta.unset_redirect_count();
 
             // Return value from navigation entry
-            self.navigation.request().widget().gobject().text()
+            self.navigation.request.widget.entry.text()
         };
 
         // Update
@@ -267,11 +259,7 @@ impl Page {
                     match Uri::parse(&request, UriFlags::NONE) {
                         Ok(_) => {
                             // Update navigation entry
-                            self.navigation
-                                .request()
-                                .widget()
-                                .gobject()
-                                .set_text(&request);
+                            self.navigation.request.widget.entry.set_text(&request);
 
                             // Load page (without history record)
                             self.load(false);
@@ -288,11 +276,7 @@ impl Page {
                     );
 
                     // Update navigation entry
-                    self.navigation
-                        .request()
-                        .widget()
-                        .gobject()
-                        .set_text(&request);
+                    self.navigation.request.widget.entry.set_text(&request);
 
                     // Load page (without history record)
                     self.load(false);
@@ -422,7 +406,7 @@ impl Page {
             .profile
             .identity
             .gemini
-            .match_priority(&self.navigation.request().widget().gobject().text())
+            .match_priority(&self.navigation.request.widget.entry.text())
         {
             Some(identity) => {
                 match gemini::client::Certificate::from_pem(&identity.pem, &identity.scope) {
@@ -929,14 +913,14 @@ fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
 /// Make new history record for given `navigation` object
 /// * applies on shared conditions match only
 fn snap_history(navigation: Rc<Navigation>) {
-    let request = navigation.request().widget().gobject().text();
+    let request = navigation.request.widget.entry.text();
 
     // Apply additional filters
-    if match navigation.history().current() {
+    if match navigation.history.current() {
         Some(current) => current != request,
         None => true,
     } {
         // Add new record match conditions
-        navigation.history().add(request, true)
+        navigation.history.add(request, true)
     }
 }

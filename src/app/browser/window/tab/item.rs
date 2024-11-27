@@ -66,7 +66,7 @@ impl Item {
         // Init events
 
         if let Some(text) = request {
-            page.navigation.request().widget().gobject().set_text(&text);
+            page.navigation.request.widget.entry.set_text(&text);
 
             if is_load {
                 page.load(true);
@@ -79,7 +79,7 @@ impl Item {
             let parent = tab_view.clone().upcast::<gtk::Widget>();
             move || {
                 // Request should match valid URI for all drivers supported
-                if let Some(uri) = page.navigation.request().uri() {
+                if let Some(uri) = page.navigation.request.uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
                         return identity::new_gemini(profile.clone(), actions.1.clone(), uri)
@@ -96,7 +96,7 @@ impl Item {
             let page = page.clone();
             move |request, is_history| {
                 if let Some(text) = request {
-                    page.navigation.request().widget().gobject().set_text(&text);
+                    page.navigation.request.widget.entry.set_text(&text);
                 }
                 page.load(is_history);
             }

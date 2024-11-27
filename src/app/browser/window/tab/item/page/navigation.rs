@@ -24,14 +24,14 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Navigation {
-    bookmark: Rc<Bookmark>,
-    history: Rc<History>,
-    home: Rc<Home>,
-    identity: Rc<Identity>,
-    profile: Rc<Profile>,
-    reload: Rc<Reload>,
-    request: Rc<Request>,
-    widget: Rc<Widget>,
+    pub bookmark: Rc<Bookmark>,
+    pub history: Rc<History>,
+    pub home: Rc<Home>,
+    pub identity: Rc<Identity>,
+    pub profile: Rc<Profile>,
+    pub reload: Rc<Reload>,
+    pub request: Rc<Request>,
+    pub widget: Rc<Widget>,
 }
 
 impl Navigation {
@@ -53,7 +53,7 @@ impl Navigation {
             home.widget().gobject(),
             history.widget().gobject(),
             reload.widget().gobject(),
-            request.widget().gobject(),
+            &request.widget.entry, // @TODO remove extra getters from other components
             bookmark.widget().gobject(),
         ));
 
@@ -73,7 +73,7 @@ impl Navigation {
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        let request_text = self.request.widget().gobject().text();
+        let request_text = self.request.widget.entry.text();
 
         self.identity.update(
             self.profile
@@ -150,34 +150,6 @@ impl Navigation {
         }
 
         Ok(())
-    }
-
-    // Getters
-
-    pub fn home(&self) -> &Rc<Home> {
-        &self.home
-    }
-
-    pub fn history(&self) -> &Rc<History> {
-        &self.history
-    }
-
-    /*
-    pub fn reload(&self) -> &Rc<Reload> {
-        &self.reload
-    } */
-
-    pub fn request(&self) -> &Rc<Request> {
-        &self.request
-    }
-
-    /*
-    pub fn bookmark(&self) -> &Rc<Bookmark> {
-        &self.bookmark
-    } */
-
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
     }
 }
 

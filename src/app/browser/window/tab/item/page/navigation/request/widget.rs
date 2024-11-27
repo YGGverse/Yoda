@@ -21,7 +21,7 @@ struct Progress {
 }
 
 pub struct Widget {
-    gobject: Entry,
+    pub entry: Entry,
     progress: Rc<Progress>,
 }
 
@@ -35,21 +35,21 @@ impl Widget {
         });
 
         // Init widget
-        let gobject = Entry::builder()
+        let entry = Entry::builder()
             .placeholder_text(PLACEHOLDER_TEXT)
             .hexpand(true)
             .build();
 
         // Connect events
-        gobject.connect_changed(move |_| {
+        entry.connect_changed(move |_| {
             action.0.update().activate(None);
         });
 
-        gobject.connect_activate(move |this| {
+        entry.connect_activate(move |this| {
             action.1.load().activate(Some(&this.text()), true);
         });
 
-        gobject.connect_state_flags_changed({
+        entry.connect_state_flags_changed({
             // Define last focus state container
             let has_focus = RefCell::new(false);
             move |this, state| {
@@ -71,7 +71,7 @@ impl Widget {
         });
 
         // Return activated `Self`
-        Self { gobject, progress }
+        Self { entry, progress }
     }
 
     // Actions
@@ -113,7 +113,7 @@ impl Widget {
             Ok(records) => {
                 for record in records {
                     if let Some(text) = record.text {
-                        self.gobject.set_text(&text);
+                        self.entry.set_text(&text);
                     }
 
                     // Delegate restore action to the item childs
@@ -132,7 +132,7 @@ impl Widget {
         app_browser_window_tab_item_page_navigation_request_id: &i64,
     ) -> Result<(), String> {
         // Keep value in memory until operation complete
-        let text = self.gobject.text();
+        let text = self.entry.text();
 
         match database::insert(
             transaction,
@@ -167,16 +167,16 @@ impl Widget {
                         Duration::from_millis(PROGRESS_ANIMATION_TIME),
                         {
                             // Clone async pointers dependency
-                            let gobject = self.gobject.clone();
+                            let entry = self.entry.clone();
                             let progress = self.progress.clone();
 
                             // Frame
                             move || {
                                 // Animate
-                                if *progress.fraction.borrow() > gobject.progress_fraction() {
-                                    gobject.set_progress_fraction(
+                                if *progress.fraction.borrow() > entry.progress_fraction() {
+                                    entry.set_progress_fraction(
                                         // Currently, here is no outrange validation, seems that wrapper make this work @TODO
-                                        gobject.progress_fraction() + PROGRESS_ANIMATION_STEP,
+                                        entry.progress_fraction() + PROGRESS_ANIMATION_STEP,
                                     );
                                     return ControlFlow::Continue;
                                 }
@@ -185,8 +185,8 @@ impl Widget {
 
                                 // Reset on 100% (to hide progress bar)
                                 // or, just await for new value request
-                                if gobject.progress_fraction() == 1.0 {
-                                    gobject.set_progress_fraction(0.0);
+                                if entry.progress_fraction() == 1.0 {
+                                    entry.set_progress_fraction(0.0);
                                 }
 
                                 // Stop iteration
@@ -197,12 +197,6 @@ impl Widget {
                 }
             }
         }
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Entry {
-        &self.gobject
     }
 }
 

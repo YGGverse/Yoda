@@ -13,7 +13,7 @@ use std::rc::Rc;
 
 // Main
 pub struct Request {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Request {
@@ -90,12 +90,8 @@ impl Request {
 
     // Getters
 
-    pub fn widget(&self) -> &Rc<Widget> {
-        &self.widget
-    }
-
     pub fn uri(&self) -> Option<Uri> {
-        match Uri::parse(&self.widget.gobject().text(), UriFlags::NONE) {
+        match Uri::parse(&self.widget.entry.text(), UriFlags::NONE) {
             Ok(uri) => Some(uri),
             _ => None,
         }

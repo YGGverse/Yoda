@@ -7,7 +7,7 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Widget {
-    gobject: Box,
+    pub gobject: Box,
 }
 
 impl Widget {
@@ -36,10 +36,5 @@ impl Widget {
         gobject.append(auth);
 
         Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
     }
 }

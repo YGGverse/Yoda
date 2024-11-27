@@ -137,12 +137,7 @@ impl Tab {
             .borrow_mut()
             .insert(item.id.clone(), item.clone());
 
-        item.page
-            .navigation
-            .request()
-            .widget()
-            .gobject()
-            .grab_focus();
+        item.page.navigation.request.widget.entry.grab_focus();
 
         item
     }
