@@ -1,3 +1,4 @@
+mod client;
 mod content;
 mod database;
 mod error;
@@ -6,6 +7,7 @@ mod meta;
 mod navigation;
 mod widget;
 
+use client::Client;
 use content::Content;
 use error::Error;
 use input::Input;
@@ -39,10 +41,11 @@ pub struct Page {
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
     // Components
-    pub navigation: Rc<Navigation>,
+    pub client: Rc<Client>,
     pub content: Rc<Content>,
     pub input: Rc<Input>,
     pub meta: Rc<Meta>,
+    pub navigation: Rc<Navigation>,
     pub widget: Rc<Widget>,
 }
 
@@ -82,6 +85,7 @@ impl Page {
             browser_action: action.0,
             tab_action: action.2,
             // Components
+            client: Rc::new(Client::new()),
             content,
             navigation,
             input,
@@ -413,9 +417,6 @@ impl Page {
         let input = self.input.clone();
         let meta = self.meta.clone();
 
-        // Init socket
-        let client = gemini::Client::new();
-
         // Return PEM string match request
         let certificate = match self
             .profile
@@ -430,7 +431,7 @@ impl Page {
         };
 
         // Listen for connection status updates
-        client.socket.connect_event({
+        self.client.gemini.socket.connect_event({
             let id = id.clone();
             let meta = meta.clone();
             let update = update.clone();
@@ -462,7 +463,7 @@ impl Page {
         });
 
         // Create connection
-        client.request_async(
+        self.client.gemini.request_async(
             uri.clone(),
             None,
             Some(cancellable.clone()),
