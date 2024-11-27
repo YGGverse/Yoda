@@ -645,17 +645,11 @@ impl Page {
                                                         }
                                                     );
                                                 },
-                                                Err((error, reason)) => {
+                                                Err(reason) => {
                                                     // Define common data
                                                     let status = Status::Failure;
                                                     let title = "Oops";
-                                                    let description = match reason {
-                                                        Some(message) => gformat!("{message}"),
-                                                        None => match error {
-                                                            gemini::gio::memory_input_stream::Error::BytesTotal => gformat!("Allowed size reached"),
-                                                            gemini::gio::memory_input_stream::Error::InputStream => gformat!("Input stream error"),
-                                                        },
-                                                    };
+                                                    let description = reason.to_string();
 
                                                     // Update widget
                                                     content
