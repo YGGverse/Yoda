@@ -424,11 +424,12 @@ impl Page {
             }
         });
 
-        // Create connection
+        // Begin new socket request
         self.client.gemini.request_async(
             uri.clone(),
-            None,
+            None, // default priority
             Some(cancellable.clone()),
+            // Search for user certificate match request scope
             match self.profile.identity.gemini.match_priority(&self.navigation.request.widget.entry.text()) {
                 Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
                     Ok(certificate) => Some(certificate),
