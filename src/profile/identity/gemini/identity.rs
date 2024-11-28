@@ -1,4 +1,4 @@
 pub struct Identity {
     pub pem: String,
-    pub scope: String,
+    // pub scope: String,
 }
