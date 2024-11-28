@@ -10,6 +10,8 @@ use gtk::{
 };
 use std::rc::Rc;
 
+const DATE_FORMAT: &str = "%Y.%m.%d";
+
 pub struct Gemini {
     // profile: Rc<Profile>,
     widget: Rc<Widget>,
@@ -68,11 +70,16 @@ impl Gemini {
                         Value::ProfileIdentityGeminiId(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
-                            "valid until {} | auth: {}",
+                            "{} - {} | auth: {}",
+                            certificate
+                                .not_valid_before()
+                                .unwrap()
+                                .format(DATE_FORMAT)
+                                .unwrap(),
                             certificate
                                 .not_valid_after()
                                 .unwrap()
-                                .format("%Y-%m-%d")
+                                .format(DATE_FORMAT)
                                 .unwrap(),
                             profile
                                 .identity
