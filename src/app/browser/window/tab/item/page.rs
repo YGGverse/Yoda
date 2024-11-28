@@ -429,7 +429,7 @@ impl Page {
             uri.clone(),
             None, // default priority
             Some(cancellable.clone()),
-            // Search for user certificate match request scope
+            // Search for user certificate match request
             match self.profile.identity.gemini.match_scope(&self.navigation.request.widget.entry.text()) {
                 Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
                     Ok(certificate) => Some(certificate),
