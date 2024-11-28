@@ -112,8 +112,8 @@ impl Gemini {
     /// Get `Identity` match `request`
     /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
     /// * this function work with memory cache (not database)
-    pub fn match_request(&self, request: &str) -> Option<Identity> {
-        if let Some(auth) = self.auth.memory.match_request(request) {
+    pub fn match_scope(&self, request: &str) -> Option<Identity> {
+        if let Some(auth) = self.auth.memory.match_scope(request) {
             match self.memory.get(auth.profile_identity_gemini_id) {
                 Ok(pem) => {
                     return Some(Identity {

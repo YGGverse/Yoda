@@ -55,7 +55,7 @@ impl Memory {
     /// Get identity match `request`
     /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
     /// * contain unspecified length priority implementation @TODO
-    pub fn match_request(&self, request: &str) -> Option<Auth> {
+    pub fn match_scope(&self, request: &str) -> Option<Auth> {
         let mut result = Vec::new();
 
         // Get all records starts with `scope`

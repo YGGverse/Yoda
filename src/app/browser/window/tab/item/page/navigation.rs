@@ -81,7 +81,7 @@ impl Navigation {
                 .gemini
                 .auth
                 .memory
-                .match_request(&request_text)
+                .match_scope(&request_text)
                 .is_some(),
             !request_text.is_empty() && request_text.starts_with("gemini"),
         );
