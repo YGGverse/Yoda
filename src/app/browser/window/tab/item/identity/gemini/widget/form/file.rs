@@ -82,7 +82,7 @@ impl File {
                                     None => todo!(),
                                 },
                                 Err(reason) => {
-                                    gobject.set_css_classes(&["error"]);
+                                    gobject.set_css_classes(&["warning"]);
                                     gobject.set_label(reason.message())
                                 }
                             }
