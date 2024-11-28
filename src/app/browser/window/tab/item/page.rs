@@ -848,7 +848,7 @@ impl Page {
 
                     // Update window
                     update.activate(Some(&id));
-                } // Header::from_socket_connection_async
+                }
             }
         );
     }
