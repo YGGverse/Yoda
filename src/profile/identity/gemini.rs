@@ -117,9 +117,9 @@ impl Gemini {
             match self.memory.get(auth.profile_identity_gemini_id) {
                 Ok(pem) => {
                     return Some(Identity {
-                        scope: auth.scope,
+                        // scope: auth.scope,
                         pem,
-                    })
+                    });
                 }
                 Err(reason) => todo!("{:?}", reason.to_string()),
             }
