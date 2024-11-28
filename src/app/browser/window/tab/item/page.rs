@@ -23,7 +23,7 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent},
+    gio::{Cancellable, SocketClientEvent, TlsCertificate},
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
@@ -401,22 +401,6 @@ impl Page {
         let input = self.input.clone();
         let meta = self.meta.clone();
 
-        // Find identity match request
-        let certificate = match self
-            .profile
-            .identity
-            .gemini
-            .match_priority(&self.navigation.request.widget.entry.text())
-        {
-            Some(identity) => {
-                match gemini::client::Certificate::from_pem(&identity.pem, &identity.scope) {
-                    Ok(certificate) => Some(certificate),
-                    Err(reason) => todo!("{reason}"),
-                }
-            }
-            None => None,
-        };
-
         // Listen for connection status updates
         self.client.gemini.socket.connect_event({
             let id = id.clone();
@@ -445,7 +429,13 @@ impl Page {
             uri.clone(),
             None,
             Some(cancellable.clone()),
-            certificate,
+            match self.profile.identity.gemini.match_priority(&self.navigation.request.widget.entry.text()) {
+                Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
+                    Ok(certificate) => Some(certificate),
+                    Err(reason) => todo!("{reason}"),
+                },
+                None => None,
+            },
             move |result| match result {
                 Ok(response) => {
                     // Route by status
