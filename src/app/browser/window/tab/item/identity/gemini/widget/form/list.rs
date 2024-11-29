@@ -88,6 +88,25 @@ impl List {
         self.model.append(&Item::new(value, title, subtitle));
     }
 
+    /// Find list item by `Value`
+    /// * return list item `position` found
+    pub fn find(&self, value: i64) -> Option<u32> {
+        self.model
+            .find_with_equal_func(|this| value == this.clone().downcast::<Item>().unwrap().value())
+    }
+
+    /// Remove list item by `Value`
+    /// * return `position` of removed list item
+    pub fn remove(&self, value: i64) -> Option<u32> {
+        match self.find(value) {
+            Some(position) => {
+                self.model.remove(position);
+                Some(position)
+            }
+            None => None,
+        }
+    }
+
     // Events
 
     /// Run callback function on `connect_selected_notify` event

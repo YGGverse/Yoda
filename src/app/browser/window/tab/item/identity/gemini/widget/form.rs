@@ -31,11 +31,11 @@ impl Form {
     /// Create new `Self`
     pub fn new(profile: Rc<Profile>, action: Rc<Action>) -> Self {
         // Init components
-        let drop = Rc::new(Drop::new(profile.clone(), action.clone()));
         let file = Rc::new(File::new(action.clone()));
         let list = Rc::new(List::new());
         let name = Rc::new(Name::new(action.clone()));
-        let save = Rc::new(Save::new(profile));
+        let save = Rc::new(Save::new(profile.clone()));
+        let drop = Rc::new(Drop::new(profile.clone(), action.clone(), list.clone()));
 
         // Init main container
         let gobject = Box::builder().orientation(Orientation::Vertical).build();

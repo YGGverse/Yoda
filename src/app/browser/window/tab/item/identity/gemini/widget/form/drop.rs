@@ -1,4 +1,5 @@
 use super::Action;
+use super::List;
 use crate::profile::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
@@ -30,7 +31,7 @@ impl Drop {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, action: Rc<Action>) -> Self {
+    pub fn new(profile: Rc<Profile>, action: Rc<Action>, list: Rc<List>) -> Self {
         // Init selected option holder
         let profile_identity_gemini_id = Rc::new(RefCell::new(None::<i64>));
 
@@ -76,14 +77,21 @@ impl Drop {
                         // Connect confirmation event
                         dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
                             let action = action.clone();
-                            let profile = profile.clone();
                             let gobject = gobject.clone();
+                            let list = list.clone();
+                            let profile = profile.clone();
                             let profile_identity_gemini_id = profile_identity_gemini_id.clone();
                             move |_, _| {
                                 match profile.identity.gemini.delete(profile_identity_gemini_id) {
                                     Ok(_) => {
-                                        gobject.set_css_classes(&["success"]);
-                                        gobject.set_label("Identity successfully deleted")
+                                        if list.remove(profile_identity_gemini_id).is_some() {
+                                            gobject.set_css_classes(&["success"]);
+                                            gobject.set_label("Identity successfully deleted")
+                                        } else {
+                                            gobject.set_css_classes(&["error"]);
+                                            gobject.set_label("List item not found")
+                                            // @TODO unexpected
+                                        }
                                     }
                                     Err(e) => {
                                         gobject.set_css_classes(&["error"]);
