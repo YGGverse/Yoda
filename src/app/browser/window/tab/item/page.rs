@@ -23,7 +23,7 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent, TlsCertificate},
+    gio::{Cancellable, SocketClientEvent},
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
@@ -431,7 +431,7 @@ impl Page {
             Some(cancellable.clone()),
             // Search for user certificate match request
             match self.profile.identity.gemini.match_scope(&self.navigation.request.widget.entry.text()) {
-                Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
+                Some(identity) => match identity.to_tls_certificate() {
                     Ok(certificate) => Some(certificate),
                     Err(reason) => todo!("{reason}"),
                 },
