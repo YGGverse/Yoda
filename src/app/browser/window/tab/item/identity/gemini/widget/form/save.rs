@@ -9,7 +9,8 @@ use gtk::{
 };
 use std::{cell::RefCell, fs::File, io::Write, rc::Rc};
 
-const LABEL: &str = "Export to file..";
+const LABEL: &str = "Export";
+const TOOLTIP_TEXT: &str = "Export selected identity to file";
 const MARGIN: i32 = 8;
 
 pub struct Save {
@@ -29,6 +30,7 @@ impl Save {
         let gobject = Button::builder()
             .label(LABEL)
             .margin_top(MARGIN)
+            .tooltip_text(TOOLTIP_TEXT)
             .visible(false)
             .build();
 

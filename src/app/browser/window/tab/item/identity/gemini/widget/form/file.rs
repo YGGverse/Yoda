@@ -9,6 +9,7 @@ use gtk::{
 use std::{cell::RefCell, rc::Rc};
 
 const LABEL: &str = "Choose file..";
+const TOOLTIP_TEXT: &str = "Import existing identity from file";
 const MARGIN: i32 = 8;
 
 pub struct File {
@@ -28,6 +29,7 @@ impl File {
         let gobject = Button::builder()
             .label(LABEL)
             .margin_top(MARGIN)
+            .tooltip_text(TOOLTIP_TEXT)
             .visible(false)
             .build();
 
