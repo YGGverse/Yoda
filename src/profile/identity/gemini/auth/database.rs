@@ -60,10 +60,17 @@ impl Database {
     // Getters
 
     /// Get records from database match current `profile_id` optionally filtered by `scope`
-    pub fn records(&self, scope: Option<&str>) -> Result<Vec<Table>, Error> {
+    pub fn records_scope(&self, scope: Option<&str>) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, scope)
+        select_scope(&tx, scope)
+    }
+
+    /// Get records from database match current `profile_id` optionally filtered by `scope`
+    pub fn records_ref(&self, profile_identity_gemini_id: i64) -> Result<Vec<Table>, Error> {
+        let readable = self.connection.read().unwrap(); // @TODO
+        let tx = readable.unchecked_transaction()?;
+        select_ref(&tx, profile_identity_gemini_id)
     }
 }
 
@@ -105,7 +112,7 @@ pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     )
 }
 
-pub fn select(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>, Error> {
+pub fn select_scope(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_gemini_id`,
@@ -116,6 +123,34 @@ pub fn select(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>, Error
     )?;
 
     let result = stmt.query_map([scope.unwrap_or("%")], |row| {
+        Ok(Table {
+            id: row.get(0)?,
+            profile_identity_gemini_id: row.get(1)?,
+            scope: row.get(2)?,
+        })
+    })?;
+
+    let mut records = Vec::new();
+
+    for record in result {
+        let table = record?;
+        records.push(table);
+    }
+
+    Ok(records)
+}
+
+pub fn select_ref(tx: &Transaction, profile_identity_gemini_id: i64) -> Result<Vec<Table>, Error> {
+    let mut stmt = tx.prepare(
+        "SELECT `id`,
+                `profile_identity_gemini_id`,
+                `scope`
+
+                FROM `profile_identity_gemini_auth`
+                WHERE `profile_identity_gemini_id` = ?",
+    )?;
+
+    let result = stmt.query_map([profile_identity_gemini_id], |row| {
         Ok(Table {
             id: row.get(0)?,
             profile_identity_gemini_id: row.get(1)?,

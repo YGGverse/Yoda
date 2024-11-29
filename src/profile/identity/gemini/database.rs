@@ -45,6 +45,22 @@ impl Database {
         }
     }
 
+    /// Delete record with given `id` from database
+    pub fn delete(&self, id: i64) -> Result<(), Error> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap(); // @TODO
+        let tx = writable.transaction()?;
+
+        // Create new record
+        delete(&tx, id)?;
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(()),
+            Err(reason) => Err(reason),
+        }
+    }
+
     /// Get single record match `id`
     pub fn record(&self, id: i64) -> Result<Option<Table>, Error> {
         let readable = self.connection.read().unwrap();
@@ -92,6 +108,10 @@ pub fn insert(tx: &Transaction, profile_identity_id: i64, pem: &str) -> Result<u
         ) VALUES (?, ?)",
         (profile_identity_id, pem),
     )
+}
+
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
+    tx.execute("DELETE FROM `profile_identity_gemini` WHERE `id` = ?", [id])
 }
 
 pub fn select(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, Error> {

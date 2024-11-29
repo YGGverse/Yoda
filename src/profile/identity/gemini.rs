@@ -68,6 +68,20 @@ impl Gemini {
         }
     }
 
+    /// Delete record from database including children dependencies, update memory index
+    pub fn delete(&self, profile_identity_gemini_id: i64) -> Result<(), Error> {
+        match self.auth.remove_ref(profile_identity_gemini_id) {
+            Ok(_) => match self.database.delete(profile_identity_gemini_id) {
+                Ok(_) => {
+                    self.index()?;
+                    Ok(())
+                }
+                Err(reason) => Err(Error::Database(reason)),
+            },
+            Err(e) => Err(Error::Auth(e)),
+        }
+    }
+
     /// Generate new certificate and insert record to DB, update memory index
     /// * return new `profile_identity_gemini_id` on success
     pub fn make(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64, Error> {

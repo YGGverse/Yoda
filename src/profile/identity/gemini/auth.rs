@@ -43,7 +43,7 @@ impl Auth {
     /// * return last insert `profile_identity_gemini_auth_id` on success
     pub fn apply(&self, profile_identity_gemini_id: i64, scope: &str) -> Result<i64, Error> {
         // Cleanup records match `scope` (unauthorize)
-        self.remove(scope)?;
+        self.remove_scope(scope)?;
 
         // Create new record (auth)
         let profile_identity_gemini_auth_id =
@@ -60,8 +60,24 @@ impl Auth {
     }
 
     /// Remove all records match request (unauthorize)
-    pub fn remove(&self, scope: &str) -> Result<(), Error> {
-        match self.database.records(Some(scope)) {
+    pub fn remove_scope(&self, scope: &str) -> Result<(), Error> {
+        match self.database.records_scope(Some(scope)) {
+            Ok(records) => {
+                for record in records {
+                    if let Err(reason) = self.database.delete(record.id) {
+                        return Err(Error::Database(reason));
+                    }
+                }
+            }
+            Err(reason) => return Err(Error::Database(reason)),
+        }
+        self.index()?;
+        Ok(())
+    }
+
+    /// Remove all records match `profile_identity_gemini_id` foreign reference key
+    pub fn remove_ref(&self, profile_identity_gemini_id: i64) -> Result<(), Error> {
+        match self.database.records_ref(profile_identity_gemini_id) {
             Ok(records) => {
                 for record in records {
                     if let Err(reason) = self.database.delete(record.id) {
@@ -83,7 +99,7 @@ impl Auth {
         }
 
         // Build new index
-        match self.database.records(None) {
+        match self.database.records_scope(None) {
             Ok(records) => {
                 for record in records {
                     if let Err(reason) = self

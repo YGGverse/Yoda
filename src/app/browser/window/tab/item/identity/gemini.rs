@@ -86,7 +86,7 @@ impl Gemini {
                                 .gemini
                                 .auth
                                 .database
-                                .records(None)
+                                .records_scope(None)
                                 .unwrap()
                                 .iter()
                                 .filter(|this| this.profile_identity_gemini_id == identity.id)
@@ -100,7 +100,7 @@ impl Gemini {
                         .gemini
                         .auth
                         .database
-                        .records(Some(auth_url.as_str()))
+                        .records_scope(Some(auth_url.as_str()))
                         .unwrap()
                         .iter()
                         .filter(|this| this.profile_identity_gemini_id == identity.id)
@@ -162,7 +162,8 @@ impl Gemini {
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        if let Err(reason) = profile.identity.gemini.auth.remove(auth_url.as_str())
+                        if let Err(reason) =
+                            profile.identity.gemini.auth.remove_scope(auth_url.as_str())
                         {
                             todo!("{}", reason.to_string())
                         };
