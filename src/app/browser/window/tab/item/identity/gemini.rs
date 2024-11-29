@@ -23,7 +23,7 @@ impl Gemini {
     /// Create new `Self` for given Profile
     pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_uri: Uri) -> Self {
         // Init widget
-        let widget = Rc::new(Widget::new());
+        let widget = Rc::new(Widget::new(profile.clone()));
 
         // Init shared components
         let auth_url = auth_uri.to_string();

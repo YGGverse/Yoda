@@ -45,6 +45,21 @@ impl Database {
         }
     }
 
+    /// Get single record match `id`
+    pub fn record(&self, id: i64) -> Result<Option<Table>, Error> {
+        let readable = self.connection.read().unwrap();
+        let tx = readable.unchecked_transaction()?;
+        let records = select(&tx, *self.profile_identity_id)?; // @TODO single record query
+
+        for record in records {
+            if record.id == id {
+                return Ok(Some(record));
+            }
+        }
+
+        Ok(None)
+    }
+
     /// Get all records match current `profile_identity_id`
     pub fn records(&self) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO

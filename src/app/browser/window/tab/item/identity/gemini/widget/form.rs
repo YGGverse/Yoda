@@ -9,6 +9,7 @@ use name::Name;
 use save::Save;
 
 use super::Action;
+use crate::profile::Profile;
 use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
@@ -17,7 +18,7 @@ pub struct Form {
     pub file: Rc<File>,
     pub list: Rc<List>,
     pub name: Rc<Name>,
-    pub save: Rc<Save>,
+    // pub save: Rc<Save>,
     pub gobject: Box,
 }
 
@@ -25,12 +26,12 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(action: Rc<Action>) -> Self {
+    pub fn new(profile: Rc<Profile>, action: Rc<Action>) -> Self {
         // Init components
         let file = Rc::new(File::new(action.clone()));
         let list = Rc::new(List::new());
         let name = Rc::new(Name::new(action.clone()));
-        let save = Rc::new(Save::new(action.clone()));
+        let save = Rc::new(Save::new(profile));
 
         // Init main container
         let gobject = Box::builder().orientation(Orientation::Vertical).build();
@@ -48,18 +49,18 @@ impl Form {
             let update = action.update.clone();
             move |item| {
                 // Change name entry visibility
-                name.show(matches!(item, Value::GenerateNewAuth));
+                name.update(matches!(item, Value::GenerateNewAuth));
 
                 // Change file choose button visibility
-                file.show(matches!(item, Value::ImportPem));
+                file.update(matches!(item, Value::ImportPem));
 
-                // Change export button visibility, update holder @TODO
+                // Change export button visibility by update it holder value
                 match item {
-                    Value::ProfileIdentityGeminiId(id) => {
-                        // save.show(Some(id));
+                    Value::ProfileIdentityGeminiId(value) => {
+                        save.update(Some(value));
                     }
                     _ => {
-                        // save.show(None);
+                        save.update(None);
                     }
                 }
 
@@ -75,7 +76,7 @@ impl Form {
             file,
             list,
             name,
-            save,
+            // save,
         }
     }
 

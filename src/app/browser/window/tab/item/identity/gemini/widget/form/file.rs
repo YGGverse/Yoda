@@ -101,7 +101,7 @@ impl File {
 
     /// Change visibility status
     /// * grab focus on `is_visible`
-    pub fn show(&self, is_visible: bool) {
+    pub fn update(&self, is_visible: bool) {
         self.gobject.set_visible(is_visible);
         if is_visible {
             self.gobject.grab_focus();

@@ -1,7 +1,7 @@
 mod certificate;
 use certificate::Certificate;
 
-use super::Action;
+use crate::profile::Profile;
 use gtk::{
     gio::{Cancellable, ListStore},
     prelude::{ButtonExt, FileExt, WidgetExt},
@@ -13,7 +13,7 @@ const LABEL: &str = "Export to file..";
 const MARGIN: i32 = 8;
 
 pub struct Save {
-    certificate: Rc<RefCell<Option<Certificate>>>,
+    profile_identity_gemini_id: Rc<RefCell<Option<i64>>>,
     pub gobject: Button,
 }
 
@@ -21,9 +21,9 @@ impl Save {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(action: Rc<Action>) -> Self {
-        // Init `Certificate` holder
-        let certificate = Rc::new(RefCell::new(None::<Certificate>));
+    pub fn new(profile: Rc<Profile>) -> Self {
+        // Init selected option holder
+        let profile_identity_gemini_id = Rc::new(RefCell::new(None));
 
         // Init `GObject`
         let gobject = Button::builder()
@@ -34,75 +34,91 @@ impl Save {
 
         // Init events
         gobject.connect_clicked({
-            let certificate = certificate.clone();
+            let profile_identity_gemini_id = profile_identity_gemini_id.clone();
             let gobject = gobject.clone();
             move |_| {
-                // Get certificate selected from holder
-                match certificate.borrow().as_ref() {
-                    Some(certificate) => {
-                        // Copy certificate holder values
-                        let name = certificate.name.clone();
-                        let data = certificate.data.clone();
-
+                // Get selected identity from holder
+                match profile_identity_gemini_id.borrow().as_ref() {
+                    Some(profile_identity_gemini_id) => {
                         // Lock open button (prevent double click)
                         gobject.set_sensitive(false);
 
-                        // Init file filters related with PEM extension
-                        let filters = ListStore::new::<FileFilter>();
+                        // Create PEM file based on option ID selected
+                        match Certificate::new(profile.clone(), *profile_identity_gemini_id) {
+                            Ok(certificate) => {
+                                // Init file filters related with PEM extension
+                                let filters = ListStore::new::<FileFilter>();
 
-                        let filter_all = FileFilter::new();
-                        filter_all.add_pattern("*.*");
-                        filter_all.set_name(Some("All"));
-                        filters.append(&filter_all);
+                                let filter_all = FileFilter::new();
+                                filter_all.add_pattern("*.*");
+                                filter_all.set_name(Some("All"));
+                                filters.append(&filter_all);
 
-                        let filter_pem = FileFilter::new();
-                        filter_pem.add_mime_type("application/x-x509-ca-cert");
-                        filter_pem.set_name(Some("Certificate (*.pem)"));
-                        filters.append(&filter_pem);
+                                let filter_pem = FileFilter::new();
+                                filter_pem.add_mime_type("application/x-x509-ca-cert");
+                                filter_pem.set_name(Some("Certificate (*.pem)"));
+                                filters.append(&filter_pem);
 
-                        // Init file dialog
-                        FileDialog::builder()
-                            .default_filter(&filter_pem)
-                            .filters(&filters)
-                            .initial_name(format!("{name}.pem"))
-                            .build()
-                            .save(None::<&Window>, None::<&Cancellable>, {
-                                let gobject = gobject.clone();
-                                move |result| {
-                                    match result {
-                                        Ok(file) => match file.path() {
-                                            Some(path) => match File::create(&path) {
-                                                Ok(mut destination) => {
-                                                    match destination.write_all(data.as_bytes()) {
-                                                        Ok(_) => {
-                                                            // @TODO
-                                                            gobject.set_css_classes(&["success"]);
-                                                            gobject.set_label(&format!(
-                                                                "Saved to {}",
-                                                                path.to_string_lossy()
-                                                            ))
+                                // Init file dialog
+                                FileDialog::builder()
+                                    .default_filter(&filter_pem)
+                                    .filters(&filters)
+                                    .initial_name(format!("{}.pem", certificate.name))
+                                    .build()
+                                    .save(None::<&Window>, None::<&Cancellable>, {
+                                        let gobject = gobject.clone();
+                                        move |result| {
+                                            match result {
+                                                Ok(file) => match file.path() {
+                                                    Some(path) => match File::create(&path) {
+                                                        Ok(mut destination) => {
+                                                            match destination.write_all(
+                                                                certificate.data.as_bytes(),
+                                                            ) {
+                                                                Ok(_) => {
+                                                                    gobject.set_css_classes(&[
+                                                                        "success",
+                                                                    ]);
+                                                                    gobject.set_label(&format!(
+                                                                        "Saved to {}",
+                                                                        path.to_string_lossy()
+                                                                    ))
+                                                                }
+                                                                Err(e) => {
+                                                                    gobject.set_css_classes(&[
+                                                                        "error",
+                                                                    ]);
+                                                                    gobject
+                                                                        .set_label(&e.to_string())
+                                                                }
+                                                            }
                                                         }
-                                                        Err(reason) => {
+                                                        Err(e) => {
                                                             gobject.set_css_classes(&["error"]);
-                                                            gobject.set_label(&reason.to_string())
+                                                            gobject.set_label(&e.to_string())
                                                         }
+                                                    },
+                                                    None => {
+                                                        gobject.set_css_classes(&["warning"]);
+                                                        gobject.set_label(
+                                                            "Could not init destination path",
+                                                        )
                                                     }
+                                                },
+                                                Err(e) => {
+                                                    gobject.set_css_classes(&["warning"]);
+                                                    gobject.set_label(e.message())
                                                 }
-                                                Err(reason) => {
-                                                    gobject.set_css_classes(&["error"]);
-                                                    gobject.set_label(&reason.to_string())
-                                                }
-                                            },
-                                            None => todo!(),
-                                        },
-                                        Err(reason) => {
-                                            gobject.set_css_classes(&["warning"]);
-                                            gobject.set_label(reason.message())
+                                            }
+                                            gobject.set_sensitive(true); // unlock
                                         }
-                                    }
-                                    gobject.set_sensitive(true); // unlock
-                                }
-                            });
+                                    });
+                            }
+                            Err(e) => {
+                                gobject.set_css_classes(&["error"]);
+                                gobject.set_label(&e.to_string())
+                            }
+                        }
                     }
                     None => todo!(), // unexpected
                 }
@@ -111,16 +127,25 @@ impl Save {
 
         // Return activated `Self`
         Self {
-            certificate,
+            profile_identity_gemini_id,
             gobject,
         }
     }
 
     // Actions
 
-    /// Change visibility status
-    /// * grab focus on `is_visible`
-    pub fn show(&self, is_visible: bool) {
-        self.gobject.set_visible(is_visible)
+    /// Update `profile_identity_gemini_id` holder,
+    /// toggle visibility depending on given value
+    pub fn update(&self, profile_identity_gemini_id: Option<i64>) {
+        self.gobject.set_visible(match profile_identity_gemini_id {
+            Some(value) => {
+                self.profile_identity_gemini_id.replace(Some(value));
+                true
+            }
+            None => {
+                self.profile_identity_gemini_id.replace(None);
+                false
+            }
+        })
     }
 }

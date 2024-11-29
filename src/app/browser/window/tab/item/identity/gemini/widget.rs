@@ -4,6 +4,7 @@ pub mod form;
 use action::Action;
 use form::{list::item::value::Value, Form};
 
+use crate::profile::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
@@ -32,12 +33,12 @@ impl Widget {
     // Constructors
 
     /// Create new `Self`
-    pub fn new() -> Self {
+    pub fn new(profile: Rc<Profile>) -> Self {
         // Init actions
         let action = Rc::new(Action::new());
 
         // Init child container
-        let form = Rc::new(Form::new(action.clone()));
+        let form = Rc::new(Form::new(profile, action.clone()));
 
         // Init main `GObject`
         let gobject = AlertDialog::builder()
