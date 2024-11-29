@@ -80,7 +80,7 @@ impl Drop {
                             let gobject = gobject.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            let profile_identity_gemini_id = profile_identity_gemini_id.clone();
+                            let profile_identity_gemini_id = *profile_identity_gemini_id;
                             move |_, _| {
                                 match profile.identity.gemini.delete(profile_identity_gemini_id) {
                                     Ok(_) => {
