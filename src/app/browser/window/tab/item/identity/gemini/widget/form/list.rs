@@ -89,7 +89,7 @@ impl List {
     }
 
     /// Find list item by `Value`
-    /// * return list item `position` found
+    /// * return `position` found
     pub fn find(&self, value: i64) -> Option<u32> {
         self.model
             .find_with_equal_func(|this| value == this.clone().downcast::<Item>().unwrap().value())
