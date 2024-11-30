@@ -777,7 +777,7 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         gemini::client::response::meta::Status::CertificateInvalid => {
                             // Close connection
-                            let _ = response.connection.close();
+                            let _ = response.connection.close(); // @TODO
 
                             // Define common data
                             let status = Status::Success;
