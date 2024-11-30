@@ -28,14 +28,13 @@ use gtk::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{CancellableExt, EditableExt, SocketClientExt},
+    prelude::{EditableExt, SocketClientExt},
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, rc::Rc, time::Duration};
+use std::{rc::Rc, time::Duration};
 
 pub struct Page {
     id: GString,
-    cancellable: RefCell<Cancellable>,
     profile: Rc<Profile>,
     // Actions
     browser_action: Rc<BrowserAction>,
@@ -78,7 +77,6 @@ impl Page {
 
         // Done
         Self {
-            cancellable: RefCell::new(Cancellable::new()),
             id,
             profile,
             // Actions
@@ -159,15 +157,6 @@ impl Page {
 
         // Reset widgets
         self.input.unset();
-
-        // Cancel previous async operations
-        let cancellable = self.cancellable.take();
-        if !cancellable.is_cancelled() {
-            cancellable.cancel();
-        }
-
-        // Create new cancellable
-        self.cancellable.replace(Cancellable::new());
 
         // Create shared variant value
         let id = self.id.clone();
@@ -391,8 +380,10 @@ impl Page {
 
     // @TODO move somewhere outside
     fn load_gemini(&self, uri: Uri, is_history: bool) {
+        // Init new Cancellable
+        let cancellable = Cancellable::new();
+
         // Init shared clones
-        let cancellable = self.cancellable.borrow().clone();
         let update = self.browser_action.update.clone();
         let tab_action = self.tab_action.clone();
         let navigation = self.navigation.clone();
@@ -444,6 +435,9 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
                         gemini::client::response::meta::Status::Input |
                         gemini::client::response::meta::Status::SensitiveInput => {
+                            // Close connection
+                            response.connection.close();
+
                             // Format response
                             let status = Status::Input;
                             let title = match response.meta.data {
@@ -500,6 +494,9 @@ impl Page {
                                             move |result|{
                                                 match result {
                                                     Ok(buffer) => {
+                                                        // Close connection
+                                                        response.connection.close();
+
                                                         // Set children component
                                                         let text_gemini = content.to_text_gemini(
                                                             &uri,
@@ -580,6 +577,10 @@ impl Page {
                                                         &memory_input_stream,
                                                         Some(&cancellable),
                                                         move |result| {
+                                                            // Close connection
+                                                            response.connection.close();
+
+                                                            // Process buffer data
                                                             match result {
                                                                 Ok(buffer) => {
                                                                     // Update page meta
