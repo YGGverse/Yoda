@@ -88,9 +88,9 @@ impl Widget {
     pub fn on_apply(&self, callback: impl Fn(Value) + 'static) {
         self.gobject.connect_response(Some(RESPONSE_APPLY.0), {
             let form = self.form.clone();
-            move |this, _| {
+            move |this, response| {
                 // Prevent double-click action
-                this.set_response_enabled(RESPONSE_APPLY.0, false);
+                this.set_response_enabled(response, false);
 
                 // Result
                 callback(form.list.selected())
