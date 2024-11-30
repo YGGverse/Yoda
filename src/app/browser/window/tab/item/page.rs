@@ -436,7 +436,7 @@ impl Page {
                         gemini::client::response::meta::Status::Input |
                         gemini::client::response::meta::Status::SensitiveInput => {
                             // Close connection
-                            response.connection.close();
+                            let _ = response.connection.close();
 
                             // Format response
                             let status = Status::Input;
@@ -495,7 +495,7 @@ impl Page {
                                                 match result {
                                                     Ok(buffer) => {
                                                         // Close connection
-                                                        response.connection.close();
+                                                        let _ = response.connection.close();
 
                                                         // Set children component
                                                         let text_gemini = content.to_text_gemini(
@@ -578,7 +578,7 @@ impl Page {
                                                         Some(&cancellable),
                                                         move |result| {
                                                             // Close connection
-                                                            response.connection.close();
+                                                            let _ = response.connection.close();
 
                                                             // Process buffer data
                                                             match result {
@@ -634,7 +634,7 @@ impl Page {
                                 },
                                 _ => {
                                     // Close connection
-                                    response.connection.close();
+                                    let _ = response.connection.close();
 
                                     // Define common data
                                     let status = Status::Failure;
@@ -661,7 +661,7 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                         gemini::client::response::meta::Status::PermanentRedirect => {
                             // Close connection
-                            response.connection.close();
+                            let _ = response.connection.close();
 
                             // Extract redirection URL from response data
                             match response.meta.data {
@@ -777,7 +777,7 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         gemini::client::response::meta::Status::CertificateInvalid => {
                             // Close connection
-                            response.connection.close();
+                            let _ = response.connection.close();
 
                             // Define common data
                             let status = Status::Success;
@@ -810,7 +810,7 @@ impl Page {
                         }
                         _ => {
                             // Close connection
-                            response.connection.close();
+                            let _ = response.connection.close();
 
                             // Define common data
                             let status = Status::Failure;
