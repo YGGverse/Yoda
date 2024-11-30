@@ -633,6 +633,9 @@ impl Page {
                                         );
                                 },
                                 _ => {
+                                    // Close connection
+                                    response.connection.close();
+
                                     // Define common data
                                     let status = Status::Failure;
                                     let title = "Oops";
@@ -657,6 +660,9 @@ impl Page {
                         gemini::client::response::meta::Status::Redirect |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                         gemini::client::response::meta::Status::PermanentRedirect => {
+                            // Close connection
+                            response.connection.close();
+
                             // Extract redirection URL from response data
                             match response.meta.data {
                                 Some(unresolved_url) => {
@@ -770,6 +776,9 @@ impl Page {
                         gemini::client::response::meta::Status::CertificateUnauthorized |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         gemini::client::response::meta::Status::CertificateInvalid => {
+                            // Close connection
+                            response.connection.close();
+
                             // Define common data
                             let status = Status::Success;
                             let title = "Identity";
@@ -800,6 +809,9 @@ impl Page {
                             update.activate(Some(&id));
                         }
                         _ => {
+                            // Close connection
+                            response.connection.close();
+
                             // Define common data
                             let status = Status::Failure;
                             let title = "Oops";
