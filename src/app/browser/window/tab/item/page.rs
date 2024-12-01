@@ -418,8 +418,8 @@ impl Page {
         // Begin new socket request
         self.client.gemini.request_async(
             uri.clone(),
-            None, // default priority
-            Some(cancellable.clone()),
+            Priority::DEFAULT,
+            cancellable.clone(),
             // Search for user certificate match request
             match self.profile.identity.gemini.match_scope(&self.navigation.request.widget.entry.text()) {
                 Some(identity) => match identity.to_tls_certificate() {
@@ -435,9 +435,6 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
                         gemini::client::response::meta::Status::Input |
                         gemini::client::response::meta::Status::SensitiveInput => {
-                            // Close connection
-                            let _ = response.connection.close();
-
                             // Format response
                             let status = Status::Input;
                             let title = match response.meta.data {
@@ -483,8 +480,8 @@ impl Page {
                                     // Read entire input stream to buffer
                                     gemini::client::response::data::Text::from_stream_async(
                                         response.connection.stream(),
-                                        Some(Priority::DEFAULT),
-                                        Some(cancellable.clone()),
+                                        Priority::DEFAULT,
+                                        cancellable.clone(),
                                         {
                                             let content = content.clone();
                                             let id = id.clone();
@@ -494,9 +491,6 @@ impl Page {
                                             move |result|{
                                                 match result {
                                                     Ok(buffer) => {
-                                                        // Close connection
-                                                        let _ = response.connection.close();
-
                                                         // Set children component
                                                         let text_gemini = content.to_text_gemini(
                                                             &uri,
@@ -554,7 +548,7 @@ impl Page {
                                     // this action allows to count the bytes for loading widget and validate max size for incoming data
                                     gemini::gio::memory_input_stream::from_stream_async(
                                         response.connection.stream(),
-                                        Some(cancellable.clone()),
+                                        cancellable.clone(),
                                         Priority::DEFAULT,
                                         0x400, // 1024 bytes per chunk, optional step for images download tracking
                                         0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
@@ -577,9 +571,6 @@ impl Page {
                                                         &memory_input_stream,
                                                         Some(&cancellable),
                                                         move |result| {
-                                                            // Close connection
-                                                            let _ = response.connection.close();
-
                                                             // Process buffer data
                                                             match result {
                                                                 Ok(buffer) => {
@@ -633,9 +624,6 @@ impl Page {
                                         );
                                 },
                                 _ => {
-                                    // Close connection
-                                    let _ = response.connection.close();
-
                                     // Define common data
                                     let status = Status::Failure;
                                     let title = "Oops";
@@ -660,9 +648,6 @@ impl Page {
                         gemini::client::response::meta::Status::Redirect |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                         gemini::client::response::meta::Status::PermanentRedirect => {
-                            // Close connection
-                            let _ = response.connection.close();
-
                             // Extract redirection URL from response data
                             match response.meta.data {
                                 Some(unresolved_url) => {
@@ -776,9 +761,6 @@ impl Page {
                         gemini::client::response::meta::Status::CertificateUnauthorized |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         gemini::client::response::meta::Status::CertificateInvalid => {
-                            // Close connection
-                            let _ = response.connection.close(); // @TODO
-
                             // Define common data
                             let status = Status::Success;
                             let title = "Identity";
@@ -809,9 +791,6 @@ impl Page {
                             update.activate(Some(&id));
                         }
                         _ => {
-                            // Close connection
-                            let _ = response.connection.close();
-
                             // Define common data
                             let status = Status::Failure;
                             let title = "Oops";
