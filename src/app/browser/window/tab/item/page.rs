@@ -23,12 +23,12 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent},
+    gio::SocketClientEvent,
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{CancellableExt, EditableExt, SocketClientExt},
+    prelude::{EditableExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -380,19 +380,8 @@ impl Page {
 
     // @TODO move outside
     fn load_gemini(&self, uri: Uri, is_history: bool) {
-        // Cancel previous client operations
-        {
-            let cancellable = self.client.cancellable.take();
-            if !cancellable.is_cancelled() {
-                cancellable.cancel();
-            }
-        }
-
-        // Init new Cancellable
-        let cancellable = Cancellable::new();
-        self.client.cancellable.replace(cancellable.clone());
-
         // Init shared clones
+        let cancellable = self.client.cancellable();
         let update = self.browser_action.update.clone();
         let tab_action = self.tab_action.clone();
         let navigation = self.navigation.clone();

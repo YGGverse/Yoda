@@ -1,4 +1,4 @@
-use gtk::gio::Cancellable;
+use gtk::{gio::Cancellable, prelude::CancellableExt};
 use std::cell::RefCell;
 
 /// Multi-client holder for single `Page` object
@@ -24,5 +24,20 @@ impl Client {
             cancellable: RefCell::new(Cancellable::new()),
             gemini: gemini::Client::new(),
         }
+    }
+
+    /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
+    pub fn cancellable(&self) -> Cancellable {
+        // Init new Cancellable
+        let cancellable = Cancellable::new();
+
+        // Cancel previous client operations
+        let previous = self.cancellable.replace(cancellable.clone());
+        if !previous.is_cancelled() {
+            previous.cancel();
+        }
+
+        // Done
+        cancellable
     }
 }
