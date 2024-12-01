@@ -433,8 +433,8 @@ impl Page {
                     // Route by status
                     match response.meta.status {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                        gemini::client::response::meta::Status::Input |
-                        gemini::client::response::meta::Status::SensitiveInput => {
+                        gemini::client::connection::response::meta::Status::Input |
+                        gemini::client::connection::response::meta::Status::SensitiveInput => {
                             // Format response
                             let status = Status::Input;
                             let title = match response.meta.data {
@@ -444,7 +444,7 @@ impl Page {
 
                             // Toggle input form variant
                             match response.meta.status {
-                                gemini::client::response::meta::Status::SensitiveInput =>
+                                gemini::client::connection::response::meta::Status::SensitiveInput =>
                                     input.set_new_sensitive(
                                         tab_action.clone(),
                                         uri.clone(),
@@ -468,7 +468,7 @@ impl Page {
                             update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-                        gemini::client::response::meta::Status::Success => {
+                        gemini::client::connection::response::meta::Status::Success => {
                             // Add history record
                             if is_history {
                                 snap_history(navigation.clone());
@@ -476,9 +476,9 @@ impl Page {
 
                             // Route by MIME
                             match response.meta.mime {
-                                Some(gemini::client::response::meta::Mime::TextGemini) => {
+                                Some(gemini::client::connection::response::meta::Mime::TextGemini) => {
                                     // Read entire input stream to buffer
-                                    gemini::client::response::data::Text::from_stream_async(
+                                    gemini::client::connection::response::data::Text::from_stream_async(
                                         response.connection.stream(),
                                         Priority::DEFAULT,
                                         cancellable.clone(),
@@ -534,10 +534,10 @@ impl Page {
                                     );
                                 },
                                 Some(
-                                    gemini::client::response::meta::Mime::ImagePng  |
-                                    gemini::client::response::meta::Mime::ImageGif  |
-                                    gemini::client::response::meta::Mime::ImageJpeg |
-                                    gemini::client::response::meta::Mime::ImageWebp
+                                    gemini::client::connection::response::meta::Mime::ImagePng  |
+                                    gemini::client::connection::response::meta::Mime::ImageGif  |
+                                    gemini::client::connection::response::meta::Mime::ImageJpeg |
+                                    gemini::client::connection::response::meta::Mime::ImageWebp
                                 ) => {
                                     // Final image size unknown, show loading widget
                                     let status = content.to_status_loading(
@@ -645,9 +645,9 @@ impl Page {
                             }
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                        gemini::client::response::meta::Status::Redirect |
+                        gemini::client::connection::response::meta::Status::Redirect |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        gemini::client::response::meta::Status::PermanentRedirect => {
+                        gemini::client::connection::response::meta::Status::PermanentRedirect => {
                             // Extract redirection URL from response data
                             match response.meta.data {
                                 Some(unresolved_url) => {
@@ -702,7 +702,7 @@ impl Page {
                                                                 UriHideFlags::FRAGMENT | UriHideFlags::QUERY
                                                             ),
                                                             // Set follow policy based on status code
-                                                            matches!(response.meta.status, gemini::client::response::meta::Status::PermanentRedirect),
+                                                            matches!(response.meta.status, gemini::client::connection::response::meta::Status::PermanentRedirect),
                                                         )
                                                             .set_status(Status::Redirect) // @TODO is this status really wanted?
                                                             .set_title("Redirect");
@@ -756,11 +756,11 @@ impl Page {
                             update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                        gemini::client::response::meta::Status::CertificateRequest |
+                        gemini::client::connection::response::meta::Status::CertificateRequest |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                        gemini::client::response::meta::Status::CertificateUnauthorized |
+                        gemini::client::connection::response::meta::Status::CertificateUnauthorized |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                        gemini::client::response::meta::Status::CertificateInvalid => {
+                        gemini::client::connection::response::meta::Status::CertificateInvalid => {
                             // Define common data
                             let status = Status::Success;
                             let title = "Identity";
@@ -777,8 +777,8 @@ impl Page {
                                 .set_description(Some(&match response.meta.data {
                                     Some(data) => data.value,
                                     None => match response.meta.status {
-                                        gemini::client::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
-                                        gemini::client::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
+                                        gemini::client::connection::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
+                                        gemini::client::connection::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
                                         _ => gformat!("Client certificate required")
                                     },
                                 }));
