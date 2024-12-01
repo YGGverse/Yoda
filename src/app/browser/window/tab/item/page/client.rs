@@ -31,7 +31,7 @@ impl Client {
         // Init new Cancellable
         let cancellable = Cancellable::new();
 
-        // Cancel previous client operations
+        // Replace by cancel previous operations
         let previous = self.cancellable.replace(cancellable.clone());
         if !previous.is_cancelled() {
             previous.cancel();
