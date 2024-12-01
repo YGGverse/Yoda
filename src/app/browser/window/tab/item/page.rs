@@ -28,7 +28,7 @@ use gtk::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{EditableExt, SocketClientExt},
+    prelude::{CancellableExt, EditableExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -378,10 +378,19 @@ impl Page {
 
     // Private helpers
 
-    // @TODO move somewhere outside
+    // @TODO move outside
     fn load_gemini(&self, uri: Uri, is_history: bool) {
+        // Cancel previous client operations
+        {
+            let cancellable = self.client.cancellable.take();
+            if !cancellable.is_cancelled() {
+                cancellable.cancel();
+            }
+        }
+
         // Init new Cancellable
         let cancellable = Cancellable::new();
+        self.client.cancellable.replace(cancellable.clone());
 
         // Init shared clones
         let update = self.browser_action.update.clone();
