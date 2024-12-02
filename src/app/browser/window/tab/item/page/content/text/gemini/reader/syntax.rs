@@ -35,7 +35,11 @@ impl Syntax {
         Ok(source.to_string())
     }
 
-    fn highlight(&self, source: &str, syntax_reference: &SyntaxReference) -> Result<String, Error> {
+    pub fn highlight(
+        &self,
+        source: &str,
+        syntax_reference: &SyntaxReference,
+    ) -> Result<String, Error> {
         let ranges = HighlightLines::new(syntax_reference, &self.theme_set.themes[DEFAULT_THEME])
             .highlight_line(&source, &self.syntax_set)?;
 
