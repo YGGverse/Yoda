@@ -28,6 +28,8 @@ use gtk::{
 use std::{collections::HashMap, rc::Rc};
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
+pub const EXTERNAL_LINK_INDICATOR: &str = "⇖";
+pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
 
 pub struct Reader {
@@ -153,7 +155,7 @@ impl Reader {
                 // Append external indicator on exist
                 if let Some(is_external) = link.is_external {
                     if is_external {
-                        alt.push("⇖".to_string());
+                        alt.push(EXTERNAL_LINK_INDICATOR.to_string());
                     }
                 }
 
@@ -198,7 +200,7 @@ impl Reader {
                 // Append value to buffer
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
-                    format!("• {}", list.value).as_str(),
+                    format!("{LIST_ITEM} {}", list.value).as_str(),
                     &[&tag.list.text_tag],
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
