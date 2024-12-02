@@ -69,14 +69,22 @@ impl Reader {
             // Is inline code
             if let Some(code) = Code::inline_from(line) {
                 // Append value to buffer
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    &match syntax.auto_highlight(&code.value, None) {
-                        Ok(highlight) => highlight,
-                        Err(_) => code.value.to_string(), // @TODO handle
-                    },
-                    &[&tag.code.text_tag],
-                );
+                match syntax.highlight(&code.value, &tag.code.text_tag, None) {
+                    Ok(highlight) => {
+                        for (text_tag, entity) in highlight {
+                            buffer.insert_with_tags(&mut buffer.end_iter(), &entity, &[&text_tag]);
+                        }
+                    }
+                    Err(_) => {
+                        buffer.insert_with_tags(
+                            &mut buffer.end_iter(),
+                            &code.value,
+                            &[&tag.code.text_tag],
+                        );
+                    } // @TODO handle
+                }
+
+                // Append new line
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
@@ -119,15 +127,25 @@ impl Reader {
                                     None => None,
                                 };
 
-                                // Insert multiline code buffer into main buffer
-                                buffer.insert_with_tags(
-                                    &mut buffer.end_iter(),
-                                    &match syntax.auto_highlight(&this.value, alt) {
-                                        Ok(highlight) => highlight,
-                                        Err(_) => this.value.to_string(), // @TODO handle
-                                    },
-                                    &[&tag.code.text_tag],
-                                );
+                                // Insert multiline code into main buffer
+                                match syntax.highlight(&this.value, &tag.code.text_tag, alt) {
+                                    Ok(highlight) => {
+                                        for (text_tag, entity) in highlight {
+                                            buffer.insert_with_tags(
+                                                &mut buffer.end_iter(),
+                                                &entity,
+                                                &[&text_tag],
+                                            );
+                                        }
+                                    }
+                                    Err(_) => {
+                                        buffer.insert_with_tags(
+                                            &mut buffer.end_iter(),
+                                            &this.value,
+                                            &[&tag.code.text_tag],
+                                        );
+                                    } // @TODO handle
+                                }
 
                                 // Reset
                                 multiline = None;
