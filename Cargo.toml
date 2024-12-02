@@ -21,7 +21,7 @@ version = "0.11.0"
 
 [dependencies.gemtext]
 package = "ggemtext"
-version = "0.2.1"
+version = "0.3.0"
 
 [dependencies.gtk]
 package = "gtk4"
@@ -35,6 +35,7 @@ version = "0.32.1"
 [dependencies.openssl]
 version = "0.10.68"
 
+# development
 [patch.crates-io]
 #ggemini = { path = "ggemini" }
-#ggemtext = { path = "ggemtext" }
+ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }

@@ -1,6 +1,8 @@
+pub mod error;
 mod tag;
 mod widget;
 
+pub use error::Error;
 use tag::Tag;
 use widget::Widget;
 
@@ -32,7 +34,11 @@ pub struct Reader {
 
 impl Reader {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, actions: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn new(
+        gemtext: &str,
+        base: &Uri,
+        actions: (Rc<WindowAction>, Rc<TabAction>),
+    ) -> Result<Self, Error> {
         // Init default values
         let mut title = None;
 
@@ -77,36 +83,39 @@ impl Reader {
                     }
                 }
                 Some(ref mut this) => {
-                    Code::multiline_continue_from(this, line);
+                    match Code::multiline_continue_from(this, line) {
+                        Ok(()) => {
+                            // Close tag found:
+                            if this.completed {
+                                // Is alt provided
+                                if let Some(alt) = &this.alt {
+                                    // Insert alt value to the main buffer
+                                    buffer.insert_with_tags(
+                                        &mut buffer.end_iter(),
+                                        alt.as_str(),
+                                        &[&tag.title.text_tag],
+                                    );
+                                    buffer.insert(&mut buffer.end_iter(), "\n");
+                                }
 
-                    // Close tag found:
-                    if this.completed {
-                        // Is alt provided
-                        if let Some(alt) = &this.alt {
-                            // Insert alt value to the main buffer
-                            buffer.insert_with_tags(
-                                &mut buffer.end_iter(),
-                                alt.as_str(),
-                                &[&tag.title.text_tag],
-                            );
-                            buffer.insert(&mut buffer.end_iter(), "\n");
+                                // Insert multiline code buffer into main buffer
+                                buffer.insert_with_tags(
+                                    &mut buffer.end_iter(),
+                                    &this.buffer.join("\n"),
+                                    &[&tag.code.text_tag],
+                                );
+
+                                buffer.insert(&mut buffer.end_iter(), "\n");
+
+                                // Reset
+                                multiline = None;
+                            }
+
+                            // Skip other actions for this line
+                            continue;
                         }
-
-                        // Insert multiline code buffer into main buffer
-                        buffer.insert_with_tags(
-                            &mut buffer.end_iter(),
-                            &this.buffer.join("\n"),
-                            &[&tag.code.text_tag],
-                        );
-
-                        buffer.insert(&mut buffer.end_iter(), "\n");
-
-                        // Reset
-                        multiline = None;
+                        Err(e) => return Err(Error::Gemtext(e.to_string())),
                     }
-
-                    // Skip other actions for this line
-                    continue;
                 }
             };
 
@@ -351,6 +360,6 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Self { title, widget }
+        Ok(Self { title, widget })
     }
 }
