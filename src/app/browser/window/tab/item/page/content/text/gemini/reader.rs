@@ -71,9 +71,9 @@ impl Reader {
                 // Append value to buffer
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
-                    &match syntax.highlight(&code.value, None) {
-                        Some(highlight) => highlight,
-                        None => code.value.to_string(),
+                    &match syntax.auto_highlight(&code.value, None) {
+                        Ok(highlight) => highlight,
+                        Err(_) => code.value.to_string(), // @TODO handle
                     },
                     &[&tag.code.text_tag],
                 );
@@ -122,9 +122,9 @@ impl Reader {
                                 // Insert multiline code buffer into main buffer
                                 buffer.insert_with_tags(
                                     &mut buffer.end_iter(),
-                                    &match syntax.highlight(&this.value, alt) {
-                                        Some(highlight) => highlight,
-                                        None => this.value.to_string(),
+                                    &match syntax.auto_highlight(&this.value, alt) {
+                                        Ok(highlight) => highlight,
+                                        Err(_) => this.value.to_string(), // @TODO handle
                                     },
                                     &[&tag.code.text_tag],
                                 );

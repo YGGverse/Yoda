@@ -1,6 +1,9 @@
 use syntect::{
-    easy::HighlightLines, highlighting::ThemeSet, parsing::SyntaxSet,
+    easy::HighlightLines,
+    highlighting::ThemeSet,
+    parsing::{SyntaxReference, SyntaxSet},
     util::as_24_bit_terminal_escaped,
+    Error,
 };
 
 pub const DEFAULT_THEME: &str = "base16-ocean.dark";
@@ -18,18 +21,24 @@ impl Syntax {
         }
     }
 
-    pub fn highlight(&self, source: &str, extension: Option<&String>) -> Option<String> {
-        match extension {
-            Some(extension) => match self.syntax_set.find_syntax_by_extension(extension) {
-                Some(syntax) => {
-                    let ranges = HighlightLines::new(syntax, &self.theme_set.themes[DEFAULT_THEME])
-                        .highlight_line(&source, &self.syntax_set)
-                        .unwrap(); // @TODO
-                    Some(as_24_bit_terminal_escaped(&ranges[..], true))
-                }
-                None => None,
-            },
-            None => None, // @TODO detect by source
+    pub fn auto_highlight(&self, source: &str, alt: Option<&String>) -> Result<String, Error> {
+        if let Some(name) = alt {
+            if let Some(syntax_reference) = self.syntax_set.find_syntax_by_name(name) {
+                return self.highlight(source, syntax_reference);
+            }
         }
+
+        if let Some(syntax_reference) = self.syntax_set.find_syntax_by_first_line(source) {
+            return self.highlight(source, syntax_reference);
+        }
+
+        Ok(source.to_string())
+    }
+
+    fn highlight(&self, source: &str, syntax_reference: &SyntaxReference) -> Result<String, Error> {
+        let ranges = HighlightLines::new(syntax_reference, &self.theme_set.themes[DEFAULT_THEME])
+            .highlight_line(&source, &self.syntax_set)?;
+
+        Ok(as_24_bit_terminal_escaped(&ranges[..], true))
     }
 }
