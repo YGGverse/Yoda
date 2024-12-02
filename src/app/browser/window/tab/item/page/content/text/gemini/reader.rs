@@ -100,6 +100,8 @@ impl Reader {
                                         alt.as_str(),
                                         &[&tag.title.text_tag],
                                     );
+
+                                    // Append new line after alt text
                                     buffer.insert(&mut buffer.end_iter(), NEW_LINE);
                                 }
 
@@ -109,8 +111,6 @@ impl Reader {
                                     &this.value,
                                     &[&tag.code.text_tag],
                                 );
-
-                                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                                 // Reset
                                 multiline = None;
