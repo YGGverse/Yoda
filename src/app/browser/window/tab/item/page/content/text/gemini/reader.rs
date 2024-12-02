@@ -27,6 +27,9 @@ use gtk::{
 };
 use std::{collections::HashMap, rc::Rc};
 
+pub const DATE_FORMAT: &str = "%Y-%m-%d";
+pub const NEW_LINE: &str = "\n";
+
 pub struct Reader {
     pub title: Option<GString>,
     pub widget: Rc<Widget>,
@@ -64,7 +67,7 @@ impl Reader {
                     code.value.as_str(),
                     &[&tag.code.text_tag],
                 );
-                buffer.insert(&mut buffer.end_iter(), "\n");
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
                 continue;
@@ -95,17 +98,17 @@ impl Reader {
                                         alt.as_str(),
                                         &[&tag.title.text_tag],
                                     );
-                                    buffer.insert(&mut buffer.end_iter(), "\n");
+                                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
                                 }
 
                                 // Insert multiline code buffer into main buffer
                                 buffer.insert_with_tags(
                                     &mut buffer.end_iter(),
-                                    &this.buffer.join("\n"),
+                                    &this.value,
                                     &[&tag.code.text_tag],
                                 );
 
-                                buffer.insert(&mut buffer.end_iter(), "\n");
+                                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                                 // Reset
                                 multiline = None;
@@ -131,7 +134,7 @@ impl Reader {
                         Level::H3 => &tag.h3.text_tag,
                     }],
                 );
-                buffer.insert(&mut buffer.end_iter(), "\n");
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Update reader title using first gemtext header match
                 if title.is_none() {
@@ -157,7 +160,7 @@ impl Reader {
                 // Append date on exist
                 if let Some(timestamp) = link.timestamp {
                     // https://docs.gtk.org/glib/method.DateTime.format.html
-                    if let Ok(value) = timestamp.format("%Y-%m-%d") {
+                    if let Ok(value) = timestamp.format(DATE_FORMAT) {
                         alt.push(value.to_string())
                     }
                 }
@@ -181,7 +184,7 @@ impl Reader {
 
                 // Append alt vector values to buffer
                 buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
-                buffer.insert(&mut buffer.end_iter(), "\n");
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Append tag to HashMap storage
                 links.insert(a, link.uri.clone());
@@ -198,7 +201,7 @@ impl Reader {
                     format!("• {}", list.value).as_str(),
                     &[&tag.list.text_tag],
                 );
-                buffer.insert(&mut buffer.end_iter(), "\n");
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
                 continue;
@@ -212,7 +215,7 @@ impl Reader {
                     quote.value.as_str(),
                     &[&tag.quote.text_tag],
                 );
-                buffer.insert(&mut buffer.end_iter(), "\n");
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
                 continue;
@@ -224,7 +227,7 @@ impl Reader {
 
             buffer.tag_table().add(&tag);
             buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag]);
-            buffer.insert(&mut buffer.end_iter(), "\n");
+            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 
         // Init additional controllers
