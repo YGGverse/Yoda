@@ -5,7 +5,7 @@ use gtk::{
 const MARGIN: i32 = 8;
 
 pub struct Widget {
-    gobject: TextView,
+    pub text_view: TextView,
 }
 
 impl Widget {
@@ -16,7 +16,7 @@ impl Widget {
         middle_button_controller: GestureClick,
         motion_controller: EventControllerMotion,
     ) -> Self {
-        let gobject = TextView::builder()
+        let text_view = TextView::builder()
             .bottom_margin(MARGIN)
             .buffer(buffer)
             .cursor_visible(false)
@@ -28,15 +28,10 @@ impl Widget {
             .wrap_mode(WrapMode::Word)
             .build();
 
-        gobject.add_controller(primary_button_controller);
-        gobject.add_controller(middle_button_controller);
-        gobject.add_controller(motion_controller);
+        text_view.add_controller(primary_button_controller);
+        text_view.add_controller(middle_button_controller);
+        text_view.add_controller(motion_controller);
 
-        Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &TextView {
-        &self.gobject
+        Self { text_view }
     }
 }

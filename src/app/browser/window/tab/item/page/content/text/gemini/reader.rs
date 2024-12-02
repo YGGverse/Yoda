@@ -20,14 +20,14 @@ use gtk::{
     gio::Cancellable,
     glib::{GString, TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
-    UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
+    WrapMode,
 };
 use std::{collections::HashMap, rc::Rc};
 
 pub struct Reader {
-    title: Option<GString>,
-    widget: Rc<Widget>,
+    pub title: Option<GString>,
+    pub widget: Rc<Widget>,
 }
 
 impl Reader {
@@ -46,14 +46,18 @@ impl Reader {
         let tag = Tag::new();
 
         // Init new text buffer
-        let buffer = TextBuffer::new(Some(tag.gobject()));
+        let buffer = TextBuffer::new(Some(&tag.text_tag_table));
 
         // Parse gemtext lines
         for line in gemtext.lines() {
             // Is inline code
             if let Some(code) = Code::inline_from(line) {
                 // Append value to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), code.value.as_str(), &[tag.code()]);
+                buffer.insert_with_tags(
+                    &mut buffer.end_iter(),
+                    code.value.as_str(),
+                    &[&tag.code.text_tag],
+                );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
                 // Skip other actions for this line
@@ -83,7 +87,7 @@ impl Reader {
                             buffer.insert_with_tags(
                                 &mut buffer.end_iter(),
                                 alt.as_str(),
-                                &[tag.title()],
+                                &[&tag.title.text_tag],
                             );
                             buffer.insert(&mut buffer.end_iter(), "\n");
                         }
@@ -92,7 +96,7 @@ impl Reader {
                         buffer.insert_with_tags(
                             &mut buffer.end_iter(),
                             &this.buffer.join("\n"),
-                            &[tag.code()],
+                            &[&tag.code.text_tag],
                         );
 
                         buffer.insert(&mut buffer.end_iter(), "\n");
@@ -113,9 +117,9 @@ impl Reader {
                     &mut buffer.end_iter(),
                     header.value.as_str(),
                     &[match header.level {
-                        Level::H1 => tag.h1(),
-                        Level::H2 => tag.h2(),
-                        Level::H3 => tag.h3(),
+                        Level::H1 => &tag.h1.text_tag,
+                        Level::H2 => &tag.h2.text_tag,
+                        Level::H3 => &tag.h3.text_tag,
                     }],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
@@ -183,7 +187,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     format!("• {}", list.value).as_str(),
-                    &[tag.list()],
+                    &[&tag.list.text_tag],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
@@ -197,7 +201,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     quote.value.as_str(),
-                    &[tag.quote()],
+                    &[&tag.quote.text_tag],
                 );
                 buffer.insert(&mut buffer.end_iter(), "\n");
 
@@ -229,17 +233,17 @@ impl Reader {
 
         // Init events
         primary_button_controller.connect_released({
-            let gobject = widget.gobject().clone();
+            let text_view = widget.text_view.clone();
             let _links_ = links.clone(); // is copy
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
-                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
                     TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
 
-                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
+                if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
@@ -267,16 +271,16 @@ impl Reader {
         });
 
         middle_button_controller.connect_pressed({
-            let gobject = widget.gobject().clone();
+            let text_view = widget.text_view.clone();
             let _links_ = links.clone(); // is copy
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
-                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
                     TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
-                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
+                if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
@@ -311,28 +315,28 @@ impl Reader {
         }); // for a note: this action sensitive to focus out
 
         motion_controller.connect_motion({
-            let gobject = widget.gobject().clone();
+            let text_view = widget.text_view.clone();
             let _links_ = links.clone(); // is copy
             move |_, window_x, window_y| {
                 // Detect tag match current coords hovered
-                let (buffer_x, buffer_y) = gobject.window_to_buffer_coords(
+                let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
                     TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
 
-                if let Some(iter) = gobject.iter_at_location(buffer_x, buffer_y) {
+                if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
                             // Toggle cursor
-                            gobject.set_cursor_from_name(Some("pointer"));
+                            text_view.set_cursor_from_name(Some("pointer"));
 
                             // Show tooltip | @TODO set_gutter option?
-                            gobject.set_tooltip_text(Some(uri.to_string().as_str()));
+                            text_view.set_tooltip_text(Some(uri.to_string().as_str()));
 
                             // Redraw required to apply changes immediately
-                            gobject.queue_draw();
+                            text_view.queue_draw();
 
                             return;
                         }
@@ -340,22 +344,13 @@ impl Reader {
                 }
 
                 // Restore defaults
-                gobject.set_cursor_from_name(Some("text"));
-                gobject.set_tooltip_text(None);
-                gobject.queue_draw();
+                text_view.set_cursor_from_name(Some("text"));
+                text_view.set_tooltip_text(None);
+                text_view.queue_draw();
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
         Self { title, widget }
-    }
-
-    // Getters
-    pub fn title(&self) -> &Option<GString> {
-        &self.title
-    }
-
-    pub fn gobject(&self) -> &TextView {
-        self.widget.gobject()
     }
 }

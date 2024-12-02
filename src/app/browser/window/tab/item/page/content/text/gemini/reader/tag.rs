@@ -17,15 +17,15 @@ use title::Title;
 use gtk::{TextTag, TextTagTable};
 
 pub struct Tag {
-    gobject: TextTagTable,
+    pub text_tag_table: TextTagTable,
     // Tags
-    code: Code,
-    h1: H1,
-    h2: H2,
-    h3: H3,
-    list: List,
-    quote: Quote,
-    title: Title,
+    pub code: Code,
+    pub h1: H1,
+    pub h2: H2,
+    pub h3: H3,
+    pub list: List,
+    pub quote: Quote,
+    pub title: Title,
 }
 
 impl Tag {
@@ -41,18 +41,18 @@ impl Tag {
         let title = Title::new();
 
         // Init tag table
-        let gobject = TextTagTable::new();
+        let text_tag_table = TextTagTable::new();
 
-        gobject.add(code.gobject());
-        gobject.add(h1.gobject());
-        gobject.add(h2.gobject());
-        gobject.add(h3.gobject());
-        gobject.add(title.gobject());
-        gobject.add(list.gobject());
-        gobject.add(quote.gobject());
+        text_tag_table.add(&code.text_tag);
+        text_tag_table.add(&h1.text_tag);
+        text_tag_table.add(&h2.text_tag);
+        text_tag_table.add(&h3.text_tag);
+        text_tag_table.add(&title.text_tag);
+        text_tag_table.add(&list.text_tag);
+        text_tag_table.add(&quote.text_tag);
 
         Self {
-            gobject,
+            text_tag_table,
             // Tags
             code,
             h1,
@@ -65,40 +65,7 @@ impl Tag {
     }
 
     // Actions
-    pub fn add(&self, tag: &TextTag) -> bool {
-        self.gobject.add(tag)
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &TextTagTable {
-        &self.gobject
-    }
-
-    pub fn code(&self) -> &TextTag {
-        self.code.gobject()
-    }
-
-    pub fn h1(&self) -> &TextTag {
-        self.h1.gobject()
-    }
-
-    pub fn h2(&self) -> &TextTag {
-        self.h2.gobject()
-    }
-
-    pub fn h3(&self) -> &TextTag {
-        self.h3.gobject()
-    }
-
-    pub fn list(&self) -> &TextTag {
-        self.list.gobject()
-    }
-
-    pub fn quote(&self) -> &TextTag {
-        self.quote.gobject()
-    }
-
-    pub fn title(&self) -> &TextTag {
-        self.title.gobject()
+    pub fn add(&self, text_tag: &TextTag) -> bool {
+        self.text_tag_table.add(text_tag)
     }
 }

@@ -69,8 +69,8 @@ impl Page {
         let widget = Rc::new(Widget::new(
             &id,
             &navigation.widget.gobject,
-            content.gobject(),
-            input.gobject(),
+            &content.gobject,
+            &input.widget.clamp,
         ));
 
         let meta = Rc::new(Meta::new(Status::New, gformat!("New page")));
@@ -495,8 +495,8 @@ impl Page {
                                                             &buffer.data
                                                         );
 
-                                                        let title = match text_gemini.meta_title() {
-                                                            Some(title) => title,
+                                                        let title = match text_gemini.meta.title {
+                                                            Some(ref title) => title,
                                                             None => &uri_to_title(&uri)
                                                         };
 

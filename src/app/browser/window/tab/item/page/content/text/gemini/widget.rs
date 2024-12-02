@@ -1,24 +1,19 @@
 use adw::ClampScrollable;
-use gtk::TextView;
+use gtk::prelude::IsA;
 
 pub struct Widget {
-    gobject: ClampScrollable,
+    pub clamp_scrollable: ClampScrollable,
 }
 
 impl Widget {
     // Construct
-    pub fn new(child: &TextView) -> Self {
+    pub fn new(child: &impl IsA<gtk::Widget>) -> Self {
         Self {
-            gobject: ClampScrollable::builder()
+            clamp_scrollable: ClampScrollable::builder()
                 .child(child)
                 .css_classes(["view"])
                 .maximum_size(800)
                 .build(),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &ClampScrollable {
-        &self.gobject
     }
 }

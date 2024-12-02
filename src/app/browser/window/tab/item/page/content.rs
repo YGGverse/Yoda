@@ -18,7 +18,7 @@ use std::{rc::Rc, time::Duration};
 pub struct Content {
     window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
-    gobject: Box,
+    pub gobject: Box,
 }
 
 impl Content {
@@ -97,7 +97,7 @@ impl Content {
             base,
             (self.window_action.clone(), self.tab_action.clone()),
         );
-        self.gobject.append(text.gobject());
+        self.gobject.append(&text.scrolled_window);
         text
     }
 
@@ -106,12 +106,5 @@ impl Content {
         while let Some(child) = self.gobject.last_child() {
             self.gobject.remove(&child);
         }
-    }
-
-    // Getters
-
-    /// Get reference to `Self` gobject
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
     }
 }

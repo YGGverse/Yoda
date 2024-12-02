@@ -7,12 +7,11 @@ use sensitive::Sensitive;
 use widget::Widget;
 
 use crate::app::browser::window::tab::item::Action as TabAction;
-use adw::Clamp;
 use gtk::glib::Uri;
 use std::rc::Rc;
 
 pub struct Input {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Input {
@@ -53,10 +52,5 @@ impl Input {
         self.widget.update(Some(
             Sensitive::new(action, base, title, max_length).gobject(),
         ));
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Clamp {
-        self.widget.gobject()
     }
 }
