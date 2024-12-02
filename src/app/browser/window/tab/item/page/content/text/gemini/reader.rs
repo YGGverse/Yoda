@@ -72,7 +72,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     &match syntax.highlight(&code.value, None) {
-                        Some(result) => result,
+                        Some(highlight) => highlight,
                         None => code.value.to_string(),
                     },
                     &[&tag.code.text_tag],
@@ -123,7 +123,7 @@ impl Reader {
                                 buffer.insert_with_tags(
                                     &mut buffer.end_iter(),
                                     &match syntax.highlight(&this.value, alt) {
-                                        Some(result) => result,
+                                        Some(highlight) => highlight,
                                         None => this.value.to_string(),
                                     },
                                     &[&tag.code.text_tag],
