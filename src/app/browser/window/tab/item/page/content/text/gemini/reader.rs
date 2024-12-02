@@ -1,8 +1,10 @@
 pub mod error;
+mod syntax;
 mod tag;
 mod widget;
 
 pub use error::Error;
+use syntax::Syntax;
 use tag::Tag;
 use widget::Widget;
 
@@ -53,6 +55,9 @@ impl Reader {
         // Init multiline code builder features
         let mut multiline = None;
 
+        // Init syntect highlight features
+        let syntax = Syntax::new();
+
         // Init tags
         let tag = Tag::new();
 
@@ -66,7 +71,10 @@ impl Reader {
                 // Append value to buffer
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
-                    code.value.as_str(),
+                    &match syntax.highlight(&code.value, None) {
+                        Some(result) => result,
+                        None => code.value.to_string(),
+                    },
                     &[&tag.code.text_tag],
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
@@ -93,22 +101,31 @@ impl Reader {
                             // Close tag found:
                             if this.completed {
                                 // Is alt provided
-                                if let Some(alt) = &this.alt {
-                                    // Insert alt value to the main buffer
-                                    buffer.insert_with_tags(
-                                        &mut buffer.end_iter(),
-                                        alt.as_str(),
-                                        &[&tag.title.text_tag],
-                                    );
+                                let alt = match this.alt {
+                                    Some(ref alt) => {
+                                        // Insert alt value to the main buffer
+                                        buffer.insert_with_tags(
+                                            &mut buffer.end_iter(),
+                                            alt.as_str(),
+                                            &[&tag.title.text_tag],
+                                        );
 
-                                    // Append new line after alt text
-                                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                                }
+                                        // Append new line after alt text
+                                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+
+                                        // Return value as wanted also for syntax highlight detection
+                                        Some(alt)
+                                    }
+                                    None => None,
+                                };
 
                                 // Insert multiline code buffer into main buffer
                                 buffer.insert_with_tags(
                                     &mut buffer.end_iter(),
-                                    &this.value,
+                                    &match syntax.highlight(&this.value, alt) {
+                                        Some(result) => result,
+                                        None => this.value.to_string(),
+                                    },
                                     &[&tag.code.text_tag],
                                 );
 
@@ -316,8 +333,8 @@ impl Reader {
                                     None::<&Window>,
                                     None::<&Cancellable>,
                                     |result| {
-                                        if let Err(error) = result {
-                                            println!("{error}")
+                                        if let Err(e) = result {
+                                            println!("{e}")
                                         }
                                     },
                                 ),
