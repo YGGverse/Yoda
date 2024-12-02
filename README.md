@@ -86,6 +86,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] `file://` - localhost browser
 * [ ] `config://` - low-level key/value settings editor
+* [ ] `view-source://` - page source viewer (where supported)
 
 ### Media types
 
