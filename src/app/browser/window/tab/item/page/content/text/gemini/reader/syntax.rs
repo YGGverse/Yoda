@@ -1,3 +1,4 @@
+use adw::StyleManager;
 use gtk::{
     gdk::RGBA,
     pango::{Style, Underline},
@@ -21,7 +22,8 @@ use syntect::{
     Solarized (dark)
     Solarized (light)
 */
-pub const DEFAULT_THEME: &str = "Solarized (dark)";
+pub const DEFAULT_THEME_DARK: &str = "base16-eighties.dark";
+pub const DEFAULT_THEME_LIGHT: &str = "InspiredGitHub";
 
 pub struct Syntax {
     syntax_set: SyntaxSet,
@@ -85,8 +87,15 @@ impl Syntax {
         let mut buffer = Vec::new();
 
         // Apply syntect decorator
-        let ranges = HighlightLines::new(syntax_reference, &self.theme_set.themes[DEFAULT_THEME])
-            .highlight_line(&source, &self.syntax_set)?;
+        let ranges = HighlightLines::new(
+            syntax_reference,
+            &self.theme_set.themes[if StyleManager::default().is_dark() {
+                DEFAULT_THEME_DARK
+            } else {
+                DEFAULT_THEME_LIGHT
+            }], // @TODO apply on env change
+        )
+        .highlight_line(&source, &self.syntax_set)?;
 
         // Build tags
         for (style, entity) in ranges {
