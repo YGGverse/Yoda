@@ -11,7 +11,17 @@ use syntect::{
     Error,
 };
 
-pub const DEFAULT_THEME: &str = "base16-ocean.dark";
+/*  Default theme
+    @TODO make optional
+    base16-ocean.dark
+    base16-eighties.dark
+    base16-mocha.dark
+    base16-ocean.light
+    InspiredGitHub
+    Solarized (dark)
+    Solarized (light)
+*/
+pub const DEFAULT_THEME: &str = "Solarized (dark)";
 
 pub struct Syntax {
     syntax_set: SyntaxSet,
