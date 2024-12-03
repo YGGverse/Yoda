@@ -17,7 +17,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install system packages
-      run: sudo apt-get install libgtk-4-dev libglib2.0-dev
+      run: sudo apt install libgtk-4-dev libglib2.0-dev
+    - name: Config path
+      run: export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
     - name: Build
       run: cargo build --verbose
     - name: Run tests
