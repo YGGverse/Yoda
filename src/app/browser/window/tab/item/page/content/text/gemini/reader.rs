@@ -71,8 +71,17 @@ impl Reader {
                 // Append value to buffer
                 match syntax.highlight(&code.value, &tag.code.text_tag, None) {
                     Ok(highlight) => {
-                        for (text_tag, entity) in highlight {
-                            buffer.insert_with_tags(&mut buffer.end_iter(), &entity, &[&text_tag]);
+                        for (syntax_tag, entity) in highlight {
+                            // Register new tag
+                            if !tag.text_tag_table.add(&syntax_tag) {
+                                todo!()
+                            }
+                            // Append tag to buffer
+                            buffer.insert_with_tags(
+                                &mut buffer.end_iter(),
+                                &entity,
+                                &[&syntax_tag],
+                            );
                         }
                     }
                     Err(_) => {
@@ -130,11 +139,16 @@ impl Reader {
                                 // Insert multiline code into main buffer
                                 match syntax.highlight(&this.value, &tag.code.text_tag, alt) {
                                     Ok(highlight) => {
-                                        for (text_tag, entity) in highlight {
+                                        for (syntax_tag, entity) in highlight {
+                                            // Register new tag
+                                            if !tag.text_tag_table.add(&syntax_tag) {
+                                                todo!()
+                                            }
+                                            // Append tag to buffer
                                             buffer.insert_with_tags(
                                                 &mut buffer.end_iter(),
                                                 &entity,
-                                                &[&text_tag],
+                                                &[&syntax_tag],
                                             );
                                         }
                                     }
@@ -215,8 +229,9 @@ impl Reader {
                     .wrap_mode(WrapMode::Word)
                     .build();
 
+                // Register new tag
                 if !tag.text_tag_table.add(&a) {
-                    panic!() // @TODO handle
+                    todo!()
                 }
 
                 // Append alt vector values to buffer
