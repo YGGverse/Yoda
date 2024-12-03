@@ -215,7 +215,7 @@ impl Reader {
                     .wrap_mode(WrapMode::Word)
                     .build();
 
-                if !tag.add(&a) {
+                if !tag.text_tag_table.add(&a) {
                     panic!() // @TODO handle
                 }
 

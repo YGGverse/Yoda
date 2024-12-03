@@ -14,7 +14,7 @@ use list::List;
 use quote::Quote;
 use title::Title;
 
-use gtk::{TextTag, TextTagTable};
+use gtk::TextTagTable;
 
 pub struct Tag {
     pub text_tag_table: TextTagTable,
@@ -62,10 +62,5 @@ impl Tag {
             quote,
             title,
         }
-    }
-
-    // Actions
-    pub fn add(&self, text_tag: &TextTag) -> bool {
-        self.text_tag_table.add(text_tag)
     }
 }
