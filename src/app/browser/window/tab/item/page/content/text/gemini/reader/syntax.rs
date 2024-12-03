@@ -51,7 +51,7 @@ impl Syntax {
 
         // Create new tag from source preset
         let mut tag = TextTag::new(None);
-        tag.clone_from(source_tag);
+        // @TODO copy preset tag.clone_from(source_tag);
 
         // Append
         buffer.push((tag, source.to_string()));
@@ -75,7 +75,7 @@ impl Syntax {
         for (style, entity) in ranges {
             // Create new tag from source preset
             let mut tag = TextTag::new(None);
-            tag.clone_from(source_tag);
+            // @TODO copy preset tag.clone_from(source_tag);
 
             // Tuneup using syntect conversion
             tag.set_background_rgba(Some(&color_to_rgba(style.background)));
@@ -94,12 +94,19 @@ impl Syntax {
 // Tools
 
 fn color_to_rgba(color: Color) -> RGBA {
+    /* @TODO #1931
     RGBA::new(
         color.r.into(),
         color.g.into(),
         color.b.into(),
         color.a.into(),
-    )
+    )*/
+
+    RGBA::parse(format!(
+        "rgba({},{},{},{})",
+        color.r, color.g, color.b, color.a
+    ))
+    .unwrap()
 }
 
 fn font_style_to_style(font_style: FontStyle) -> Style {
