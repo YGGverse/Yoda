@@ -33,7 +33,7 @@ impl Syntax {
         alt: Option<&String>,
     ) -> Result<Vec<(TextTag, String)>, Error> {
         if let Some(name) = alt {
-            if let Some(reference) = self.syntax_set.find_syntax_by_extension("rs") {
+            if let Some(reference) = self.syntax_set.find_syntax_by_extension(name) {
                 return self.syntect_buffer(source_code, source_tag, reference);
             }
         }
@@ -49,9 +49,8 @@ impl Syntax {
         // Init new line buffer
         let mut buffer = Vec::new();
 
-        // Create new tag from source preset
-        let mut tag = TextTag::new(None);
-        // @TODO copy preset tag.clone_from(source_tag);
+        // Create new tag preset from source
+        let tag = new_text_tag_from(source_tag);
 
         // Append
         buffer.push((tag, source.to_string()));
@@ -73,9 +72,8 @@ impl Syntax {
 
         // Build tags
         for (style, entity) in ranges {
-            // Create new tag from source preset
-            let mut tag = TextTag::new(None);
-            // @TODO copy preset tag.clone_from(source_tag);
+            // Create new tag preset from source
+            let tag = new_text_tag_from(source_tag);
 
             // Tuneup using syntect conversion
             // tag.set_background_rgba(Some(&color_to_rgba(style.background)));
@@ -121,4 +119,14 @@ fn font_style_to_underline(font_style: FontStyle) -> Underline {
         FontStyle::UNDERLINE => Underline::Single,
         _ => Underline::None,
     }
+}
+
+fn new_text_tag_from(source_tag: &TextTag) -> TextTag {
+    TextTag::builder()
+        .foreground_rgba(&source_tag.foreground_rgba().unwrap())
+        .family(source_tag.family().unwrap())
+        .left_margin(source_tag.left_margin())
+        .scale(source_tag.scale())
+        .wrap_mode(source_tag.wrap_mode())
+        .build()
 }
