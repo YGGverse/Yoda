@@ -32,12 +32,12 @@ impl Syntax {
         source_tag: &TextTag,
         alt: Option<&String>,
     ) -> Result<Vec<(TextTag, String)>, Error> {
-        if let Some(name) = alt {
-            if let Some(reference) = self.syntax_set.find_syntax_by_name(name) {
+        if let Some(value) = alt {
+            if let Some(reference) = self.syntax_set.find_syntax_by_name(value) {
                 return self.syntect_buffer(source_code, source_tag, reference);
             }
 
-            if let Some(reference) = self.syntax_set.find_syntax_by_extension(name) {
+            if let Some(reference) = self.syntax_set.find_syntax_by_token(value) {
                 return self.syntect_buffer(source_code, source_tag, reference);
             }
         }
