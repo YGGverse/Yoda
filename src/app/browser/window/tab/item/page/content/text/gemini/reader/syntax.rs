@@ -40,6 +40,10 @@ impl Syntax {
             if let Some(reference) = self.syntax_set.find_syntax_by_token(value) {
                 return self.syntect_buffer(source_code, source_tag, reference);
             }
+
+            if let Some(reference) = self.syntax_set.find_syntax_by_path(value) {
+                return self.syntect_buffer(source_code, source_tag, reference);
+            }
         }
 
         if let Some(reference) = self.syntax_set.find_syntax_by_first_line(source_code) {
