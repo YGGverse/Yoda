@@ -122,11 +122,19 @@ fn font_style_to_underline(font_style: FontStyle) -> Underline {
 }
 
 fn new_text_tag_from(source_tag: &TextTag) -> TextTag {
-    TextTag::builder()
-        .foreground_rgba(&source_tag.foreground_rgba().unwrap())
-        .family(source_tag.family().unwrap())
+    let text_tag = TextTag::builder()
         .left_margin(source_tag.left_margin())
         .scale(source_tag.scale())
         .wrap_mode(source_tag.wrap_mode())
-        .build()
+        .build();
+
+    if let Some(ref family) = source_tag.family() {
+        text_tag.set_family(Some(family));
+    }
+
+    if let Some(ref foreground_rgba) = source_tag.foreground_rgba() {
+        text_tag.set_foreground_rgba(Some(foreground_rgba));
+    }
+
+    text_tag
 }
