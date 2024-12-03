@@ -33,7 +33,7 @@ impl Syntax {
         alt: Option<&String>,
     ) -> Result<Vec<(TextTag, String)>, Error> {
         if let Some(name) = alt {
-            if let Some(reference) = self.syntax_set.find_syntax_by_extension(name) {
+            if let Some(reference) = self.syntax_set.find_syntax_by_extension("rs") {
                 return self.syntect_buffer(source_code, source_tag, reference);
             }
         }
@@ -78,7 +78,7 @@ impl Syntax {
             // @TODO copy preset tag.clone_from(source_tag);
 
             // Tuneup using syntect conversion
-            tag.set_background_rgba(Some(&color_to_rgba(style.background)));
+            // tag.set_background_rgba(Some(&color_to_rgba(style.background)));
             tag.set_foreground_rgba(Some(&color_to_rgba(style.foreground)));
             tag.set_style(font_style_to_style(style.font_style));
             tag.set_underline(font_style_to_underline(style.font_style));
