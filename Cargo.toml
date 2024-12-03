@@ -36,7 +36,6 @@ version = "0.32.1"
 version = "0.10.68"
 
 [dependencies.syntect]
-package = "syntect"
 version = "5.2.0"
 
 # development
