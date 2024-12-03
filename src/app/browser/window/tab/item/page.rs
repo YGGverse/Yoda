@@ -866,12 +866,12 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 /// Useful as common placeholder when page title could not be detected
 ///
 /// * this feature may be improved and moved outside @TODO
-fn uri_to_title(uri: &Uri) -> GString {
-    let title = GString::from(uri.path().split('/').last().unwrap_or_default());
+fn uri_to_title(uri: &Uri) -> String {
+    let title = uri.path().split('/').last().unwrap_or_default().to_string();
     if title.is_empty() {
         match uri.host() {
-            Some(host) => gformat!("{host}"),
-            None => gformat!("Untitled"),
+            Some(host) => host.to_string(),
+            None => "Untitled".to_string(),
         }
     } else {
         title

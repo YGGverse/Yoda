@@ -13,7 +13,7 @@ use crate::app::browser::window::{
 };
 use adw::StyleManager;
 use gemtext::line::{
-    code::Code,
+    code::{Inline, Multiline},
     header::{Header, Level},
     link::Link,
     list::List,
@@ -22,7 +22,7 @@ use gemtext::line::{
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
     gio::Cancellable,
-    glib::{GString, TimeZone, Uri},
+    glib::{TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
     WrapMode,
@@ -35,7 +35,7 @@ pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
 
 pub struct Reader {
-    pub title: Option<GString>,
+    pub title: Option<String>,
     pub widget: Rc<Widget>,
 }
 
@@ -67,7 +67,7 @@ impl Reader {
         // Parse gemtext lines
         for line in gemtext.lines() {
             // Is inline code
-            if let Some(code) = Code::inline_from(line) {
+            if let Some(code) = Inline::from(line) {
                 // Append value to buffer
                 match syntax.highlight(&code.value, &tag.code.text_tag, None) {
                     Ok(highlight) => {
@@ -104,7 +104,7 @@ impl Reader {
             match multiline {
                 None => {
                     // Open tag found
-                    if let Some(code) = Code::multiline_begin_from(line) {
+                    if let Some(code) = Multiline::begin_from(line) {
                         // Begin next lines collection into the code buffer
                         multiline = Some(code);
 
@@ -113,7 +113,7 @@ impl Reader {
                     }
                 }
                 Some(ref mut this) => {
-                    match Code::multiline_continue_from(this, line) {
+                    match Multiline::continue_from(this, line) {
                         Ok(()) => {
                             // Close tag found:
                             if this.completed {

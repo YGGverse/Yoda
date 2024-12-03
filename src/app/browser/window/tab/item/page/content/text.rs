@@ -3,14 +3,11 @@ mod gemini;
 use gemini::Gemini;
 
 use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
-use gtk::{
-    glib::{GString, Uri},
-    ScrolledWindow,
-};
+use gtk::{glib::Uri, ScrolledWindow};
 use std::rc::Rc;
 
 pub struct Meta {
-    pub title: Option<GString>,
+    pub title: Option<String>,
 } // @TODO move to separated mod
 
 pub struct Text {
