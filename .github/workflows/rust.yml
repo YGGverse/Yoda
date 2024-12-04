@@ -12,12 +12,13 @@ env:
 jobs:
   build:
 
+    # https://github.com/actions/runner-images
     runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
     - name: Install system packages
-      run: sudo apt install -y libgtk-4-dev libglib2.0-dev libadwaita-1-dev
+      run: sudo apt install -y build-essential libgtk-4-dev libadwaita-1-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
