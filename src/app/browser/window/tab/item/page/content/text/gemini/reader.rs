@@ -11,7 +11,6 @@ use widget::Widget;
 use crate::app::browser::window::{
     action::Position, tab::item::Action as TabAction, Action as WindowAction,
 };
-use adw::StyleManager;
 use gemtext::line::{
     code::{Inline, Multiline},
     header::{Header, Level},
@@ -224,7 +223,8 @@ impl Reader {
 
                 // Create new tag for new link
                 let a = TextTag::builder()
-                    .foreground_rgba(&StyleManager::default().accent_color_rgba()) // @TODO
+                    .foreground("#3584e4")
+                    // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
                     .sentence(true)
                     .wrap_mode(WrapMode::Word)
                     .build();

@@ -1,7 +1,8 @@
-use adw::{Spinner, StatusPage};
+use adw::StatusPage;
 use gtk::{
     glib::{timeout_add_local, ControlFlow},
     prelude::WidgetExt,
+    Spinner, // use adw::Spinner; @TODO adw 1.6 / ubuntu 24.10+
 };
 use std::time::Duration;
 

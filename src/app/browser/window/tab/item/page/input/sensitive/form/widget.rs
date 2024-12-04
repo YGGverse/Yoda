@@ -14,7 +14,7 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(action_send: SimpleAction, title: Option<&str>, max_length: Option<i32>) -> Self {
+    pub fn new(action_send: SimpleAction, title: Option<&str>, _max_length: Option<i32>) -> Self {
         // Init gobject
         let gobject = PasswordEntryRow::builder().show_apply_button(true).build();
 
@@ -22,9 +22,10 @@ impl Widget {
             gobject.set_title(value);
         }
 
+        /* @TODO adw 1.6 / ubuntu 24.10+
         if let Some(value) = max_length {
             gobject.set_max_length(value);
-        }
+        } */
 
         // Init events
         gobject.connect_apply(move |_| {

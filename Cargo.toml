@@ -13,7 +13,7 @@ repository = "https://github.com/YGGverse/Yoda"
 [dependencies.adw]
 package = "libadwaita"
 version = "0.7.0"
-features = ["v1_6"]
+features = ["v1_5"]
 
 [dependencies.gemini]
 package = "ggemini"
