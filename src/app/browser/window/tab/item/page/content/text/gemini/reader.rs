@@ -26,7 +26,7 @@ use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
     WrapMode,
 };
-use std::{collections::HashMap, rc::Rc};
+use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const EXTERNAL_LINK_INDICATOR: &str = "⇖";
@@ -52,8 +52,12 @@ impl Reader {
         // Init default values
         let mut title = None;
 
-        // Init HashMap storage for event controllers
+        // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
+
+        // Init hovered tag storage for `links`
+        // * maybe less expensive than update entire HashMap by iter
+        let hover: Rc<Cell<Option<TextTag>>> = Rc::new(Cell::new(None));
 
         // Init multiline code builder features
         let mut multiline = None;
@@ -305,10 +309,13 @@ impl Reader {
             motion_controller.clone(),
         ));
 
+        // Init shared reference container for HashTable constructed
+        let links = Rc::new(links);
+
         // Init events
         primary_button_controller.connect_released({
             let text_view = widget.text_view.clone();
-            let _links_ = links.clone(); // is copy
+            let links = links.clone();
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
@@ -320,7 +327,7 @@ impl Reader {
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
-                        if let Some(uri) = _links_.get(&tag) {
+                        if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
                                 "gemini" => {
@@ -346,7 +353,7 @@ impl Reader {
 
         middle_button_controller.connect_pressed({
             let text_view = widget.text_view.clone();
-            let _links_ = links.clone(); // is copy
+            let links = links.clone();
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
@@ -357,7 +364,7 @@ impl Reader {
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
-                        if let Some(uri) = _links_.get(&tag) {
+                        if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
                                 "gemini" => {
@@ -390,7 +397,8 @@ impl Reader {
 
         motion_controller.connect_motion({
             let text_view = widget.text_view.clone();
-            let _links_ = links.clone(); // is copy
+            let links = links.clone();
+            let hover = hover.clone();
             move |_, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
@@ -400,7 +408,7 @@ impl Reader {
                 );
 
                 // Reset link colors to default
-                for (tag, _) in _links_.iter() {
+                if let Some(tag) = hover.replace(None) {
                     tag.set_foreground_rgba(Some(&link_color.0));
                 }
 
@@ -408,9 +416,12 @@ impl Reader {
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
-                        if let Some(uri) = _links_.get(&tag) {
+                        if let Some(uri) = links.get(&tag) {
                             // Toggle color
                             tag.set_foreground_rgba(Some(&link_color.1));
+
+                            // Keep hovered tag in memory
+                            hover.replace(Some(tag.clone()));
 
                             // Toggle cursor
                             text_view.set_cursor_from_name(Some("pointer"));
