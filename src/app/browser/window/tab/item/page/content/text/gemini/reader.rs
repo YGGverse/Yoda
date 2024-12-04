@@ -19,10 +19,10 @@ use gemtext::line::{
     quote::Quote,
 };
 use gtk::{
-    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY},
+    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, RGBA},
     gio::Cancellable,
     glib::{TimeZone, Uri},
-    prelude::{TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt},
+    prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
     WrapMode,
 };
@@ -32,6 +32,10 @@ pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const EXTERNAL_LINK_INDICATOR: &str = "⇖";
 pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
+
+// @TODO use accent colors in adw 1.6 / ubuntu 24.10+
+const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 1.0);
+const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 0.9);
 
 pub struct Reader {
     pub title: Option<String>,
@@ -53,6 +57,12 @@ impl Reader {
 
         // Init multiline code builder features
         let mut multiline = None;
+
+        // Init colors
+        let link_color = (
+            new_rgba_from(LINK_COLOR_DEFAULT),
+            new_rgba_from(LINK_COLOR_ONHOVER),
+        );
 
         // Init syntect highlight features
         let syntax = Syntax::new();
@@ -223,7 +233,7 @@ impl Reader {
 
                 // Create new tag for new link
                 let a = TextTag::builder()
-                    .foreground("#3584e4")
+                    .foreground_rgba(&link_color.0)
                     // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
                     .sentence(true)
                     .wrap_mode(WrapMode::Word)
@@ -389,10 +399,19 @@ impl Reader {
                     window_y as i32,
                 );
 
+                // Reset link colors to default
+                for (tag, _) in _links_.iter() {
+                    tag.set_foreground_rgba(Some(&link_color.0));
+                }
+
+                // Apply hover effect
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = _links_.get(&tag) {
+                            // Toggle color
+                            tag.set_foreground_rgba(Some(&link_color.1));
+
                             // Toggle cursor
                             text_view.set_cursor_from_name(Some("pointer"));
 
@@ -417,4 +436,16 @@ impl Reader {
         // Result
         Ok(Self { title, widget })
     }
+}
+
+// Private helpers
+
+/// Create new [RGBA](https://docs.gtk.org/gdk4/struct.RGBA.html) from tuple
+fn new_rgba_from(value: (f32, f32, f32, f32)) -> RGBA {
+    // Extract values
+    let (r, g, b, a) = value;
+
+    /* @TODO #1931
+    RGBA::new(r, g, b, a)*/
+    RGBA::parse(format!("rgba({r},{g},{b},{a})")).unwrap()
 }
