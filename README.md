@@ -128,7 +128,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 #### Debian
 
-_todo_
+``` bash
+sudo apt install git build-essential\
+                 libglib2.0-dev libgtk-4-dev libadwaita-1-dev\
+                 libssl-dev
+```
 
 #### Fedora
 
