@@ -427,7 +427,7 @@ impl Reader {
                             text_view.set_cursor_from_name(Some("pointer"));
 
                             // Show tooltip | @TODO set_gutter option?
-                            text_view.set_tooltip_text(Some(uri.to_string().as_str()));
+                            text_view.set_tooltip_text(Some(&uri.to_string()));
 
                             // Redraw required to apply changes immediately
                             text_view.queue_draw();
