@@ -120,26 +120,28 @@ GTK 4 / Libadwaita client written in Rust
 * GTK `4.16`
 * Libadwaita `1.5` (Ubuntu 24.04+)
 
-Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
-
-``` bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
 #### Debian
 
 ``` bash
-sudo apt install git build-essential\
-                 libglib2.0-dev libgtk-4-dev libadwaita-1-dev\
-                 libssl-dev
+sudo apt install git curl build-essential\
+                 libgtk-4-dev libadwaita-1-dev\
+                 libsqlite3-dev libssl-dev
 ```
 
 #### Fedora
 
 ``` bash
-sudo dnf install git gcc\
-                 cairo-devel glib2-devel gtk4-devel libadwaita-devel pango-devel\
-                 sqlite-devel
+sudo dnf install git curl gcc\
+                 gtk4-devel libadwaita-devel\
+                 sqlite-devel openssl-devel
+```
+
+#### Rust
+
+Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
+
+``` bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 ### Install
