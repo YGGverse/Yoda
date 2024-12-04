@@ -95,7 +95,7 @@ impl Syntax {
                 DEFAULT_THEME_LIGHT
             }], // @TODO apply on env change
         )
-        .highlight_line(&source, &self.syntax_set)?;
+        .highlight_line(source, &self.syntax_set)?;
 
         // Build tags
         for (style, entity) in ranges {
