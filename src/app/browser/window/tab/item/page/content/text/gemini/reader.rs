@@ -309,7 +309,7 @@ impl Reader {
             motion_controller.clone(),
         ));
 
-        // Init shared reference container for HashTable constructed
+        // Init shared reference container for HashTable collected
         let links = Rc::new(links);
 
         // Init events
