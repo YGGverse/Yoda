@@ -119,19 +119,12 @@ impl Syntax {
 // Tools
 
 fn color_to_rgba(color: Color) -> RGBA {
-    /* @TODO #1931
     RGBA::new(
-        color.r.into(),
-        color.g.into(),
-        color.b.into(),
-        color.a.into(),
-    )*/
-
-    RGBA::parse(format!(
-        "rgba({},{},{},{})",
-        color.r, color.g, color.b, color.a
-    ))
-    .unwrap()
+        color.r as f32 / 255.0,
+        color.g as f32 / 255.0,
+        color.b as f32 / 255.0,
+        color.a as f32 / 255.0,
+    )
 }
 
 fn font_style_to_style(font_style: FontStyle) -> Style {

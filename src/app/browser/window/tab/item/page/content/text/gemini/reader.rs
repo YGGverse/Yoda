@@ -34,8 +34,8 @@ pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
 
 // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
-const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 1.0);
-const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 0.9);
+const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 255.0);
+const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 228.0);
 
 pub struct Reader {
     pub title: Option<String>,
@@ -453,10 +453,6 @@ impl Reader {
 
 /// Create new [RGBA](https://docs.gtk.org/gdk4/struct.RGBA.html) from tuple
 fn new_rgba_from(value: (f32, f32, f32, f32)) -> RGBA {
-    // Extract values
     let (r, g, b, a) = value;
-
-    /* @TODO #1931
-    RGBA::new(r, g, b, a)*/
-    RGBA::parse(format!("rgba({r},{g},{b},{a})")).unwrap()
+    RGBA::new(r / 255.0, g / 255.0, b / 255.0, a / 255.0)
 }
