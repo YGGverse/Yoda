@@ -118,7 +118,7 @@ GTK 4 / Libadwaita client written in Rust
 * Gio `2.82`
 * Glib `2.56`
 * GTK `4.16`
-* Libadwaita `1.6`
+* Libadwaita `1.6` (Ubuntu 24.10+)
 
 Use [rustup](https://rustup.rs) installer to setup latest Rust compiler and Cargo package manager:
 
