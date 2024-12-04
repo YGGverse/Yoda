@@ -113,11 +113,10 @@ GTK 4 / Libadwaita client written in Rust
 
 ### Requirements
 
-* Cairo `1.16`
+* Cairo `1.18`
 * GDK PixBuf `2.42`
-* Gio `2.82`
-* Glib `2.56`
-* GTK `4.16`
+* Glib `2.80`
+* GTK `4.14`
 * Libadwaita `1.5` (Ubuntu 24.04+)
 
 #### Debian
