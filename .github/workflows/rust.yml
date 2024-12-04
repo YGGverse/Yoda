@@ -19,7 +19,7 @@ jobs:
     - name: Install system packages
       run: sudo apt install -y libgtk-4-dev libglib2.0-dev
     - name: Set PKG_CONFIG_PATH
-      run: echo "PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig" >> $GITHUB_ENV
+      run: echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" >> $GITHUB_ENV
     - name: Build
       run: cargo build --verbose
     - name: Run tests
