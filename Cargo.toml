@@ -26,7 +26,7 @@ version = "0.3.0"
 [dependencies.gtk]
 package = "gtk4"
 version = "0.9.1"
-features = ["gnome_45"]
+features = ["gnome_47"]
 
 [dependencies.sqlite]
 package = "rusqlite"
