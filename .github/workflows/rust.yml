@@ -12,14 +12,12 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-24.10
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
     - name: Install system packages
-      run: sudo apt install -y libgtk-4-dev libglib2.0-dev
-    - name: Set PKG_CONFIG_PATH
-      run: echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" >> $GITHUB_ENV
+      run: sudo apt install -y libgtk-4-dev libglib2.0-dev libadwaita-1-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
