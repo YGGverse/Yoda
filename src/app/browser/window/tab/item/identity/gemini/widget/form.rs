@@ -1,10 +1,12 @@
 mod drop;
+mod exit;
 mod file;
 pub mod list;
 mod name;
 mod save;
 
 use drop::Drop;
+use exit::Exit;
 use file::File;
 use list::{item::value::Value, List};
 use name::Name;
@@ -18,6 +20,7 @@ use std::rc::Rc;
 pub struct Form {
     // pub action: Rc<Action>,
     // pub drop: Rc<Drop>,
+    // pub exit: Rc<Exit>,
     pub file: Rc<File>,
     pub list: Rc<List>,
     pub name: Rc<Name>,
@@ -36,6 +39,7 @@ impl Form {
         let name = Rc::new(Name::new(action.clone()));
         let save = Rc::new(Save::new(profile.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), action.clone(), list.clone()));
+        let exit = Rc::new(Exit::new(profile.clone(), action.clone(), list.clone()));
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
@@ -43,12 +47,14 @@ impl Form {
         g_box.append(&list.dropdown);
         g_box.append(&name.entry);
         g_box.append(&file.button);
+        g_box.append(&exit.button);
         g_box.append(&drop.button);
         g_box.append(&save.button);
 
         // Connect events
         list.on_select({
             let drop = drop.clone();
+            let exit = exit.clone();
             let file = file.clone();
             let name = name.clone();
             let save = save.clone();
@@ -64,10 +70,12 @@ impl Form {
                 match item {
                     Value::ProfileIdentityGeminiId(value) => {
                         drop.update(Some(value));
+                        exit.update(Some(value));
                         save.update(Some(value));
                     }
                     _ => {
                         drop.update(None);
+                        exit.update(None);
                         save.update(None);
                     }
                 }
@@ -81,6 +89,7 @@ impl Form {
         Self {
             // action,
             // drop,
+            // exit,
             file,
             list,
             name,
