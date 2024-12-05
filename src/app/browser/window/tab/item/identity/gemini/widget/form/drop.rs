@@ -14,11 +14,11 @@ use std::{cell::RefCell, rc::Rc};
 // Defaults
 
 const LABEL: &str = "Delete";
-const TOOLTIP_TEXT: &str = "Drop selected identity from database";
+const TOOLTIP_TEXT: &str = "Drop selected identity from profile";
 const MARGIN: i32 = 8;
 
 const HEADING: &str = "Delete";
-const BODY: &str = "Permanently delete selected identity from database?";
+const BODY: &str = "Delete selected identity from profile?";
 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
