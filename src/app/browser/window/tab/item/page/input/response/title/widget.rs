@@ -1,13 +1,13 @@
 use gtk::{prelude::WidgetExt, Align, Label};
 
 pub struct Widget {
-    gobject: Label,
+    pub label: Label,
 }
 
 impl Widget {
     // Construct
     pub fn new(title: Option<&str>) -> Self {
-        let gobject = Label::builder()
+        let label = Label::builder()
             .css_classes(["heading"])
             .halign(Align::Start)
             .margin_end(8)
@@ -15,18 +15,13 @@ impl Widget {
             .visible(false)
             .build();
 
-        if let Some(label) = title {
-            if !label.is_empty() {
-                gobject.set_label(label);
-                gobject.set_visible(true)
+        if let Some(value) = title {
+            if !value.is_empty() {
+                label.set_label(value);
+                label.set_visible(true)
             }
         }
 
-        Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Label {
-        &self.gobject
+        Self { label }
     }
 }

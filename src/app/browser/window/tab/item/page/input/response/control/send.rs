@@ -1,11 +1,11 @@
 mod widget;
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, Button};
+use gtk::gio::SimpleAction;
 use std::rc::Rc;
 
 pub struct Send {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Send {
@@ -21,10 +21,5 @@ impl Send {
     // Actions
     pub fn update(&self, is_sensitive: bool) {
         self.widget.update(is_sensitive);
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Button {
-        self.widget.gobject()
     }
 }

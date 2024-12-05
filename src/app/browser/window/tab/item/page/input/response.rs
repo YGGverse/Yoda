@@ -13,13 +13,12 @@ use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
     prelude::WidgetExt,
-    Box,
 };
 use std::rc::Rc;
 
 pub struct Response {
     // Components
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Response {
@@ -41,9 +40,9 @@ impl Response {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            title.gobject(),
-            form.gobject(),
-            control.gobject(),
+            &title.widget.label,
+            &form.widget.text_view,
+            &control.widget.g_box,
         ));
 
         // Init events
@@ -55,7 +54,7 @@ impl Response {
                 control.update(size_limit.map(|limit| {
                     limit as i32
                         - (base.to_string_partial(UriHideFlags::QUERY).len() as i32
-                            + Uri::escape_string(form.text().as_str(), None, false).len() as i32)
+                            + Uri::escape_string(&form.widget.text(), None, false).len() as i32)
                 }));
             }
         });
@@ -67,21 +66,18 @@ impl Response {
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(form.text().as_str(), None, false),
+                        Uri::escape_string(&form.widget.text(), None, false),
                     )),
                     true,
                 );
             }
         });
 
-        widget.gobject().connect_realize(move |_| form.focus());
+        widget.g_box.connect_realize(move |_| {
+            form.widget.text_view.grab_focus();
+        });
 
         // Return activated struct
         Self { widget }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
     }
 }

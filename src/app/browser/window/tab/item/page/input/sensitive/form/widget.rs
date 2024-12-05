@@ -2,51 +2,33 @@ use adw::{
     prelude::{EntryRowExt, PreferencesRowExt},
     PasswordEntryRow,
 };
-use gtk::{
-    gio::SimpleAction,
-    glib::GString,
-    prelude::{ActionExt, EditableExt, WidgetExt},
-};
+use gtk::{gio::SimpleAction, prelude::ActionExt};
 
 pub struct Widget {
-    gobject: PasswordEntryRow,
+    pub password_entry_row: PasswordEntryRow,
 }
 
 impl Widget {
     // Construct
     pub fn new(action_send: SimpleAction, title: Option<&str>, _max_length: Option<i32>) -> Self {
-        // Init gobject
-        let gobject = PasswordEntryRow::builder().show_apply_button(true).build();
+        // Init main widget
+        let password_entry_row = PasswordEntryRow::builder().show_apply_button(true).build();
 
         if let Some(value) = title {
-            gobject.set_title(value);
+            password_entry_row.set_title(value);
         }
 
         /* @TODO adw 1.6 / ubuntu 24.10+
         if let Some(value) = max_length {
-            gobject.set_max_length(value);
+            password_entry_row.set_max_length(value);
         } */
 
         // Init events
-        gobject.connect_apply(move |_| {
+        password_entry_row.connect_apply(move |_| {
             action_send.activate(None);
         });
 
         // Return activated struct
-        Self { gobject }
-    }
-
-    // Actions
-    pub fn focus(&self) {
-        self.gobject.grab_focus();
-    }
-
-    // Getters
-    pub fn text(&self) -> GString {
-        self.gobject.text()
-    }
-
-    pub fn gobject(&self) -> &PasswordEntryRow {
-        &self.gobject
+        Self { password_entry_row }
     }
 }

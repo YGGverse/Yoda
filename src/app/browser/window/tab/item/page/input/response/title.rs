@@ -2,11 +2,10 @@ mod widget;
 
 use widget::Widget;
 
-use gtk::Label;
 use std::rc::Rc;
 
 pub struct Title {
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Title {
@@ -15,10 +14,5 @@ impl Title {
         Self {
             widget: Rc::new(Widget::new(title)),
         }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Label {
-        self.widget.gobject()
     }
 }

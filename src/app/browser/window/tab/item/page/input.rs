@@ -38,7 +38,7 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            Response::new(action, base, title, size_limit).gobject(),
+            &Response::new(action, base, title, size_limit).widget.g_box,
         ));
     }
 

@@ -6,13 +6,13 @@ use counter::Counter;
 use send::Send;
 use widget::Widget;
 
-use gtk::{gio::SimpleAction, Box};
+use gtk::gio::SimpleAction;
 use std::rc::Rc;
 
 pub struct Control {
-    counter: Rc<Counter>,
-    send: Rc<Send>,
-    widget: Rc<Widget>,
+    pub counter: Rc<Counter>,
+    pub send: Rc<Send>,
+    pub widget: Rc<Widget>,
 }
 
 impl Control {
@@ -23,7 +23,7 @@ impl Control {
         let send = Rc::new(Send::new(action_send));
 
         // Init widget
-        let widget = Rc::new(Widget::new(counter.gobject(), send.gobject()));
+        let widget = Rc::new(Widget::new(&counter.widget.label, &send.widget.button));
 
         // Return activated struct
         Self {
@@ -41,10 +41,5 @@ impl Control {
             Some(left) => left > 0,
             None => false,
         });
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
     }
 }

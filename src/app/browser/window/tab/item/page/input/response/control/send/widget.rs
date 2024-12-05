@@ -5,36 +5,31 @@ use gtk::{
 };
 
 pub struct Widget {
-    gobject: Button,
+    pub button: Button,
 }
 
 impl Widget {
     // Construct
     pub fn new(action_send: SimpleAction) -> Self {
-        // Init gobject
-        let gobject = Button::builder()
+        // Init main widget
+        let button = Button::builder()
             //.css_classes(["accent"])
             .label("Send")
             .build();
 
         // Init events
-        gobject.connect_clicked({
+        button.connect_clicked({
             move |_| {
                 action_send.activate(None);
             }
         });
 
         // Return activated `Self`
-        Self { gobject }
+        Self { button }
     }
 
     // Actions
     pub fn update(&self, is_sensitive: bool) {
-        self.gobject.set_sensitive(is_sensitive);
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Button {
-        &self.gobject
+        self.button.set_sensitive(is_sensitive);
     }
 }

@@ -8,7 +8,7 @@ use crate::app::browser::window::tab::item::action::Action as TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::WidgetExt,
+    prelude::{EditableExt, WidgetExt},
     Box,
 };
 use std::rc::Rc;
@@ -38,7 +38,7 @@ impl Sensitive {
         ));
 
         // Init widget
-        let widget = Rc::new(Widget::new(form.gobject()));
+        let widget = Rc::new(Widget::new(&form.widget.password_entry_row));
 
         // Init events
         action_send.connect_activate({
@@ -48,14 +48,16 @@ impl Sensitive {
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(form.text().as_str(), None, false),
+                        Uri::escape_string(&form.widget.password_entry_row.text(), None, false),
                     )),
                     true,
                 );
             }
         });
 
-        widget.gobject().connect_realize(move |_| form.focus());
+        widget.gobject().connect_realize(move |_| {
+            form.widget.password_entry_row.grab_focus();
+        });
 
         // Return activated struct
         Self { widget }
