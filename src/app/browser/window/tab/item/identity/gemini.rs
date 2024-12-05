@@ -68,7 +68,7 @@ impl Gemini {
                         Value::ProfileIdentityGeminiId(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
-                            "{} - {} | auth: {}",
+                            "{} - {} | scope: {}",
                             // certificate validity time
                             certificate
                                 .not_valid_before()
