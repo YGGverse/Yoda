@@ -52,12 +52,25 @@ impl Gemini {
             "Use existing certificate",
         );
 
-        // Collect additional options from database
+        // Collect identities as options from profile database
+        // * memory cache synced also and could be faster @TODO
         let mut i = 2; // start from 3'th
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
                     i += 1;
+
+                    // Is selected?
+                    if profile
+                        .identity
+                        .gemini
+                        .auth
+                        .memory
+                        .match_scope(auth_url.as_str())
+                        .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id)
+                    {
+                        selected = i;
+                    }
 
                     // Get certificate details
                     let certificate = match TlsCertificate::from_pem(&identity.pem) {
@@ -93,22 +106,6 @@ impl Gemini {
                                 .count(),
                         ),
                     );
-
-                    // Is selected?
-                    if profile
-                        .identity
-                        .gemini
-                        .auth
-                        .database
-                        .records_scope(Some(auth_url.as_str()))
-                        .unwrap()
-                        .iter()
-                        .filter(|this| this.profile_identity_gemini_id == identity.id)
-                        .count()
-                        > 0
-                    {
-                        selected = i;
-                    }
                 }
 
                 // Select list item
