@@ -96,14 +96,14 @@ impl List {
         }
     }
 
-    /// Find list item by `Value`
+    /// Find list item by `value` (stores ID)
     /// * return `position` found
     pub fn find(&self, value: i64) -> Option<u32> {
         self.list_store
             .find_with_equal_func(|this| value == this.clone().downcast::<Item>().unwrap().value())
     }
 
-    /// Remove list item by `Value`
+    /// Remove list item by `value` (stores ID)
     /// * return `position` of removed list item
     pub fn remove(&self, value: i64) -> Option<u32> {
         match self.find(value) {
@@ -120,22 +120,23 @@ impl List {
     /// Run callback function on `connect_selected_notify` event
     /// * return `Value` enum match selected item
     pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
-        self.dropdown
-            .connect_selected_notify(move |this| callback(selected_item(this).value_enum()));
+        self.dropdown.connect_selected_notify(move |this| {
+            callback(
+                this.selected_item()
+                    .and_downcast::<Item>()
+                    .unwrap()
+                    .value_enum(),
+            )
+        });
     }
 
     // Getters
 
     /// Get selected `Item` GObject
     pub fn selected_item(&self) -> Item {
-        selected_item(&self.dropdown)
+        self.dropdown
+            .selected_item()
+            .and_downcast::<Item>()
+            .unwrap()
     }
-}
-
-// Tools
-
-/// Cast and return selected `Item` GObject for any internal
-/// [DropDown](https://docs.gtk.org/gtk4/class.DropDown.html) widget
-fn selected_item(dropdown: &DropDown) -> Item {
-    dropdown.selected_item().and_downcast::<Item>().unwrap()
 }
