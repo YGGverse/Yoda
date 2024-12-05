@@ -69,7 +69,7 @@ GTK 4 / Libadwaita client written in Rust
       * [x] Multiline
         * [x] Alt
       * [x] Syntax highlight* (by [syntect](https://github.com/trishume/syntect))
-      * [ ] Terminal emulation* (by [cansi](https://github.com/colored-rs/cansi))
+      * [ ] ANSI / terminal emulation* (by [cansi](https://github.com/colored-rs/cansi))
           * [x] foreground
           * [x] background
           * [ ] intensity
