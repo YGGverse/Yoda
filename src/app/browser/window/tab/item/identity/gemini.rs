@@ -5,7 +5,7 @@ use crate::app::browser::window::Action;
 use crate::profile::Profile;
 use gtk::{
     gio::{prelude::TlsCertificateExt, TlsCertificate},
-    glib::Uri,
+    glib::{gformat, Uri},
     prelude::IsA,
 };
 use std::rc::Rc;
@@ -66,8 +66,36 @@ impl Gemini {
                         Err(reason) => todo!("{reason}"),
                     };
 
-                    // Get auth details for tooltip
-                    let mut auth_scope = Vec::new();
+                    // Init tooltip components
+                    let mut tooltip = format!("<b>Certificate</b>\n");
+
+                    if let Some(subject_name) = certificate.subject_name() {
+                        tooltip
+                            .push_str(&format!("\n<small><b>subject</b>\n{subject_name}</small>"));
+                    }
+
+                    if let Some(issuer_name) = certificate.issuer_name() {
+                        tooltip.push_str(&format!("\n<small><b>issuer</b>\n{issuer_name}</small>"));
+                    }
+
+                    if let Some(not_valid_before) = certificate.not_valid_before() {
+                        if let Ok(timestamp) = not_valid_before.format_iso8601() {
+                            tooltip.push_str(&format!(
+                                "\n<small><b>valid after</b>\n{timestamp}</small>"
+                            ));
+                        }
+                    }
+
+                    if let Some(not_valid_after) = certificate.not_valid_after() {
+                        if let Ok(timestamp) = not_valid_after.format_iso8601() {
+                            tooltip.push_str(&format!(
+                                "\n<small><b>valid before</b>\n{timestamp}</small>"
+                            ));
+                        }
+                    }
+
+                    // Collect scope info
+                    let mut scope = Vec::new();
 
                     for auth in profile
                         .identity
@@ -79,45 +107,35 @@ impl Gemini {
                         .iter()
                         .filter(|this| this.profile_identity_gemini_id == identity.id)
                     {
-                        auth_scope.push(format!("<small>{}</small>", auth.scope.clone()))
+                        scope.push(format!("<small>{}</small>", auth.scope.clone()))
                     }
 
-                    // Build tooltip
-                    let mut tooltip = format!(
-                        "<b>valid</b>\n<small>{}</small> - <small>{}</small>",
-                        certificate
-                            .not_valid_before()
-                            .unwrap()
-                            .format_iso8601()
-                            .unwrap(),
-                        certificate
-                            .not_valid_after()
-                            .unwrap()
-                            .format_iso8601()
-                            .unwrap()
-                    );
-
-                    if auth_scope.len() > 0 {
-                        tooltip.push_str(&format!("\n<b>scope</b>\n{}", auth_scope.join("\n")));
+                    if scope.len() > 0 {
+                        tooltip.push_str(&format!("\n\n<b>Scope</b>\n\n{}", scope.join("\n")));
                     }
 
                     // Append record option
                     widget.form.list.append(
                         Value::ProfileIdentityGeminiId(identity.id),
-                        &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
+                        // title
+                        &certificate
+                            .subject_name()
+                            .unwrap_or(gformat!("Unknown"))
+                            .replace("CN=", ""), // trim prefix
+                        // subtitle
                         &format!(
                             "{} - {} | scope: {}",
                             certificate
                                 .not_valid_before()
-                                .unwrap()
+                                .unwrap() // @TODO
                                 .format(DATE_FORMAT)
                                 .unwrap(),
                             certificate
                                 .not_valid_after()
-                                .unwrap()
+                                .unwrap() // @TODO
                                 .format(DATE_FORMAT)
                                 .unwrap(),
-                            auth_scope.len(),
+                            scope.len(),
                         ),
                         Some(&tooltip),
                         profile
