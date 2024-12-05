@@ -57,13 +57,13 @@ impl List {
             let child = list_item.child().and_downcast::<Box>().unwrap();
 
             // Update `title` (expected as the first child)
-            let title = child.first_child().unwrap().downcast::<Label>().unwrap();
+            let title = child.first_child().and_downcast::<Label>().unwrap();
 
             title.set_label(&item.title());
             title.set_css_classes(if item.is_active() { &["success"] } else { &[] });
 
             // Update `subtitle` (expected as the last child)
-            let subtitle = child.last_child().unwrap().downcast::<Label>().unwrap();
+            let subtitle = child.last_child().and_downcast::<Label>().unwrap();
 
             subtitle.set_label(&item.subtitle());
             subtitle.set_tooltip_markup(Some(&item.tooltip()));
