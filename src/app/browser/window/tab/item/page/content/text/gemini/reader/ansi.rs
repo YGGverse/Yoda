@@ -20,28 +20,30 @@ pub fn format(source_code: &str) -> Vec<(TextTag, String)> {
         let tag = Tag::new();
 
         // Apply supported decorations
-        if let Some(fg) = entity.fg {
-            tag.text_tag.set_foreground_rgba(Some(&color_to_rgba(fg)));
+        if let Some(color) = entity.fg {
+            tag.text_tag
+                .set_foreground_rgba(Some(&color_to_rgba(color)));
         }
 
-        if let Some(bg) = entity.bg {
-            tag.text_tag.set_background_rgba(Some(&color_to_rgba(bg)));
+        if let Some(color) = entity.bg {
+            tag.text_tag
+                .set_background_rgba(Some(&color_to_rgba(color)));
         }
 
-        if let Some(italic) = entity.italic {
-            if italic {
+        if let Some(is_italic) = entity.italic {
+            if is_italic {
                 tag.text_tag.set_style(Style::Italic);
             }
         }
 
-        if let Some(underline) = entity.underline {
-            if underline {
+        if let Some(is_underline) = entity.underline {
+            if is_underline {
                 tag.text_tag.set_underline(Underline::Single);
             }
         }
 
-        if let Some(strikethrough) = entity.strikethrough {
-            tag.text_tag.set_strikethrough(strikethrough);
+        if let Some(is_strikethrough) = entity.strikethrough {
+            tag.text_tag.set_strikethrough(is_strikethrough);
         }
 
         // Append
