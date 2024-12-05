@@ -2,12 +2,13 @@ pub mod item;
 use item::{value::Value, Item};
 
 use gtk::{
+    gdk::Cursor,
     gio::{
         prelude::{Cast, CastNone},
         ListStore,
     },
     prelude::{BoxExt, ListItemExt, WidgetExt},
-    Align, Box, DropDown, Label, ListItem, SignalListItemFactory,
+    Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
 };
 
 pub struct List {
@@ -37,12 +38,25 @@ impl List {
             child.append(&Label::builder().halign(Align::Start).build());
 
             // Subtitle
-            child.append(
-                &Label::builder()
-                    .halign(Align::Start)
-                    .css_classes(["caption", "dim-label"])
+            let subtitle = Box::builder()
+                .orientation(Orientation::Horizontal)
+                .css_classes(["caption", "dim-label"])
+                .halign(Align::Start)
+                .build();
+
+            subtitle.append(
+                &Image::builder()
+                    .cursor(&Cursor::from_name("help", None).unwrap())
+                    .icon_name("dialog-information")
+                    .margin_end(4)
+                    .pixel_size(11)
                     .build(),
             );
+
+            subtitle.append(&Label::new(None));
+
+            // Subtitle
+            child.append(&subtitle);
 
             // Done
             this.downcast_ref::<ListItem>()
@@ -56,20 +70,29 @@ impl List {
             let item = list_item.item().and_downcast::<Item>().unwrap();
             let child = list_item.child().and_downcast::<Box>().unwrap();
 
-            // Update `title` (expected as the first child)
+            // Update `title`
             let title = child.first_child().and_downcast::<Label>().unwrap();
 
             title.set_label(&item.title());
             title.set_css_classes(if item.is_active() { &["success"] } else { &[] });
 
-            // Update `subtitle` (expected as the last child)
-            let subtitle = child.last_child().and_downcast::<Label>().unwrap();
+            // Update `subtitle`
+            let subtitle = child.last_child().and_downcast::<Box>().unwrap();
 
-            subtitle.set_label(&item.subtitle());
-            subtitle.set_tooltip_markup(Some(&item.tooltip()));
+            subtitle
+                .last_child()
+                .and_downcast::<Label>()
+                .unwrap()
+                .set_label(&item.subtitle());
+
+            // Update `tooltip`
+            let tooltip = subtitle.first_child().and_downcast::<Image>().unwrap();
+
+            tooltip.set_visible(!item.tooltip().is_empty());
+            tooltip.set_tooltip_markup(Some(&item.tooltip()));
         });
 
-        // Init main `DropDown`
+        // Init main widget
         let dropdown = DropDown::builder()
             .model(&list_store)
             .factory(&factory)
