@@ -30,16 +30,12 @@ pub fn format(source_code: &str) -> Vec<(TextTag, String)> {
                 .set_background_rgba(Some(&color_to_rgba(color)));
         }
 
-        if let Some(is_italic) = entity.italic {
-            if is_italic {
-                tag.text_tag.set_style(Style::Italic);
-            }
+        if entity.italic.is_some_and(|is_italic| is_italic) {
+            tag.text_tag.set_style(Style::Italic);
         }
 
-        if let Some(is_underline) = entity.underline {
-            if is_underline {
-                tag.text_tag.set_underline(Underline::Single);
-            }
+        if entity.underline.is_some_and(|is_underline| is_underline) {
+            tag.text_tag.set_underline(Underline::Single);
         }
 
         if let Some(is_strikethrough) = entity.strikethrough {
