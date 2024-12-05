@@ -93,7 +93,7 @@ impl Widget {
                 this.set_response_enabled(response, false);
 
                 // Result
-                callback(form.list.value())
+                callback(form.list.selected_item().value_enum())
             }
         });
     }

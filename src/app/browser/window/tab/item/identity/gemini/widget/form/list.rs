@@ -120,24 +120,22 @@ impl List {
     /// Run callback function on `connect_selected_notify` event
     /// * return `Value` enum match selected item
     pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
-        self.dropdown.connect_selected_notify(move |this| {
-            callback(
-                this.selected_item()
-                    .and_downcast::<Item>()
-                    .unwrap()
-                    .value_enum(),
-            )
-        });
+        self.dropdown
+            .connect_selected_notify(move |this| callback(selected_item(this).value_enum()));
     }
 
     // Getters
 
-    /// Get formatted `value` match selected item
-    pub fn value(&self) -> Value {
-        self.dropdown
-            .selected_item()
-            .and_downcast::<Item>()
-            .unwrap()
-            .value_enum()
+    /// Get selected `Item` GObject
+    pub fn selected_item(&self) -> Item {
+        selected_item(&self.dropdown)
     }
+}
+
+// Tools
+
+/// Cast and return selected `Item` GObject for any internal
+/// [DropDown](https://docs.gtk.org/gtk4/class.DropDown.html) widget
+fn selected_item(dropdown: &DropDown) -> Item {
+    dropdown.selected_item().and_downcast::<Item>().unwrap()
 }

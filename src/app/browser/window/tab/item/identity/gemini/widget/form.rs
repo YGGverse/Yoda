@@ -93,9 +93,10 @@ impl Form {
 
     /// Validate `Self` components match current selection
     pub fn is_applicable(&self) -> bool {
-        match self.list.value() {
+        match self.list.selected_item().value_enum() {
             Value::GenerateNewAuth => self.name.is_valid(),
             Value::ImportPem => self.file.is_valid(),
+            Value::ProfileIdentityGeminiId(_) => !self.list.selected_item().is_active(),
             _ => true,
         }
     }
