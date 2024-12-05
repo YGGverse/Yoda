@@ -67,7 +67,7 @@ impl Gemini {
                     };
 
                     // Init tooltip components
-                    let mut tooltip = format!("<b>Certificate</b>\n");
+                    let mut tooltip = "<b>Certificate</b>\n".to_string();
 
                     if let Some(subject_name) = certificate.subject_name() {
                         tooltip
@@ -110,7 +110,7 @@ impl Gemini {
                         scope.push(format!("<small>{}</small>", auth.scope.clone()))
                     }
 
-                    if scope.len() > 0 {
+                    if !scope.is_empty() {
                         tooltip.push_str(&format!("\n\n<b>Scope</b>\n\n{}", scope.join("\n")));
                     }
 

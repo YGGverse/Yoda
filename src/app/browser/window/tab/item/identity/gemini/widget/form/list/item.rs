@@ -37,13 +37,7 @@ impl Item {
             )
             .property("title", title)
             .property("subtitle", subtitle)
-            .property(
-                "tooltip",
-                match tooltip {
-                    Some(text) => text,
-                    None => "", // NULL
-                },
-            )
+            .property("tooltip", tooltip.unwrap_or_default())
             .property("is_active", is_active)
             .build()
     }
