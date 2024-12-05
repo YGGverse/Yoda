@@ -44,4 +44,4 @@ version = "2.2.1"
 # development
 [patch.crates-io]
 # ggemini = { path = "ggemini" }
-ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }
+# ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }
