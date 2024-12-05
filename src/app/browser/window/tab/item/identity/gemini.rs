@@ -149,7 +149,7 @@ impl Gemini {
                 }
             }
             Err(e) => todo!("{e}"),
-        }
+        } // @TODO separate markup
 
         // Init events
         widget.on_apply({
