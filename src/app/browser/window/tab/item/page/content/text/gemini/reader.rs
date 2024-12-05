@@ -81,8 +81,8 @@ impl Reader {
         for line in gemtext.lines() {
             // Is inline code
             if let Some(code) = Inline::from(line) {
-                // Append value to buffer
-                match syntax.highlight(&code.value, &tag.code.text_tag, None) {
+                // Try auto-detect code syntax for given `value`
+                match syntax.highlight(&code.value, None) {
                     Ok(highlight) => {
                         for (syntax_tag, entity) in highlight {
                             // Register new tag
@@ -98,6 +98,7 @@ impl Reader {
                         }
                     }
                     Err(_) => {
+                        // Nothing match, append default `Code` tag into the main buffer
                         buffer.insert_with_tags(
                             &mut buffer.end_iter(),
                             &code.value,
@@ -149,8 +150,9 @@ impl Reader {
                                     None => None,
                                 };
 
-                                // Insert multiline code into main buffer
-                                match syntax.highlight(&this.value, &tag.code.text_tag, alt) {
+                                // Begin code block construction
+                                // Try auto-detect code syntax for given `value` and `alt`
+                                match syntax.highlight(&this.value, alt) {
                                     Ok(highlight) => {
                                         for (syntax_tag, entity) in highlight {
                                             // Register new tag
@@ -166,6 +168,9 @@ impl Reader {
                                         }
                                     }
                                     Err(_) => {
+                                        // Try ANSI/SGR highlight (terminal emulation)
+
+                                        // Nothing match, append default `Code` tag into the main buffer
                                         buffer.insert_with_tags(
                                             &mut buffer.end_iter(),
                                             &this.value,

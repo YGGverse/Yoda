@@ -1,5 +1,8 @@
 pub mod error;
+mod tag;
+
 pub use error::Error;
+use tag::Tag;
 
 use adw::StyleManager;
 use gtk::{
@@ -50,25 +53,24 @@ impl Syntax {
     pub fn highlight(
         &self,
         source_code: &str,
-        source_tag: &TextTag,
         alt: Option<&String>,
     ) -> Result<Vec<(TextTag, String)>, Error> {
         if let Some(value) = alt {
             if let Some(reference) = self.syntax_set.find_syntax_by_name(value) {
-                return self.buffer(source_code, source_tag, reference);
+                return self.buffer(source_code, reference);
             }
 
             if let Some(reference) = self.syntax_set.find_syntax_by_token(value) {
-                return self.buffer(source_code, source_tag, reference);
+                return self.buffer(source_code, reference);
             }
 
             if let Some(reference) = self.syntax_set.find_syntax_by_path(value) {
-                return self.buffer(source_code, source_tag, reference);
+                return self.buffer(source_code, reference);
             }
         }
 
         if let Some(reference) = self.syntax_set.find_syntax_by_first_line(source_code) {
-            return self.buffer(source_code, source_tag, reference);
+            return self.buffer(source_code, reference);
         }
 
         Err(Error::Parse)
@@ -77,7 +79,6 @@ impl Syntax {
     fn buffer(
         &self,
         source: &str,
-        source_tag: &TextTag,
         syntax_reference: &SyntaxReference,
     ) -> Result<Vec<(TextTag, String)>, Error> {
         // Init new line buffer
@@ -98,16 +99,19 @@ impl Syntax {
                 // Build tags
                 for (style, entity) in result {
                     // Create new tag preset from source
-                    let tag = new_text_tag_from(source_tag);
+                    let tag = Tag::new();
 
                     // Tuneup using syntect conversion
                     // tag.set_background_rgba(Some(&color_to_rgba(style.background)));
-                    tag.set_foreground_rgba(Some(&color_to_rgba(style.foreground)));
-                    tag.set_style(font_style_to_style(style.font_style));
-                    tag.set_underline(font_style_to_underline(style.font_style));
+                    tag.text_tag
+                        .set_foreground_rgba(Some(&color_to_rgba(style.foreground)));
+                    tag.text_tag
+                        .set_style(font_style_to_style(style.font_style));
+                    tag.text_tag
+                        .set_underline(font_style_to_underline(style.font_style));
 
                     // Append
-                    buffer.push((tag, entity.to_string()));
+                    buffer.push((tag.text_tag, entity.to_string()));
                 }
                 Ok(buffer)
             }
@@ -139,22 +143,4 @@ fn font_style_to_underline(font_style: FontStyle) -> Underline {
         FontStyle::UNDERLINE => Underline::Single,
         _ => Underline::None,
     }
-}
-
-fn new_text_tag_from(source_tag: &TextTag) -> TextTag {
-    let text_tag = TextTag::builder()
-        .left_margin(source_tag.left_margin())
-        .scale(source_tag.scale())
-        .wrap_mode(source_tag.wrap_mode())
-        .build();
-
-    if let Some(ref family) = source_tag.family() {
-        text_tag.set_family(Some(family));
-    }
-
-    if let Some(ref foreground_rgba) = source_tag.foreground_rgba() {
-        text_tag.set_foreground_rgba(Some(foreground_rgba));
-    }
-
-    text_tag
 }
