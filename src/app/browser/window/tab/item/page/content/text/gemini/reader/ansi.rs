@@ -9,12 +9,13 @@ use gtk::{
     TextTag,
 };
 
-/// Apply `ANSI` format to new buffer
+/// Apply `ANSI`/`SGR` format to new buffer
 pub fn format(source_code: &str) -> Vec<(TextTag, String)> {
     // Init new line buffer
     let mut buffer = Vec::new();
 
-    for entity in categorise_text(&source_code) {
+    // Begin entities parse
+    for entity in categorise_text(source_code) {
         // Create new tag from default preset
         let tag = Tag::new();
 
