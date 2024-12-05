@@ -11,8 +11,8 @@ use gtk::{
 };
 
 pub struct List {
-    pub gobject: DropDown,
-    model: ListStore,
+    pub dropdown: DropDown,
+    list_store: ListStore,
 }
 
 impl List {
@@ -20,14 +20,14 @@ impl List {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        // Init model with custom `GObject` properties
-        let model = ListStore::new::<Item>();
+        // Init `ListStore` with custom `DropDown` properties
+        let list_store = ListStore::new::<Item>();
 
         // Setup item factory
         // * wanted only to append items after `DropDown` init
         let factory = SignalListItemFactory::new();
 
-        factory.connect_setup(|_, gobject| {
+        factory.connect_setup(|_, dropdown| {
             // Init widget for dropdown item
             let widget = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
@@ -45,15 +45,15 @@ impl List {
             );
 
             // Done
-            gobject
+            dropdown
                 .downcast_ref::<ListItem>()
                 .unwrap()
                 .set_child(Some(&widget));
         });
 
-        factory.connect_bind(|_, gobject| {
+        factory.connect_bind(|_, dropdown| {
             // Downcast requirements
-            let list_item = gobject.downcast_ref::<ListItem>().unwrap();
+            let list_item = dropdown.downcast_ref::<ListItem>().unwrap();
             let item = list_item.item().and_downcast::<Item>().unwrap();
             let container = list_item.child().and_downcast::<Box>().unwrap();
 
@@ -74,11 +74,17 @@ impl List {
                 .set_label(&item.subtitle());
         });
 
-        // Init main `GObject`
-        let gobject = DropDown::builder().model(&model).factory(&factory).build();
+        // Init main `DropDown`
+        let dropdown = DropDown::builder()
+            .model(&list_store)
+            .factory(&factory)
+            .build();
 
         // Return activated `Self`
-        Self { model, gobject }
+        Self {
+            list_store,
+            dropdown,
+        }
     }
 
     // Actions
@@ -86,16 +92,17 @@ impl List {
     /// Append new item
     pub fn append(&self, value: Value, title: &str, subtitle: &str, is_selected: bool) {
         let item = Item::new(value, title, subtitle);
-        self.model.append(&item);
+        self.list_store.append(&item);
         if is_selected {
-            self.gobject.set_selected(self.model.find(&item).unwrap()); // @TODO panic or handle?
+            self.dropdown
+                .set_selected(self.list_store.find(&item).unwrap()); // @TODO panic or handle?
         }
     }
 
     /// Find list item by `Value`
     /// * return `position` found
     pub fn find(&self, value: i64) -> Option<u32> {
-        self.model
+        self.list_store
             .find_with_equal_func(|this| value == this.clone().downcast::<Item>().unwrap().value())
     }
 
@@ -104,7 +111,7 @@ impl List {
     pub fn remove(&self, value: i64) -> Option<u32> {
         match self.find(value) {
             Some(position) => {
-                self.model.remove(position);
+                self.list_store.remove(position);
                 Some(position)
             }
             None => None,
@@ -116,7 +123,7 @@ impl List {
     /// Run callback function on `connect_selected_notify` event
     /// * return `Value` enum match selected item
     pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
-        self.gobject.connect_selected_notify(move |list| {
+        self.dropdown.connect_selected_notify(move |list| {
             callback(
                 list.selected_item()
                     .and_downcast::<Item>()
@@ -130,7 +137,7 @@ impl List {
 
     /// Get formatted `value` match selected item
     pub fn selected(&self) -> Value {
-        self.gobject
+        self.dropdown
             .selected_item()
             .and_downcast::<Item>()
             .unwrap()

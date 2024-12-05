@@ -15,7 +15,7 @@ const MARGIN: i32 = 8;
 
 pub struct Save {
     profile_identity_gemini_id: Rc<RefCell<Option<i64>>>,
-    pub gobject: Button,
+    pub button: Button,
 }
 
 impl Save {
@@ -26,8 +26,8 @@ impl Save {
         // Init selected option holder
         let profile_identity_gemini_id = Rc::new(RefCell::new(None));
 
-        // Init `GObject`
-        let gobject = Button::builder()
+        // Init main widget
+        let button = Button::builder()
             .label(LABEL)
             .margin_top(MARGIN)
             .tooltip_text(TOOLTIP_TEXT)
@@ -35,15 +35,15 @@ impl Save {
             .build();
 
         // Init events
-        gobject.connect_clicked({
+        button.connect_clicked({
             let profile_identity_gemini_id = profile_identity_gemini_id.clone();
-            let gobject = gobject.clone();
+            let button = button.clone();
             move |_| {
                 // Get selected identity from holder
                 match profile_identity_gemini_id.borrow().as_ref() {
                     Some(profile_identity_gemini_id) => {
                         // Lock open button (prevent double click)
-                        gobject.set_sensitive(false);
+                        button.set_sensitive(false);
 
                         // Create PEM file based on option ID selected
                         match Certificate::new(profile.clone(), *profile_identity_gemini_id) {
@@ -68,7 +68,7 @@ impl Save {
                                     .initial_name(format!("{}.pem", certificate.name))
                                     .build()
                                     .save(None::<&Window>, None::<&Cancellable>, {
-                                        let gobject = gobject.clone();
+                                        let button = button.clone();
                                         move |result| {
                                             match result {
                                                 Ok(file) => match file.path() {
@@ -78,47 +78,46 @@ impl Save {
                                                                 certificate.data.as_bytes(),
                                                             ) {
                                                                 Ok(_) => {
-                                                                    gobject.set_css_classes(&[
+                                                                    button.set_css_classes(&[
                                                                         "success",
                                                                     ]);
-                                                                    gobject.set_label(&format!(
+                                                                    button.set_label(&format!(
                                                                         "Saved to {}",
                                                                         path.to_string_lossy()
                                                                     ))
                                                                 }
                                                                 Err(e) => {
-                                                                    gobject.set_css_classes(&[
+                                                                    button.set_css_classes(&[
                                                                         "error",
                                                                     ]);
-                                                                    gobject
-                                                                        .set_label(&e.to_string())
+                                                                    button.set_label(&e.to_string())
                                                                 }
                                                             }
                                                         }
                                                         Err(e) => {
-                                                            gobject.set_css_classes(&["error"]);
-                                                            gobject.set_label(&e.to_string())
+                                                            button.set_css_classes(&["error"]);
+                                                            button.set_label(&e.to_string())
                                                         }
                                                     },
                                                     None => {
-                                                        gobject.set_css_classes(&["warning"]);
-                                                        gobject.set_label(
+                                                        button.set_css_classes(&["warning"]);
+                                                        button.set_label(
                                                             "Could not init destination path",
                                                         )
                                                     }
                                                 },
                                                 Err(e) => {
-                                                    gobject.set_css_classes(&["warning"]);
-                                                    gobject.set_label(e.message())
+                                                    button.set_css_classes(&["warning"]);
+                                                    button.set_label(e.message())
                                                 }
                                             }
-                                            gobject.set_sensitive(true); // unlock
+                                            button.set_sensitive(true); // unlock
                                         }
                                     });
                             }
                             Err(e) => {
-                                gobject.set_css_classes(&["error"]);
-                                gobject.set_label(&e.to_string())
+                                button.set_css_classes(&["error"]);
+                                button.set_label(&e.to_string())
                             }
                         }
                     }
@@ -130,7 +129,7 @@ impl Save {
         // Return activated `Self`
         Self {
             profile_identity_gemini_id,
-            gobject,
+            button,
         }
     }
 
@@ -139,7 +138,7 @@ impl Save {
     /// Update `profile_identity_gemini_id` holder,
     /// toggle visibility depending on given value
     pub fn update(&self, profile_identity_gemini_id: Option<i64>) {
-        self.gobject.set_visible(match profile_identity_gemini_id {
+        self.button.set_visible(match profile_identity_gemini_id {
             Some(value) => {
                 self.profile_identity_gemini_id.replace(Some(value));
                 true

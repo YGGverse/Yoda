@@ -12,7 +12,7 @@ const MIN_LENGTH: u16 = 1;
 const MAX_LENGTH: u16 = 36;
 
 pub struct Name {
-    pub gobject: Entry,
+    pub entry: Entry,
 }
 
 impl Name {
@@ -20,8 +20,8 @@ impl Name {
 
     /// Create new `Self`
     pub fn new(action: Rc<Action>) -> Self {
-        // Init `GObject`
-        let gobject = Entry::builder()
+        // Init main gobject
+        let entry = Entry::builder()
             .margin_top(MARGIN)
             .max_length(MAX_LENGTH as i32)
             .placeholder_text(PLACEHOLDER_TEXT)
@@ -29,10 +29,10 @@ impl Name {
             .build();
 
         // Init events
-        gobject.connect_changed(move |_| action.update.activate());
+        entry.connect_changed(move |_| action.update.activate());
 
         // Return activated `Self`
-        Self { gobject }
+        Self { entry }
     }
 
     // Actions
@@ -40,20 +40,20 @@ impl Name {
     /// Change visibility status
     /// * grab focus on `is_visible`
     pub fn update(&self, is_visible: bool) {
-        self.gobject.set_visible(is_visible);
+        self.entry.set_visible(is_visible);
         if is_visible {
-            self.gobject.grab_focus();
+            self.entry.grab_focus();
         }
     }
 
     // Getters
 
     pub fn is_valid(&self) -> bool {
-        self.gobject.text_length() >= MIN_LENGTH && self.gobject.text_length() <= MAX_LENGTH
+        self.entry.text_length() >= MIN_LENGTH && self.entry.text_length() <= MAX_LENGTH
     }
 
     pub fn value(&self) -> Option<GString> {
-        let text = self.gobject.text();
+        let text = self.entry.text();
         if text.is_empty() {
             None
         } else {

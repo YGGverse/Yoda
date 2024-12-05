@@ -24,7 +24,7 @@ const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
 pub struct Drop {
     profile_identity_gemini_id: Rc<RefCell<Option<i64>>>,
-    pub gobject: Button,
+    pub button: Button,
 }
 
 impl Drop {
@@ -35,8 +35,8 @@ impl Drop {
         // Init selected option holder
         let profile_identity_gemini_id = Rc::new(RefCell::new(None::<i64>));
 
-        // Init `GObject`
-        let gobject = Button::builder()
+        // Init main widget
+        let button = Button::builder()
             .label(LABEL)
             .margin_top(MARGIN)
             .tooltip_text(TOOLTIP_TEXT)
@@ -44,16 +44,16 @@ impl Drop {
             .build();
 
         // Init events
-        gobject.connect_clicked({
+        button.connect_clicked({
             let action = action.clone();
-            let gobject = gobject.clone();
+            let button = button.clone();
             let profile_identity_gemini_id = profile_identity_gemini_id.clone();
             move |_| {
                 // Get selected identity from holder
                 match profile_identity_gemini_id.borrow().as_ref() {
                     Some(profile_identity_gemini_id) => {
-                        // Init main `GObject`
-                        let dialog = AlertDialog::builder()
+                        // Init sub-widget
+                        let alert_dialog = AlertDialog::builder()
                             .heading(HEADING)
                             .body(BODY)
                             .close_response(RESPONSE_CANCEL.0)
@@ -61,23 +61,23 @@ impl Drop {
                             .build();
 
                         // Set response variants
-                        dialog.add_responses(&[RESPONSE_CANCEL, RESPONSE_CONFIRM]);
+                        alert_dialog.add_responses(&[RESPONSE_CANCEL, RESPONSE_CONFIRM]);
 
                         // Decorate default response preset
-                        dialog.set_response_appearance(
+                        alert_dialog.set_response_appearance(
                             RESPONSE_CONFIRM.0,
                             ResponseAppearance::Suggested,
                         );
 
-                        dialog.set_response_appearance(
+                        alert_dialog.set_response_appearance(
                             RESPONSE_CANCEL.0,
                             ResponseAppearance::Destructive,
                         );
 
                         // Connect confirmation event
-                        dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
+                        alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
                             let action = action.clone();
-                            let gobject = gobject.clone();
+                            let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
                             let profile_identity_gemini_id = *profile_identity_gemini_id;
@@ -85,17 +85,17 @@ impl Drop {
                                 match profile.identity.gemini.delete(profile_identity_gemini_id) {
                                     Ok(_) => {
                                         if list.remove(profile_identity_gemini_id).is_some() {
-                                            gobject.set_css_classes(&["success"]);
-                                            gobject.set_label("Identity successfully deleted")
+                                            button.set_css_classes(&["success"]);
+                                            button.set_label("Identity successfully deleted")
                                         } else {
-                                            gobject.set_css_classes(&["error"]);
-                                            gobject.set_label("List item not found")
+                                            button.set_css_classes(&["error"]);
+                                            button.set_label("List item not found")
                                             // @TODO unexpected
                                         }
                                     }
                                     Err(e) => {
-                                        gobject.set_css_classes(&["error"]);
-                                        gobject.set_label(&e.to_string())
+                                        button.set_css_classes(&["error"]);
+                                        button.set_label(&e.to_string())
                                     }
                                 }
                                 action.update.activate()
@@ -103,7 +103,7 @@ impl Drop {
                         });
 
                         // Show dialog
-                        dialog.present(Some(&gobject))
+                        alert_dialog.present(Some(&button))
                     }
                     None => todo!(), // unexpected
                 }
@@ -113,7 +113,7 @@ impl Drop {
         // Return activated `Self`
         Self {
             profile_identity_gemini_id,
-            gobject,
+            button,
         }
     }
 
@@ -122,7 +122,7 @@ impl Drop {
     /// Update `profile_identity_gemini_id` holder,
     /// toggle visibility depending on given value
     pub fn update(&self, profile_identity_gemini_id: Option<i64>) {
-        self.gobject.set_visible(match profile_identity_gemini_id {
+        self.button.set_visible(match profile_identity_gemini_id {
             Some(value) => {
                 self.profile_identity_gemini_id.replace(Some(value));
                 true

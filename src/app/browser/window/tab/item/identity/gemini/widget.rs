@@ -26,7 +26,7 @@ const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 pub struct Widget {
     // pub action: Rc<Action>,
     pub form: Rc<Form>,
-    pub gobject: AlertDialog,
+    pub alert_dialog: AlertDialog,
 }
 
 impl Widget {
@@ -40,36 +40,36 @@ impl Widget {
         // Init child container
         let form = Rc::new(Form::new(profile, action.clone()));
 
-        // Init main `GObject`
-        let gobject = AlertDialog::builder()
+        // Init main widget
+        let alert_dialog = AlertDialog::builder()
             .heading(HEADING)
             .body(BODY)
             .close_response(RESPONSE_CANCEL.0)
             .default_response(RESPONSE_APPLY.0)
-            .extra_child(&form.gobject)
+            .extra_child(&form.g_box)
             .build();
 
         // Set response variants
-        gobject.add_responses(&[
+        alert_dialog.add_responses(&[
             RESPONSE_CANCEL,
             // RESPONSE_MANAGE,
             RESPONSE_APPLY,
         ]);
 
         // Deactivate not implemented feature @TODO
-        // gobject.set_response_enabled(RESPONSE_MANAGE.0, false);
+        // alert_dialog.set_response_enabled(RESPONSE_MANAGE.0, false);
 
         // Decorate default response preset
-        gobject.set_response_appearance(RESPONSE_APPLY.0, ResponseAppearance::Suggested);
-        gobject.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
+        alert_dialog.set_response_appearance(RESPONSE_APPLY.0, ResponseAppearance::Suggested);
+        alert_dialog.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
 
         // Init events
         action.update.connect_activate({
             let form = form.clone();
-            let gobject = gobject.clone();
+            let alert_dialog = alert_dialog.clone();
             move || {
                 // Deactivate apply button if the form values could not be processed
-                gobject.set_response_enabled(RESPONSE_APPLY.0, form.is_valid());
+                alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_valid());
             }
         });
 
@@ -77,7 +77,7 @@ impl Widget {
         Self {
             // action,
             form,
-            gobject,
+            alert_dialog,
         }
     }
 
@@ -86,7 +86,7 @@ impl Widget {
     /// Callback wrapper for `apply` [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
     /// * return `Value` enum or new record request on `None`
     pub fn on_apply(&self, callback: impl Fn(Value) + 'static) {
-        self.gobject.connect_response(Some(RESPONSE_APPLY.0), {
+        self.alert_dialog.connect_response(Some(RESPONSE_APPLY.0), {
             let form = self.form.clone();
             move |this, response| {
                 // Prevent double-click action
@@ -100,6 +100,6 @@ impl Widget {
 
     /// Show dialog with new preset
     pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
-        self.gobject.present(parent)
+        self.alert_dialog.present(parent)
     }
 }

@@ -22,7 +22,7 @@ pub struct Form {
     pub list: Rc<List>,
     pub name: Rc<Name>,
     // pub save: Rc<Save>,
-    pub gobject: Box,
+    pub g_box: Box,
 }
 
 impl Form {
@@ -38,13 +38,13 @@ impl Form {
         let drop = Rc::new(Drop::new(profile.clone(), action.clone(), list.clone()));
 
         // Init main container
-        let gobject = Box::builder().orientation(Orientation::Vertical).build();
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
 
-        gobject.append(&list.gobject);
-        gobject.append(&name.gobject);
-        gobject.append(&file.gobject);
-        gobject.append(&drop.gobject);
-        gobject.append(&save.gobject);
+        g_box.append(&list.dropdown);
+        g_box.append(&name.entry);
+        g_box.append(&file.button);
+        g_box.append(&drop.button);
+        g_box.append(&save.button);
 
         // Connect events
         list.on_select({
@@ -85,7 +85,7 @@ impl Form {
             list,
             name,
             // save,
-            gobject,
+            g_box,
         }
     }
 

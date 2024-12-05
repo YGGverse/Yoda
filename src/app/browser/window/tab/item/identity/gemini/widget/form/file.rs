@@ -14,7 +14,7 @@ const MARGIN: i32 = 8;
 
 pub struct File {
     pub pem: Rc<RefCell<Option<GString>>>,
-    pub gobject: Button,
+    pub button: Button,
 }
 
 impl File {
@@ -25,8 +25,8 @@ impl File {
         // Init PEM
         let pem = Rc::new(RefCell::new(None));
 
-        // Init `GObject`
-        let gobject = Button::builder()
+        // Init main gobject
+        let button = Button::builder()
             .label(LABEL)
             .margin_top(MARGIN)
             .tooltip_text(TOOLTIP_TEXT)
@@ -34,13 +34,13 @@ impl File {
             .build();
 
         // Init events
-        gobject.connect_clicked({
-            let gobject = gobject.clone();
+        button.connect_clicked({
+            let button = button.clone();
             let pem = pem.clone();
             let update = action.update.clone();
             move |_| {
                 // Lock open button (prevent double click)
-                gobject.set_sensitive(false);
+                button.set_sensitive(false);
 
                 // Init file filters related with PEM extension
                 let filters = ListStore::new::<FileFilter>();
@@ -61,7 +61,7 @@ impl File {
                     .default_filter(&filter_pem)
                     .build()
                     .open(None::<&Window>, None::<&Cancellable>, {
-                        let gobject = gobject.clone();
+                        let button = button.clone();
                         let pem = pem.clone();
                         let update = update.clone();
                         move |result| {
@@ -72,23 +72,23 @@ impl File {
                                         match TlsCertificate::from_file(filename) {
                                             Ok(certificate) => {
                                                 pem.replace(to_pem(certificate));
-                                                gobject.set_css_classes(&["success"]);
-                                                gobject.set_label(filename)
+                                                button.set_css_classes(&["success"]);
+                                                button.set_label(filename)
                                             }
                                             Err(reason) => {
-                                                gobject.set_css_classes(&["error"]);
-                                                gobject.set_label(reason.message())
+                                                button.set_css_classes(&["error"]);
+                                                button.set_label(reason.message())
                                             }
                                         }
                                     }
                                     None => todo!(),
                                 },
                                 Err(reason) => {
-                                    gobject.set_css_classes(&["warning"]);
-                                    gobject.set_label(reason.message())
+                                    button.set_css_classes(&["warning"]);
+                                    button.set_label(reason.message())
                                 }
                             }
-                            gobject.set_sensitive(true); // unlock
+                            button.set_sensitive(true); // unlock
                             update.activate()
                         }
                     });
@@ -96,7 +96,7 @@ impl File {
         });
 
         // Return activated `Self`
-        Self { pem, gobject }
+        Self { pem, button }
     }
 
     // Actions
@@ -104,9 +104,9 @@ impl File {
     /// Change visibility status
     /// * grab focus on `is_visible`
     pub fn update(&self, is_visible: bool) {
-        self.gobject.set_visible(is_visible);
+        self.button.set_visible(is_visible);
         if is_visible {
-            self.gobject.grab_focus();
+            self.button.grab_focus();
         }
     }
 
