@@ -59,13 +59,8 @@ impl List {
             // Update `title` (expected as the first child)
             let title = child.first_child().unwrap().downcast::<Label>().unwrap();
 
-            if item.is_active() {
-                title.set_css_classes(&["success"]);
-            } else {
-                title.set_css_classes(&[]);
-            }
-
             title.set_label(&item.title());
+            title.set_css_classes(if item.is_active() { &["success"] } else { &[] });
 
             // Update `subtitle` (expected as the last child)
             child
