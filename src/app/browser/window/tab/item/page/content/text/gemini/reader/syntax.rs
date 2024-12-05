@@ -33,6 +33,9 @@ pub struct Syntax {
 }
 
 impl Syntax {
+    // Constructors
+
+    /// Create new `Self`
     pub fn new() -> Self {
         Self {
             syntax_set: SyntaxSet::load_defaults_newlines(),
@@ -40,6 +43,10 @@ impl Syntax {
         }
     }
 
+    // Actions
+
+    /// Apply `Syntect` highlight to new buffer returned,
+    /// according to given `alt` and `source_code` content
     pub fn highlight(
         &self,
         source_code: &str,
