@@ -84,8 +84,12 @@ impl List {
     // Actions
 
     /// Append new item
-    pub fn append(&self, value: Value, title: &str, subtitle: &str) {
-        self.model.append(&Item::new(value, title, subtitle));
+    pub fn append(&self, value: Value, title: &str, subtitle: &str, is_selected: bool) {
+        let item = Item::new(value, title, subtitle);
+        self.model.append(&item);
+        if is_selected {
+            self.gobject.set_selected(self.model.find(&item).unwrap()); // @TODO panic or handle?
+        }
     }
 
     /// Find list item by `Value`

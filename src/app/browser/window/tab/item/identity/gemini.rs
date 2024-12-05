@@ -25,17 +25,15 @@ impl Gemini {
         // Init widget
         let widget = Rc::new(Widget::new(profile.clone()));
 
-        // Init shared components
-        let auth_url = auth_uri.to_string();
-
-        // Set first record selected by default
-        let mut selected: u32 = 0;
+        // Init shared URL string from URI
+        let url = auth_uri.to_string();
 
         // Add guest option
         widget.form.list.append(
             Value::UseGuestSession,
             "Guest session",
             "No identity for this request",
+            false,
         );
 
         // Add new identity option
@@ -43,6 +41,7 @@ impl Gemini {
             Value::GenerateNewAuth,
             "Create new",
             "Generate long-term certificate",
+            false,
         );
 
         // Add import existing identity option
@@ -50,28 +49,14 @@ impl Gemini {
             Value::ImportPem,
             "Import identity",
             "Use existing certificate",
+            false,
         );
 
         // Collect identities as options from profile database
         // * memory cache synced also and could be faster @TODO
-        let mut i = 2; // start from 3'th
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
-                    i += 1;
-
-                    // Is selected?
-                    if profile
-                        .identity
-                        .gemini
-                        .auth
-                        .memory
-                        .match_scope(auth_url.as_str())
-                        .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id)
-                    {
-                        selected = i;
-                    }
-
                     // Get certificate details
                     let certificate = match TlsCertificate::from_pem(&identity.pem) {
                         Ok(certificate) => certificate,
@@ -84,6 +69,7 @@ impl Gemini {
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
                             "{} - {} | auth: {}",
+                            // certificate validity time
                             certificate
                                 .not_valid_before()
                                 .unwrap()
@@ -94,6 +80,7 @@ impl Gemini {
                                 .unwrap()
                                 .format(DATE_FORMAT)
                                 .unwrap(),
+                            // count active certificate sessions
                             profile
                                 .identity
                                 .gemini
@@ -105,13 +92,18 @@ impl Gemini {
                                 .filter(|this| this.profile_identity_gemini_id == identity.id)
                                 .count(),
                         ),
+                        // is selected
+                        profile
+                            .identity
+                            .gemini
+                            .auth
+                            .memory
+                            .match_scope(&url)
+                            .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id),
                     );
                 }
-
-                // Select list item
-                widget.form.list.gobject.set_selected(selected);
             }
-            Err(_) => todo!(),
+            Err(e) => todo!("{e}"),
         }
 
         // Init events
@@ -152,16 +144,14 @@ impl Gemini {
                             .identity
                             .gemini
                             .auth
-                            .apply(profile_identity_gemini_id, auth_url.as_str())
+                            .apply(profile_identity_gemini_id, &url)
                         {
                             todo!("{}", reason.to_string())
                         };
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        if let Err(reason) =
-                            profile.identity.gemini.auth.remove_scope(auth_url.as_str())
-                        {
+                        if let Err(reason) = profile.identity.gemini.auth.remove_scope(&url) {
                             todo!("{}", reason.to_string())
                         };
                     }
