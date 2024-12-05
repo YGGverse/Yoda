@@ -98,7 +98,7 @@ impl Gemini {
                     );
 
                     if auth_scope.len() > 0 {
-                        tooltip.push_str(&format!("\n\n<b>scope</b>\n{}", auth_scope.join("\n")));
+                        tooltip.push_str(&format!("\n<b>scope</b>\n{}", auth_scope.join("\n")));
                     }
 
                     // Append record option
