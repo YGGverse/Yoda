@@ -69,7 +69,7 @@ impl Widget {
             let alert_dialog = alert_dialog.clone();
             move || {
                 // Deactivate apply button if the form values could not be processed
-                alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_valid());
+                alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_applicable());
             }
         });
 

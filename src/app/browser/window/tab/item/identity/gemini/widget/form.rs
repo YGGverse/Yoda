@@ -92,7 +92,7 @@ impl Form {
     // Actions
 
     /// Validate `Self` components match current selection
-    pub fn is_valid(&self) -> bool {
+    pub fn is_applicable(&self) -> bool {
         match self.list.value() {
             Value::GenerateNewAuth => self.name.is_valid(),
             Value::ImportPem => self.file.is_valid(),
