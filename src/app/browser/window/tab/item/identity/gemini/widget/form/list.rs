@@ -136,7 +136,7 @@ impl List {
     // Getters
 
     /// Get formatted `value` match selected item
-    pub fn selected(&self) -> Value {
+    pub fn value(&self) -> Value {
         self.dropdown
             .selected_item()
             .and_downcast::<Item>()

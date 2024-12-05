@@ -93,7 +93,7 @@ impl Form {
 
     /// Validate `Self` components match current selection
     pub fn is_valid(&self) -> bool {
-        match self.list.selected() {
+        match self.list.value() {
             Value::GenerateNewAuth => self.name.is_valid(),
             Value::ImportPem => self.file.is_valid(),
             _ => true,

@@ -93,7 +93,7 @@ impl Widget {
                 this.set_response_enabled(response, false);
 
                 // Result
-                callback(form.list.selected())
+                callback(form.list.value())
             }
         });
     }
