@@ -79,12 +79,12 @@ impl Gemini {
                         .iter()
                         .filter(|this| this.profile_identity_gemini_id == identity.id)
                     {
-                        auth_scope.push(auth.scope.clone())
+                        auth_scope.push(format!("<small>{}</small>", auth.scope.clone()))
                     }
 
                     // Build tooltip
                     let mut tooltip = format!(
-                        "Valid:\n{}\n{}",
+                        "<b>valid</b>\n<small>{}</small> - <small>{}</small>",
                         certificate
                             .not_valid_before()
                             .unwrap()
@@ -98,7 +98,7 @@ impl Gemini {
                     );
 
                     if auth_scope.len() > 0 {
-                        tooltip.push_str(&format!("\n\nScope:\n{}", auth_scope.join("\n")));
+                        tooltip.push_str(&format!("\n\n<b>scope</b>\n{}", auth_scope.join("\n")));
                     }
 
                     // Append record option

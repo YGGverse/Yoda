@@ -66,7 +66,7 @@ impl List {
             let subtitle = child.last_child().unwrap().downcast::<Label>().unwrap();
 
             subtitle.set_label(&item.subtitle());
-            subtitle.set_tooltip_text(Some(&item.tooltip()));
+            subtitle.set_tooltip_markup(Some(&item.tooltip()));
         });
 
         // Init main `DropDown`
