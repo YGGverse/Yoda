@@ -1,3 +1,4 @@
+mod ansi;
 pub mod error;
 mod syntax;
 mod tag;
@@ -81,7 +82,7 @@ impl Reader {
         for line in gemtext.lines() {
             // Is inline code
             if let Some(code) = Inline::from(line) {
-                // Try auto-detect code syntax for given `value`
+                // Try auto-detect code syntax for given `value` @TODO optional
                 match syntax.highlight(&code.value, None) {
                     Ok(highlight) => {
                         for (syntax_tag, entity) in highlight {
@@ -98,12 +99,19 @@ impl Reader {
                         }
                     }
                     Err(_) => {
-                        // Nothing match, append default `Code` tag into the main buffer
-                        buffer.insert_with_tags(
-                            &mut buffer.end_iter(),
-                            &code.value,
-                            &[&tag.code.text_tag],
-                        );
+                        // Try ANSI/SGR format (terminal emulation) @TODO optional
+                        for (syntax_tag, entity) in ansi::format(&code.value) {
+                            // Register new tag
+                            if !tag.text_tag_table.add(&syntax_tag) {
+                                todo!()
+                            }
+                            // Append tag to buffer
+                            buffer.insert_with_tags(
+                                &mut buffer.end_iter(),
+                                &entity,
+                                &[&syntax_tag],
+                            );
+                        }
                     } // @TODO handle
                 }
 
@@ -151,7 +159,7 @@ impl Reader {
                                 };
 
                                 // Begin code block construction
-                                // Try auto-detect code syntax for given `value` and `alt`
+                                // Try auto-detect code syntax for given `value` and `alt` @TODO optional
                                 match syntax.highlight(&this.value, alt) {
                                     Ok(highlight) => {
                                         for (syntax_tag, entity) in highlight {
@@ -168,14 +176,19 @@ impl Reader {
                                         }
                                     }
                                     Err(_) => {
-                                        // Try ANSI/SGR highlight (terminal emulation)
-
-                                        // Nothing match, append default `Code` tag into the main buffer
-                                        buffer.insert_with_tags(
-                                            &mut buffer.end_iter(),
-                                            &this.value,
-                                            &[&tag.code.text_tag],
-                                        );
+                                        // Try ANSI/SGR format (terminal emulation) @TODO optional
+                                        for (syntax_tag, entity) in ansi::format(&this.value) {
+                                            // Register new tag
+                                            if !tag.text_tag_table.add(&syntax_tag) {
+                                                todo!()
+                                            }
+                                            // Append tag to buffer
+                                            buffer.insert_with_tags(
+                                                &mut buffer.end_iter(),
+                                                &entity,
+                                                &[&syntax_tag],
+                                            );
+                                        }
                                     } // @TODO handle
                                 }
 

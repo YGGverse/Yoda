@@ -98,7 +98,7 @@ impl Syntax {
             Ok(result) => {
                 // Build tags
                 for (style, entity) in result {
-                    // Create new tag preset from source
+                    // Create new tag from default preset
                     let tag = Tag::new();
 
                     // Tuneup using syntect conversion

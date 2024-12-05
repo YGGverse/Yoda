@@ -1,11 +1,15 @@
 use gtk::{TextTag, WrapMode};
 
-pub struct Code {
+/// Default [TextTag](https://docs.gtk.org/gtk4/class.TextTag.html) preset
+/// for ANSI buffer
+pub struct Tag {
     pub text_tag: TextTag,
 }
 
-impl Code {
-    // Construct
+impl Tag {
+    // Constructors
+
+    /// Create new `Self`
     pub fn new() -> Self {
         Self {
             text_tag: TextTag::builder()
