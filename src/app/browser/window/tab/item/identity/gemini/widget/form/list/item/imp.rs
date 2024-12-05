@@ -17,6 +17,8 @@ pub struct Item {
     title: RefCell<String>,
     #[property(get, set)]
     subtitle: RefCell<String>,
+    #[property(get, set)]
+    is_active: Cell<bool>,
 }
 
 #[glib::object_subclass]

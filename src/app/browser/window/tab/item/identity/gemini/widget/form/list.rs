@@ -54,18 +54,21 @@ impl List {
             // Downcast requirements
             let list_item = this.downcast_ref::<ListItem>().unwrap();
             let item = list_item.item().and_downcast::<Item>().unwrap();
-            let container = list_item.child().and_downcast::<Box>().unwrap();
+            let child = list_item.child().and_downcast::<Box>().unwrap();
 
             // Update `title` (expected as the first child)
-            container
-                .first_child()
-                .unwrap()
-                .downcast::<Label>()
-                .unwrap()
-                .set_label(&item.title());
+            let title = child.first_child().unwrap().downcast::<Label>().unwrap();
+
+            if item.is_active() {
+                title.set_css_classes(&["success"]);
+            } else {
+                title.set_css_classes(&[]);
+            }
+
+            title.set_label(&item.title());
 
             // Update `subtitle` (expected as the last child)
-            container
+            child
                 .last_child()
                 .unwrap()
                 .downcast::<Label>()
@@ -89,10 +92,10 @@ impl List {
     // Actions
 
     /// Append new item
-    pub fn append(&self, value: Value, title: &str, subtitle: &str, is_selected: bool) {
-        let item = Item::new(value, title, subtitle);
+    pub fn append(&self, value: Value, title: &str, subtitle: &str, is_active: bool) {
+        let item = Item::new(value, title, subtitle, is_active);
         self.list_store.append(&item);
-        if is_selected {
+        if is_active {
             self.dropdown
                 .set_selected(self.list_store.find(&item).unwrap()); // @TODO panic or handle?
         }

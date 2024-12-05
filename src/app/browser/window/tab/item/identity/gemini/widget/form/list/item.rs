@@ -18,7 +18,7 @@ impl Item {
     // Constructors
 
     /// Create new `GObject`
-    pub fn new(value: Value, title: &str, subtitle: &str) -> Self {
+    pub fn new(value: Value, title: &str, subtitle: &str, is_active: bool) -> Self {
         Object::builder()
             .property(
                 "value",
@@ -31,6 +31,7 @@ impl Item {
             )
             .property("title", title)
             .property("subtitle", subtitle)
+            .property("is_active", is_active)
             .build()
     }
 
