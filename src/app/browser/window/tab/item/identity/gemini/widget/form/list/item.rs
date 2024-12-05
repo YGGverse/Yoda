@@ -18,7 +18,13 @@ impl Item {
     // Constructors
 
     /// Create new `GObject`
-    pub fn new(value: Value, title: &str, subtitle: &str, is_active: bool) -> Self {
+    pub fn new(
+        value: Value,
+        title: &str,
+        subtitle: &str,
+        tooltip: Option<&str>,
+        is_active: bool,
+    ) -> Self {
         Object::builder()
             .property(
                 "value",
@@ -31,6 +37,13 @@ impl Item {
             )
             .property("title", title)
             .property("subtitle", subtitle)
+            .property(
+                "tooltip",
+                match tooltip {
+                    Some(text) => text,
+                    None => "", // NULL
+                },
+            )
             .property("is_active", is_active)
             .build()
     }

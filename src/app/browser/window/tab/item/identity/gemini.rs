@@ -33,6 +33,7 @@ impl Gemini {
             Value::UseGuestSession,
             "Guest session",
             "No identity for this request",
+            None,
             false,
         );
 
@@ -41,6 +42,7 @@ impl Gemini {
             Value::GenerateNewAuth,
             "Create new",
             "Generate long-term certificate",
+            None,
             false,
         );
 
@@ -49,6 +51,7 @@ impl Gemini {
             Value::ImportPem,
             "Import identity",
             "Use existing certificate",
+            None,
             false,
         );
 
@@ -63,13 +66,47 @@ impl Gemini {
                         Err(reason) => todo!("{reason}"),
                     };
 
+                    // Get auth details for tooltip
+                    let mut auth_scope = Vec::new();
+
+                    for auth in profile
+                        .identity
+                        .gemini
+                        .auth
+                        .database
+                        .records_scope(None)
+                        .unwrap()
+                        .iter()
+                        .filter(|this| this.profile_identity_gemini_id == identity.id)
+                    {
+                        auth_scope.push(auth.scope.clone())
+                    }
+
+                    // Build tooltip
+                    let mut tooltip = format!(
+                        "Valid:\n{}\n{}",
+                        certificate
+                            .not_valid_before()
+                            .unwrap()
+                            .format_iso8601()
+                            .unwrap(),
+                        certificate
+                            .not_valid_after()
+                            .unwrap()
+                            .format_iso8601()
+                            .unwrap()
+                    );
+
+                    if auth_scope.len() > 0 {
+                        tooltip.push_str(&format!("\n\nScope:\n{}", auth_scope.join("\n")));
+                    }
+
                     // Append record option
                     widget.form.list.append(
                         Value::ProfileIdentityGeminiId(identity.id),
                         &certificate.subject_name().unwrap().replace("CN=", ""), // trim prefix
                         &format!(
                             "{} - {} | scope: {}",
-                            // certificate validity time
                             certificate
                                 .not_valid_before()
                                 .unwrap()
@@ -80,26 +117,16 @@ impl Gemini {
                                 .unwrap()
                                 .format(DATE_FORMAT)
                                 .unwrap(),
-                            // count active certificate sessions
-                            profile
-                                .identity
-                                .gemini
-                                .auth
-                                .database
-                                .records_scope(None)
-                                .unwrap()
-                                .iter()
-                                .filter(|this| this.profile_identity_gemini_id == identity.id)
-                                .count(),
+                            auth_scope.len(),
                         ),
-                        // is selected
+                        Some(&tooltip),
                         profile
                             .identity
                             .gemini
                             .auth
                             .memory
                             .match_scope(&url)
-                            .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id),
+                            .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id), // is selected
                     );
                 }
             }

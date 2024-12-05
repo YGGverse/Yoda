@@ -18,6 +18,8 @@ pub struct Item {
     #[property(get, set)]
     subtitle: RefCell<String>,
     #[property(get, set)]
+    tooltip: RefCell<String>,
+    #[property(get, set)]
     is_active: Cell<bool>,
 }
 

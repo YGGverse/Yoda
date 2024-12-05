@@ -63,12 +63,10 @@ impl List {
             title.set_css_classes(if item.is_active() { &["success"] } else { &[] });
 
             // Update `subtitle` (expected as the last child)
-            child
-                .last_child()
-                .unwrap()
-                .downcast::<Label>()
-                .unwrap()
-                .set_label(&item.subtitle());
+            let subtitle = child.last_child().unwrap().downcast::<Label>().unwrap();
+
+            subtitle.set_label(&item.subtitle());
+            subtitle.set_tooltip_text(Some(&item.tooltip()));
         });
 
         // Init main `DropDown`
@@ -87,9 +85,18 @@ impl List {
     // Actions
 
     /// Append new item
-    pub fn append(&self, value: Value, title: &str, subtitle: &str, is_active: bool) {
-        let item = Item::new(value, title, subtitle, is_active);
+    pub fn append(
+        &self,
+        value: Value,
+        title: &str,
+        subtitle: &str,
+        tooltip: Option<&str>,
+        is_active: bool,
+    ) {
+        let item = Item::new(value, title, subtitle, tooltip, is_active);
+
         self.list_store.append(&item);
+
         if is_active {
             self.dropdown
                 .set_selected(self.list_store.find(&item).unwrap()); // @TODO panic or handle?
