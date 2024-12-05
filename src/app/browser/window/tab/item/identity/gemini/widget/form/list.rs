@@ -27,7 +27,7 @@ impl List {
         // * wanted only to append items after `DropDown` init
         let factory = SignalListItemFactory::new();
 
-        factory.connect_setup(|_, dropdown| {
+        factory.connect_setup(|_, this| {
             // Init widget for dropdown item
             let widget = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
@@ -45,15 +45,14 @@ impl List {
             );
 
             // Done
-            dropdown
-                .downcast_ref::<ListItem>()
+            this.downcast_ref::<ListItem>()
                 .unwrap()
                 .set_child(Some(&widget));
         });
 
-        factory.connect_bind(|_, dropdown| {
+        factory.connect_bind(|_, this| {
             // Downcast requirements
-            let list_item = dropdown.downcast_ref::<ListItem>().unwrap();
+            let list_item = this.downcast_ref::<ListItem>().unwrap();
             let item = list_item.item().and_downcast::<Item>().unwrap();
             let container = list_item.child().and_downcast::<Box>().unwrap();
 
