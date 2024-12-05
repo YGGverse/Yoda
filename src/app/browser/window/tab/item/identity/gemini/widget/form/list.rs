@@ -29,15 +29,15 @@ impl List {
 
         factory.connect_setup(|_, this| {
             // Init widget for dropdown item
-            let widget = Box::builder()
+            let child = Box::builder()
                 .orientation(gtk::Orientation::Vertical)
                 .build();
 
             // Title
-            widget.append(&Label::builder().halign(Align::Start).build());
+            child.append(&Label::builder().halign(Align::Start).build());
 
             // Subtitle
-            widget.append(
+            child.append(
                 &Label::builder()
                     .halign(Align::Start)
                     .css_classes(["caption", "dim-label"])
@@ -47,7 +47,7 @@ impl List {
             // Done
             this.downcast_ref::<ListItem>()
                 .unwrap()
-                .set_child(Some(&widget));
+                .set_child(Some(&child));
         });
 
         factory.connect_bind(|_, this| {
@@ -122,9 +122,9 @@ impl List {
     /// Run callback function on `connect_selected_notify` event
     /// * return `Value` enum match selected item
     pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
-        self.dropdown.connect_selected_notify(move |list| {
+        self.dropdown.connect_selected_notify(move |this| {
             callback(
-                list.selected_item()
+                this.selected_item()
                     .and_downcast::<Item>()
                     .unwrap()
                     .value_enum(),
