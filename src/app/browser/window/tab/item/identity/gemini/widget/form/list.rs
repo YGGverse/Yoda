@@ -46,8 +46,9 @@ impl List {
 
             subtitle.append(
                 &Image::builder()
+                    .css_classes(["accent"])
                     .cursor(&Cursor::from_name("help", None).unwrap())
-                    .icon_name("dialog-information")
+                    .icon_name("help-about-symbolic")
                     .margin_end(4)
                     .pixel_size(11)
                     .build(),
