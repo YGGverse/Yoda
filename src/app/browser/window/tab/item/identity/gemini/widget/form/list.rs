@@ -39,7 +39,6 @@ impl List {
                     match Item::new_profile_identity_gemini_id(
                         profile.clone(),
                         identity.id,
-                        &identity.pem,
                         auth_url,
                     ) {
                         Ok(item) => list_store.append(&item),

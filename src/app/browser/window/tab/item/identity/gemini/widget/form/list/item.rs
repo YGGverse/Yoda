@@ -57,40 +57,48 @@ impl Item {
     pub fn new_profile_identity_gemini_id(
         profile: Rc<Profile>,
         profile_identity_gemini_id: i64,
-        pem: &str,
         auth_url: &str,
     ) -> Result<Self, Error> {
-        match TlsCertificate::from_pem(pem) {
-            Ok(certificate) => {
-                // Collect shared certificate scope
-                let scope = scope(profile.clone(), profile_identity_gemini_id);
-
-                // Build GObject
-                Ok(Object::builder()
-                    .property("value", profile_identity_gemini_id)
-                    .property(
-                        "title",
-                        title::new_for_profile_identity_gemini_id(&certificate),
-                    )
-                    .property(
-                        "subtitle",
-                        subtitle::new_for_profile_identity_gemini_id(&certificate, &scope),
-                    )
-                    .property(
-                        "tooltip",
-                        tooltip::new_for_profile_identity_gemini_id(&certificate, &scope),
-                    )
-                    .property(
-                        "is_active",
-                        is_active::new_for_profile_identity_gemini_id(
-                            profile,
-                            profile_identity_gemini_id,
-                            auth_url,
-                        ),
-                    )
-                    .build())
-            }
-            Err(e) => Err(Error::TlsCertificate(e)),
+        // Get PEM by ID
+        match profile
+            .identity
+            .gemini
+            .memory
+            .get(profile_identity_gemini_id)
+        {
+            // Extract certificate details from PEM string
+            Ok(ref pem) => match TlsCertificate::from_pem(pem) {
+                // Collect certificate scopes for item
+                Ok(ref certificate) => match scope(profile.clone(), profile_identity_gemini_id) {
+                    // Ready to build `Item` GObject
+                    Ok(ref scope) => Ok(Object::builder()
+                        .property("value", profile_identity_gemini_id)
+                        .property(
+                            "title",
+                            title::new_for_profile_identity_gemini_id(certificate),
+                        )
+                        .property(
+                            "subtitle",
+                            subtitle::new_for_profile_identity_gemini_id(certificate, scope),
+                        )
+                        .property(
+                            "tooltip",
+                            tooltip::new_for_profile_identity_gemini_id(certificate, scope),
+                        )
+                        .property(
+                            "is_active",
+                            is_active::new_for_profile_identity_gemini_id(
+                                profile,
+                                profile_identity_gemini_id,
+                                auth_url,
+                            ),
+                        )
+                        .build()),
+                    Err(_) => todo!(),
+                },
+                Err(e) => Err(Error::TlsCertificate(e)),
+            },
+            Err(_) => todo!(),
         }
     }
 
@@ -109,19 +117,19 @@ impl Item {
 
 // Tools
 
-fn scope(profile: Rc<Profile>, profile_identity_gemini_id: i64) -> Vec<String> {
-    let mut scope = Vec::new();
-    for auth in profile
-        .identity
-        .gemini
-        .auth
-        .database
-        .records_scope(None)
-        .unwrap()
-        .iter()
-        .filter(|this| this.profile_identity_gemini_id == profile_identity_gemini_id)
-    {
-        scope.push(auth.scope.clone())
+/// Collect certificate scope vector from `Profile` database for `profile_identity_gemini_id`
+fn scope(profile: Rc<Profile>, profile_identity_gemini_id: i64) -> Result<Vec<String>, Error> {
+    match profile.identity.gemini.auth.database.records_scope(None) {
+        Ok(result) => {
+            let mut scope = Vec::new();
+            for auth in result
+                .iter()
+                .filter(|this| this.profile_identity_gemini_id == profile_identity_gemini_id)
+            {
+                scope.push(auth.scope.clone())
+            }
+            Ok(scope)
+        }
+        Err(_) => todo!(),
     }
-    scope
 }
