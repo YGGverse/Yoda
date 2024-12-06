@@ -19,12 +19,12 @@ use std::rc::Rc;
 
 pub struct Form {
     // pub action: Rc<Action>,
-    // pub drop: Rc<Drop>,
-    // pub exit: Rc<Exit>,
+    pub drop: Rc<Drop>,
+    pub exit: Rc<Exit>,
     pub file: Rc<File>,
     pub list: Rc<List>,
     pub name: Rc<Name>,
-    // pub save: Rc<Save>,
+    pub save: Rc<Save>,
     pub g_box: Box,
 }
 
@@ -35,7 +35,7 @@ impl Form {
     pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_url: &str) -> Self {
         // Init components
         let file = Rc::new(File::new(action.clone()));
-        let list = Rc::new(List::new(profile.clone(), auth_url));
+        let list = Rc::new(List::new(profile.clone(), action.clone(), auth_url));
         let name = Rc::new(Name::new(action.clone()));
         let save = Rc::new(Save::new(profile.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), action.clone(), list.clone()));
@@ -51,49 +51,15 @@ impl Form {
         g_box.append(&drop.button);
         g_box.append(&save.button);
 
-        // Connect events
-        list.on_select({
-            let drop = drop.clone();
-            let exit = exit.clone();
-            let file = file.clone();
-            let name = name.clone();
-            let save = save.clone();
-            let update = action.update.clone();
-            move |item| {
-                // Change name entry visibility
-                name.update(matches!(item, Value::GeneratePem));
-
-                // Change file choose button visibility
-                file.update(matches!(item, Value::ImportPem));
-
-                // Change other components visibility by update it holder value
-                match item {
-                    Value::ProfileIdentityGeminiId(value) => {
-                        drop.update(Some(value));
-                        exit.update(Some(value));
-                        save.update(Some(value));
-                    }
-                    _ => {
-                        drop.update(None);
-                        exit.update(None);
-                        save.update(None);
-                    }
-                }
-
-                // Update widget
-                update.activate();
-            }
-        });
-
         // Return activated `Self`
         Self {
             // action,
-            // drop,
-            // exit,
+            drop,
+            exit,
             file,
             list,
             name,
-            // save,
+            save,
             g_box,
         }
     }
@@ -107,6 +73,33 @@ impl Form {
             Value::ImportPem => self.file.is_valid(),
             Value::ProfileIdentityGeminiId(_) => !self.list.selected_item().is_active(),
             _ => true,
+        }
+    }
+
+    pub fn update(&self) {
+        // Get selected item
+        let item = self.list.selected_item();
+
+        // Update name entry visibility
+        self.name
+            .update(matches!(item.value_enum(), Value::GeneratePem));
+
+        // Update file choose button visibility
+        self.file
+            .update(matches!(item.value_enum(), Value::ImportPem));
+
+        // Update ID-related components
+        match item.value_enum() {
+            Value::ProfileIdentityGeminiId(value) => {
+                self.drop.update(Some(value));
+                self.exit.update(Some(value));
+                self.save.update(Some(value));
+            }
+            _ => {
+                self.drop.update(None);
+                self.exit.update(None);
+                self.save.update(None);
+            }
         }
     }
 }

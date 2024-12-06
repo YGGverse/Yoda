@@ -1,8 +1,9 @@
 pub mod item;
 use std::rc::Rc;
 
-use item::{value::Value, Item};
+use item::Item;
 
+use super::Action;
 use crate::profile::Profile;
 use gtk::{
     gdk::Cursor,
@@ -23,7 +24,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
+    pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_url: &str) -> Self {
         // Init model
         let list_store = ListStore::new::<Item>();
 
@@ -131,6 +132,9 @@ impl List {
             .factory(&factory)
             .build();
 
+        // Connect events
+        dropdown.connect_selected_notify(move |_| action.update.activate());
+
         // Return activated `Self`
         Self {
             list_store,
@@ -157,21 +161,6 @@ impl List {
             }
             None => None,
         }
-    }
-
-    // Events
-
-    /// Run callback function on `connect_selected_notify` event
-    /// * return `Value` enum match selected item
-    pub fn on_select(&self, callback: impl Fn(Value) + 'static) {
-        self.dropdown.connect_selected_notify(move |this| {
-            callback(
-                this.selected_item()
-                    .and_downcast::<Item>()
-                    .unwrap()
-                    .value_enum(),
-            )
-        });
     }
 
     // Getters
