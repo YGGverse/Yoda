@@ -127,7 +127,7 @@ impl List {
                     .find_with_equal_func(|item| {
                         item.dynamic_cast_ref::<Item>().unwrap().is_active()
                     })
-                    .unwrap(),
+                    .unwrap_or_default(),
             )
             .factory(&factory)
             .build();
