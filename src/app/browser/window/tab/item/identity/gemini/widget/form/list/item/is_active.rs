@@ -11,6 +11,6 @@ pub fn new_for_profile_identity_gemini_id(
         .gemini
         .auth
         .memory
-        .match_scope(&auth_url)
+        .match_scope(auth_url)
         .is_some_and(|auth| auth.profile_identity_gemini_id == profile_identity_gemini_id)
 }
