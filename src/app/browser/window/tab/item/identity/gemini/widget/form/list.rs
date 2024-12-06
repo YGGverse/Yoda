@@ -122,15 +122,15 @@ impl List {
         // Init main widget
         let dropdown = DropDown::builder()
             .model(&list_store)
+            .selected(
+                list_store
+                    .find_with_equal_func(|item| {
+                        item.dynamic_cast_ref::<Item>().unwrap().is_active()
+                    })
+                    .unwrap(),
+            )
             .factory(&factory)
             .build();
-
-        // Select active record
-        dropdown.set_selected(
-            list_store
-                .find_with_equal_func(|item| item.dynamic_cast_ref::<Item>().unwrap().is_active())
-                .unwrap(),
-        ); // @TODO panic or handle?
 
         // Return activated `Self`
         Self {
