@@ -33,12 +33,12 @@ impl Widget {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>) -> Self {
+    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
         // Init actions
         let action = Rc::new(Action::new());
 
         // Init child container
-        let form = Rc::new(Form::new(profile, action.clone()));
+        let form = Rc::new(Form::new(profile, action.clone(), auth_url));
 
         // Init main widget
         let alert_dialog = AlertDialog::builder()

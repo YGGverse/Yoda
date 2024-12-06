@@ -32,10 +32,10 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, action: Rc<Action>) -> Self {
+    pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_url: &str) -> Self {
         // Init components
         let file = Rc::new(File::new(action.clone()));
-        let list = Rc::new(List::new());
+        let list = Rc::new(List::new(profile.clone(), auth_url));
         let name = Rc::new(Name::new(action.clone()));
         let save = Rc::new(Save::new(profile.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), action.clone(), list.clone()));
@@ -61,7 +61,7 @@ impl Form {
             let update = action.update.clone();
             move |item| {
                 // Change name entry visibility
-                name.update(matches!(item, Value::GenerateNewAuth));
+                name.update(matches!(item, Value::GeneratePem));
 
                 // Change file choose button visibility
                 file.update(matches!(item, Value::ImportPem));
@@ -103,7 +103,7 @@ impl Form {
     /// Validate `Self` components match current selection
     pub fn is_applicable(&self) -> bool {
         match self.list.selected_item().value_enum() {
-            Value::GenerateNewAuth => self.name.is_valid(),
+            Value::GeneratePem => self.name.is_valid(),
             Value::ImportPem => self.file.is_valid(),
             Value::ProfileIdentityGeminiId(_) => !self.list.selected_item().is_active(),
             _ => true,

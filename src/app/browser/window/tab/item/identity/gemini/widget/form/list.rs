@@ -1,6 +1,9 @@
 pub mod item;
+use std::rc::Rc;
+
 use item::{value::Value, Item};
 
+use crate::profile::Profile;
 use gtk::{
     gdk::Cursor,
     gio::{
@@ -20,9 +23,32 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new() -> Self {
-        // Init `ListStore` with custom `DropDown` properties
+    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
+        // Init model
         let list_store = ListStore::new::<Item>();
+
+        list_store.append(&Item::new_guest_session());
+        list_store.append(&Item::new_generate_pem());
+        list_store.append(&Item::new_import_pem());
+
+        // Append identities from profile database
+        // * memory cache synced also and could be faster @TODO
+        match profile.identity.gemini.database.records() {
+            Ok(identities) => {
+                for identity in identities {
+                    match Item::new_profile_identity_gemini_id(
+                        profile.clone(),
+                        identity.id,
+                        &identity.pem,
+                        auth_url,
+                    ) {
+                        Ok(item) => list_store.append(&item),
+                        Err(_) => todo!(),
+                    }
+                }
+            }
+            Err(_) => todo!(),
+        }
 
         // Setup item factory
         // * wanted only to append items after `DropDown` init
@@ -99,6 +125,13 @@ impl List {
             .factory(&factory)
             .build();
 
+        // Select active record
+        dropdown.set_selected(
+            list_store
+                .find_with_equal_func(|item| item.dynamic_cast_ref::<Item>().unwrap().is_active())
+                .unwrap(),
+        ); // @TODO panic or handle?
+
         // Return activated `Self`
         Self {
             list_store,
@@ -107,25 +140,6 @@ impl List {
     }
 
     // Actions
-
-    /// Append new item
-    pub fn append(
-        &self,
-        value: Value,
-        title: &str,
-        subtitle: &str,
-        tooltip: Option<&str>,
-        is_active: bool,
-    ) {
-        let item = Item::new(value, title, subtitle, tooltip, is_active);
-
-        self.list_store.append(&item);
-
-        if is_active {
-            self.dropdown
-                .set_selected(self.list_store.find(&item).unwrap()); // @TODO panic or handle?
-        }
-    }
 
     /// Find list item by `value` (stores ID)
     /// * return `position` found

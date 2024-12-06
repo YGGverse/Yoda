@@ -1,8 +1,21 @@
+mod error;
 mod imp;
+mod is_active;
+mod subtitle;
+mod title;
+mod tooltip;
 pub mod value;
 
-use gtk::glib::{self, Object};
-use value::Value;
+use std::rc::Rc;
+
+pub use error::Error;
+pub use value::Value;
+
+use crate::profile::Profile;
+use gtk::{
+    gio::TlsCertificate,
+    glib::{self, Object},
+};
 
 glib::wrapper! {
     pub struct Item(ObjectSubclass<imp::Item>);
@@ -10,47 +23,105 @@ glib::wrapper! {
 
 // C-type property `value` conversion for `Item`
 // * values > 0 reserved for `profile_identity_gemini_id`
-const G_VALUE_GENERATE_NEW_AUTH: i64 = 0;
+const G_VALUE_GENERATE_PEM: i64 = 0;
 const G_VALUE_IMPORT_PEM: i64 = -1;
-const G_VALUE_USE_GUEST_SESSION: i64 = -2;
+const G_VALUE_GUEST_SESSION: i64 = -2;
 
 impl Item {
     // Constructors
 
-    /// Create new `GObject`
-    pub fn new(
-        value: Value,
-        title: &str,
-        subtitle: &str,
-        tooltip: Option<&str>,
-        is_active: bool,
-    ) -> Self {
+    pub fn new_guest_session() -> Self {
         Object::builder()
-            .property(
-                "value",
-                match value {
-                    Value::GenerateNewAuth => G_VALUE_GENERATE_NEW_AUTH,
-                    Value::ImportPem => G_VALUE_IMPORT_PEM,
-                    Value::UseGuestSession => G_VALUE_USE_GUEST_SESSION,
-                    Value::ProfileIdentityGeminiId(value) => value,
-                },
-            )
-            .property("title", title)
-            .property("subtitle", subtitle)
-            .property("tooltip", tooltip.unwrap_or_default())
-            .property("is_active", is_active)
+            .property("value", G_VALUE_GUEST_SESSION)
+            .property("title", "Guest session")
+            .property("subtitle", "No identity for this request")
             .build()
+    }
+
+    pub fn new_generate_pem() -> Self {
+        Object::builder()
+            .property("value", G_VALUE_GENERATE_PEM)
+            .property("title", "Create new")
+            .property("subtitle", "Generate long-term certificate")
+            .build()
+    }
+
+    pub fn new_import_pem() -> Self {
+        Object::builder()
+            .property("value", G_VALUE_IMPORT_PEM)
+            .property("title", "Import identity")
+            .property("subtitle", "Use existing certificate")
+            .build()
+    }
+
+    pub fn new_profile_identity_gemini_id(
+        profile: Rc<Profile>,
+        profile_identity_gemini_id: i64,
+        pem: &str,
+        auth_url: &str,
+    ) -> Result<Self, Error> {
+        match TlsCertificate::from_pem(pem) {
+            Ok(certificate) => {
+                // Collect shared certificate scope
+                let scope = scope(profile.clone(), profile_identity_gemini_id);
+
+                // Build GObject
+                Ok(Object::builder()
+                    .property("value", profile_identity_gemini_id)
+                    .property(
+                        "title",
+                        title::new_for_profile_identity_gemini_id(&certificate),
+                    )
+                    .property(
+                        "subtitle",
+                        subtitle::new_for_profile_identity_gemini_id(&certificate, &scope),
+                    )
+                    .property(
+                        "tooltip",
+                        tooltip::new_for_profile_identity_gemini_id(&certificate, &scope),
+                    )
+                    .property(
+                        "is_active",
+                        is_active::new_for_profile_identity_gemini_id(
+                            profile,
+                            profile_identity_gemini_id,
+                            auth_url,
+                        ),
+                    )
+                    .build())
+            }
+            Err(e) => Err(Error::TlsCertificate(e)),
+        }
     }
 
     // Getters
 
-    /// Get `value` as enum `Value`
+    /// Get `Self` C-value as `Value`
     pub fn value_enum(&self) -> Value {
         match self.value() {
-            G_VALUE_GENERATE_NEW_AUTH => Value::GenerateNewAuth,
+            G_VALUE_GENERATE_PEM => Value::GeneratePem,
+            G_VALUE_GUEST_SESSION => Value::GuestSession,
             G_VALUE_IMPORT_PEM => Value::ImportPem,
-            G_VALUE_USE_GUEST_SESSION => Value::UseGuestSession,
             value => Value::ProfileIdentityGeminiId(value),
         }
     }
+}
+
+// Tools
+
+fn scope(profile: Rc<Profile>, profile_identity_gemini_id: i64) -> Vec<String> {
+    let mut scope = Vec::new();
+    for auth in profile
+        .identity
+        .gemini
+        .auth
+        .database
+        .records_scope(None)
+        .unwrap()
+        .iter()
+        .filter(|this| this.profile_identity_gemini_id == profile_identity_gemini_id)
+    {
+        scope.push(auth.scope.clone())
+    }
+    scope
 }

@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub enum Value {
-    GenerateNewAuth,
+    GeneratePem,
+    GuestSession,
     ImportPem,
     ProfileIdentityGeminiId(i64),
-    UseGuestSession,
 }

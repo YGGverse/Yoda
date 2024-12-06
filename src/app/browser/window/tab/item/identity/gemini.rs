@@ -3,14 +3,8 @@ use widget::{form::list::item::value::Value, Widget};
 
 use crate::app::browser::window::Action;
 use crate::profile::Profile;
-use gtk::{
-    gio::{prelude::TlsCertificateExt, TlsCertificate},
-    glib::{gformat, Uri},
-    prelude::IsA,
-};
+use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
-
-const DATE_FORMAT: &str = "%Y.%m.%d";
 
 pub struct Gemini {
     // profile: Rc<Profile>,
@@ -20,136 +14,13 @@ pub struct Gemini {
 impl Gemini {
     // Construct
 
-    /// Create new `Self` for given Profile
+    /// Create new `Self` for given `Profile`
     pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_uri: Uri) -> Self {
-        // Init widget
-        let widget = Rc::new(Widget::new(profile.clone()));
-
         // Init shared URL string from URI
-        let url = auth_uri.to_string();
+        let auth_url = auth_uri.to_string();
 
-        // Add guest option
-        widget.form.list.append(
-            Value::UseGuestSession,
-            "Guest session",
-            "No identity for this request",
-            None,
-            false,
-        );
-
-        // Add new identity option
-        widget.form.list.append(
-            Value::GenerateNewAuth,
-            "Create new",
-            "Generate long-term certificate",
-            None,
-            false,
-        );
-
-        // Add import existing identity option
-        widget.form.list.append(
-            Value::ImportPem,
-            "Import identity",
-            "Use existing certificate",
-            None,
-            false,
-        );
-
-        // Collect identities as options from profile database
-        // * memory cache synced also and could be faster @TODO
-        match profile.identity.gemini.database.records() {
-            Ok(identities) => {
-                for identity in identities {
-                    // Get certificate details
-                    let certificate = match TlsCertificate::from_pem(&identity.pem) {
-                        Ok(certificate) => certificate,
-                        Err(reason) => todo!("{reason}"),
-                    };
-
-                    // Init tooltip components
-                    let mut tooltip = "<b>Certificate</b>\n".to_string();
-
-                    if let Some(subject_name) = certificate.subject_name() {
-                        tooltip
-                            .push_str(&format!("\n<small><b>subject</b>\n{subject_name}</small>"));
-                    }
-
-                    if let Some(issuer_name) = certificate.issuer_name() {
-                        tooltip.push_str(&format!("\n<small><b>issuer</b>\n{issuer_name}</small>"));
-                    }
-
-                    if let Some(not_valid_before) = certificate.not_valid_before() {
-                        if let Ok(timestamp) = not_valid_before.format_iso8601() {
-                            tooltip.push_str(&format!(
-                                "\n<small><b>valid after</b>\n{timestamp}</small>"
-                            ));
-                        }
-                    }
-
-                    if let Some(not_valid_after) = certificate.not_valid_after() {
-                        if let Ok(timestamp) = not_valid_after.format_iso8601() {
-                            tooltip.push_str(&format!(
-                                "\n<small><b>valid before</b>\n{timestamp}</small>"
-                            ));
-                        }
-                    }
-
-                    // Collect scope info
-                    let mut scope = Vec::new();
-
-                    for auth in profile
-                        .identity
-                        .gemini
-                        .auth
-                        .database
-                        .records_scope(None)
-                        .unwrap()
-                        .iter()
-                        .filter(|this| this.profile_identity_gemini_id == identity.id)
-                    {
-                        scope.push(format!("<small>{}</small>", auth.scope.clone()))
-                    }
-
-                    if !scope.is_empty() {
-                        tooltip.push_str(&format!("\n\n<b>Scope</b>\n\n{}", scope.join("\n")));
-                    }
-
-                    // Append record option
-                    widget.form.list.append(
-                        Value::ProfileIdentityGeminiId(identity.id),
-                        // title
-                        &certificate
-                            .subject_name()
-                            .unwrap_or(gformat!("Unknown"))
-                            .replace("CN=", ""), // trim prefix
-                        // subtitle
-                        &format!(
-                            "{} - {} | scope: {}",
-                            certificate
-                                .not_valid_before()
-                                .unwrap() // @TODO
-                                .format(DATE_FORMAT)
-                                .unwrap(),
-                            certificate
-                                .not_valid_after()
-                                .unwrap() // @TODO
-                                .format(DATE_FORMAT)
-                                .unwrap(),
-                            scope.len(),
-                        ),
-                        Some(&tooltip),
-                        profile
-                            .identity
-                            .gemini
-                            .auth
-                            .memory
-                            .match_scope(&url)
-                            .is_some_and(|auth| auth.profile_identity_gemini_id == identity.id), // is selected
-                    );
-                }
-            }
-            Err(e) => todo!("{e}"),
-        } // @TODO separate markup
+        // Init widget
+        let widget = Rc::new(Widget::new(profile.clone(), &auth_url));
 
         // Init events
         widget.on_apply({
@@ -158,8 +29,8 @@ impl Gemini {
                 // Get option match user choice
                 let option = match response {
                     Value::ProfileIdentityGeminiId(value) => Some(value),
-                    Value::UseGuestSession => None,
-                    Value::GenerateNewAuth => Some(
+                    Value::GuestSession => None,
+                    Value::GeneratePem => Some(
                         match profile
                             .identity
                             .gemini
@@ -189,14 +60,14 @@ impl Gemini {
                             .identity
                             .gemini
                             .auth
-                            .apply(profile_identity_gemini_id, &url)
+                            .apply(profile_identity_gemini_id, &auth_url)
                         {
                             todo!("{}", reason.to_string())
                         };
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        if let Err(reason) = profile.identity.gemini.auth.remove_scope(&url) {
+                        if let Err(reason) = profile.identity.gemini.auth.remove_scope(&auth_url) {
                             todo!("{}", reason.to_string())
                         };
                     }
