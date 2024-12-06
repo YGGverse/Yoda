@@ -8,6 +8,12 @@ pub struct Memory {
     index: RefCell<HashMap<i64, String>>,
 }
 
+impl Default for Memory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Memory {
     // Constructors
 

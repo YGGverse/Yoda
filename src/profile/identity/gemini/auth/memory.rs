@@ -11,6 +11,12 @@ pub struct Memory {
     index: RefCell<HashMap<String, i64>>,
 }
 
+impl Default for Memory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Memory {
     // Constructors
 

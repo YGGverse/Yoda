@@ -24,6 +24,12 @@ pub struct Profile {
     pub config_path: PathBuf,
 }
 
+impl Default for Profile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Profile {
     // Constructors
 
