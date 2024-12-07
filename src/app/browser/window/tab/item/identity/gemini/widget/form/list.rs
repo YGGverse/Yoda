@@ -18,7 +18,6 @@ use gtk::{
 pub struct List {
     pub dropdown: DropDown,
     list_store: ListStore,
-    // profile: Rc<Profile>,
 }
 
 impl List {
@@ -140,7 +139,6 @@ impl List {
         Self {
             dropdown,
             list_store,
-            // profile,
         }
     }
 
@@ -154,24 +152,12 @@ impl List {
         })
     }
 
-    /// Remove list item by `profile_identity_gemini_id` (stores ID)
+    /// Remove list item by `profile_identity_gemini_id`
     /// * return `position` of removed list item
     pub fn remove(&self, profile_identity_gemini_id: i64) -> Option<u32> {
         match self.find(profile_identity_gemini_id) {
             Some(position) => {
                 self.list_store.remove(position);
-                Some(position)
-            }
-            None => todo!(),
-        }
-    }
-
-    /// Update list item by `profile_identity_gemini_id` (stores ID)
-    /// * return `position` of updated list item
-    pub fn update(&self, profile_identity_gemini_id: i64) -> Option<u32> {
-        match self.find(profile_identity_gemini_id) {
-            Some(position) => {
-                // @TODO
                 Some(position)
             }
             None => todo!(),

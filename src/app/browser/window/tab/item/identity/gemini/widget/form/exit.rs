@@ -78,12 +78,15 @@ impl Exit {
                                 .auth
                                 .remove_ref(profile_identity_gemini_id)
                             {
-                                Ok(_) => match list.update(profile_identity_gemini_id) {
-                                    Some(_) => {
+                                Ok(_) => match list.selected().update(&profile, "") {
+                                    Ok(_) => {
                                         button.set_css_classes(&["success"]);
-                                        button.set_label("Identity successfully disconnected");
+                                        button.set_label("Identity successfully disconnected")
                                     }
-                                    None => todo!(),
+                                    Err(e) => {
+                                        button.set_css_classes(&["error"]);
+                                        button.set_label(&e.to_string())
+                                    }
                                 },
                                 Err(e) => {
                                     button.set_css_classes(&["error"]);

@@ -6,8 +6,6 @@ mod title;
 mod tooltip;
 pub mod value;
 
-use std::rc::Rc;
-
 pub use error::Error;
 pub use value::Value;
 
@@ -16,6 +14,7 @@ use gtk::{
     gio::TlsCertificate,
     glib::{self, Object},
 };
+use std::rc::Rc;
 
 glib::wrapper! {
     pub struct Item(ObjectSubclass<imp::Item>);
@@ -69,7 +68,7 @@ impl Item {
             // Extract certificate details from PEM string
             Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                 // Collect certificate scopes for item
-                Ok(ref certificate) => match scope(profile.clone(), profile_identity_gemini_id) {
+                Ok(ref certificate) => match scope(&profile, profile_identity_gemini_id) {
                     // Ready to build `Item` GObject
                     Ok(ref scope) => Ok(Object::builder()
                         .property("value", profile_identity_gemini_id)
@@ -88,7 +87,7 @@ impl Item {
                         .property(
                             "is_active",
                             is_active::new_for_profile_identity_gemini_id(
-                                profile,
+                                &profile,
                                 profile_identity_gemini_id,
                                 auth_url,
                             ),
@@ -100,6 +99,59 @@ impl Item {
             },
             Err(_) => todo!(),
         }
+    }
+
+    // Actions
+
+    /// Update properties for `Self` for given `Profile` and `auth_url`
+    pub fn update(&self, profile: &Rc<Profile>, auth_url: &str) -> Result<(), Error> {
+        // Update item depending on value type
+        match self.value_enum() {
+            Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+                // Get PEM by ID
+                match profile
+                    .identity
+                    .gemini
+                    .memory
+                    .get(profile_identity_gemini_id)
+                {
+                    // Extract certificate details from PEM string
+                    Ok(ref pem) => match TlsCertificate::from_pem(pem) {
+                        Ok(ref certificate) => {
+                            // Get current scope
+                            let ref scope = scope(profile, profile_identity_gemini_id)?;
+
+                            // Update properties
+                            self.set_title(title::new_for_profile_identity_gemini_id(certificate));
+
+                            self.set_subtitle(subtitle::new_for_profile_identity_gemini_id(
+                                certificate,
+                                scope,
+                            ));
+
+                            self.set_tooltip(tooltip::new_for_profile_identity_gemini_id(
+                                certificate,
+                                scope,
+                            ));
+
+                            self.set_is_active(is_active::new_for_profile_identity_gemini_id(
+                                profile,
+                                profile_identity_gemini_id,
+                                auth_url,
+                            ));
+
+                            // @TODO emit update request
+                        }
+                        Err(e) => return Err(Error::TlsCertificate(e)),
+                    },
+                    Err(_) => todo!(),
+                }
+            }
+            _ => {
+                // nothing to update yet..
+            }
+        }
+        Ok(()) // @TODO
     }
 
     // Getters
@@ -118,7 +170,7 @@ impl Item {
 // Tools
 
 /// Collect certificate scope vector from `Profile` database for `profile_identity_gemini_id`
-fn scope(profile: Rc<Profile>, profile_identity_gemini_id: i64) -> Result<Vec<String>, Error> {
+fn scope(profile: &Rc<Profile>, profile_identity_gemini_id: i64) -> Result<Vec<String>, Error> {
     match profile.identity.gemini.auth.database.records_scope(None) {
         Ok(result) => {
             let mut scope = Vec::new();
