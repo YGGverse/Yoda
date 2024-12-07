@@ -1,4 +1,4 @@
-use super::Action;
+use super::WidgetAction;
 use gtk::{
     gio::{Cancellable, ListStore, TlsCertificate},
     glib::{gformat, GString},
@@ -21,7 +21,7 @@ impl File {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(action_widget: Rc<Action>) -> Self {
+    pub fn new(widget_action: Rc<WidgetAction>) -> Self {
         // Init PEM
         let pem = Rc::new(RefCell::new(None));
 
@@ -35,7 +35,7 @@ impl File {
 
         // Init events
         button.connect_clicked({
-            let action_widget = action_widget.clone();
+            let widget_action = widget_action.clone();
             let button = button.clone();
             let pem = pem.clone();
             move |_| {
@@ -61,7 +61,7 @@ impl File {
                     .default_filter(&filter_pem)
                     .build()
                     .open(None::<&Window>, None::<&Cancellable>, {
-                        let action_widget = action_widget.clone();
+                        let widget_action = widget_action.clone();
                         let button = button.clone();
                         let pem = pem.clone();
                         move |result| {
@@ -89,7 +89,7 @@ impl File {
                                 }
                             }
                             button.set_sensitive(true); // unlock
-                            action_widget.update.activate()
+                            widget_action.update.activate()
                         }
                     });
             }

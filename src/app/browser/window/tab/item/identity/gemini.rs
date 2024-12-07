@@ -25,7 +25,11 @@ impl Gemini {
         let auth_url = auth_uri.to_string();
 
         // Init widget
-        let widget = Rc::new(Widget::new(profile.clone(), &auth_url));
+        let widget = Rc::new(Widget::new(
+            (action.0.clone(), action.1.clone()),
+            profile.clone(),
+            &auth_url,
+        ));
 
         // Init events
         widget.on_cancel({

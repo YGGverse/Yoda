@@ -1,4 +1,5 @@
 use super::list::{item::Value, List};
+use crate::app::browser::action::Action as BrowserAction;
 use crate::profile::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
@@ -29,7 +30,7 @@ impl Exit {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, list: Rc<List>) -> Self {
+    pub fn new(browser_action: Rc<BrowserAction>, profile: Rc<Profile>, list: Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -69,29 +70,33 @@ impl Exit {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
+                            let browser_action = browser_action.clone();
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            move |_, _| match profile
-                                .identity
-                                .gemini
-                                .auth
-                                .remove_ref(profile_identity_gemini_id)
-                            {
-                                Ok(_) => match list.selected().update(&profile, "") {
-                                    Ok(_) => {
-                                        button.set_css_classes(&["success"]);
-                                        button.set_label("Identity successfully disconnected")
-                                    }
+                            move |_, _| {
+                                match profile
+                                    .identity
+                                    .gemini
+                                    .auth
+                                    .remove_ref(profile_identity_gemini_id)
+                                {
+                                    Ok(_) => match list.selected().update(&profile, "") {
+                                        Ok(_) => {
+                                            button.set_css_classes(&["success"]);
+                                            button.set_label("Identity successfully disconnected")
+                                        }
+                                        Err(e) => {
+                                            button.set_css_classes(&["error"]);
+                                            button.set_label(&e.to_string())
+                                        }
+                                    },
                                     Err(e) => {
                                         button.set_css_classes(&["error"]);
                                         button.set_label(&e.to_string())
                                     }
-                                },
-                                Err(e) => {
-                                    button.set_css_classes(&["error"]);
-                                    button.set_label(&e.to_string())
                                 }
+                                browser_action.update.activate(None)
                             }
                         });
 

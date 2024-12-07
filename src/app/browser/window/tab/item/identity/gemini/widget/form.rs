@@ -12,7 +12,9 @@ use list::{item::value::Value, List};
 use name::Name;
 use save::Save;
 
-use super::Action;
+use super::WidgetAction;
+use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use crate::profile::Profile;
 use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
@@ -32,14 +34,18 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, action_widget: Rc<Action>, auth_url: &str) -> Self {
+    pub fn new(
+        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<WidgetAction>),
+        profile: Rc<Profile>,
+        auth_url: &str,
+    ) -> Self {
         // Init components
-        let list = Rc::new(List::new(action_widget.clone(), profile.clone(), auth_url));
-        let file = Rc::new(File::new(action_widget.clone()));
-        let name = Rc::new(Name::new(action_widget.clone()));
+        let list = Rc::new(List::new(action.2.clone(), profile.clone(), auth_url));
+        let file = Rc::new(File::new(action.2.clone()));
+        let name = Rc::new(Name::new(action.2.clone()));
         let save = Rc::new(Save::new(profile.clone(), list.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), list.clone()));
-        let exit = Rc::new(Exit::new(profile.clone(), list.clone()));
+        let exit = Rc::new(Exit::new(action.0.clone(), profile.clone(), list.clone()));
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Vertical).build();

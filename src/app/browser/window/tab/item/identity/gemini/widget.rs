@@ -1,10 +1,12 @@
 mod action;
 pub mod form;
 
-use action::Action;
 use form::{list::item::value::Value, Form};
 
+use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use crate::profile::Profile;
+use action::Action as WidgetAction;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
@@ -33,12 +35,20 @@ impl Widget {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
+    pub fn new(
+        action: (Rc<BrowserAction>, Rc<WindowAction>),
+        profile: Rc<Profile>,
+        auth_url: &str,
+    ) -> Self {
         // Init actions
-        let action = Rc::new(Action::new());
+        let widget_action = Rc::new(WidgetAction::new());
 
         // Init child container
-        let form = Rc::new(Form::new(profile, action.clone(), auth_url));
+        let form = Rc::new(Form::new(
+            (action.0.clone(), action.1.clone(), widget_action.clone()),
+            profile,
+            auth_url,
+        ));
 
         // Init main widget
         let alert_dialog = AlertDialog::builder()
@@ -64,7 +74,7 @@ impl Widget {
         alert_dialog.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
 
         // Init events
-        action.update.connect_activate({
+        widget_action.update.connect_activate({
             let form = form.clone();
             let alert_dialog = alert_dialog.clone();
             move || {
