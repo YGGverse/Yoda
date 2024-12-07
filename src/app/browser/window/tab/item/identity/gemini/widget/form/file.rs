@@ -21,7 +21,7 @@ impl File {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(action: Rc<Action>) -> Self {
+    pub fn new(widget_action: Rc<Action>) -> Self {
         // Init PEM
         let pem = Rc::new(RefCell::new(None));
 
@@ -37,7 +37,7 @@ impl File {
         button.connect_clicked({
             let button = button.clone();
             let pem = pem.clone();
-            let update = action.update.clone();
+            let widget_action = widget_action.clone();
             move |_| {
                 // Lock open button (prevent double click)
                 button.set_sensitive(false);
@@ -63,7 +63,7 @@ impl File {
                     .open(None::<&Window>, None::<&Cancellable>, {
                         let button = button.clone();
                         let pem = pem.clone();
-                        let update = update.clone();
+                        let widget_action = widget_action.clone();
                         move |result| {
                             match result {
                                 Ok(file) => match file.path() {
@@ -89,7 +89,7 @@ impl File {
                                 }
                             }
                             button.set_sensitive(true); // unlock
-                            update.activate()
+                            widget_action.update.activate()
                         }
                     });
             }
@@ -102,12 +102,8 @@ impl File {
     // Actions
 
     /// Change visibility status
-    /// * grab focus on `is_visible`
-    pub fn update(&self, is_visible: bool) {
+    pub fn set_visible(&self, is_visible: bool) {
         self.button.set_visible(is_visible);
-        if is_visible {
-            self.button.grab_focus();
-        }
     }
 
     // Getters

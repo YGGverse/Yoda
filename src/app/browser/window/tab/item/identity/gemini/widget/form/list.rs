@@ -3,7 +3,6 @@ use std::rc::Rc;
 
 use item::Item;
 
-use super::Action;
 use crate::profile::Profile;
 use gtk::{
     gdk::Cursor,
@@ -18,22 +17,23 @@ use gtk::{
 pub struct List {
     pub dropdown: DropDown,
     list_store: ListStore,
+    // profile: Rc<Profile>,
 }
 
 impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_url: &str) -> Self {
+    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
         // Init model
         let list_store = ListStore::new::<Item>();
+
+        list_store.remove_all();
 
         list_store.append(&Item::new_guest_session());
         list_store.append(&Item::new_generate_pem());
         list_store.append(&Item::new_import_pem());
 
-        // Append identities from profile database
-        // * memory cache synced also and could be faster @TODO
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
@@ -132,41 +132,52 @@ impl List {
             .factory(&factory)
             .build();
 
-        // Connect events
-        dropdown.connect_selected_notify(move |_| action.update.activate());
-
         // Return activated `Self`
         Self {
-            list_store,
             dropdown,
+            list_store,
+            // profile,
         }
     }
 
     // Actions
 
-    /// Find list item by `value` (stores ID)
+    /// Find list item by `profile_identity_gemini_id`
     /// * return `position` found
-    pub fn find(&self, value: i64) -> Option<u32> {
-        self.list_store
-            .find_with_equal_func(|this| value == this.clone().downcast::<Item>().unwrap().value())
+    pub fn find(&self, profile_identity_gemini_id: i64) -> Option<u32> {
+        self.list_store.find_with_equal_func(|this| {
+            profile_identity_gemini_id == this.downcast_ref::<Item>().unwrap().value()
+        })
     }
 
-    /// Remove list item by `value` (stores ID)
+    /// Remove list item by `profile_identity_gemini_id` (stores ID)
     /// * return `position` of removed list item
-    pub fn remove(&self, value: i64) -> Option<u32> {
-        match self.find(value) {
+    pub fn remove(&self, profile_identity_gemini_id: i64) -> Option<u32> {
+        match self.find(profile_identity_gemini_id) {
             Some(position) => {
                 self.list_store.remove(position);
                 Some(position)
             }
-            None => None,
+            None => todo!(),
+        }
+    }
+
+    /// Update list item by `profile_identity_gemini_id` (stores ID)
+    /// * return `position` of updated list item
+    pub fn update(&self, profile_identity_gemini_id: i64) -> Option<u32> {
+        match self.find(profile_identity_gemini_id) {
+            Some(position) => {
+                // @TODO
+                Some(position)
+            }
+            None => todo!(),
         }
     }
 
     // Getters
 
     /// Get selected `Item` GObject
-    pub fn selected_item(&self) -> Item {
+    pub fn selected(&self) -> Item {
         self.dropdown
             .selected_item()
             .and_downcast::<Item>()

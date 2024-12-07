@@ -19,7 +19,7 @@ impl Name {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(action: Rc<Action>) -> Self {
+    pub fn new(widget_action: Rc<Action>) -> Self {
         // Init main gobject
         let entry = Entry::builder()
             .margin_top(MARGIN)
@@ -29,7 +29,7 @@ impl Name {
             .build();
 
         // Init events
-        entry.connect_changed(move |_| action.update.activate());
+        entry.connect_changed(move |_| widget_action.update.activate());
 
         // Return activated `Self`
         Self { entry }
@@ -39,7 +39,7 @@ impl Name {
 
     /// Change visibility status
     /// * grab focus on `is_visible`
-    pub fn update(&self, is_visible: bool) {
+    pub fn set_visible(&self, is_visible: bool) {
         self.entry.set_visible(is_visible);
         if is_visible {
             self.entry.grab_focus();

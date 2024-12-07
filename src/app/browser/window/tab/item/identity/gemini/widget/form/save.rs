@@ -1,20 +1,20 @@
 mod certificate;
 use certificate::Certificate;
 
+use super::list::{item::Value, List};
 use crate::profile::Profile;
 use gtk::{
     gio::{Cancellable, ListStore},
     prelude::{ButtonExt, FileExt, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
-use std::{cell::RefCell, fs::File, io::Write, rc::Rc};
+use std::{fs::File, io::Write, rc::Rc};
 
 const LABEL: &str = "Export";
 const TOOLTIP_TEXT: &str = "Export selected identity to file";
 const MARGIN: i32 = 8;
 
 pub struct Save {
-    profile_identity_gemini_id: Rc<RefCell<Option<i64>>>,
     pub button: Button,
 }
 
@@ -22,10 +22,7 @@ impl Save {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>) -> Self {
-        // Init selected option holder
-        let profile_identity_gemini_id = Rc::new(RefCell::new(None));
-
+    pub fn new(profile: Rc<Profile>, list: Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -36,17 +33,16 @@ impl Save {
 
         // Init events
         button.connect_clicked({
-            let profile_identity_gemini_id = profile_identity_gemini_id.clone();
             let button = button.clone();
             move |_| {
                 // Get selected identity from holder
-                match profile_identity_gemini_id.borrow().as_ref() {
-                    Some(profile_identity_gemini_id) => {
+                match list.selected().value_enum() {
+                    Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
                         // Lock open button (prevent double click)
                         button.set_sensitive(false);
 
                         // Create PEM file based on option ID selected
-                        match Certificate::new(profile.clone(), *profile_identity_gemini_id) {
+                        match Certificate::new(profile.clone(), profile_identity_gemini_id) {
                             Ok(certificate) => {
                                 // Init file filters related with PEM extension
                                 let filters = ListStore::new::<FileFilter>();
@@ -121,32 +117,18 @@ impl Save {
                             }
                         }
                     }
-                    None => todo!(), // unexpected
+                    _ => todo!(), // unexpected
                 }
             }
         });
 
         // Return activated `Self`
-        Self {
-            profile_identity_gemini_id,
-            button,
-        }
+        Self { button }
     }
 
     // Actions
 
-    /// Update `profile_identity_gemini_id` holder,
-    /// toggle visibility depending on given value
-    pub fn update(&self, profile_identity_gemini_id: Option<i64>) {
-        self.button.set_visible(match profile_identity_gemini_id {
-            Some(value) => {
-                self.profile_identity_gemini_id.replace(Some(value));
-                true
-            }
-            None => {
-                self.profile_identity_gemini_id.replace(None);
-                false
-            }
-        })
+    pub fn set_visible(&self, is_visible: bool) {
+        self.button.set_visible(is_visible)
     }
 }

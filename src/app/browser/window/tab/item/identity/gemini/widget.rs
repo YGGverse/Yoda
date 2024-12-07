@@ -68,9 +68,6 @@ impl Widget {
             let form = form.clone();
             let alert_dialog = alert_dialog.clone();
             move || {
-                // Update form with it children components
-                form.update();
-
                 // Deactivate apply button if the form values could not be processed
                 alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_applicable());
             }
@@ -96,14 +93,13 @@ impl Widget {
                 this.set_response_enabled(response, false);
 
                 // Result
-                callback(form.list.selected_item().value_enum())
+                callback(form.list.selected().value_enum())
             }
         });
     }
 
     /// Show dialog with new preset
     pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
-        self.form.update();
         self.alert_dialog.present(parent)
     }
 }
