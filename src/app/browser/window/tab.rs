@@ -232,7 +232,7 @@ impl Tab {
                         .set_title(item.page.meta.title().as_str())
                 }
             }
-            // Update all tabs on ID not found @TODO change initial update method
+            // Update all tabs
             None => {
                 for (_, item) in self.index.borrow().iter() {
                     // Update item components
@@ -247,7 +247,7 @@ impl Tab {
                 }
             }
         }
-    } // @TODO need optimization
+    }
 
     pub fn clean(
         &self,
