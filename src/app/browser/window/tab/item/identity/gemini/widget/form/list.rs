@@ -133,7 +133,7 @@ impl List {
             .build();
 
         // Connect events
-        dropdown.connect_selected_notify(move |_| action_widget.update.activate(false));
+        dropdown.connect_selected_notify(move |_| action_widget.update.activate());
 
         // Return activated `Self`
         Self {

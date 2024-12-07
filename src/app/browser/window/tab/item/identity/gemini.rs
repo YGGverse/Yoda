@@ -1,7 +1,8 @@
 mod widget;
 use widget::{form::list::item::value::Value, Widget};
 
-use crate::app::browser::window::Action;
+use crate::app::browser::action::Action as BrowserAction;
+use crate::app::browser::window::action::Action as WindowAction;
 use crate::profile::Profile;
 use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
@@ -15,7 +16,11 @@ impl Gemini {
     // Construct
 
     /// Create new `Self` for given `Profile`
-    pub fn new(profile: Rc<Profile>, action: Rc<Action>, auth_uri: Uri) -> Self {
+    pub fn new(
+        action: (Rc<BrowserAction>, Rc<WindowAction>),
+        profile: Rc<Profile>,
+        auth_uri: Uri,
+    ) -> Self {
         // Init shared URL string from URI
         let auth_url = auth_uri.to_string();
 
@@ -24,11 +29,8 @@ impl Gemini {
 
         // Init events
         widget.on_cancel({
-            let action = action.clone();
-            move |is_reload_request| {
-                if is_reload_request {
-                    action.reload.activate();
-                }
+            move || {
+                action.0.update.activate(None);
             }
         });
 
@@ -83,7 +85,7 @@ impl Gemini {
                 }
 
                 // Reload page to apply changes
-                action.reload.activate();
+                action.1.reload.activate();
             }
         });
 

@@ -51,7 +51,7 @@ impl Item {
         let page = Rc::new(Page::new(
             id.clone(),
             profile.clone(),
-            (actions.0, actions.1.clone(), action.clone()),
+            (actions.0.clone(), actions.1.clone(), action.clone()),
         ));
 
         let widget = Rc::new(Widget::new(
@@ -75,6 +75,8 @@ impl Item {
 
         // Show identity selection for item
         action.ident().connect_activate({
+            let browser_action = actions.0.clone();
+            let window_action = actions.1.clone();
             let page = page.clone();
             let parent = tab_view.clone().upcast::<gtk::Widget>();
             move || {
@@ -82,8 +84,12 @@ impl Item {
                 if let Some(uri) = page.navigation.request.uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
-                        return identity::new_gemini(profile.clone(), actions.1.clone(), uri)
-                            .present(Some(&parent));
+                        return identity::new_gemini(
+                            (browser_action.clone(), window_action.clone()),
+                            profile.clone(),
+                            uri,
+                        )
+                        .present(Some(&parent));
                     }
                 }
                 // Show dialog with unsupported request message

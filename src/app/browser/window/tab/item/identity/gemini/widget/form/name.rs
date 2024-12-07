@@ -29,7 +29,7 @@ impl Name {
             .build();
 
         // Init events
-        entry.connect_changed(move |_| action_widget.update.activate(false));
+        entry.connect_changed(move |_| action_widget.update.activate());
 
         // Return activated `Self`
         Self { entry }
