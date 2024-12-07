@@ -29,8 +29,6 @@ impl List {
         // Init model
         let list_store = ListStore::new::<Item>();
 
-        list_store.remove_all();
-
         list_store.append(&Item::new_guest_session());
         list_store.append(&Item::new_generate_pem());
         list_store.append(&Item::new_import_pem());
