@@ -10,7 +10,7 @@ use adw::{
     AlertDialog, ResponseAppearance,
 };
 use gtk::prelude::IsA;
-use std::rc::Rc;
+use std::{cell::Cell, rc::Rc};
 
 // Defaults
 const HEADING: &str = "Ident";
@@ -27,6 +27,7 @@ pub struct Widget {
     // pub action: Rc<Action>,
     pub form: Rc<Form>,
     pub alert_dialog: AlertDialog,
+    pub is_reload_request: Rc<Cell<bool>>,
 }
 
 impl Widget {
@@ -36,6 +37,9 @@ impl Widget {
     pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
         // Init actions
         let action = Rc::new(Action::new());
+
+        // Page may require reload for some widget actions
+        let is_reload_request = Rc::new(Cell::new(false));
 
         // Init child container
         let form = Rc::new(Form::new(profile, action.clone(), auth_url));
@@ -67,7 +71,11 @@ impl Widget {
         action.update.connect_activate({
             let form = form.clone();
             let alert_dialog = alert_dialog.clone();
-            move || {
+            let is_reload_request = is_reload_request.clone();
+            move |_is_reload_request| {
+                // Update reload state
+                is_reload_request.replace(_is_reload_request);
+
                 // Update child components
                 form.update();
 
@@ -81,13 +89,14 @@ impl Widget {
             // action,
             form,
             alert_dialog,
+            is_reload_request,
         }
     }
 
     // Actions
 
-    /// Callback wrapper for `apply` [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
-    /// * return `Value` enum or new record request on `None`
+    /// Callback wrapper to apply
+    /// [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
     pub fn on_apply(&self, callback: impl Fn(Value) + 'static) {
         self.alert_dialog.connect_response(Some(RESPONSE_APPLY.0), {
             let form = self.form.clone();
@@ -99,6 +108,23 @@ impl Widget {
                 callback(form.list.selected().value_enum())
             }
         });
+    }
+
+    /// Callback wrapper to cancel
+    /// [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
+    /// * return require reload state
+    pub fn on_cancel(&self, callback: impl Fn(bool) + 'static) {
+        self.alert_dialog
+            .connect_response(Some(RESPONSE_CANCEL.0), {
+                let is_reload_request = self.is_reload_request.take();
+                move |this, response| {
+                    // Prevent double-click action
+                    this.set_response_enabled(response, false);
+
+                    // Result
+                    callback(is_reload_request)
+                }
+            });
     }
 
     /// Show dialog with new preset

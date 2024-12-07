@@ -23,6 +23,15 @@ impl Gemini {
         let widget = Rc::new(Widget::new(profile.clone(), &auth_url));
 
         // Init events
+        widget.on_cancel({
+            let action = action.clone();
+            move |is_reload_request| {
+                if is_reload_request {
+                    action.reload.activate();
+                }
+            }
+        });
+
         widget.on_apply({
             let widget = widget.clone();
             move |response| {
