@@ -37,11 +37,7 @@ impl List {
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
-                    match Item::new_profile_identity_gemini_id(
-                        profile.clone(),
-                        identity.id,
-                        auth_url,
-                    ) {
+                    match Item::new_profile_identity_gemini_id(&profile, identity.id, auth_url) {
                         Ok(item) => list_store.append(&item),
                         Err(_) => todo!(),
                     }

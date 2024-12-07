@@ -54,7 +54,7 @@ impl Item {
     }
 
     pub fn new_profile_identity_gemini_id(
-        profile: Rc<Profile>,
+        profile: &Rc<Profile>,
         profile_identity_gemini_id: i64,
         auth_url: &str,
     ) -> Result<Self, Error> {
@@ -68,7 +68,7 @@ impl Item {
             // Extract certificate details from PEM string
             Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                 // Collect certificate scopes for item
-                Ok(ref certificate) => match scope(&profile, profile_identity_gemini_id) {
+                Ok(ref certificate) => match scope(profile, profile_identity_gemini_id) {
                     // Ready to build `Item` GObject
                     Ok(ref scope) => Ok(Object::builder()
                         .property("value", profile_identity_gemini_id)
@@ -87,7 +87,7 @@ impl Item {
                         .property(
                             "is_active",
                             is_active::new_for_profile_identity_gemini_id(
-                                &profile,
+                                profile,
                                 profile_identity_gemini_id,
                                 auth_url,
                             ),
