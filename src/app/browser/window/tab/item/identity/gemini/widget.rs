@@ -68,6 +68,9 @@ impl Widget {
             let form = form.clone();
             let alert_dialog = alert_dialog.clone();
             move || {
+                // Update child components
+                form.update();
+
                 // Deactivate apply button if the form values could not be processed
                 alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_applicable());
             }

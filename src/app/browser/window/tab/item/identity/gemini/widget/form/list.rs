@@ -3,6 +3,7 @@ use std::rc::Rc;
 
 use item::Item;
 
+use super::Action;
 use crate::profile::Profile;
 use gtk::{
     gdk::Cursor,
@@ -24,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, auth_url: &str) -> Self {
+    pub fn new(widget_action: Rc<Action>, profile: Rc<Profile>, auth_url: &str) -> Self {
         // Init model
         let list_store = ListStore::new::<Item>();
 
@@ -131,6 +132,9 @@ impl List {
             )
             .factory(&factory)
             .build();
+
+        // Connect events
+        dropdown.connect_selected_notify(move |_| widget_action.update.activate());
 
         // Return activated `Self`
         Self {
