@@ -89,7 +89,7 @@ impl File {
                                 }
                             }
                             button.set_sensitive(true); // unlock
-                            action_widget.update.activate(true)
+                            action_widget.update.activate(false)
                         }
                     });
             }
