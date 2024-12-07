@@ -6,6 +6,7 @@ use adw::{
     AlertDialog, ResponseAppearance,
 };
 use gtk::{
+    glib::Uri,
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
@@ -30,7 +31,12 @@ impl Exit {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(browser_action: Rc<BrowserAction>, profile: Rc<Profile>, list: Rc<List>) -> Self {
+    pub fn new(
+        browser_action: Rc<BrowserAction>,
+        profile: Rc<Profile>,
+        list: Rc<List>,
+        auth_uri: Uri,
+    ) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -41,6 +47,7 @@ impl Exit {
 
         // Init events
         button.connect_clicked({
+            let auth_uri = auth_uri.clone();
             let button = button.clone();
             move |_| {
                 // Get selected identity from holder
@@ -70,6 +77,7 @@ impl Exit {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
+                            let auth_uri = auth_uri.clone();
                             let browser_action = browser_action.clone();
                             let button = button.clone();
                             let list = list.clone();
@@ -81,7 +89,10 @@ impl Exit {
                                     .auth
                                     .remove_ref(profile_identity_gemini_id)
                                 {
-                                    Ok(_) => match list.selected().update(&profile, "") {
+                                    Ok(_) => match list
+                                        .selected()
+                                        .update(&profile, &auth_uri.to_string())
+                                    {
                                         Ok(_) => {
                                             button.set_css_classes(&["success"]);
                                             button.set_label("Identity successfully disconnected")

@@ -16,7 +16,7 @@ use super::WidgetAction;
 use crate::app::browser::action::Action as BrowserAction;
 use crate::app::browser::window::action::Action as WindowAction;
 use crate::profile::Profile;
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Form {
@@ -37,15 +37,24 @@ impl Form {
     pub fn new(
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<WidgetAction>),
         profile: Rc<Profile>,
-        auth_url: &str,
+        auth_uri: Uri,
     ) -> Self {
         // Init components
-        let list = Rc::new(List::new(action.2.clone(), profile.clone(), auth_url));
+        let list = Rc::new(List::new(
+            action.2.clone(),
+            profile.clone(),
+            auth_uri.clone(),
+        ));
         let file = Rc::new(File::new(action.2.clone()));
         let name = Rc::new(Name::new(action.2.clone()));
         let save = Rc::new(Save::new(profile.clone(), list.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), list.clone()));
-        let exit = Rc::new(Exit::new(action.0.clone(), profile.clone(), list.clone()));
+        let exit = Rc::new(Exit::new(
+            action.0.clone(),
+            profile.clone(),
+            list.clone(),
+            auth_uri.clone(),
+        ));
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Vertical).build();

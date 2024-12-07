@@ -11,7 +11,7 @@ use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
 };
-use gtk::prelude::IsA;
+use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
 // Defaults
@@ -38,7 +38,7 @@ impl Widget {
     pub fn new(
         action: (Rc<BrowserAction>, Rc<WindowAction>),
         profile: Rc<Profile>,
-        auth_url: &str,
+        auth_uri: Uri,
     ) -> Self {
         // Init actions
         let widget_action = Rc::new(WidgetAction::new());
@@ -47,7 +47,7 @@ impl Widget {
         let form = Rc::new(Form::new(
             (action.0.clone(), action.1.clone(), widget_action.clone()),
             profile,
-            auth_url,
+            auth_uri,
         ));
 
         // Init main widget

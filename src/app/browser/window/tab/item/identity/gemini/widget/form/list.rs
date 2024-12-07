@@ -11,6 +11,7 @@ use gtk::{
         prelude::{Cast, CastNone},
         ListStore,
     },
+    glib::Uri,
     prelude::{BoxExt, ListItemExt, WidgetExt},
     Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
 };
@@ -24,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: Rc<WidgetAction>, profile: Rc<Profile>, auth_url: &str) -> Self {
+    pub fn new(widget_action: Rc<WidgetAction>, profile: Rc<Profile>, auth_uri: Uri) -> Self {
         // Init model
         let list_store = ListStore::new::<Item>();
 
@@ -37,7 +38,11 @@ impl List {
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
                 for identity in identities {
-                    match Item::new_profile_identity_gemini_id(&profile, identity.id, auth_url) {
+                    match Item::new_profile_identity_gemini_id(
+                        &profile,
+                        identity.id,
+                        &auth_uri.to_string(),
+                    ) {
                         Ok(item) => list_store.append(&item),
                         Err(_) => todo!(),
                     }

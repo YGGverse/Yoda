@@ -28,7 +28,7 @@ impl Gemini {
         let widget = Rc::new(Widget::new(
             (action.0.clone(), action.1.clone()),
             profile.clone(),
-            &auth_url,
+            auth_uri.clone(),
         ));
 
         // Init events
