@@ -32,7 +32,7 @@ pub fn new_for_profile_identity_gemini_id(
         tooltip.push_str("\n\n<b>Scope</b>\n");
 
         for path in scope {
-            tooltip.push_str(&format!("\n{}", path));
+            tooltip.push_str(&format!("\n<small>{}</small>", path));
         }
     }
 
