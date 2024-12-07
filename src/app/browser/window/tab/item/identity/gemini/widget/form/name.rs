@@ -19,7 +19,7 @@ impl Name {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: Rc<Action>) -> Self {
+    pub fn new(action_widget: Rc<Action>) -> Self {
         // Init main gobject
         let entry = Entry::builder()
             .margin_top(MARGIN)
@@ -29,7 +29,7 @@ impl Name {
             .build();
 
         // Init events
-        entry.connect_changed(move |_| widget_action.update.activate());
+        entry.connect_changed(move |_| action_widget.update.activate());
 
         // Return activated `Self`
         Self { entry }

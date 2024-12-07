@@ -25,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: Rc<Action>, profile: Rc<Profile>, auth_url: &str) -> Self {
+    pub fn new(action_widget: Rc<Action>, profile: Rc<Profile>, auth_url: &str) -> Self {
         // Init model
         let list_store = ListStore::new::<Item>();
 
@@ -134,7 +134,7 @@ impl List {
             .build();
 
         // Connect events
-        dropdown.connect_selected_notify(move |_| widget_action.update.activate());
+        dropdown.connect_selected_notify(move |_| action_widget.update.activate());
 
         // Return activated `Self`
         Self {

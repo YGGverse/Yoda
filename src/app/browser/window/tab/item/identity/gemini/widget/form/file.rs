@@ -21,7 +21,7 @@ impl File {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: Rc<Action>) -> Self {
+    pub fn new(action_widget: Rc<Action>) -> Self {
         // Init PEM
         let pem = Rc::new(RefCell::new(None));
 
@@ -35,9 +35,9 @@ impl File {
 
         // Init events
         button.connect_clicked({
+            let action_widget = action_widget.clone();
             let button = button.clone();
             let pem = pem.clone();
-            let widget_action = widget_action.clone();
             move |_| {
                 // Lock open button (prevent double click)
                 button.set_sensitive(false);
@@ -61,9 +61,9 @@ impl File {
                     .default_filter(&filter_pem)
                     .build()
                     .open(None::<&Window>, None::<&Cancellable>, {
+                        let action_widget = action_widget.clone();
                         let button = button.clone();
                         let pem = pem.clone();
-                        let widget_action = widget_action.clone();
                         move |result| {
                             match result {
                                 Ok(file) => match file.path() {
@@ -89,7 +89,7 @@ impl File {
                                 }
                             }
                             button.set_sensitive(true); // unlock
-                            widget_action.update.activate()
+                            action_widget.update.activate()
                         }
                     });
             }

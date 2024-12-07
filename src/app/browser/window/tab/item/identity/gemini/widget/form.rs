@@ -18,7 +18,7 @@ use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Form {
-    // pub widget_action: Rc<Action>,
+    // pub action_widget: Rc<Action>,
     pub drop: Rc<Drop>,
     pub exit: Rc<Exit>,
     pub file: Rc<File>,
@@ -32,11 +32,11 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, widget_action: Rc<Action>, auth_url: &str) -> Self {
+    pub fn new(profile: Rc<Profile>, action_widget: Rc<Action>, auth_url: &str) -> Self {
         // Init components
-        let list = Rc::new(List::new(widget_action.clone(), profile.clone(), auth_url));
-        let file = Rc::new(File::new(widget_action.clone()));
-        let name = Rc::new(Name::new(widget_action.clone()));
+        let list = Rc::new(List::new(action_widget.clone(), profile.clone(), auth_url));
+        let file = Rc::new(File::new(action_widget.clone()));
+        let name = Rc::new(Name::new(action_widget.clone()));
         let save = Rc::new(Save::new(profile.clone(), list.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), list.clone()));
         let exit = Rc::new(Exit::new(profile.clone(), list.clone()));
@@ -53,7 +53,7 @@ impl Form {
 
         // Return activated `Self`
         Self {
-            // widget_action,
+            // action_widget,
             drop,
             exit,
             file,
