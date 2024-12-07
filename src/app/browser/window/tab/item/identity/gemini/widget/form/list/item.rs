@@ -119,7 +119,7 @@ impl Item {
                     Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                         Ok(ref certificate) => {
                             // Get current scope
-                            let ref scope = scope(profile, profile_identity_gemini_id)?;
+                            let scope = &scope(profile, profile_identity_gemini_id)?;
 
                             // Update properties
                             self.set_title(title::new_for_profile_identity_gemini_id(certificate));
