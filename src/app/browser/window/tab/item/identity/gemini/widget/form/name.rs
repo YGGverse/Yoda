@@ -38,10 +38,10 @@ impl Name {
     // Actions
 
     /// Change visibility status
-    /// * grab focus on `is_visible`
+    /// * grab focus on `is_visible` is `true`
     pub fn set_visible(&self, is_visible: bool) {
         self.entry.set_visible(is_visible);
-        if is_visible {
+        if is_visible && self.entry.focus_child().is_none() {
             self.entry.grab_focus();
         }
     }
