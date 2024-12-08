@@ -12,7 +12,7 @@ use gtk::{
         ListStore,
     },
     glib::Uri,
-    prelude::{BoxExt, ListItemExt, WidgetExt},
+    prelude::{BoxExt, ListItemExt, ObjectExt, WidgetExt},
     Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
 };
 
@@ -96,26 +96,46 @@ impl List {
             let item = list_item.item().and_downcast::<Item>().unwrap();
             let child = list_item.child().and_downcast::<Box>().unwrap();
 
-            // Update `title`
-            let title = child.first_child().and_downcast::<Label>().unwrap();
+            // Bind `title`
+            match child.first_child().and_downcast::<Label>() {
+                Some(label) => {
+                    label.set_label(&item.title());
+                    label.set_css_classes(if item.is_active() { &["success"] } else { &[] });
+                    item.bind_property("title", &label, "label").build(); // sync label
+                    item.bind_property("is-active", &label, "css-classes")
+                        .transform_to(|_, is_active| {
+                            if is_active {
+                                Some(vec!["success".to_string()])
+                            } else {
+                                Some(vec![])
+                            }
+                        })
+                        .build(); // sync class by status
+                }
+                None => todo!(),
+            };
 
-            title.set_label(&item.title());
-            title.set_css_classes(if item.is_active() { &["success"] } else { &[] });
-
-            // Update `subtitle`
+            // Bind `subtitle`
             let subtitle = child.last_child().and_downcast::<Box>().unwrap();
 
-            subtitle
-                .last_child()
-                .and_downcast::<Label>()
-                .unwrap()
-                .set_label(&item.subtitle());
+            match subtitle.last_child().and_downcast::<Label>() {
+                Some(label) => {
+                    label.set_label(&item.subtitle());
+                    item.bind_property("subtitle", &label, "label").build(); // sync
+                }
+                None => todo!(),
+            };
 
-            // Update `tooltip`
-            let tooltip = subtitle.first_child().and_downcast::<Image>().unwrap();
-
-            tooltip.set_visible(!item.tooltip().is_empty());
-            tooltip.set_tooltip_markup(Some(&item.tooltip()));
+            // Bind `tooltip`
+            match subtitle.first_child().and_downcast::<Image>() {
+                Some(tooltip) => {
+                    tooltip.set_visible(!item.tooltip().is_empty());
+                    tooltip.set_tooltip_markup(Some(&item.tooltip()));
+                    item.bind_property("tooltip", &tooltip, "tooltip-markup")
+                        .build(); // sync
+                }
+                None => todo!(),
+            };
         });
 
         // Init main widget
