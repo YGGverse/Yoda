@@ -32,11 +32,7 @@ impl Gemini {
         ));
 
         // Init events
-        widget.on_cancel({
-            move || {
-                action.0.update.activate(None);
-            }
-        });
+        widget.on_cancel(move || action.0.update.activate(None));
 
         widget.on_apply({
             let widget = widget.clone();
