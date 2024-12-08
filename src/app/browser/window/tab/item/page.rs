@@ -198,7 +198,7 @@ impl Page {
         };
 
         // Detect source view mode, return `request` string prepared for route
-        let (request, is_view_source) = match request.strip_prefix("source:") {
+        let (request, is_source) = match request.strip_prefix("source:") {
             Some(postfix) => (GString::from(postfix), true),
             None => (request, false),
         };
@@ -213,7 +213,7 @@ impl Page {
                 // Route by scheme
                 match uri.scheme().as_str() {
                     "file" => todo!(),
-                    "gemini" => self.load_gemini(uri, is_history, is_view_source), // @TODO
+                    "gemini" => self.load_gemini(uri, is_history, is_source),
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
@@ -385,7 +385,7 @@ impl Page {
     // Private helpers
 
     // @TODO move outside
-    fn load_gemini(&self, uri: Uri, is_history: bool, is_view_source: bool) {
+    fn load_gemini(&self, uri: Uri, is_history: bool, is_source: bool) {
         // Init shared clones
         let cancellable = self.client.cancellable();
         let update = self.browser_action.update.clone();
@@ -497,7 +497,7 @@ impl Page {
                                                     Ok(buffer) => {
                                                         // Set children component,
                                                         // extract title from meta parsed
-                                                        let title = if is_view_source {
+                                                        let title = if is_source {
                                                             content.to_text_source(
                                                                 &buffer.data
                                                             );
