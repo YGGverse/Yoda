@@ -92,11 +92,18 @@ impl Content {
     /// * could be useful to extract document title parsed from Gemtext
     pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-        let text = Text::gemini(
+        let text = Text::new_gemini(
             data,
             base,
             (self.window_action.clone(), self.tab_action.clone()),
         );
+        self.gobject.append(&text.scrolled_window);
+        text
+    }
+
+    pub fn to_text_source(&self, data: &str) -> Text {
+        self.clean();
+        let text = Text::new_source(data);
         self.gobject.append(&text.scrolled_window);
         text
     }

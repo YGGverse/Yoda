@@ -197,6 +197,12 @@ impl Page {
             self.navigation.request.widget.entry.text()
         };
 
+        // Detect source view mode, return `request` string prepared for route
+        let (request, is_view_source) = match request.strip_prefix("view-source:") {
+            Some(postfix) => (gformat!("{}", postfix.to_string()), true),
+            None => (request, false),
+        };
+
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
         self.browser_action.update.activate(Some(&id));
@@ -207,7 +213,7 @@ impl Page {
                 // Route by scheme
                 match uri.scheme().as_str() {
                     "file" => todo!(),
-                    "gemini" => self.load_gemini(uri, is_history), // @TODO
+                    "gemini" => self.load_gemini(uri, is_history, is_view_source), // @TODO
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
@@ -379,7 +385,7 @@ impl Page {
     // Private helpers
 
     // @TODO move outside
-    fn load_gemini(&self, uri: Uri, is_history: bool) {
+    fn load_gemini(&self, uri: Uri, is_history: bool, is_view_source: bool) {
         // Init shared clones
         let cancellable = self.client.cancellable();
         let update = self.browser_action.update.clone();
@@ -489,20 +495,26 @@ impl Page {
                                             move |result|{
                                                 match result {
                                                     Ok(buffer) => {
-                                                        // Set children component
-                                                        let text_gemini = content.to_text_gemini(
-                                                            &uri,
-                                                            &buffer.data
-                                                        );
-
-                                                        let title = match text_gemini.meta.title {
-                                                            Some(ref title) => title,
-                                                            None => &uri_to_title(&uri)
+                                                        // Set children component,
+                                                        // extract title from meta parsed
+                                                        let title = if is_view_source {
+                                                            content.to_text_source(
+                                                                &buffer.data
+                                                            );
+                                                            uri_to_title(&uri)
+                                                        } else {
+                                                            match content.to_text_gemini(
+                                                                &uri,
+                                                                &buffer.data
+                                                            ).meta.title {
+                                                                Some(meta_title) => meta_title,
+                                                                None => uri_to_title(&uri)
+                                                            }
                                                         };
 
                                                         // Update page meta
                                                         meta.set_status(Status::Success)
-                                                            .set_title(title);
+                                                            .set_title(&title);
 
                                                         // Update window components
                                                         update.activate(Some(&id));

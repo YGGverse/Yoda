@@ -1,6 +1,8 @@
 mod gemini;
+mod source;
 
 use gemini::Gemini;
+use source::Source;
 
 use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use gtk::{glib::Uri, ScrolledWindow};
@@ -16,24 +18,38 @@ pub struct Text {
 }
 
 impl Text {
-    // Construct
-    pub fn gemini(gemtext: &str, base: &Uri, actions: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
-        // Init components
+    // Constructors
+
+    pub fn new_gemini(
+        gemtext: &str,
+        base: &Uri,
+        actions: (Rc<WindowAction>, Rc<TabAction>),
+    ) -> Self {
+        // Init widget driver
         let gemini = Gemini::new(gemtext, base, actions);
 
-        // Init meta
-        let meta = Meta {
-            title: gemini.reader.title.clone(),
-        };
-
-        // Init scrolled_window
+        // Init scrolled container
         let scrolled_window = ScrolledWindow::builder().build();
 
         scrolled_window.set_child(Some(&gemini.widget.clamp_scrollable));
 
         // Result
         Self {
-            meta,
+            meta: Meta {
+                title: gemini.reader.title.clone(),
+            },
+            scrolled_window,
+        }
+    }
+
+    pub fn new_source(data: &str) -> Self {
+        // Init scrolled container
+        let scrolled_window = ScrolledWindow::builder().build();
+        scrolled_window.set_child(Some(&Source::new(data).text_view));
+
+        // Result
+        Self {
+            meta: Meta { title: None },
             scrolled_window,
         }
     }
