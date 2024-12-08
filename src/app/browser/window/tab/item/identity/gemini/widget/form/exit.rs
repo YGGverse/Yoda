@@ -125,7 +125,8 @@ impl Exit {
 
     // Actions
 
-    pub fn set_visible(&self, is_visible: bool) {
-        self.button.set_visible(is_visible)
+    pub fn update(&self, is_visible: bool, is_sensitive: bool) {
+        self.button.set_visible(is_visible);
+        self.button.set_sensitive(is_sensitive);
     }
 }

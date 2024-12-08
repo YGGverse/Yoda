@@ -102,7 +102,7 @@ impl File {
     // Actions
 
     /// Change visibility status
-    pub fn set_visible(&self, is_visible: bool) {
+    pub fn update(&self, is_visible: bool) {
         self.button.set_visible(is_visible);
     }
 

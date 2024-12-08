@@ -28,6 +28,8 @@ pub struct Form {
     pub name: Rc<Name>,
     pub save: Rc<Save>,
     pub g_box: Box,
+    auth_uri: Uri,
+    profile: Rc<Profile>,
 }
 
 impl Form {
@@ -76,6 +78,8 @@ impl Form {
             name,
             save,
             g_box,
+            auth_uri,
+            profile,
         }
     }
 
@@ -92,23 +96,34 @@ impl Form {
     }
 
     pub fn update(&self) {
-        // Get selected item value
+        // Get shared selected item value
         let value = self.list.selected().value_enum();
 
-        // Toggle visibility for children components
-        self.name.set_visible(matches!(value, Value::GeneratePem));
-        self.file.set_visible(matches!(value, Value::ImportPem));
+        // Begin children components update
+        self.name.update(matches!(value, Value::GeneratePem));
+        self.file.update(matches!(value, Value::ImportPem));
 
         match value {
-            Value::ProfileIdentityGeminiId(_) => {
-                self.drop.set_visible(true);
-                self.exit.set_visible(true);
-                self.save.set_visible(true);
+            Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+                self.drop.update(true);
+                self.exit.update(
+                    true,
+                    self.profile
+                        .identity
+                        .gemini
+                        .auth
+                        .memory
+                        .match_scope(&self.auth_uri.to_string())
+                        .is_some_and(|auth| {
+                            auth.profile_identity_gemini_id == profile_identity_gemini_id
+                        }),
+                );
+                self.save.update(true);
             }
             _ => {
-                self.drop.set_visible(false);
-                self.exit.set_visible(false);
-                self.save.set_visible(false);
+                self.drop.update(false);
+                self.exit.update(false, false);
+                self.save.update(false);
             }
         }
     }
