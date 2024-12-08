@@ -1,12 +1,13 @@
 mod action;
 pub mod form;
 
+use action::Action as WidgetAction;
 use form::{list::item::value::Value, Form};
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
-use crate::profile::Profile;
-use action::Action as WidgetAction;
+use crate::{
+    app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
+    Profile,
+};
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
