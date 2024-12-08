@@ -85,7 +85,7 @@ impl Item {
                             tooltip::new_for_profile_identity_gemini_id(certificate, scope),
                         )
                         .property(
-                            "is_active",
+                            "is-active",
                             is_active::new_for_profile_identity_gemini_id(
                                 profile,
                                 profile_identity_gemini_id,
