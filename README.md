@@ -1,7 +1,5 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
-![Linux](https://github.com/YGGverse/Yoda/actions/workflows/linux.yml/badge.svg)
-
 GTK 4 / Libadwaita client written in Rust
 
 > [!IMPORTANT]
@@ -121,6 +119,8 @@ GTK 4 / Libadwaita client written in Rust
 #### Video
 
 ## Build
+
+![Linux](https://github.com/YGGverse/Yoda/actions/workflows/linux.yml/badge.svg)
 
 ### Requirements
 
