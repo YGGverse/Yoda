@@ -163,6 +163,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ``` bash
 cargo install Yoda
 ```
+* run `Yoda`
 
 #### Repository
 
@@ -171,6 +172,7 @@ git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
 cargo build
 ```
+* `cargo run`
 
 ## Development
 
