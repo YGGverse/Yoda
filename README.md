@@ -94,7 +94,7 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] Localhost
-  * [ ] `file://` - localhost browser
+  * [ ] `file://` - local file browser
 * [ ] System
   * [ ] `config:` - low-level key/value settings editor
   * [x] `source:` - page source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
@@ -126,9 +126,9 @@ GTK 4 / Libadwaita client written in Rust
 ### Requirements
 
 * Cairo `1.18`
-* GDK PixBuf `2.42`
+* GdkPixBuf `2.42`
 * Glib `2.80`
-* GTK `4.14`
+* Gtk `4.14`
 * GtkSourceView `5.14`
 * Libadwaita `1.5` (Ubuntu 24.04+)
 
