@@ -11,6 +11,12 @@ impl About {
         // Collect debug info
         let debug = &[
             format!(
+                "Adwaita {}.{}.{}",
+                adw::major_version(),
+                adw::minor_version(),
+                adw::micro_version()
+            ),
+            format!(
                 "Gtk {}.{}.{}",
                 gtk::major_version(),
                 gtk::minor_version(),
