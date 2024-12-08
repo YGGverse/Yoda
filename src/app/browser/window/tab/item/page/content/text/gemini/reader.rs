@@ -100,17 +100,13 @@ impl Reader {
                     }
                     Err(_) => {
                         // Try ANSI/SGR format (terminal emulation) @TODO optional
-                        for (syntax_tag, entity) in ansi::format(&code.value) {
+                        for (ansi_tag, entity) in ansi::format(&code.value) {
                             // Register new tag
-                            if !tag.text_tag_table.add(&syntax_tag) {
+                            if !tag.text_tag_table.add(&ansi_tag) {
                                 todo!()
                             }
                             // Append tag to buffer
-                            buffer.insert_with_tags(
-                                &mut buffer.end_iter(),
-                                &entity,
-                                &[&syntax_tag],
-                            );
+                            buffer.insert_with_tags(&mut buffer.end_iter(), &entity, &[&ansi_tag]);
                         }
                     } // @TODO handle
                 }

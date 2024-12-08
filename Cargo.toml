@@ -38,8 +38,8 @@ version = "0.10.68"
 [dependencies.syntect]
 version = "5.2.0"
 
-[dependencies.cansi]
-version = "2.2.1"
+[dependencies.ansi-parser]
+version = "0.9.1"
 
 # development
 [patch.crates-io]
