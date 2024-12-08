@@ -198,8 +198,8 @@ impl Page {
         };
 
         // Detect source view mode, return `request` string prepared for route
-        let (request, is_view_source) = match request.strip_prefix("view-source:") {
-            Some(postfix) => (gformat!("{}", postfix.to_string()), true),
+        let (request, is_view_source) = match request.strip_prefix("source:") {
+            Some(postfix) => (GString::from(postfix), true),
             None => (request, false),
         };
 

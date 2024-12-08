@@ -97,7 +97,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] `file://` - localhost browser
 * [ ] System
   * [ ] `config:` - low-level key/value settings editor
-  * [x] `view-source:` - page source viewer (where supported)
+  * [x] `source:` - page source viewer (where supported)
 
 ### Media types
 
@@ -129,13 +129,14 @@ GTK 4 / Libadwaita client written in Rust
 * GDK PixBuf `2.42`
 * Glib `2.80`
 * GTK `4.14`
+* GtkSourceView `5.14`
 * Libadwaita `1.5` (Ubuntu 24.04+)
 
 #### Debian
 
 ``` bash
 sudo apt install git curl build-essential\
-                 libgtk-4-dev libadwaita-1-dev\
+                 libgtk-4-dev libgtksourceview-5-dev libadwaita-1-dev\
                  libsqlite3-dev libssl-dev
 ```
 
@@ -143,7 +144,7 @@ sudo apt install git curl build-essential\
 
 ``` bash
 sudo dnf install git curl gcc\
-                 gtk4-devel libadwaita-devel\
+                 gtk4-devel gtksourceview5-devel libadwaita-devel\
                  sqlite-devel openssl-devel
 ```
 

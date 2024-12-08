@@ -11,10 +11,16 @@ impl About {
         // Collect debug info
         let debug = &[
             format!(
-                "GTK {}.{}.{}",
+                "Gtk {}.{}.{}",
                 gtk::major_version(),
                 gtk::minor_version(),
                 gtk::micro_version()
+            ),
+            format!(
+                "GtkSourceView {}.{}.{}",
+                sourceview::major_version(),
+                sourceview::minor_version(),
+                sourceview::micro_version()
             ),
             format!("SQLite {}", sqlite::version()),
             // @TODO

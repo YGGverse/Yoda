@@ -41,6 +41,10 @@ version = "5.2.0"
 [dependencies.ansi-parser]
 version = "0.9.1"
 
+[dependencies.sourceview]
+package = "sourceview5"
+version = "0.9.1"
+
 # development
 [patch.crates-io]
 # ggemini = { path = "ggemini" }
