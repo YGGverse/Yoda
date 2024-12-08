@@ -53,7 +53,7 @@ impl Form {
         let save = Rc::new(Save::new(profile.clone(), list.clone()));
         let drop = Rc::new(Drop::new(profile.clone(), list.clone()));
         let exit = Rc::new(Exit::new(
-            action.0.clone(),
+            (action.0.clone(), action.2.clone()),
             profile.clone(),
             list.clone(),
             auth_uri.clone(),
