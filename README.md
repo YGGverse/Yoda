@@ -97,7 +97,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] `file://` - localhost browser
 * [ ] System
   * [ ] `config:` - low-level key/value settings editor
-  * [x] `source:` - page source viewer (where supported)
+  * [x] `source:` - page source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
 
 ### Media types
 
