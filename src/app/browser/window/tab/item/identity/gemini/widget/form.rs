@@ -13,9 +13,10 @@ use name::Name;
 use save::Save;
 
 use super::WidgetAction;
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
-use crate::profile::Profile;
+use crate::{
+    app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
+    Profile,
+};
 use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
@@ -85,7 +86,7 @@ impl Form {
 
     // Actions
 
-    /// Validate `Self` components match current selection
+    /// Get `Apply` button sensitivity to disable when it does not change anything
     pub fn is_applicable(&self) -> bool {
         match self.list.selected().value_enum() {
             Value::GeneratePem => self.name.is_valid(),
