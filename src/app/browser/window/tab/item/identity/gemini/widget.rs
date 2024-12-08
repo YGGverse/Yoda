@@ -86,6 +86,9 @@ impl Widget {
             }
         });
 
+        // Make initial update
+        widget_action.update.activate();
+
         // Return new activated `Self`
         Self {
             // action,
@@ -127,7 +130,6 @@ impl Widget {
 
     /// Show dialog with new preset
     pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
-        self.form.update();
         self.alert_dialog.present(parent)
     }
 }
