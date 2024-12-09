@@ -229,7 +229,7 @@ impl Tab {
                 if !item.page.is_loading() {
                     item.widget
                         .gobject
-                        .set_title(item.page.meta.title().as_str())
+                        .set_title(&item.page.meta.title.borrow())
                 }
             }
             // Update all tabs
@@ -242,7 +242,7 @@ impl Tab {
                     if !item.page.is_loading() {
                         item.widget
                             .gobject
-                            .set_title(item.page.meta.title().as_str())
+                            .set_title(&item.page.meta.title.borrow())
                     }
                 }
             }

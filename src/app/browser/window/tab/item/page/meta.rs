@@ -74,14 +74,6 @@ impl Meta {
 
     // Getters
 
-    pub fn status(&self) -> Status {
-        self.status.borrow().clone()
-    }
-
-    pub fn title(&self) -> GString {
-        self.title.borrow().clone()
-    }
-
     pub fn redirects(&self) -> usize {
         self.redirect.borrow().len() + 1
     }
@@ -149,7 +141,7 @@ impl Meta {
         app_browser_window_tab_page_id: &i64,
     ) -> Result<(), String> {
         // Keep value in memory until operation complete
-        let title = self.title();
+        let title = self.title.borrow();
 
         match database::insert(
             transaction,

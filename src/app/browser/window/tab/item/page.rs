@@ -350,7 +350,7 @@ impl Page {
 
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
-        match self.meta.status() {
+        match *self.meta.status.borrow() {
             Status::Reload | Status::SessionRestore => Some(0.0),
             Status::Resolving => Some(0.1),
             Status::Resolved => Some(0.2),
