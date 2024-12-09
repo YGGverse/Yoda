@@ -70,7 +70,7 @@ impl Widget {
                 EntryIconPosition::Primary => todo!(),
                 EntryIconPosition::Secondary => {
                     if go.is_some() {
-                        tab_action.load().activate(Some(&this.text()), true);
+                        tab_action.load.activate(Some(&this.text()), true);
                     }
                 }
                 _ => println!("Undefined icon position"), // drop notice @TODO
@@ -82,7 +82,7 @@ impl Widget {
         });
 
         entry.connect_activate(move |entry| {
-            tab_action.load().activate(Some(&entry.text()), true);
+            tab_action.load.activate(Some(&entry.text()), true);
         });
 
         entry.connect_state_flags_changed({

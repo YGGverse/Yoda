@@ -6,7 +6,7 @@ use gtk::{
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Load` action of `Item` group
 pub struct Load {
-    gobject: SimpleAction,
+    pub simple_action: SimpleAction,
 }
 
 impl Load {
@@ -15,7 +15,7 @@ impl Load {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
-            gobject: SimpleAction::new(
+            simple_action: SimpleAction::new(
                 &uuid_string_random(),
                 Some(&<(String, bool)>::static_variant_type()),
             ),
@@ -27,7 +27,7 @@ impl Load {
     /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     /// with formatted for this action [Variant](https://docs.gtk.org/glib/struct.Variant.html) value
     pub fn activate(&self, request: Option<&str>, is_history: bool) {
-        self.gobject.activate(Some(
+        self.simple_action.activate(Some(
             &(
                 match request {
                     Some(value) => String::from(value),
@@ -44,7 +44,7 @@ impl Load {
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     pub fn connect_activate(&self, callback: impl Fn(Option<GString>, bool) + 'static) {
-        self.gobject.connect_activate(move |_, this| {
+        self.simple_action.connect_activate(move |_, this| {
             let (request, is_history) = this
                 .expect("Expected (`request`,`is_history`) variant")
                 .get::<(String, bool)>()

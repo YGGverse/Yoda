@@ -20,7 +20,7 @@ impl Widget {
             .build();
 
         // Init events @TODO dialog window required
-        gobject.connect_clicked(move |_| action.ident().activate());
+        gobject.connect_clicked(move |_| action.ident.activate());
 
         // Return activated `Self`
         Self { gobject }

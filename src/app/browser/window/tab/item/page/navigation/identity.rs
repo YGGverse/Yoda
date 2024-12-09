@@ -21,7 +21,7 @@ impl Identity {
     // Actions
     pub fn update(&self, is_auth: bool, is_enabled: bool) {
         // Update action status
-        self.action.ident().gobject().set_enabled(is_enabled);
+        self.action.ident.simple_action.set_enabled(is_enabled);
 
         // Update widget
         self.widget.update(is_auth, is_enabled)

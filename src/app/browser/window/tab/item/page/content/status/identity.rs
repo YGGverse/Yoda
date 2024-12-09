@@ -24,7 +24,7 @@ pub fn new_gobject(action: Rc<Action>) -> StatusPage {
         .build();
 
     // Init events
-    button.connect_clicked(move |_| action.ident().activate());
+    button.connect_clicked(move |_| action.ident.activate());
 
     // Init status page
     StatusPage::builder()

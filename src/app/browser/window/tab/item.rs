@@ -74,7 +74,7 @@ impl Item {
         }
 
         // Show identity selection for item
-        action.ident().connect_activate({
+        action.ident.connect_activate({
             let browser_action = actions.0.clone();
             let window_action = actions.1.clone();
             let page = page.clone();
@@ -98,7 +98,7 @@ impl Item {
         });
 
         // Load new request for item
-        action.load().connect_activate({
+        action.load.connect_activate({
             let page = page.clone();
             move |request, is_history| {
                 if let Some(text) = request {

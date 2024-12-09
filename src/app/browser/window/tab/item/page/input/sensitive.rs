@@ -44,7 +44,7 @@ impl Sensitive {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                tab_action.load().activate(
+                tab_action.load.activate(
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),

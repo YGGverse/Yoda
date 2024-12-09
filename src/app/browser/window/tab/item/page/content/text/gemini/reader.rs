@@ -346,7 +346,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    actions.1.load().activate(Some(&uri.to_str()), true);
+                                    actions.1.load.activate(Some(&uri.to_str()), true);
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(

@@ -116,7 +116,7 @@ impl Page {
     pub fn home(&self) {
         if let Some(url) = self.navigation.home.url() {
             // Update with history record
-            self.tab_action.load().activate(Some(&url), true);
+            self.tab_action.load.activate(Some(&url), true);
         }
     }
 
@@ -802,7 +802,7 @@ impl Page {
                                                             .set_title("Redirect");
 
                                                         // Reload page to apply redirection (without history record request)
-                                                        tab_action.load().activate(None, false);
+                                                        tab_action.load.activate(None, false);
                                                     }
                                                 },
                                                 Err(reason) => {
