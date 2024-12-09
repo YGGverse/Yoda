@@ -427,7 +427,7 @@ impl Page {
             Priority::DEFAULT,
             cancellable.clone(),
             // Search for user certificate match request
-            match self.profile.identity.gemini.match_scope(&self.navigation.request.widget.entry.text()) {
+            match self.profile.identity.gemini.match_scope(&uri.to_string()) {
                 Some(identity) => match identity.to_tls_certificate() {
                     Ok(certificate) => Some(certificate),
                     Err(reason) => todo!("{reason}"),
