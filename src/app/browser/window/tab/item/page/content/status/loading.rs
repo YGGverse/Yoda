@@ -22,6 +22,7 @@ pub fn new_gobject(show_with_delay: Option<Duration>) -> StatusPage {
     let status_page = StatusPage::builder()
         .child(&spinner)
         .title(DEFAULT_TITLE)
+        .visible(false)
         .build();
 
     // Apply optional delay
