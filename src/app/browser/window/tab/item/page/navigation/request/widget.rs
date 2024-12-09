@@ -2,14 +2,20 @@ mod database;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
+    gio::Icon,
     glib::{timeout_add_local, ControlFlow, SourceId},
     prelude::{EditableExt, EntryExt, WidgetExt},
-    Entry, StateFlags,
+    Entry, EntryIconPosition, StateFlags,
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, rc::Rc, time::Duration};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+    time::Duration,
+};
 
 const PLACEHOLDER_TEXT: &str = "URL or search term...";
+const GO_TOOLTIP_TEXT: &str = "Go to the address";
 
 // Progress bar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
@@ -28,32 +34,62 @@ pub struct Widget {
 impl Widget {
     // Construct
     pub fn new(action: (Rc<BrowserAction>, Rc<TabAction>)) -> Self {
+        // Set actions name
+        let (browser_action, tab_action) = action;
+
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
             source_id: RefCell::new(None),
         });
 
-        // Init widget
+        // Init main widget
         let entry = Entry::builder()
             .placeholder_text(PLACEHOLDER_TEXT)
             .hexpand(true)
             .build();
 
+        // Init `go` button feature (if icon available)
+        let go = match Icon::for_string("pan-end-symbolic") {
+            Ok(icon) => {
+                entry.set_secondary_icon_gicon(Some(&icon));
+                entry.set_secondary_icon_tooltip_text(Some(GO_TOOLTIP_TEXT));
+                Some(icon)
+            }
+            Err(e) => {
+                println!("{e}"); // drop notice @TODO
+                None
+            }
+        };
+
         // Connect events
-        entry.connect_changed(move |_| {
-            action.0.update.activate(None);
+        entry.connect_icon_release({
+            let tab_action = tab_action.clone();
+            let go = go.clone();
+            move |this, position| match position {
+                EntryIconPosition::Primary => todo!(),
+                EntryIconPosition::Secondary => {
+                    if go.is_some() {
+                        tab_action.load().activate(Some(&this.text()), true);
+                    }
+                }
+                _ => println!("Undefined icon position"), // drop notice @TODO
+            }
         });
 
-        entry.connect_activate(move |this| {
-            action.1.load().activate(Some(&this.text()), true);
+        entry.connect_changed(move |_| {
+            browser_action.update.activate(None);
+        });
+
+        entry.connect_activate(move |entry| {
+            tab_action.load().activate(Some(&entry.text()), true);
         });
 
         entry.connect_state_flags_changed({
             // Define last focus state container
-            let has_focus = RefCell::new(false);
-            move |this, state| {
-                // Select entire text on first click release
+            let has_focus = Cell::new(false);
+            move |entry, state| {
+                // Select entire text on first click (release)
                 // this behavior implemented in most web-browsers,
                 // to simply overwrite current request with new value
                 // Note:
@@ -61,9 +97,9 @@ impl Widget {
                 // * This is experimental feature does not follow native GTK behavior @TODO make optional
                 if !has_focus.take()
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
-                    && this.selection_bounds().is_none()
+                    && entry.selection_bounds().is_none()
                 {
-                    this.select_region(0, this.text_length().into());
+                    entry.select_region(0, entry.text_length().into());
                 }
                 // Update last focus state
                 has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
