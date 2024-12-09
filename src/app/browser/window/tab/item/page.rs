@@ -155,7 +155,7 @@ impl Page {
     pub fn load(&self, is_history: bool) {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
-        const DEFAULT_MAX_REDIRECT_COUNT: i8 = 10;
+        const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
 
         // Reset widgets
         self.input.unset();
@@ -163,40 +163,29 @@ impl Page {
         // Create shared variant value
         let id = self.id.clone();
 
-        // Try **take** request value from Redirect holder first
-        let request = if let Some(redirect) = self.meta.take_redirect() {
-            // Update redirect counter
-            self.meta
-                .set_redirect_count(match self.meta.redirect_count() {
-                    Some(value) => {
-                        // Prevent infinitive redirection
-                        if value > DEFAULT_MAX_REDIRECT_COUNT {
-                            todo!()
-                        }
-                        // Increase
-                        Some(value + 1)
-                    }
-                    // Set initial value
-                    None => Some(1),
-                });
+        // Prevent infinitive redirection
+        if self.meta.total_redirects() > DEFAULT_MAX_REDIRECT_COUNT {
+            todo!()
+        }
 
-            // Update navigation on redirect `is_foreground`
-            if redirect.is_foreground() {
+        // Try redirect request
+        let request = if let Some(redirect) = self.meta.last_redirect() {
+            if redirect.is_foreground {
                 self.navigation
                     .request
                     .widget
                     .entry
-                    .set_text(redirect.request().as_str());
+                    .set_text(&redirect.request);
             }
 
             // Return value from redirection holder
-            Request::from(&redirect.request())
+            Request::from(&redirect.request, redirect.referrer.as_ref())
         } else {
             // Reset redirect counter as request value taken from user input
-            self.meta.unset_redirect_count();
+            self.meta.redirect.borrow_mut().clear();
 
             // Return value from navigation entry
-            Request::from(&self.navigation.request.widget.entry.text())
+            Request::from(&self.navigation.request.widget.entry.text(), None)
         };
 
         // Update
@@ -773,7 +762,7 @@ impl Page {
                                                             )
                                                         );
                                                     // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
-                                                    } else if meta.redirect_count() > Some(5) {
+                                                    } else if meta.total_redirects() > 5 {
                                                         // Update meta
                                                         meta.set_status(Status::Failure)
                                                             .set_title("Oops");
@@ -790,12 +779,14 @@ impl Page {
                                                     // then call page reload action to apply it by the parental controller
                                                     } else {
                                                         meta.set_redirect(
-                                                            // Skip query and fragment by protocol requirements
+                                                            // skip query and fragment by protocol requirements
                                                             // @TODO review fragment specification
                                                             resolved_uri.to_string_partial(
                                                                 UriHideFlags::FRAGMENT | UriHideFlags::QUERY
                                                             ),
-                                                            // Set follow policy based on status code
+                                                            // referrer
+                                                            Some(navigation.request.widget.entry.text()),
+                                                            // set follow policy based on status code
                                                             matches!(response.meta.status, gemini::client::connection::response::meta::Status::PermanentRedirect),
                                                         )
                                                             .set_status(Status::Redirect) // @TODO is this status really wanted?

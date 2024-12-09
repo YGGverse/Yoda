@@ -29,10 +29,9 @@ pub enum Status {
 }
 
 pub struct Meta {
-    status: RefCell<Status>,
-    title: RefCell<GString>,
-    redirect: RefCell<Option<Redirect>>,
-    redirect_count: RefCell<Option<i8>>,
+    pub status: RefCell<Status>,
+    pub title: RefCell<GString>,
+    pub redirect: RefCell<Vec<Redirect>>,
 }
 
 impl Meta {
@@ -42,8 +41,7 @@ impl Meta {
         Self {
             status: RefCell::new(status),
             title: RefCell::new(title),
-            redirect: RefCell::new(None),
-            redirect_count: RefCell::new(None),
+            redirect: RefCell::new(Vec::new()),
         }
     }
 
@@ -59,29 +57,17 @@ impl Meta {
         self
     }
 
-    pub fn set_redirect(&self, request: GString, is_foreground: bool) -> &Self {
+    pub fn set_redirect(
+        &self,
+        request: GString,
+        referrer: Option<GString>,
+        is_foreground: bool,
+    ) -> &Self {
         self.redirect
-            .replace(Some(Redirect::new(request, is_foreground)));
+            .borrow_mut()
+            .push(Redirect::new(request, referrer, is_foreground));
         self
     }
-
-    pub fn set_redirect_count(&self, redirect_count: Option<i8>) -> &Self {
-        self.redirect_count.replace(redirect_count);
-        self
-    }
-
-    pub fn unset_redirect_count(&self) -> &Self {
-        if self.redirect_count.borrow().is_some() {
-            self.set_redirect_count(None);
-        }
-        self
-    }
-
-    /* @TODO not in use
-    pub fn unset_redirect(&self) -> &Self {
-        self.redirect.replace(None);
-        self
-    } */
 
     // Getters
 
@@ -93,15 +79,12 @@ impl Meta {
         self.title.borrow().clone()
     }
 
-    pub fn redirect_count(&self) -> Option<i8> {
-        *self.redirect_count.borrow()
+    pub fn total_redirects(&self) -> usize {
+        self.redirect.borrow().len() + 1
     }
 
-    /// WARNING!
-    ///
-    /// This function **take** the `Redirect` without clone semantics
-    pub fn take_redirect(&self) -> Option<Redirect> {
-        self.redirect.take()
+    pub fn last_redirect(&self) -> Option<Redirect> {
+        self.redirect.borrow().last().cloned()
     }
 
     // Actions

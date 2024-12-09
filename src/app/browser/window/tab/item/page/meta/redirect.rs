@@ -12,28 +12,21 @@ use gtk::glib::GString;
 /// * `request` - destination
 ///   * currently, it's raw `GString` not [Uri](https://docs.gtk.org/glib/struct.Uri.html)
 ///     because of compatibility with request field as it could contain any other, not parsable values
+#[derive(Clone, Debug)]
 pub struct Redirect {
-    is_foreground: bool,
-    request: GString,
+    pub is_foreground: bool,
+    pub referrer: Option<GString>,
+    pub request: GString,
 }
 
 impl Redirect {
     // Constructors
 
-    pub fn new(request: GString, is_foreground: bool) -> Self {
+    pub fn new(request: GString, referrer: Option<GString>, is_foreground: bool) -> Self {
         Self {
             is_foreground,
+            referrer,
             request,
         }
-    }
-
-    // Getters
-
-    pub fn request(&self) -> GString {
-        self.request.clone()
-    }
-
-    pub fn is_foreground(&self) -> bool {
-        self.is_foreground
     }
 }
