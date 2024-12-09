@@ -19,7 +19,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [Audio](#audio)
   * [ ] [Video](#video)
 * [ ] Certificates
-* [ ] Downloads
+* [x] Downloads
 * [ ] History
 * [ ] Proxy
 * [ ] Session
@@ -95,8 +95,10 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] Localhost
   * [ ] `file://` - local file browser
-* [ ] System
-  * [ ] `config:` - low-level key/value settings editor
+* [ ] Request mode
+  * [ ] `about:`
+    * [ ] `config` - low-level key/value settings editor
+  * [x] `download:` - save current request to file
   * [x] `source:` - page source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
 
 ### Media types

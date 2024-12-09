@@ -5,6 +5,7 @@ mod error;
 mod input;
 mod meta;
 mod navigation;
+mod request;
 mod widget;
 
 use client::Client;
@@ -13,6 +14,7 @@ use error::Error;
 use input::Input;
 use meta::{Meta, Status};
 use navigation::Navigation;
+use request::Request;
 use widget::Widget;
 
 use crate::app::browser::{
@@ -23,12 +25,12 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::SocketClientEvent,
+    gio::{Cancellable, SocketClientEvent},
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{EditableExt, SocketClientExt},
+    prelude::{CancellableExt, EditableExt, FileExt, SocketClientExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -188,19 +190,13 @@ impl Page {
             }
 
             // Return value from redirection holder
-            redirect.request()
+            Request::from(&redirect.request())
         } else {
             // Reset redirect counter as request value taken from user input
             self.meta.unset_redirect_count();
 
             // Return value from navigation entry
-            self.navigation.request.widget.entry.text()
-        };
-
-        // Detect source view mode, return `request` string prepared for route
-        let (request, is_source) = match request.strip_prefix("source:") {
-            Some(postfix) => (GString::from(postfix), true),
-            None => (request, false),
+            Request::from(&self.navigation.request.widget.entry.text())
         };
 
         // Update
@@ -208,12 +204,20 @@ impl Page {
         self.browser_action.update.activate(Some(&id));
 
         // Route by request
-        match Uri::parse(&request, UriFlags::NONE) {
-            Ok(uri) => {
+        match request {
+            Request::Default(ref uri) | Request::Download(ref uri) | Request::Source(ref uri) => {
                 // Route by scheme
                 match uri.scheme().as_str() {
                     "file" => todo!(),
-                    "gemini" => self.load_gemini(uri, is_history, is_source),
+                    "gemini" => {
+                        let (uri, is_download, is_source) = match request {
+                            Request::Default(uri) => (uri, false, false),
+                            Request::Download(uri) => (uri, true, false),
+                            Request::Source(uri) => (uri, false, true),
+                            _ => panic!(),
+                        };
+                        self.load_gemini(uri, is_download, is_source, is_history)
+                    }
                     scheme => {
                         // Define common data
                         let status = Status::Failure;
@@ -228,9 +232,7 @@ impl Page {
                         self.content
                             .to_status_failure()
                             .set_title(title)
-                            .set_description(Some(
-                                gformat!("Protocol `{scheme}` not supported").as_str(),
-                            ));
+                            .set_description(Some(&format!("Scheme `{scheme}` not supported")));
 
                         // Update meta
                         self.meta.set_status(status).set_title(title);
@@ -240,21 +242,24 @@ impl Page {
                     }
                 }
             }
-            Err(_) => {
+            Request::Search(ref query) => {
                 // Try interpret URI manually
                 if Regex::match_simple(
                     r"^[^\/\s]+\.[\w]{2,}",
-                    request.clone(),
+                    query,
                     RegexCompileFlags::DEFAULT,
                     RegexMatchFlags::DEFAULT,
                 ) {
                     // Seems request contain some host, try append default scheme
-                    let request = gformat!("gemini://{request}");
-                    // Make sure new request conversable to valid URI
-                    match Uri::parse(&request, UriFlags::NONE) {
-                        Ok(_) => {
+                    // * make sure new request conversable to valid URI
+                    match Uri::parse(&format!("gemini://{query}"), UriFlags::NONE) {
+                        Ok(uri) => {
                             // Update navigation entry
-                            self.navigation.request.widget.entry.set_text(&request);
+                            self.navigation
+                                .request
+                                .widget
+                                .entry
+                                .set_text(&uri.to_string());
 
                             // Load page (without history record)
                             self.load(false);
@@ -265,19 +270,16 @@ impl Page {
                     }
                 } else {
                     // Plain text given, make search request to default provider
-                    let request = gformat!(
+                    self.navigation.request.widget.entry.set_text(&format!(
                         "gemini://tlgs.one/search?{}",
-                        Uri::escape_string(&request, None, false)
-                    );
-
-                    // Update navigation entry
-                    self.navigation.request.widget.entry.set_text(&request);
+                        Uri::escape_string(query, None, false)
+                    ));
 
                     // Load page (without history record)
                     self.load(false);
                 }
             }
-        }; // Uri::parse
+        };
     }
 
     pub fn update(&self) {
@@ -385,7 +387,7 @@ impl Page {
     // Private helpers
 
     // @TODO move outside
-    fn load_gemini(&self, uri: Uri, is_history: bool, is_source: bool) {
+    fn load_gemini(&self, uri: Uri, is_download: bool, is_source: bool, is_history: bool) {
         // Init shared clones
         let cancellable = self.client.cancellable();
         let update = self.browser_action.update.clone();
@@ -473,52 +475,227 @@ impl Page {
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         gemini::client::connection::response::meta::Status::Success => {
-                            // Add history record
                             if is_history {
                                 snap_history(navigation.clone());
                             }
+                            if is_download {
+                                // Update meta
+                                meta.set_status(Status::Success).set_title("Download");
 
-                            // Route by MIME
-                            match response.meta.mime {
-                                Some(gemini::client::connection::response::meta::Mime::TextGemini) => {
-                                    // Read entire input stream to buffer
-                                    gemini::client::connection::response::data::Text::from_stream_async(
-                                        response.connection.stream(),
-                                        Priority::DEFAULT,
-                                        cancellable.clone(),
-                                        {
-                                            let content = content.clone();
-                                            let id = id.clone();
-                                            let meta = meta.clone();
-                                            let update = update.clone();
-                                            let uri = uri.clone();
-                                            move |result|{
-                                                match result {
-                                                    Ok(buffer) => {
-                                                        // Set children component,
-                                                        // extract title from meta parsed
-                                                        let title = if is_source {
-                                                            content.to_text_source(
-                                                                &buffer.data
-                                                            );
-                                                            uri_to_title(&uri)
-                                                        } else {
-                                                            match content.to_text_gemini(
-                                                                &uri,
-                                                                &buffer.data
-                                                            ).meta.title {
-                                                                Some(meta_title) => meta_title,
-                                                                None => uri_to_title(&uri)
+                                // Update window
+                                update.activate(Some(&id));
+
+                                // Init download widget
+                                content.to_status_download(
+                                    &uri_to_title(&uri), // grab default filename
+                                    &cancellable,
+                                    {
+                                        let cancellable = cancellable.clone();
+                                        move |file, download_status| {
+                                            match file.replace(
+                                                None,
+                                                false,
+                                                gtk::gio::FileCreateFlags::NONE,
+                                                Some(&cancellable)
+                                            ) {
+                                                Ok(file_output_stream) => {
+                                                    gemini::gio::file_output_stream::move_all_from_stream_async(
+                                                        response.connection.stream(),
+                                                        file_output_stream,
+                                                        cancellable.clone(),
+                                                        Priority::DEFAULT,
+                                                        (
+                                                            0x400, // 1024 bytes per chunk
+                                                            None,  // unlimited
+                                                            0      // initial totals
+                                                        ),
+                                                        (
+                                                            {
+                                                                let download_status = download_status.clone();
+                                                                move |_, total| {
+                                                                    // Update loading progress
+                                                                    download_status.set_label(
+                                                                        &format!("Download: {total} bytes")
+                                                                    );
+                                                                }
+                                                            },
+                                                            {
+                                                                let cancellable = cancellable.clone();
+                                                                move |result| match result {
+                                                                    Ok((_, total)) => {
+                                                                        // Update loading progress
+                                                                        download_status.set_label(
+                                                                            &format!("Download completed ({total} bytes total)")
+                                                                        );
+                                                                    }
+                                                                    Err(e) => {
+                                                                        // cancel uncompleted async operations
+                                                                        // * this will also toggle download widget actions
+                                                                        cancellable.cancel();
+
+                                                                        // update status message
+                                                                        download_status.set_label(&e.to_string());
+                                                                        download_status.set_css_classes(&["error"]);
+
+                                                                        // cleanup
+                                                                        let _ = file.delete(Cancellable::NONE); // @TODO
+                                                                    }
+                                                                }
                                                             }
-                                                        };
+                                                        )
+                                                    );
+                                                },
+                                                Err(e) => {
+                                                    // cancel uncompleted async operations
+                                                    // * this will also toggle download widget actions
+                                                    cancellable.cancel();
 
-                                                        // Update page meta
-                                                        meta.set_status(Status::Success)
-                                                            .set_title(&title);
+                                                    // update status message
+                                                    download_status.set_label(&e.to_string());
+                                                    download_status.set_css_classes(&["error"]);
 
-                                                        // Update window components
-                                                        update.activate(Some(&id));
+                                                    // cleanup
+                                                    let _ = file.delete(Cancellable::NONE); // @TODO
+                                                }
+                                            }
+                                        }
+                                    }
+                                );
+                            } else { // browse
+                                match response.meta.mime {
+                                    Some(gemini::client::connection::response::meta::Mime::TextGemini) => {
+                                        // Read entire input stream to buffer
+                                        gemini::client::connection::response::data::Text::from_stream_async(
+                                            response.connection.stream(),
+                                            Priority::DEFAULT,
+                                            cancellable.clone(),
+                                            {
+                                                let content = content.clone();
+                                                let id = id.clone();
+                                                let meta = meta.clone();
+                                                let update = update.clone();
+                                                let uri = uri.clone();
+                                                move |result|{
+                                                    match result {
+                                                        Ok(buffer) => {
+                                                            // Set children component,
+                                                            // extract title from meta parsed
+                                                            let title = if is_source {
+                                                                content.to_text_source(
+                                                                    &buffer.data
+                                                                );
+                                                                uri_to_title(&uri)
+                                                            } else {
+                                                                match content.to_text_gemini(
+                                                                    &uri,
+                                                                    &buffer.data
+                                                                ).meta.title {
+                                                                    Some(meta_title) => meta_title,
+                                                                    None => uri_to_title(&uri)
+                                                                }
+                                                            };
+
+                                                            // Update page meta
+                                                            meta.set_status(Status::Success)
+                                                                .set_title(&title);
+
+                                                            // Update window components
+                                                            update.activate(Some(&id));
+                                                        }
+                                                        Err(reason) => {
+                                                            // Define common data
+                                                            let status = Status::Failure;
+                                                            let title = "Oops";
+                                                            let description = reason.to_string();
+
+                                                            // Update widget
+                                                            content
+                                                                .to_status_failure()
+                                                                .set_title(title)
+                                                                .set_description(Some(&description));
+
+                                                            // Update meta
+                                                            meta.set_status(status)
+                                                                .set_title(title);
+
+                                                            // Update window
+                                                            update.activate(Some(&id));
+                                                        },
                                                     }
+                                                }
+                                            }
+                                        );
+                                    },
+                                    Some(
+                                        gemini::client::connection::response::meta::Mime::ImagePng  |
+                                        gemini::client::connection::response::meta::Mime::ImageGif  |
+                                        gemini::client::connection::response::meta::Mime::ImageJpeg |
+                                        gemini::client::connection::response::meta::Mime::ImageWebp
+                                    ) => {
+                                        // Final image size unknown, show loading widget
+                                        let status = content.to_status_loading(
+                                            Some(Duration::from_secs(1)) // show if download time > 1 second
+                                        );
+
+                                        // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
+                                        // this action allows to count the bytes for loading widget and validate max size for incoming data
+                                        gemini::gio::memory_input_stream::from_stream_async(
+                                            response.connection.stream(),
+                                            cancellable.clone(),
+                                            Priority::DEFAULT,
+                                            0x400, // 1024 bytes per chunk, optional step for images download tracking
+                                            0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
+                                            move |_, total| {
+                                                // Update loading progress
+                                                status.set_description(
+                                                    Some(&gformat!("Download: {total} bytes"))
+                                                );
+                                            },
+                                            {
+                                                let cancellable = cancellable.clone();
+                                                let content = content.clone();
+                                                let id = id.clone();
+                                                let meta = meta.clone();
+                                                let update = update.clone();
+                                                let uri = uri.clone();
+                                                move |result| match result {
+                                                    Ok((memory_input_stream, _)) => {
+                                                        Pixbuf::from_stream_async(
+                                                            &memory_input_stream,
+                                                            Some(&cancellable),
+                                                            move |result| {
+                                                                // Process buffer data
+                                                                match result {
+                                                                    Ok(buffer) => {
+                                                                        // Update page meta
+                                                                        meta.set_status(Status::Success)
+                                                                            .set_title(uri_to_title(&uri).as_str());
+
+                                                                        // Update page content
+                                                                        content.to_image(&Texture::for_pixbuf(&buffer));
+
+                                                                        // Update window components
+                                                                        update.activate(Some(&id));
+                                                                    }
+                                                                    Err(reason) => {
+                                                                        // Define common data
+                                                                        let status = Status::Failure;
+                                                                        let title = "Oops";
+
+                                                                        // Update widget
+                                                                        content
+                                                                            .to_status_failure()
+                                                                            .set_title(title)
+                                                                            .set_description(Some(reason.message()));
+
+                                                                        // Update meta
+                                                                        meta.set_status(status)
+                                                                            .set_title(title);
+                                                                    }
+                                                                }
+                                                            }
+                                                        );
+                                                    },
                                                     Err(reason) => {
                                                         // Define common data
                                                         let status = Status::Failure;
@@ -534,124 +711,31 @@ impl Page {
                                                         // Update meta
                                                         meta.set_status(status)
                                                             .set_title(title);
-
-                                                        // Update window
-                                                        update.activate(Some(&id));
-                                                    },
+                                                    }
                                                 }
-                                            }
-                                        }
-                                    );
-                                },
-                                Some(
-                                    gemini::client::connection::response::meta::Mime::ImagePng  |
-                                    gemini::client::connection::response::meta::Mime::ImageGif  |
-                                    gemini::client::connection::response::meta::Mime::ImageJpeg |
-                                    gemini::client::connection::response::meta::Mime::ImageWebp
-                                ) => {
-                                    // Final image size unknown, show loading widget
-                                    let status = content.to_status_loading(
-                                        Some(Duration::from_secs(1)) // show if download time > 1 second
-                                    );
-
-                                    // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
-                                    // this action allows to count the bytes for loading widget and validate max size for incoming data
-                                    gemini::gio::memory_input_stream::from_stream_async(
-                                        response.connection.stream(),
-                                        cancellable.clone(),
-                                        Priority::DEFAULT,
-                                        0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                        0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                        move |(_, total)| {
-                                            // Update loading progress
-                                            status.set_description(
-                                                Some(&gformat!("Download: {total} bytes"))
+                                                }
                                             );
-                                        },
-                                        {
-                                            let cancellable = cancellable.clone();
-                                            let content = content.clone();
-                                            let id = id.clone();
-                                            let meta = meta.clone();
-                                            let update = update.clone();
-                                            let uri = uri.clone();
-                                            move |result| match result {
-                                                Ok(memory_input_stream) => {
-                                                    Pixbuf::from_stream_async(
-                                                        &memory_input_stream,
-                                                        Some(&cancellable),
-                                                        move |result| {
-                                                            // Process buffer data
-                                                            match result {
-                                                                Ok(buffer) => {
-                                                                    // Update page meta
-                                                                    meta.set_status(Status::Success)
-                                                                        .set_title(uri_to_title(&uri).as_str());
+                                    },
+                                    _ => {
+                                        // Define common data
+                                        let status = Status::Failure;
+                                        let title = "Oops";
+                                        let description = gformat!("Content type not supported");
 
-                                                                    // Update page content
-                                                                    content.to_image(&Texture::for_pixbuf(&buffer));
+                                        // Update widget
+                                        content
+                                            .to_status_failure()
+                                            .set_title(title)
+                                            .set_description(Some(&description));
 
-                                                                    // Update window components
-                                                                    update.activate(Some(&id));
-                                                                }
-                                                                Err(reason) => {
-                                                                    // Define common data
-                                                                    let status = Status::Failure;
-                                                                    let title = "Oops";
+                                        // Update meta
+                                        meta.set_status(status)
+                                            .set_title(title);
 
-                                                                    // Update widget
-                                                                    content
-                                                                        .to_status_failure()
-                                                                        .set_title(title)
-                                                                        .set_description(Some(reason.message()));
-
-                                                                    // Update meta
-                                                                    meta.set_status(status)
-                                                                        .set_title(title);
-                                                                }
-                                                            }
-                                                        }
-                                                    );
-                                                },
-                                                Err(reason) => {
-                                                    // Define common data
-                                                    let status = Status::Failure;
-                                                    let title = "Oops";
-                                                    let description = reason.to_string();
-
-                                                    // Update widget
-                                                    content
-                                                        .to_status_failure()
-                                                        .set_title(title)
-                                                        .set_description(Some(&description));
-
-                                                    // Update meta
-                                                    meta.set_status(status)
-                                                        .set_title(title);
-                                                }
-                                            }
-                                            }
-                                        );
-                                },
-                                _ => {
-                                    // Define common data
-                                    let status = Status::Failure;
-                                    let title = "Oops";
-                                    let description = gformat!("Content type not supported");
-
-                                    // Update widget
-                                    content
-                                        .to_status_failure()
-                                        .set_title(title)
-                                        .set_description(Some(&description));
-
-                                    // Update meta
-                                    meta.set_status(status)
-                                        .set_title(title);
-
-                                    // Update window
-                                    update.activate(Some(&id));
-                                },
+                                        // Update window
+                                        update.activate(Some(&id));
+                                    },
+                                }
                             }
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
@@ -816,7 +900,7 @@ impl Page {
                                 .set_title(title)
                                 .set_description(Some(&match response.meta.data {
                                     Some(data) => data.value,
-                                    None => gformat!("Status code yet not supported"),
+                                    None => gformat!("Status code not supported"),
                                 }));
 
                             // Update meta

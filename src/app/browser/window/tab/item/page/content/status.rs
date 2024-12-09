@@ -1,9 +1,14 @@
+mod download;
 mod failure;
 mod identity;
 mod loading;
 
 use crate::app::browser::window::tab::item::Action;
 use adw::StatusPage;
+use gtk::{
+    gio::{Cancellable, File},
+    Label,
+};
 use std::{rc::Rc, time::Duration};
 
 pub struct Status {
@@ -12,6 +17,17 @@ pub struct Status {
 
 impl Status {
     // Constructors
+
+    /// Create new download preset
+    pub fn new_download(
+        initial_filename: &str,
+        cancellable: &Cancellable,
+        on_choose: impl Fn(File, Label) + 'static,
+    ) -> Self {
+        Self {
+            gobject: download::new(initial_filename, cancellable, on_choose),
+        }
+    }
 
     /// Create new failure preset
     ///

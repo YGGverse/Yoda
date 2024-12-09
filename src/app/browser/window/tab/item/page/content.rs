@@ -9,9 +9,10 @@ use text::Text;
 use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
 use gtk::{
     gdk::Paintable,
+    gio::{Cancellable, File},
     glib::Uri,
     prelude::{BoxExt, IsA, WidgetExt},
-    Box, Orientation,
+    Box, Label, Orientation,
 };
 use std::{rc::Rc, time::Duration};
 
@@ -43,6 +44,21 @@ impl Content {
         let image = Image::new_from_paintable(paintable);
         self.gobject.append(image.gobject());
         image
+    }
+
+    /// Set new `content::Status` component for `Self` with new `status::Download` preset
+    ///
+    /// * action removes previous children component from `Self`
+    pub fn to_status_download(
+        &self,
+        initial_filename: &str,
+        cancellable: &Cancellable,
+        on_choose: impl Fn(File, Label) + 'static,
+    ) -> Status {
+        self.clean();
+        let status = Status::new_download(initial_filename, cancellable, on_choose);
+        self.gobject.append(status.gobject());
+        status
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
