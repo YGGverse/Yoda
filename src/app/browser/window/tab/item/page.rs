@@ -164,12 +164,12 @@ impl Page {
         let id = self.id.clone();
 
         // Prevent infinitive redirection
-        if self.meta.total_redirects() > DEFAULT_MAX_REDIRECT_COUNT {
+        if self.meta.redirects() > DEFAULT_MAX_REDIRECT_COUNT {
             todo!()
         }
 
         // Try redirect request
-        let request = if let Some(redirect) = self.meta.last_redirect() {
+        let request = if let Some(redirect) = self.meta.redirect() {
             if redirect.is_foreground {
                 self.navigation
                     .request
@@ -762,7 +762,7 @@ impl Page {
                                                             )
                                                         );
                                                     // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
-                                                    } else if meta.total_redirects() > 5 {
+                                                    } else if meta.redirects() > 5 {
                                                         // Update meta
                                                         meta.set_status(Status::Failure)
                                                             .set_title("Oops");
@@ -778,7 +778,7 @@ impl Page {
                                                     // Redirection value looks valid, create new redirect (stored in meta `Redirect` holder)
                                                     // then call page reload action to apply it by the parental controller
                                                     } else {
-                                                        meta.set_redirect(
+                                                        meta.add_redirect(
                                                             // skip query and fragment by protocol requirements
                                                             // @TODO review fragment specification
                                                             resolved_uri.to_string_partial(

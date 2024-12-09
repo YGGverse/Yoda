@@ -5,7 +5,7 @@ use redirect::Redirect;
 
 use gtk::glib::GString;
 use sqlite::Transaction;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 #[derive(Debug, Clone)]
 pub enum Status {
@@ -57,15 +57,18 @@ impl Meta {
         self
     }
 
-    pub fn set_redirect(
+    pub fn add_redirect(
         &self,
         request: GString,
         referrer: Option<GString>,
         is_foreground: bool,
     ) -> &Self {
-        self.redirect
-            .borrow_mut()
-            .push(Redirect::new(request, referrer, is_foreground));
+        self.redirect.borrow_mut().push(Redirect {
+            request,
+            referrer,
+            is_foreground,
+            is_processed: Cell::new(false),
+        });
         self
     }
 
@@ -79,12 +82,17 @@ impl Meta {
         self.title.borrow().clone()
     }
 
-    pub fn total_redirects(&self) -> usize {
+    pub fn redirects(&self) -> usize {
         self.redirect.borrow().len() + 1
     }
 
-    pub fn last_redirect(&self) -> Option<Redirect> {
-        self.redirect.borrow().last().cloned()
+    pub fn redirect(&self) -> Option<Redirect> {
+        if let Some(redirect) = self.redirect.borrow().last() {
+            if !redirect.is_processed.replace(true) {
+                return Some(redirect.clone());
+            }
+        }
+        None
     }
 
     // Actions
