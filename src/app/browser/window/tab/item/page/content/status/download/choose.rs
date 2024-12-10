@@ -31,7 +31,6 @@ impl Choose {
             .halign(Align::Center)
             .label(LABEL)
             .margin_top(MARGIN)
-            .visible(false)
             .build();
 
         Self { action, button }
