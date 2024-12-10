@@ -504,7 +504,7 @@ impl Page {
                                                                 move |_, total| {
                                                                     // Update loading progress
                                                                     download_status.set_label(
-                                                                        &format!("Download: {total} bytes")
+                                                                        &format!("Received {total} bytes...")
                                                                     );
                                                                 }
                                                             },
@@ -514,7 +514,7 @@ impl Page {
                                                                     Ok((_, total)) => {
                                                                         // Update loading progress
                                                                         download_status.set_label(
-                                                                            &format!("Download completed ({total} bytes total)")
+                                                                            &format!("Download ({total} bytes) completed!")
                                                                         );
                                                                     }
                                                                     Err(e) => {
