@@ -26,7 +26,7 @@ const TITLE: &str = "Download";
 /// Create new [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
 /// with progress indication and UI controls
 /// * applies callback function once on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
-/// * requires external IOStream read/write implementation, depending of protocol driver in use
+/// * requires external IOStream read/write implementation (depending of protocol)
 pub fn new(
     initial_filename: &str,
     cancellable: &Cancellable,
@@ -50,13 +50,10 @@ pub fn new(
         move |_, button| {
             // cancel all operations
             cancellable.cancel();
-
             // deactivate `spinner`
             progress.disable();
-
-            // update `status`
+            // update `status` text
             status.set_warning(STATUS_CANCELLED);
-
             // hide self
             button.set_visible(false);
         }
@@ -88,29 +85,22 @@ pub fn new(
                         Ok(file) => {
                             // update destination file
                             file_launcher.set_file(Some(&file));
-
                             // update `status` text
                             status.set_default(STATUS_LOADING);
-
                             // show `cancel` button
                             cancel.button.set_visible(true);
-
                             // show spinner
                             progress.enable();
-
                             // hide self
                             button.set_visible(false);
-
                             // callback
                             on_choose(file, status.label.clone())
                         }
                         Err(e) => {
                             // update destination file
                             file_launcher.set_file(File::NONE);
-
                             // hide spinner
                             progress.disable();
-
                             // update `status`
                             status.set_warning(e.message());
                         }
