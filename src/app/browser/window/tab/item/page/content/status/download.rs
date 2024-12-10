@@ -18,13 +18,16 @@ use gtk::{
 };
 use std::rc::Rc;
 
+// Defaults
+
 const ICON_NAME: &str = "document-save-symbolic";
 const STATUS_CANCELLED: &str = "Operation cancelled";
 const STATUS_LOADING: &str = "Loading...";
 const TITLE: &str = "Download";
 
 /// Create new [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-/// with progress indication and UI controls
+/// preset with children widget contain download UI
+/// * includes progress indication and UI controls
 /// * applies callback function once on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
 /// * requires external IOStream read/write implementation (depending of protocol)
 pub fn new(
