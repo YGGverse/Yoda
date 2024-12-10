@@ -27,9 +27,8 @@ const TITLE: &str = "Download";
 
 /// Create new [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
 /// preset with children widget contain download UI
-/// * includes progress indication and UI controls
-/// * applies callback function once on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
-/// * requires external IOStream read/write implementation (depending of protocol)
+/// * apply callback function on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
+/// * require external IOStream read/write implementation (depending of protocol)
 pub fn new(
     initial_filename: &str,
     cancellable: &Cancellable,
