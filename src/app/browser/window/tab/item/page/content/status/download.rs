@@ -18,6 +18,11 @@ use gtk::{
 };
 use std::rc::Rc;
 
+const ICON_NAME: &str = "document-save-symbolic";
+const STATUS_CANCELLED: &str = "Operation cancelled";
+const STATUS_LOADING: &str = "Loading...";
+const TITLE: &str = "Download";
+
 /// Create new [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
 /// with progress indication and UI controls
 /// * applies callback function once on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
@@ -50,7 +55,7 @@ pub fn new(
             progress.disable();
 
             // update `status`
-            status.set_warning("Operation cancelled");
+            status.set_warning(STATUS_CANCELLED);
 
             // hide self
             button.set_visible(false);
@@ -84,13 +89,13 @@ pub fn new(
                             // update destination file
                             file_launcher.set_file(Some(&file));
 
-                            // update `status`
-                            status.set_default("Loading...");
+                            // update `status` text
+                            status.set_default(STATUS_LOADING);
 
                             // show `cancel` button
                             cancel.button.set_visible(true);
 
-                            // show `spinner`
+                            // show spinner
                             progress.enable();
 
                             // hide self
@@ -103,7 +108,7 @@ pub fn new(
                             // update destination file
                             file_launcher.set_file(File::NONE);
 
-                            // update `spinner`
+                            // hide spinner
                             progress.disable();
 
                             // update `status`
@@ -146,7 +151,7 @@ pub fn new(
     // Init main widget
     StatusPage::builder()
         .child(&child)
-        .icon_name("document-save-symbolic")
-        .title("Download")
+        .icon_name(ICON_NAME)
+        .title(TITLE)
         .build()
 }
