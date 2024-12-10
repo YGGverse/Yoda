@@ -519,9 +519,7 @@ impl Page {
                                                         )
                                                     );
                                                 },
-                                                Err(e) => {
-                                                    action.cancel.activate(&e.to_string())
-                                                }
+                                                Err(e) => action.cancel.activate(&e.to_string())
                                             }
                                         }
                                     }
