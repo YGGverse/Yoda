@@ -7,7 +7,7 @@ use gtk::{
 
 // Defaults
 
-const CSS_CLASSES: [&str; 1] = ["error"];
+const CSS_CLASSES: [&str; 1] = ["accent"];
 const LABEL: &str = "Choose";
 const MARGIN: i32 = 16;
 
