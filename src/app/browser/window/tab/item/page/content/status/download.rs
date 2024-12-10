@@ -31,11 +31,11 @@ pub fn new(
     let dialog = FileDialog::builder().initial_name(initial_filename).build();
     let file_launcher = FileLauncher::new(File::NONE);
 
+    let cancel = Rc::new(Cancel::new());
+    let choose = Rc::new(Choose::new());
+    let open = Rc::new(Open::new());
     let progress = Rc::new(Progress::new());
     let status = Rc::new(Status::new());
-    let cancel = Rc::new(Cancel::new());
-    let open = Rc::new(Open::new());
-    let choose = Rc::new(Choose::new());
 
     // Init events
     cancel.on_activate({
@@ -56,26 +56,6 @@ pub fn new(
 
             // hide self
             button.set_visible(false);
-        }
-    });
-
-    open.on_activate({
-        let cancellable = cancellable.clone();
-        let file_launcher = file_launcher.clone();
-        let status = status.clone();
-        move |_, button| {
-            button.set_sensitive(false); // lock
-            file_launcher.launch(Window::NONE, Some(&cancellable), {
-                let status = status.clone();
-                let button = button.clone();
-                move |result| {
-                    if let Err(ref e) = result {
-                        status.label.set_css_classes(&["error"]);
-                        status.label.set_label(e.message())
-                    }
-                    button.set_sensitive(true); // unlock
-                }
-            })
         }
     });
 
@@ -138,6 +118,26 @@ pub fn new(
                     }
                 }
             });
+        }
+    });
+
+    open.on_activate({
+        let cancellable = cancellable.clone();
+        let file_launcher = file_launcher.clone();
+        let status = status.clone();
+        move |_, button| {
+            button.set_sensitive(false); // lock
+            file_launcher.launch(Window::NONE, Some(&cancellable), {
+                let status = status.clone();
+                let button = button.clone();
+                move |result| {
+                    if let Err(ref e) = result {
+                        status.label.set_css_classes(&["error"]);
+                        status.label.set_label(e.message())
+                    }
+                    button.set_sensitive(true); // unlock
+                }
+            })
         }
     });
 
