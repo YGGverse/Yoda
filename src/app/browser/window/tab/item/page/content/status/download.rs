@@ -50,8 +50,7 @@ pub fn new(
             progress.disable();
 
             // update `status`
-            status.label.set_css_classes(&["warning"]);
-            status.label.set_label("Operation cancelled");
+            status.set_warning("Operation cancelled");
 
             // hide self
             button.set_visible(false);
@@ -86,8 +85,7 @@ pub fn new(
                             file_launcher.set_file(Some(&file));
 
                             // update `status`
-                            status.label.set_css_classes(&[]);
-                            status.label.set_label("Loading...");
+                            status.set_default("Loading...");
 
                             // show `cancel` button
                             cancel.button.set_visible(true);
@@ -109,8 +107,7 @@ pub fn new(
                             progress.disable();
 
                             // update `status`
-                            status.label.set_css_classes(&["warning"]);
-                            status.label.set_label(e.message())
+                            status.set_warning(e.message());
                         }
                     }
                 }
@@ -129,8 +126,7 @@ pub fn new(
                 let button = button.clone();
                 move |result| {
                     if let Err(ref e) = result {
-                        status.label.set_css_classes(&["error"]);
-                        status.label.set_label(e.message())
+                        status.set_error(e.message())
                     }
                     button.set_sensitive(true); // unlock
                 }
