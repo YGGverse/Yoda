@@ -88,11 +88,12 @@ pub fn new(
         .build();
 
     open.connect_clicked({
+        let cancellable = cancellable.clone();
         let file_launcher = file_launcher.clone();
         let status = status.clone();
         move |this| {
             this.set_sensitive(false); // lock
-            file_launcher.launch(Window::NONE, Cancellable::NONE, {
+            file_launcher.launch(Window::NONE, Some(&cancellable), {
                 let status = status.clone();
                 let this = this.clone();
                 move |result| {
@@ -117,6 +118,7 @@ pub fn new(
 
     choose.connect_clicked({
         // init shared references
+        let cancellable = cancellable.clone();
         let cancel = cancel.clone();
         let dialog = dialog.clone();
         let file_launcher = file_launcher.clone();
@@ -126,7 +128,7 @@ pub fn new(
         move |this| {
             // lock choose button to prevent double click
             this.set_sensitive(false);
-            dialog.save(Window::NONE, Cancellable::NONE, {
+            dialog.save(Window::NONE, Some(&cancellable), {
                 // delegate shared references
                 let cancel = cancel.clone();
                 let file_launcher = file_launcher.clone();
