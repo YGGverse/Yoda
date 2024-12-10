@@ -1,4 +1,4 @@
-use gtk::Spinner; // use adw::Spinner; @TODO adw 1.6 / ubuntu 24.10+
+use gtk::{prelude::WidgetExt, Spinner}; // use adw::Spinner; @TODO adw 1.6 / ubuntu 24.10+
 
 // Defaults
 
@@ -21,5 +21,17 @@ impl Progress {
                 .width_request(SIZE)
                 .build(),
         }
+    }
+
+    // Actions
+
+    pub fn enable(&self) {
+        self.spinner.set_visible(true);
+        self.spinner.start();
+    }
+
+    pub fn disable(&self) {
+        self.spinner.set_visible(false);
+        self.spinner.stop();
     }
 }

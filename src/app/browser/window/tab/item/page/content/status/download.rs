@@ -43,12 +43,11 @@ pub fn new(
         let progress = progress.clone();
         let status = status.clone();
         move |_, button| {
-            // apply cancellable
+            // cancel all operations
             cancellable.cancel();
 
             // deactivate `spinner`
-            progress.spinner.set_visible(false);
-            progress.spinner.stop();
+            progress.disable();
 
             // update `status`
             status.label.set_css_classes(&["warning"]);
@@ -94,8 +93,7 @@ pub fn new(
                             cancel.button.set_visible(true);
 
                             // show `spinner`
-                            progress.spinner.set_visible(true);
-                            progress.spinner.start();
+                            progress.enable();
 
                             // hide self
                             button.set_visible(false);
@@ -108,8 +106,7 @@ pub fn new(
                             file_launcher.set_file(File::NONE);
 
                             // update `spinner`
-                            progress.spinner.set_visible(false);
-                            progress.spinner.stop();
+                            progress.disable();
 
                             // update `status`
                             status.label.set_css_classes(&["warning"]);
