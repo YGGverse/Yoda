@@ -1,9 +1,11 @@
+mod action;
 mod cancel;
 mod choose;
 mod open;
 mod progress;
 mod status;
 
+pub use action::Action;
 use cancel::Cancel;
 use choose::Choose;
 use open::Open;
@@ -14,7 +16,7 @@ use adw::StatusPage;
 use gtk::{
     gio::{Cancellable, File},
     prelude::{BoxExt, CancellableExt, WidgetExt},
-    Box, FileDialog, FileLauncher, Label, Orientation, Window,
+    Box, FileDialog, FileLauncher, Orientation, Window,
 };
 use std::rc::Rc;
 
@@ -32,11 +34,13 @@ const TITLE: &str = "Download";
 pub fn new(
     initial_filename: &str,
     cancellable: &Cancellable,
-    on_choose: impl Fn(File, Label) + 'static,
+    on_choose: impl Fn(File, Rc<Action>) + 'static,
 ) -> StatusPage {
     // Init components
     let dialog = FileDialog::builder().initial_name(initial_filename).build();
     let file_launcher = FileLauncher::new(File::NONE);
+
+    let action = Rc::new(Action::new()); // public callback API
 
     let cancel = Rc::new(Cancel::new());
     let choose = Rc::new(Choose::new());
@@ -44,7 +48,43 @@ pub fn new(
     let progress = Rc::new(Progress::new());
     let status = Rc::new(Status::new());
 
-    // Init events
+    // Init action events
+    action.cancel.on_activate({
+        let cancel = cancel.clone();
+        let cancellable = cancellable.clone();
+        let progress = progress.clone();
+        let status = status.clone();
+        move |_, message| {
+            cancellable.cancel();
+            progress.disable();
+            status.set_warning(&message);
+            cancel.button.set_visible(false);
+        }
+    });
+
+    action.complete.on_activate({
+        let cancel = cancel.clone();
+        let cancellable = cancellable.clone();
+        let open = open.clone();
+        let progress = progress.clone();
+        let status = status.clone();
+        move |_, message| {
+            cancellable.cancel();
+            progress.disable();
+            status.set_success(&message);
+            cancel.button.set_visible(false);
+            open.button.set_visible(true);
+        }
+    });
+
+    action.update.on_activate({
+        let status = status.clone();
+        move |_, message| {
+            status.set_default(&message);
+        }
+    });
+
+    // Init widget events
     cancel.on_activate({
         let cancellable = cancellable.clone();
         let progress = progress.clone();
@@ -75,6 +115,7 @@ pub fn new(
             button.set_sensitive(false);
             dialog.save(Window::NONE, Some(&cancellable), {
                 // delegate shared references
+                let action = action.clone();
                 let cancel = cancel.clone();
                 let file_launcher = file_launcher.clone();
                 let progress = progress.clone();
@@ -96,7 +137,7 @@ pub fn new(
                             // hide self
                             button.set_visible(false);
                             // callback
-                            on_choose(file, status.label.clone())
+                            on_choose(file, action)
                         }
                         Err(e) => {
                             // update destination file

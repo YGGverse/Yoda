@@ -12,7 +12,7 @@ use gtk::{
     gio::{Cancellable, File},
     glib::Uri,
     prelude::{BoxExt, IsA, WidgetExt},
-    Box, Label, Orientation,
+    Box, Orientation,
 };
 use std::{rc::Rc, time::Duration};
 
@@ -53,7 +53,7 @@ impl Content {
         &self,
         initial_filename: &str,
         cancellable: &Cancellable,
-        on_choose: impl Fn(File, Label) + 'static,
+        on_choose: impl Fn(File, Rc<status::download::Action>) + 'static,
     ) -> Status {
         self.clean();
         let status = Status::new_download(initial_filename, cancellable, on_choose);

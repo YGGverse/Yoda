@@ -25,12 +25,12 @@ use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, SocketClientEvent},
+    gio::SocketClientEvent,
     glib::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{CancellableExt, EditableExt, FileExt, SocketClientExt, WidgetExt},
+    prelude::{EditableExt, FileExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -480,7 +480,7 @@ impl Page {
                                     &cancellable,
                                     {
                                         let cancellable = cancellable.clone();
-                                        move |file, download_status| {
+                                        move |file, action| {
                                             match file.replace(
                                                 None,
                                                 false,
@@ -499,52 +499,28 @@ impl Page {
                                                             0      // initial totals
                                                         ),
                                                         (
+                                                            // on chunk
                                                             {
-                                                                let download_status = download_status.clone();
-                                                                move |_, total| {
-                                                                    // Update loading progress
-                                                                    download_status.set_label(
-                                                                        &format!("Received {total} bytes...")
-                                                                    );
-                                                                }
+                                                                let action = action.clone();
+                                                                move |_, total| action.update.activate(
+                                                                    &format!("Received {total} bytes...")
+                                                                )
                                                             },
+                                                            // on complete
                                                             {
-                                                                let cancellable = cancellable.clone();
+                                                                let action = action.clone();
                                                                 move |result| match result {
-                                                                    Ok((_, total)) => {
-                                                                        // Update loading progress
-                                                                        download_status.set_label(
-                                                                            &format!("Download ({total} bytes) completed!")
-                                                                        );
-                                                                    }
-                                                                    Err(e) => {
-                                                                        // cancel uncompleted async operations
-                                                                        // * this will also toggle download widget actions
-                                                                        cancellable.cancel();
-
-                                                                        // update status message
-                                                                        download_status.set_label(&e.to_string());
-                                                                        download_status.set_css_classes(&["error"]);
-
-                                                                        // cleanup
-                                                                        let _ = file.delete(Cancellable::NONE); // @TODO
-                                                                    }
+                                                                    Ok((_, total)) => action.complete.activate(
+                                                                        &format!("Download ({total} bytes) completed!")
+                                                                    ),
+                                                                    Err(e) => action.cancel.activate(&e.to_string())
                                                                 }
                                                             }
                                                         )
                                                     );
                                                 },
                                                 Err(e) => {
-                                                    // cancel uncompleted async operations
-                                                    // * this will also toggle download widget actions
-                                                    cancellable.cancel();
-
-                                                    // update status message
-                                                    download_status.set_label(&e.to_string());
-                                                    download_status.set_css_classes(&["error"]);
-
-                                                    // cleanup
-                                                    let _ = file.delete(Cancellable::NONE); // @TODO
+                                                    action.cancel.activate(&e.to_string())
                                                 }
                                             }
                                         }

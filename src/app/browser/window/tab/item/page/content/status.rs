@@ -1,14 +1,10 @@
-mod download;
+pub mod download;
 mod failure;
 mod identity;
 mod loading;
 
-use crate::app::browser::window::tab::item::Action;
 use adw::StatusPage;
-use gtk::{
-    gio::{Cancellable, File},
-    Label,
-};
+use gtk::gio::{Cancellable, File};
 use std::{rc::Rc, time::Duration};
 
 pub struct Status {
@@ -22,7 +18,7 @@ impl Status {
     pub fn new_download(
         initial_filename: &str,
         cancellable: &Cancellable,
-        on_choose: impl Fn(File, Label) + 'static,
+        on_choose: impl Fn(File, Rc<download::Action>) + 'static,
     ) -> Self {
         Self {
             gobject: download::new(initial_filename, cancellable, on_choose),
@@ -42,7 +38,7 @@ impl Status {
     ///
     /// Useful as placeholder for 60 status code
     /// https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-    pub fn new_identity(action: Rc<Action>) -> Self {
+    pub fn new_identity(action: Rc<crate::app::browser::window::tab::item::Action>) -> Self {
         Self {
             gobject: identity::new_gobject(action),
         }
