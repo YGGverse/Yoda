@@ -49,7 +49,7 @@ pub fn new(
         let cancellable = cancellable.clone();
         let progress = progress.clone();
         let status = status.clone();
-        move |_, button| {
+        move |button| {
             // cancel all operations
             cancellable.cancel();
             // deactivate `spinner`
@@ -70,7 +70,7 @@ pub fn new(
         let progress = progress.clone();
         let status = status.clone();
         let on_choose = Rc::new(on_choose);
-        move |_, button| {
+        move |button| {
             // lock choose button to prevent double click
             button.set_sensitive(false);
             dialog.save(Window::NONE, Some(&cancellable), {
@@ -116,7 +116,7 @@ pub fn new(
         let cancellable = cancellable.clone();
         let file_launcher = file_launcher.clone();
         let status = status.clone();
-        move |_, button| {
+        move |button| {
             button.set_sensitive(false); // lock
             file_launcher.launch(Window::NONE, Some(&cancellable), {
                 let status = status.clone();

@@ -1,9 +1,4 @@
-use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, SignalHandlerId},
-    prelude::ActionExt,
-    Align, Button,
-};
+use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
 
 // Defaults
 
@@ -13,7 +8,6 @@ const MARGIN: i32 = 16;
 
 /// Open [File](https://docs.gtk.org/gio/iface.File.html) on download complete
 pub struct Open {
-    pub action: SimpleAction,
     pub button: Button,
 }
 
@@ -22,31 +16,21 @@ impl Open {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        let action = SimpleAction::new(&uuid_string_random(), None);
-
-        let button = Button::builder()
-            .action_name(action.name())
-            .css_classes(CSS_CLASSES)
-            .halign(Align::Center)
-            .label(LABEL)
-            .margin_top(MARGIN)
-            .visible(false)
-            .build();
-
-        Self { action, button }
+        Self {
+            button: Button::builder()
+                .css_classes(CSS_CLASSES)
+                .halign(Align::Center)
+                .label(LABEL)
+                .margin_top(MARGIN)
+                .visible(false)
+                .build(),
+        }
     }
 
     // Actions
 
     /// Formatted action connector for external implementation
-    pub fn on_activate(
-        &self,
-        callback: impl Fn(SimpleAction, Button) + 'static,
-    ) -> SignalHandlerId {
-        self.action.connect_activate({
-            let action = self.action.clone();
-            let button = self.button.clone();
-            move |_, _| callback(action.clone(), button.clone())
-        })
+    pub fn on_activate(&self, callback: impl Fn(&Button) + 'static) -> SignalHandlerId {
+        self.button.connect_clicked(move |this| callback(this))
     }
 }
