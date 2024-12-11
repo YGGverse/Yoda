@@ -175,8 +175,10 @@ impl Widget {
 
     pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
         // Update primary icon
-        let identity = self.entry.first_child().unwrap(); // @TODO handle
-        identity.remove_css_class("success");
+        self.entry
+            .first_child()
+            .unwrap()
+            .remove_css_class("success"); // @TODO handle
 
         self.entry.set_primary_icon_activatable(false);
         self.entry.set_primary_icon_sensitive(false);
@@ -197,9 +199,9 @@ impl Widget {
                 self.entry.set_primary_icon_sensitive(true);
                 self.entry.set_primary_icon_name(Some(icon_name));
                 if is_identity_active {
+                    self.entry.first_child().unwrap().add_css_class("success"); // @TODO handle
                     self.entry
                         .set_primary_icon_tooltip_text(Some(tooltip_text.1));
-                    identity.add_css_class("success");
                 } else {
                     self.entry
                         .set_primary_icon_tooltip_text(Some(tooltip_text.0));
