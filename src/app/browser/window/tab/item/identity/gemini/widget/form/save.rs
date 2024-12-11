@@ -4,11 +4,12 @@ use certificate::Certificate;
 use super::list::{item::Value, List};
 use crate::profile::Profile;
 use gtk::{
-    gio::{Cancellable, ListStore},
-    prelude::{ButtonExt, FileExt, WidgetExt},
+    gio::{Cancellable, FileCreateFlags, ListStore},
+    glib::Priority,
+    prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
-use std::{fs::File, io::Write, rc::Rc};
+use std::rc::Rc;
 
 const LABEL: &str = "Export";
 const TOOLTIP_TEXT: &str = "Export selected identity to file";
@@ -67,39 +68,39 @@ impl Save {
                                         let button = button.clone();
                                         move |result| {
                                             match result {
-                                                Ok(file) => match file.path() {
-                                                    Some(path) => match File::create(&path) {
-                                                        Ok(mut destination) => {
-                                                            match destination.write_all(
-                                                                certificate.data.as_bytes(),
-                                                            ) {
+                                                Ok(file) => match file.replace(
+                                                    None,
+                                                    false,
+                                                    FileCreateFlags::NONE,
+                                                    Cancellable::NONE, // @TODO
+                                                ) {
+                                                    Ok(stream) => stream.write_async(
+                                                        certificate.data,
+                                                        Priority::DEFAULT,
+                                                        Cancellable::NONE, // @TODO
+                                                        {
+                                                            let button = button.clone();
+                                                            move |result| match result {
                                                                 Ok(_) => {
                                                                     button.set_css_classes(&[
                                                                         "success",
                                                                     ]);
-                                                                    button.set_label(&format!(
-                                                                        "Saved to {}",
-                                                                        path.to_string_lossy()
-                                                                    ))
+                                                                    button.set_label(
+                                                                        "Saved to destination!",
+                                                                    )
                                                                 }
-                                                                Err(e) => {
+                                                                Err((_, e)) => {
                                                                     button.set_css_classes(&[
                                                                         "error",
                                                                     ]);
                                                                     button.set_label(&e.to_string())
                                                                 }
                                                             }
-                                                        }
-                                                        Err(e) => {
-                                                            button.set_css_classes(&["error"]);
-                                                            button.set_label(&e.to_string())
-                                                        }
-                                                    },
-                                                    None => {
-                                                        button.set_css_classes(&["warning"]);
-                                                        button.set_label(
-                                                            "Could not init destination path",
-                                                        )
+                                                        },
+                                                    ),
+                                                    Err(e) => {
+                                                        button.set_css_classes(&["error"]);
+                                                        button.set_label(&e.to_string())
                                                     }
                                                 },
                                                 Err(e) => {
