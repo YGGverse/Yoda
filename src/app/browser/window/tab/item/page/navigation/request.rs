@@ -5,7 +5,7 @@ use widget::Widget;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    glib::{Uri, UriFlags},
+    glib::{GString, Uri, UriFlags},
     prelude::EditableExt,
 };
 use sqlite::Transaction;
@@ -95,6 +95,20 @@ impl Request {
             Ok(uri) => Some(uri),
             _ => None,
         }
+    }
+
+    pub fn strip_prefix(&self) -> GString {
+        let mut text = self.widget.entry.text();
+
+        if let Some(postfix) = text.strip_prefix("source:") {
+            text = postfix.into()
+        };
+
+        if let Some(postfix) = text.strip_prefix("download:") {
+            text = postfix.into()
+        };
+
+        text
     }
 }
 

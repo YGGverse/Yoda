@@ -24,7 +24,7 @@ impl Home {
 
     // Actions
     pub fn update(&self, request: &str) {
-        let has_home = match Uri::parse(strip_prefix(request), UriFlags::NONE) {
+        let has_home = match Uri::parse(request, UriFlags::NONE) {
             Ok(uri) => {
                 let has_home = "/" != uri.path();
                 self.uri.replace(Some(uri));
@@ -55,20 +55,4 @@ impl Home {
         }
         None
     }
-}
-
-// Tools
-
-fn strip_prefix(request: &str) -> &str {
-    let request = match request.strip_prefix("source:") {
-        Some(postfix) => postfix,
-        None => request,
-    };
-
-    let request = match request.strip_prefix("download:") {
-        Some(postfix) => postfix,
-        None => request,
-    };
-
-    request
 }
