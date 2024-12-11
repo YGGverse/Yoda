@@ -25,6 +25,15 @@ impl Menu {
             )),
         );
 
+        main.append(
+            Some("Save as.."),
+            Some(&format!(
+                "{}.{}",
+                window_action.id,
+                window_action.save_as.gobject.name()
+            )),
+        );
+
         let main_mark = gtk::gio::Menu::new();
 
         main_mark.append(

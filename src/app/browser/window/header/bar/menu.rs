@@ -36,6 +36,12 @@ impl Menu {
                     window_action.reload.gobject.name()
                 )));
 
+                main_page.append(Some("Save as.."), Some(&format!(
+                    "{}.{}",
+                    window_action.id,
+                    window_action.save_as.gobject.name()
+                )));
+
                 // Main > Page > Mark
                 let main_page_mark = gio::Menu::new();
 

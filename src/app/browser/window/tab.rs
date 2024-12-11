@@ -59,6 +59,7 @@ impl Tab {
                 action.home.change_state(state);
                 action.pin.change_state(state);
                 action.reload.change_state(state);
+                action.save_as.change_state(state);
             }
         });
 
@@ -152,18 +153,22 @@ impl Tab {
         self.widget.close_all();
     }
 
+    // Save page at given `position`, `None` to save selected page (if available)
+    pub fn save_as(&self, page_position: Option<i32>) {
+        if let Some(item) = self.item(page_position) {
+            item.page.navigation.request.to_download();
+            item.page.load(true);
+        }
+    }
+
     /// Toggle `Bookmark` in current `Profile` for `Page` at given `position` (current page on `None`)
     /// * return `true` on bookmark created, `false` on deleted; `Error` otherwise.
     pub fn bookmark(&self, page_position: Option<i32>) -> Result<bool, Error> {
-        if let Some(page) = self.widget.page(page_position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    return match item.page.bookmark() {
-                        Ok(result) => Ok(result),
-                        Err(_) => Err(Error::Bookmark),
-                    };
-                }
-            }
+        if let Some(item) = self.item(page_position) {
+            return match item.page.bookmark() {
+                Ok(result) => Ok(result),
+                Err(_) => Err(Error::Bookmark),
+            };
         }
         Err(Error::PageNotFound)
     }
@@ -174,43 +179,27 @@ impl Tab {
     }
 
     pub fn page_home(&self, page_position: Option<i32>) {
-        if let Some(page) = self.widget.page(page_position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    item.page.home();
-                }
-            }
+        if let Some(item) = self.item(page_position) {
+            item.page.home();
         }
     }
 
     pub fn page_history_back(&self, page_position: Option<i32>) {
-        if let Some(page) = self.widget.page(page_position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    item.page.history_back();
-                }
-            }
+        if let Some(item) = self.item(page_position) {
+            item.page.history_back();
         }
     }
 
     pub fn page_history_forward(&self, page_position: Option<i32>) {
-        if let Some(page) = self.widget.page(page_position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    item.page.history_forward();
-                }
-            }
+        if let Some(item) = self.item(page_position) {
+            item.page.history_forward();
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_reload(&self, page_position: Option<i32>) {
-        if let Some(page) = self.widget.page(page_position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    item.page.reload();
-                }
-            }
+        if let Some(item) = self.item(page_position) {
+            item.page.reload();
         }
     }
 
@@ -342,6 +331,17 @@ impl Tab {
         }
 
         // @TODO other/child features..
+    }
+
+    fn item(&self, position: Option<i32>) -> Option<Rc<Item>> {
+        if let Some(page) = self.widget.page(position) {
+            if let Some(id) = page.keyword() {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    return Some(item.clone());
+                }
+            }
+        }
+        None
     }
 }
 

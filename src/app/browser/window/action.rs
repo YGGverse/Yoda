@@ -7,6 +7,7 @@ mod history_forward;
 mod home;
 mod pin;
 mod reload;
+mod save_as;
 
 use append::Append;
 use bookmark::Bookmark;
@@ -17,6 +18,7 @@ use history_forward::HistoryForward;
 use home::Home;
 use pin::Pin;
 use reload::Reload;
+use save_as::SaveAs;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -39,6 +41,7 @@ pub struct Action {
     pub home: Rc<Home>,
     pub pin: Rc<Pin>,
     pub reload: Rc<Reload>,
+    pub save_as: Rc<SaveAs>,
     // Group
     pub id: GString,
     pub gobject: SimpleActionGroup,
@@ -59,6 +62,7 @@ impl Action {
         let home = Rc::new(Home::new());
         let pin = Rc::new(Pin::new());
         let reload = Rc::new(Reload::new());
+        let save_as = Rc::new(SaveAs::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -76,6 +80,7 @@ impl Action {
         gobject.add_action(&home.gobject);
         gobject.add_action(&pin.gobject);
         gobject.add_action(&reload.gobject);
+        gobject.add_action(&save_as.gobject);
 
         // Done
         Self {
@@ -88,6 +93,7 @@ impl Action {
             home,
             pin,
             reload,
+            save_as,
             id,
             gobject,
         }

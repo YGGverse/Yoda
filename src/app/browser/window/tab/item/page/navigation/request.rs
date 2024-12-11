@@ -5,7 +5,7 @@ use widget::Widget;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    glib::{GString, Uri, UriFlags},
+    glib::{gformat, GString, Uri, UriFlags},
     prelude::EditableExt,
 };
 use sqlite::Transaction;
@@ -88,6 +88,12 @@ impl Request {
         Ok(())
     }
 
+    // Setters
+
+    pub fn to_download(&self) {
+        self.widget.entry.set_text(&self.download());
+    }
+
     // Getters
 
     pub fn uri(&self) -> Option<Uri> {
@@ -109,6 +115,10 @@ impl Request {
         };
 
         text
+    }
+
+    pub fn download(&self) -> GString {
+        gformat!("download:{}", self.strip_prefix())
     }
 }
 
