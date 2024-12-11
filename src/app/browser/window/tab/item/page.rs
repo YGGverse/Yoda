@@ -144,12 +144,6 @@ impl Page {
         }
     }
 
-    /// Used as API for external reload actions
-    /// * this method record history to memory buffer by default
-    pub fn reload(&self) {
-        self.load(true);
-    }
-
     /// Main loader for different protocols, that routed by scheme
     /// * every protocol has it own (children) method implementation
     pub fn load(&self, is_history: bool) {

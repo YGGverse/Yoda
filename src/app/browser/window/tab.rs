@@ -199,7 +199,7 @@ impl Tab {
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.reload();
+            item.page.load(true);
         }
     }
 
