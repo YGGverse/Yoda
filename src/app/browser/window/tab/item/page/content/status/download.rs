@@ -57,7 +57,7 @@ pub fn new(
         move |_, message| {
             cancellable.cancel();
             progress.disable();
-            status.set_warning(&message);
+            status.set_error(&message);
             cancel.button.set_visible(false);
         }
     });
