@@ -63,7 +63,7 @@ impl Save {
                                     .filters(&filters)
                                     .initial_name(format!("{}.pem", certificate.name))
                                     .build()
-                                    .save(None::<&Window>, None::<&Cancellable>, {
+                                    .save(Window::NONE, Cancellable::NONE, {
                                         let button = button.clone();
                                         move |result| {
                                             match result {
