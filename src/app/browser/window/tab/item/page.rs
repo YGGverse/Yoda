@@ -497,16 +497,19 @@ impl Page {
                                                         cancellable.clone(),
                                                         Priority::DEFAULT,
                                                         (
-                                                            0x400, // 1024 bytes per chunk
-                                                            None,  // unlimited
-                                                            0      // initial totals
+                                                            0x100000, // 1M bytes per chunk
+                                                            None,     // unlimited
+                                                            0         // initial totals
                                                         ),
                                                         (
                                                             // on chunk
                                                             {
                                                                 let action = action.clone();
                                                                 move |_, total| action.update.activate(
-                                                                    &format!("Received {total} bytes...")
+                                                                    &format!(
+                                                                        "Received {}...",
+                                                                        format_bytes(total)
+                                                                    )
                                                                 )
                                                             },
                                                             // on complete
@@ -967,5 +970,18 @@ fn snap_history(navigation: Rc<Navigation>) {
     } {
         // Add new record match conditions
         navigation.history.add(request, true)
+    }
+}
+
+/// Format bytes to KB/MB/GB presentation
+fn format_bytes(total: usize) -> String {
+    if total < 1024 {
+        format!("{} bytes", total)
+    } else if total < 1024 * 1024 {
+        format!("{:.2} KB", total as f64 / 1024.0)
+    } else if total < 1024 * 1024 * 1024 {
+        format!("{:.2} MB", total as f64 / (1024.0 * 1024.0))
+    } else {
+        format!("{:.2} GB", total as f64 / (1024.0 * 1024.0 * 1024.0))
     }
 }
