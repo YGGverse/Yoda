@@ -2,7 +2,6 @@ mod bookmark;
 mod database;
 mod history;
 mod home;
-mod identity;
 mod reload;
 mod request;
 mod widget;
@@ -10,7 +9,6 @@ mod widget;
 use bookmark::Bookmark;
 use history::History;
 use home::Home;
-use identity::Identity;
 use reload::Reload;
 use request::Request;
 use widget::Widget;
@@ -27,7 +25,6 @@ pub struct Navigation {
     pub bookmark: Rc<Bookmark>,
     pub history: Rc<History>,
     pub home: Rc<Home>,
-    pub identity: Rc<Identity>,
     pub profile: Rc<Profile>,
     pub reload: Rc<Reload>,
     pub request: Rc<Request>,
@@ -40,7 +37,6 @@ impl Navigation {
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
         // Init components
-        let identity = Rc::new(Identity::new(action.2.clone()));
         let home = Rc::new(Home::new(action.1.clone()));
         let history = Rc::new(History::new(action.1.clone()));
         let reload = Rc::new(Reload::new(action.1.clone()));
@@ -49,7 +45,6 @@ impl Navigation {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            &identity.widget.gobject,
             &home.widget.gobject,
             &history.widget.gobject,
             &reload.widget.gobject,
@@ -62,7 +57,6 @@ impl Navigation {
             bookmark,
             history,
             home,
-            identity,
             profile,
             reload,
             request,
@@ -75,7 +69,14 @@ impl Navigation {
     pub fn update(&self, progress_fraction: Option<f64>) {
         let request_text = self.request.widget.entry.text();
 
-        self.identity.update(
+        self.bookmark
+            .update(self.profile.bookmark.get(&request_text).is_ok());
+        self.history.update();
+        self.home.update(self.request.uri());
+        self.reload.update(!request_text.is_empty());
+        self.request.update(
+            progress_fraction,
+            !request_text.is_empty() && request_text.starts_with("gemini"),
             self.profile
                 .identity
                 .gemini
@@ -83,14 +84,7 @@ impl Navigation {
                 .memory
                 .match_scope(&request_text)
                 .is_some(),
-            !request_text.is_empty() && request_text.starts_with("gemini"),
         );
-        self.bookmark
-            .update(self.profile.bookmark.get(&request_text).is_ok());
-        self.history.update();
-        self.home.update(self.request.uri());
-        self.reload.update(!request_text.is_empty());
-        self.request.update(progress_fraction);
     }
 
     pub fn clean(

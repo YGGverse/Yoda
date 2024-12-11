@@ -2,7 +2,6 @@ mod database;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    gio::Icon,
     glib::{timeout_add_local, ControlFlow, SourceId},
     prelude::{EditableExt, EntryExt, WidgetExt},
     Entry, EntryIconPosition, StateFlags,
@@ -15,7 +14,16 @@ use std::{
 };
 
 const PLACEHOLDER_TEXT: &str = "URL or search term...";
+
 const GO_TOOLTIP_TEXT: &str = "Go to the address";
+const GO_ICON_NAME: &str = "pan-end-symbolic";
+
+const IDENTITY_TOOLTIP_TEXT: (&str, &str) = (
+    "Identity",
+    "Identity feature not available for this location",
+);
+const IDENTITY_ICON_NAME: (&str, &str) =
+    ("avatar-default-symbolic", "applications-system-symbolic");
 
 // Progress bar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
@@ -49,31 +57,19 @@ impl Widget {
             .hexpand(true)
             .build();
 
-        // Init `go` button feature (if icon available)
-        let go = match Icon::for_string("pan-end-symbolic") {
-            Ok(icon) => {
-                entry.set_secondary_icon_gicon(Some(&icon));
-                entry.set_secondary_icon_tooltip_text(Some(GO_TOOLTIP_TEXT));
-                Some(icon)
-            }
-            Err(e) => {
-                println!("{e}"); // drop notice @TODO
-                None
-            }
-        };
+        entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.0));
+        entry.set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.0));
+
+        entry.set_secondary_icon_name(Some(GO_ICON_NAME));
+        entry.set_secondary_icon_tooltip_text(Some(GO_TOOLTIP_TEXT));
 
         // Connect events
         entry.connect_icon_release({
             let tab_action = tab_action.clone();
-            let go = go.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => todo!(),
-                EntryIconPosition::Secondary => {
-                    if go.is_some() {
-                        tab_action.load.activate(Some(&this.text()), true);
-                    }
-                }
-                _ => println!("Undefined icon position"), // drop notice @TODO
+                EntryIconPosition::Primary => tab_action.ident.activate(),
+                EntryIconPosition::Secondary => tab_action.load.activate(Some(&this.text()), true),
+                _ => todo!(), // unexpected
             }
         });
 
@@ -190,8 +186,36 @@ impl Widget {
         Ok(())
     }
 
-    pub fn update(&self, progress_fraction: Option<f64>) {
-        // Skip update animation for None value
+    pub fn update(
+        &self,
+        progress_fraction: Option<f64>,
+        is_identity_applicable: bool,
+        is_identity_active: bool,
+    ) {
+        // Update identity
+        self.entry
+            .set_primary_icon_activatable(is_identity_applicable);
+        self.entry
+            .set_primary_icon_sensitive(is_identity_applicable);
+
+        if is_identity_applicable {
+            self.entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.0));
+            self.entry
+                .set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.0));
+        } else {
+            self.entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.1));
+            self.entry
+                .set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.1));
+        }
+
+        let identity = self.entry.first_child().unwrap(); // @TODO handle
+        identity.remove_css_class("success");
+        if is_identity_active {
+            identity.add_css_class("success");
+        }
+
+        // Update progress
+        // * skip update animation for None value
         if let Some(value) = progress_fraction {
             // Update shared fraction on new value was changed
             if value != self.progress.fraction.replace(value) {
