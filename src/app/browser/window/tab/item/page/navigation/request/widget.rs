@@ -47,6 +47,7 @@ impl Widget {
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text(PLACEHOLDER_TEXT)
+            .secondary_icon_tooltip_text("Go to the location")
             .hexpand(true)
             .build();
 
