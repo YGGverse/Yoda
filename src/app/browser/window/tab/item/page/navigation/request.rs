@@ -94,6 +94,10 @@ impl Request {
         self.widget.entry.set_text(&self.download());
     }
 
+    pub fn to_source(&self) {
+        self.widget.entry.set_text(&self.source());
+    }
+
     // Getters
 
     pub fn uri(&self) -> Option<Uri> {
@@ -119,6 +123,10 @@ impl Request {
 
     pub fn download(&self) -> GString {
         gformat!("download:{}", self.strip_prefix())
+    }
+
+    pub fn source(&self) -> GString {
+        gformat!("source:{}", self.strip_prefix())
     }
 }
 

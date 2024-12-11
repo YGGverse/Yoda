@@ -86,6 +86,11 @@ impl Window {
             move |position| tab.save_as(position)
         });
 
+        action.source.connect_activate({
+            let tab = tab.clone();
+            move |position| tab.source(position)
+        });
+
         action.history_back.connect_activate({
             let tab = tab.clone();
             move |position| {

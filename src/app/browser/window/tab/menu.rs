@@ -56,6 +56,19 @@ impl Menu {
 
         main.append_section(None, &main_mark);
 
+        let main_tools = gtk::gio::Menu::new();
+
+        main_tools.append(
+            Some("Source"),
+            Some(&format!(
+                "{}.{}",
+                window_action.id,
+                window_action.source.gobject.name()
+            )),
+        );
+
+        main.append_section(None, &main_tools);
+
         let navigation = gtk::gio::Menu::new();
 
         navigation.append(

@@ -60,6 +60,7 @@ impl Tab {
                 action.pin.change_state(state);
                 action.reload.change_state(state);
                 action.save_as.change_state(state);
+                action.source.change_state(state);
             }
         });
 
@@ -157,6 +158,14 @@ impl Tab {
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.page.navigation.request.to_download();
+            item.page.load(true);
+        }
+    }
+
+    // View source for page at given `position`, `None` to use selected page (if available)
+    pub fn source(&self, page_position: Option<i32>) {
+        if let Some(item) = self.item(page_position) {
+            item.page.navigation.request.to_source();
             item.page.load(true);
         }
     }

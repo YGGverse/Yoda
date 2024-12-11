@@ -8,6 +8,7 @@ mod home;
 mod pin;
 mod reload;
 mod save_as;
+mod source;
 
 use append::Append;
 use bookmark::Bookmark;
@@ -19,6 +20,7 @@ use home::Home;
 use pin::Pin;
 use reload::Reload;
 use save_as::SaveAs;
+use source::Source;
 
 use gtk::{
     gio::SimpleActionGroup,
@@ -42,6 +44,7 @@ pub struct Action {
     pub pin: Rc<Pin>,
     pub reload: Rc<Reload>,
     pub save_as: Rc<SaveAs>,
+    pub source: Rc<Source>,
     // Group
     pub id: GString,
     pub gobject: SimpleActionGroup,
@@ -63,6 +66,7 @@ impl Action {
         let pin = Rc::new(Pin::new());
         let reload = Rc::new(Reload::new());
         let save_as = Rc::new(SaveAs::new());
+        let source = Rc::new(Source::new());
 
         // Generate unique group ID
         let id = uuid_string_random();
@@ -81,6 +85,7 @@ impl Action {
         gobject.add_action(&pin.gobject);
         gobject.add_action(&reload.gobject);
         gobject.add_action(&save_as.gobject);
+        gobject.add_action(&source.gobject);
 
         // Done
         Self {
@@ -94,6 +99,7 @@ impl Action {
             pin,
             reload,
             save_as,
+            source,
             id,
             gobject,
         }

@@ -201,6 +201,14 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
+                    browser.window.action.source.gobject.name()
+                ),
+                &["<Primary>u"],
+            ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window.action.id,
                     browser.window.action.home.gobject.name()
                 ),
                 &["<Primary>h"],

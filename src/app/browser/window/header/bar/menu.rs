@@ -59,6 +59,17 @@ impl Menu {
 
                 main_page.append_section(None, &main_page_mark);
 
+                // Main > Page > Tools
+                let main_page_tools = gio::Menu::new();
+
+                main_page_tools.append(Some("Source"), Some(&format!(
+                    "{}.{}",
+                    window_action.id,
+                    window_action.source.gobject.name()
+                )));
+
+                main_page.append_section(None, &main_page_tools);
+
                 // Main > Page > Navigation
                 let main_page_navigation = gio::Menu::new();
 
