@@ -30,7 +30,7 @@ use gtk::{
         gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
         UriHideFlags,
     },
-    prelude::{EditableExt, FileExt, SocketClientExt},
+    prelude::{EditableExt, FileExt, SocketClientExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -156,6 +156,9 @@ impl Page {
         /// Global limit to prevent infinitive redirects (ALL protocols)
         /// * every protocol implementation has own value checker, according to specification
         const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
+
+        // Move focus out from navigation entry
+        self.navigation.reload.widget.gobject.grab_focus();
 
         // Reset widgets
         self.input.unset();
