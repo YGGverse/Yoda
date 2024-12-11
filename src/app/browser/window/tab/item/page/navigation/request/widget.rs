@@ -54,7 +54,7 @@ impl Widget {
         entry.connect_icon_release({
             let tab_action = tab_action.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => tab_action.ident.activate(),
+                EntryIconPosition::Primary => tab_action.ident.activate(), // @TODO PrimaryIcon impl
                 EntryIconPosition::Secondary => tab_action.load.activate(Some(&this.text()), true),
                 _ => todo!(), // unexpected
             }
