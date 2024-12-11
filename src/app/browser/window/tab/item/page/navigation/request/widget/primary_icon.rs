@@ -34,7 +34,7 @@ pub fn from(request: &str) -> PrimaryIcon {
 
     if request.starts_with("gemini:") {
         return PrimaryIcon::Gemini {
-            icon_name: "avatar-default-symbolic",
+            icon_name: "channel-secure-symbolic",
             tooltip_text: ("Guest session", "User session"),
         };
     }
