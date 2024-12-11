@@ -79,9 +79,7 @@ pub fn new(
 
     action.update.on_activate({
         let status = status.clone();
-        move |_, message| {
-            status.set_default(&message);
-        }
+        move |_, message| status.set_default(&message)
     });
 
     // Init widget events
@@ -90,19 +88,15 @@ pub fn new(
         let progress = progress.clone();
         let status = status.clone();
         move |button| {
-            // cancel all operations
-            cancellable.cancel();
-            // deactivate `spinner`
-            progress.disable();
-            // update `status` text
-            status.set_warning(STATUS_CANCELLED);
-            // hide self
+            button.set_sensitive(false);
             button.set_visible(false);
+            cancellable.cancel();
+            progress.disable();
+            status.set_warning(STATUS_CANCELLED);
         }
     });
 
     choose.on_activate({
-        // init shared references
         let cancellable = cancellable.clone();
         let cancel = cancel.clone();
         let dialog = dialog.clone();
@@ -111,10 +105,8 @@ pub fn new(
         let status = status.clone();
         let on_choose = Rc::new(on_choose);
         move |button| {
-            // lock choose button to prevent double click
-            button.set_sensitive(false);
+            button.set_sensitive(false); // lock
             dialog.save(Window::NONE, Some(&cancellable), {
-                // delegate shared references
                 let action = action.clone();
                 let cancel = cancel.clone();
                 let file_launcher = file_launcher.clone();
@@ -126,25 +118,16 @@ pub fn new(
                     button.set_sensitive(true); // unlock
                     match result {
                         Ok(file) => {
-                            // update destination file
                             file_launcher.set_file(Some(&file));
-                            // update `status` text
                             status.set_default(STATUS_LOADING);
-                            // show `cancel` button
                             cancel.button.set_visible(true);
-                            // show spinner
                             progress.enable();
-                            // hide self
                             button.set_visible(false);
-                            // callback
                             on_choose(file, action)
                         }
                         Err(e) => {
-                            // update destination file
                             file_launcher.set_file(File::NONE);
-                            // hide spinner
                             progress.disable();
-                            // update `status`
                             status.set_warning(e.message());
                         }
                     }
@@ -163,10 +146,11 @@ pub fn new(
                 let status = status.clone();
                 let button = button.clone();
                 move |result| {
-                    if let Err(ref e) = result {
+                    if let Err(e) = result {
                         status.set_error(e.message())
+                    } else {
+                        button.set_sensitive(true); // unlock
                     }
-                    button.set_sensitive(true); // unlock
                 }
             })
         }
