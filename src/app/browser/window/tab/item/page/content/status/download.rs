@@ -139,19 +139,11 @@ pub fn new(
     open.on_activate({
         let cancellable = cancellable.clone();
         let file_launcher = file_launcher.clone();
-        let status = status.clone();
         move |button| {
             button.set_sensitive(false); // lock
             file_launcher.launch(Window::NONE, Some(&cancellable), {
-                let status = status.clone();
                 let button = button.clone();
-                move |result| {
-                    if let Err(e) = result {
-                        status.set_error(e.message())
-                    } else {
-                        button.set_sensitive(true); // unlock
-                    }
-                }
+                move |_| button.set_sensitive(true) // unlock
             })
         }
     });
