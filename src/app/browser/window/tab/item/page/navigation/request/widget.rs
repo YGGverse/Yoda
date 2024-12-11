@@ -60,6 +60,14 @@ impl Widget {
             }
         });
 
+        entry.connect_has_focus_notify(|this| {
+            if this.focus_child().is_some_and(|text| text.has_focus()) {
+                this.set_secondary_icon_name(Some("pan-end-symbolic"));
+            } else {
+                this.set_secondary_icon_name(None);
+            }
+        });
+
         entry.connect_changed(move |_| {
             browser_action.update.activate(None);
         });
