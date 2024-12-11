@@ -974,14 +974,14 @@ fn snap_history(navigation: Rc<Navigation>) {
 }
 
 /// Format bytes to KB/MB/GB presentation
-fn format_bytes(total: usize) -> String {
-    if total < 1024 {
-        format!("{} bytes", total)
-    } else if total < 1024 * 1024 {
-        format!("{:.2} KB", total as f64 / 1024.0)
-    } else if total < 1024 * 1024 * 1024 {
-        format!("{:.2} MB", total as f64 / (1024.0 * 1024.0))
+fn format_bytes(value: usize) -> String {
+    if value < 1024 {
+        format!("{} bytes", value)
+    } else if value < 1024 * 1024 {
+        format!("{:.2} KB", value as f64 / 1024.0)
+    } else if value < 1024 * 1024 * 1024 {
+        format!("{:.2} MB", value as f64 / (1024.0 * 1024.0))
     } else {
-        format!("{:.2} GB", total as f64 / (1024.0 * 1024.0 * 1024.0))
+        format!("{:.2} GB", value as f64 / (1024.0 * 1024.0 * 1024.0))
     }
 }
