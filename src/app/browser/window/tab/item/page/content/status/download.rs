@@ -127,7 +127,6 @@ pub fn new(
                         }
                         Err(e) => {
                             file_launcher.set_file(File::NONE);
-                            progress.disable();
                             status.set_warning(e.message());
                         }
                     }
