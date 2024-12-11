@@ -1,4 +1,7 @@
 mod database;
+mod primary_icon;
+
+use primary_icon::PrimaryIcon;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
@@ -14,16 +17,6 @@ use std::{
 };
 
 const PLACEHOLDER_TEXT: &str = "URL or search term...";
-
-const GO_TOOLTIP_TEXT: &str = "Go to the address";
-const GO_ICON_NAME: &str = "pan-end-symbolic";
-
-const IDENTITY_TOOLTIP_TEXT: (&str, &str) = (
-    "Identity",
-    "Identity feature not available for this location",
-);
-const IDENTITY_ICON_NAME: (&str, &str) =
-    ("avatar-default-symbolic", "applications-system-symbolic");
 
 // Progress bar animation setup
 const PROGRESS_ANIMATION_STEP: f64 = 0.05;
@@ -56,12 +49,6 @@ impl Widget {
             .placeholder_text(PLACEHOLDER_TEXT)
             .hexpand(true)
             .build();
-
-        entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.0));
-        entry.set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.0));
-
-        entry.set_secondary_icon_name(Some(GO_ICON_NAME));
-        entry.set_secondary_icon_tooltip_text(Some(GO_TOOLTIP_TEXT));
 
         // Connect events
         entry.connect_icon_release({
@@ -186,32 +173,52 @@ impl Widget {
         Ok(())
     }
 
-    pub fn update(
-        &self,
-        progress_fraction: Option<f64>,
-        is_identity_applicable: bool,
-        is_identity_active: bool,
-    ) {
-        // Update identity
-        self.entry
-            .set_primary_icon_activatable(is_identity_applicable);
-        self.entry
-            .set_primary_icon_sensitive(is_identity_applicable);
-
-        if is_identity_applicable {
-            self.entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.0));
-            self.entry
-                .set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.0));
-        } else {
-            self.entry.set_primary_icon_name(Some(IDENTITY_ICON_NAME.1));
-            self.entry
-                .set_primary_icon_tooltip_text(Some(IDENTITY_TOOLTIP_TEXT.1));
-        }
-
+    pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
+        // Update primary icon
         let identity = self.entry.first_child().unwrap(); // @TODO handle
         identity.remove_css_class("success");
-        if is_identity_active {
-            identity.add_css_class("success");
+
+        self.entry.set_primary_icon_activatable(false);
+        self.entry.set_primary_icon_sensitive(false);
+
+        match primary_icon::from(&self.entry.text()) {
+            PrimaryIcon::Download {
+                icon_name,
+                tooltip_text,
+            } => {
+                self.entry.set_primary_icon_name(Some(icon_name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            }
+            PrimaryIcon::Gemini {
+                icon_name,
+                tooltip_text,
+            } => {
+                self.entry.set_primary_icon_activatable(true);
+                self.entry.set_primary_icon_sensitive(true);
+                self.entry.set_primary_icon_name(Some(icon_name));
+                if is_identity_active {
+                    self.entry
+                        .set_primary_icon_tooltip_text(Some(tooltip_text.1));
+                    identity.add_css_class("success");
+                } else {
+                    self.entry
+                        .set_primary_icon_tooltip_text(Some(tooltip_text.0));
+                }
+            }
+            PrimaryIcon::Search {
+                icon_name,
+                tooltip_text,
+            } => {
+                self.entry.set_primary_icon_name(Some(icon_name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            }
+            PrimaryIcon::Source {
+                icon_name,
+                tooltip_text,
+            } => {
+                self.entry.set_primary_icon_name(Some(icon_name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            }
         }
 
         // Update progress
@@ -261,6 +268,7 @@ impl Widget {
 }
 
 // Tools
+
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
     if let Err(e) = database::init(tx) {

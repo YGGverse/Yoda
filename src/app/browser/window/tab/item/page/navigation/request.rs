@@ -25,17 +25,8 @@ impl Request {
     }
 
     // Actions
-    pub fn update(
-        &self,
-        progress_fraction: Option<f64>,
-        is_identity_applicable: bool,
-        is_identity_active: bool,
-    ) {
-        self.widget.update(
-            progress_fraction,
-            is_identity_applicable,
-            is_identity_active,
-        );
+    pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
+        self.widget.update(progress_fraction, is_identity_active);
     }
 
     pub fn clean(

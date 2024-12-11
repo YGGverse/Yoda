@@ -76,7 +76,6 @@ impl Navigation {
         self.reload.update(!request_text.is_empty());
         self.request.update(
             progress_fraction,
-            !request_text.is_empty() && request_text.starts_with("gemini"),
             self.profile
                 .identity
                 .gemini
