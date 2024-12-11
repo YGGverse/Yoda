@@ -36,7 +36,7 @@ use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
 
 pub struct Page {
-    id: GString,
+    id: Rc<GString>,
     profile: Rc<Profile>,
     // Actions
     browser_action: Rc<BrowserAction>,
@@ -54,7 +54,7 @@ impl Page {
     // Constructors
 
     pub fn new(
-        id: GString,
+        id: Rc<GString>,
         profile: Rc<Profile>,
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {

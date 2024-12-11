@@ -24,7 +24,7 @@ use std::rc::Rc;
 pub struct Item {
     // Auto-generated unique item ID
     // useful as widget name in GTK actions callback
-    pub id: GString,
+    pub id: Rc<GString>,
     // Components
     pub page: Rc<Page>,
     pub widget: Rc<Widget>,
@@ -42,7 +42,7 @@ impl Item {
         let (position, request, is_pinned, is_selected, is_attention, is_load) = options;
 
         // Generate unique ID for new page components
-        let id = uuid_string_random();
+        let id = Rc::new(uuid_string_random());
 
         // Init components
 

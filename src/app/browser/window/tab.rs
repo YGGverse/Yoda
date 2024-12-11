@@ -25,7 +25,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 pub struct Tab {
     profile: Rc<Profile>,
     actions: (Rc<BrowserAction>, Rc<WindowAction>),
-    index: Rc<RefCell<HashMap<GString, Rc<Item>>>>,
+    index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>>,
     pub widget: Rc<Widget>,
 }
 
@@ -33,7 +33,8 @@ impl Tab {
     // Construct
     pub fn new(profile: Rc<Profile>, action: (Rc<BrowserAction>, Rc<WindowAction>)) -> Self {
         // Init empty HashMap index
-        let index: Rc<RefCell<HashMap<GString, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
+        let index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>> =
+            Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
         let menu = Menu::new(action.1.clone());
