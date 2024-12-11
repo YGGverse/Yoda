@@ -95,11 +95,11 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] Localhost
   * [ ] `file://` - local file browser
-* [ ] Request mode
+* [ ] Request prefix
   * [ ] `about:`
     * [ ] `config` - low-level key/value settings editor
-  * [x] `download:` - save current request to file
-  * [x] `source:` - page source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
+  * [x] `download:` - save location to file
+  * [x] `source:` - source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
 
 ### Media types
 
