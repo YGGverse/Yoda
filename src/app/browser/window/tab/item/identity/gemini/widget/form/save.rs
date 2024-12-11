@@ -85,9 +85,10 @@ impl Save {
                                                                     button.set_css_classes(&[
                                                                         "success",
                                                                     ]);
-                                                                    button.set_label(
-                                                                        "Saved to destination!",
-                                                                    )
+                                                                    button.set_label(&format!(
+                                                                        "Saved to {}",
+                                                                        file.parse_name()
+                                                                    ))
                                                                 }
                                                                 Err((_, e)) => {
                                                                     button.set_css_classes(&[
