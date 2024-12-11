@@ -72,7 +72,7 @@ impl Navigation {
         self.bookmark
             .update(self.profile.bookmark.get(&request_text).is_ok());
         self.history.update();
-        self.home.update(self.request.uri());
+        self.home.update(&request_text);
         self.reload.update(!request_text.is_empty());
         self.request.update(
             progress_fraction,

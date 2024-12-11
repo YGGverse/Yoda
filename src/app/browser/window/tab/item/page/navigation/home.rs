@@ -3,7 +3,7 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::glib::{gformat, GString, Uri};
+use gtk::glib::{gformat, GString, Uri, UriFlags};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
@@ -23,28 +23,26 @@ impl Home {
     }
 
     // Actions
-    pub fn update(&self, uri: Option<Uri>) {
-        // Detect sensitivity value
-        let status = match &uri {
-            Some(uri) => "/" != uri.path(),
-            None => false,
+    pub fn update(&self, request: &str) {
+        let has_home = match Uri::parse(strip_prefix(request), UriFlags::NONE) {
+            Ok(uri) => {
+                let has_home = "/" != uri.path();
+                self.uri.replace(Some(uri));
+                has_home
+            }
+            _ => {
+                self.uri.replace(None);
+                false
+            }
         };
-
-        // Update parsed cache
-        self.uri.replace(uri);
-
-        // Update action status
-        self.action.home.gobject.set_enabled(status);
-
-        // Update child components
-        self.widget.update(status);
+        self.action.home.gobject.set_enabled(has_home);
+        self.widget.update(has_home);
     }
 
     // Getters
 
     pub fn url(&self) -> Option<GString> {
-        // Build URL from parsed URI cache
-        if let Some(uri) = self.uri.take() {
+        if let Some(uri) = &*self.uri.borrow() {
             let scheme = uri.scheme();
             let port = uri.port();
             if let Some(host) = uri.host() {
@@ -57,4 +55,20 @@ impl Home {
         }
         None
     }
+}
+
+// Tools
+
+fn strip_prefix(request: &str) -> &str {
+    let request = match request.strip_prefix("source:") {
+        Some(postfix) => postfix,
+        None => request,
+    };
+
+    let request = match request.strip_prefix("download:") {
+        Some(postfix) => postfix,
+        None => request,
+    };
+
+    request
 }
