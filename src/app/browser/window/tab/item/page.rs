@@ -511,7 +511,7 @@ impl Page {
                                                                 let action = action.clone();
                                                                 move |result| match result {
                                                                     Ok((_, total)) => action.complete.activate(
-                                                                        &format!("Download ({total} bytes) completed!")
+                                                                        &format!("Saved to {} ({total} bytes total)", file.parse_name())
                                                                     ),
                                                                     Err(e) => action.cancel.activate(&e.to_string())
                                                                 }
