@@ -184,42 +184,28 @@ impl Widget {
         self.entry.set_primary_icon_sensitive(false);
 
         match primary_icon::from(&self.entry.text()) {
-            PrimaryIcon::Download {
-                icon_name,
-                tooltip_text,
-            } => {
-                self.entry.set_primary_icon_name(Some(icon_name));
-                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            PrimaryIcon::Download { name, tooltip } => {
+                self.entry.set_primary_icon_name(Some(name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
-            PrimaryIcon::Gemini {
-                icon_name,
-                tooltip_text,
-            } => {
+            PrimaryIcon::Gemini { name, tooltip } => {
                 self.entry.set_primary_icon_activatable(true);
                 self.entry.set_primary_icon_sensitive(true);
-                self.entry.set_primary_icon_name(Some(icon_name));
+                self.entry.set_primary_icon_name(Some(name));
                 if is_identity_active {
                     self.entry.first_child().unwrap().add_css_class("success"); // @TODO handle
-                    self.entry
-                        .set_primary_icon_tooltip_text(Some(tooltip_text.1));
+                    self.entry.set_primary_icon_tooltip_text(Some(tooltip.1));
                 } else {
-                    self.entry
-                        .set_primary_icon_tooltip_text(Some(tooltip_text.0));
+                    self.entry.set_primary_icon_tooltip_text(Some(tooltip.0));
                 }
             }
-            PrimaryIcon::Search {
-                icon_name,
-                tooltip_text,
-            } => {
-                self.entry.set_primary_icon_name(Some(icon_name));
-                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            PrimaryIcon::Search { name, tooltip } => {
+                self.entry.set_primary_icon_name(Some(name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
-            PrimaryIcon::Source {
-                icon_name,
-                tooltip_text,
-            } => {
-                self.entry.set_primary_icon_name(Some(icon_name));
-                self.entry.set_primary_icon_tooltip_text(Some(tooltip_text));
+            PrimaryIcon::Source { name, tooltip } => {
+                self.entry.set_primary_icon_name(Some(name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
         }
 
