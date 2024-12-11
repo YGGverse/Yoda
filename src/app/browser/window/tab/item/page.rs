@@ -313,6 +313,9 @@ impl Page {
                     // Delegate restore action to the item childs
                     self.meta.restore(transaction, &record.id)?;
                     self.navigation.restore(transaction, &record.id)?;
+                    // Make initial page history snap using `navigation` values restored
+                    // * just to have back/forward navigation ability
+                    snap_history(self.navigation.clone());
                 }
             }
             Err(e) => return Err(e.to_string()),
