@@ -66,6 +66,7 @@ impl Widget {
                 this.set_secondary_icon_name(Some("pan-end-symbolic"));
             } else {
                 this.set_secondary_icon_name(None);
+                this.select_region(0, 0);
             }
         });
 
