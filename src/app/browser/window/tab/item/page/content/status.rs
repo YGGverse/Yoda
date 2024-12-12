@@ -4,8 +4,12 @@ mod identity;
 mod loading;
 mod mime;
 
+use super::TabAction;
 use adw::StatusPage;
-use gtk::gio::{Cancellable, File};
+use gtk::{
+    gio::{Cancellable, File},
+    glib::GString,
+};
 use std::{rc::Rc, time::Duration};
 
 pub struct Status {
@@ -38,9 +42,9 @@ impl Status {
     /// Create new mime issue preset
     ///
     /// Useful as placeholder widget for mime issue handlers
-    pub fn new_mime(mime: &str) -> Self {
+    pub fn new_mime(mime: &str, download: Option<(Rc<TabAction>, GString)>) -> Self {
         Self {
-            gobject: mime::new_gobject(mime),
+            gobject: mime::new_gobject(mime, download),
         }
     }
 

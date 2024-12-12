@@ -6,11 +6,11 @@ use image::Image;
 use status::Status;
 use text::Text;
 
-use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
+use super::{TabAction, WindowAction};
 use gtk::{
     gdk::Paintable,
     gio::{Cancellable, File},
-    glib::Uri,
+    glib::{GString, Uri},
     prelude::{BoxExt, IsA, WidgetExt},
     Box, Orientation,
 };
@@ -74,9 +74,9 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Mime` issue preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_mime(&self, mime: &str) -> Status {
+    pub fn to_status_mime(&self, mime: &str, download: Option<(Rc<TabAction>, GString)>) -> Status {
         self.clean();
-        let status = Status::new_mime(mime);
+        let status = Status::new_mime(mime, download);
         self.gobject.append(status.gobject());
         status
     }

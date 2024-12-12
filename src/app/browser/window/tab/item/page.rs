@@ -679,7 +679,10 @@ impl Page {
                                     },
                                     mime => {
                                         // Init children widget
-                                        let status = content.to_status_mime(mime);
+                                        let status = content.to_status_mime(
+                                            mime,
+                                            Some((tab_action.clone(), navigation.request.download()))
+                                        );
 
                                         // Update page meta
                                         meta.set_status(Status::Failure)
