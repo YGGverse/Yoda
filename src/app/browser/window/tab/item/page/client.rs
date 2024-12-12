@@ -1,5 +1,5 @@
 use gtk::{gio::Cancellable, prelude::CancellableExt};
-use std::cell::RefCell;
+use std::cell::Cell;
 
 /// Multi-client holder for single `Page` object
 ///
@@ -9,7 +9,7 @@ use std::cell::RefCell;
 /// e.g. session resumption or multi-thread connection management (depending of client type selected)
 pub struct Client {
     // Shared reference to cancel async operations
-    cancellable: RefCell<Cancellable>,
+    cancellable: Cell<Cancellable>,
     // Clients
     pub gemini: gemini::Client,
     // other clients..
@@ -21,7 +21,7 @@ impl Client {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
-            cancellable: RefCell::new(Cancellable::new()),
+            cancellable: Cell::new(Cancellable::new()),
             gemini: gemini::Client::new(),
         }
     }
