@@ -26,6 +26,7 @@ impl Choose {
             .halign(Align::Center)
             .label(LABEL)
             .margin_top(MARGIN)
+            .sensitive(!is_activate_on_release)
             .build();
 
         if is_activate_on_release {
