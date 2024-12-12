@@ -167,7 +167,7 @@ impl Request {
         resolver_timeout: u32,
         cancellable: Option<&Cancellable>,
         callback: impl FnOnce(Option<GString>) + 'static,
-    ) -> Option<GString> {
+    ) {
         // suggest scheme
         let url = gformat!("gemini://{}", self.strip_prefix().trim());
 
@@ -184,9 +184,8 @@ impl Request {
                     Ok(_) => Some(url),
                     Err(_) => None,
                 })
-            });
+            })
         }
-        None
     }
 }
 
