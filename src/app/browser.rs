@@ -69,6 +69,13 @@ impl Browser {
             }
         });
 
+        action.focus.connect_activate({
+            let widget = widget.clone();
+            move || {
+                widget.application_window.set_focus(gtk::Window::NONE);
+            }
+        });
+
         action.profile.connect_activate({
             let profile = profile.clone();
             move || {

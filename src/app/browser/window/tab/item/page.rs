@@ -27,7 +27,7 @@ use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::SocketClientEvent,
     glib::{gformat, GString, Priority, Uri, UriFlags, UriHideFlags},
-    prelude::{EditableExt, FileExt, SocketClientExt, WidgetExt},
+    prelude::{EditableExt, FileExt, SocketClientExt},
 };
 use sqlite::Transaction;
 use std::{rc::Rc, time::Duration};
@@ -149,7 +149,7 @@ impl Page {
         const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
 
         // Move focus out from navigation entry
-        self.navigation.reload.widget.gobject.grab_focus();
+        // self.navigation.reload.widget.gobject.grab_focus();
 
         // Reset widgets
         self.input.unset();

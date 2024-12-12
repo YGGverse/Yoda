@@ -156,6 +156,14 @@ impl App {
                 ),
                 &["<Primary>u"],
             ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.action.id,
+                    browser.action.focus.gobject.name()
+                ),
+                &["Escape"],
+            ),
             // Tab actions
             (
                 format!(
