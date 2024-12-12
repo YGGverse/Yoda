@@ -2,7 +2,7 @@ use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
 
 // Defaults
 
-const CSS_CLASSES: [&str; 1] = ["accent"];
+const CSS_CLASSES: [&str; 1] = ["suggested-action"];
 const LABEL: &str = "Open";
 const MARGIN: i32 = 16;
 

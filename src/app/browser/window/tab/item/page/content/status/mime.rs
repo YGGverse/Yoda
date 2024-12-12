@@ -14,7 +14,7 @@ pub fn new(mime: &str, download: Option<(Rc<TabAction>, GString)>) -> StatusPage
 
     if let Some((action, request)) = download {
         let button = Button::builder()
-            .css_classes(["accent"])
+            .css_classes(["suggested-action"])
             .halign(Align::Center)
             .label("Download")
             .tooltip_text("Download as file to open with external application")

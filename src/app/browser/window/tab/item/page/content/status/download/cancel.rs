@@ -2,7 +2,7 @@ use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
 
 // Defaults
 
-const CSS_CLASSES: [&str; 1] = ["error"];
+const CSS_CLASSES: [&str; 1] = ["destructive-action"];
 const LABEL: &str = "Cancel";
 const MARGIN: i32 = 16;
 
