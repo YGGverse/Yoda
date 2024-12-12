@@ -26,9 +26,8 @@ impl Home {
     pub fn update(&self, request: &str) {
         let has_home = match Uri::parse(request, UriFlags::NONE) {
             Ok(uri) => {
-                let has_home = "/" != uri.path();
-                self.uri.replace(Some(uri));
-                has_home
+                self.uri.replace(Some(uri.clone()));
+                uri.path().len() > 1
             }
             _ => {
                 self.uri.replace(None);
