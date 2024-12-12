@@ -55,9 +55,7 @@ impl List {
 
         factory.connect_setup(|_, this| {
             // Init widget for dropdown item
-            let child = Box::builder()
-                .orientation(gtk::Orientation::Vertical)
-                .build();
+            let child = Box::builder().orientation(Orientation::Vertical).build();
 
             // Title
             child.append(&Label::builder().halign(Align::Start).build());
