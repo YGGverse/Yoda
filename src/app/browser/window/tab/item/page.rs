@@ -149,13 +149,10 @@ impl Page {
         const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
 
         // Move focus out from navigation entry
-        // self.navigation.reload.widget.gobject.grab_focus();
+        self.browser_action.focus.activate();
 
         // Reset widgets
         self.input.unset();
-
-        // Create shared variant value
-        let id = self.id.clone();
 
         // Prevent infinitive redirection
         if self.meta.redirects() > DEFAULT_MAX_REDIRECT_COUNT {
@@ -184,7 +181,7 @@ impl Page {
 
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
-        self.browser_action.update.activate(Some(&id));
+        self.browser_action.update.activate(Some(&self.id));
 
         // Route by request
         match request {
@@ -217,7 +214,7 @@ impl Page {
                             .set_title(&status.title());
 
                         // Update window
-                        self.browser_action.update.activate(Some(&id));
+                        self.browser_action.update.activate(Some(&self.id));
                     }
                 }
             }

@@ -1,4 +1,4 @@
-use gtk::{gio::SimpleAction, glib::uuid_string_random};
+use gtk::{gio::SimpleAction, glib::uuid_string_random, prelude::ActionExt};
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Focus` action of `Browser` group
 pub struct Focus {
@@ -13,6 +13,14 @@ impl Focus {
         Self {
             gobject: SimpleAction::new(&uuid_string_random(), None),
         }
+    }
+
+    // Actions
+
+    /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
+    /// with formatted for this action [Variant](https://docs.gtk.org/glib/struct.Variant.html) value
+    pub fn activate(&self) {
+        self.gobject.activate(None); // @TODO custom value
     }
 
     // Events
