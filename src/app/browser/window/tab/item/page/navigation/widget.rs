@@ -7,7 +7,7 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Widget {
-    pub gobject: Box,
+    pub g_box: Box,
 }
 
 impl Widget {
@@ -19,7 +19,7 @@ impl Widget {
         request: &impl IsA<gtk::Widget>,
         bookmark: &impl IsA<gtk::Widget>,
     ) -> Self {
-        let gobject = Box::builder()
+        let g_box = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(SPACING)
             .margin_start(MARGIN)
@@ -27,12 +27,12 @@ impl Widget {
             .margin_bottom(MARGIN)
             .build();
 
-        gobject.append(base);
-        gobject.append(history);
-        gobject.append(reload);
-        gobject.append(request);
-        gobject.append(bookmark);
+        g_box.append(base);
+        g_box.append(history);
+        g_box.append(reload);
+        g_box.append(request);
+        g_box.append(bookmark);
 
-        Self { gobject }
+        Self { g_box }
     }
 }

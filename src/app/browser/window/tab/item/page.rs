@@ -70,7 +70,7 @@ impl Page {
 
         let widget = Rc::new(Widget::new(
             &id,
-            &navigation.widget.gobject,
+            &navigation.widget.g_box,
             &content.g_box,
             &input.widget.clamp,
         ));
