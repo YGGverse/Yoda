@@ -3,7 +3,7 @@ use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
 // Defaults
 
 const CSS_CLASSES: [&str; 1] = ["accent"];
-const LABEL: &str = "Choose";
+const LABEL: &str = "Choose location..";
 const MARGIN: i32 = 16;
 
 /// Choose destination [File](https://docs.gtk.org/gio/iface.File.html)
