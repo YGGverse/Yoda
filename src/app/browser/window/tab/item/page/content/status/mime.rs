@@ -17,7 +17,7 @@ pub fn new_gobject(mime: &str, download: Option<(Rc<TabAction>, GString)>) -> St
             .css_classes(["accent"])
             .halign(Align::Center)
             .label("Download")
-            .tooltip_text("Download as file to open with other application")
+            .tooltip_text("Download as file to open with external application")
             .build();
 
         button.connect_clicked(move |_| {
