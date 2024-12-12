@@ -26,10 +26,7 @@ use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
     gio::SocketClientEvent,
-    glib::{
-        gformat, GString, Priority, Regex, RegexCompileFlags, RegexMatchFlags, Uri, UriFlags,
-        UriHideFlags,
-    },
+    glib::{gformat, GString, Priority, Uri, UriFlags, UriHideFlags},
     prelude::{EditableExt, FileExt, SocketClientExt, WidgetExt},
 };
 use sqlite::Transaction;
@@ -225,41 +222,15 @@ impl Page {
                 }
             }
             Request::Search(ref query) => {
-                // Try interpret URI manually
-                if Regex::match_simple(
-                    r"^[^\/\s]+\.[\w]{2,}",
-                    query,
-                    RegexCompileFlags::DEFAULT,
-                    RegexMatchFlags::DEFAULT,
-                ) {
-                    // Seems request contain some host, try append default scheme
-                    // * make sure new request conversable to valid URI
-                    match Uri::parse(&format!("gemini://{query}"), UriFlags::NONE) {
-                        Ok(uri) => {
-                            // Update navigation entry
-                            self.navigation
-                                .request
-                                .widget
-                                .entry
-                                .set_text(&uri.to_string());
-
-                            // Load page (without history record)
-                            self.load(false);
-                        }
-                        Err(_) => {
-                            // @TODO any action here?
-                        }
-                    }
-                } else {
-                    // Plain text given, make search request to default provider
+                // try autocomplete scheme prefix @TODO optional resolve timeout
+                if self.navigation.request.to_gemini(500).is_none() {
+                    // make search request to default provider @TODO optional
                     self.navigation.request.widget.entry.set_text(&format!(
                         "gemini://tlgs.one/search?{}",
                         Uri::escape_string(query, None, false)
                     ));
-
-                    // Load page (without history record)
-                    self.load(false);
                 }
+                self.load(true)
             }
         };
     }

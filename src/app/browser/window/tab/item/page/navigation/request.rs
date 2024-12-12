@@ -5,8 +5,9 @@ use widget::Widget;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
+    gio::{Cancellable, NetworkAddress, Resolver},
     glib::{gformat, GString, Uri, UriFlags},
-    prelude::EditableExt,
+    prelude::{EditableExt, NetworkAddressExt, ResolverExt},
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -98,6 +99,13 @@ impl Request {
         self.widget.entry.set_text(&self.source());
     }
 
+    pub fn to_gemini(&self, resolver_timeout: u32) -> Option<GString> {
+        self.gemini(resolver_timeout).and_then(|url| {
+            self.widget.entry.set_text(&url);
+            Some(url)
+        })
+    }
+
     // Getters
 
     pub fn uri(&self) -> Option<Uri> {
@@ -118,6 +126,14 @@ impl Request {
             text = postfix.into()
         };
 
+        if let Some(postfix) = text.strip_prefix("file://") {
+            text = postfix.into()
+        };
+
+        if let Some(postfix) = text.strip_prefix("gemini://") {
+            text = postfix.into()
+        };
+
         text
     }
 
@@ -127,6 +143,28 @@ impl Request {
 
     pub fn source(&self) -> GString {
         gformat!("source:{}", self.strip_prefix())
+    }
+
+    pub fn gemini(&self, resolver_timeout: u32) -> Option<GString> {
+        // suggest scheme
+        let url = gformat!("gemini://{}", self.strip_prefix().trim());
+
+        // setup default resolver
+        // * wanted to detect value contain **resolvable** hostname
+        let resolver = Resolver::default();
+        resolver.set_timeout(resolver_timeout);
+
+        // is connectable
+        if let Ok(connectable) = NetworkAddress::parse_uri(&url, 1965) {
+            // is resolvable @TODO async
+            if resolver
+                .lookup_by_name(&connectable.hostname(), Cancellable::NONE)
+                .is_ok()
+            {
+                return Some(url);
+            }
+        }
+        None
     }
 }
 
