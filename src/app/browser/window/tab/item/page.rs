@@ -528,8 +528,8 @@ impl Page {
                                     }
                                 );
                             } else { // browse
-                                match response.meta.mime {
-                                    Some(gemini::client::connection::response::meta::Mime::TextGemini) => {
+                                match response.meta.mime.unwrap().value.to_lowercase().as_str() {
+                                    "text/gemini" => {
                                         // Read entire input stream to buffer
                                         gemini::client::connection::response::data::Text::from_stream_async(
                                             response.connection.stream(),
@@ -592,12 +592,7 @@ impl Page {
                                             }
                                         );
                                     },
-                                    Some(
-                                        gemini::client::connection::response::meta::Mime::ImagePng  |
-                                        gemini::client::connection::response::meta::Mime::ImageGif  |
-                                        gemini::client::connection::response::meta::Mime::ImageJpeg |
-                                        gemini::client::connection::response::meta::Mime::ImageWebp
-                                    ) => {
+                                    "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                         // Final image size unknown, show loading widget
                                         let status = content.to_status_loading(
                                             Some(Duration::from_secs(1)) // show if download time > 1 second
