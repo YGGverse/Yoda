@@ -2,14 +2,14 @@ use adw::{TabBar, TabView};
 use gtk::prelude::IsA;
 
 pub struct Widget {
-    pub gobject: TabBar,
+    pub tab_bar: TabBar,
 }
 
 impl Widget {
     // Construct
     pub fn new(view: &TabView, start_action_widget: &impl IsA<gtk::Widget>) -> Self {
         Self {
-            gobject: TabBar::builder()
+            tab_bar: TabBar::builder()
                 .autohide(false)
                 .expand_tabs(false)
                 .end_action_widget(start_action_widget) // @TODO find solution to append after tabs

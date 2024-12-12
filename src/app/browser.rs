@@ -59,13 +59,13 @@ impl Browser {
 
         action.close.connect_activate({
             let widget = widget.clone();
-            move || widget.gobject().close()
+            move || widget.application_window.close()
         });
 
         action.debug.connect_activate({
             let widget = widget.clone();
             move || {
-                widget.gobject().emit_enable_debugging(true);
+                widget.application_window.emit_enable_debugging(true);
             }
         });
 
@@ -160,7 +160,7 @@ impl Browser {
 
     pub fn init(&self, application: Option<&impl IsA<Application>>) -> &Self {
         // Assign browser window to this application
-        self.widget.gobject().set_application(application); // @TODO
+        self.widget.application_window.set_application(application); // @TODO
 
         // Init main window
         self.window.init();
@@ -168,7 +168,7 @@ impl Browser {
     }
 
     pub fn present(&self) -> &Self {
-        self.widget.gobject().present();
+        self.widget.application_window.present();
         self
     }
 

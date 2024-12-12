@@ -32,7 +32,7 @@ impl Bar {
             widget: Rc::new(Widget::new(
                 &control.widget.gobject,
                 &menu.widget.gobject,
-                &tab.widget.gobject,
+                &tab.widget.tab_bar,
             )),
         }
     }

@@ -14,7 +14,7 @@ const DEFAULT_WIDTH: i32 = 640;
 const MAXIMIZED: bool = false;
 
 pub struct Widget {
-    gobject: ApplicationWindow,
+    pub application_window: ApplicationWindow,
 }
 
 impl Widget {
@@ -24,7 +24,7 @@ impl Widget {
         action_groups: &[(&GString, SimpleActionGroup)],
     ) -> Self {
         // Init GTK
-        let gobject = ApplicationWindow::builder()
+        let application_window = ApplicationWindow::builder()
             .content(content)
             .default_height(DEFAULT_HEIGHT)
             .default_width(DEFAULT_WIDTH)
@@ -33,11 +33,11 @@ impl Widget {
 
         // Register actions
         for (name, group) in action_groups {
-            gobject.insert_action_group(name, Some(group));
+            application_window.insert_action_group(name, Some(group));
         }
 
         // Return new struct
-        Self { gobject }
+        Self { application_window }
     }
 
     // Actions
@@ -65,8 +65,8 @@ impl Widget {
             Ok(records) => {
                 for record in records {
                     // Restore widget
-                    self.gobject.set_maximized(record.is_maximized);
-                    self.gobject
+                    self.application_window.set_maximized(record.is_maximized);
+                    self.application_window
                         .set_default_size(record.default_width, record.default_height);
 
                     // Delegate restore action to childs
@@ -83,9 +83,9 @@ impl Widget {
         match database::insert(
             transaction,
             app_browser_id,
-            &self.gobject.default_width(),
-            &self.gobject.default_height(),
-            &self.gobject.is_maximized(),
+            &self.application_window.default_width(),
+            &self.application_window.default_height(),
+            &self.application_window.is_maximized(),
         ) {
             Ok(_) => {
                 // Delegate save action to childs
@@ -96,11 +96,6 @@ impl Widget {
         }
 
         Ok(())
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &ApplicationWindow {
-        &self.gobject
     }
 }
 
