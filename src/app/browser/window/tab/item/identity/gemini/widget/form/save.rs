@@ -9,7 +9,7 @@ use gtk::{
     prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
-use std::rc::Rc;
+use std::{path::MAIN_SEPARATOR, rc::Rc};
 
 const LABEL: &str = "Export";
 const TOOLTIP_TEXT: &str = "Export selected identity to file";
@@ -62,7 +62,10 @@ impl Save {
                                 FileDialog::builder()
                                     .default_filter(&filter_pem)
                                     .filters(&filters)
-                                    .initial_name(format!("{}.pem", certificate.name))
+                                    .initial_name(format!(
+                                        "{}.pem",
+                                        certificate.name.replace(MAIN_SEPARATOR, "-")
+                                    ))
                                     .build()
                                     .save(Window::NONE, Cancellable::NONE, {
                                         let button = button.clone();
