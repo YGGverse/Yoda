@@ -7,7 +7,7 @@ use gtk::{
 // Defaults
 
 const CSS_CLASSES: [&str; 1] = ["suggested-action"];
-const LABEL: (&str, &str) = ("Choose location..", "Awaiting for choose..");
+const LABEL: (&str, &str) = ("Choose location..", "Pending..");
 const MARGIN: i32 = 16;
 
 /// Choose destination [File](https://docs.gtk.org/gio/iface.File.html)
