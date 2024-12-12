@@ -86,10 +86,4 @@ impl Status {
         self.gobject.set_description(value);
         self
     }
-
-    // Getters
-
-    pub fn gobject(&self) -> &StatusPage {
-        &self.gobject
-    }
 }

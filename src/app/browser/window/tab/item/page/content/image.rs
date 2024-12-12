@@ -5,7 +5,7 @@ use gtk::{
 };
 
 pub struct Image {
-    gobject: Picture,
+    pub picture: Picture,
 }
 
 impl Image {
@@ -17,18 +17,12 @@ impl Image {
     // Constructors
 
     pub fn new_from_paintable(paintable: &impl IsA<Paintable>) -> Self {
-        let gobject = Picture::for_paintable(paintable);
+        let picture = Picture::for_paintable(paintable);
 
-        gobject.set_content_fit(Self::DEFAULT_CONTENT_FIT);
-        gobject.set_margin_end(Self::DEFAULT_MARGIN);
-        gobject.set_margin_start(Self::DEFAULT_MARGIN);
+        picture.set_content_fit(Self::DEFAULT_CONTENT_FIT);
+        picture.set_margin_end(Self::DEFAULT_MARGIN);
+        picture.set_margin_start(Self::DEFAULT_MARGIN);
 
-        Self { gobject }
-    }
-
-    // Getters
-
-    pub fn gobject(&self) -> &Picture {
-        &self.gobject
+        Self { picture }
     }
 }

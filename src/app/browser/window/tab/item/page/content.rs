@@ -42,7 +42,7 @@ impl Content {
     pub fn to_image(&self, paintable: &impl IsA<Paintable>) -> Image {
         self.clean();
         let image = Image::new_from_paintable(paintable);
-        self.gobject.append(image.gobject());
+        self.gobject.append(&image.picture);
         image
     }
 
@@ -57,7 +57,7 @@ impl Content {
     ) -> Status {
         self.clean();
         let status = Status::new_download(initial_filename, cancellable, on_choose);
-        self.gobject.append(status.gobject());
+        self.gobject.append(&status.gobject);
         status
     }
 
@@ -67,7 +67,7 @@ impl Content {
     pub fn to_status_failure(&self) -> Status {
         self.clean();
         let status = Status::new_failure();
-        self.gobject.append(status.gobject());
+        self.gobject.append(&status.gobject);
         status
     }
 
@@ -77,7 +77,7 @@ impl Content {
     pub fn to_status_mime(&self, mime: &str, download: Option<(Rc<TabAction>, GString)>) -> Status {
         self.clean();
         let status = Status::new_mime(mime, download);
-        self.gobject.append(status.gobject());
+        self.gobject.append(&status.gobject);
         status
     }
 
@@ -87,7 +87,7 @@ impl Content {
     pub fn to_status_identity(&self) -> Status {
         self.clean();
         let status = Status::new_identity(self.tab_action.clone());
-        self.gobject.append(status.gobject());
+        self.gobject.append(&status.gobject);
         status
     }
 
@@ -97,7 +97,7 @@ impl Content {
     pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> Status {
         self.clean();
         let status = Status::new_loading(show_with_delay);
-        self.gobject.append(status.gobject());
+        self.gobject.append(&status.gobject);
         status
     }
 
