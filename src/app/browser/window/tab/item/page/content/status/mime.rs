@@ -1,7 +1,7 @@
 use adw::StatusPage;
 
 const DEFAULT_TITLE: &str = "Oops";
-const DEFAULT_ICON_NAME: &str = "help-contents-symbolic";
+const DEFAULT_ICON_NAME: &str = "dialog-question-symbolic";
 
 /// Create new default `GObject` preset for mime issue
 /// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
