@@ -9,7 +9,7 @@ use std::cell::RefCell;
 /// e.g. session resumption or multi-thread connection management (depending of client type selected)
 pub struct Client {
     // Shared reference to cancel async operations
-    pub cancellable: RefCell<Cancellable>,
+    cancellable: RefCell<Cancellable>,
     // Clients
     pub gemini: gemini::Client,
     // other clients..
