@@ -221,16 +221,26 @@ impl Page {
                     }
                 }
             }
-            Request::Search(ref query) => {
-                // try autocomplete scheme prefix @TODO optional resolve timeout
-                if self.navigation.request.to_gemini(500).is_none() {
-                    // make search request to default provider @TODO optional
-                    self.navigation.request.widget.entry.set_text(&format!(
-                        "gemini://tlgs.one/search?{}",
-                        Uri::escape_string(query, None, false)
-                    ));
-                }
-                self.load(true)
+            Request::Search(query) => {
+                // try autocomplete scheme and request it on successful resolve
+                // otherwise make search request @TODO optional search provider
+                self.navigation
+                    .request
+                    .to_gemini_async(500, Some(&self.client.cancellable()), {
+                        let tab_action = self.tab_action.clone();
+                        move |result| {
+                            tab_action.load.activate(
+                                Some(&match result {
+                                    Some(url) => url,
+                                    None => gformat!(
+                                        "gemini://tlgs.one/search?{}",
+                                        Uri::escape_string(&query, None, false)
+                                    ),
+                                }),
+                                true,
+                            )
+                        }
+                    });
             }
         };
     }
