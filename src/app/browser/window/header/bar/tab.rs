@@ -4,7 +4,7 @@ mod widget;
 use append::Append;
 use widget::Widget;
 
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use adw::TabView;
 use std::rc::Rc;
 
