@@ -678,20 +678,12 @@ impl Page {
                                             );
                                     },
                                     mime => {
-                                        // Define common data
-                                        let status = Status::Failure;
-                                        let title = "Oops";
-                                        let description = gformat!("Content type `{mime}` yet not supported!");
+                                        // Init children widget
+                                        let status = content.to_status_mime(mime);
 
-                                        // Update widget
-                                        content
-                                            .to_status_mime()
-                                            .set_title(title)
-                                            .set_description(Some(&description));
-
-                                        // Update meta
-                                        meta.set_status(status)
-                                            .set_title(title);
+                                        // Update page meta
+                                        meta.set_status(Status::Failure)
+                                            .set_title(status.gobject.title().as_str());
 
                                         // Update window
                                         update.activate(Some(&id));

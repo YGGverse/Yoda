@@ -9,7 +9,7 @@ use gtk::gio::{Cancellable, File};
 use std::{rc::Rc, time::Duration};
 
 pub struct Status {
-    gobject: StatusPage,
+    pub gobject: StatusPage,
 }
 
 impl Status {
@@ -38,9 +38,9 @@ impl Status {
     /// Create new mime issue preset
     ///
     /// Useful as placeholder widget for mime issue handlers
-    pub fn new_mime() -> Self {
+    pub fn new_mime(mime: &str) -> Self {
         Self {
-            gobject: mime::new_gobject(),
+            gobject: mime::new_gobject(mime),
         }
     }
 

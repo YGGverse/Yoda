@@ -74,9 +74,9 @@ impl Content {
     /// Set new `content::Status` component for `Self` with new `status::Mime` issue preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_mime(&self) -> Status {
+    pub fn to_status_mime(&self, mime: &str) -> Status {
         self.clean();
-        let status = Status::new_mime();
+        let status = Status::new_mime(mime);
         self.gobject.append(status.gobject());
         status
     }
