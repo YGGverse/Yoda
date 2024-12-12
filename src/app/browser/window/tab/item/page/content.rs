@@ -3,10 +3,10 @@ mod status;
 mod text;
 
 use image::Image;
-use status::Status;
 use text::Text;
 
 use super::{TabAction, WindowAction};
+use adw::StatusPage;
 use gtk::{
     gdk::Paintable,
     gio::{Cancellable, File},
@@ -19,7 +19,7 @@ use std::{rc::Rc, time::Duration};
 pub struct Content {
     window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
-    pub gobject: Box,
+    pub g_box: Box,
 }
 
 impl Content {
@@ -28,7 +28,7 @@ impl Content {
     /// Create new container for different components
     pub fn new(action: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
         Self {
-            gobject: Box::builder().orientation(Orientation::Vertical).build(),
+            g_box: Box::builder().orientation(Orientation::Vertical).build(),
             window_action: action.0,
             tab_action: action.1,
         }
@@ -42,7 +42,7 @@ impl Content {
     pub fn to_image(&self, paintable: &impl IsA<Paintable>) -> Image {
         self.clean();
         let image = Image::new_from_paintable(paintable);
-        self.gobject.append(&image.picture);
+        self.g_box.append(&image.picture);
         image
     }
 
@@ -54,50 +54,54 @@ impl Content {
         initial_filename: &str,
         cancellable: &Cancellable,
         on_choose: impl Fn(File, Rc<status::download::Action>) + 'static,
-    ) -> Status {
+    ) -> StatusPage {
         self.clean();
-        let status = Status::new_download(initial_filename, cancellable, on_choose);
-        self.gobject.append(&status.gobject);
+        let status = status::download::new(initial_filename, cancellable, on_choose);
+        self.g_box.append(&status);
         status
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_failure(&self) -> Status {
+    pub fn to_status_failure(&self) -> StatusPage {
         self.clean();
-        let status = Status::new_failure();
-        self.gobject.append(&status.gobject);
+        let status = status::failure::new();
+        self.g_box.append(&status);
         status
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Mime` issue preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_mime(&self, mime: &str, download: Option<(Rc<TabAction>, GString)>) -> Status {
+    pub fn to_status_mime(
+        &self,
+        mime: &str,
+        download: Option<(Rc<TabAction>, GString)>,
+    ) -> StatusPage {
         self.clean();
-        let status = Status::new_mime(mime, download);
-        self.gobject.append(&status.gobject);
+        let status = status::mime::new(mime, download);
+        self.g_box.append(&status);
         status
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Identity` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_identity(&self) -> Status {
+    pub fn to_status_identity(&self) -> StatusPage {
         self.clean();
-        let status = Status::new_identity(self.tab_action.clone());
-        self.gobject.append(&status.gobject);
+        let status = status::identity::new(self.tab_action.clone());
+        self.g_box.append(&status);
         status
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Loading` preset
     ///
     /// * action removes previous children component from `Self`
-    pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> Status {
+    pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> StatusPage {
         self.clean();
-        let status = Status::new_loading(show_with_delay);
-        self.gobject.append(&status.gobject);
+        let status = status::loading::new(show_with_delay);
+        self.g_box.append(&status);
         status
     }
 
@@ -123,21 +127,21 @@ impl Content {
             base,
             (self.window_action.clone(), self.tab_action.clone()),
         );
-        self.gobject.append(&text.scrolled_window);
+        self.g_box.append(&text.scrolled_window);
         text
     }
 
     pub fn to_text_source(&self, data: &str) -> Text {
         self.clean();
         let text = Text::new_source(data);
-        self.gobject.append(&text.scrolled_window);
+        self.g_box.append(&text.scrolled_window);
         text
     }
 
     /// Remove all children components from `Self`
     pub fn clean(&self) {
-        while let Some(child) = self.gobject.last_child() {
-            self.gobject.remove(&child);
+        while let Some(child) = self.g_box.last_child() {
+            self.g_box.remove(&child);
         }
     }
 }

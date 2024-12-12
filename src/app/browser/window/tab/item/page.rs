@@ -71,7 +71,7 @@ impl Page {
         let widget = Rc::new(Widget::new(
             &id,
             &navigation.widget.gobject,
-            &content.gobject,
+            &content.g_box,
             &input.widget.clamp,
         ));
 
@@ -205,23 +205,19 @@ impl Page {
                         self.load_gemini(uri, is_download, is_source, is_history)
                     }
                     scheme => {
-                        // Define common data
-                        let status = Status::Failure;
-                        let title = "Oops";
-
                         // Add history record
                         if is_history {
                             snap_history(self.navigation.clone());
                         }
 
                         // Update widget
-                        self.content
-                            .to_status_failure()
-                            .set_title(title)
-                            .set_description(Some(&format!("Scheme `{scheme}` not supported")));
+                        let status = self.content.to_status_failure();
+                        status.set_description(Some(&format!("Scheme `{scheme}` not supported")));
 
                         // Update meta
-                        self.meta.set_status(status).set_title(title);
+                        self.meta
+                            .set_status(Status::Failure)
+                            .set_title(&status.title());
 
                         // Update window
                         self.browser_action.update.activate(Some(&id));
@@ -419,7 +415,7 @@ impl Page {
             match self.profile.identity.gemini.match_scope(&uri.to_string()) {
                 Some(identity) => match identity.to_tls_certificate() {
                     Ok(certificate) => Some(certificate),
-                    Err(reason) => todo!("{reason}"),
+                    Err(e) => todo!("{e}"),
                 },
                 None => None,
             },
@@ -568,21 +564,14 @@ impl Page {
                                                             // Update window components
                                                             update.activate(Some(&id));
                                                         }
-                                                        Err(reason) => {
-                                                            // Define common data
-                                                            let status = Status::Failure;
-                                                            let title = "Oops";
-                                                            let description = reason.to_string();
-
+                                                        Err(e) => {
                                                             // Update widget
-                                                            content
-                                                                .to_status_failure()
-                                                                .set_title(title)
-                                                                .set_description(Some(&description));
+                                                            let status = content.to_status_failure();
+                                                            status.set_description(Some(&e.to_string()));
 
                                                             // Update meta
-                                                            meta.set_status(status)
-                                                                .set_title(title);
+                                                            meta.set_status(Status::Failure)
+                                                                .set_title(&status.title());
 
                                                             // Update window
                                                             update.activate(Some(&id));
@@ -638,40 +627,27 @@ impl Page {
                                                                         // Update window components
                                                                         update.activate(Some(&id));
                                                                     }
-                                                                    Err(reason) => {
-                                                                        // Define common data
-                                                                        let status = Status::Failure;
-                                                                        let title = "Oops";
-
+                                                                    Err(e) => {
                                                                         // Update widget
-                                                                        content
-                                                                            .to_status_failure()
-                                                                            .set_title(title)
-                                                                            .set_description(Some(reason.message()));
+                                                                        let status = content.to_status_failure();
+                                                                        status.set_description(Some(e.message()));
 
                                                                         // Update meta
-                                                                        meta.set_status(status)
-                                                                            .set_title(title);
+                                                                        meta.set_status(Status::Failure)
+                                                                            .set_title(&status.title());
                                                                     }
                                                                 }
                                                             }
                                                         );
                                                     },
-                                                    Err(reason) => {
-                                                        // Define common data
-                                                        let status = Status::Failure;
-                                                        let title = "Oops";
-                                                        let description = reason.to_string();
-
+                                                    Err(e) => {
                                                         // Update widget
-                                                        content
-                                                            .to_status_failure()
-                                                            .set_title(title)
-                                                            .set_description(Some(&description));
+                                                        let status = content.to_status_failure();
+                                                        status.set_description(Some(&e.to_string()));
 
                                                         // Update meta
-                                                        meta.set_status(status)
-                                                            .set_title(title);
+                                                        meta.set_status(Status::Failure)
+                                                            .set_title(&status.title());
                                                     }
                                                 }
                                                 }
@@ -686,7 +662,7 @@ impl Page {
 
                                         // Update page meta
                                         meta.set_status(Status::Failure)
-                                            .set_title(status.gobject.title().as_str());
+                                            .set_title(&status.title());
 
                                         // Update window
                                         update.activate(Some(&id));
@@ -763,45 +739,36 @@ impl Page {
                                                         tab_action.load.activate(None, false);
                                                     }
                                                 },
-                                                Err(reason) => {
-                                                    let status = Status::Failure;
-                                                    let title = "Oops";
+                                                Err(e) => {
+                                                    // Update widget
+                                                    let status = content.to_status_failure();
+                                                    status.set_description(Some(&e.to_string()));
 
-                                                    meta.set_status(status)
-                                                        .set_title(title);
-
-                                                    content
-                                                        .to_status_failure()
-                                                        .set_title(title)
-                                                        .set_description(Some(reason.message()));
+                                                    // Update meta
+                                                    meta.set_status(Status::Failure)
+                                                        .set_title(&status.title());
                                                 }
                                             }
                                         }
-                                        Err(reason) => {
-                                            let status = Status::Failure;
-                                            let title = "Oops";
+                                        Err(e) => {
+                                            // Update widget
+                                            let status = content.to_status_failure();
+                                            status.set_description(Some(&e.to_string()));
 
-                                            meta.set_status(status)
-                                                .set_title(title);
-
-                                            content
-                                                .to_status_failure()
-                                                .set_title(title)
-                                                .set_description(Some(reason.message()));
+                                            // Update meta
+                                            meta.set_status(Status::Failure)
+                                                .set_title(&status.title());
                                         },
                                     }
                                 },
                                 None => {
-                                    let status = Status::Failure;
-                                    let title = "Oops";
+                                    // Update widget
+                                    let status = content.to_status_failure();
+                                    status.set_description(Some("Redirection target not defined"));
 
-                                    meta.set_status(status)
-                                        .set_title(title);
-
-                                    content
-                                        .to_status_failure()
-                                        .set_title(title)
-                                        .set_description(Some("Redirection target not defined"));
+                                    // Update meta
+                                    meta.set_status(Status::Failure)
+                                        .set_title(&status.title());
                                 },
                             }
 
@@ -813,83 +780,66 @@ impl Page {
                         gemini::client::connection::response::meta::Status::CertificateUnauthorized |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         gemini::client::connection::response::meta::Status::CertificateInvalid => {
-                            // Define common data
-                            let status = Status::Success;
-                            let title = "Identity";
-
                             // Add history record
                             if is_history {
                                 snap_history(navigation.clone());
                             }
 
                             // Update widget
-                            content
-                                .to_status_identity()
-                                .set_title(title)
-                                .set_description(Some(&match response.meta.data {
-                                    Some(data) => data.value,
-                                    None => match response.meta.status {
-                                        gemini::client::connection::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
-                                        gemini::client::connection::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
-                                        _ => gformat!("Client certificate required")
-                                    },
-                                }));
+                            let status = content.to_status_identity();
+
+                            status.set_description(Some(&match response.meta.data {
+                                Some(data) => data.value,
+                                None => match response.meta.status {
+                                    gemini::client::connection::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
+                                    gemini::client::connection::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
+                                    _ => gformat!("Client certificate required")
+                                },
+                            }));
 
                             // Update meta
-                            meta.set_status(status)
-                                .set_title(title);
+                            meta.set_status(Status::Success)
+                                .set_title(&status.title());
 
                             // Update window
                             update.activate(Some(&id));
                         }
                         _ => {
-                            // Define common data
-                            let status = Status::Failure;
-                            let title = "Oops";
-
                             // Add history record
                             if is_history {
                                 snap_history(navigation.clone());
                             }
 
                             // Update widget
-                            content
-                                .to_status_failure()
-                                .set_title(title)
-                                .set_description(Some(&match response.meta.data {
-                                    Some(data) => data.value,
-                                    None => gformat!("Status code not supported"),
-                                }));
+                            let status = content.to_status_failure();
+
+                            status.set_description(Some(&match response.meta.data {
+                                Some(data) => data.value,
+                                None => gformat!("Status code not supported"),
+                            }));
 
                             // Update meta
-                            meta.set_status(status)
-                                .set_title(title);
+                            meta.set_status(Status::Failure)
+                                .set_title(&status.title());
 
                             // Update window
                             update.activate(Some(&id));
                         }
                     }
                 },
-                Err(reason) => {
-                    // Define common data
-                    let status = Status::Failure;
-                    let title = "Oops";
-                    let description = reason.to_string();
-
+                Err(e) => {
                     // Add history record
                     if is_history {
                         snap_history(navigation.clone());
                     }
 
                     // Update widget
-                    content
-                        .to_status_failure()
-                        .set_title(title)
-                        .set_description(Some(&description));
+                    let status = content.to_status_failure();
+                    status.set_description(Some(&e.to_string()));
 
                     // Update meta
-                    meta.set_status(status)
-                        .set_title(title);
+                    meta.set_status(Status::Failure)
+                        .set_title(&status.title());
 
                     // Update window
                     update.activate(Some(&id));

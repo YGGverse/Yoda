@@ -11,7 +11,7 @@ const DEFAULT_TITLE: &str = "Loading..";
 
 /// Create new default preset for loading
 /// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-pub fn new_gobject(show_with_delay: Option<Duration>) -> StatusPage {
+pub fn new(show_with_delay: Option<Duration>) -> StatusPage {
     // Init spinner component
     let spinner = Spinner::builder()
         .width_request(SPINNER_SIZE)
