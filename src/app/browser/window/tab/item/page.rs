@@ -373,6 +373,9 @@ impl Page {
 
     // @TODO move outside
     fn load_gemini(&self, uri: Uri, is_download: bool, is_source: bool, is_history: bool) {
+        // Init local namespace
+        use gemini::client::connection::response;
+
         // Init shared clones
         let cancellable = self.client.cancellable();
         let update = self.browser_action.update.clone();
@@ -424,8 +427,8 @@ impl Page {
                     // Route by status
                     match response.meta.status {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                        gemini::client::connection::response::meta::Status::Input |
-                        gemini::client::connection::response::meta::Status::SensitiveInput => {
+                        response::meta::Status::Input |
+                        response::meta::Status::SensitiveInput => {
                             // Format response
                             let status = Status::Input;
                             let title = match response.meta.data {
@@ -435,7 +438,7 @@ impl Page {
 
                             // Toggle input form variant
                             match response.meta.status {
-                                gemini::client::connection::response::meta::Status::SensitiveInput =>
+                                response::meta::Status::SensitiveInput =>
                                     input.set_new_sensitive(
                                         tab_action.clone(),
                                         uri.clone(),
@@ -459,7 +462,7 @@ impl Page {
                             update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-                        gemini::client::connection::response::meta::Status::Success => {
+                        response::meta::Status::Success => {
                             if is_history {
                                 snap_history(navigation.clone());
                             }
@@ -527,7 +530,7 @@ impl Page {
                                 match response.meta.mime.unwrap().value.to_lowercase().as_str() {
                                     "text/gemini" => {
                                         // Read entire input stream to buffer
-                                        gemini::client::connection::response::data::Text::from_stream_async(
+                                        response::data::Text::from_stream_async(
                                             response.connection.stream(),
                                             Priority::DEFAULT,
                                             cancellable.clone(),
@@ -671,9 +674,9 @@ impl Page {
                             }
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                        gemini::client::connection::response::meta::Status::Redirect |
+                        response::meta::Status::Redirect |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        gemini::client::connection::response::meta::Status::PermanentRedirect => {
+                        response::meta::Status::PermanentRedirect => {
                             // Extract redirection URL from response data
                             match response.meta.data {
                                 Some(unresolved_url) => {
@@ -730,7 +733,7 @@ impl Page {
                                                             // referrer
                                                             Some(navigation.request.widget.entry.text()),
                                                             // set follow policy based on status code
-                                                            matches!(response.meta.status, gemini::client::connection::response::meta::Status::PermanentRedirect),
+                                                            matches!(response.meta.status, response::meta::Status::PermanentRedirect),
                                                         )
                                                             .set_status(Status::Redirect) // @TODO is this status really wanted?
                                                             .set_title("Redirect");
@@ -775,11 +778,11 @@ impl Page {
                             update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                        gemini::client::connection::response::meta::Status::CertificateRequest |
+                        response::meta::Status::CertificateRequest |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                        gemini::client::connection::response::meta::Status::CertificateUnauthorized |
+                        response::meta::Status::CertificateUnauthorized |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                        gemini::client::connection::response::meta::Status::CertificateInvalid => {
+                        response::meta::Status::CertificateInvalid => {
                             // Add history record
                             if is_history {
                                 snap_history(navigation.clone());
@@ -791,8 +794,8 @@ impl Page {
                             status.set_description(Some(&match response.meta.data {
                                 Some(data) => data.value,
                                 None => match response.meta.status {
-                                    gemini::client::connection::response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
-                                    gemini::client::connection::response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
+                                    response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
+                                    response::meta::Status::CertificateInvalid => gformat!("Certificate not valid"),
                                     _ => gformat!("Client certificate required")
                                 },
                             }));
