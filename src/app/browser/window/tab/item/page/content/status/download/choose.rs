@@ -1,4 +1,8 @@
-use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
+use gtk::{
+    glib::SignalHandlerId,
+    prelude::{ButtonExt, WidgetExt},
+    Align, Button,
+};
 
 // Defaults
 
@@ -16,15 +20,21 @@ impl Choose {
     // Constructors
 
     /// Create new `Self`
-    pub fn new() -> Self {
-        Self {
-            button: Button::builder()
-                .css_classes(CSS_CLASSES)
-                .halign(Align::Center)
-                .label(LABEL)
-                .margin_top(MARGIN)
-                .build(),
+    pub fn new(is_activate_on_release: bool) -> Self {
+        let button = Button::builder()
+            .css_classes(CSS_CLASSES)
+            .halign(Align::Center)
+            .label(LABEL)
+            .margin_top(MARGIN)
+            .build();
+
+        if is_activate_on_release {
+            button.connect_realize(|this| {
+                this.activate();
+            });
         }
+
+        Self { button }
     }
 
     // Actions

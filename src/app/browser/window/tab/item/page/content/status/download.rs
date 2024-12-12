@@ -43,7 +43,7 @@ pub fn new(
     let action = Rc::new(Action::new()); // public callback API
 
     let cancel = Rc::new(Cancel::new());
-    let choose = Rc::new(Choose::new());
+    let choose = Rc::new(Choose::new(true)); // @TODO optional `is_activate_on_release` value
     let open = Rc::new(Open::new());
     let progress = Rc::new(Progress::new());
     let status = Rc::new(Status::new());
