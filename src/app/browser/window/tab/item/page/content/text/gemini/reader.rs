@@ -350,8 +350,8 @@ impl Reader {
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
-                                    None::<&Window>,
-                                    None::<&Cancellable>,
+                                    Window::NONE,
+                                    Cancellable::NONE,
                                     |result| {
                                         if let Err(error) = result {
                                             println!("{error}")
@@ -394,8 +394,8 @@ impl Reader {
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
-                                    None::<&Window>,
-                                    None::<&Cancellable>,
+                                    Window::NONE,
+                                    Cancellable::NONE,
                                     |result| {
                                         if let Err(e) = result {
                                             println!("{e}")

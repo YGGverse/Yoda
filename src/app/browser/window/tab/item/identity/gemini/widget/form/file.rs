@@ -60,7 +60,7 @@ impl File {
                     .filters(&filters)
                     .default_filter(&filter_pem)
                     .build()
-                    .open(None::<&Window>, None::<&Cancellable>, {
+                    .open(Window::NONE, Cancellable::NONE, {
                         let widget_action = widget_action.clone();
                         let button = button.clone();
                         let pem = pem.clone();
