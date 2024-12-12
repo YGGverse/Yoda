@@ -71,6 +71,16 @@ impl Content {
         status
     }
 
+    /// Set new `content::Status` component for `Self` with new `status::Mime` issue preset
+    ///
+    /// * action removes previous children component from `Self`
+    pub fn to_status_mime(&self) -> Status {
+        self.clean();
+        let status = Status::new_mime();
+        self.gobject.append(status.gobject());
+        status
+    }
+
     /// Set new `content::Status` component for `Self` with new `status::Identity` preset
     ///
     /// * action removes previous children component from `Self`

@@ -2,6 +2,7 @@ pub mod download;
 mod failure;
 mod identity;
 mod loading;
+mod mime;
 
 use adw::StatusPage;
 use gtk::gio::{Cancellable, File};
@@ -31,6 +32,15 @@ impl Status {
     pub fn new_failure() -> Self {
         Self {
             gobject: failure::new_gobject(),
+        }
+    }
+
+    /// Create new mime issue preset
+    ///
+    /// Useful as placeholder widget for mime issue handlers
+    pub fn new_mime() -> Self {
+        Self {
+            gobject: mime::new_gobject(),
         }
     }
 
