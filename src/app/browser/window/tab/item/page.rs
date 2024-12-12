@@ -677,15 +677,15 @@ impl Page {
                                                 }
                                             );
                                     },
-                                    _ => {
+                                    mime => {
                                         // Define common data
                                         let status = Status::Failure;
                                         let title = "Oops";
-                                        let description = gformat!("Content type not supported");
+                                        let description = gformat!("Content type `{mime}` yet not supported!");
 
                                         // Update widget
                                         content
-                                            .to_status_failure()
+                                            .to_status_mime()
                                             .set_title(title)
                                             .set_description(Some(&description));
 
