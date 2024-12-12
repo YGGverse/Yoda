@@ -467,14 +467,8 @@ impl Page {
                                 snap_history(navigation.clone());
                             }
                             if is_download {
-                                // Update meta
-                                meta.set_status(Status::Success).set_title("Download");
-
-                                // Update window
-                                update.activate(Some(&id));
-
                                 // Init download widget
-                                content.to_status_download(
+                                let status = content.to_status_download(
                                     &uri_to_title(&uri), // grab default filename
                                     &cancellable,
                                     {
@@ -526,6 +520,13 @@ impl Page {
                                         }
                                     }
                                 );
+
+                                // Update meta
+                                meta.set_status(Status::Success)
+                                    .set_title(&status.title());
+
+                                // Update window
+                                update.activate(Some(&id));
                             } else { // browse
                                 match response.meta.mime.unwrap().value.to_lowercase().as_str() {
                                     "text/gemini" => {
