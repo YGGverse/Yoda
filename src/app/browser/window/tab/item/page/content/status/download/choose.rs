@@ -7,7 +7,7 @@ use gtk::{
 // Defaults
 
 const CSS_CLASSES: [&str; 1] = ["suggested-action"];
-const LABEL: &str = "Choose location..";
+const LABEL: (&str, &str) = ("Choose location..", "Awaiting for choose..");
 const MARGIN: i32 = 16;
 
 /// Choose destination [File](https://docs.gtk.org/gio/iface.File.html)
@@ -24,10 +24,22 @@ impl Choose {
         let button = Button::builder()
             .css_classes(CSS_CLASSES)
             .halign(Align::Center)
-            .label(LABEL)
+            .label(if is_activate_on_release {
+                LABEL.1
+            } else {
+                LABEL.0
+            })
             .margin_top(MARGIN)
             .sensitive(!is_activate_on_release)
             .build();
+
+        button.connect_sensitive_notify(|this| {
+            if this.is_sensitive() {
+                this.set_label(LABEL.0)
+            } else {
+                this.set_label(LABEL.1)
+            }
+        });
 
         if is_activate_on_release {
             button.connect_realize(|this| {
