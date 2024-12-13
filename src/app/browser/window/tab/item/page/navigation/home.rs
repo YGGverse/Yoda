@@ -45,11 +45,11 @@ impl Home {
             let scheme = uri.scheme();
             let port = uri.port();
             if let Some(host) = uri.host() {
-                if port.is_positive() {
-                    return Some(gformat!("{scheme}://{host}:{port}/"));
+                return Some(if port.is_positive() {
+                    gformat!("{scheme}://{host}:{port}/")
                 } else {
-                    return Some(gformat!("{scheme}://{host}/"));
-                } // @TODO auth params
+                    gformat!("{scheme}://{host}/")
+                });
             }
         }
         None
