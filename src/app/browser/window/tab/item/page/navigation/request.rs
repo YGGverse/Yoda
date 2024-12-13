@@ -1,4 +1,5 @@
 mod database;
+mod test;
 mod widget;
 
 use widget::Widget;
