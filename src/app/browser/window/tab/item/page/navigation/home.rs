@@ -3,7 +3,7 @@ mod widget;
 use widget::Widget;
 
 use crate::app::browser::window::action::Action as WindowAction;
-use gtk::glib::{gformat, GString, Uri, UriFlags};
+use gtk::glib::{gformat, GString, Uri};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Home {
@@ -23,13 +23,13 @@ impl Home {
     }
 
     // Actions
-    pub fn update(&self, request: &str) {
-        let has_home = match Uri::parse(request, UriFlags::NONE) {
-            Ok(uri) => {
+    pub fn update(&self, request: Option<&Uri>) {
+        let has_home = match request {
+            Some(uri) => {
                 self.uri.replace(Some(uri.clone()));
                 uri.path().len() > 1
             }
-            _ => {
+            None => {
                 self.uri.replace(None);
                 false
             }

@@ -124,8 +124,9 @@ impl Request {
     // Getters
 
     /// Get current request value in [Uri](https://docs.gtk.org/glib/struct.Uri.html) format
+    /// * `strip_prefix` on parse
     pub fn uri(&self) -> Option<Uri> {
-        match Uri::parse(&self.widget.entry.text(), UriFlags::NONE) {
+        match Uri::parse(&strip_prefix(self.widget.entry.text()), UriFlags::NONE) {
             Ok(uri) => Some(uri),
             _ => None,
         }
@@ -134,17 +135,7 @@ impl Request {
     /// Get current request value without system prefix
     /// * the `prefix` is not `scheme`
     pub fn strip_prefix(&self) -> GString {
-        let mut text = self.widget.entry.text();
-
-        if let Some(postfix) = text.strip_prefix("source:") {
-            text = postfix.into()
-        };
-
-        if let Some(postfix) = text.strip_prefix("download:") {
-            text = postfix.into()
-        };
-
-        text
+        strip_prefix(self.widget.entry.text())
     }
 
     /// Get request value in `download:` format
@@ -187,6 +178,20 @@ impl Request {
 }
 
 // Tools
+
+/// Strip system prefix from request string
+/// * the `prefix` is not `scheme`
+pub fn strip_prefix(mut request: GString) -> GString {
+    if let Some(postfix) = request.strip_prefix("source:") {
+        request = postfix.into()
+    };
+
+    if let Some(postfix) = request.strip_prefix("download:") {
+        request = postfix.into()
+    };
+
+    request
+}
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components

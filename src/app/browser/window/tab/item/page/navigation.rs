@@ -17,7 +17,6 @@ use crate::app::browser::window::tab::item::Action as TabAction;
 use crate::app::browser::window::Action as WindowAction;
 use crate::app::browser::Action as BrowserAction;
 use crate::Profile;
-use gtk::prelude::EditableExt;
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -36,14 +35,14 @@ impl Navigation {
         profile: Rc<Profile>,
         action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
-        // Init components
+        // init children components
         let home = Rc::new(Home::new(action.1.clone()));
         let history = Rc::new(History::new(action.1.clone()));
         let reload = Rc::new(Reload::new(action.1.clone()));
         let request = Rc::new(Request::new((action.0, action.2)));
         let bookmark = Rc::new(Bookmark::new(action.1));
 
-        // Init widget
+        // init main widget
         let widget = Rc::new(Widget::new(
             &home.widget.gobject,
             &history.widget.gobject,
@@ -52,7 +51,7 @@ impl Navigation {
             &bookmark.widget.gobject,
         ));
 
-        // Done
+        // done
         Self {
             bookmark,
             history,
@@ -67,13 +66,15 @@ impl Navigation {
     // Actions
 
     pub fn update(&self, progress_fraction: Option<f64>) {
-        let request_text = self.request.widget.entry.text();
+        // init shared request value
+        let request = self.request.strip_prefix();
 
+        // update children components
         self.bookmark
-            .update(self.profile.bookmark.get(&request_text).is_ok());
+            .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
-        self.home.update(&request_text);
-        self.reload.update(!request_text.is_empty());
+        self.home.update(self.request.uri().as_ref());
+        self.reload.update(!request.is_empty());
         self.request.update(
             progress_fraction,
             self.profile
@@ -81,7 +82,7 @@ impl Navigation {
                 .gemini
                 .auth
                 .memory
-                .match_scope(&request_text)
+                .match_scope(&request)
                 .is_some(),
         );
     }
