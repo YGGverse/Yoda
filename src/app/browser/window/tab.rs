@@ -59,7 +59,7 @@ impl Tab {
                                 }
                             }
                         }
-                        Some(position) // activated tab position
+                        Some(position) // activated tab
                     }
                     // on menu close
                     None => {
@@ -70,7 +70,7 @@ impl Tab {
                                 }
                             }
                         }
-                        None // selected tab
+                        None // current tab
                     }
                 };
 
