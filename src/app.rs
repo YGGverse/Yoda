@@ -152,14 +152,6 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.action.id,
-                    browser.action.update.simple_action.name()
-                ),
-                &["<Primary>u"],
-            ),
-            (
-                format!(
-                    "{}.{}",
-                    browser.action.id,
                     browser.action.focus.simple_action.name()
                 ),
                 &["Escape"],
