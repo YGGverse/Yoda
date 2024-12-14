@@ -34,7 +34,7 @@ impl Home {
                 false
             }
         };
-        self.action.home.gobject.set_enabled(has_home);
+        self.action.home.simple_action.set_enabled(has_home);
         self.widget.update(has_home);
     }
 

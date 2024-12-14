@@ -8,7 +8,7 @@ use sqlite::Transaction;
 const DEFAULT_TITLE: &str = "New page";
 
 pub struct Widget {
-    pub gobject: TabPage,
+    pub tab_page: TabPage,
 }
 
 impl Widget {
@@ -25,8 +25,8 @@ impl Widget {
         // Define state variables
         let (is_pinned, is_selected, is_attention) = state;
 
-        // Create new `TabPage` GObject in given `TabView`
-        let gobject = match position {
+        // Create new `TabPage` for given `TabView`
+        let tab_page = match position {
             Position::After => match tab_view.selected_page() {
                 Some(page) => add(tab_view, child, tab_view.page_position(&page) + 1),
                 None => tab_view.append(child),
@@ -35,22 +35,22 @@ impl Widget {
             Position::Number(value) => add(tab_view, child, value),
         };
 
-        // Setup `GObject`
-        gobject.set_needs_attention(is_attention);
-        gobject.set_keyword(keyword);
-        gobject.set_title(match title {
+        // Setup
+        tab_page.set_needs_attention(is_attention);
+        tab_page.set_keyword(keyword);
+        tab_page.set_title(match title {
             Some(value) => value,
             None => DEFAULT_TITLE,
         });
 
-        tab_view.set_page_pinned(&gobject, is_pinned);
+        tab_view.set_page_pinned(&tab_page, is_pinned);
 
         if is_selected {
-            tab_view.set_selected_page(&gobject);
+            tab_view.set_selected_page(&tab_page);
         }
 
         // Done
-        Self { gobject }
+        Self { tab_page }
     }
 
     // Actions
@@ -88,7 +88,7 @@ impl Widget {
                 for record in records {
                     // Record value can be stored as NULL
                     if let Some(title) = record.title {
-                        self.gobject.set_title(title.as_str());
+                        self.tab_page.set_title(title.as_str());
                     }
 
                     // Delegate restore action to the item childs
@@ -107,7 +107,7 @@ impl Widget {
         app_browser_window_tab_item_id: &i64,
     ) -> Result<(), String> {
         // Keep value in memory until operation complete
-        let title = self.gobject.title();
+        let title = self.tab_page.title();
 
         match database::insert(
             transaction,

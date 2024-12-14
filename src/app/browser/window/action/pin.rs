@@ -11,7 +11,7 @@ const DEFAULT_STATE: i32 = -1;
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Pin` action of `Window` group
 pub struct Pin {
-    pub gobject: SimpleAction,
+    pub simple_action: SimpleAction,
 }
 
 impl Pin {
@@ -20,7 +20,7 @@ impl Pin {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
-            gobject: SimpleAction::new_stateful(
+            simple_action: SimpleAction::new_stateful(
                 &uuid_string_random(),
                 None,
                 &DEFAULT_STATE.to_variant(),
@@ -33,7 +33,7 @@ impl Pin {
     /// Change action [state](https://docs.gtk.org/gio/method.SimpleAction.set_state.html)
     /// * set `DEFAULT_STATE` on `None`
     pub fn change_state(&self, state: Option<i32>) {
-        self.gobject.change_state(
+        self.simple_action.change_state(
             &match state {
                 Some(value) => value,
                 None => DEFAULT_STATE,
@@ -47,7 +47,7 @@ impl Pin {
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     pub fn connect_activate(&self, callback: impl Fn(Option<i32>) + 'static) {
-        self.gobject.connect_activate(move |this, _| {
+        self.simple_action.connect_activate(move |this, _| {
             let state = this
                 .state()
                 .expect("State value required")

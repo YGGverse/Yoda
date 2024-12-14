@@ -27,19 +27,19 @@ impl Menu {
                 main_page.append(Some("New"), Some(&format!(
                     "{}.{}",
                     window_action.id,
-                    window_action.append.gobject.name()
+                    window_action.append.simple_action.name()
                 )));
 
                 main_page.append(Some("Reload"), Some(&format!(
                     "{}.{}",
                     window_action.id,
-                    window_action.reload.gobject.name()
+                    window_action.reload.simple_action.name()
                 )));
 
                 main_page.append(Some("Save as.."), Some(&format!(
                     "{}.{}",
                     window_action.id,
-                    window_action.save_as.gobject.name()
+                    window_action.save_as.simple_action.name()
                 )));
 
                 // Main > Page > Mark
@@ -48,13 +48,13 @@ impl Menu {
                     main_page_mark.append(Some("Bookmark"), Some(&format!(
                         "{}.{}",
                         window_action.id,
-                        window_action.bookmark.gobject.name()
+                        window_action.bookmark.simple_action.name()
                     )));
 
                     main_page_mark.append(Some("Pin"), Some(&format!(
                         "{}.{}",
                         window_action.id,
-                        window_action.pin.gobject.name()
+                        window_action.pin.simple_action.name()
                     )));
 
                 main_page.append_section(None, &main_page_mark);
@@ -65,7 +65,7 @@ impl Menu {
                 main_page_tools.append(Some("Source"), Some(&format!(
                     "{}.{}",
                     window_action.id,
-                    window_action.source.gobject.name()
+                    window_action.source.simple_action.name()
                 )));
 
                 main_page.append_section(None, &main_page_tools);
@@ -76,7 +76,7 @@ impl Menu {
                     main_page_navigation.append(Some("Home"), Some(&format!(
                         "{}.{}",
                         window_action.id,
-                        window_action.home.gobject.name()
+                        window_action.home.simple_action.name()
                     )));
 
                     // Main > Page > Navigation > History
@@ -85,13 +85,13 @@ impl Menu {
                         main_page_navigation_history.append(Some("Back"), Some(&format!(
                             "{}.{}",
                             window_action.id,
-                            window_action.history_back.gobject.name()
+                            window_action.history_back.simple_action.name()
                         )));
 
                         main_page_navigation_history.append(Some("Forward"), Some(&format!(
                             "{}.{}",
                             window_action.id,
-                            window_action.history_forward.gobject.name()
+                            window_action.history_forward.simple_action.name()
                         )));
 
                     main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
@@ -104,13 +104,13 @@ impl Menu {
                     main_page_close.append(Some("Current"), Some(&format!(
                         "{}.{}",
                         window_action.id,
-                        window_action.close.gobject.name()
+                        window_action.close.simple_action.name()
                     )));
 
                     main_page_close.append(Some("All"), Some(&format!(
                         "{}.{}",
                         window_action.id,
-                        window_action.close_all.gobject.name()
+                        window_action.close_all.simple_action.name()
                     )));
 
                     main_page.append_submenu(Some("Close"), &main_page_close);
@@ -124,19 +124,19 @@ impl Menu {
                 main_tool.append(Some("Debug"), Some(&format!(
                     "{}.{}",
                     browser_action.id,
-                    browser_action.debug.gobject.name()
+                    browser_action.debug.simple_action.name()
                 )));
 
                 main_tool.append(Some("Profile"), Some(&format!(
                     "{}.{}",
                     browser_action.id,
-                    browser_action.profile.gobject.name()
+                    browser_action.profile.simple_action.name()
                 )));
 
                 main_tool.append(Some("About"), Some(&format!(
                     "{}.{}",
                     browser_action.id,
-                    browser_action.about.gobject.name()
+                    browser_action.about.simple_action.name()
                 )));
 
         main.append_submenu(Some("Tool"), &main_tool);
@@ -144,7 +144,7 @@ impl Menu {
         main.append(Some("Quit"), Some(&format!(
             "{}.{}",
             browser_action.id,
-            browser_action.close.gobject.name()
+            browser_action.close.simple_action.name()
         )));
 
         // Result

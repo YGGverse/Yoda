@@ -6,7 +6,7 @@ use std::rc::Rc;
 ///
 /// https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/method.TabView.get_menu_model.html
 pub struct Menu {
-    pub gobject: gtk::gio::Menu,
+    pub main: gtk::gio::Menu,
 }
 
 impl Menu {
@@ -21,7 +21,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.reload.gobject.name()
+                window_action.reload.simple_action.name()
             )),
         );
 
@@ -30,7 +30,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.save_as.gobject.name()
+                window_action.save_as.simple_action.name()
             )),
         );
 
@@ -41,7 +41,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.bookmark.gobject.name()
+                window_action.bookmark.simple_action.name()
             )),
         );
 
@@ -50,7 +50,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.pin.gobject.name()
+                window_action.pin.simple_action.name()
             )),
         );
 
@@ -63,7 +63,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.source.gobject.name()
+                window_action.source.simple_action.name()
             )),
         );
 
@@ -76,7 +76,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.home.gobject.name()
+                window_action.home.simple_action.name()
             )),
         );
 
@@ -89,7 +89,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.history_back.gobject.name()
+                window_action.history_back.simple_action.name()
             )),
         );
 
@@ -98,7 +98,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.history_forward.gobject.name()
+                window_action.history_forward.simple_action.name()
             )),
         );
 
@@ -111,7 +111,7 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.close.gobject.name()
+                window_action.close.simple_action.name()
             )),
         );
 
@@ -120,12 +120,12 @@ impl Menu {
             Some(&format!(
                 "{}.{}",
                 window_action.id,
-                window_action.close_all.gobject.name()
+                window_action.close_all.simple_action.name()
             )),
         );
 
         main.append_submenu(Some("Close"), &close);
 
-        Self { gobject: main }
+        Self { main }
     }
 }

@@ -39,12 +39,12 @@ impl Browser {
                 (
                     // Browser
                     &action.id,
-                    action.gobject.clone(),
+                    action.simple_action_group.clone(),
                 ),
                 (
                     // Window
                     &window.action.id,
-                    window.action.gobject.clone(),
+                    window.action.simple_action_group.clone(),
                 ),
             ],
         ));

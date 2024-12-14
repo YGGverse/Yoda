@@ -27,7 +27,7 @@ impl Header {
 
         // Return new struct
         Self {
-            widget: Rc::new(Widget::new(&bar.widget.gobject)),
+            widget: Rc::new(Widget::new(&bar.widget.g_box)),
         }
     }
 }

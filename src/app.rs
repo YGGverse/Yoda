@@ -16,14 +16,14 @@ const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
     profile: Rc<Profile>,
-    gobject: Application,
+    application: Application,
 }
 
 impl App {
     // Construct
     pub fn new(profile: Rc<Profile>) -> Self {
         // Init GTK
-        let gobject = Application::builder()
+        let application = Application::builder()
             .application_id(APPLICATION_ID)
             .build();
 
@@ -31,12 +31,12 @@ impl App {
         let browser = Rc::new(Browser::new(profile.clone()));
 
         // Init events
-        gobject.connect_activate({
+        application.connect_activate({
             let browser = browser.clone();
             move |_| browser.update()
         });
 
-        gobject.connect_startup({
+        application.connect_startup({
             let browser = browser.clone();
             let profile = profile.clone();
             move |this| {
@@ -72,7 +72,7 @@ impl App {
             }
         });
 
-        gobject.connect_shutdown({
+        application.connect_shutdown({
             let browser = browser.clone();
             let profile = profile.clone();
             move |_| {
@@ -136,7 +136,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.action.id,
-                    browser.action.close.gobject.name()
+                    browser.action.close.simple_action.name()
                 ),
                 &["<Primary>Escape"],
             ),
@@ -144,7 +144,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.action.id,
-                    browser.action.debug.gobject.name()
+                    browser.action.debug.simple_action.name()
                 ),
                 &["<Primary>i"],
             ),
@@ -152,7 +152,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.action.id,
-                    browser.action.update.gobject.name()
+                    browser.action.update.simple_action.name()
                 ),
                 &["<Primary>u"],
             ),
@@ -160,7 +160,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.action.id,
-                    browser.action.focus.gobject.name()
+                    browser.action.focus.simple_action.name()
                 ),
                 &["Escape"],
             ),
@@ -169,7 +169,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.append.gobject.name()
+                    browser.window.action.append.simple_action.name()
                 ),
                 &["<Primary>t"],
             ),
@@ -177,7 +177,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.bookmark.gobject.name()
+                    browser.window.action.bookmark.simple_action.name()
                 ),
                 &["<Primary>b"],
             ),
@@ -185,7 +185,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.pin.gobject.name()
+                    browser.window.action.pin.simple_action.name()
                 ),
                 &["<Primary>p"],
             ),
@@ -193,7 +193,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.reload.gobject.name()
+                    browser.window.action.reload.simple_action.name()
                 ),
                 &["<Primary>r"],
             ),
@@ -201,7 +201,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.save_as.gobject.name()
+                    browser.window.action.save_as.simple_action.name()
                 ),
                 &["<Primary>s"],
             ),
@@ -209,7 +209,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.source.gobject.name()
+                    browser.window.action.source.simple_action.name()
                 ),
                 &["<Primary>u"],
             ),
@@ -217,7 +217,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.home.gobject.name()
+                    browser.window.action.home.simple_action.name()
                 ),
                 &["<Primary>h"],
             ),
@@ -225,7 +225,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.history_back.gobject.name()
+                    browser.window.action.history_back.simple_action.name()
                 ),
                 &["<Primary>Left"],
             ),
@@ -233,7 +233,7 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.history_forward.gobject.name()
+                    browser.window.action.history_forward.simple_action.name()
                 ),
                 &["<Primary>Right"],
             ),
@@ -241,16 +241,19 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
-                    browser.window.action.close.gobject.name()
+                    browser.window.action.close.simple_action.name()
                 ),
                 &["<Primary>q"],
             ),
         ] {
-            gobject.set_accels_for_action(detailed_action_name, &accels);
+            application.set_accels_for_action(detailed_action_name, &accels);
         }
 
         // Return activated App struct
-        Self { profile, gobject }
+        Self {
+            profile,
+            application,
+        }
     }
 
     // Actions
@@ -283,7 +286,7 @@ impl App {
         } // unlock database
 
         // Start application
-        self.gobject.run()
+        self.application.run()
     }
 }
 

@@ -47,7 +47,7 @@ pub struct Action {
     pub source: Rc<Source>,
     // Group
     pub id: GString,
-    pub gobject: SimpleActionGroup,
+    pub simple_action_group: SimpleActionGroup,
 }
 
 impl Action {
@@ -72,20 +72,20 @@ impl Action {
         let id = uuid_string_random();
 
         // Init group
-        let gobject = SimpleActionGroup::new();
+        let simple_action_group = SimpleActionGroup::new();
 
         // Add action to given group
-        gobject.add_action(&append.gobject);
-        gobject.add_action(&bookmark.gobject);
-        gobject.add_action(&close_all.gobject);
-        gobject.add_action(&close.gobject);
-        gobject.add_action(&history_back.gobject);
-        gobject.add_action(&history_forward.gobject);
-        gobject.add_action(&home.gobject);
-        gobject.add_action(&pin.gobject);
-        gobject.add_action(&reload.gobject);
-        gobject.add_action(&save_as.gobject);
-        gobject.add_action(&source.gobject);
+        simple_action_group.add_action(&append.simple_action);
+        simple_action_group.add_action(&bookmark.simple_action);
+        simple_action_group.add_action(&close_all.simple_action);
+        simple_action_group.add_action(&close.simple_action);
+        simple_action_group.add_action(&history_back.simple_action);
+        simple_action_group.add_action(&history_forward.simple_action);
+        simple_action_group.add_action(&home.simple_action);
+        simple_action_group.add_action(&pin.simple_action);
+        simple_action_group.add_action(&reload.simple_action);
+        simple_action_group.add_action(&save_as.simple_action);
+        simple_action_group.add_action(&source.simple_action);
 
         // Done
         Self {
@@ -101,7 +101,7 @@ impl Action {
             save_as,
             source,
             id,
-            gobject,
+            simple_action_group,
         }
     }
 }

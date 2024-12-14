@@ -24,7 +24,7 @@ impl Back {
 
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action.history_back.gobject.set_enabled(status);
+        self.action.history_back.simple_action.set_enabled(status);
 
         // Update child components
         self.widget.update(status);

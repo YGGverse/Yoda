@@ -30,7 +30,7 @@ pub struct Action {
     pub update: Rc<Update>,
     // Group
     pub id: GString,
-    pub gobject: SimpleActionGroup,
+    pub simple_action_group: SimpleActionGroup,
 }
 
 impl Action {
@@ -50,15 +50,15 @@ impl Action {
         let id = uuid_string_random();
 
         // Init group
-        let gobject = SimpleActionGroup::new();
+        let simple_action_group = SimpleActionGroup::new();
 
         // Add action to given group
-        gobject.add_action(&about.gobject);
-        gobject.add_action(&close.gobject);
-        gobject.add_action(&debug.gobject);
-        gobject.add_action(&focus.gobject);
-        gobject.add_action(&profile.gobject);
-        gobject.add_action(&update.gobject);
+        simple_action_group.add_action(&about.simple_action);
+        simple_action_group.add_action(&close.simple_action);
+        simple_action_group.add_action(&debug.simple_action);
+        simple_action_group.add_action(&focus.simple_action);
+        simple_action_group.add_action(&profile.simple_action);
+        simple_action_group.add_action(&update.simple_action);
 
         // Done
         Self {
@@ -69,7 +69,7 @@ impl Action {
             profile,
             update,
             id,
-            gobject,
+            simple_action_group,
         }
     }
 }

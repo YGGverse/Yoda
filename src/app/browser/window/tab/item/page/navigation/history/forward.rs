@@ -22,7 +22,10 @@ impl Forward {
     // Actions
     pub fn update(&self, status: bool) {
         // Update actions
-        self.action.history_forward.gobject.set_enabled(status);
+        self.action
+            .history_forward
+            .simple_action
+            .set_enabled(status);
 
         // Update child components
         self.widget.update(status);

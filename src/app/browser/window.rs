@@ -29,8 +29,8 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::new(profile, (browser_action.clone(), action.clone())));
-        let header = Header::new(browser_action, action.clone(), &tab.widget.gobject);
-        let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.gobject));
+        let header = Header::new(browser_action, action.clone(), &tab.widget.tab_view);
+        let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.tab_view));
 
         // Init events
         action.append.connect_activate({

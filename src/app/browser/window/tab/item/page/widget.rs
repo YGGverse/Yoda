@@ -4,7 +4,7 @@ use gtk::{
 };
 
 pub struct Widget {
-    gobject: Box,
+    pub g_box: Box,
 }
 
 impl Widget {
@@ -17,20 +17,15 @@ impl Widget {
         input: &impl IsA<gtk::Widget>,
     ) -> Self {
         // Init self
-        let gobject = Box::builder()
+        let g_box = Box::builder()
             .orientation(Orientation::Vertical)
             .name(name)
             .build();
 
-        gobject.append(navigation);
-        gobject.append(content);
-        gobject.append(input);
+        g_box.append(navigation);
+        g_box.append(content);
+        g_box.append(input);
 
-        Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
+        Self { g_box }
     }
 }

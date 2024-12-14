@@ -40,11 +40,11 @@ impl Tab {
         let menu = Menu::new(action.1.clone());
 
         // Init widget
-        let widget = Rc::new(Widget::new(&menu.gobject));
+        let widget = Rc::new(Widget::new(&menu.main));
 
         // Init events
 
-        widget.gobject.connect_setup_menu({
+        widget.tab_view.connect_setup_menu({
             let action = action.1.clone();
             move |tab_view, tab_page| {
                 // Set new state for page selected on menu open
@@ -65,7 +65,7 @@ impl Tab {
             }
         });
 
-        widget.gobject.connect_close_page({
+        widget.tab_view.connect_close_page({
             let index = index.clone();
             move |_, item| {
                 // Get index ID by keyword saved
@@ -84,7 +84,7 @@ impl Tab {
             }
         });
 
-        widget.gobject.connect_selected_page_notify({
+        widget.tab_view.connect_selected_page_notify({
             let index = index.clone();
             move |this| {
                 if let Some(page) = this.selected_page() {
@@ -120,7 +120,7 @@ impl Tab {
     ) -> Rc<Item> {
         // Init new tab item
         let item = Rc::new(Item::new(
-            &self.widget.gobject,
+            &self.widget.tab_view,
             self.profile.clone(),
             // Actions
             (self.actions.0.clone(), self.actions.1.clone()),
@@ -227,7 +227,7 @@ impl Tab {
                 // Update tab title on loading indicator inactive
                 if !item.page.is_loading() {
                     item.widget
-                        .gobject
+                        .tab_page
                         .set_title(&item.page.meta.title.borrow())
                 }
             }
@@ -240,7 +240,7 @@ impl Tab {
                     // Update tab title on loading indicator inactive
                     if !item.page.is_loading() {
                         item.widget
-                            .gobject
+                            .tab_page
                             .set_title(&item.page.meta.title.borrow())
                     }
                 }
@@ -282,7 +282,7 @@ impl Tab {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
-                        &self.widget.gobject,
+                        &self.widget.tab_view,
                         transaction,
                         &record.id,
                         self.profile.clone(),
@@ -321,10 +321,10 @@ impl Tab {
                     item.save(
                         transaction,
                         &id,
-                        &self.widget.gobject.page_position(&item.widget.gobject),
-                        &item.widget.gobject.is_pinned(),
-                        &item.widget.gobject.is_selected(),
-                        &item.widget.gobject.needs_attention(),
+                        &self.widget.tab_view.page_position(&item.widget.tab_page),
+                        &item.widget.tab_page.is_pinned(),
+                        &item.widget.tab_page.is_selected(),
+                        &item.widget.tab_page.needs_attention(),
                     )?;
                 }
             }

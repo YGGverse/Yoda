@@ -57,7 +57,7 @@ impl Item {
         let widget = Rc::new(Widget::new(
             id.as_str(),
             tab_view,
-            page.widget.gobject(),
+            &page.widget.g_box,
             None,
             position,
             (is_pinned, is_selected, is_attention),
@@ -118,7 +118,7 @@ impl Item {
         self.page.update();
 
         // Update tab loading indicator
-        self.widget.gobject.set_loading(self.page.is_loading());
+        self.widget.tab_page.set_loading(self.page.is_loading());
     }
 
     pub fn clean(

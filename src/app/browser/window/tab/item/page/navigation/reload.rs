@@ -23,7 +23,7 @@ impl Reload {
 
     pub fn update(&self, is_enabled: bool) {
         // Update actions
-        self.action.reload.gobject.set_enabled(is_enabled);
+        self.action.reload.simple_action.set_enabled(is_enabled);
 
         // Update child components
         self.widget.update(is_enabled);
