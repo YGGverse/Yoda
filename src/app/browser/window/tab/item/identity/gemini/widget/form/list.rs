@@ -85,7 +85,7 @@ impl List {
                 &Image::builder()
                     .css_classes(["success"]) // @TODO toggle on certificate issues
                     .cursor(&Cursor::from_name("help", None).unwrap())
-                    .icon_name("help-about-symbolic")
+                    .icon_name("application-certificate-symbolic")
                     .margin_end(4)
                     .pixel_size(11)
                     .build(),
