@@ -43,13 +43,36 @@ impl Tab {
         let widget = Rc::new(Widget::new(&menu.main));
 
         // Init events
-
         widget.tab_view.connect_setup_menu({
             let action = action.1.clone();
+            let index = index.clone();
+            let widget = widget.clone();
             move |tab_view, tab_page| {
-                // Set new state for page selected on menu open
-                // * this action return default state (`None`) on menu close
-                let state = tab_page.map(|this| tab_view.page_position(this));
+                let state = match tab_page {
+                    // on menu open
+                    Some(this) => {
+                        let position = tab_view.page_position(this);
+                        if let Some(page) = widget.page(Some(position)) {
+                            if let Some(id) = page.keyword() {
+                                if let Some(item) = index.borrow().get(&id) {
+                                    item.page.update(); // update window actions for tab activated
+                                }
+                            }
+                        }
+                        Some(position)
+                    }
+                    // on menu close
+                    None => {
+                        if let Some(page) = widget.page(None) {
+                            if let Some(id) = page.keyword() {
+                                if let Some(item) = index.borrow().get(&id) {
+                                    item.page.update(); // update window actions for current tab
+                                }
+                            }
+                        }
+                        None
+                    }
+                };
 
                 // Update actions with new state value
                 action.bookmark.change_state(state);
