@@ -25,7 +25,7 @@ version = "0.3.0"
 
 [dependencies.gtk]
 package = "gtk4"
-version = "0.9.1"
+version = "0.9.4"
 features = ["gnome_46"]
 
 [dependencies.sqlite]
