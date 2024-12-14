@@ -55,22 +55,22 @@ impl Tab {
                         if let Some(page) = widget.page(Some(position)) {
                             if let Some(id) = page.keyword() {
                                 if let Some(item) = index.borrow().get(&id) {
-                                    item.page.update(); // update window actions for tab activated
+                                    item.page.update(); // update window actions using page of tab activated
                                 }
                             }
                         }
-                        Some(position)
+                        Some(position) // activated tab position
                     }
                     // on menu close
                     None => {
                         if let Some(page) = widget.page(None) {
                             if let Some(id) = page.keyword() {
                                 if let Some(item) = index.borrow().get(&id) {
-                                    item.page.update(); // update window actions for current tab
+                                    item.page.update(); // update window actions using page of current tab
                                 }
                             }
                         }
-                        None
+                        None // selected tab
                     }
                 };
 
