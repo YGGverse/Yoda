@@ -52,13 +52,12 @@ impl Tab {
                     // on menu open
                     Some(this) => {
                         let position = tab_view.page_position(this);
-                        if let Some(page) = widget.page(Some(position)) {
-                            if let Some(id) = page.keyword() {
-                                if let Some(item) = index.borrow().get(&id) {
-                                    item.page.update(); // update window actions using page of tab activated
-                                }
+                        if let Some(id) = this.keyword() {
+                            if let Some(item) = index.borrow().get(&id) {
+                                item.page.update(); // update window actions using page of tab activated
                             }
                         }
+
                         Some(position) // activated tab
                     }
                     // on menu close
