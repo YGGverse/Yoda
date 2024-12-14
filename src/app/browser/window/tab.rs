@@ -51,14 +51,12 @@ impl Tab {
                 let state = match tab_page {
                     // on menu open
                     Some(this) => {
-                        let position = tab_view.page_position(this);
                         if let Some(id) = this.keyword() {
                             if let Some(item) = index.borrow().get(&id) {
                                 item.page.update(); // update window actions using page of tab activated
                             }
                         }
-
-                        Some(position) // activated tab
+                        Some(tab_view.page_position(this)) // activated tab
                     }
                     // on menu close
                     None => {
