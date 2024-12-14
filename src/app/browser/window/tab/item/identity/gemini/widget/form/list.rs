@@ -83,7 +83,7 @@ impl List {
 
             subtitle.append(
                 &Image::builder()
-                    .css_classes(["accent"])
+                    .css_classes(["success"]) // @TODO toggle on certificate issues
                     .cursor(&Cursor::from_name("help", None).unwrap())
                     .icon_name("help-about-symbolic")
                     .margin_end(4)
