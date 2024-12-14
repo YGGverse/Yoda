@@ -62,10 +62,11 @@ impl Drop {
                             ResponseAppearance::Suggested,
                         );
 
+                        /* contrast issue with Ubuntu orange accents
                         alert_dialog.set_response_appearance(
                             RESPONSE_CANCEL.0,
                             ResponseAppearance::Destructive,
-                        );
+                        ); */
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {

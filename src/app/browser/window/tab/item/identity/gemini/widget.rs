@@ -72,7 +72,8 @@ impl Widget {
 
         // Decorate default response preset
         alert_dialog.set_response_appearance(RESPONSE_APPLY.0, ResponseAppearance::Suggested);
-        alert_dialog.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive);
+        /* contrast issue with Ubuntu orange accents
+        alert_dialog.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive); */
 
         // Init events
         widget_action.update.connect_activate({

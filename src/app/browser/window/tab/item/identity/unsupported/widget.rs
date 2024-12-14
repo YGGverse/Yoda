@@ -1,6 +1,6 @@
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
-    AlertDialog, ResponseAppearance,
+    AlertDialog,
 };
 use gtk::prelude::IsA;
 
@@ -29,7 +29,8 @@ impl Widget {
         gobject.add_responses(&[RESPONSE_QUIT]);
 
         // Decorate default response preset
-        gobject.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive);
+        /* contrast issue with Ubuntu orange accents
+        gobject.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive); */
 
         // Init events
         gobject.connect_response(None, move |dialog, response| {
