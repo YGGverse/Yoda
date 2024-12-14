@@ -16,7 +16,7 @@ use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
 // Defaults
-const HEADING: &str = "Ident";
+const HEADING: &str = "Identity";
 const BODY: &str = "Select identity certificate";
 
 // Response variants
