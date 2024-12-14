@@ -4,8 +4,7 @@ mod widget;
 use bar::Bar;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
+use super::{Action as WindowAction, BrowserAction};
 use adw::TabView;
 use std::rc::Rc;
 

@@ -10,7 +10,7 @@ use sqlite::Transaction;
 use tab::Tab;
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
+use super::Action as BrowserAction;
 use crate::Profile;
 use gtk::glib::GString;
 use std::rc::Rc;

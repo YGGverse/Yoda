@@ -2,16 +2,16 @@ use adw::{TabView, ToolbarView};
 use gtk::{prelude::BoxExt, Box, Orientation};
 
 pub struct Widget {
-    pub gobject: Box,
+    pub g_box: Box,
 }
 
 impl Widget {
     // Construct
     pub fn new(header: &ToolbarView, tab: &TabView) -> Self {
-        let gobject = Box::builder().orientation(Orientation::Vertical).build();
-        gobject.append(header);
-        gobject.append(tab);
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
+        g_box.append(header);
+        g_box.append(tab);
 
-        Self { gobject }
+        Self { g_box }
     }
 }
