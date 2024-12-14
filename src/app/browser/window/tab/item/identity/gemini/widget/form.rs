@@ -91,8 +91,7 @@ impl Form {
         match self.list.selected().value_enum() {
             Value::GeneratePem => self.name.is_valid(),
             Value::ImportPem => self.file.is_valid(),
-            Value::ProfileIdentityGeminiId(_) => !self.list.selected().is_active(),
-            _ => true,
+            _ => !self.list.selected().is_active(),
         }
     }
 

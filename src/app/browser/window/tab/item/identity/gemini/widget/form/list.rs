@@ -26,24 +26,38 @@ impl List {
 
     /// Create new `Self`
     pub fn new(widget_action: Rc<WidgetAction>, profile: Rc<Profile>, auth_uri: Uri) -> Self {
+        // Init dropdown items
+        let guest_session = Item::new_guest_session();
+        let generate_pem = Item::new_generate_pem();
+        let import_pem = Item::new_import_pem();
+
         // Init model
         let list_store = ListStore::new::<Item>();
 
-        list_store.append(&Item::new_guest_session());
-        list_store.append(&Item::new_generate_pem());
-        list_store.append(&Item::new_import_pem());
+        list_store.append(&guest_session);
+        list_store.append(&generate_pem);
+        list_store.append(&import_pem);
 
         match profile.identity.gemini.database.records() {
             Ok(identities) => {
+                let mut is_guest_session = true;
                 for identity in identities {
                     match Item::new_profile_identity_gemini_id(
                         &profile,
                         identity.id,
                         &auth_uri.to_string(),
                     ) {
-                        Ok(item) => list_store.append(&item),
+                        Ok(item) => {
+                            if item.is_active() {
+                                is_guest_session = false;
+                            }
+                            list_store.append(&item)
+                        }
                         Err(_) => todo!(),
                     }
+                }
+                if is_guest_session {
+                    guest_session.set_is_active(true);
                 }
             }
             Err(_) => todo!(),
@@ -98,12 +112,12 @@ impl List {
             match child.first_child().and_downcast::<Label>() {
                 Some(label) => {
                     label.set_label(&item.title());
-                    label.set_css_classes(if item.is_active() { &["success"] } else { &[] });
+                    label.set_css_classes(if item.is_active() { &["accent"] } else { &[] });
                     item.bind_property("title", &label, "label").build(); // sync label
                     item.bind_property("is-active", &label, "css-classes")
                         .transform_to(|_, is_active| {
                             if is_active {
-                                Some(vec!["success".to_string()])
+                                Some(vec!["accent".to_string()])
                             } else {
                                 Some(vec![])
                             }
