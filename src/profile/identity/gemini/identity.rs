@@ -15,7 +15,7 @@ impl Identity {
     pub fn to_tls_certificate(&self) -> Result<TlsCertificate, Error> {
         match TlsCertificate::from_pem(&self.pem) {
             Ok(certificate) => Ok(certificate),
-            Err(reason) => Err(Error::TlsCertificate(reason)),
+            Err(e) => Err(Error::TlsCertificate(e)),
         }
     }
 }

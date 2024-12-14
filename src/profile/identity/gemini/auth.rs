@@ -49,7 +49,7 @@ impl Auth {
         let profile_identity_gemini_auth_id =
             match self.database.add(profile_identity_gemini_id, scope) {
                 Ok(id) => id,
-                Err(reason) => return Err(Error::Database(reason)),
+                Err(e) => return Err(Error::Database(e)),
             };
 
         // Reindex
@@ -64,12 +64,12 @@ impl Auth {
         match self.database.records_scope(Some(scope)) {
             Ok(records) => {
                 for record in records {
-                    if let Err(reason) = self.database.delete(record.id) {
-                        return Err(Error::Database(reason));
+                    if let Err(e) = self.database.delete(record.id) {
+                        return Err(Error::Database(e));
                     }
                 }
             }
-            Err(reason) => return Err(Error::Database(reason)),
+            Err(e) => return Err(Error::Database(e)),
         }
         self.index()?;
         Ok(())
@@ -80,12 +80,12 @@ impl Auth {
         match self.database.records_ref(profile_identity_gemini_id) {
             Ok(records) => {
                 for record in records {
-                    if let Err(reason) = self.database.delete(record.id) {
-                        return Err(Error::Database(reason));
+                    if let Err(e) = self.database.delete(record.id) {
+                        return Err(Error::Database(e));
                     }
                 }
             }
-            Err(reason) => return Err(Error::Database(reason)),
+            Err(e) => return Err(Error::Database(e)),
         }
         self.index()?;
         Ok(())
@@ -94,23 +94,23 @@ impl Auth {
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
-        if let Err(reason) = self.memory.clear() {
-            return Err(Error::Memory(reason));
+        if let Err(e) = self.memory.clear() {
+            return Err(Error::Memory(e));
         }
 
         // Build new index
         match self.database.records_scope(None) {
             Ok(records) => {
                 for record in records {
-                    if let Err(reason) = self
+                    if let Err(e) = self
                         .memory
                         .add(record.scope, record.profile_identity_gemini_id)
                     {
-                        return Err(Error::Memory(reason));
+                        return Err(Error::Memory(e));
                     }
                 }
             }
-            Err(reason) => return Err(Error::Database(reason)),
+            Err(e) => return Err(Error::Database(e)),
         }
 
         Ok(())

@@ -48,7 +48,7 @@ impl Gemini {
                             .make(None, &widget.form.name.value().unwrap())
                         {
                             Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
-                            Err(reason) => todo!("{}", reason.to_string()),
+                            Err(e) => todo!("{}", e.to_string()),
                         },
                     ),
                     Value::ImportPem => Some(
@@ -58,7 +58,7 @@ impl Gemini {
                             .add(&widget.form.file.pem.take().unwrap())
                         {
                             Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
-                            Err(reason) => todo!("{}", reason.to_string()),
+                            Err(e) => todo!("{}", e.to_string()),
                         },
                     ),
                 };
@@ -67,19 +67,19 @@ impl Gemini {
                 match option {
                     // Activate identity for `auth_uri`
                     Some(profile_identity_gemini_id) => {
-                        if let Err(reason) = profile
+                        if let Err(e) = profile
                             .identity
                             .gemini
                             .auth
                             .apply(profile_identity_gemini_id, &auth_url)
                         {
-                            todo!("{}", reason.to_string())
+                            todo!("{}", e.to_string())
                         };
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        if let Err(reason) = profile.identity.gemini.auth.remove_scope(&auth_url) {
-                            todo!("{}", reason.to_string())
+                        if let Err(e) = profile.identity.gemini.auth.remove_scope(&auth_url) {
+                            todo!("{}", e.to_string())
                         };
                     }
                 }

@@ -29,16 +29,16 @@ impl Identity {
                 Some(identity) => identity.id,
                 None => match database.add(profile_id, true) {
                     Ok(id) => id,
-                    Err(reason) => return Err(Error::Database(reason)),
+                    Err(e) => return Err(Error::Database(e)),
                 },
             },
-            Err(reason) => return Err(Error::Database(reason)),
+            Err(e) => return Err(Error::Database(e)),
         });
 
         // Init gemini component
         let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
             Ok(result) => result,
-            Err(reason) => return Err(Error::Gemini(reason)),
+            Err(e) => return Err(Error::Gemini(e)),
         });
 
         // Done
@@ -53,8 +53,8 @@ impl Identity {
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
-    if let Err(reason) = database::init(tx) {
-        return Err(reason.to_string());
+    if let Err(e) = database::init(tx) {
+        return Err(e.to_string());
     }
 
     // Delegate migration to childs

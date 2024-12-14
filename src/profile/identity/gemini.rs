@@ -36,7 +36,7 @@ impl Gemini {
         // Init components
         let auth = match Auth::new(connection.clone()) {
             Ok(auth) => Rc::new(auth),
-            Err(reason) => return Err(Error::Auth(reason)),
+            Err(e) => return Err(Error::Auth(e)),
         };
         let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
         let memory = Rc::new(Memory::new());
@@ -64,7 +64,7 @@ impl Gemini {
                 self.index()?;
                 Ok(profile_identity_gemini_id)
             }
-            Err(reason) => Err(Error::Database(reason)),
+            Err(e) => Err(Error::Database(e)),
         }
     }
 
@@ -76,7 +76,7 @@ impl Gemini {
                     self.index()?;
                     Ok(())
                 }
-                Err(reason) => Err(Error::Database(reason)),
+                Err(e) => Err(Error::Database(e)),
             },
             Err(e) => Err(Error::Auth(e)),
         }
@@ -97,27 +97,27 @@ impl Gemini {
             name,
         ) {
             Ok(pem) => self.add(&pem),
-            Err(reason) => Err(Error::Certificate(reason)),
+            Err(e) => Err(Error::Certificate(e)),
         }
     }
 
     /// Create new `Memory` index from `Database` for `Self`
     pub fn index(&self) -> Result<(), Error> {
         // Clear previous records
-        if let Err(reason) = self.memory.clear() {
-            return Err(Error::Memory(reason));
+        if let Err(e) = self.memory.clear() {
+            return Err(Error::Memory(e));
         }
 
         // Build new index
         match self.database.records() {
             Ok(records) => {
                 for record in records {
-                    if let Err(reason) = self.memory.add(record.id, record.pem) {
-                        return Err(Error::Memory(reason));
+                    if let Err(e) = self.memory.add(record.id, record.pem) {
+                        return Err(Error::Memory(e));
                     }
                 }
             }
-            Err(reason) => return Err(Error::Database(reason)),
+            Err(e) => return Err(Error::Database(e)),
         };
 
         Ok(())
@@ -135,7 +135,7 @@ impl Gemini {
                         pem,
                     });
                 }
-                Err(reason) => todo!("{:?}", reason.to_string()),
+                Err(e) => todo!("{:?}", e.to_string()),
             }
         }
         None

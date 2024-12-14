@@ -28,11 +28,11 @@ impl Certificate {
                         data: identity.pem,
                         name: certificate.subject_name().unwrap().replace("CN=", ""),
                     }),
-                    Err(reason) => Err(Error::TlsCertificate(reason)),
+                    Err(e) => Err(Error::TlsCertificate(e)),
                 },
                 None => Err(Error::NotFound(profile_identity_gemini_id)),
             },
-            Err(reason) => Err(Error::Database(reason)),
+            Err(e) => Err(Error::Database(e)),
         }
     }
 }

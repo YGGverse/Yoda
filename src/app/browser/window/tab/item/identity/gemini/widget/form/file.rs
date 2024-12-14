@@ -75,17 +75,17 @@ impl File {
                                                 button.set_css_classes(&["success"]);
                                                 button.set_label(filename)
                                             }
-                                            Err(reason) => {
+                                            Err(e) => {
                                                 button.set_css_classes(&["error"]);
-                                                button.set_label(reason.message())
+                                                button.set_label(e.message())
                                             }
                                         }
                                     }
                                     None => todo!(),
                                 },
-                                Err(reason) => {
+                                Err(e) => {
                                     button.set_css_classes(&["warning"]);
-                                    button.set_label(reason.message())
+                                    button.set_label(e.message())
                                 }
                             }
                             button.set_sensitive(true); // unlock

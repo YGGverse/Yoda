@@ -9,11 +9,11 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Database(reason) => {
-                write!(f, "Database error: {reason}")
+            Self::Database(e) => {
+                write!(f, "Database error: {e}")
             }
-            Self::Gemini(reason) => {
-                write!(f, "Could not init Gemini identity: {reason}")
+            Self::Gemini(e) => {
+                write!(f, "Could not init Gemini identity: {e}")
             }
         }
     }

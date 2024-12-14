@@ -52,7 +52,7 @@ impl Database {
         // Done
         match tx.commit() {
             Ok(_) => Ok(id),
-            Err(reason) => Err(reason),
+            Err(e) => Err(e),
         }
     }
 
@@ -66,9 +66,9 @@ impl Database {
         match delete(&tx, id) {
             Ok(_) => match tx.commit() {
                 Ok(_) => Ok(()),
-                Err(reason) => Err(reason),
+                Err(e) => Err(e),
             },
-            Err(reason) => Err(reason),
+            Err(e) => Err(e),
         }
     }
 }

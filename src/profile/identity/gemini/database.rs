@@ -41,7 +41,7 @@ impl Database {
         // Done
         match tx.commit() {
             Ok(_) => Ok(id),
-            Err(reason) => Err(reason),
+            Err(e) => Err(e),
         }
     }
 
@@ -57,7 +57,7 @@ impl Database {
         // Done
         match tx.commit() {
             Ok(_) => Ok(()),
-            Err(reason) => Err(reason),
+            Err(e) => Err(e),
         }
     }
 
