@@ -1,5 +1,6 @@
-use super::MARGIN;
 use gtk::{gdk::Cursor, Button};
+
+const MARGIN: i32 = 6;
 
 pub fn new() -> Button {
     Button::builder()

@@ -1,8 +1,9 @@
-use super::MARGIN;
 use gtk::{
     prelude::{EditableExt, EntryExt},
     Entry, EntryIconPosition,
 };
+
+const MARGIN: i32 = 6;
 
 pub fn new() -> Entry {
     // Init widget

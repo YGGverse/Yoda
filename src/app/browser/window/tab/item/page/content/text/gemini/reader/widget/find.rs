@@ -13,8 +13,6 @@ use gtk::{
 };
 use std::rc::Rc;
 
-const MARGIN: i32 = 6;
-
 pub struct Find {
     pub close: Button,
     pub entry: Entry,

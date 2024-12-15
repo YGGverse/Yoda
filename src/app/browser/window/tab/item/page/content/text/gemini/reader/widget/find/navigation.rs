@@ -1,10 +1,10 @@
 mod back;
 mod forward;
 
+use gtk::{prelude::BoxExt, Box, Button, Orientation, TextIter};
 use std::{cell::Cell, rc::Rc};
 
-use super::MARGIN;
-use gtk::{prelude::BoxExt, Box, Button, Orientation, TextIter};
+const MARGIN: i32 = 6;
 
 pub struct Navigation {
     pub back: Button,
