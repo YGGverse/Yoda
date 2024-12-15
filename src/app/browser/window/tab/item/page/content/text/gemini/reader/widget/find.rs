@@ -1,7 +1,8 @@
 use gtk::{
     gdk::{Cursor, RGBA},
-    prelude::{BoxExt, ButtonExt, EditableExt, EntryExt, TextBufferExt},
-    Box, Button, Entry, EntryIconPosition, Orientation, TextBuffer, TextSearchFlags, TextTag,
+    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt},
+    Box, Button, CheckButton, Entry, EntryIconPosition, Orientation, TextBuffer, TextSearchFlags,
+    TextTag,
 };
 
 const MARGIN: i32 = 6;
@@ -21,9 +22,42 @@ impl Find {
             .icon_name("window-close-symbolic")
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
+            .margin_start(MARGIN)
             .margin_top(MARGIN)
             .tooltip_text("Close find bar")
             .build();
+
+        let match_case = CheckButton::builder()
+            .cursor(&Cursor::from_name("default", None).unwrap())
+            .label("Match case")
+            .build();
+
+        let navigation = Box::builder()
+            .css_classes([
+                "linked", // merge childs
+            ])
+            .margin_end(MARGIN)
+            .orientation(Orientation::Horizontal)
+            .build();
+
+        let back = Button::builder()
+            .icon_name("go-previous-symbolic")
+            .margin_bottom(MARGIN)
+            .margin_top(MARGIN)
+            .sensitive(false)
+            .tooltip_text("Back")
+            .build();
+
+        let forward = Button::builder()
+            .icon_name("go-next-symbolic")
+            .margin_bottom(MARGIN)
+            .margin_top(MARGIN)
+            .sensitive(false)
+            .tooltip_text("Forward")
+            .build();
+
+        navigation.append(&back);
+        navigation.append(&forward);
 
         let entry = Entry::builder()
             .hexpand(true)
@@ -36,15 +70,17 @@ impl Find {
             .primary_icon_name("system-search-symbolic")
             .build();
 
-        let text_tag = TextTag::builder()
+        let found_tag = TextTag::builder()
             .background_rgba(&RGBA::new(0.502, 0.502, 0.502, 0.5)) // @TODO
             .build();
-        text_buffer.tag_table().add(&text_tag);
+        text_buffer.tag_table().add(&found_tag);
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Horizontal).build();
 
         g_box.append(&entry);
+        g_box.append(&navigation);
+        g_box.append(&match_case);
         g_box.append(&close);
 
         // Connect events
@@ -55,36 +91,23 @@ impl Find {
 
         entry.connect_changed({
             let entry = entry.clone();
+            let found_tag = found_tag.clone();
+            let match_case = match_case.clone();
             let text_buffer = text_buffer.clone();
-            let text_tag = text_tag.clone();
             move |this| {
-                // Toggle clear action
+                // toggle clear action
                 if this.text().is_empty() {
                     this.set_secondary_icon_name(None);
                 } else {
                     this.set_secondary_icon_name(Some("edit-clear-symbolic"));
                 }
-
-                // Cleanup previous search results
-                text_buffer.remove_tag(
-                    &text_tag,
-                    &text_buffer.start_iter(),
-                    &text_buffer.end_iter(),
+                // apply changes
+                update(
+                    &text_buffer,
+                    &found_tag,
+                    entry.text().as_str(),
+                    match_case.is_active(),
                 );
-
-                // Get subject once
-                let query = entry.text();
-
-                // Begin search
-                let mut next = text_buffer.start_iter();
-                while let Some((start, end)) = next.forward_search(
-                    &query,
-                    TextSearchFlags::CASE_INSENSITIVE, // @TODO
-                    None,                              // unlimited
-                ) {
-                    text_buffer.apply_tag(&text_tag, &start, &end);
-                    next = end;
-                }
             }
         });
 
@@ -93,11 +116,49 @@ impl Find {
             _ => todo!(), // unexpected
         });
 
+        match_case.connect_toggled({
+            let entry = entry.clone();
+            let found_tag = found_tag.clone();
+            let text_buffer = text_buffer.clone();
+            move |this| {
+                println!("1");
+                update(
+                    &text_buffer,
+                    &found_tag,
+                    entry.text().as_str(),
+                    this.is_active(),
+                )
+            }
+        });
+
         // Done
         Self {
             close,
             entry,
             g_box,
         }
+    }
+}
+
+fn update(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_case: bool) {
+    // Cleanup previous search results
+    text_buffer.remove_tag(
+        found_tag,
+        &text_buffer.start_iter(),
+        &text_buffer.end_iter(),
+    );
+
+    // Begin search
+    let mut next = text_buffer.start_iter();
+    while let Some((start, end)) = next.forward_search(
+        subject,
+        match is_match_case {
+            true => TextSearchFlags::TEXT_ONLY,
+            false => TextSearchFlags::CASE_INSENSITIVE,
+        },
+        None, // unlimited
+    ) {
+        text_buffer.apply_tag(found_tag, &start, &end);
+        next = end;
     }
 }
