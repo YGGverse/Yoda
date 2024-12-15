@@ -55,7 +55,7 @@ impl Navigation {
         self.matches.replace(matches);
 
         // Update child components
-        self.back.update(self.is_match());
+        self.back.update(false);
         self.forward.update(self.is_match());
     }
 
