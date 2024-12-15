@@ -106,7 +106,7 @@ impl Find {
                     this.set_secondary_icon_name(Some("edit-clear-symbolic"));
                 }
                 // apply changes
-                if update(
+                if find(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
@@ -131,7 +131,7 @@ impl Find {
             let found_tag = found_tag.clone();
             let text_buffer = text_buffer.clone();
             move |this| {
-                if update(
+                if find(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
@@ -155,12 +155,7 @@ impl Find {
     }
 }
 
-fn update(
-    text_buffer: &TextBuffer,
-    found_tag: &TextTag,
-    subject: &str,
-    is_match_case: bool,
-) -> i64 {
+fn find(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_case: bool) -> i64 {
     // Cleanup previous search results
     text_buffer.remove_tag(
         found_tag,
