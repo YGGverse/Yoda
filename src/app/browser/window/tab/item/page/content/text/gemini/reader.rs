@@ -24,8 +24,8 @@ use gtk::{
     gio::Cancellable,
     glib::{TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
-    WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextSearchFlags, TextTag, TextWindowType,
+    UriLauncher, Window, WrapMode,
 };
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
@@ -39,6 +39,8 @@ const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 255.0);
 const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 228.0);
 
 pub struct Reader {
+    buffer: TextBuffer,
+    tag: Tag,
     pub title: Option<String>,
     pub widget: Rc<Widget>,
 }
@@ -303,7 +305,7 @@ impl Reader {
 
             // Nothing match custom tags above,
             // just append plain text covered in empty tag (to handle controller events properly)
-            let tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
+            let tag = TextTag::builder().wrap_mode(WrapMode::Word).build(); // @TODO single shared
 
             buffer.tag_table().add(&tag);
             buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag]);
@@ -459,7 +461,33 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Ok(Self { title, widget })
+        Ok(Self {
+            buffer,
+            tag,
+            title,
+            widget,
+        })
+    }
+
+    // Actions
+
+    pub fn find(&self) {
+        self.buffer.remove_tag(
+            &self.tag.found.text_tag,
+            &self.buffer.start_iter(),
+            &self.buffer.end_iter(),
+        );
+
+        let mut next = self.buffer.start_iter();
+        while let Some((start, end)) = next.forward_search(
+            "Gemini",
+            TextSearchFlags::CASE_INSENSITIVE, // @TODO
+            None,                              // unlimited
+        ) {
+            self.buffer
+                .apply_tag(&self.tag.found.text_tag, &start, &end);
+            next = end;
+        }
     }
 }
 
