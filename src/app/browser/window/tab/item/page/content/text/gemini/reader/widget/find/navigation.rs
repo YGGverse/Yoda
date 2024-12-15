@@ -1,13 +1,16 @@
 mod back;
 mod forward;
 
+use std::{cell::Cell, rc::Rc};
+
 use super::MARGIN;
-use gtk::{prelude::BoxExt, Box, Button, Orientation};
+use gtk::{prelude::BoxExt, Box, Button, Orientation, TextIter};
 
 pub struct Navigation {
     pub back: Button,
     pub forward: Button,
     pub g_box: Box,
+    pub matches: Rc<Cell<Vec<(TextIter, TextIter)>>>,
 }
 
 impl Navigation {
@@ -15,6 +18,8 @@ impl Navigation {
 
     /// Create new `Self`
     pub fn new() -> Self {
+        let matches = Rc::new(Cell::new(Vec::new()));
+
         // Init components
         let back = back::new();
         let forward = forward::new();
@@ -35,6 +40,11 @@ impl Navigation {
             back,
             forward,
             g_box,
+            matches,
         }
+    }
+
+    pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
+        self.matches.replace(matches);
     }
 }

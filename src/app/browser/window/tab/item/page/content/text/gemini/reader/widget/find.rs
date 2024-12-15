@@ -11,7 +11,7 @@ use gtk::{
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, WidgetExt},
     Box, Button, Entry, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
 };
-use std::{cell::Cell, rc::Rc};
+use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 
@@ -24,15 +24,12 @@ pub struct Find {
 impl Find {
     // Construct
     pub fn new(text_buffer: &TextBuffer) -> Self {
-        // Init shared matches holder
-        let matches = Rc::new(Cell::new(Vec::<(TextIter, TextIter)>::new()));
-
         // Init components
         let close = close::new();
         let entry = entry::new();
         let match_case = match_case::new();
-        let navigation = Navigation::new();
-        let tag = Tag::new(text_buffer.tag_table());
+        let navigation = Rc::new(Navigation::new());
+        let tag = Rc::new(Tag::new(text_buffer.tag_table()));
 
         // Init main container
         let g_box = Box::builder()
@@ -52,54 +49,35 @@ impl Find {
         });
 
         entry.connect_changed({
-            let back = navigation.back.clone();
             let entry = entry.clone();
-            let forward = navigation.forward.clone();
-            let found_tag = tag.found.clone();
             let match_case = match_case.clone();
-            let matches = matches.clone();
+            let navigation = navigation.clone();
+            let tag = tag.clone();
             let text_buffer = text_buffer.clone();
             move |_| {
-                // do search
-                let result = find(
+                navigation.update(find(
                     &text_buffer,
-                    &found_tag,
+                    &tag.found,
                     entry.text().as_str(),
                     match_case.is_active(),
-                );
-
-                // update components
-                update(&entry, &back, &forward, result.is_empty());
-
-                // update matches index
-                matches.replace(result);
+                ));
+                update(&entry, &navigation);
             }
         });
 
         match_case.connect_toggled({
             let entry = entry.clone();
-            let found_tag = tag.found.clone();
-            let matches = matches.clone();
+            let navigation = navigation.clone();
+            let tag = tag.clone();
             let text_buffer = text_buffer.clone();
             move |this| {
-                // do search
-                let result = find(
+                navigation.update(find(
                     &text_buffer,
-                    &found_tag,
+                    &tag.found,
                     entry.text().as_str(),
                     this.is_active(),
-                );
-
-                // update components
-                update(
-                    &entry,
-                    &navigation.back,
-                    &navigation.forward,
-                    result.is_empty(),
-                );
-
-                // update matches index
-                matches.replace(result);
+                ));
+                update(&entry, &navigation);
             }
         });
 
@@ -147,14 +125,14 @@ fn find(
     result
 }
 
-fn update(entry: &Entry, back: &Button, forward: &Button, is_empty: bool) {
-    if is_empty {
+fn update(entry: &Entry, navigation: &Rc<Navigation>) {
+    if navigation.matches.take().is_empty() {
         entry.add_css_class("error");
-        back.set_sensitive(false);
-        forward.set_sensitive(false);
+        navigation.back.set_sensitive(false);
+        navigation.forward.set_sensitive(false);
     } else {
         entry.remove_css_class("error");
-        back.set_sensitive(false);
-        forward.set_sensitive(true);
+        navigation.back.set_sensitive(false);
+        navigation.forward.set_sensitive(true);
     }
 }
