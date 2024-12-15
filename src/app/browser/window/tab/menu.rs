@@ -26,6 +26,15 @@ impl Menu {
         );
 
         main.append(
+            Some("Find.."),
+            Some(&format!(
+                "{}.{}",
+                window_action.id,
+                window_action.find.simple_action.name()
+            )),
+        );
+
+        main.append(
             Some("Save as.."),
             Some(&format!(
                 "{}.{}",

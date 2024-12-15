@@ -177,6 +177,14 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
+                    browser.window.action.find.simple_action.name()
+                ),
+                &["<Primary>f"],
+            ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window.action.id,
                     browser.window.action.pin.simple_action.name()
                 ),
                 &["<Primary>p"],

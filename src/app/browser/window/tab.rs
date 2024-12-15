@@ -75,6 +75,7 @@ impl Tab {
                 action.bookmark.change_state(state);
                 action.close_all.change_state(state);
                 action.close.change_state(state);
+                action.find.change_state(state);
                 action.history_back.change_state(state);
                 action.history_forward.change_state(state);
                 action.home.change_state(state);

@@ -36,6 +36,12 @@ impl Menu {
                     window_action.reload.simple_action.name()
                 )));
 
+                main_page.append(Some("Find.."), Some(&format!(
+                    "{}.{}",
+                    window_action.id,
+                    window_action.find.simple_action.name()
+                )));
+
                 main_page.append(Some("Save as.."), Some(&format!(
                     "{}.{}",
                     window_action.id,

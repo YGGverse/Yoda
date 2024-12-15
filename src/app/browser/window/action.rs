@@ -2,6 +2,7 @@ mod append;
 mod bookmark;
 mod close;
 mod close_all;
+mod find;
 mod history_back;
 mod history_forward;
 mod home;
@@ -14,6 +15,7 @@ use append::Append;
 use bookmark::Bookmark;
 use close::Close;
 use close_all::CloseAll;
+use find::Find;
 use history_back::HistoryBack;
 use history_forward::HistoryForward;
 use home::Home;
@@ -38,6 +40,7 @@ pub struct Action {
     pub bookmark: Rc<Bookmark>,
     pub close_all: Rc<CloseAll>,
     pub close: Rc<Close>,
+    pub find: Rc<Find>,
     pub history_back: Rc<HistoryBack>,
     pub history_forward: Rc<HistoryForward>,
     pub home: Rc<Home>,
@@ -60,6 +63,7 @@ impl Action {
         let bookmark = Rc::new(Bookmark::new());
         let close = Rc::new(Close::new());
         let close_all = Rc::new(CloseAll::new());
+        let find = Rc::new(Find::new());
         let history_back = Rc::new(HistoryBack::new());
         let history_forward = Rc::new(HistoryForward::new());
         let home = Rc::new(Home::new());
@@ -79,6 +83,7 @@ impl Action {
         simple_action_group.add_action(&bookmark.simple_action);
         simple_action_group.add_action(&close_all.simple_action);
         simple_action_group.add_action(&close.simple_action);
+        simple_action_group.add_action(&find.simple_action);
         simple_action_group.add_action(&history_back.simple_action);
         simple_action_group.add_action(&history_forward.simple_action);
         simple_action_group.add_action(&home.simple_action);
@@ -93,6 +98,7 @@ impl Action {
             bookmark,
             close_all,
             close,
+            find,
             history_back,
             history_forward,
             home,
