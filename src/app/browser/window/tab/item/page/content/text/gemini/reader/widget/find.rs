@@ -124,7 +124,7 @@ fn find(
 }
 
 fn update(entry: &Entry, navigation: &Rc<Navigation>) {
-    if navigation.matches.take().is_empty() {
+    if navigation.matches.borrow().is_empty() {
         entry.add_css_class("error");
         navigation.back.set_sensitive(false);
         navigation.forward.set_sensitive(false);

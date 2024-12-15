@@ -2,7 +2,7 @@ mod back;
 mod forward;
 
 use gtk::{prelude::BoxExt, Box, Button, Orientation, TextIter};
-use std::{cell::Cell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 const MARGIN: i32 = 6;
 
@@ -10,7 +10,7 @@ pub struct Navigation {
     pub back: Button,
     pub forward: Button,
     pub g_box: Box,
-    pub matches: Rc<Cell<Vec<(TextIter, TextIter)>>>,
+    pub matches: Rc<RefCell<Vec<(TextIter, TextIter)>>>,
 }
 
 impl Navigation {
@@ -18,7 +18,8 @@ impl Navigation {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        let matches = Rc::new(Cell::new(Vec::new()));
+        // Init shared matches holder
+        let matches = Rc::new(RefCell::new(Vec::new()));
 
         // Init components
         let back = back::new();
