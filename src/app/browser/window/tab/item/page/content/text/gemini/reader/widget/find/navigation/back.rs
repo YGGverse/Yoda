@@ -14,7 +14,7 @@ impl Back {
         Self {
             button: Button::builder()
                 .cursor(&Cursor::from_name("default", None).unwrap())
-                .icon_name("go-previous-symbolic")
+                .icon_name("go-up-symbolic")
                 .margin_bottom(MARGIN)
                 .margin_top(MARGIN)
                 .sensitive(false)

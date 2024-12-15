@@ -14,7 +14,7 @@ impl Forward {
         Self {
             button: Button::builder()
                 .cursor(&Cursor::from_name("default", None).unwrap())
-                .icon_name("go-next-symbolic")
+                .icon_name("go-down-symbolic")
                 .margin_bottom(MARGIN)
                 .margin_top(MARGIN)
                 .sensitive(false)
