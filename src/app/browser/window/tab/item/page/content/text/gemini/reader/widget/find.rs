@@ -1,6 +1,6 @@
 use gtk::{
     gdk::{Cursor, RGBA},
-    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt},
+    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, WidgetExt},
     Box, Button, CheckButton, Entry, EntryIconPosition, Orientation, TextBuffer, TextSearchFlags,
     TextTag,
 };
@@ -67,6 +67,7 @@ impl Find {
             .margin_top(MARGIN)
             .placeholder_text("Find in text..")
             .primary_icon_activatable(false)
+            .primary_icon_sensitive(false)
             .primary_icon_name("system-search-symbolic")
             .build();
 
@@ -76,7 +77,10 @@ impl Find {
         text_buffer.tag_table().add(&found_tag);
 
         // Init main container
-        let g_box = Box::builder().orientation(Orientation::Horizontal).build();
+        let g_box = Box::builder()
+            // .css_classes(["app-notification"])
+            .orientation(Orientation::Horizontal)
+            .build();
 
         g_box.append(&entry);
         g_box.append(&navigation);
@@ -102,12 +106,18 @@ impl Find {
                     this.set_secondary_icon_name(Some("edit-clear-symbolic"));
                 }
                 // apply changes
-                update(
+                if update(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
                     match_case.is_active(),
-                );
+                )
+                .is_positive()
+                {
+                    entry.remove_css_class("error");
+                } else {
+                    entry.add_css_class("error");
+                }
             }
         });
 
@@ -121,13 +131,18 @@ impl Find {
             let found_tag = found_tag.clone();
             let text_buffer = text_buffer.clone();
             move |this| {
-                println!("1");
-                update(
+                if update(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
                     this.is_active(),
                 )
+                .is_positive()
+                {
+                    entry.remove_css_class("error");
+                } else {
+                    entry.add_css_class("error");
+                }
             }
         });
 
@@ -140,7 +155,12 @@ impl Find {
     }
 }
 
-fn update(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_case: bool) {
+fn update(
+    text_buffer: &TextBuffer,
+    found_tag: &TextTag,
+    subject: &str,
+    is_match_case: bool,
+) -> i64 {
     // Cleanup previous search results
     text_buffer.remove_tag(
         found_tag,
@@ -150,6 +170,7 @@ fn update(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match
 
     // Begin search
     let mut next = text_buffer.start_iter();
+    let mut total: i64 = 0;
     while let Some((start, end)) = next.forward_search(
         subject,
         match is_match_case {
@@ -159,6 +180,9 @@ fn update(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match
         None, // unlimited
     ) {
         text_buffer.apply_tag(found_tag, &start, &end);
+        total = total + 1;
         next = end;
     }
+
+    total
 }
