@@ -180,7 +180,7 @@ fn update(
         None, // unlimited
     ) {
         text_buffer.apply_tag(found_tag, &start, &end);
-        total = total + 1;
+        total += 1;
         next = end;
     }
 
