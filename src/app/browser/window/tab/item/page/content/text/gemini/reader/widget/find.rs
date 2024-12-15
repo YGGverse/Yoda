@@ -1,9 +1,18 @@
+mod close;
+mod entry;
+mod match_case;
+mod navigation;
+mod tag;
+
+use navigation::Navigation;
+use tag::Tag;
+
 use gtk::{
-    gdk::{Cursor, RGBA},
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, WidgetExt},
-    Box, Button, CheckButton, Entry, EntryIconPosition, Orientation, TextBuffer, TextIter,
-    TextSearchFlags, TextTag,
+    Box, Button, Entry, EntryIconPosition, Orientation, TextBuffer, TextIter, TextSearchFlags,
+    TextTag,
 };
+use std::{cell::Cell, rc::Rc};
 
 const MARGIN: i32 = 6;
 
@@ -16,65 +25,15 @@ pub struct Find {
 impl Find {
     // Construct
     pub fn new(text_buffer: &TextBuffer) -> Self {
+        // Init shared matches holder
+        let matches = Rc::new(Cell::new(Vec::<(TextIter, TextIter)>::new()));
+
         // Init components
-        let close = Button::builder()
-            .cursor(&Cursor::from_name("default", None).unwrap())
-            .icon_name("window-close-symbolic")
-            .margin_bottom(MARGIN)
-            .margin_end(MARGIN)
-            .margin_start(MARGIN)
-            .margin_top(MARGIN)
-            .tooltip_text("Close find bar")
-            .build();
-
-        let match_case = CheckButton::builder()
-            .cursor(&Cursor::from_name("default", None).unwrap())
-            .label("Match case")
-            .build();
-
-        let navigation = Box::builder()
-            .css_classes([
-                "linked", // merge childs
-            ])
-            .margin_end(MARGIN)
-            .orientation(Orientation::Horizontal)
-            .build();
-
-        let back = Button::builder()
-            .icon_name("go-previous-symbolic")
-            .margin_bottom(MARGIN)
-            .margin_top(MARGIN)
-            .sensitive(false)
-            .tooltip_text("Back")
-            .build();
-
-        let forward = Button::builder()
-            .icon_name("go-next-symbolic")
-            .margin_bottom(MARGIN)
-            .margin_top(MARGIN)
-            .sensitive(false)
-            .tooltip_text("Forward")
-            .build();
-
-        navigation.append(&back);
-        navigation.append(&forward);
-
-        let entry = Entry::builder()
-            .hexpand(true)
-            .margin_bottom(MARGIN)
-            .margin_end(MARGIN)
-            .margin_start(MARGIN)
-            .margin_top(MARGIN)
-            .placeholder_text("Find in text..")
-            .primary_icon_activatable(false)
-            .primary_icon_sensitive(false)
-            .primary_icon_name("system-search-symbolic")
-            .build();
-
-        let found_tag = TextTag::builder()
-            .background_rgba(&RGBA::new(0.502, 0.502, 0.502, 0.5)) // @TODO
-            .build();
-        text_buffer.tag_table().add(&found_tag);
+        let close = close::new();
+        let entry = entry::new();
+        let match_case = match_case::new();
+        let navigation = Navigation::new();
+        let tag = Tag::new(text_buffer.tag_table());
 
         // Init main container
         let g_box = Box::builder()
@@ -83,7 +42,7 @@ impl Find {
             .build();
 
         g_box.append(&entry);
-        g_box.append(&navigation);
+        g_box.append(&navigation.g_box);
         g_box.append(&match_case);
         g_box.append(&close);
 
@@ -94,30 +53,34 @@ impl Find {
         });
 
         entry.connect_changed({
+            let back = navigation.back.clone();
             let entry = entry.clone();
-            let found_tag = found_tag.clone();
+            let forward = navigation.forward.clone();
+            let found_tag = tag.found.clone();
             let match_case = match_case.clone();
+            let matches = matches.clone();
             let text_buffer = text_buffer.clone();
             move |this| {
-                // toggle clear action
+                // toggle entry clear button
                 if this.text().is_empty() {
                     this.set_secondary_icon_name(None);
                 } else {
                     this.set_secondary_icon_name(Some("edit-clear-symbolic"));
                 }
-                // apply changes
-                if find(
+
+                // do search
+                let result = find(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
                     match_case.is_active(),
-                )
-                .is_empty()
-                {
-                    entry.add_css_class("error");
-                } else {
-                    entry.remove_css_class("error");
-                }
+                );
+
+                // update components
+                update(&entry, &back, &forward, result.is_empty());
+
+                // update matches index
+                matches.replace(result);
             }
         });
 
@@ -128,21 +91,28 @@ impl Find {
 
         match_case.connect_toggled({
             let entry = entry.clone();
-            let found_tag = found_tag.clone();
+            let found_tag = tag.found.clone();
+            let matches = matches.clone();
             let text_buffer = text_buffer.clone();
             move |this| {
-                if find(
+                // do search
+                let result = find(
                     &text_buffer,
                     &found_tag,
                     entry.text().as_str(),
                     this.is_active(),
-                )
-                .is_empty()
-                {
-                    entry.add_css_class("error");
-                } else {
-                    entry.remove_css_class("error");
-                }
+                );
+
+                // update components
+                update(
+                    &entry,
+                    &navigation.back,
+                    &navigation.forward,
+                    result.is_empty(),
+                );
+
+                // update matches index
+                matches.replace(result);
             }
         });
 
@@ -155,12 +125,14 @@ impl Find {
     }
 }
 
+// Tools
+
 fn find(
     text_buffer: &TextBuffer,
     found_tag: &TextTag,
     subject: &str,
     is_match_case: bool,
-) -> Vec<TextIter> {
+) -> Vec<(TextIter, TextIter)> {
     // Init start matches result
     let mut result = Vec::new();
 
@@ -182,8 +154,20 @@ fn find(
         None, // unlimited
     ) {
         text_buffer.apply_tag(found_tag, &start, &end);
-        result.push(start);
-        next = end;
+        next = end.clone();
+        result.push((start, end));
     }
     result
+}
+
+fn update(entry: &Entry, back: &Button, forward: &Button, is_empty: bool) {
+    if is_empty {
+        entry.add_css_class("error");
+        back.set_sensitive(false);
+        forward.set_sensitive(false);
+    } else {
+        entry.remove_css_class("error");
+        back.set_sensitive(false);
+        forward.set_sensitive(true);
+    }
 }
