@@ -1,21 +1,22 @@
 mod close;
-mod entry;
+mod input;
 mod match_case;
 mod navigation;
 mod tag;
 
+use input::Input;
 use navigation::Navigation;
 use tag::Tag;
 
 use gtk::{
-    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, WidgetExt},
-    Box, Button, Entry, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
+    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt},
+    Box, Button, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
 };
 use std::rc::Rc;
 
 pub struct Find {
     pub close: Button,
-    pub entry: Entry,
+    pub input: Rc<Input>,
     pub g_box: Box,
 }
 
@@ -24,7 +25,7 @@ impl Find {
     pub fn new(text_buffer: &TextBuffer) -> Self {
         // Init components
         let close = close::new();
-        let entry = entry::new();
+        let input = Rc::new(Input::new());
         let match_case = match_case::new();
         let navigation = Rc::new(Navigation::new());
         let tag = Rc::new(Tag::new(text_buffer.tag_table()));
@@ -35,19 +36,19 @@ impl Find {
             .orientation(Orientation::Horizontal)
             .build();
 
-        g_box.append(&entry);
+        g_box.append(&input.entry);
         g_box.append(&navigation.g_box);
         g_box.append(&match_case);
         g_box.append(&close);
 
         // Connect events
         close.connect_clicked({
-            let entry = entry.clone();
-            move |_| entry.delete_text(0, -1)
+            let input = input.clone();
+            move |_| input.clean()
         });
 
-        entry.connect_changed({
-            let entry = entry.clone();
+        input.entry.connect_changed({
+            let input = input.clone();
             let match_case = match_case.clone();
             let navigation = navigation.clone();
             let tag = tag.clone();
@@ -56,15 +57,15 @@ impl Find {
                 navigation.update(find(
                     &text_buffer,
                     &tag.found,
-                    entry.text().as_str(),
+                    input.entry.text().as_str(),
                     match_case.is_active(),
                 ));
-                update(&entry, &navigation);
+                input.update(navigation.is_match());
             }
         });
 
         match_case.connect_toggled({
-            let entry = entry.clone();
+            let input = input.clone();
             let navigation = navigation.clone();
             let tag = tag.clone();
             let text_buffer = text_buffer.clone();
@@ -72,17 +73,17 @@ impl Find {
                 navigation.update(find(
                     &text_buffer,
                     &tag.found,
-                    entry.text().as_str(),
+                    input.entry.text().as_str(),
                     this.is_active(),
                 ));
-                update(&entry, &navigation);
+                input.update(navigation.is_match());
             }
         });
 
         // Done
         Self {
             close,
-            entry,
+            input,
             g_box,
         }
     }
@@ -121,16 +122,4 @@ fn find(
         result.push((start, end));
     }
     result
-}
-
-fn update(entry: &Entry, navigation: &Rc<Navigation>) {
-    if navigation.matches.borrow().is_empty() {
-        entry.add_css_class("error");
-        navigation.back.set_sensitive(false);
-        navigation.forward.set_sensitive(false);
-    } else {
-        entry.remove_css_class("error");
-        navigation.back.set_sensitive(false);
-        navigation.forward.set_sensitive(true);
-    }
 }

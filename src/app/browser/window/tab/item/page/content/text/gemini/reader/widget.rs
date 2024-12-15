@@ -52,7 +52,7 @@ impl Widget {
             let text_view = text_view.clone();
             move |_| {
                 text_view.set_gutter(TextWindowType::Bottom, Some(&find.g_box));
-                find.entry.grab_focus();
+                find.input.entry.grab_focus();
             }
         });
 
