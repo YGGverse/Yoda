@@ -1,21 +1,33 @@
+mod find;
+
+use find::Find;
+
 use gtk::{
-    prelude::WidgetExt, EventControllerMotion, GestureClick, TextBuffer, TextView, WrapMode,
+    prelude::{TextViewExt, WidgetExt},
+    EventControllerMotion, GestureClick, TextBuffer, TextView, TextWindowType, WrapMode,
 };
 
 const MARGIN: i32 = 8;
 
 pub struct Widget {
+    find: Find,
     pub text_view: TextView,
 }
 
 impl Widget {
-    // Construct
+    // Constructors
+
+    /// Create new `Self`
     pub fn new(
         buffer: &TextBuffer,
         primary_button_controller: GestureClick,
         middle_button_controller: GestureClick,
         motion_controller: EventControllerMotion,
     ) -> Self {
+        // Init components
+        let find = Find::new();
+
+        // Init main widget
         let text_view = TextView::builder()
             .bottom_margin(MARGIN)
             .buffer(buffer)
@@ -32,6 +44,20 @@ impl Widget {
         text_view.add_controller(middle_button_controller);
         text_view.add_controller(motion_controller);
 
-        Self { text_view }
+        // Done
+        Self { find, text_view }
+    }
+
+    // Actions
+
+    pub fn find(&self, is_visible: bool) {
+        if is_visible {
+            self.text_view
+                .set_gutter(TextWindowType::Bottom, Some(&self.find.g_box));
+            self.find.g_box.grab_focus();
+        } else {
+            self.text_view
+                .set_gutter(TextWindowType::Bottom, gtk::Widget::NONE);
+        }
     }
 }
