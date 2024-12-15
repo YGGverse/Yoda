@@ -9,9 +9,8 @@ use syntax::Syntax;
 use tag::Tag;
 use widget::Widget;
 
-use crate::app::browser::window::{
-    action::Position, tab::item::Action as TabAction, Action as WindowAction,
-};
+use super::{TabAction, WindowAction};
+use crate::app::browser::window::action::Position;
 use gemtext::line::{
     code::{Inline, Multiline},
     header::{Header, Level},
@@ -24,8 +23,8 @@ use gtk::{
     gio::Cancellable,
     glib::{TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
-    EventControllerMotion, GestureClick, TextBuffer, TextSearchFlags, TextTag, TextWindowType,
-    UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextWindowType, UriLauncher, Window,
+    WrapMode,
 };
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
@@ -39,8 +38,6 @@ const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 255.0);
 const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 228.0);
 
 pub struct Reader {
-    buffer: TextBuffer,
-    tag: Tag,
     pub title: Option<String>,
     pub widget: Rc<Widget>,
 }
@@ -50,7 +47,7 @@ impl Reader {
     pub fn new(
         gemtext: &str,
         base: &Uri,
-        actions: (Rc<WindowAction>, Rc<TabAction>),
+        (window_action, tab_action): (Rc<WindowAction>, Rc<TabAction>),
     ) -> Result<Self, Error> {
         // Init default values
         let mut title = None;
@@ -319,10 +316,11 @@ impl Reader {
 
         // Init widget
         let widget = Rc::new(Widget::new(
+            &window_action,
             &buffer,
-            primary_button_controller.clone(),
-            middle_button_controller.clone(),
-            motion_controller.clone(),
+            &primary_button_controller,
+            &middle_button_controller,
+            &motion_controller,
         ));
 
         // Init shared reference container for HashTable collected
@@ -348,7 +346,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    actions.1.load.activate(Some(&uri.to_str()), true);
+                                    tab_action.load.activate(Some(&uri.to_str()), true);
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
@@ -385,7 +383,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" => {
                                     // Open new page in browser
-                                    actions.0.append.activate_stateful_once(
+                                    window_action.append.activate_stateful_once(
                                         Position::After,
                                         Some(uri.to_string()),
                                         false,
@@ -461,33 +459,7 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Ok(Self {
-            buffer,
-            tag,
-            title,
-            widget,
-        })
-    }
-
-    // Actions
-
-    pub fn find(&self) {
-        self.buffer.remove_tag(
-            &self.tag.found.text_tag,
-            &self.buffer.start_iter(),
-            &self.buffer.end_iter(),
-        );
-
-        let mut next = self.buffer.start_iter();
-        while let Some((start, end)) = next.forward_search(
-            "Gemini",
-            TextSearchFlags::CASE_INSENSITIVE, // @TODO
-            None,                              // unlimited
-        ) {
-            self.buffer
-                .apply_tag(&self.tag.found.text_tag, &start, &end);
-            next = end;
-        }
+        Ok(Self { title, widget })
     }
 }
 

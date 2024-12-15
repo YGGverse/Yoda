@@ -1,4 +1,3 @@
-mod found;
 mod h1;
 mod h2;
 mod h3;
@@ -6,7 +5,6 @@ mod list;
 mod quote;
 mod title;
 
-use found::Found;
 use h1::H1;
 use h2::H2;
 use h3::H3;
@@ -25,7 +23,6 @@ pub struct Tag {
     pub list: List,
     pub quote: Quote,
     pub title: Title,
-    pub found: Found,
 }
 
 impl Tag {
@@ -38,7 +35,6 @@ impl Tag {
         let list = List::new();
         let quote = Quote::new();
         let title = Title::new();
-        let found = Found::new();
 
         // Init tag table
         let text_tag_table = TextTagTable::new();
@@ -49,7 +45,6 @@ impl Tag {
         text_tag_table.add(&title.text_tag);
         text_tag_table.add(&list.text_tag);
         text_tag_table.add(&quote.text_tag);
-        text_tag_table.add(&found.text_tag);
 
         Self {
             text_tag_table,
@@ -60,7 +55,6 @@ impl Tag {
             list,
             quote,
             title,
-            found,
         }
     }
 }
