@@ -8,7 +8,7 @@ use navigation::Navigation;
 use tag::Tag;
 
 use gtk::{
-    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, WidgetExt},
+    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, WidgetExt},
     Box, Button, Entry, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
 };
 use std::{cell::Cell, rc::Rc};
@@ -59,14 +59,7 @@ impl Find {
             let match_case = match_case.clone();
             let matches = matches.clone();
             let text_buffer = text_buffer.clone();
-            move |this| {
-                // toggle entry clear button
-                if this.text().is_empty() {
-                    this.set_secondary_icon_name(None);
-                } else {
-                    this.set_secondary_icon_name(Some("edit-clear-symbolic"));
-                }
-
+            move |_| {
                 // do search
                 let result = find(
                     &text_buffer,

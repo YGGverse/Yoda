@@ -24,6 +24,15 @@ pub fn new() -> Entry {
         _ => todo!(), // unexpected
     });
 
+    entry.connect_changed(|this| {
+        // toggle entry clear button
+        if this.text().is_empty() {
+            this.set_secondary_icon_name(None);
+        } else {
+            this.set_secondary_icon_name(Some("edit-clear-symbolic"));
+        }
+    });
+
     // Done
     entry
 }
