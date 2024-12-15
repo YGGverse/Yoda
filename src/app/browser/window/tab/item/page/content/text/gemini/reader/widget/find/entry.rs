@@ -1,8 +1,12 @@
 use super::MARGIN;
-use gtk::Entry;
+use gtk::{
+    prelude::{EditableExt, EntryExt},
+    Entry, EntryIconPosition,
+};
 
 pub fn new() -> Entry {
-    Entry::builder()
+    // Init widget
+    let entry = Entry::builder()
         .hexpand(true)
         .margin_bottom(MARGIN)
         .margin_end(MARGIN)
@@ -12,5 +16,14 @@ pub fn new() -> Entry {
         .primary_icon_activatable(false)
         .primary_icon_sensitive(false)
         .primary_icon_name("system-search-symbolic")
-        .build()
+        .build();
+
+    // Connect events
+    entry.connect_icon_release(|this, position| match position {
+        EntryIconPosition::Secondary => this.delete_text(0, -1),
+        _ => todo!(), // unexpected
+    });
+
+    // Done
+    entry
 }

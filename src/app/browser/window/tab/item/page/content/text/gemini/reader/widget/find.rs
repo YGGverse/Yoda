@@ -9,8 +9,7 @@ use tag::Tag;
 
 use gtk::{
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, WidgetExt},
-    Box, Button, Entry, EntryIconPosition, Orientation, TextBuffer, TextIter, TextSearchFlags,
-    TextTag,
+    Box, Button, Entry, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
 };
 use std::{cell::Cell, rc::Rc};
 
@@ -82,11 +81,6 @@ impl Find {
                 // update matches index
                 matches.replace(result);
             }
-        });
-
-        entry.connect_icon_release(move |this, position| match position {
-            EntryIconPosition::Secondary => this.delete_text(0, -1),
-            _ => todo!(), // unexpected
         });
 
         match_case.connect_toggled({
