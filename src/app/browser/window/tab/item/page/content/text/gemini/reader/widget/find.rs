@@ -148,7 +148,7 @@ fn find(
         None, // unlimited
     ) {
         text_buffer.apply_tag(found_tag, &start, &end);
-        next = end.clone();
+        next = end;
         result.push((start, end));
     }
     result
