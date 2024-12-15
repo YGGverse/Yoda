@@ -1,8 +1,8 @@
 use gtk::{
     gdk::{Cursor, RGBA},
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, WidgetExt},
-    Box, Button, CheckButton, Entry, EntryIconPosition, Orientation, TextBuffer, TextSearchFlags,
-    TextTag,
+    Box, Button, CheckButton, Entry, EntryIconPosition, Orientation, TextBuffer, TextIter,
+    TextSearchFlags, TextTag,
 };
 
 const MARGIN: i32 = 6;
@@ -112,11 +112,11 @@ impl Find {
                     entry.text().as_str(),
                     match_case.is_active(),
                 )
-                .is_positive()
+                .is_empty()
                 {
-                    entry.remove_css_class("error");
-                } else {
                     entry.add_css_class("error");
+                } else {
+                    entry.remove_css_class("error");
                 }
             }
         });
@@ -137,11 +137,11 @@ impl Find {
                     entry.text().as_str(),
                     this.is_active(),
                 )
-                .is_positive()
+                .is_empty()
                 {
-                    entry.remove_css_class("error");
-                } else {
                     entry.add_css_class("error");
+                } else {
+                    entry.remove_css_class("error");
                 }
             }
         });
@@ -155,7 +155,15 @@ impl Find {
     }
 }
 
-fn find(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_case: bool) -> i64 {
+fn find(
+    text_buffer: &TextBuffer,
+    found_tag: &TextTag,
+    subject: &str,
+    is_match_case: bool,
+) -> Vec<TextIter> {
+    // Init start matches result
+    let mut result = Vec::new();
+
     // Cleanup previous search results
     text_buffer.remove_tag(
         found_tag,
@@ -165,7 +173,6 @@ fn find(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_c
 
     // Begin search
     let mut next = text_buffer.start_iter();
-    let mut total: i64 = 0;
     while let Some((start, end)) = next.forward_search(
         subject,
         match is_match_case {
@@ -175,9 +182,8 @@ fn find(text_buffer: &TextBuffer, found_tag: &TextTag, subject: &str, is_match_c
         None, // unlimited
     ) {
         text_buffer.apply_tag(found_tag, &start, &end);
-        total += 1;
+        result.push(start);
         next = end;
     }
-
-    total
+    result
 }
