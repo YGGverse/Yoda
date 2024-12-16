@@ -317,7 +317,6 @@ impl Reader {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            &window_action,
             &buffer,
             &primary_button_controller,
             &middle_button_controller,

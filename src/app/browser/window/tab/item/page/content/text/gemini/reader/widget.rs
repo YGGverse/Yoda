@@ -1,6 +1,3 @@
-use std::rc::Rc;
-
-use super::WindowAction;
 use gtk::{
     prelude::WidgetExt, EventControllerMotion, GestureClick, TextBuffer, TextView, WrapMode,
 };
@@ -16,7 +13,6 @@ impl Widget {
 
     /// Create new `Self`
     pub fn new(
-        action: &WindowAction,
         buffer: &TextBuffer,
         primary_button_controller: &GestureClick,
         middle_button_controller: &GestureClick,
