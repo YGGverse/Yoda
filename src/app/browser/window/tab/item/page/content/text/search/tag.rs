@@ -4,7 +4,7 @@ mod found;
 use gtk::{TextTag, TextTagTable};
 
 pub struct Tag {
-    // pub current: TextTag,
+    pub current: TextTag,
     pub found: TextTag,
 }
 
@@ -20,8 +20,6 @@ impl Tag {
         tag_table.add(&current);
         tag_table.add(&found);
 
-        Self {
-            /*current,*/ found,
-        }
+        Self { current, found }
     }
 }

@@ -28,8 +28,8 @@ impl Search {
         let close = close::new();
         let input = Rc::new(Input::new());
         let match_case = match_case::new();
-        let navigation = Rc::new(Navigation::new());
         let tag = Rc::new(Tag::new(text_buffer.tag_table()));
+        let navigation = Rc::new(Navigation::new(text_buffer.clone(), tag.current.clone()));
 
         // Init main container
         let g_box = Box::builder()
