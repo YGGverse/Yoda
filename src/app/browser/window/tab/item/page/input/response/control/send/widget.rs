@@ -4,6 +4,8 @@ use gtk::{
     Button,
 };
 
+const MARGIN: i32 = 6;
+
 pub struct Widget {
     pub button: Button,
 }
@@ -15,6 +17,7 @@ impl Widget {
         let button = Button::builder()
             //.css_classes(["accent"])
             .label("Send")
+            .margin_bottom(MARGIN)
             .build();
 
         // Init events

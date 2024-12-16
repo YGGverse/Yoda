@@ -9,7 +9,7 @@ impl Widget {
     // Construct
     pub fn new() -> Self {
         let clamp = Clamp::builder()
-            .css_classes(["app-notification"])
+            .css_classes(["osd"])
             .maximum_size(800)
             .visible(false)
             .build();

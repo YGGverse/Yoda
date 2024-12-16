@@ -33,7 +33,7 @@ impl Search {
 
         // Init main container
         let g_box = Box::builder()
-            .css_classes(["app-notification"])
+            .css_classes(["osd"])
             .orientation(Orientation::Horizontal)
             .visible(false)
             .build();
