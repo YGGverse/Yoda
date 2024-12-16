@@ -68,7 +68,7 @@ impl Text {
             let navigation = search.navigation.clone();
             move |_| {
                 if let Some((mut start, _)) = navigation.back() {
-                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                    text_view.scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
                 }
             }
         });
@@ -78,7 +78,7 @@ impl Text {
             let navigation = search.navigation.clone();
             move |_| {
                 if let Some((mut start, _)) = navigation.forward() {
-                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                    text_view.scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
                 }
             }
         });
