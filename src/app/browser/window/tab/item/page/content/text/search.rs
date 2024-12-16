@@ -104,13 +104,17 @@ fn find(
     // Init matches holder
     let mut result = Vec::new();
 
+    // Get iters
+    let buffer_start = buffer.start_iter();
+    let buffer_end = buffer.end_iter();
+
     // Cleanup previous search highlights
-    buffer.remove_tag(&tag.current, &buffer.start_iter(), &buffer.end_iter());
-    buffer.remove_tag(&tag.found, &buffer.start_iter(), &buffer.end_iter());
+    buffer.remove_tag(&tag.current, &buffer_start, &buffer_end);
+    buffer.remove_tag(&tag.found, &buffer_start, &buffer_end);
 
     // Begin new search
-    let mut next = buffer.start_iter();
-    while let Some((start, end)) = next.forward_search(
+    let mut next = buffer_start;
+    while let Some((match_start, match_end)) = next.forward_search(
         subject,
         match is_match_case {
             true => TextSearchFlags::TEXT_ONLY,
@@ -118,9 +122,9 @@ fn find(
         },
         None, // unlimited
     ) {
-        buffer.apply_tag(&tag.found, &start, &end);
-        next = end;
-        result.push((start, end));
+        buffer.apply_tag(&tag.found, &match_start, &match_end);
+        next = match_end;
+        result.push((match_start, match_end));
     }
     result
 }
