@@ -5,7 +5,7 @@ use gemini::Gemini;
 use source::Source;
 
 use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
-use gtk::{glib::Uri, ScrolledWindow};
+use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation, ScrolledWindow};
 use std::rc::Rc;
 
 pub struct Meta {
@@ -14,7 +14,7 @@ pub struct Meta {
 
 pub struct Text {
     pub meta: Meta,
-    pub scrolled_window: ScrolledWindow,
+    pub g_box: Box,
 }
 
 impl Text {
@@ -25,32 +25,37 @@ impl Text {
         base: &Uri,
         actions: (Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
-        // Init widget driver
+        // Init components
         let gemini = Gemini::new(gemtext, base, actions);
 
-        // Init scrolled container
-        let scrolled_window = ScrolledWindow::builder().build();
+        // Init main widget
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
+        g_box.append(
+            &ScrolledWindow::builder()
+                .child(&gemini.widget.clamp_scrollable)
+                .build(),
+        );
 
-        scrolled_window.set_child(Some(&gemini.widget.clamp_scrollable));
-
-        // Result
         Self {
             meta: Meta {
                 title: gemini.reader.title.clone(),
             },
-            scrolled_window,
+            g_box,
         }
     }
 
     pub fn new_source(data: &str) -> Self {
-        // Init scrolled container
-        let scrolled_window = ScrolledWindow::builder().build();
-        scrolled_window.set_child(Some(&Source::new(data).text_view));
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
 
-        // Result
+        g_box.append(
+            &ScrolledWindow::builder()
+                .child(&Source::new(data).text_view)
+                .build(),
+        );
+
         Self {
             meta: Meta { title: None },
-            scrolled_window,
+            g_box,
         }
     }
 }

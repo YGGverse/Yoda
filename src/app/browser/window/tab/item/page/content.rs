@@ -127,14 +127,14 @@ impl Content {
             base,
             (self.window_action.clone(), self.tab_action.clone()),
         );
-        self.g_box.append(&text.scrolled_window);
+        self.g_box.append(&text.g_box);
         text
     }
 
     pub fn to_text_source(&self, data: &str) -> Text {
         self.clean();
         let text = Text::new_source(data);
-        self.g_box.append(&text.scrolled_window);
+        self.g_box.append(&text.g_box);
         text
     }
 
