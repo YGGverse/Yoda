@@ -81,6 +81,11 @@ impl Window {
             move |_| tab.close_all()
         });
 
+        action.find.connect_activate({
+            let tab = tab.clone();
+            move |position| tab.find(position)
+        });
+
         action.save_as.connect_activate({
             let tab = tab.clone();
             move |position| tab.save_as(position)

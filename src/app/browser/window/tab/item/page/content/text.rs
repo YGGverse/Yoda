@@ -1,17 +1,14 @@
 mod gemini;
-mod search;
 mod source;
 
 use gemini::Gemini;
-use search::Search;
 use source::Source;
 
 use super::{BrowserAction, TabAction, WindowAction};
-use adw::Clamp;
 use gtk::{
     glib::Uri,
-    prelude::{BoxExt, ButtonExt, TextViewExt, WidgetExt},
-    Box, Orientation, ScrolledWindow,
+    prelude::{BoxExt, TextViewExt},
+    Box, Orientation, ScrolledWindow, TextBuffer,
 };
 use std::rc::Rc;
 
@@ -20,8 +17,8 @@ pub struct Meta {
 } // @TODO move to separated mod
 
 pub struct Text {
+    pub buffer: TextBuffer,
     pub g_box: Box,
-    pub has_search: bool,
     pub meta: Meta,
 }
 
@@ -39,7 +36,6 @@ impl Text {
     ) -> Self {
         // Init components
         let gemini = Gemini::new(gemtext, base, (window_action, tab_action));
-        let search = Rc::new(Search::new(&gemini.reader.buffer));
 
         // Init main widget
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
@@ -50,15 +46,8 @@ impl Text {
                 .build(),
         );
 
-        g_box.append(
-            &Clamp::builder()
-                .child(&search.g_box)
-                .css_classes(["osd"])
-                .maximum_size(800)
-                .build(),
-        );
-
         // Connect events
+        /* @TODO
         browser_action.escape.connect_activate({
             let close = search.close.clone();
             move || {
@@ -99,29 +88,28 @@ impl Text {
             move |_| {
                 search.g_box.set_visible(false);
             }
-        });
+        });*/
 
         Self {
+            buffer: gemini.reader.widget.text_view.buffer(),
             meta: Meta {
                 title: gemini.reader.title.clone(),
             },
-            has_search: true,
             g_box,
         }
     }
 
     pub fn new_source(data: &str) -> Self {
+        // Init components
+        let source = Source::new(data);
+
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
 
-        g_box.append(
-            &ScrolledWindow::builder()
-                .child(&Source::new(data).text_view)
-                .build(),
-        );
+        g_box.append(&ScrolledWindow::builder().child(&source.text_view).build());
 
         Self {
+            buffer: source.text_view.buffer(),
             meta: Meta { title: None },
-            has_search: false,
             g_box,
         }
     }

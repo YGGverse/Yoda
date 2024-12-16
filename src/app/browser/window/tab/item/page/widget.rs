@@ -14,6 +14,7 @@ impl Widget {
         // Components
         navigation: &impl IsA<gtk::Widget>,
         content: &impl IsA<gtk::Widget>,
+        search: &impl IsA<gtk::Widget>,
         input: &impl IsA<gtk::Widget>,
     ) -> Self {
         // Init self
@@ -24,6 +25,7 @@ impl Widget {
 
         g_box.append(navigation);
         g_box.append(content);
+        g_box.append(search);
         g_box.append(input);
 
         Self { g_box }

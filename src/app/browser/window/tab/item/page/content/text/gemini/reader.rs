@@ -38,7 +38,6 @@ const LINK_COLOR_DEFAULT: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 255.0);
 const LINK_COLOR_ONHOVER: (f32, f32, f32, f32) = (53.0, 132.0, 228.0, 228.0);
 
 pub struct Reader {
-    pub buffer: TextBuffer,
     pub title: Option<String>,
     pub widget: Rc<Widget>,
 }
@@ -459,11 +458,7 @@ impl Reader {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Ok(Self {
-            buffer,
-            title,
-            widget,
-        })
+        Ok(Self { title, widget })
     }
 }
 

@@ -6,6 +6,7 @@ mod input;
 mod meta;
 mod navigation;
 mod request;
+mod search;
 mod widget;
 
 use client::Client;
@@ -15,6 +16,7 @@ use input::Input;
 use meta::{Meta, Status};
 use navigation::Navigation;
 use request::Request;
+use search::Search;
 use widget::Widget;
 
 use crate::app::browser::{
@@ -42,6 +44,7 @@ pub struct Page {
     // Components
     pub client: Rc<Client>,
     pub content: Rc<Content>,
+    pub search: Rc<Search>,
     pub input: Rc<Input>,
     pub meta: Rc<Meta>,
     pub navigation: Rc<Navigation>,
@@ -67,6 +70,8 @@ impl Page {
             tab_action.clone(),
         )));
 
+        let search = Rc::new(Search::new());
+
         let navigation = Rc::new(Navigation::new(
             profile.clone(),
             (
@@ -82,6 +87,7 @@ impl Page {
             &id,
             &navigation.widget.g_box,
             &content.g_box,
+            &search.g_box,
             &input.widget.clamp,
         ));
 
@@ -98,9 +104,10 @@ impl Page {
             // Components
             client: Rc::new(Client::new()),
             content,
-            navigation,
+            search,
             input,
             meta,
+            navigation,
             widget,
         }
     }
@@ -120,6 +127,16 @@ impl Page {
         };
         self.update();
         result
+    }
+
+    /// Request `Escape` action for child components
+    pub fn escape(&self) {
+        self.search.hide()
+    }
+
+    /// Toggle `Find` widget
+    pub fn find(&self) {
+        self.search.toggle()
     }
 
     /// Navigate home URL (parsed from current navigation entry)
@@ -169,6 +186,7 @@ impl Page {
         self.window_action.find.simple_action.set_enabled(false);
 
         // Reset widgets
+        self.search.update(None);
         self.input.unset();
 
         // Prevent infinitive redirection
@@ -372,21 +390,22 @@ impl Page {
         use gemini::client::connection::response;
 
         // Init shared clones
+        let browser_action = self.browser_action.clone();
         let cancellable = self.client.cancellable();
         let content = self.content.clone();
-        let find = self.window_action.find.clone();
+        let search = self.search.clone();
         let id = self.id.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
         let navigation = self.navigation.clone();
         let tab_action = self.tab_action.clone();
-        let update = self.browser_action.update.clone();
+        let window_action = self.window_action.clone();
 
         // Listen for connection status updates
         self.client.gemini.socket.connect_event({
             let id = id.clone();
             let meta = meta.clone();
-            let update = update.clone();
+            let update = browser_action.update.clone();
             move |_, event, _, _| {
                 meta.set_status(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
@@ -455,7 +474,7 @@ impl Page {
                                 .set_title(&title);
 
                             // Update page
-                            update.activate(Some(&id));
+                            browser_action.update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         response::meta::Status::Success => {
@@ -522,7 +541,7 @@ impl Page {
                                     .set_title(&status.title());
 
                                 // Update window
-                                update.activate(Some(&id));
+                                browser_action.update.activate(Some(&id));
                             } else { // browse
                                 match response.meta.mime.unwrap().value.to_lowercase().as_str() {
                                     "text/gemini" => {
@@ -532,18 +551,19 @@ impl Page {
                                             Priority::DEFAULT,
                                             cancellable.clone(),
                                             {
+                                                let browser_action = browser_action.clone();
                                                 let content = content.clone();
-                                                let find = find.clone();
+                                                let search = search.clone();
                                                 let id = id.clone();
                                                 let meta = meta.clone();
-                                                let update = update.clone();
                                                 let uri = uri.clone();
+                                                let window_action = window_action.clone();
                                                 move |result|{
                                                     match result {
                                                         Ok(buffer) => {
                                                             // Set children component,
                                                             // extract title from meta parsed
-                                                            let text = if is_source {
+                                                            let text_widget = if is_source {
                                                                 content.to_text_source(
                                                                     &buffer.data
                                                                 )
@@ -554,16 +574,20 @@ impl Page {
                                                                 )
                                                             };
 
+                                                            // Update `find` model with new buffer
+                                                            search.update(Some(text_widget.buffer));
+
                                                             // Update page meta
                                                             meta.set_status(Status::Success)
-                                                                .set_title(&match text.meta.title {
+                                                                .set_title(&match text_widget.meta.title {
                                                                     Some(meta_title) => meta_title,
                                                                     None => uri_to_title(&uri)
                                                                 });
 
                                                             // Update window components
-                                                            find.simple_action.set_enabled(text.has_search);
-                                                            update.activate(Some(&id));
+                                                            window_action.find.simple_action.set_enabled(true);
+
+                                                            browser_action.update.activate(Some(&id));
                                                         }
                                                         Err(e) => {
                                                             // Update widget
@@ -575,7 +599,7 @@ impl Page {
                                                                 .set_title(&status.title());
 
                                                             // Update window
-                                                            update.activate(Some(&id));
+                                                            browser_action.update.activate(Some(&id));
                                                         },
                                                     }
                                                 }
@@ -603,11 +627,11 @@ impl Page {
                                                 );
                                             },
                                             {
+                                                let browser_action = browser_action.clone();
                                                 let cancellable = cancellable.clone();
                                                 let content = content.clone();
                                                 let id = id.clone();
                                                 let meta = meta.clone();
-                                                let update = update.clone();
                                                 let uri = uri.clone();
                                                 move |result| match result {
                                                     Ok((memory_input_stream, _)) => {
@@ -626,7 +650,7 @@ impl Page {
                                                                         content.to_image(&Texture::for_pixbuf(&buffer));
 
                                                                         // Update window components
-                                                                        update.activate(Some(&id));
+                                                                        browser_action.update.activate(Some(&id));
                                                                     }
                                                                     Err(e) => {
                                                                         // Update widget
@@ -666,7 +690,7 @@ impl Page {
                                             .set_title(&status.title());
 
                                         // Update window
-                                        update.activate(Some(&id));
+                                        browser_action.update.activate(Some(&id));
                                     },
                                 }
                             }
@@ -773,7 +797,7 @@ impl Page {
                                 },
                             }
 
-                            update.activate(Some(&id));
+                            browser_action.update.activate(Some(&id));
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
                         response::meta::Status::CertificateRequest |
@@ -803,7 +827,7 @@ impl Page {
                                 .set_title(&status.title());
 
                             // Update window
-                            update.activate(Some(&id));
+                            browser_action.update.activate(Some(&id));
                         }
                         _ => {
                             // Add history record
@@ -824,7 +848,7 @@ impl Page {
                                 .set_title(&status.title());
 
                             // Update window
-                            update.activate(Some(&id));
+                            browser_action.update.activate(Some(&id));
                         }
                     }
                 },
@@ -843,7 +867,7 @@ impl Page {
                         .set_title(&status.title());
 
                     // Update window
-                    update.activate(Some(&id));
+                    browser_action.update.activate(Some(&id));
                 }
             }
         );

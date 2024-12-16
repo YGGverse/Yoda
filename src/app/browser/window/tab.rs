@@ -166,14 +166,28 @@ impl Tab {
         item
     }
 
-    /// Close page at given `position`, `None` to close selected page (if available)
-    pub fn close(&self, position: Option<i32>) {
-        self.widget.close(position);
+    /// Close page at given `page_position`, `None` to close selected page (if available)
+    pub fn close(&self, page_position: Option<i32>) {
+        self.widget.close(page_position);
     }
 
     // Close all pages
     pub fn close_all(&self) {
         self.widget.close_all();
+    }
+
+    // Toggle search widget
+    pub fn escape(&self, page_position: Option<i32>) {
+        if let Some(item) = self.item(page_position) {
+            item.page.escape();
+        }
+    }
+
+    // Toggle search widget
+    pub fn find(&self, page_position: Option<i32>) {
+        if let Some(item) = self.item(page_position) {
+            item.page.find();
+        }
     }
 
     // Save page at given `position`, `None` to save selected page (if available)
