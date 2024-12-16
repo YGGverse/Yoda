@@ -14,14 +14,14 @@ use gtk::{
 };
 use std::rc::Rc;
 
-pub struct Find {
+pub struct Search {
     pub close: Button,
     pub g_box: Box,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
 }
 
-impl Find {
+impl Search {
     // Construct
     pub fn new(text_buffer: &TextBuffer) -> Self {
         // Init components

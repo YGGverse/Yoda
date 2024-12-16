@@ -1,11 +1,17 @@
 mod gemini;
+mod search;
 mod source;
 
 use gemini::Gemini;
+use search::Search;
 use source::Source;
 
-use crate::app::browser::window::{tab::item::Action as TabAction, Action as WindowAction};
-use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation, ScrolledWindow};
+use super::{TabAction, WindowAction};
+use gtk::{
+    glib::Uri,
+    prelude::{BoxExt, ButtonExt, TextViewExt,WidgetExt},
+    Box, Orientation, ScrolledWindow,
+};
 use std::rc::Rc;
 
 pub struct Meta {
@@ -23,10 +29,11 @@ impl Text {
     pub fn new_gemini(
         gemtext: &str,
         base: &Uri,
-        actions: (Rc<WindowAction>, Rc<TabAction>),
+        (window_action, tab_action): (Rc<WindowAction>, Rc<TabAction>),
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, actions);
+        let gemini = Gemini::new(gemtext, base, (window_action.clone(), tab_action));
+        let search = Rc::new(Search::new(&gemini.reader.buffer));
 
         // Init main widget
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
@@ -35,6 +42,43 @@ impl Text {
                 .child(&gemini.widget.clamp_scrollable)
                 .build(),
         );
+
+        // Connect events
+        window_action.find.connect_activate({
+            let search = search.clone();
+            let text_view = gemini.reader.widget.text_view.clone();
+            move |_| {
+                // @TODO show
+                search.input.entry.grab_focus();
+            }
+        });
+
+        search.navigation.back.button.connect_clicked({
+            let text_view = gemini.reader.widget.text_view.clone();
+            let navigation = search.navigation.clone();
+            move |_| {
+                if let Some((mut start, _)) = navigation.back() {
+                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                }
+            }
+        });
+
+        search.navigation.forward.button.connect_clicked({
+            let text_view = gemini.reader.widget.text_view.clone();
+            let navigation = search.navigation.clone();
+            move |_| {
+                if let Some((mut start, _)) = navigation.forward() {
+                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                }
+            }
+        });
+
+        search.close.connect_clicked({
+            let text_view = gemini.reader.widget.text_view.clone();
+            move |_| {
+                // @TODO hide
+            }
+        });
 
         Self {
             meta: Meta {
