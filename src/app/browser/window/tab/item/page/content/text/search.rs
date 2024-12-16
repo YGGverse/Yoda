@@ -35,6 +35,7 @@ impl Search {
         let g_box = Box::builder()
             // .css_classes(["app-notification"])
             .orientation(Orientation::Horizontal)
+            .visible(false)
             .build();
 
         g_box.append(&input.entry);

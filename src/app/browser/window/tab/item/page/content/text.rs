@@ -9,7 +9,7 @@ use source::Source;
 use super::{TabAction, WindowAction};
 use gtk::{
     glib::Uri,
-    prelude::{BoxExt, ButtonExt, TextViewExt,WidgetExt},
+    prelude::{BoxExt, ButtonExt, TextViewExt, WidgetExt},
     Box, Orientation, ScrolledWindow,
 };
 use std::rc::Rc;
@@ -37,18 +37,20 @@ impl Text {
 
         // Init main widget
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
+
         g_box.append(
             &ScrolledWindow::builder()
                 .child(&gemini.widget.clamp_scrollable)
                 .build(),
         );
 
+        g_box.append(&search.g_box);
+
         // Connect events
         window_action.find.connect_activate({
             let search = search.clone();
-            let text_view = gemini.reader.widget.text_view.clone();
             move |_| {
-                // @TODO show
+                search.g_box.set_visible(true);
                 search.input.entry.grab_focus();
             }
         });
@@ -74,9 +76,9 @@ impl Text {
         });
 
         search.close.connect_clicked({
-            let text_view = gemini.reader.widget.text_view.clone();
+            let search = search.clone();
             move |_| {
-                // @TODO hide
+                search.g_box.set_visible(false);
             }
         });
 
