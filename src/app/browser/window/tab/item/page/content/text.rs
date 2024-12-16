@@ -7,6 +7,7 @@ use search::Search;
 use source::Source;
 
 use super::{TabAction, WindowAction};
+use adw::Clamp;
 use gtk::{
     glib::Uri,
     prelude::{BoxExt, ButtonExt, TextViewExt, WidgetExt},
@@ -45,7 +46,13 @@ impl Text {
                 .build(),
         );
 
-        g_box.append(&search.g_box);
+        g_box.append(
+            &Clamp::builder()
+                .child(&search.g_box)
+                .css_classes(["osd"])
+                .maximum_size(800)
+                .build(),
+        );
 
         // Connect events
         window_action.find.connect_activate({
