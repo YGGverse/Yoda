@@ -83,7 +83,7 @@ impl Navigation {
         let index = self.index.take();
         match self.matches.borrow().get(back(index)) {
             Some((start, end)) => {
-                self.text_buffer.apply_tag(&self.current_tag, &start, &end);
+                self.text_buffer.apply_tag(&self.current_tag, start, end);
                 self.index.replace(if index == 0 {
                     len_to_index(self.matches.borrow().len())
                 } else {
@@ -110,7 +110,7 @@ impl Navigation {
         let next = forward(index);
         match self.matches.borrow().get(next) {
             Some((start, end)) => {
-                self.text_buffer.apply_tag(&self.current_tag, &start, &end);
+                self.text_buffer.apply_tag(&self.current_tag, start, end);
                 self.index.replace(next);
                 Some((*start, *end))
             }
