@@ -18,7 +18,7 @@ impl Tag {
 
         // Init `Self`
         tag_table.add(&found);
-        tag_table.add(&current); // keep current priority as `current` overwrites `found` tag!
+        tag_table.add(&current); // keep current priority as `current` should overwrite `found`
                                  // https://docs.gtk.org/gtk4/method.TextTag.set_priority.html
 
         Self { current, found }
