@@ -33,7 +33,6 @@ impl Search {
 
         // Init main container
         let g_box = Box::builder()
-            .css_classes(["osd"])
             .orientation(Orientation::Horizontal)
             .valign(Align::Center)
             .vexpand(false)
