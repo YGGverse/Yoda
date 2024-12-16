@@ -38,6 +38,7 @@ pub struct Page {
     // Actions
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
+    window_action: Rc<WindowAction>,
     // Components
     pub client: Rc<Client>,
     pub content: Rc<Content>,
@@ -53,14 +54,22 @@ impl Page {
     pub fn new(
         id: Rc<GString>,
         profile: Rc<Profile>,
-        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
+        (browser_action, window_action, tab_action): (
+            Rc<BrowserAction>,
+            Rc<WindowAction>,
+            Rc<TabAction>,
+        ),
     ) -> Self {
         // Init components
-        let content = Rc::new(Content::new((action.1.clone(), action.2.clone())));
+        let content = Rc::new(Content::new((window_action.clone(), tab_action.clone())));
 
         let navigation = Rc::new(Navigation::new(
             profile.clone(),
-            (action.0.clone(), action.1.clone(), action.2.clone()),
+            (
+                browser_action.clone(),
+                window_action.clone(),
+                tab_action.clone(),
+            ),
         ));
 
         let input = Rc::new(Input::new());
@@ -79,8 +88,9 @@ impl Page {
             id,
             profile,
             // Actions
-            browser_action: action.0,
-            tab_action: action.2,
+            browser_action,
+            tab_action,
+            window_action,
             // Components
             client: Rc::new(Client::new()),
             content,
@@ -150,6 +160,9 @@ impl Page {
 
         // Move focus out from navigation entry
         self.browser_action.focus.activate();
+
+        // Initially disable find action
+        self.window_action.find.simple_action.set_enabled(false);
 
         // Reset widgets
         self.input.unset();
@@ -356,13 +369,14 @@ impl Page {
 
         // Init shared clones
         let cancellable = self.client.cancellable();
-        let update = self.browser_action.update.clone();
-        let tab_action = self.tab_action.clone();
-        let navigation = self.navigation.clone();
         let content = self.content.clone();
+        let find = self.window_action.find.clone();
         let id = self.id.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
+        let navigation = self.navigation.clone();
+        let tab_action = self.tab_action.clone();
+        let update = self.browser_action.update.clone();
 
         // Listen for connection status updates
         self.client.gemini.socket.connect_event({
@@ -515,6 +529,7 @@ impl Page {
                                             cancellable.clone(),
                                             {
                                                 let content = content.clone();
+                                                let find = find.clone();
                                                 let id = id.clone();
                                                 let meta = meta.clone();
                                                 let update = update.clone();
@@ -524,26 +539,26 @@ impl Page {
                                                         Ok(buffer) => {
                                                             // Set children component,
                                                             // extract title from meta parsed
-                                                            let title = if is_source {
+                                                            let text = if is_source {
                                                                 content.to_text_source(
                                                                     &buffer.data
-                                                                );
-                                                                uri_to_title(&uri)
+                                                                )
                                                             } else {
-                                                                match content.to_text_gemini(
+                                                                content.to_text_gemini(
                                                                     &uri,
                                                                     &buffer.data
-                                                                ).meta.title {
-                                                                    Some(meta_title) => meta_title,
-                                                                    None => uri_to_title(&uri)
-                                                                }
+                                                                )
                                                             };
 
                                                             // Update page meta
                                                             meta.set_status(Status::Success)
-                                                                .set_title(&title);
+                                                                .set_title(&match text.meta.title {
+                                                                    Some(meta_title) => meta_title,
+                                                                    None => uri_to_title(&uri)
+                                                                });
 
                                                             // Update window components
+                                                            find.simple_action.set_enabled(text.has_search);
                                                             update.activate(Some(&id));
                                                         }
                                                         Err(e) => {

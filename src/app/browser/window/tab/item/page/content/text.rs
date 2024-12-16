@@ -19,8 +19,9 @@ pub struct Meta {
 } // @TODO move to separated mod
 
 pub struct Text {
-    pub meta: Meta,
     pub g_box: Box,
+    pub has_search: bool,
+    pub meta: Meta,
 }
 
 impl Text {
@@ -86,6 +87,7 @@ impl Text {
             meta: Meta {
                 title: gemini.reader.title.clone(),
             },
+            has_search: true,
             g_box,
         }
     }
@@ -101,6 +103,7 @@ impl Text {
 
         Self {
             meta: Meta { title: None },
+            has_search: false,
             g_box,
         }
     }

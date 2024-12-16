@@ -19,13 +19,12 @@ impl Find {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        Self {
-            simple_action: SimpleAction::new_stateful(
-                &uuid_string_random(),
-                None,
-                &DEFAULT_STATE.to_variant(),
-            ),
-        }
+        let simple_action =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &DEFAULT_STATE.to_variant());
+
+        simple_action.set_enabled(false);
+
+        Self { simple_action }
     }
 
     // Actions
