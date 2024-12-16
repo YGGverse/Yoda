@@ -75,7 +75,7 @@ impl Navigation {
                 } else {
                     index
                 });
-                Some((start.clone(), end.clone()))
+                Some((*start, *end))
             }
             None => {
                 self.index
