@@ -16,8 +16,9 @@ use std::rc::Rc;
 
 pub struct Find {
     pub close: Button,
-    pub input: Rc<Input>,
     pub g_box: Box,
+    pub input: Rc<Input>,
+    pub navigation: Rc<Navigation>,
 }
 
 impl Find {
@@ -83,8 +84,9 @@ impl Find {
         // Done
         Self {
             close,
-            input,
             g_box,
+            input,
+            navigation,
         }
     }
 }

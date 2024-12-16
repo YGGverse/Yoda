@@ -56,6 +56,26 @@ impl Widget {
             }
         });
 
+        find.navigation.back.button.connect_clicked({
+            let text_view = text_view.clone();
+            let navigation = find.navigation.clone();
+            move |_| {
+                if let Some((mut start, _)) = navigation.back() {
+                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                }
+            }
+        });
+
+        find.navigation.forward.button.connect_clicked({
+            let text_view = text_view.clone();
+            let navigation = find.navigation.clone();
+            move |_| {
+                if let Some((mut start, _)) = navigation.forward() {
+                    text_view.scroll_to_iter(&mut start, 0.0, false, 0.0, 0.0);
+                }
+            }
+        });
+
         find.close.connect_clicked({
             let text_view = text_view.clone();
             move |_| text_view.set_gutter(TextWindowType::Bottom, gtk::Widget::NONE)
