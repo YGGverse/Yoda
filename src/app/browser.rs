@@ -69,7 +69,7 @@ impl Browser {
             }
         });
 
-        action.focus.connect_activate({
+        action.escape.connect_activate({
             let widget = widget.clone();
             move || {
                 widget.application_window.set_focus(gtk::Window::NONE);

@@ -1,11 +1,11 @@
 use gtk::{gio::SimpleAction, glib::uuid_string_random, prelude::ActionExt};
 
-/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Focus` action of `Browser` group
-pub struct Focus {
+/// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Escape` action of `Browser` group
+pub struct Escape {
     pub simple_action: SimpleAction,
 }
 
-impl Focus {
+impl Escape {
     // Constructors
 
     /// Create new `Self`

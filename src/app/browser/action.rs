@@ -1,14 +1,14 @@
 mod about;
 mod close;
 mod debug;
-mod focus;
+mod escape;
 mod profile;
 mod update;
 
 use about::About;
 use close::Close;
 use debug::Debug;
-use focus::Focus;
+use escape::Escape;
 use profile::Profile;
 use update::Update;
 
@@ -25,7 +25,7 @@ pub struct Action {
     pub about: Rc<About>,
     pub close: Rc<Close>,
     pub debug: Rc<Debug>,
-    pub focus: Rc<Focus>,
+    pub escape: Rc<Escape>,
     pub profile: Rc<Profile>,
     pub update: Rc<Update>,
     // Group
@@ -42,7 +42,7 @@ impl Action {
         let about = Rc::new(About::new());
         let close = Rc::new(Close::new());
         let debug = Rc::new(Debug::new());
-        let focus = Rc::new(Focus::new());
+        let escape = Rc::new(Escape::new());
         let profile = Rc::new(Profile::new());
         let update = Rc::new(Update::new());
 
@@ -56,7 +56,7 @@ impl Action {
         simple_action_group.add_action(&about.simple_action);
         simple_action_group.add_action(&close.simple_action);
         simple_action_group.add_action(&debug.simple_action);
-        simple_action_group.add_action(&focus.simple_action);
+        simple_action_group.add_action(&escape.simple_action);
         simple_action_group.add_action(&profile.simple_action);
         simple_action_group.add_action(&update.simple_action);
 
@@ -65,7 +65,7 @@ impl Action {
             about,
             close,
             debug,
-            focus,
+            escape,
             profile,
             update,
             id,

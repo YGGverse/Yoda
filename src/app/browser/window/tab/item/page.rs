@@ -159,7 +159,7 @@ impl Page {
         const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
 
         // Move focus out from navigation entry
-        self.browser_action.focus.activate();
+        self.browser_action.escape.activate();
 
         // Initially disable find action
         self.window_action.find.simple_action.set_enabled(false);
