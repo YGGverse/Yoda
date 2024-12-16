@@ -10,7 +10,7 @@ use tag::Tag;
 
 use gtk::{
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt},
-    Box, Button, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
+    Align, Box, Button, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
 };
 use std::rc::Rc;
 
@@ -35,6 +35,8 @@ impl Search {
         let g_box = Box::builder()
             .css_classes(["osd"])
             .orientation(Orientation::Horizontal)
+            .valign(Align::Center)
+            .vexpand(false)
             .visible(false)
             .build();
 
