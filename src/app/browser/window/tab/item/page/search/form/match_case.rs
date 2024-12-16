@@ -1,8 +1,5 @@
-use gtk::{gdk::Cursor, CheckButton};
+use gtk::CheckButton;
 
 pub fn new() -> CheckButton {
-    CheckButton::builder()
-        .cursor(&Cursor::from_name("default", None).unwrap())
-        .label("Match case")
-        .build()
+    CheckButton::builder().label("Match case").build()
 }

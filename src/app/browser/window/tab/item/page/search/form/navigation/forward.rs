@@ -1,4 +1,4 @@
-use gtk::{gdk::Cursor, prelude::WidgetExt, Align, Button};
+use gtk::{prelude::WidgetExt, Align, Button};
 
 pub struct Forward {
     pub button: Button,
@@ -11,7 +11,6 @@ impl Forward {
     pub fn new() -> Self {
         Self {
             button: Button::builder()
-                .cursor(&Cursor::from_name("default", None).unwrap())
                 .icon_name("go-down-symbolic")
                 .sensitive(false)
                 .tooltip_text("Forward")

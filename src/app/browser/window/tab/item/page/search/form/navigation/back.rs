@@ -1,4 +1,4 @@
-use gtk::{gdk::Cursor, prelude::WidgetExt, Align, Button};
+use gtk::{prelude::WidgetExt, Align, Button};
 
 pub struct Back {
     pub button: Button,
@@ -11,7 +11,6 @@ impl Back {
     pub fn new() -> Self {
         Self {
             button: Button::builder()
-                .cursor(&Cursor::from_name("default", None).unwrap())
                 .icon_name("go-up-symbolic")
                 .sensitive(false)
                 .tooltip_text("Back")
