@@ -6,7 +6,7 @@ use gemini::Gemini;
 use search::Search;
 use source::Source;
 
-use super::{TabAction, WindowAction};
+use super::{BrowserAction, TabAction, WindowAction};
 use adw::Clamp;
 use gtk::{
     glib::Uri,
@@ -31,10 +31,14 @@ impl Text {
     pub fn new_gemini(
         gemtext: &str,
         base: &Uri,
-        (window_action, tab_action): (Rc<WindowAction>, Rc<TabAction>),
+        (browser_action, window_action, tab_action): (
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<TabAction>,
+        ),
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, (window_action.clone(), tab_action));
+        let gemini = Gemini::new(gemtext, base, (window_action, tab_action));
         let search = Rc::new(Search::new(&gemini.reader.buffer));
 
         // Init main widget
@@ -55,6 +59,13 @@ impl Text {
         );
 
         // Connect events
+        browser_action.escape.connect_activate({
+            let close = search.close.clone();
+            move || {
+                close.activate();
+            }
+        });
+
         window_action.find.connect_activate({
             let search = search.clone();
             move |_| {

@@ -5,7 +5,7 @@ mod text;
 use image::Image;
 use text::Text;
 
-use super::{TabAction, WindowAction};
+use super::{BrowserAction, TabAction, WindowAction};
 use adw::StatusPage;
 use gtk::{
     gdk::Paintable,
@@ -17,6 +17,7 @@ use gtk::{
 use std::{rc::Rc, time::Duration};
 
 pub struct Content {
+    browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
     tab_action: Rc<TabAction>,
     pub g_box: Box,
@@ -26,11 +27,18 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new(action: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn new(
+        (browser_action, window_action, tab_action): (
+            Rc<BrowserAction>,
+            Rc<WindowAction>,
+            Rc<TabAction>,
+        ),
+    ) -> Self {
         Self {
             g_box: Box::builder().orientation(Orientation::Vertical).build(),
-            window_action: action.0,
-            tab_action: action.1,
+            browser_action,
+            window_action,
+            tab_action,
         }
     }
 
@@ -125,7 +133,7 @@ impl Content {
         let text = Text::new_gemini(
             data,
             base,
-            (self.window_action.clone(), self.tab_action.clone()),
+            (&self.browser_action, &self.window_action, &self.tab_action),
         );
         self.g_box.append(&text.g_box);
         text

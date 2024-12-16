@@ -61,7 +61,11 @@ impl Page {
         ),
     ) -> Self {
         // Init components
-        let content = Rc::new(Content::new((window_action.clone(), tab_action.clone())));
+        let content = Rc::new(Content::new((
+            browser_action.clone(),
+            window_action.clone(),
+            tab_action.clone(),
+        )));
 
         let navigation = Rc::new(Navigation::new(
             profile.clone(),

@@ -15,9 +15,15 @@ pub struct Gemini {
 
 impl Gemini {
     // Construct
-    pub fn new(gemtext: &str, base: &Uri, actions: (Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn new(
+        gemtext: &str,
+        base: &Uri,
+        (window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>),
+    ) -> Self {
         // Init components
-        let reader = Rc::new(Reader::new(gemtext, base, actions).unwrap()); // @TODO handle errors
+        let reader = Rc::new(
+            Reader::new(gemtext, base, (window_action.clone(), tab_action.clone())).unwrap(),
+        ); // @TODO handle errors
         let widget = Rc::new(Widget::new(&reader.widget.text_view));
 
         // Result
