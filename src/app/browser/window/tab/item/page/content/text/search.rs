@@ -10,7 +10,7 @@ use tag::Tag;
 
 use gtk::{
     prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt},
-    Align, Box, Button, Orientation, TextBuffer, TextIter, TextSearchFlags, TextTag,
+    Align, Box, Button, Orientation, TextBuffer, TextIter, TextSearchFlags,
 };
 use std::rc::Rc;
 
@@ -23,13 +23,13 @@ pub struct Search {
 
 impl Search {
     // Construct
-    pub fn new(text_buffer: &TextBuffer) -> Self {
+    pub fn new(buffer: &TextBuffer) -> Self {
         // Init components
         let close = close::new();
         let input = Rc::new(Input::new());
         let match_case = match_case::new();
-        let tag = Rc::new(Tag::new(text_buffer.tag_table()));
-        let navigation = Rc::new(Navigation::new(text_buffer.clone(), tag.current.clone()));
+        let tag = Rc::new(Tag::new(buffer.tag_table()));
+        let navigation = Rc::new(Navigation::new(buffer.clone(), tag.current.clone()));
 
         // Init main container
         let g_box = Box::builder()
@@ -55,11 +55,11 @@ impl Search {
             let match_case = match_case.clone();
             let navigation = navigation.clone();
             let tag = tag.clone();
-            let text_buffer = text_buffer.clone();
+            let buffer = buffer.clone();
             move |_| {
                 navigation.update(find(
-                    &text_buffer,
-                    &tag.found,
+                    &buffer,
+                    &tag,
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 ));
@@ -71,11 +71,11 @@ impl Search {
             let input = input.clone();
             let navigation = navigation.clone();
             let tag = tag.clone();
-            let text_buffer = text_buffer.clone();
+            let buffer = buffer.clone();
             move |this| {
                 navigation.update(find(
-                    &text_buffer,
-                    &tag.found,
+                    &buffer,
+                    &tag,
                     input.entry.text().as_str(),
                     this.is_active(),
                 ));
@@ -96,23 +96,20 @@ impl Search {
 // Tools
 
 fn find(
-    text_buffer: &TextBuffer,
-    found_tag: &TextTag,
+    buffer: &TextBuffer,
+    tag: &Rc<Tag>,
     subject: &str,
     is_match_case: bool,
 ) -> Vec<(TextIter, TextIter)> {
-    // Init start matches result
+    // Init matches holder
     let mut result = Vec::new();
 
-    // Cleanup previous search results
-    text_buffer.remove_tag(
-        found_tag,
-        &text_buffer.start_iter(),
-        &text_buffer.end_iter(),
-    );
+    // Cleanup previous search highlights
+    buffer.remove_tag(&tag.current, &buffer.start_iter(), &buffer.end_iter());
+    buffer.remove_tag(&tag.found, &buffer.start_iter(), &buffer.end_iter());
 
-    // Begin search
-    let mut next = text_buffer.start_iter();
+    // Begin new search
+    let mut next = buffer.start_iter();
     while let Some((start, end)) = next.forward_search(
         subject,
         match is_match_case {
@@ -121,7 +118,7 @@ fn find(
         },
         None, // unlimited
     ) {
-        text_buffer.apply_tag(found_tag, &start, &end);
+        buffer.apply_tag(&tag.found, &start, &end);
         next = end;
         result.push((start, end));
     }
