@@ -91,7 +91,7 @@ impl Navigation {
         match self.matches.borrow().get(next) {
             Some((start, end)) => {
                 self.index.replace(next);
-                Some((start.clone(), end.clone()))
+                Some((*start, *end))
             }
             None => {
                 self.index.replace(0);
