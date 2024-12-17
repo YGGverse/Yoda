@@ -17,7 +17,7 @@ pub struct Navigation {
     pub back: Back,
     pub forward: Forward,
     pub g_box: Box,
-    iter: RefCell<Option<Cycle<IntoIter<(TextIter, TextIter)>>>>,
+    iter: RefCell<Cycle<IntoIter<(TextIter, TextIter)>>>,
 }
 
 impl Navigation {
@@ -45,7 +45,7 @@ impl Navigation {
             back,
             forward,
             g_box,
-            iter: RefCell::new(None),
+            iter: RefCell::new(Vec::new().into_iter().cycle()),
         }
     }
 
@@ -54,7 +54,7 @@ impl Navigation {
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
         self.back.update(!matches.is_empty());
         self.forward.update(!matches.is_empty());
-        self.iter.replace(Some(matches.into_iter().cycle()));
+        let _ = self.iter.replace(matches.into_iter().cycle());
     }
 
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -66,15 +66,12 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.iter.borrow_mut().as_mut() {
-            Some(iter) => match iter.next() {
-                Some((start, end)) => {
-                    buffer.apply_tag(&subject.tag.current, &start, &end);
-                    Some((start, end))
-                }
-                None => None,
-            },
-            None => todo!(), // unexpected
+        match self.iter.borrow_mut().next() {
+            Some((start, end)) => {
+                buffer.apply_tag(&subject.tag.current, &start, &end);
+                Some((start, end))
+            }
+            None => None,
         } // @TODO reverse
     }
 
@@ -87,15 +84,12 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.iter.borrow_mut().as_mut() {
-            Some(iter) => match iter.next() {
-                Some((start, end)) => {
-                    buffer.apply_tag(&subject.tag.current, &start, &end);
-                    Some((start, end))
-                }
-                None => None,
-            },
-            None => todo!(), // unexpected
+        match self.iter.borrow_mut().next() {
+            Some((start, end)) => {
+                buffer.apply_tag(&subject.tag.current, &start, &end);
+                Some((start, end))
+            }
+            None => None,
         }
     }
 }
