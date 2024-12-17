@@ -20,7 +20,7 @@ impl Tag {
         // Init tag table
         // keep order as `current` should overwrite `found` tag style
         // https://docs.gtk.org/gtk4/method.TextTag.set_priority.html
-        for &tag in &[&current, &found] {
+        for &tag in &[&found, &current] {
             if !table.add(tag) {
                 todo!()
             }
