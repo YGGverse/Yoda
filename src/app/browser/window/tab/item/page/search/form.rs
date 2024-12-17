@@ -3,12 +3,14 @@ mod input;
 mod match_case;
 mod navigation;
 
-use super::Buffer;
+use super::Subject;
 use input::Input;
 use navigation::Navigation;
 
 use gtk::{
-    prelude::{BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, WidgetExt},
+    prelude::{
+        BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, TextViewExt, WidgetExt,
+    },
     Align, Box, Orientation, TextIter, TextSearchFlags,
 };
 use std::{cell::RefCell, rc::Rc};
@@ -21,7 +23,7 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(buffer: &Rc<RefCell<Option<Buffer>>>) -> Self {
+    pub fn new(buffer: &Rc<RefCell<Option<Subject>>>) -> Self {
         // Init components
         let close = close::new();
         let input = Rc::new(Input::new());
@@ -99,41 +101,44 @@ impl Form {
 // Tools
 
 fn find(
-    buffer: &Rc<RefCell<Option<Buffer>>>,
-    subject: &str,
+    subject: &Rc<RefCell<Option<Subject>>>,
+    request: &str,
     is_match_case: bool,
 ) -> Vec<(TextIter, TextIter)> {
     // Init matches holder
     let mut result = Vec::new();
 
     // Borrow buffer
-    match buffer.borrow().as_ref() {
-        Some(buffer) => {
+    match subject.borrow().as_ref() {
+        Some(subject) => {
             // Get iters
-            let buffer_start = buffer.text_buffer.start_iter();
-            let buffer_end = buffer.text_buffer.end_iter();
+            let buffer_start = subject.text_view.buffer().start_iter();
+            let buffer_end = subject.text_view.buffer().end_iter();
 
             // Cleanup previous search highlights
-            buffer
-                .text_buffer
-                .remove_tag(&buffer.tag.current, &buffer_start, &buffer_end);
-            buffer
-                .text_buffer
-                .remove_tag(&buffer.tag.found, &buffer_start, &buffer_end);
+            subject
+                .text_view
+                .buffer()
+                .remove_tag(&subject.tag.current, &buffer_start, &buffer_end);
+            subject
+                .text_view
+                .buffer()
+                .remove_tag(&subject.tag.found, &buffer_start, &buffer_end);
 
             // Begin new search
             let mut next = buffer_start;
             while let Some((match_start, match_end)) = next.forward_search(
-                subject,
+                request,
                 match is_match_case {
                     true => TextSearchFlags::TEXT_ONLY,
                     false => TextSearchFlags::CASE_INSENSITIVE,
                 },
                 None, // unlimited
             ) {
-                buffer
-                    .text_buffer
-                    .apply_tag(&buffer.tag.found, &match_start, &match_end);
+                subject
+                    .text_view
+                    .buffer()
+                    .apply_tag(&subject.tag.found, &match_start, &match_end);
                 next = match_end;
                 result.push((match_start, match_end));
             }

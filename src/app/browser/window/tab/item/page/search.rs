@@ -1,19 +1,19 @@
-mod buffer;
 mod form;
 mod placeholder;
+mod subject;
 
-use buffer::Buffer;
 use form::Form;
 use placeholder::Placeholder;
+use subject::Subject;
 
 use gtk::{
     prelude::{BoxExt, WidgetExt},
-    Align, Box, Orientation, TextBuffer,
+    Align, Box, Orientation, TextBuffer, TextView,
 };
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Search {
-    buffer: Rc<RefCell<Option<Buffer>>>,
+    subject: Rc<RefCell<Option<Subject>>>,
     pub form: Rc<Form>,
     pub placeholder: Rc<Placeholder>,
     pub g_box: Box,
@@ -25,8 +25,8 @@ impl Search {
     /// Create new `Self`
     pub fn new() -> Self {
         // Init components
-        let buffer = Rc::new(RefCell::new(None));
-        let form = Rc::new(Form::new(&buffer));
+        let subject = Rc::new(RefCell::new(None));
+        let form = Rc::new(Form::new(&subject));
         let placeholder = Rc::new(Placeholder::new());
 
         // Init main container
@@ -42,7 +42,7 @@ impl Search {
 
         // Done
         Self {
-            buffer,
+            subject,
             form,
             g_box,
             placeholder,
@@ -52,7 +52,7 @@ impl Search {
     // Actions
 
     pub fn show(&self) {
-        if self.buffer.borrow().is_some() {
+        if self.subject.borrow().is_some() {
             self.form.show();
             self.placeholder.hide();
         } else {
@@ -74,9 +74,10 @@ impl Search {
         }
     }
 
-    pub fn update(&self, text_buffer: Option<TextBuffer>) {
-        self.buffer.replace(match text_buffer {
-            Some(buffer) => Some(Buffer::new(buffer)),
+    /// * currently supports [TextView](https://docs.gtk.org/gtk4/class.TextView.html) only
+    pub fn update(&self, text_view: Option<TextView>) {
+        self.subject.replace(match text_view {
+            Some(subject) => Some(Subject::new(subject)),
             None => None,
         });
     }

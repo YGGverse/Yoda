@@ -575,7 +575,7 @@ impl Page {
                                                             };
 
                                                             // Update `find` model with new buffer
-                                                            search.update(Some(text_widget.buffer));
+                                                            search.update(Some(text_widget.text_view));
 
                                                             // Update page meta
                                                             meta.set_status(Status::Success)

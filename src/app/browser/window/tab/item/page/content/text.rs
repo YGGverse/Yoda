@@ -7,8 +7,8 @@ use source::Source;
 use super::{BrowserAction, TabAction, WindowAction};
 use gtk::{
     glib::Uri,
-    prelude::{BoxExt, TextViewExt},
-    Box, Orientation, ScrolledWindow, TextBuffer,
+    prelude::{BoxExt, Cast},
+    Box, Orientation, ScrolledWindow, TextView,
 };
 use std::rc::Rc;
 
@@ -17,7 +17,7 @@ pub struct Meta {
 } // @TODO move to separated mod
 
 pub struct Text {
-    pub buffer: TextBuffer,
+    pub text_view: TextView,
     pub g_box: Box,
     pub meta: Meta,
 }
@@ -91,7 +91,7 @@ impl Text {
         });*/
 
         Self {
-            buffer: gemini.reader.widget.text_view.buffer(),
+            text_view: gemini.reader.widget.text_view.clone().upcast::<TextView>(),
             meta: Meta {
                 title: gemini.reader.title.clone(),
             },
@@ -108,7 +108,7 @@ impl Text {
         g_box.append(&ScrolledWindow::builder().child(&source.text_view).build());
 
         Self {
-            buffer: source.text_view.buffer(),
+            text_view: source.text_view.upcast::<TextView>(),
             meta: Meta { title: None },
             g_box,
         }
