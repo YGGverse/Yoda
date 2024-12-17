@@ -1,18 +1,17 @@
 mod back;
 mod forward;
+mod iter;
 
 use back::Back;
 use forward::Forward;
+use iter::Iter;
 
 use super::Subject;
 use gtk::{
     prelude::{BoxExt, TextBufferExt, TextViewExt},
     Box, Orientation, TextIter,
 };
-use std::{
-    cell::{Cell, RefCell},
-    rc::Rc,
-};
+use std::cell::RefCell;
 
 const MARGIN: i32 = 6;
 
@@ -20,8 +19,7 @@ pub struct Navigation {
     pub back: Back,
     pub forward: Forward,
     pub g_box: Box,
-    index: Rc<Cell<usize>>,
-    matches: Rc<RefCell<Vec<(TextIter, TextIter)>>>,
+    iter: RefCell<Option<Iter>>,
 }
 
 impl Navigation {
@@ -29,10 +27,6 @@ impl Navigation {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        // Init shared matches holder
-        let index = Rc::new(Cell::new(0));
-        let matches = Rc::new(RefCell::new(Vec::new()));
-
         // Init components
         let back = Back::new();
         let forward = Forward::new();
@@ -53,21 +47,16 @@ impl Navigation {
             back,
             forward,
             g_box,
-            index,
-            matches,
+            iter: RefCell::new(None),
         }
     }
 
     // Actions
 
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
-        // Update self
-        self.matches.replace(matches);
-        self.index.replace(0); // reset
-
-        // Update child components
-        self.back.update(self.is_match());
-        self.forward.update(self.is_match());
+        self.back.update(!matches.is_empty());
+        self.forward.update(!matches.is_empty());
+        self.iter.replace(Some(Iter::new(matches)));
     }
 
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -79,23 +68,15 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        let index = self.index.take();
-
-        match self.matches.borrow().get(back(index)) {
-            Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, start, end);
-                self.index.replace(if index == 0 {
-                    len_to_index(self.matches.borrow().len())
-                } else {
-                    index
-                });
-                Some((*start, *end))
-            }
-            None => {
-                self.index
-                    .replace(len_to_index(self.matches.borrow().len())); // go last
-                None
-            }
+        match self.iter.borrow_mut().as_mut() {
+            Some(iter) => match iter.back() {
+                Some((start, end)) => {
+                    buffer.apply_tag(&subject.tag.current, &start, &end);
+                    Some((start, end))
+                }
+                None => iter.reset(),
+            },
+            None => todo!(),
         }
     }
 
@@ -108,36 +89,15 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        let index = self.index.take();
-        let next = forward(index);
-        match self.matches.borrow().get(next) {
-            Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, start, end);
-                self.index.replace(next);
-                Some((*start, *end))
-            }
-            None => {
-                self.index.replace(0);
-                None
-            }
+        match self.iter.borrow_mut().as_mut() {
+            Some(iter) => match iter.forward() {
+                Some((start, end)) => {
+                    buffer.apply_tag(&subject.tag.current, &start, &end);
+                    Some((start, end))
+                }
+                None => iter.reset(),
+            },
+            None => todo!(),
         }
     }
-
-    // Getters
-
-    pub fn is_match(&self) -> bool {
-        !self.matches.borrow().is_empty()
-    }
-}
-
-fn back(index: usize) -> usize {
-    index - 1
-}
-
-fn forward(index: usize) -> usize {
-    index + 1
-}
-
-fn len_to_index(len: usize) -> usize {
-    len - 1
 }

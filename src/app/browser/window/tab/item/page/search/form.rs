@@ -48,12 +48,13 @@ impl Form {
             let navigation = navigation.clone();
             let subject = subject.clone();
             move |_| {
-                navigation.update(find(
+                let matches = find(
                     &subject,
                     input.entry.text().as_str(),
                     match_case.is_active(),
-                ));
-                input.update(navigation.is_match());
+                );
+                input.update(!matches.is_empty());
+                navigation.update(matches);
             }
         });
 
@@ -62,12 +63,9 @@ impl Form {
             let navigation = navigation.clone();
             let subject = subject.clone();
             move |this| {
-                navigation.update(find(
-                    &subject,
-                    input.entry.text().as_str(),
-                    this.is_active(),
-                ));
-                input.update(navigation.is_match());
+                let matches = find(&subject, input.entry.text().as_str(), this.is_active());
+                input.update(!matches.is_empty());
+                navigation.update(matches);
             }
         });
 
