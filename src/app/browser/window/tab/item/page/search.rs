@@ -7,8 +7,8 @@ use placeholder::Placeholder;
 use subject::Subject;
 
 use gtk::{
-    prelude::{BoxExt, WidgetExt},
-    Align, Box, Orientation, TextBuffer, TextView,
+    prelude::{BoxExt, ButtonExt, WidgetExt},
+    Align, Box, Orientation, TextView,
 };
 use std::{cell::RefCell, rc::Rc};
 
@@ -40,6 +40,13 @@ impl Search {
         g_box.append(&form.g_box);
         g_box.append(&placeholder.label);
 
+        // Connect events
+
+        form.close.connect_clicked({
+            let g_box = g_box.clone();
+            move |_| g_box.set_visible(false)
+        });
+
         // Done
         Self {
             subject,
@@ -50,6 +57,10 @@ impl Search {
     }
 
     // Actions
+
+    pub fn escape(&self) {
+        self.hide()
+    }
 
     pub fn show(&self) {
         if self.subject.borrow().is_some() {

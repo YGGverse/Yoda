@@ -4,7 +4,7 @@ mod source;
 use gemini::Gemini;
 use source::Source;
 
-use super::{BrowserAction, TabAction, WindowAction};
+use super::{TabAction, WindowAction};
 use gtk::{
     glib::Uri,
     prelude::{BoxExt, Cast},
@@ -28,11 +28,7 @@ impl Text {
     pub fn new_gemini(
         gemtext: &str,
         base: &Uri,
-        (browser_action, window_action, tab_action): (
-            &Rc<BrowserAction>,
-            &Rc<WindowAction>,
-            &Rc<TabAction>,
-        ),
+        (window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>),
     ) -> Self {
         // Init components
         let gemini = Gemini::new(gemtext, base, (window_action, tab_action));
@@ -45,50 +41,6 @@ impl Text {
                 .child(&gemini.widget.clamp_scrollable)
                 .build(),
         );
-
-        // Connect events
-        /* @TODO
-        browser_action.escape.connect_activate({
-            let close = search.close.clone();
-            move || {
-                close.activate();
-            }
-        });
-
-        window_action.find.connect_activate({
-            let search = search.clone();
-            move |_| {
-                search.g_box.set_visible(true);
-                search.input.entry.grab_focus();
-            }
-        });
-
-        search.navigation.back.button.connect_clicked({
-            let text_view = gemini.reader.widget.text_view.clone();
-            let navigation = search.navigation.clone();
-            move |_| {
-                if let Some((mut start, _)) = navigation.back() {
-                    text_view.scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
-                }
-            }
-        });
-
-        search.navigation.forward.button.connect_clicked({
-            let text_view = gemini.reader.widget.text_view.clone();
-            let navigation = search.navigation.clone();
-            move |_| {
-                if let Some((mut start, _)) = navigation.forward() {
-                    text_view.scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
-                }
-            }
-        });
-
-        search.close.connect_clicked({
-            let search = search.clone();
-            move |_| {
-                search.g_box.set_visible(false);
-            }
-        });*/
 
         Self {
             text_view: gemini.reader.widget.text_view.clone().upcast::<TextView>(),

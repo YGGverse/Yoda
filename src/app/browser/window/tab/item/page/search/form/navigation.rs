@@ -4,9 +4,10 @@ mod forward;
 use back::Back;
 use forward::Forward;
 
+use super::Subject;
 use gtk::{
-    prelude::{BoxExt, TextBufferExt},
-    Box, Orientation, TextBuffer, TextIter, TextTag,
+    prelude::{BoxExt, TextBufferExt, TextViewExt},
+    Box, Orientation, TextIter,
 };
 use std::{
     cell::{Cell, RefCell},
@@ -68,55 +69,60 @@ impl Navigation {
         self.back.update(self.is_match());
         self.forward.update(self.is_match());
     }
-    /*
-       pub fn back(&self) -> Option<(TextIter, TextIter)> {
-           self.text_buffer.remove_tag(
-               &self.current_tag,
-               &self.text_buffer.start_iter(),
-               &self.text_buffer.end_iter(),
-           );
 
-           let index = self.index.take();
-           match self.matches.borrow().get(back(index)) {
-               Some((start, end)) => {
-                   self.text_buffer.apply_tag(&self.current_tag, start, end);
-                   self.index.replace(if index == 0 {
-                       len_to_index(self.matches.borrow().len())
-                   } else {
-                       index
-                   });
-                   Some((*start, *end))
-               }
-               None => {
-                   self.index
-                       .replace(len_to_index(self.matches.borrow().len())); // go last
-                   None
-               }
-           }
-       }
+    pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
+        let buffer = subject.text_view.buffer();
 
-       pub fn forward(&self) -> Option<(TextIter, TextIter)> {
-           self.text_buffer.remove_tag(
-               &self.current_tag,
-               &self.text_buffer.start_iter(),
-               &self.text_buffer.end_iter(),
-           );
+        buffer.remove_tag(
+            &subject.tag.current,
+            &buffer.start_iter(),
+            &buffer.end_iter(),
+        );
 
-           let index = self.index.take();
-           let next = forward(index);
-           match self.matches.borrow().get(next) {
-               Some((start, end)) => {
-                   self.text_buffer.apply_tag(&self.current_tag, start, end);
-                   self.index.replace(next);
-                   Some((*start, *end))
-               }
-               None => {
-                   self.index.replace(0);
-                   None
-               }
-           }
-       }
-    */
+        let index = self.index.take();
+
+        match self.matches.borrow().get(back(index)) {
+            Some((start, end)) => {
+                buffer.apply_tag(&subject.tag.current, start, end);
+                self.index.replace(if index == 0 {
+                    len_to_index(self.matches.borrow().len())
+                } else {
+                    index
+                });
+                Some((*start, *end))
+            }
+            None => {
+                self.index
+                    .replace(len_to_index(self.matches.borrow().len())); // go last
+                None
+            }
+        }
+    }
+
+    pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
+        let buffer = subject.text_view.buffer();
+
+        buffer.remove_tag(
+            &subject.tag.current,
+            &buffer.start_iter(),
+            &buffer.end_iter(),
+        );
+
+        let index = self.index.take();
+        let next = forward(index);
+        match self.matches.borrow().get(next) {
+            Some((start, end)) => {
+                buffer.apply_tag(&subject.tag.current, start, end);
+                self.index.replace(next);
+                Some((*start, *end))
+            }
+            None => {
+                self.index.replace(0);
+                None
+            }
+        }
+    }
+
     // Getters
 
     pub fn is_match(&self) -> bool {

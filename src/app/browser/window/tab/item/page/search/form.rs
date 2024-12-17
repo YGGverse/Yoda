@@ -11,11 +11,13 @@ use gtk::{
     prelude::{
         BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, TextViewExt, WidgetExt,
     },
-    Align, Box, Orientation, TextIter, TextSearchFlags,
+    Align, Box, Button, Orientation, TextIter, TextSearchFlags,
 };
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Form {
+    pub close: Button,
+    pub input: Rc<Input>,
     pub g_box: Box,
 }
 
@@ -23,7 +25,7 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(buffer: &Rc<RefCell<Option<Subject>>>) -> Self {
+    pub fn new(subject: &Rc<RefCell<Option<Subject>>>) -> Self {
         // Init components
         let close = close::new();
         let input = Rc::new(Input::new());
@@ -53,10 +55,10 @@ impl Form {
             let input = input.clone();
             let match_case = match_case.clone();
             let navigation = navigation.clone();
-            let buffer = buffer.clone();
+            let subject = subject.clone();
             move |_| {
                 navigation.update(find(
-                    &buffer,
+                    &subject,
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 ));
@@ -67,22 +69,63 @@ impl Form {
         match_case.connect_toggled({
             let input = input.clone();
             let navigation = navigation.clone();
-            let buffer = buffer.clone();
+            let subject = subject.clone();
             move |this| {
-                navigation.update(find(&buffer, input.entry.text().as_str(), this.is_active()));
+                navigation.update(find(
+                    &subject,
+                    input.entry.text().as_str(),
+                    this.is_active(),
+                ));
                 input.update(navigation.is_match());
             }
         });
 
+        // Connect events
+        navigation.back.button.connect_clicked({
+            let subject = subject.clone();
+            let navigation = navigation.clone();
+            move |_| match subject.borrow().as_ref() {
+                Some(subject) => match navigation.back(subject) {
+                    Some((mut start, _)) => {
+                        subject
+                            .text_view
+                            .scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
+                    }
+                    None => todo!(),
+                },
+                None => todo!(),
+            }
+        });
+
+        navigation.forward.button.connect_clicked({
+            let subject = subject.clone();
+            let navigation = navigation.clone();
+            move |_| match subject.borrow().as_ref() {
+                Some(subject) => match navigation.forward(subject) {
+                    Some((mut start, _)) => {
+                        subject
+                            .text_view
+                            .scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
+                    }
+                    None => todo!(),
+                },
+                None => todo!(),
+            }
+        });
+
         // Done
-        Self { g_box }
+        Self {
+            close,
+            g_box,
+            input,
+        }
     }
 
     // Actions
 
     pub fn show(&self) {
-        //self.buffer.get_mut().is_none()
-        self.g_box.set_visible(true)
+        self.g_box.set_visible(true);
+        self.input.entry.grab_focus();
     }
 
     pub fn hide(&self) {
