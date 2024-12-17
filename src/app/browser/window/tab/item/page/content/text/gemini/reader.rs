@@ -204,7 +204,7 @@ impl Reader {
                 // Append value to buffer
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
-                    header.value.as_str(),
+                    &header.value,
                     &[match header.level {
                         Level::H1 => &tag.h1,
                         Level::H2 => &tag.h2,
@@ -289,11 +289,7 @@ impl Reader {
             // Is quote
             if let Some(quote) = Quote::from(line) {
                 // Append value to buffer
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    quote.value.as_str(),
-                    &[&tag.quote],
-                );
+                buffer.insert_with_tags(&mut buffer.end_iter(), &quote.value, &[&tag.quote]);
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
