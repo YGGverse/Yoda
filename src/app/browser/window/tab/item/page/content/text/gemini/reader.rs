@@ -141,7 +141,7 @@ impl Reader {
                                         buffer.insert_with_tags(
                                             &mut buffer.end_iter(),
                                             alt.as_str(),
-                                            &[&tag.title.text_tag],
+                                            &[&tag.title],
                                         );
 
                                         // Append new line after alt text
@@ -206,9 +206,9 @@ impl Reader {
                     &mut buffer.end_iter(),
                     header.value.as_str(),
                     &[match header.level {
-                        Level::H1 => &tag.h1.text_tag,
-                        Level::H2 => &tag.h2.text_tag,
-                        Level::H3 => &tag.h3.text_tag,
+                        Level::H1 => &tag.h1,
+                        Level::H2 => &tag.h2,
+                        Level::H3 => &tag.h3,
                     }],
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
@@ -278,7 +278,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     format!("{LIST_ITEM} {}", list.value).as_str(),
-                    &[&tag.list.text_tag],
+                    &[&tag.list],
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
@@ -292,7 +292,7 @@ impl Reader {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     quote.value.as_str(),
-                    &[&tag.quote.text_tag],
+                    &[&tag.quote],
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
@@ -302,7 +302,7 @@ impl Reader {
 
             // Nothing match custom tags above,
             // just append plain text covered in empty tag (to handle controller events properly)
-            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain.text_tag]);
+            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain]);
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 

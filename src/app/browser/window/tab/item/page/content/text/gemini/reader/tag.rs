@@ -6,50 +6,42 @@ mod plain;
 mod quote;
 mod title;
 
-use h1::H1;
-use h2::H2;
-use h3::H3;
-use list::List;
-use plain::Plain;
-use quote::Quote;
-use title::Title;
-
-use gtk::TextTagTable;
+use gtk::{TextTag, TextTagTable};
 
 pub struct Tag {
     pub text_tag_table: TextTagTable,
     // Tags
-    pub h1: H1,
-    pub h2: H2,
-    pub h3: H3,
-    pub list: List,
-    pub quote: Quote,
-    pub title: Title,
-    pub plain: Plain,
+    pub h1: TextTag,
+    pub h2: TextTag,
+    pub h3: TextTag,
+    pub list: TextTag,
+    pub quote: TextTag,
+    pub title: TextTag,
+    pub plain: TextTag,
 }
 
 impl Tag {
     // Construct
     pub fn new() -> Self {
         // Init components
-        let h1 = H1::new();
-        let h2 = H2::new();
-        let h3 = H3::new();
-        let list = List::new();
-        let quote = Quote::new();
-        let title = Title::new();
-        let plain = Plain::new();
+        let h1 = h1::new();
+        let h2 = h2::new();
+        let h3 = h3::new();
+        let list = list::new();
+        let quote = quote::new();
+        let title = title::new();
+        let plain = plain::new();
 
         // Init tag table
         let text_tag_table = TextTagTable::new();
 
-        text_tag_table.add(&h1.text_tag);
-        text_tag_table.add(&h2.text_tag);
-        text_tag_table.add(&h3.text_tag);
-        text_tag_table.add(&title.text_tag);
-        text_tag_table.add(&list.text_tag);
-        text_tag_table.add(&quote.text_tag);
-        text_tag_table.add(&plain.text_tag);
+        text_tag_table.add(&h1);
+        text_tag_table.add(&h2);
+        text_tag_table.add(&h3);
+        text_tag_table.add(&title);
+        text_tag_table.add(&list);
+        text_tag_table.add(&quote);
+        text_tag_table.add(&plain);
 
         Self {
             text_tag_table,
