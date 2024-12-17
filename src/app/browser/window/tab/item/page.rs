@@ -182,7 +182,7 @@ impl Page {
         self.window_action.find.simple_action.set_enabled(false);
 
         // Reset widgets
-        self.search.update(None);
+        self.search.unset();
         self.input.unset();
 
         // Prevent infinitive redirection
@@ -570,8 +570,8 @@ impl Page {
                                                                 )
                                                             };
 
-                                                            // Update `find` model with new buffer
-                                                            search.update(Some(text_widget.text_view));
+                                                            // Connect `TextView` widget, update `search` model
+                                                            search.set(Some(text_widget.text_view));
 
                                                             // Update page meta
                                                             meta.set_status(Status::Success)

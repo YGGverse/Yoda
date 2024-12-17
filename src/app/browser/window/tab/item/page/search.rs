@@ -82,7 +82,12 @@ impl Search {
     }
 
     /// * currently supports [TextView](https://docs.gtk.org/gtk4/class.TextView.html) only
-    pub fn update(&self, text_view: Option<TextView>) {
+    pub fn set(&self, text_view: Option<TextView>) {
         self.subject.replace(text_view.map(Subject::new));
+    }
+
+    pub fn unset(&self) {
+        self.subject.replace(None);
+        self.hide() // make sure widget not visible anymore
     }
 }
