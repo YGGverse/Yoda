@@ -1,17 +1,15 @@
 mod back;
 mod forward;
-mod iter;
 
 use back::Back;
 use forward::Forward;
-use iter::Iter;
 
 use super::Subject;
 use gtk::{
     prelude::{BoxExt, TextBufferExt, TextViewExt},
     Box, Orientation, TextIter,
 };
-use std::cell::RefCell;
+use std::{cell::RefCell, iter::Cycle, vec::IntoIter};
 
 const MARGIN: i32 = 6;
 
@@ -19,7 +17,7 @@ pub struct Navigation {
     pub back: Back,
     pub forward: Forward,
     pub g_box: Box,
-    iter: RefCell<Option<Iter>>,
+    iter: RefCell<Option<Cycle<IntoIter<(TextIter, TextIter)>>>>,
 }
 
 impl Navigation {
@@ -56,7 +54,7 @@ impl Navigation {
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
         self.back.update(!matches.is_empty());
         self.forward.update(!matches.is_empty());
-        self.iter.replace(Some(Iter::new(matches)));
+        self.iter.replace(Some(matches.into_iter().cycle()));
     }
 
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -69,15 +67,15 @@ impl Navigation {
         );
 
         match self.iter.borrow_mut().as_mut() {
-            Some(iter) => match iter.back() {
+            Some(iter) => match iter.next() {
                 Some((start, end)) => {
                     buffer.apply_tag(&subject.tag.current, &start, &end);
                     Some((start, end))
                 }
-                None => iter.reset(),
+                None => None,
             },
             None => todo!(), // unexpected
-        }
+        } // @TODO reverse
     }
 
     pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -90,12 +88,12 @@ impl Navigation {
         );
 
         match self.iter.borrow_mut().as_mut() {
-            Some(iter) => match iter.forward() {
+            Some(iter) => match iter.next() {
                 Some((start, end)) => {
                     buffer.apply_tag(&subject.tag.current, &start, &end);
                     Some((start, end))
                 }
-                None => iter.reset(),
+                None => None,
             },
             None => todo!(), // unexpected
         }
