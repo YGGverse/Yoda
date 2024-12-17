@@ -76,7 +76,7 @@ impl Navigation {
                 }
                 None => iter.reset(),
             },
-            None => todo!(),
+            None => todo!(), // unexpected
         }
     }
 
@@ -97,7 +97,7 @@ impl Navigation {
                 }
                 None => iter.reset(),
             },
-            None => todo!(),
+            None => todo!(), // unexpected
         }
     }
 }
