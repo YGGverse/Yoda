@@ -8,7 +8,8 @@ use navigation::Navigation;
 
 use gtk::{
     prelude::{
-        BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, TextViewExt, WidgetExt,
+        BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, TextViewExt,
+        WidgetExt,
     },
     Align, Box, Orientation, TextIter, TextSearchFlags,
 };
@@ -49,7 +50,7 @@ impl Form {
             let subject = subject.clone();
             move |_| {
                 let matches = find(
-                    &subject,
+                    subject.borrow().as_ref().unwrap(), // @TODO handle
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 );
@@ -58,12 +59,40 @@ impl Form {
             }
         });
 
+        input.entry.connect_activate({
+            let input = input.clone();
+            let match_case = match_case.clone();
+            let navigation = navigation.clone();
+            let subject = subject.clone();
+            move |_| {
+                // try continue
+                if navigation
+                    .forward(subject.borrow().as_ref().unwrap()) // @TODO handle
+                    .is_none()
+                {
+                    // begin new search
+                    let matches = find(
+                        subject.borrow().as_ref().unwrap(), // @TODO handle
+                        input.entry.text().as_str(),
+                        match_case.is_active(),
+                    );
+                    input.update(!matches.is_empty());
+                    navigation.update(matches);
+                    navigation.forward(subject.borrow().as_ref().unwrap()); // @TODO handle
+                }
+            }
+        });
+
         match_case.connect_toggled({
             let input = input.clone();
             let navigation = navigation.clone();
             let subject = subject.clone();
             move |this| {
-                let matches = find(&subject, input.entry.text().as_str(), this.is_active());
+                let matches = find(
+                    subject.borrow().as_ref().unwrap(), // @TODO handle
+                    input.entry.text().as_str(),
+                    this.is_active(),
+                );
                 input.update(!matches.is_empty());
                 navigation.update(matches);
             }
@@ -123,49 +152,39 @@ impl Form {
 
 // Tools
 
-fn find(
-    subject: &Rc<RefCell<Option<Subject>>>,
-    request: &str,
-    is_match_case: bool,
-) -> Vec<(TextIter, TextIter)> {
+fn find(subject: &Subject, request: &str, is_match_case: bool) -> Vec<(TextIter, TextIter)> {
     // Init matches holder
     let mut result = Vec::new();
 
-    // Borrow buffer
-    match subject.borrow().as_ref() {
-        Some(subject) => {
-            // Get iters
-            let (buffer_start, buffer_end) = subject.text_view.buffer().bounds();
+    // Get iters
+    let (buffer_start, buffer_end) = subject.text_view.buffer().bounds();
 
-            // Cleanup previous search highlights
-            subject
-                .text_view
-                .buffer()
-                .remove_tag(&subject.tag.current, &buffer_start, &buffer_end);
-            subject
-                .text_view
-                .buffer()
-                .remove_tag(&subject.tag.found, &buffer_start, &buffer_end);
+    // Cleanup previous search highlights
+    subject
+        .text_view
+        .buffer()
+        .remove_tag(&subject.tag.current, &buffer_start, &buffer_end);
+    subject
+        .text_view
+        .buffer()
+        .remove_tag(&subject.tag.found, &buffer_start, &buffer_end);
 
-            // Begin new search
-            let mut next = buffer_start;
-            while let Some((match_start, match_end)) = next.forward_search(
-                request,
-                match is_match_case {
-                    true => TextSearchFlags::TEXT_ONLY,
-                    false => TextSearchFlags::CASE_INSENSITIVE,
-                },
-                None, // unlimited
-            ) {
-                subject
-                    .text_view
-                    .buffer()
-                    .apply_tag(&subject.tag.found, &match_start, &match_end);
-                next = match_end;
-                result.push((match_start, match_end));
-            }
-            result
-        }
-        None => todo!(), // unexpected
+    // Begin new search
+    let mut next = buffer_start;
+    while let Some((match_start, match_end)) = next.forward_search(
+        request,
+        match is_match_case {
+            true => TextSearchFlags::TEXT_ONLY,
+            false => TextSearchFlags::CASE_INSENSITIVE,
+        },
+        None, // unlimited
+    ) {
+        subject
+            .text_view
+            .buffer()
+            .apply_tag(&subject.tag.found, &match_start, &match_end);
+        next = match_end;
+        result.push((match_start, match_end));
     }
+    result
 }
