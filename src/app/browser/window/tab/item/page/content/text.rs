@@ -43,7 +43,7 @@ impl Text {
         );
 
         Self {
-            text_view: gemini.reader.widget.text_view.clone().upcast::<TextView>(),
+            text_view: gemini.reader.widget.text_view.clone(),
             meta: Meta {
                 title: gemini.reader.title.clone(),
             },
