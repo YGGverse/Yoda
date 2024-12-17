@@ -58,10 +58,6 @@ impl Search {
 
     // Actions
 
-    pub fn escape(&self) {
-        self.hide()
-    }
-
     pub fn show(&self) {
         if self.subject.borrow().is_some() {
             self.form.show();
@@ -87,9 +83,6 @@ impl Search {
 
     /// * currently supports [TextView](https://docs.gtk.org/gtk4/class.TextView.html) only
     pub fn update(&self, text_view: Option<TextView>) {
-        self.subject.replace(match text_view {
-            Some(subject) => Some(Subject::new(subject)),
-            None => None,
-        });
+        self.subject.replace(text_view.map(Subject::new));
     }
 }

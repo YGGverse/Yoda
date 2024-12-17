@@ -80,7 +80,6 @@ impl Form {
             }
         });
 
-        // Connect events
         navigation.back.button.connect_clicked({
             let subject = subject.clone();
             let navigation = navigation.clone();
@@ -130,14 +129,6 @@ impl Form {
 
     pub fn hide(&self) {
         self.g_box.set_visible(false)
-    }
-
-    pub fn toggle(&self) {
-        if self.g_box.is_visible() {
-            self.hide()
-        } else {
-            self.show()
-        }
     }
 }
 
