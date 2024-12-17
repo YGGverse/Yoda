@@ -302,10 +302,7 @@ impl Reader {
 
             // Nothing match custom tags above,
             // just append plain text covered in empty tag (to handle controller events properly)
-            let tag = TextTag::builder().wrap_mode(WrapMode::Word).build(); // @TODO single shared
-
-            buffer.tag_table().add(&tag);
-            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag]);
+            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain.text_tag]);
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 

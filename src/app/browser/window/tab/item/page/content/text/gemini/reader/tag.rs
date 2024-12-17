@@ -2,6 +2,7 @@ mod h1;
 mod h2;
 mod h3;
 mod list;
+mod plain;
 mod quote;
 mod title;
 
@@ -9,6 +10,7 @@ use h1::H1;
 use h2::H2;
 use h3::H3;
 use list::List;
+use plain::Plain;
 use quote::Quote;
 use title::Title;
 
@@ -23,6 +25,7 @@ pub struct Tag {
     pub list: List,
     pub quote: Quote,
     pub title: Title,
+    pub plain: Plain,
 }
 
 impl Tag {
@@ -35,6 +38,7 @@ impl Tag {
         let list = List::new();
         let quote = Quote::new();
         let title = Title::new();
+        let plain = Plain::new();
 
         // Init tag table
         let text_tag_table = TextTagTable::new();
@@ -45,6 +49,7 @@ impl Tag {
         text_tag_table.add(&title.text_tag);
         text_tag_table.add(&list.text_tag);
         text_tag_table.add(&quote.text_tag);
+        text_tag_table.add(&plain.text_tag);
 
         Self {
             text_tag_table,
@@ -55,6 +60,7 @@ impl Tag {
             list,
             quote,
             title,
+            plain,
         }
     }
 }
