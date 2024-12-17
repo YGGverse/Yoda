@@ -137,8 +137,7 @@ fn find(
     match subject.borrow().as_ref() {
         Some(subject) => {
             // Get iters
-            let buffer_start = subject.text_view.buffer().start_iter();
-            let buffer_end = subject.text_view.buffer().end_iter();
+            let (buffer_start, buffer_end) = subject.text_view.buffer().bounds();
 
             // Cleanup previous search highlights
             subject
