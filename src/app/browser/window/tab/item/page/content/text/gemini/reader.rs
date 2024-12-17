@@ -33,10 +33,6 @@ pub const EXTERNAL_LINK_INDICATOR: &str = "⇖";
 pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
 
-// @TODO use accent colors in adw 1.6 / ubuntu 24.10+
-const LINK_COLOR: ((f32, f32, f32, f32), (f32, f32, f32, f32)) =
-    ((0.2, 0.5, 0.9, 1.0), (0.2, 0.5, 0.9, 0.9));
-
 pub struct Reader {
     pub title: Option<String>,
     pub widget: Rc<Widget>,
@@ -63,7 +59,8 @@ impl Reader {
         let mut multiline = None;
 
         // Init colors
-        let link_color = (rgba(LINK_COLOR.0), rgba(LINK_COLOR.1));
+        // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
+        let link_color = (RGBA::new(0.2, 0.5, 0.9, 1.0), RGBA::new(0.2, 0.5, 0.9, 0.9));
 
         // Init syntect highlight features
         let syntax = Syntax::new();
@@ -450,11 +447,4 @@ impl Reader {
         // Result
         Ok(Self { title, widget })
     }
-}
-
-// Private helpers
-
-/// Create new [RGBA](https://docs.gtk.org/gdk4/struct.RGBA.html) from tuple
-fn rgba((r, g, b, a): (f32, f32, f32, f32)) -> RGBA {
-    RGBA::new(r, g, b, a)
 }
