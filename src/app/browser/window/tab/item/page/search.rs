@@ -1,3 +1,4 @@
+mod close;
 mod form;
 mod placeholder;
 mod subject;
@@ -28,10 +29,11 @@ impl Search {
         let subject = Rc::new(RefCell::new(None));
         let form = Rc::new(Form::new(&subject));
         let placeholder = Rc::new(Placeholder::new());
+        let close = close::new();
 
         // Init main container
         let g_box = Box::builder()
-            .orientation(Orientation::Vertical)
+            .orientation(Orientation::Horizontal)
             .valign(Align::Center)
             .vexpand(false)
             .visible(false)
@@ -39,12 +41,16 @@ impl Search {
 
         g_box.append(&form.g_box);
         g_box.append(&placeholder.label);
+        g_box.append(&close);
 
         // Connect events
-
-        form.close.connect_clicked({
+        close.connect_clicked({
+            let form = form.clone();
             let g_box = g_box.clone();
-            move |_| g_box.set_visible(false)
+            move |_| {
+                g_box.set_visible(false);
+                form.clean()
+            }
         });
 
         // Done

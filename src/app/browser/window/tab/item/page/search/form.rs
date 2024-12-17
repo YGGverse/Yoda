@@ -1,4 +1,3 @@
-mod close;
 mod input;
 mod match_case;
 mod navigation;
@@ -11,12 +10,11 @@ use gtk::{
     prelude::{
         BoxExt, ButtonExt, CheckButtonExt, EditableExt, TextBufferExt, TextViewExt, WidgetExt,
     },
-    Align, Box, Button, Orientation, TextIter, TextSearchFlags,
+    Align, Box, Orientation, TextIter, TextSearchFlags,
 };
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Form {
-    pub close: Button,
     pub input: Rc<Input>,
     pub g_box: Box,
 }
@@ -27,7 +25,6 @@ impl Form {
     /// Create new `Self`
     pub fn new(subject: &Rc<RefCell<Option<Subject>>>) -> Self {
         // Init components
-        let close = close::new();
         let input = Rc::new(Input::new());
         let match_case = match_case::new();
         let navigation = Rc::new(Navigation::new());
@@ -43,14 +40,8 @@ impl Form {
         g_box.append(&input.entry);
         g_box.append(&navigation.g_box);
         g_box.append(&match_case);
-        g_box.append(&close);
 
         // Connect events
-        close.connect_clicked({
-            let input = input.clone();
-            move |_| input.clean()
-        });
-
         input.entry.connect_changed({
             let input = input.clone();
             let match_case = match_case.clone();
@@ -113,14 +104,14 @@ impl Form {
         });
 
         // Done
-        Self {
-            close,
-            g_box,
-            input,
-        }
+        Self { g_box, input }
     }
 
     // Actions
+
+    pub fn clean(&self) {
+        self.input.clean();
+    }
 
     pub fn show(&self) {
         self.g_box.set_visible(true);
