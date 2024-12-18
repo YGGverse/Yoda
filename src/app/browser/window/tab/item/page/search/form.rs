@@ -63,6 +63,8 @@ impl Form {
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 );
+                input.update(!matches.is_empty());
+                navigation.update(matches);
                 if !this.text().is_empty() {
                     result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
@@ -71,8 +73,6 @@ impl Form {
                     result.label.set_visible(false);
                     separator.set_visible(false);
                 }
-                input.update(!matches.is_empty());
-                navigation.update(matches);
             }
         });
 
@@ -103,6 +103,8 @@ impl Form {
                     input.entry.text().as_str(),
                     this.is_active(),
                 );
+                input.update(!matches.is_empty());
+                navigation.update(matches);
                 if !input.entry.text().is_empty() {
                     result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
@@ -111,8 +113,6 @@ impl Form {
                     result.label.set_visible(false);
                     separator.set_visible(false);
                 }
-                input.update(!matches.is_empty());
-                navigation.update(matches);
             }
         });
 
