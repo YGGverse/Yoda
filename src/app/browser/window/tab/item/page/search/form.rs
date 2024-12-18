@@ -1,6 +1,7 @@
 mod input;
 mod match_case;
 mod navigation;
+mod separator;
 
 use super::Subject;
 use input::Input;
@@ -29,6 +30,7 @@ impl Form {
         let input = Rc::new(Input::new());
         let match_case = match_case::new();
         let navigation = Rc::new(Navigation::new());
+        let separator = separator::new();
 
         // Init main container
         let g_box = Box::builder()
@@ -41,6 +43,7 @@ impl Form {
         g_box.append(&input.entry);
         g_box.append(&navigation.g_box);
         g_box.append(&match_case);
+        g_box.append(&separator);
 
         // Connect events
         input.entry.connect_changed({
