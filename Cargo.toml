@@ -45,6 +45,9 @@ version = "0.9.1"
 package = "sourceview5"
 version = "0.9.1"
 
+[dependencies.plurify]
+version = "0.1.0"
+
 # development
 [patch.crates-io]
 # ggemini = { git = "https://github.com/YGGverse/ggemini.git" }
