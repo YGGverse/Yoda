@@ -53,13 +53,18 @@ impl Navigation {
 
     // Actions
 
+    /// Update widget state, including child components
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
         self.back.update(!matches.is_empty());
         self.forward.update(!matches.is_empty());
         self.model.replace(Model::new(matches));
     }
 
-    pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
+    /// Navigate back in matches, apply tags to buffer
+    /// * return `start`/`end` iters to scroll up the widget
+    /// * user should not activate this function on empty results
+    ///   expected all actions / buttons deactivated in this case
+    pub fn back(&self, subject: &Subject) -> (TextIter, TextIter) {
         let buffer = subject.text_view.buffer();
 
         buffer.remove_tag(
@@ -68,16 +73,25 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.model.borrow_mut().back() {
-            Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, start, end);
-                Some((*start, *end))
-            }
-            None => None,
+        let mut model = self.model.borrow_mut();
+
+        let (start, end) = match model.back() {
+            Some((start, end)) => (*start, *end),
+            None => todo!(), // unexpected
+        };
+
+        if model.position().is_some() {
+            buffer.apply_tag(&subject.tag.current, &start, &end);
         }
+
+        (start, end)
     }
 
-    pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
+    /// Navigate forward in matches, apply tags to buffer
+    /// * return `start`/`end` iters to scroll down the widget
+    /// * user should not activate this function on empty results
+    ///   expected all actions / buttons deactivated in this case
+    pub fn forward(&self, subject: &Subject) -> (TextIter, TextIter) {
         let buffer = subject.text_view.buffer();
 
         buffer.remove_tag(
@@ -86,14 +100,21 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.model.borrow_mut().next() {
-            Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, start, end);
-                Some((*start, *end))
-            }
-            None => None,
+        let mut model = self.model.borrow_mut();
+
+        let (start, end) = match model.next() {
+            Some((start, end)) => (*start, *end),
+            None => todo!(), // unexpected
+        };
+
+        if model.position().is_some() {
+            buffer.apply_tag(&subject.tag.current, &start, &end);
         }
+
+        (start, end)
     }
+
+    // Getters
 
     pub fn position(&self) -> Option<usize> {
         self.model.borrow().position()
