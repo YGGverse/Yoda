@@ -83,9 +83,13 @@ impl Form {
             move |this| match subject.borrow().as_ref() {
                 Some(subject) => {
                     if !this.text().is_empty() {
-                        let (mut start, _) = navigation.forward(subject);
-                        result.update(navigation.position(), navigation.total());
-                        scroll_to_iter(&subject.text_view, &mut start)
+                        match navigation.forward(subject) {
+                            Some((mut start, _)) => {
+                                result.update(navigation.position(), navigation.total());
+                                scroll_to_iter(&subject.text_view, &mut start)
+                            }
+                            None => todo!(), // unexpected
+                        }
                     }
                 }
                 None => todo!(),
@@ -123,9 +127,13 @@ impl Form {
             let subject = subject.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => {
-                    let (mut start, _) = navigation.back(subject);
-                    result.update(navigation.position(), navigation.total());
-                    scroll_to_iter(&subject.text_view, &mut start)
+                    match navigation.back(subject) {
+                        Some((mut start, _)) => {
+                            result.update(navigation.position(), navigation.total());
+                            scroll_to_iter(&subject.text_view, &mut start)
+                        }
+                        None => todo!(), // unexpected
+                    }
                 }
                 None => todo!(),
             }
@@ -136,11 +144,13 @@ impl Form {
             let result = result.clone();
             let subject = subject.clone();
             move |_| match subject.borrow().as_ref() {
-                Some(subject) => {
-                    let (mut start, _) = navigation.forward(subject);
-                    result.update(navigation.position(), navigation.total());
-                    scroll_to_iter(&subject.text_view, &mut start)
-                }
+                Some(subject) => match navigation.forward(subject) {
+                    Some((mut start, _)) => {
+                        result.update(navigation.position(), navigation.total());
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
+                    None => todo!(), // unexpected
+                },
                 None => todo!(),
             }
         });

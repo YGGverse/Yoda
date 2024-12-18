@@ -64,7 +64,7 @@ impl Navigation {
     /// * return `start`/`end` iters to scroll up the widget
     /// * user should not activate this function on empty results
     ///   expected all actions / buttons deactivated in this case
-    pub fn back(&self, subject: &Subject) -> (TextIter, TextIter) {
+    pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
         let buffer = subject.text_view.buffer();
 
         buffer.remove_tag(
@@ -75,23 +75,22 @@ impl Navigation {
 
         let mut model = self.model.borrow_mut();
 
-        let (start, end) = match model.back() {
-            Some((start, end)) => (*start, *end),
-            None => todo!(), // unexpected
-        };
-
-        if model.position().is_some() {
-            buffer.apply_tag(&subject.tag.current, &start, &end);
+        match model.back().map(|(start, end)| (*start, *end)) {
+            Some((start, end)) => {
+                if model.position().is_some() {
+                    buffer.apply_tag(&subject.tag.current, &start, &end);
+                }
+                Some((start, end))
+            }
+            None => None,
         }
-
-        (start, end)
     }
 
     /// Navigate forward in matches, apply tags to buffer
     /// * return `start`/`end` iters to scroll down the widget
     /// * user should not activate this function on empty results
     ///   expected all actions / buttons deactivated in this case
-    pub fn forward(&self, subject: &Subject) -> (TextIter, TextIter) {
+    pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
         let buffer = subject.text_view.buffer();
 
         buffer.remove_tag(
@@ -102,16 +101,15 @@ impl Navigation {
 
         let mut model = self.model.borrow_mut();
 
-        let (start, end) = match model.next() {
-            Some((start, end)) => (*start, *end),
-            None => todo!(), // unexpected
-        };
-
-        if model.position().is_some() {
-            buffer.apply_tag(&subject.tag.current, &start, &end);
+        match model.next().map(|(start, end)| (*start, *end)) {
+            Some((start, end)) => {
+                if model.position().is_some() {
+                    buffer.apply_tag(&subject.tag.current, &start, &end);
+                }
+                Some((start, end))
+            }
+            None => None,
         }
-
-        (start, end)
     }
 
     // Getters
