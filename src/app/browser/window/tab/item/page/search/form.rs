@@ -58,18 +58,18 @@ impl Form {
             let separator = separator.clone();
             let subject = subject.clone();
             move |this| {
-                let matches = find(
+                navigation.renew(find(
                     subject.borrow().as_ref().unwrap(), // @TODO handle
                     input.entry.text().as_str(),
                     match_case.is_active(),
-                );
-                input.update(!matches.is_empty());
-                navigation.renew(matches);
+                ));
                 if !this.text().is_empty() {
-                    result.update(navigation.position(), navigation.total());
+                    input.update(navigation.total() > 0);
                     result.label.set_visible(true);
+                    result.update(navigation.position(), navigation.total());
                     separator.set_visible(true);
                 } else {
+                    input.update(true);
                     result.label.set_visible(false);
                     separator.set_visible(false);
                 }
@@ -104,18 +104,18 @@ impl Form {
             let result = result.clone();
             let subject = subject.clone();
             move |this| {
-                let matches = find(
+                navigation.renew(find(
                     subject.borrow().as_ref().unwrap(), // @TODO handle
                     input.entry.text().as_str(),
                     this.is_active(),
-                );
-                input.update(!matches.is_empty());
-                navigation.renew(matches);
+                ));
                 if !input.entry.text().is_empty() {
-                    result.update(navigation.position(), navigation.total());
+                    input.update(navigation.total() > 0);
                     result.label.set_visible(true);
+                    result.update(navigation.position(), navigation.total());
                     separator.set_visible(true);
                 } else {
+                    input.update(true);
                     result.label.set_visible(false);
                     separator.set_visible(false);
                 }
@@ -181,9 +181,6 @@ impl Form {
 // Tools
 
 fn find(subject: &Subject, request: &str, is_match_case: bool) -> Vec<(TextIter, TextIter)> {
-    // Init matches holder
-    let mut result = Vec::new();
-
     // Get iters
     let (buffer_start, buffer_end) = subject.text_view.buffer().bounds();
 
@@ -196,6 +193,14 @@ fn find(subject: &Subject, request: &str, is_match_case: bool) -> Vec<(TextIter,
         .text_view
         .buffer()
         .remove_tag(&subject.tag.found, &buffer_start, &buffer_end);
+
+    // Init matches holder
+    let mut result = Vec::new();
+
+    // Skip search for empty request
+    if request.is_empty() {
+        return result;
+    }
 
     // Begin new search
     let mut next = buffer_start;
