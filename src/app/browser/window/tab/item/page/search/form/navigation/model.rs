@@ -23,4 +23,12 @@ impl<T> Model<T> {
         self.cursor.next();
         self.vector.get(self.cursor.as_index())
     }
+
+    pub fn position(&self) -> usize {
+        self.cursor.as_position()
+    }
+
+    pub fn total(&self) -> usize {
+        self.vector.len()
+    }
 }

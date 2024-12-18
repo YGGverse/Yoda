@@ -64,7 +64,7 @@ impl Form {
                     match_case.is_active(),
                 );
                 if !this.text().is_empty() {
-                    result.update(0, matches.len());
+                    result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
                     separator.set_visible(true);
                 } else {
@@ -78,10 +78,12 @@ impl Form {
 
         input.entry.connect_activate({
             let navigation = navigation.clone();
+            let result = result.clone();
             let subject = subject.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => {
                     if let Some((mut start, _)) = navigation.forward(subject) {
+                        result.update(navigation.position(), navigation.total());
                         scroll_to_iter(&subject.text_view, &mut start)
                     }
                 }
@@ -91,9 +93,10 @@ impl Form {
 
         match_case.connect_toggled({
             let input = input.clone();
-            let navigation = navigation.clone();
-            let subject = subject.clone();
             let input = input.clone();
+            let navigation = navigation.clone();
+            let result = result.clone();
+            let subject = subject.clone();
             move |this| {
                 let matches = find(
                     subject.borrow().as_ref().unwrap(), // @TODO handle
@@ -101,7 +104,7 @@ impl Form {
                     this.is_active(),
                 );
                 if !input.entry.text().is_empty() {
-                    result.update(0, matches.len());
+                    result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
                     separator.set_visible(true);
                 } else {
@@ -114,11 +117,15 @@ impl Form {
         });
 
         navigation.back.button.connect_clicked({
-            let subject = subject.clone();
             let navigation = navigation.clone();
+            let result = result.clone();
+            let subject = subject.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.back(subject) {
-                    Some((mut start, _)) => scroll_to_iter(&subject.text_view, &mut start),
+                    Some((mut start, _)) => {
+                        result.update(navigation.position(), navigation.total());
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
                     None => todo!(),
                 },
                 None => todo!(),
@@ -126,11 +133,15 @@ impl Form {
         });
 
         navigation.forward.button.connect_clicked({
-            let subject = subject.clone();
             let navigation = navigation.clone();
+            let result = result.clone();
+            let subject = subject.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.forward(subject) {
-                    Some((mut start, _)) => scroll_to_iter(&subject.text_view, &mut start),
+                    Some((mut start, _)) => {
+                        result.update(navigation.position(), navigation.total());
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
                     None => todo!(),
                 },
                 None => todo!(),

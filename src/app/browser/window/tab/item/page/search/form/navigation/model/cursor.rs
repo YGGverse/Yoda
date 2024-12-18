@@ -34,4 +34,8 @@ impl Cursor {
             0
         }
     }
+
+    pub fn as_position(&self) -> usize {
+        self.current
+    }
 }

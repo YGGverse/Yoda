@@ -94,4 +94,12 @@ impl Navigation {
             None => None,
         }
     }
+
+    pub fn position(&self) -> usize {
+        self.model.borrow().position()
+    }
+
+    pub fn total(&self) -> usize {
+        self.model.borrow().total()
+    }
 }
