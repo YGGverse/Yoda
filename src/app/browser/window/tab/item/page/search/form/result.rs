@@ -32,7 +32,7 @@ impl Result {
             }
             self.label.remove_css_class("error");
         } else {
-            self.label.set_label(&format!("Phrase not found"));
+            self.label.set_label("Phrase not found");
             self.label.add_css_class("error");
         }
     }
