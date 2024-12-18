@@ -60,10 +60,8 @@ impl Navigation {
         self.model.replace(Model::new(matches));
     }
 
-    /// Navigate back in matches, apply tags to buffer
+    /// Navigate back in matches, apply tags to the buffer
     /// * return `start`/`end` iters to scroll up the widget
-    /// * user should not activate this function on empty results
-    ///   expected all actions / buttons deactivated in this case
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
         let buffer = subject.text_view.buffer();
 
@@ -86,10 +84,8 @@ impl Navigation {
         }
     }
 
-    /// Navigate forward in matches, apply tags to buffer
+    /// Navigate forward in matches, apply tags to the buffer
     /// * return `start`/`end` iters to scroll down the widget
-    /// * user should not activate this function on empty results
-    ///   expected all actions / buttons deactivated in this case
     pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
         let buffer = subject.text_view.buffer();
 
