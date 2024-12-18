@@ -7,12 +7,15 @@ pub struct Model<T> {
 }
 
 impl<T> Model<T> {
+    // Constructors
     pub fn new(vector: Vec<T>) -> Self {
         Self {
             cursor: Cursor::new(vector.len()),
             vector,
         }
     }
+
+    // Actions
 
     pub fn back(&mut self) -> Option<&T> {
         self.cursor.back();
@@ -24,11 +27,21 @@ impl<T> Model<T> {
         self.vector.get(self.cursor.as_index())
     }
 
+    // Getters
+
     pub fn position(&self) -> Option<usize> {
         self.cursor.as_position()
     }
 
     pub fn total(&self) -> usize {
         self.vector.len()
+    }
+
+    pub fn is_back(&self) -> bool {
+        self.cursor.is_back()
+    }
+
+    pub fn is_next(&self) -> bool {
+        self.cursor.is_next()
     }
 }

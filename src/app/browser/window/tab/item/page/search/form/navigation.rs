@@ -53,11 +53,17 @@ impl Navigation {
 
     // Actions
 
-    /// Update widget state, including child components
-    pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
-        self.back.update(!matches.is_empty());
-        self.forward.update(!matches.is_empty());
+    /// Update navigation model
+    pub fn renew(&self, matches: Vec<(TextIter, TextIter)>) {
         self.model.replace(Model::new(matches));
+        self.update();
+    }
+
+    /// Update widget including child components
+    pub fn update(&self) {
+        let model = self.model.borrow();
+        self.back.update(model.is_back());
+        self.forward.update(model.is_next());
     }
 
     /// Navigate back in matches, apply tags to the buffer

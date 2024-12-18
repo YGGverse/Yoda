@@ -4,12 +4,16 @@ pub struct Cursor {
 }
 
 impl Cursor {
+    // Constructors
+
     pub fn new(len: usize) -> Self {
         Self {
             current: 0,
             last: len,
         }
     }
+
+    // Actions
 
     pub fn back(&mut self) {
         self.current = if self.current > 0 {
@@ -27,6 +31,8 @@ impl Cursor {
         }
     }
 
+    // Getters
+
     pub fn as_index(&self) -> usize {
         if self.current > 0 {
             self.current - 1
@@ -41,5 +47,13 @@ impl Cursor {
         } else {
             None
         }
+    }
+
+    pub fn is_back(&self) -> bool {
+        self.current > 0
+    }
+
+    pub fn is_next(&self) -> bool {
+        self.current < self.last
     }
 }

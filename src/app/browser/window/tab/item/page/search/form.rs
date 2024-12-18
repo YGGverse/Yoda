@@ -64,7 +64,7 @@ impl Form {
                     match_case.is_active(),
                 );
                 input.update(!matches.is_empty());
-                navigation.update(matches);
+                navigation.renew(matches);
                 if !this.text().is_empty() {
                     result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
@@ -109,7 +109,7 @@ impl Form {
                     this.is_active(),
                 );
                 input.update(!matches.is_empty());
-                navigation.update(matches);
+                navigation.renew(matches);
                 if !input.entry.text().is_empty() {
                     result.update(navigation.position(), navigation.total());
                     result.label.set_visible(true);
@@ -129,6 +129,7 @@ impl Form {
                 Some(subject) => {
                     match navigation.back(subject) {
                         Some((mut start, _)) => {
+                            navigation.update();
                             result.update(navigation.position(), navigation.total());
                             scroll_to_iter(&subject.text_view, &mut start)
                         }
@@ -146,6 +147,7 @@ impl Form {
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.forward(subject) {
                     Some((mut start, _)) => {
+                        navigation.update();
                         result.update(navigation.position(), navigation.total());
                         scroll_to_iter(&subject.text_view, &mut start)
                     }
