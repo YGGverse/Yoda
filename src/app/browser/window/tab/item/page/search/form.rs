@@ -11,7 +11,7 @@ use gtk::{
         BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, TextViewExt,
         WidgetExt,
     },
-    Align, Box, Orientation, TextIter, TextSearchFlags,
+    Align, Box, Orientation, TextIter, TextSearchFlags, TextView,
 };
 use std::{cell::RefCell, rc::Rc};
 
@@ -60,26 +60,15 @@ impl Form {
         });
 
         input.entry.connect_activate({
-            let input = input.clone();
-            let match_case = match_case.clone();
             let navigation = navigation.clone();
             let subject = subject.clone();
-            move |_| {
-                // try continue
-                if navigation
-                    .forward(subject.borrow().as_ref().unwrap()) // @TODO handle
-                    .is_none()
-                {
-                    // begin new search
-                    let matches = find(
-                        subject.borrow().as_ref().unwrap(), // @TODO handle
-                        input.entry.text().as_str(),
-                        match_case.is_active(),
-                    );
-                    input.update(!matches.is_empty());
-                    navigation.update(matches);
-                    navigation.forward(subject.borrow().as_ref().unwrap()); // @TODO handle
+            move |_| match subject.borrow().as_ref() {
+                Some(subject) => {
+                    if let Some((mut start, _)) = navigation.forward(subject) {
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
                 }
+                None => todo!(),
             }
         });
 
@@ -103,11 +92,7 @@ impl Form {
             let navigation = navigation.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.back(subject) {
-                    Some((mut start, _)) => {
-                        subject
-                            .text_view
-                            .scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
-                    }
+                    Some((mut start, _)) => scroll_to_iter(&subject.text_view, &mut start),
                     None => todo!(),
                 },
                 None => todo!(),
@@ -119,11 +104,7 @@ impl Form {
             let navigation = navigation.clone();
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.forward(subject) {
-                    Some((mut start, _)) => {
-                        subject
-                            .text_view
-                            .scroll_to_iter(&mut start, 0.0, true, 0.0, 0.0);
-                    }
+                    Some((mut start, _)) => scroll_to_iter(&subject.text_view, &mut start),
                     None => todo!(),
                 },
                 None => todo!(),
@@ -187,4 +168,8 @@ fn find(subject: &Subject, request: &str, is_match_case: bool) -> Vec<(TextIter,
         result.push((match_start, match_end));
     }
     result
+}
+
+fn scroll_to_iter(text_view: &TextView, iter: &mut TextIter) {
+    text_view.scroll_to_iter(iter, 0.0, true, 0.0, 0.0);
 }
