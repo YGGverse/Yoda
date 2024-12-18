@@ -1,4 +1,6 @@
-use gtk::{prelude::WidgetExt, Label};
+use gtk::{prelude::WidgetExt, Align, Label};
+
+const MARGIN: i32 = 6;
 
 pub struct Placeholder {
     pub label: Label,
@@ -12,7 +14,9 @@ impl Placeholder {
         Self {
             label: Label::builder()
                 .css_classes(["error"])
+                .halign(Align::Start)
                 .label("Search action requires activation!")
+                .margin_start(MARGIN)
                 .build(),
         }
     }
