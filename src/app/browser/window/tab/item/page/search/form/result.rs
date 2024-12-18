@@ -22,7 +22,7 @@ impl Result {
 
     // Actions
 
-    pub fn show(&self, current: usize, total: usize) {
+    pub fn update(&self, current: usize, total: usize) {
         if total > 0 {
             self.label
                 .set_label(&format!("{current} if {total} matches"));
@@ -31,10 +31,5 @@ impl Result {
             self.label.set_label(&format!("Phrase not found"));
             self.label.add_css_class("error");
         }
-        self.label.set_visible(true);
-    }
-
-    pub fn hide(&self) {
-        self.label.set_visible(false);
     }
 }

@@ -63,11 +63,12 @@ impl Form {
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 );
-                if !this.text().is_empty() && !matches.is_empty() {
-                    result.show(0, matches.len());
+                if !this.text().is_empty() {
+                    result.update(0, matches.len());
+                    result.label.set_visible(true);
                     separator.set_visible(true);
                 } else {
-                    result.hide();
+                    result.label.set_visible(false);
                     separator.set_visible(false);
                 }
                 input.update(!matches.is_empty());
@@ -92,12 +93,21 @@ impl Form {
             let input = input.clone();
             let navigation = navigation.clone();
             let subject = subject.clone();
+            let input = input.clone();
             move |this| {
                 let matches = find(
                     subject.borrow().as_ref().unwrap(), // @TODO handle
                     input.entry.text().as_str(),
                     this.is_active(),
                 );
+                if !input.entry.text().is_empty() {
+                    result.update(0, matches.len());
+                    result.label.set_visible(true);
+                    separator.set_visible(true);
+                } else {
+                    result.label.set_visible(false);
+                    separator.set_visible(false);
+                }
                 input.update(!matches.is_empty());
                 navigation.update(matches);
             }
