@@ -1,15 +1,17 @@
 mod back;
 mod forward;
+mod model;
 
 use back::Back;
 use forward::Forward;
+use model::Model;
 
 use super::Subject;
 use gtk::{
     prelude::{BoxExt, TextBufferExt, TextViewExt},
     Box, Orientation, TextIter,
 };
-use std::{cell::RefCell, iter::Cycle, vec::IntoIter};
+use std::cell::RefCell;
 
 const MARGIN: i32 = 6;
 
@@ -17,7 +19,7 @@ pub struct Navigation {
     pub back: Back,
     pub forward: Forward,
     pub g_box: Box,
-    iter: RefCell<Cycle<IntoIter<(TextIter, TextIter)>>>,
+    model: RefCell<Model<(TextIter, TextIter)>>,
 }
 
 impl Navigation {
@@ -45,7 +47,7 @@ impl Navigation {
             back,
             forward,
             g_box,
-            iter: RefCell::new(Vec::new().into_iter().cycle()),
+            model: RefCell::new(Model::new(Vec::new())), // @TODO
         }
     }
 
@@ -54,7 +56,7 @@ impl Navigation {
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
         self.back.update(!matches.is_empty());
         self.forward.update(!matches.is_empty());
-        let _ = self.iter.replace(matches.into_iter().cycle());
+        let _ = self.model.replace(Model::new(matches));
     }
 
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -66,13 +68,13 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.iter.borrow_mut().next() {
+        match self.model.borrow_mut().back() {
             Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, &start, &end);
-                Some((start, end))
+                buffer.apply_tag(&subject.tag.current, start, end);
+                Some((*start, *end))
             }
             None => None,
-        } // @TODO reverse
+        }
     }
 
     pub fn forward(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
@@ -84,10 +86,10 @@ impl Navigation {
             &buffer.end_iter(),
         );
 
-        match self.iter.borrow_mut().next() {
+        match self.model.borrow_mut().next() {
             Some((start, end)) => {
-                buffer.apply_tag(&subject.tag.current, &start, &end);
-                Some((start, end))
+                buffer.apply_tag(&subject.tag.current, start, end);
+                Some((*start, *end))
             }
             None => None,
         }
