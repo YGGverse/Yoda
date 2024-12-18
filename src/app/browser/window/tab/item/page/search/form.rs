@@ -57,13 +57,13 @@ impl Form {
             let result = result.clone();
             let separator = separator.clone();
             let subject = subject.clone();
-            move |_| {
+            move |this| {
                 let matches = find(
                     subject.borrow().as_ref().unwrap(), // @TODO handle
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 );
-                if !matches.is_empty() {
+                if !this.text().is_empty() && !matches.is_empty() {
                     result.show(0, matches.len());
                     separator.set_visible(true);
                 } else {
