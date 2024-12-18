@@ -8,5 +8,6 @@ pub fn new() -> Separator {
         .margin_end(MARGIN)
         .margin_start(MARGIN)
         .margin_top(MARGIN)
+        .visible(false)
         .build()
 }

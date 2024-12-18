@@ -1,11 +1,13 @@
 mod input;
 mod match_case;
 mod navigation;
+mod result;
 mod separator;
 
 use super::Subject;
 use input::Input;
 use navigation::Navigation;
+use result::Result;
 
 use gtk::{
     prelude::{
@@ -27,6 +29,7 @@ impl Form {
     /// Create new `Self`
     pub fn new(subject: &Rc<RefCell<Option<Subject>>>) -> Self {
         // Init components
+        let result = Rc::new(Result::new());
         let input = Rc::new(Input::new());
         let match_case = match_case::new();
         let navigation = Rc::new(Navigation::new());
@@ -44,12 +47,15 @@ impl Form {
         g_box.append(&navigation.g_box);
         g_box.append(&match_case);
         g_box.append(&separator);
+        g_box.append(&result.label);
 
         // Connect events
         input.entry.connect_changed({
             let input = input.clone();
             let match_case = match_case.clone();
             let navigation = navigation.clone();
+            let result = result.clone();
+            let separator = separator.clone();
             let subject = subject.clone();
             move |_| {
                 let matches = find(
@@ -57,6 +63,13 @@ impl Form {
                     input.entry.text().as_str(),
                     match_case.is_active(),
                 );
+                if !matches.is_empty() {
+                    result.show(0, matches.len());
+                    separator.set_visible(true);
+                } else {
+                    result.hide();
+                    separator.set_visible(false);
+                }
                 input.update(!matches.is_empty());
                 navigation.update(matches);
             }
