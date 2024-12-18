@@ -33,6 +33,7 @@ impl Search {
 
         // Init main container
         let g_box = Box::builder()
+            .homogeneous(true)
             .orientation(Orientation::Horizontal)
             .valign(Align::Center)
             .vexpand(false)

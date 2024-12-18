@@ -4,11 +4,12 @@ const MARGIN: i32 = 6;
 
 pub fn new() -> Button {
     Button::builder()
+        .halign(Align::End)
         .icon_name("window-close-symbolic")
         .margin_end(MARGIN)
         .margin_start(MARGIN)
+        .tooltip_text("Close find bar")
         .valign(Align::Center)
         .vexpand(false)
-        .tooltip_text("Close find bar")
         .build()
 }

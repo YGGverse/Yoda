@@ -4,6 +4,7 @@ use gtk::{
 };
 
 const MARGIN: i32 = 6;
+const WIDTH_REQUEST: i32 = 280;
 
 pub struct Input {
     pub entry: Entry,
@@ -16,7 +17,6 @@ impl Input {
     pub fn new() -> Self {
         // Init widget
         let entry = Entry::builder()
-            .hexpand(true)
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
             .margin_start(MARGIN)
@@ -27,6 +27,7 @@ impl Input {
             .primary_icon_sensitive(false)
             .valign(Align::Center)
             .vexpand(false)
+            .width_request(WIDTH_REQUEST) // | .hexpand(true)
             .build();
 
         // Connect events
