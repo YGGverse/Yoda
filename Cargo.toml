@@ -46,7 +46,7 @@ package = "sourceview5"
 version = "0.9.1"
 
 [dependencies.plurify]
-version = "0.1.0"
+version = "0.1.1"
 
 # development
 [patch.crates-io]
