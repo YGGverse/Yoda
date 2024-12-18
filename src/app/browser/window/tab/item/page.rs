@@ -132,7 +132,7 @@ impl Page {
 
     /// Toggle `Find` widget
     pub fn find(&self) {
-        self.search.toggle()
+        self.search.show()
     }
 
     /// Navigate home URL (parsed from current navigation entry)
