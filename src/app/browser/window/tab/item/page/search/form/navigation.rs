@@ -47,7 +47,7 @@ impl Navigation {
             back,
             forward,
             g_box,
-            model: RefCell::new(Model::new(Vec::new())), // @TODO
+            model: RefCell::new(Model::new(Vec::new())), // @TODO option?
         }
     }
 
@@ -56,7 +56,7 @@ impl Navigation {
     pub fn update(&self, matches: Vec<(TextIter, TextIter)>) {
         self.back.update(!matches.is_empty());
         self.forward.update(!matches.is_empty());
-        let _ = self.model.replace(Model::new(matches));
+        self.model.replace(Model::new(matches));
     }
 
     pub fn back(&self, subject: &Subject) -> Option<(TextIter, TextIter)> {
