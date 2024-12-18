@@ -11,8 +11,8 @@ use result::Result;
 
 use gtk::{
     prelude::{
-        BoxExt, ButtonExt, CheckButtonExt, EditableExt, EntryExt, TextBufferExt, TextViewExt,
-        WidgetExt,
+        BoxExt, ButtonExt, CheckButtonExt, DisplayExt, EditableExt, EntryExt, TextBufferExt,
+        TextViewExt, WidgetExt,
     },
     Align, Box, Orientation, TextIter, TextSearchFlags, TextView,
 };
@@ -214,6 +214,11 @@ fn find(subject: &Subject, request: &str, is_match_case: bool) -> Vec<(TextIter,
         next = match_end;
         result.push((match_start, match_end));
     }
+
+    if result.is_empty() {
+        subject.text_view.display().beep()
+    }
+
     result
 }
 
