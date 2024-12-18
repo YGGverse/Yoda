@@ -35,7 +35,11 @@ impl Cursor {
         }
     }
 
-    pub fn as_position(&self) -> usize {
-        self.current
+    pub fn as_position(&self) -> Option<usize> {
+        if self.current > 0 {
+            Some(self.current)
+        } else {
+            None
+        }
     }
 }

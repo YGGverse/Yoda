@@ -22,13 +22,13 @@ impl Result {
 
     // Actions
 
-    pub fn update(&self, current: usize, total: usize) {
+    pub fn update(&self, current: Option<usize>, total: usize) {
         if total > 0 {
-            if current > 0 {
-                self.label
-                    .set_label(&format!("{current} of {total} matches"));
-            } else {
-                self.label.set_label(&format!("{total} matches"));
+            match current {
+                Some(position) => self
+                    .label
+                    .set_label(&format!("{position} of {total} matches")),
+                None => self.label.set_label(&format!("{total} matches")),
             }
             self.label.remove_css_class("error");
         } else {

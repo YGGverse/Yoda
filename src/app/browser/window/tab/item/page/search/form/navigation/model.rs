@@ -24,7 +24,7 @@ impl<T> Model<T> {
         self.vector.get(self.cursor.as_index())
     }
 
-    pub fn position(&self) -> usize {
+    pub fn position(&self) -> Option<usize> {
         self.cursor.as_position()
     }
 

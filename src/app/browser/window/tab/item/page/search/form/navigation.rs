@@ -95,7 +95,7 @@ impl Navigation {
         }
     }
 
-    pub fn position(&self) -> usize {
+    pub fn position(&self) -> Option<usize> {
         self.model.borrow().position()
     }
 
