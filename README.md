@@ -132,13 +132,14 @@ GTK 4 / Libadwaita client written in Rust
 * Glib `2.80`
 * Gtk `4.14`
 * GtkSourceView `5.14`
-* Libadwaita `1.5` (Ubuntu 24.04+)
+* libadwaita `1.5` (Ubuntu 24.04+)
+* libspelling `0.1`
 
 #### Debian
 
 ``` bash
 sudo apt install git curl build-essential\
-                 libgtk-4-dev libgtksourceview-5-dev libadwaita-1-dev\
+                 libgtk-4-dev libgtksourceview-5-dev libadwaita-1-dev libspelling-1-dev\
                  libsqlite3-dev libssl-dev
 ```
 
@@ -146,7 +147,7 @@ sudo apt install git curl build-essential\
 
 ``` bash
 sudo dnf install git curl gcc\
-                 gtk4-devel gtksourceview5-devel libadwaita-devel\
+                 gtk4-devel gtksourceview5-devel libadwaita-devel libspelling-devel\
                  sqlite-devel openssl-devel
 ```
 

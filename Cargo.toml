@@ -48,6 +48,9 @@ version = "0.9.1"
 [dependencies.plurify]
 version = "0.1.1"
 
+[dependencies.libspelling]
+version = "0.3.0"
+
 # development
 [patch.crates-io]
 # ggemini = { git = "https://github.com/YGGverse/ggemini.git" }
