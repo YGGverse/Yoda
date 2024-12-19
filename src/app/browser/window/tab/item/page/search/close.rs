@@ -5,6 +5,7 @@ const MARGIN: i32 = 6;
 pub fn new() -> Button {
     Button::builder()
         .halign(Align::End)
+        .hexpand(true)
         .icon_name("window-close-symbolic")
         .margin_end(MARGIN)
         .margin_start(MARGIN)
