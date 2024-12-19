@@ -28,6 +28,7 @@ impl Widget {
         let text_view = TextView::builder()
             .bottom_margin(MARGIN)
             .buffer(&buffer)
+            .css_classes(["frame", "view"])
             .extra_menu(&adapter.menu_model())
             .left_margin(MARGIN)
             .right_margin(MARGIN)

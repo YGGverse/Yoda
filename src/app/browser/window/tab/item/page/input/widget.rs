@@ -1,6 +1,8 @@
 use adw::Clamp;
 use gtk::{prelude::WidgetExt, Box};
 
+const MARGIN: i32 = 6;
+
 pub struct Widget {
     pub clamp: Clamp,
 }
@@ -9,7 +11,8 @@ impl Widget {
     // Construct
     pub fn new() -> Self {
         let clamp = Clamp::builder()
-            .css_classes(["osd"])
+            .margin_bottom(MARGIN)
+            .margin_top(MARGIN)
             .maximum_size(800)
             .visible(false)
             .build();

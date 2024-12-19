@@ -13,7 +13,7 @@ impl Widget {
     pub fn new(action_send: SimpleAction) -> Self {
         // Init main widget
         let button = Button::builder()
-            //.css_classes(["accent"])
+            .css_classes(["accent"]) // | `suggested-action`
             .label("Send")
             .build();
 

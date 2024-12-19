@@ -1,7 +1,5 @@
 use gtk::{prelude::WidgetExt, Align, Label};
 
-const MARGIN: i32 = 6;
-
 pub struct Widget {
     pub label: Label,
 }
@@ -12,9 +10,6 @@ impl Widget {
         let label = Label::builder()
             .css_classes(["heading"])
             .halign(Align::Start)
-            .margin_end(MARGIN)
-            .margin_start(MARGIN)
-            .margin_top(MARGIN)
             .visible(false)
             .build();
 
