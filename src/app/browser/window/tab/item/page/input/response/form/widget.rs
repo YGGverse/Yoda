@@ -31,6 +31,7 @@ impl Widget {
             .css_classes(["frame", "view"])
             .extra_menu(&adapter.menu_model())
             .left_margin(MARGIN)
+            .margin_bottom(MARGIN / 4)
             .right_margin(MARGIN)
             .top_margin(MARGIN)
             .wrap_mode(WrapMode::Word)
