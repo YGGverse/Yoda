@@ -176,10 +176,19 @@ impl Tab {
         self.widget.close_all();
     }
 
-    // Toggle search widget
-    pub fn escape(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
-            item.page.escape();
+    // Toggle escape action for specified or current item
+    pub fn escape(&self, item_id: Option<GString>) {
+        match item_id {
+            Some(id) => {
+                if let Some(item) = self.index.borrow().get(&id) {
+                    item.page.escape()
+                }
+            }
+            None => {
+                if let Some(item) = self.item(None) {
+                    item.page.escape();
+                }
+            }
         }
     }
 

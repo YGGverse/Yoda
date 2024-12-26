@@ -70,8 +70,8 @@ impl Browser {
         action.escape.connect_activate({
             let widget = widget.clone();
             let window = window.clone();
-            move || {
-                window.tab.escape(None); // current tab
+            move |tab_item_id| {
+                window.escape(tab_item_id);
                 widget.application_window.set_focus(gtk::Window::NONE);
             }
         });

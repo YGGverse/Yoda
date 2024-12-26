@@ -119,6 +119,10 @@ impl Window {
     }
 
     // Actions
+    pub fn escape(&self, tab_item_id: Option<GString>) {
+        self.tab.escape(tab_item_id);
+    }
+
     pub fn update(&self, tab_item_id: Option<GString>) {
         self.tab.update(tab_item_id);
     }
