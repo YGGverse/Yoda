@@ -124,6 +124,8 @@ GTK 4 / Libadwaita client written in Rust
 ## Build
 
 ![Linux](https://github.com/YGGverse/Yoda/actions/workflows/linux.yml/badge.svg)
+[![Dependencies](https://deps.rs/repo/github/YGGverse/Yoda/status.svg)](https://deps.rs/repo/github/YGGverse/Yoda)
+[![crates.io](https://img.shields.io/crates/v/Yoda.svg)](https://crates.io/crates/Yoda)
 
 ### Requirements
 
