@@ -9,6 +9,12 @@ pub struct Memory {
     index: RefCell<HashMap<String, i64>>,
 }
 
+impl Default for Memory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Memory {
     // Constructors
 
@@ -56,7 +62,7 @@ impl Memory {
         }
     }
 
-    /// Get recent requests vector sorted DESC by `ID`
+    /// Get recent requests vector sorted by `ID` DESC
     pub fn recent(&self, limit: usize) -> Vec<String> {
         let mut recent: Vec<String> = Vec::new();
         for (request, _) in self
@@ -71,7 +77,7 @@ impl Memory {
         recent
     }
 
-    /// Get total records in memory pool
+    /// Get records total
     pub fn total(&self) -> usize {
         self.index.borrow().len()
     }
