@@ -209,8 +209,8 @@ cargo build
 
 UI localization planed as Crowdin repository, but it is not implemented yet.
 
-To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-{CODE}`
-* just replace `CODE` with the locale code you want.
+To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-CODE`
+* just replace `CODE` with the locale code you want
 
 ### Releases
 
