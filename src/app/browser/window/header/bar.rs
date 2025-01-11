@@ -26,11 +26,11 @@ impl Bar {
     ) -> Self {
         let control = Control::new();
         let tab = Tab::new(window_action, view);
-        let menu = Menu::new((browser_action, window_action), profile);
+        let menu = Rc::new(Menu::new((browser_action, window_action), profile));
         Self {
             widget: Rc::new(Widget::new(
-                &control.widget.gobject,
-                &menu.widget.gobject,
+                &control.window_controls,
+                &menu.menu_button,
                 &tab.widget.tab_bar,
             )),
         }

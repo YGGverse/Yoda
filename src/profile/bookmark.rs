@@ -11,8 +11,8 @@ use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Bookmark {
-    database: Rc<Database>, // permanent storage
-    memory: Rc<Memory>,     // fast search index
+    pub database: Rc<Database>, // permanent storage
+    pub memory: Rc<Memory>,     // fast search index
 }
 
 impl Bookmark {

@@ -4,7 +4,7 @@ mod header;
 mod tab;
 mod widget;
 
-use action::Action;
+use action::{Action, Position};
 use header::Header;
 use sqlite::Transaction;
 use tab::Tab;
@@ -29,7 +29,11 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::new(&profile, (&browser_action, &action)));
-        let header = Header::new((&browser_action, &action), &profile, &tab.widget.tab_view);
+        let header = Rc::new(Header::new(
+            (&browser_action, &action),
+            &profile,
+            &tab.widget.tab_view,
+        ));
         let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.tab_view));
 
         // Init events
@@ -108,6 +112,13 @@ impl Window {
             move |position| {
                 tab.page_history_forward(position);
             } // @TODO rename destination method
+        });
+
+        action.open.on_activate({
+            let tab = tab.clone();
+            move |_, request| {
+                tab.append(Position::End, Some(request), false, true, false, true);
+            }
         });
 
         // Init struct

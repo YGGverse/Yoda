@@ -1,17 +1,19 @@
-mod widget;
-use widget::Widget;
+use gtk::{PackType, WindowControls};
 
-use std::rc::Rc;
+const MARGIN: i32 = 4;
 
 pub struct Control {
-    pub widget: Rc<Widget>,
+    pub window_controls: WindowControls,
 }
 
 impl Control {
     // Construct
     pub fn new() -> Self {
         Self {
-            widget: Rc::new(Widget::new()),
+            window_controls: WindowControls::builder()
+                .margin_end(MARGIN)
+                .side(PackType::End)
+                .build(),
         }
     }
 }

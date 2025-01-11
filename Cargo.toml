@@ -8,6 +8,7 @@ description = "Browser for Gemini Protocol"
 keywords = ["gemini", "gemini-protocol", "gtk", "browser", "client"]
 categories = ["network-programming", "gui"]
 repository = "https://github.com/YGGverse/Yoda"
+
 # homepage = "https://yggverse.github.io"
 
 [dependencies.adw]
@@ -50,6 +51,9 @@ version = "0.1.1"
 
 [dependencies.libspelling]
 version = "0.3.0"
+
+[dependencies]
+itertools = "0.14.0"
 
 # development
 [patch.crates-io]

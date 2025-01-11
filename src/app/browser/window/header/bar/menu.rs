@@ -1,22 +1,24 @@
-mod widget;
-
-use widget::Widget;
-
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
-    prelude::ActionExt,
+    prelude::{ActionExt, ToVariant},
+    Align, MenuButton,
 };
 use std::rc::Rc;
 
+// Config options
+
+const RECENT_BOOKMARKS: usize = 50;
+
 pub struct Menu {
-    pub widget: Rc<Widget>,
+    pub menu_button: MenuButton,
 }
+
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        _profile: &Rc<Profile>,
+        profile: &Rc<Profile>,
     ) -> Self {
         // Main
         let main = gio::Menu::new();
@@ -122,6 +124,12 @@ impl Menu {
 
                 main.append_submenu(Some("Page"), &main_page);
 
+            // Main > Bookmark
+            // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
+            let main_bookmarks = gio::Menu::new();
+
+                main.append_submenu(Some("Bookmarks"), &main_bookmarks);
+
             // Main > Tool
             let main_tool = gio::Menu::new();
 
@@ -152,7 +160,42 @@ impl Menu {
             browser_action.close.simple_action.name()
         )));
 
+        // Init main widget
+        let menu_button = MenuButton::builder()
+                .css_classes(["flat"])
+                .icon_name("open-menu-symbolic")
+                .menu_model(&main)
+                .tooltip_text("Menu")
+                .valign(Align::Center)
+                .build();
+
+            // Generate dynamical menu items
+            menu_button.set_create_popup_func({
+                let profile = profile.clone();
+                let main_bookmarks = main_bookmarks.clone();
+                let window_action = window_action.clone();
+                move |_| {
+                    main_bookmarks.remove_all();
+                    for bookmark in profile.bookmark.memory.recent(RECENT_BOOKMARKS) {
+                        let menu_item = gio::MenuItem::new(Some(&bookmark), None);
+                            menu_item.set_action_and_target_value(Some(&format!(
+                                "{}.{}",
+                                window_action.id,
+                                window_action.open.simple_action.name()
+                            )), Some(&bookmark.to_variant()));
+
+                        main_bookmarks.append_item(&menu_item);
+                    }
+                    // Show all bookmarks menu item
+                    // if profile.bookmark.memory.total() > RECENT_BOOKMARKS {
+                    // @TODO
+                    // }
+                }
+            });
+
         // Result
-        Self { widget:Rc::new(Widget::new(&main)) }
+        Self {
+            menu_button
+        }
     }
 }

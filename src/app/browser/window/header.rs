@@ -13,14 +13,15 @@ pub struct Header {
 }
 
 impl Header {
-    // Construct
+    // Constructors
+
     pub fn new(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
         tab_view: &TabView,
     ) -> Self {
         // Init components
-        let bar = Bar::new((browser_action, window_action), profile, tab_view);
+        let bar = Rc::new(Bar::new((browser_action, window_action), profile, tab_view));
 
         // Return new struct
         Self {

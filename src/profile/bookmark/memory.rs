@@ -1,6 +1,7 @@
 mod error;
 use error::Error;
 
+use itertools::Itertools;
 use std::{cell::RefCell, collections::HashMap};
 
 /// Reduce disk usage by cache Bookmarks index in memory
@@ -53,5 +54,25 @@ impl Memory {
             Some(&value) => Ok(value),
             None => Err(Error::Unexpected), // @TODO
         }
+    }
+
+    /// Get recent requests vector sorted DESC by `ID`
+    pub fn recent(&self, limit: usize) -> Vec<String> {
+        let mut recent: Vec<String> = Vec::new();
+        for (request, _) in self
+            .index
+            .borrow()
+            .iter()
+            .sorted_by(|a, b| Ord::cmp(&b.1, &a.1))
+            .take(limit)
+        {
+            recent.push(request.to_string())
+        }
+        recent
+    }
+
+    /// Get total records in memory pool
+    pub fn total(&self) -> usize {
+        self.index.borrow().len()
     }
 }
