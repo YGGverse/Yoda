@@ -215,7 +215,7 @@ To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-CODE
 ### Releases
 
 * Package version in repository increase after [crates.io](https://crates.io/crates/yoda) release
-* Until DB migration not implemented, application will create new profile on `CARGO_PKG_VERSION_MAJOR`.`CARGO_PKG_VERSION_MINOR` change
+* Until DB migration not implemented, application will create new profile on every `CARGO_PKG_VERSION_MAJOR`.`CARGO_PKG_VERSION_MINOR` change
 
 ### See also
 
