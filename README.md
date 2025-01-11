@@ -14,13 +14,26 @@ GTK 4 / Libadwaita client written in Rust
 * [x] Multi-tab
 * [x] Hotkeys
 * [ ] Bookmarks
+  * [ ] Browser window
+  * [ ] Recent list
 * [ ] Build-in multimedia support
   * [x] [Images](#images)
   * [ ] [Audio](#audio)
   * [ ] [Video](#video)
-* [ ] Certificates
-* [x] Downloads
+* [x] Certificates
+  * [x] Generate new identity
+  * [x] Select for path
+  * [x] Export
+  * [x] Import
+  * [x] Delete
+* [ ] Downloads
+  * [ ] Browser window
+  * [x] Save page as file
+  * [x] Unsupported content type downloads
 * [ ] History
+  * [ ] Browser window
+  * [ ] Recently closed
+  * [ ] Recently visited
 * [ ] Proxy
 * [ ] Session
   * [ ] Window
@@ -191,6 +204,13 @@ cargo build
 #### Contributors
 
 ![wakatime](https://wakatime.com/badge/user/0b7fe6c1-b091-4c98-b930-75cfee17c7a5/project/018ebca8-4d22-4f9e-b557-186be6553d9a.svg) ![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)
+
+### Localization
+
+UI localization planed as Crowdin repository, but it is not implemented yet.
+
+To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-{CODE}`
+* just replace `CODE` with the locale code you want.
 
 ### Releases
 
