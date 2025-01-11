@@ -34,13 +34,17 @@ impl Item {
     // Construct
     pub fn new(
         tab_view: &TabView,
-        profile: Rc<Profile>,
-        actions: (Rc<BrowserAction>, Rc<WindowAction>),
-        options: (Position, Option<String>, bool, bool, bool, bool),
+        profile: &Rc<Profile>,
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        (position, request, is_pinned, is_selected, is_attention, is_load): (
+            Position,
+            Option<String>,
+            bool,
+            bool,
+            bool,
+            bool,
+        ),
     ) -> Self {
-        // Get item options from tuple
-        let (position, request, is_pinned, is_selected, is_attention, is_load) = options;
-
         // Generate unique ID for new page components
         let id = Rc::new(uuid_string_random());
 
@@ -49,9 +53,9 @@ impl Item {
         let action = Rc::new(Action::new());
 
         let page = Rc::new(Page::new(
-            id.clone(),
-            profile.clone(),
-            (actions.0.clone(), actions.1.clone(), action.clone()),
+            &id,
+            profile,
+            (browser_action, window_action, &action),
         ));
 
         let widget = Rc::new(Widget::new(
@@ -75,19 +79,20 @@ impl Item {
 
         // Show identity selection for item
         action.ident.connect_activate({
-            let browser_action = actions.0.clone();
-            let window_action = actions.1.clone();
+            let browser_action = browser_action.clone();
             let page = page.clone();
             let parent = tab_view.clone().upcast::<gtk::Widget>();
+            let profile = profile.clone();
+            let window_action = window_action.clone();
             move || {
                 // Request should match valid URI for all drivers supported
                 if let Some(uri) = page.navigation.request.uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
                         return identity::new_gemini(
-                            (browser_action.clone(), window_action.clone()),
-                            profile.clone(),
-                            uri,
+                            (&browser_action, &window_action),
+                            &profile,
+                            &uri,
                         )
                         .present(Some(&parent));
                     }
@@ -151,9 +156,9 @@ impl Item {
         tab_view: &TabView,
         transaction: &Transaction,
         app_browser_window_tab_id: &i64,
-        profile: Rc<Profile>,
+        profile: &Rc<Profile>,
         // Actions
-        action: (Rc<BrowserAction>, Rc<WindowAction>),
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -163,9 +168,9 @@ impl Item {
                     // Construct new item object
                     let item = Rc::new(Item::new(
                         tab_view,
-                        profile.clone(),
+                        profile,
                         // Actions
-                        (action.0.clone(), action.1.clone()),
+                        (browser_action, window_action),
                         // Options tuple
                         (
                             Position::End,

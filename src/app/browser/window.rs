@@ -28,8 +28,8 @@ impl Window {
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Rc::new(Tab::new(profile, (browser_action.clone(), action.clone())));
-        let header = Header::new(browser_action, action.clone(), &tab.widget.tab_view);
+        let tab = Rc::new(Tab::new(&profile, (&browser_action, &action)));
+        let header = Header::new((&browser_action, &action), &profile, &tab.widget.tab_view);
         let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.tab_view));
 
         // Init events

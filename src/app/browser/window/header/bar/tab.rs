@@ -14,7 +14,7 @@ pub struct Tab {
 
 impl Tab {
     // Construct
-    pub fn new(window_action: Rc<WindowAction>, view: &TabView) -> Self {
+    pub fn new(window_action: &Rc<WindowAction>, view: &TabView) -> Self {
         Self {
             widget: Rc::new(Widget::new(
                 view,

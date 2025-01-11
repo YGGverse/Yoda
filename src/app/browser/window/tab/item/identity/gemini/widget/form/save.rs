@@ -23,7 +23,7 @@ impl Save {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, list: Rc<List>) -> Self {
+    pub fn new(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -35,6 +35,8 @@ impl Save {
         // Init events
         button.connect_clicked({
             let button = button.clone();
+            let list = list.clone();
+            let profile = profile.clone();
             move |_| {
                 // Get selected identity from holder
                 match list.selected().value_enum() {

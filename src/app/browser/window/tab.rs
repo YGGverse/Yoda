@@ -23,28 +23,32 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
+    browser_action: Rc<BrowserAction>,
+    window_action: Rc<WindowAction>,
     profile: Rc<Profile>,
-    actions: (Rc<BrowserAction>, Rc<WindowAction>),
     index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>>,
     pub widget: Rc<Widget>,
 }
 
 impl Tab {
     // Construct
-    pub fn new(profile: Rc<Profile>, action: (Rc<BrowserAction>, Rc<WindowAction>)) -> Self {
+    pub fn new(
+        profile: &Rc<Profile>,
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+    ) -> Self {
         // Init empty HashMap index
         let index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>> =
             Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
-        let menu = Menu::new(action.1.clone());
+        let menu = Menu::new(window_action);
 
         // Init widget
         let widget = Rc::new(Widget::new(&menu.main));
 
         // Init events
         widget.tab_view.connect_setup_menu({
-            let action = action.1.clone();
+            let action = window_action.clone();
             let index = index.clone();
             let widget = widget.clone();
             move |tab_view, tab_page| {
@@ -122,8 +126,9 @@ impl Tab {
 
         // Return activated `Self`
         Self {
-            profile,
-            actions: (action.0, action.1),
+            profile: profile.clone(),
+            browser_action: browser_action.clone(),
+            window_action: window_action.clone(),
             index,
             widget,
         }
@@ -142,9 +147,9 @@ impl Tab {
         // Init new tab item
         let item = Rc::new(Item::new(
             &self.widget.tab_view,
-            self.profile.clone(),
+            &self.profile,
             // Actions
-            (self.actions.0.clone(), self.actions.1.clone()),
+            (&self.browser_action, &self.window_action),
             // Options
             (
                 position,
@@ -329,8 +334,8 @@ impl Tab {
                         &self.widget.tab_view,
                         transaction,
                         &record.id,
-                        self.profile.clone(),
-                        (self.actions.0.clone(), self.actions.1.clone()),
+                        &self.profile,
+                        (&self.browser_action, &self.window_action),
                     ) {
                         Ok(items) => {
                             for item in items {

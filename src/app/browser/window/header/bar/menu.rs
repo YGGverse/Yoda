@@ -2,8 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::app::browser::action::Action as BrowserAction;
-use crate::app::browser::window::action::Action as WindowAction;
+use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
     prelude::ActionExt,
@@ -16,8 +15,8 @@ pub struct Menu {
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
     pub fn new(
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        _profile: &Rc<Profile>,
     ) -> Self {
         // Main
         let main = gio::Menu::new();

@@ -55,12 +55,12 @@ impl Page {
     // Constructors
 
     pub fn new(
-        id: Rc<GString>,
-        profile: Rc<Profile>,
+        id: &Rc<GString>,
+        profile: &Rc<Profile>,
         (browser_action, window_action, tab_action): (
-            Rc<BrowserAction>,
-            Rc<WindowAction>,
-            Rc<TabAction>,
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<TabAction>,
         ),
     ) -> Self {
         // Init components
@@ -80,7 +80,7 @@ impl Page {
         let input = Rc::new(Input::new());
 
         let widget = Rc::new(Widget::new(
-            &id,
+            id,
             &navigation.widget.g_box,
             &content.g_box,
             &search.g_box,
@@ -91,12 +91,12 @@ impl Page {
 
         // Done
         Self {
-            id,
-            profile,
+            id: id.clone(),
+            profile: profile.clone(),
             // Actions
-            browser_action,
-            tab_action,
-            window_action,
+            browser_action: browser_action.clone(),
+            tab_action: tab_action.clone(),
+            window_action: window_action.clone(),
             // Components
             client: Rc::new(Client::new()),
             content,

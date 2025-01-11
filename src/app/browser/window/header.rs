@@ -4,7 +4,7 @@ mod widget;
 use bar::Bar;
 use widget::Widget;
 
-use super::{Action as WindowAction, BrowserAction};
+use super::{Action as WindowAction, BrowserAction, Profile};
 use adw::TabView;
 use std::rc::Rc;
 
@@ -15,14 +15,12 @@ pub struct Header {
 impl Header {
     // Construct
     pub fn new(
-        // Actions
-        browser_action: Rc<BrowserAction>,
-        window_action: Rc<WindowAction>,
-        // Widgets
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        profile: &Rc<Profile>,
         tab_view: &TabView,
     ) -> Self {
         // Init components
-        let bar = Bar::new(browser_action, window_action, tab_view);
+        let bar = Bar::new((browser_action, window_action), profile, tab_view);
 
         // Return new struct
         Self {

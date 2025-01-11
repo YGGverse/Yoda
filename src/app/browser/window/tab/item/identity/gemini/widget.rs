@@ -37,16 +37,16 @@ impl Widget {
 
     /// Create new `Self`
     pub fn new(
-        action: (Rc<BrowserAction>, Rc<WindowAction>),
-        profile: Rc<Profile>,
-        auth_uri: Uri,
+        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        profile: &Rc<Profile>,
+        auth_uri: &Uri,
     ) -> Self {
         // Init actions
         let widget_action = Rc::new(WidgetAction::new());
 
         // Init child container
         let form = Rc::new(Form::new(
-            (action.0.clone(), action.1.clone(), widget_action.clone()),
+            (browser_action, window_action, &widget_action),
             profile,
             auth_uri,
         ));

@@ -38,25 +38,25 @@ impl Form {
 
     /// Create new `Self`
     pub fn new(
-        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<WidgetAction>),
-        profile: Rc<Profile>,
-        auth_uri: Uri,
+        (browser_action, _window_action, widget_action): (
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<WidgetAction>,
+        ),
+        profile: &Rc<Profile>,
+        auth_uri: &Uri,
     ) -> Self {
         // Init components
-        let list = Rc::new(List::new(
-            action.2.clone(),
-            profile.clone(),
-            auth_uri.clone(),
-        ));
-        let file = Rc::new(File::new(action.2.clone()));
-        let name = Rc::new(Name::new(action.2.clone()));
-        let save = Rc::new(Save::new(profile.clone(), list.clone()));
-        let drop = Rc::new(Drop::new(profile.clone(), list.clone()));
+        let list = Rc::new(List::new(widget_action, profile, auth_uri));
+        let file = Rc::new(File::new(widget_action));
+        let name = Rc::new(Name::new(widget_action));
+        let save = Rc::new(Save::new(profile, &list));
+        let drop = Rc::new(Drop::new(profile, &list));
         let exit = Rc::new(Exit::new(
-            (action.0.clone(), action.2.clone()),
-            profile.clone(),
-            list.clone(),
-            auth_uri.clone(),
+            (browser_action, widget_action),
+            profile,
+            &list,
+            auth_uri,
         ));
 
         // Init main container
@@ -79,8 +79,8 @@ impl Form {
             name,
             save,
             g_box,
-            auth_uri,
-            profile,
+            auth_uri: auth_uri.clone(),
+            profile: profile.clone(),
         }
     }
 

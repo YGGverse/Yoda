@@ -25,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: Rc<WidgetAction>, profile: Rc<Profile>, auth_uri: Uri) -> Self {
+    pub fn new(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, auth_uri: &Uri) -> Self {
         // Init dropdown items
         let guest_session = Item::new_guest_session();
         let generate_pem = Item::new_generate_pem();
@@ -43,7 +43,7 @@ impl List {
                 let mut is_guest_session = true;
                 for identity in identities {
                     match Item::new_profile_identity_gemini_id(
-                        &profile,
+                        profile,
                         identity.id,
                         &auth_uri.to_string(),
                     ) {
@@ -164,7 +164,10 @@ impl List {
             .build();
 
         // Connect events
-        dropdown.connect_selected_notify(move |_| widget_action.update.activate());
+        dropdown.connect_selected_notify({
+            let widget_action = widget_action.clone();
+            move |_| widget_action.update.activate()
+        });
 
         // Return activated `Self`
         Self {

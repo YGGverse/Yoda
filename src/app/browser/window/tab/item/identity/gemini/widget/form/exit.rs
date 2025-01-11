@@ -34,10 +34,10 @@ impl Exit {
 
     /// Create new `Self`
     pub fn new(
-        action: (Rc<BrowserAction>, Rc<WidgetAction>),
-        profile: Rc<Profile>,
-        list: Rc<List>,
-        auth_uri: Uri,
+        (browser_action, widget_action): (&Rc<BrowserAction>, &Rc<WidgetAction>),
+        profile: &Rc<Profile>,
+        list: &Rc<List>,
+        auth_uri: &Uri,
     ) -> Self {
         // Init main widget
         let button = Button::builder()
@@ -50,7 +50,11 @@ impl Exit {
         // Init events
         button.connect_clicked({
             let auth_uri = auth_uri.clone();
+            let browser_action = browser_action.clone();
             let button = button.clone();
+            let list = list.clone();
+            let profile = profile.clone();
+            let widget_action = widget_action.clone();
             move |_| {
                 // Get selected identity from holder
                 match list.selected().value_enum() {
@@ -84,8 +88,8 @@ impl Exit {
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            let browser_action = action.0.clone();
-                            let widget_action = action.1.clone();
+                            let browser_action = browser_action.clone();
+                            let widget_action = widget_action.clone();
                             move |_, _| {
                                 match profile
                                     .identity

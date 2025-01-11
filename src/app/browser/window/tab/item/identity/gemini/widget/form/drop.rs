@@ -29,7 +29,7 @@ impl Drop {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, list: Rc<List>) -> Self {
+    pub fn new(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -42,6 +42,7 @@ impl Drop {
         button.connect_clicked({
             let button = button.clone();
             let list = list.clone();
+            let profile = profile.clone();
             move |_| {
                 match list.selected().value_enum() {
                     Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {

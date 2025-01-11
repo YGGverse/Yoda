@@ -13,7 +13,7 @@ impl Menu {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    pub fn new(window_action: &Rc<WindowAction>) -> Self {
         let main = gtk::gio::Menu::new();
 
         main.append(
