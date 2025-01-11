@@ -23,8 +23,8 @@ GTK 4 / Libadwaita client written in Rust
 * [x] Certificates
   * [x] Generate new identity
   * [x] Select for path
-  * [x] Export
-  * [x] Import
+  * [x] Export to PEM
+  * [x] Import from PEM
   * [x] Delete
 * [ ] Downloads
   * [ ] Browser window
