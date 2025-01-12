@@ -1,9 +1,9 @@
-mod closed;
-use closed::Closed;
+mod tab;
+use tab::Tab;
 
 /// Reduce disk usage by cache Bookmarks index in memory
 pub struct Memory {
-    pub closed: Closed,
+    pub tab: Tab,
 }
 
 impl Default for Memory {
@@ -17,8 +17,6 @@ impl Memory {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        Self {
-            closed: Closed::new(),
-        }
+        Self { tab: Tab::new() }
     }
 }

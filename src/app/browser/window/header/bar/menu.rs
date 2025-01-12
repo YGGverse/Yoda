@@ -206,7 +206,7 @@ impl Menu {
 
                     // History
                     main_history_closed.remove_all();
-                    for item in profile.history.memory.closed.recent(RECENTLY_CLOSED) {
+                    for item in profile.history.memory.tab.recent(RECENTLY_CLOSED) {
                         let item_request = item.page.navigation.request.widget.entry.text(); // @TODO restore entire `Item`
                         let menu_item = gio::MenuItem::new(Some(&label(&item_request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(

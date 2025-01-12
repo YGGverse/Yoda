@@ -107,7 +107,7 @@ impl Tab {
                             profile
                                 .history
                                 .memory
-                                .closed
+                                .tab
                                 .add(item, DateTime::now_local().unwrap().to_unix());
                         }
                     }

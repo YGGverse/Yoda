@@ -8,17 +8,17 @@ pub struct Record {
 }
 
 /// Recently closed tabs index
-pub struct Closed {
+pub struct Tab {
     index: RefCell<Vec<Record>>,
 }
 
-impl Default for Closed {
+impl Default for Tab {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Closed {
+impl Tab {
     // Constructors
 
     /// Create new `Self`
