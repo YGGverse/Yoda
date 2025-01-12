@@ -112,6 +112,8 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] Request prefix
   * [ ] `about:`
     * [ ] `config` - low-level key/value settings editor
+  * [ ] `bookmarks:` - bookmarks browser
+  * [ ] `history:` - history browser
   * [x] `download:` - save location to file
   * [x] `source:` - source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
 
