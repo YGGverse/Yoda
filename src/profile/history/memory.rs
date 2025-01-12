@@ -1,8 +1,12 @@
+mod request;
 mod tab;
+
+use request::Request;
 use tab::Tab;
 
 /// Reduce disk usage by cache Bookmarks index in memory
 pub struct Memory {
+    pub request: Request,
     pub tab: Tab,
 }
 
@@ -17,6 +21,9 @@ impl Memory {
 
     /// Create new `Self`
     pub fn new() -> Self {
-        Self { tab: Tab::new() }
+        Self {
+            request: Request::new(),
+            tab: Tab::new(),
+        }
     }
 }

@@ -28,7 +28,7 @@ use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
     gio::SocketClientEvent,
-    glib::{gformat, GString, Priority, Uri, UriFlags, UriHideFlags},
+    glib::{gformat, DateTime, GString, Priority, Uri, UriFlags, UriHideFlags},
     prelude::{EditableExt, FileExt, SocketClientExt},
 };
 use sqlite::Transaction;
@@ -234,7 +234,7 @@ impl Page {
                     scheme => {
                         // Add history record
                         if is_history {
-                            snap_history(self.navigation.clone());
+                            snap_history(&self.profile, &self.navigation);
                         }
 
                         // Update widget
@@ -322,7 +322,7 @@ impl Page {
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
                     // * just to have back/forward navigation ability
-                    snap_history(self.navigation.clone());
+                    snap_history(&self.profile, &self.navigation);
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -391,11 +391,12 @@ impl Page {
         let browser_action = self.browser_action.clone();
         let cancellable = self.client.cancellable();
         let content = self.content.clone();
-        let search = self.search.clone();
         let id = self.id.clone();
         let input = self.input.clone();
         let meta = self.meta.clone();
         let navigation = self.navigation.clone();
+        let profile = self.profile.clone();
+        let search = self.search.clone();
         let tab_action = self.tab_action.clone();
         let window_action = self.window_action.clone();
 
@@ -477,7 +478,7 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         response::meta::Status::Success => {
                             if is_history {
-                                snap_history(navigation.clone());
+                                snap_history(&profile, &navigation);
                             }
                             if is_download {
                                 // Init download widget
@@ -805,7 +806,7 @@ impl Page {
                         response::meta::Status::CertificateInvalid => {
                             // Add history record
                             if is_history {
-                                snap_history(navigation.clone());
+                                snap_history(&profile, &navigation);
                             }
 
                             // Update widget
@@ -830,7 +831,7 @@ impl Page {
                         _ => {
                             // Add history record
                             if is_history {
-                                snap_history(navigation.clone());
+                                snap_history(&profile, &navigation);
                             }
 
                             // Update widget
@@ -853,7 +854,7 @@ impl Page {
                 Err(e) => {
                     // Add history record
                     if is_history {
-                        snap_history(navigation.clone());
+                        snap_history(&profile, &navigation);
                     }
 
                     // Update widget
@@ -920,15 +921,21 @@ fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
 
 /// Make new history record for given `navigation` object
 /// * applies on shared conditions match only
-fn snap_history(navigation: Rc<Navigation>) {
+fn snap_history(profile: &Profile, navigation: &Navigation) {
     let request = navigation.request.widget.entry.text();
 
-    // Apply additional filters
+    // Add new record into the global memory index (used in global menu)
+    profile
+        .history
+        .memory
+        .request
+        .set(request.clone(), DateTime::now_local().unwrap().to_unix());
+
+    // Add new record into the page navigation history
     if match navigation.history.current() {
-        Some(current) => current != request,
+        Some(current) => current != request, // apply additional filters
         None => true,
     } {
-        // Add new record match conditions
         navigation.history.add(request, true)
     }
 }

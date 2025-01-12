@@ -33,8 +33,8 @@ GTK 4 / Libadwaita client written in Rust
 * [ ] History
   * [ ] Browser window
   * [x] Page navigation
-  * [ ] Recently visited
-  * [x] Recently closed tabs
+  * [x] Recently visited
+  * [x] Recently closed
 * [ ] Proxy
 * [ ] Session
   * [ ] Window

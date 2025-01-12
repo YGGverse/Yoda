@@ -11,6 +11,7 @@ use std::rc::Rc;
 const LABEL_MAX_LENGTH: usize = 32;
 const RECENT_BOOKMARKS: usize = 50;
 const RECENTLY_CLOSED: usize = 50;
+const RECENT_REQUESTS: usize = 50;
 
 pub struct Menu {
     pub menu_button: MenuButton,
@@ -137,8 +138,13 @@ impl Menu {
 
                 // Main > History > Recently closed
                 // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
-                let main_history_closed = gio::Menu::new();
-                    main_history.append_submenu(Some("Closed tabs"), &main_history_closed);
+                let main_history_tab = gio::Menu::new();
+                    main_history.append_submenu(Some("Recently closed"), &main_history_tab);
+
+                // Main > History > Recent requests
+                // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
+                let main_history_request = gio::Menu::new();
+                    main_history.append_section(None, &main_history_request);
 
                 main.append_submenu(Some("History"), &main_history);
 
@@ -204,8 +210,8 @@ impl Menu {
                     // @TODO
                     // }
 
-                    // History
-                    main_history_closed.remove_all();
+                    // Recently closed history
+                    main_history_tab.remove_all();
                     for item in profile.history.memory.tab.recent(RECENTLY_CLOSED) {
                         let item_request = item.page.navigation.request.widget.entry.text(); // @TODO restore entire `Item`
                         let menu_item = gio::MenuItem::new(Some(&label(&item_request, LABEL_MAX_LENGTH)), None);
@@ -215,7 +221,20 @@ impl Menu {
                                 window_action.open.simple_action.name()
                             )), Some(&item_request.to_variant()));
 
-                            main_history_closed.append_item(&menu_item);
+                            main_history_tab.append_item(&menu_item);
+                    }
+
+                    // Recently visited history
+                    main_history_request.remove_all();
+                    for request in profile.history.memory.request.recent(RECENT_REQUESTS) {
+                        let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
+                            menu_item.set_action_and_target_value(Some(&format!(
+                                "{}.{}",
+                                window_action.id,
+                                window_action.open.simple_action.name()
+                            )), Some(&request.to_variant()));
+
+                            main_history_request.append_item(&menu_item);
                     }
                 }
             });
