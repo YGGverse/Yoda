@@ -9,6 +9,7 @@ use std::rc::Rc;
 // Config options
 
 const RECENT_BOOKMARKS: usize = 50;
+const LABEL_MAX_LENGTH: usize = 32;
 
 pub struct Menu {
     pub menu_button: MenuButton,
@@ -176,13 +177,13 @@ impl Menu {
                 let window_action = window_action.clone();
                 move |_| {
                     main_bookmarks.remove_all();
-                    for bookmark in profile.bookmark.memory.recent(RECENT_BOOKMARKS) {
-                        let menu_item = gio::MenuItem::new(Some(&bookmark), None);
+                    for request in profile.bookmark.memory.recent(RECENT_BOOKMARKS) {
+                        let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
                                 window_action.open.simple_action.name()
-                            )), Some(&bookmark.to_variant()));
+                            )), Some(&request.to_variant()));
 
                         main_bookmarks.append_item(&menu_item);
                     }
@@ -198,4 +199,21 @@ impl Menu {
             menu_button
         }
     }
+}
+
+/// Format dynamically generated strings for menu item labels
+/// * trim gemini scheme prefix
+/// * trim slash postfix
+/// * crop resulting string at the middle position on new `value` longer than `limit`
+fn label(value: &str, limit: usize) -> String {
+    let value = value.replace("gemini://", "");
+    let value = value.trim_end_matches('/');
+
+    if value.len() <= limit {
+        return value.to_string();
+    }
+
+    let length = (limit - 2) / 2;
+
+    format!("{}..{}", &value[..length], &value[value.len() - length..])
 }
