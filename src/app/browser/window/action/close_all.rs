@@ -14,6 +14,12 @@ pub struct CloseAll {
     pub simple_action: SimpleAction,
 }
 
+impl Default for CloseAll {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CloseAll {
     // Constructors
 

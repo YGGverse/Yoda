@@ -20,6 +20,12 @@ pub struct Search {
     pub g_box: Box,
 }
 
+impl Default for Search {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Search {
     // Constructors
 

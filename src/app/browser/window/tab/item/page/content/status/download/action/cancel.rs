@@ -11,6 +11,12 @@ pub struct Cancel {
     pub action: SimpleAction,
 }
 
+impl Default for Cancel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Cancel {
     // Constructors
 

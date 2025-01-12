@@ -14,6 +14,12 @@ pub struct Source {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Source {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Source {
     // Constructors
 

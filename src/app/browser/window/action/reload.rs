@@ -14,6 +14,12 @@ pub struct Reload {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Reload {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Reload {
     // Constructors
 

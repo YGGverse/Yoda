@@ -4,6 +4,12 @@ pub struct Forward {
     pub button: Button,
 }
 
+impl Default for Forward {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Forward {
     // Constructors
 

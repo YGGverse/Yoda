@@ -14,6 +14,12 @@ pub struct Input {
     pub widget: Rc<Widget>,
 }
 
+impl Default for Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Input {
     // Construct
     pub fn new() -> Self {

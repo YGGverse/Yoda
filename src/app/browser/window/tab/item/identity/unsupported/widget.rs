@@ -12,6 +12,12 @@ pub struct Widget {
     gobject: AlertDialog,
 }
 
+impl Default for Widget {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Widget {
     // Constructors
 

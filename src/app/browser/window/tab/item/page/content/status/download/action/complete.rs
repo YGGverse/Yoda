@@ -11,6 +11,12 @@ pub struct Complete {
     pub action: SimpleAction,
 }
 
+impl Default for Complete {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Complete {
     // Constructors
 

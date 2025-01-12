@@ -6,6 +6,12 @@ pub struct Placeholder {
     pub label: Label,
 }
 
+impl Default for Placeholder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Placeholder {
     // Constructors
 

@@ -14,6 +14,12 @@ pub struct Home {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Home {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Home {
     // Constructors
 

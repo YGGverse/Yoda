@@ -11,6 +11,12 @@ pub struct Open {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Open {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Open {
     // Constructors
 

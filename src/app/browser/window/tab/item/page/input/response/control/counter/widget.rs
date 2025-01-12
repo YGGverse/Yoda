@@ -4,6 +4,12 @@ pub struct Widget {
     pub label: Label,
 }
 
+impl Default for Widget {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Widget {
     // Construct
     pub fn new() -> Self {

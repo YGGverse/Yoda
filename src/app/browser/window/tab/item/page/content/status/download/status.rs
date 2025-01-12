@@ -14,6 +14,12 @@ pub struct Status {
     pub label: Label,
 }
 
+impl Default for Status {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Status {
     // Constructors
 

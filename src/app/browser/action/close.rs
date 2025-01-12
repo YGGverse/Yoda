@@ -5,6 +5,12 @@ pub struct Close {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Close {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Close {
     // Constructors
 

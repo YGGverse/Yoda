@@ -5,6 +5,12 @@ pub struct Update {
     pub gobject: SimpleAction,
 }
 
+impl Default for Update {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Update {
     // Constructors
 

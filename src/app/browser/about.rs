@@ -5,6 +5,12 @@ pub struct About {
     gobject: AboutDialog,
 }
 
+impl Default for About {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl About {
     // Construct
     pub fn new() -> Self {

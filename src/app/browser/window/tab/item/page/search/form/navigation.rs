@@ -22,6 +22,12 @@ pub struct Navigation {
     model: RefCell<Model<(TextIter, TextIter)>>,
 }
 
+impl Default for Navigation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Navigation {
     // Constructors
 

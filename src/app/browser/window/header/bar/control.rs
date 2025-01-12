@@ -6,6 +6,12 @@ pub struct Control {
     pub window_controls: WindowControls,
 }
 
+impl Default for Control {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Control {
     // Construct
     pub fn new() -> Self {

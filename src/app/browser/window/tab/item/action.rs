@@ -12,6 +12,12 @@ pub struct Action {
     pub load: Rc<Load>,
 }
 
+impl Default for Action {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Action {
     // Constructors
 

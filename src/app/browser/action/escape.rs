@@ -9,6 +9,12 @@ pub struct Escape {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Escape {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Escape {
     // Constructors
 

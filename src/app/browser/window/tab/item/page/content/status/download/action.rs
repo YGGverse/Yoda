@@ -15,6 +15,12 @@ pub struct Action {
     pub update: Rc<Update>,
 }
 
+impl Default for Action {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Action {
     // Constructors
 

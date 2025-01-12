@@ -8,6 +8,12 @@ pub struct Counter {
     pub widget: Rc<Widget>,
 }
 
+impl Default for Counter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Counter {
     // Construct
     pub fn new() -> Self {

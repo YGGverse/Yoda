@@ -6,6 +6,12 @@ pub struct Tag {
     pub text_tag: TextTag,
 }
 
+impl Default for Tag {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Tag {
     // Constructors
 

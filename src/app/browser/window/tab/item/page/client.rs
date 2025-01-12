@@ -15,6 +15,12 @@ pub struct Client {
     // other clients..
 }
 
+impl Default for Client {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Client {
     // Constructors
 

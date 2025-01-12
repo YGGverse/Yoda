@@ -5,6 +5,12 @@ pub struct About {
     pub simple_action: SimpleAction,
 }
 
+impl Default for About {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl About {
     // Constructors
 

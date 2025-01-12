@@ -10,6 +10,12 @@ pub struct Input {
     pub entry: Entry,
 }
 
+impl Default for Input {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Input {
     // Constructors
 

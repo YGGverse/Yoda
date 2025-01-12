@@ -14,6 +14,12 @@ pub struct Bookmark {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Bookmark {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Bookmark {
     // Constructors
 

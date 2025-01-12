@@ -5,6 +5,12 @@ pub struct Ident {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Ident {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Ident {
     // Constructors
 

@@ -9,6 +9,12 @@ pub struct Load {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Load {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Load {
     // Constructors
 

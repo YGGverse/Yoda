@@ -5,6 +5,12 @@ pub struct Profile {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Profile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Profile {
     // Constructors
 

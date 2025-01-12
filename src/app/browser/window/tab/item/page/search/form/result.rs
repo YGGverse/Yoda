@@ -6,6 +6,12 @@ pub struct Result {
     pub label: Label,
 }
 
+impl Default for Result {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Result {
     // Constructors
 

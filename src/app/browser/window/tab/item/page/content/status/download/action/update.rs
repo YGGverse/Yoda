@@ -11,6 +11,12 @@ pub struct Update {
     pub action: SimpleAction,
 }
 
+impl Default for Update {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Update {
     // Constructors
 

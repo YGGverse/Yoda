@@ -14,6 +14,12 @@ pub struct SaveAs {
     pub simple_action: SimpleAction,
 }
 
+impl Default for SaveAs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SaveAs {
     // Constructors
 

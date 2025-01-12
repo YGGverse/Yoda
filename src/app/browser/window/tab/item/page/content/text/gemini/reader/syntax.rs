@@ -35,6 +35,12 @@ pub struct Syntax {
     theme_set: ThemeSet,
 }
 
+impl Default for Syntax {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Syntax {
     // Constructors
 

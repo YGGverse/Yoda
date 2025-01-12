@@ -40,6 +40,12 @@ pub struct Append {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Append {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Append {
     // Constructors
 

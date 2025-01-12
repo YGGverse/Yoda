@@ -4,6 +4,12 @@ pub struct Back {
     pub button: Button,
 }
 
+impl Default for Back {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Back {
     // Constructors
 

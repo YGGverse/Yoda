@@ -56,6 +56,12 @@ pub struct Action {
     pub simple_action_group: SimpleActionGroup,
 }
 
+impl Default for Action {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Action {
     // Constructors
 

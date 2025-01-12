@@ -14,6 +14,12 @@ pub struct Find {
     pub simple_action: SimpleAction,
 }
 
+impl Default for Find {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Find {
     // Constructors
 

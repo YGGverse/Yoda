@@ -14,6 +14,12 @@ pub struct HistoryForward {
     pub simple_action: SimpleAction,
 }
 
+impl Default for HistoryForward {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HistoryForward {
     // Constructors
 

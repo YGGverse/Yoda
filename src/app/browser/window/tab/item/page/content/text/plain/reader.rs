@@ -4,6 +4,12 @@ pub struct Reader {
     widget: Label,
 }
 
+impl Default for Reader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Reader {
     // Construct
     pub fn new() -> Self {

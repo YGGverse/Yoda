@@ -8,6 +8,12 @@ pub struct Unsupported {
     widget: Rc<Widget>,
 }
 
+impl Default for Unsupported {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Unsupported {
     // Construct
 

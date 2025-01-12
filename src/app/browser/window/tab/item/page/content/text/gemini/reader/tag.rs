@@ -20,6 +20,12 @@ pub struct Tag {
     pub plain: TextTag,
 }
 
+impl Default for Tag {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Tag {
     // Construct
     pub fn new() -> Self {

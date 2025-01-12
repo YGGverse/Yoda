@@ -9,6 +9,12 @@ pub struct Progress {
     pub spinner: Spinner,
 }
 
+impl Default for Progress {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Progress {
     // Constructors
 
