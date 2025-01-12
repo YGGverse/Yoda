@@ -17,10 +17,10 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_identity_id: Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_identity_id: &Rc<i64>) -> Self {
         Self {
-            connection,
-            profile_identity_id,
+            connection: connection.clone(),
+            profile_identity_id: profile_identity_id.clone(),
         }
     }
 

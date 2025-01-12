@@ -32,7 +32,7 @@ GTK 4 / Libadwaita client written in Rust
   * [x] Unsupported content type downloads
 * [ ] History
   * [ ] Browser window
-  * [ ] Recently closed
+  * [x] Recently closed
   * [ ] Recently visited
 * [ ] Proxy
 * [ ] Session

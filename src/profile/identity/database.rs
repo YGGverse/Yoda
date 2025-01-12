@@ -15,8 +15,10 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>) -> Self {
-        Self { connection }
+    pub fn build(connection: &Rc<RwLock<Connection>>) -> Self {
+        Self {
+            connection: connection.clone(),
+        }
     }
 
     // Getters
@@ -37,7 +39,7 @@ impl Database {
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(&self, profile_id: Rc<i64>, is_active: bool) -> Result<i64, Error> {
+    pub fn add(&self, profile_id: &Rc<i64>, is_active: bool) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction()?;
@@ -80,7 +82,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(tx: &Transaction, profile_id: Rc<i64>, is_active: bool) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_id: &Rc<i64>, is_active: bool) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_identity` (
             `profile_id`,

@@ -1,10 +1,11 @@
 mod bookmark;
 mod database;
-//mod history;
+mod history;
 mod identity;
 
 use bookmark::Bookmark;
 use database::Database;
+use history::History;
 use identity::Identity;
 
 use gtk::glib::{user_config_dir, DateTime};
@@ -20,6 +21,7 @@ const DB_NAME: &str = "database.sqlite3";
 pub struct Profile {
     pub bookmark: Rc<Bookmark>,
     pub database: Rc<Database>,
+    pub history: Rc<History>,
     pub identity: Rc<Identity>,
     pub config_path: PathBuf,
 }
@@ -87,7 +89,7 @@ impl Profile {
         } // unlock database
 
         // Init model
-        let database = Rc::new(Database::new(connection.clone()));
+        let database = Rc::new(Database::build(&connection));
 
         // Get active profile or create new one
         let profile_id = Rc::new(match database.active().unwrap() {
@@ -98,11 +100,10 @@ impl Profile {
             },
         });
 
-        // Init bookmark component @TODO handle errors
-        let bookmark = Rc::new(Bookmark::new(connection.clone(), profile_id.clone()));
-
-        // Init identity component
-        let identity = Rc::new(match Identity::new(connection, profile_id) {
+        // Init components
+        let bookmark = Rc::new(Bookmark::build(&connection, &profile_id));
+        let history = Rc::new(History::build(&connection, &profile_id));
+        let identity = Rc::new(match Identity::build(&connection, &profile_id) {
             Ok(result) => result,
             Err(e) => todo!("{:?}", e.to_string()),
         });
@@ -110,8 +111,9 @@ impl Profile {
         // Result
         Self {
             bookmark,
-            identity,
             database,
+            history,
+            identity,
             config_path,
         }
     }

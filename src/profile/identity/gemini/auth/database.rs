@@ -16,8 +16,10 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>) -> Self {
-        Self { connection }
+    pub fn new(connection: &Rc<RwLock<Connection>>) -> Self {
+        Self {
+            connection: connection.clone(),
+        }
     }
 
     // Actions

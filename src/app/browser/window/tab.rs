@@ -15,8 +15,8 @@ use crate::app::browser::{
 };
 use crate::Profile;
 use gtk::{
-    glib::{GString, Propagation},
-    prelude::WidgetExt,
+    glib::{DateTime, GString, Propagation},
+    prelude::{EditableExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
@@ -92,6 +92,7 @@ impl Tab {
 
         widget.tab_view.connect_close_page({
             let index = index.clone();
+            let profile = profile.clone();
             move |_, item| {
                 // Get index ID by keyword saved
                 match item.keyword() {
@@ -100,7 +101,14 @@ impl Tab {
                             panic!("Tab index can not be empty!")
                         }
                         // Cleanup HashMap index
-                        index.borrow_mut().remove(&id);
+                        if let Some(item) = index.borrow_mut().remove(&id) {
+                            // Add history record into profile memory pool
+                            // * this action allows to recover recently closed tab (e.g. from the main menu)
+                            profile.history.memory.closed.add(
+                                item.page.navigation.request.widget.entry.text(),
+                                DateTime::now_local().unwrap().to_unix(),
+                            );
+                        }
                     }
                     None => panic!("Undefined tab index!"),
                 }

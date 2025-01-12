@@ -8,8 +8,9 @@ use std::rc::Rc;
 
 // Config options
 
-const RECENT_BOOKMARKS: usize = 50;
 const LABEL_MAX_LENGTH: usize = 32;
+const RECENT_BOOKMARKS: usize = 50;
+const RECENTLY_CLOSED: usize = 50;
 
 pub struct Menu {
     pub menu_button: MenuButton,
@@ -131,6 +132,16 @@ impl Menu {
 
                 main.append_submenu(Some("Bookmarks"), &main_bookmarks);
 
+            // Main > History
+            let main_history = gio::Menu::new();
+
+                // Main > History > Recently closed
+                // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
+                let main_history_closed = gio::Menu::new();
+                    main_history.append_submenu(Some("Closed tabs"), &main_history_closed);
+
+                main.append_submenu(Some("History"), &main_history);
+
             // Main > Tool
             let main_tool = gio::Menu::new();
 
@@ -176,6 +187,7 @@ impl Menu {
                 let main_bookmarks = main_bookmarks.clone();
                 let window_action = window_action.clone();
                 move |_| {
+                    // Bookmarks
                     main_bookmarks.remove_all();
                     for request in profile.bookmark.memory.recent(RECENT_BOOKMARKS) {
                         let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
@@ -191,6 +203,19 @@ impl Menu {
                     // if profile.bookmark.memory.total() > RECENT_BOOKMARKS {
                     // @TODO
                     // }
+
+                    // History
+                    main_history_closed.remove_all();
+                    for request in profile.history.memory.closed.recent(RECENTLY_CLOSED) {
+                        let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
+                            menu_item.set_action_and_target_value(Some(&format!(
+                                "{}.{}",
+                                window_action.id,
+                                window_action.open.simple_action.name()
+                            )), Some(&request.to_variant()));
+
+                            main_history_closed.append_item(&menu_item);
+                    }
                 }
             });
 

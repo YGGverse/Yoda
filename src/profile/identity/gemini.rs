@@ -29,16 +29,16 @@ impl Gemini {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(
-        connection: Rc<RwLock<Connection>>,
-        profile_identity_id: Rc<i64>,
+    pub fn build(
+        connection: &Rc<RwLock<Connection>>,
+        profile_identity_id: &Rc<i64>,
     ) -> Result<Self, Error> {
         // Init components
-        let auth = match Auth::new(connection.clone()) {
+        let auth = match Auth::new(connection) {
             Ok(auth) => Rc::new(auth),
             Err(e) => return Err(Error::Auth(e)),
         };
-        let database = Rc::new(Database::new(connection, profile_identity_id.clone()));
+        let database = Rc::new(Database::build(connection, profile_identity_id));
         let memory = Rc::new(Memory::new());
 
         // Init `Self`

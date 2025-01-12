@@ -1,18 +1,24 @@
-mod database;
+// mod database;
+mod memory;
 
-use sqlite::Transaction;
+use memory::Memory;
 
-// Tools
+use sqlite::Connection;
+use std::{rc::Rc, sync::RwLock};
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
-    // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
+pub struct History {
+    pub memory: Rc<Memory>, // fast search index
+}
+
+impl History {
+    // Constructors
+
+    /// Create new `Self`
+    pub fn build(_connection: &Rc<RwLock<Connection>>, _profile_id: &Rc<i64>) -> Self {
+        // Init children components
+        let memory = Rc::new(Memory::new());
+
+        // Return new `Self`
+        Self { memory }
     }
-
-    // Delegate migration to childs
-    // nothing yet..
-
-    // Success
-    Ok(())
 }

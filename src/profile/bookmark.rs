@@ -19,7 +19,7 @@ impl Bookmark {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
         // Init children components
         let database = Rc::new(Database::new(connection, profile_id));
         let memory = Rc::new(Memory::new());

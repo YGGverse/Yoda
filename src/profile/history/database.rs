@@ -56,7 +56,7 @@ pub fn select(
             WHERE `profile_id` = ? AND `request` LIKE ?",
     )?;
 
-    let result = stmt.query_map((profile_id, request.unwrap_or("%")), |row| {
+    let result = stmt.query_map((profile_id, request.unwrap_or("%".to_string())), |row| {
         Ok(Table {
             id: row.get(0)?,
             profile_id: row.get(1)?,

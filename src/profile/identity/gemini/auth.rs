@@ -21,7 +21,7 @@ impl Auth {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>) -> Result<Self, Error> {
+    pub fn new(connection: &Rc<RwLock<Connection>>) -> Result<Self, Error> {
         // Init `Self`
         let this = Self {
             database: Rc::new(Database::new(connection)),

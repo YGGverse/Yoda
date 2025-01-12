@@ -19,9 +19,9 @@ impl Identity {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: Rc<RwLock<Connection>>, profile_id: Rc<i64>) -> Result<Self, Error> {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self, Error> {
         // Init identity database
-        let database = Rc::new(Database::new(connection.clone()));
+        let database = Rc::new(Database::build(connection));
 
         // Get active identity set for profile or create new one
         let profile_identity_id = Rc::new(match database.active() {
@@ -36,7 +36,7 @@ impl Identity {
         });
 
         // Init gemini component
-        let gemini = Rc::new(match Gemini::new(connection, profile_identity_id) {
+        let gemini = Rc::new(match Gemini::build(connection, &profile_identity_id) {
             Ok(result) => result,
             Err(e) => return Err(Error::Gemini(e)),
         });
