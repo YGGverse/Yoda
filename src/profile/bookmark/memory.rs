@@ -63,14 +63,13 @@ impl Memory {
     }
 
     /// Get recent requests vector sorted by `ID` DESC
-    pub fn recent(&self, limit: usize) -> Vec<String> {
+    pub fn recent(&self) -> Vec<String> {
         let mut recent: Vec<String> = Vec::new();
         for (request, _) in self
             .index
             .borrow()
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.1, &a.1))
-            .take(limit)
         {
             recent.push(request.to_string())
         }

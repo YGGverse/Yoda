@@ -39,15 +39,14 @@ impl Tab {
         });
     }
 
-    /// Get recent `Item` vector sorted by time DESC
-    pub fn recent(&self, limit: usize) -> Vec<Rc<Item>> {
+    /// Get recent `Item` vector sorted by `unix_timestamp` DESC
+    pub fn recent(&self) -> Vec<Rc<Item>> {
         let mut recent: Vec<Rc<Item>> = Vec::new();
         for record in self
             .index
             .borrow()
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.unix_timestamp, &a.unix_timestamp))
-            .take(limit)
         {
             recent.push(record.item.clone())
         }

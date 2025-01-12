@@ -39,14 +39,13 @@ impl Request {
 
     /// Get recent requests vector
     /// * sorted by `unix_timestamp` DESC
-    pub fn recent(&self, limit: usize) -> Vec<GString> {
+    pub fn recent(&self) -> Vec<GString> {
         let mut recent: Vec<GString> = Vec::new();
         for (request, _) in self
             .index
             .borrow()
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.1.unix_timestamp, &a.1.unix_timestamp))
-            .take(limit)
         {
             recent.push(request.clone())
         }

@@ -9,10 +9,6 @@ use std::rc::Rc;
 // Config options
 
 const LABEL_MAX_LENGTH: usize = 32;
-const RECENT_BOOKMARKS: usize = 50;
-const RECENTLY_CLOSED: usize = 50;
-const RECENT_REQUESTS: usize = 50;
-
 pub struct Menu {
     pub menu_button: MenuButton,
 }
@@ -195,7 +191,7 @@ impl Menu {
                 move |_| {
                     // Bookmarks
                     main_bookmarks.remove_all();
-                    for request in profile.bookmark.memory.recent(RECENT_BOOKMARKS) {
+                    for request in profile.bookmark.memory.recent() {
                         let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
@@ -212,7 +208,7 @@ impl Menu {
 
                     // Recently closed history
                     main_history_tab.remove_all();
-                    for item in profile.history.memory.tab.recent(RECENTLY_CLOSED) {
+                    for item in profile.history.memory.tab.recent() {
                         let item_request = item.page.navigation.request.widget.entry.text(); // @TODO restore entire `Item`
                         let menu_item = gio::MenuItem::new(Some(&label(&item_request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
@@ -226,7 +222,7 @@ impl Menu {
 
                     // Recently visited history
                     main_history_request.remove_all();
-                    for request in profile.history.memory.request.recent(RECENT_REQUESTS) {
+                    for request in profile.history.memory.request.recent() {
                         let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
