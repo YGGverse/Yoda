@@ -2,7 +2,7 @@ mod about;
 mod action;
 mod database;
 mod widget;
-mod window;
+pub mod window;
 
 use about::About;
 use action::Action;

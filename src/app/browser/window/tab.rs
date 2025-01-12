@@ -5,7 +5,7 @@ mod menu;
 mod widget;
 
 use error::Error;
-use item::Item;
+pub use item::Item;
 use menu::Menu;
 use widget::Widget;
 
@@ -16,7 +16,7 @@ use crate::app::browser::{
 use crate::Profile;
 use gtk::{
     glib::{DateTime, GString, Propagation},
-    prelude::{EditableExt, WidgetExt},
+    prelude::WidgetExt,
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
@@ -104,10 +104,11 @@ impl Tab {
                         if let Some(item) = index.borrow_mut().remove(&id) {
                             // Add history record into profile memory pool
                             // * this action allows to recover recently closed tab (e.g. from the main menu)
-                            profile.history.memory.closed.add(
-                                item.page.navigation.request.widget.entry.text(),
-                                DateTime::now_local().unwrap().to_unix(),
-                            );
+                            profile
+                                .history
+                                .memory
+                                .closed
+                                .add(item, DateTime::now_local().unwrap().to_unix());
                         }
                     }
                     None => panic!("Undefined tab index!"),

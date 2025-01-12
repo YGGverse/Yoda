@@ -1,7 +1,7 @@
 mod action;
 mod database;
 mod header;
-mod tab;
+pub mod tab;
 mod widget;
 
 use action::{Action, Position};

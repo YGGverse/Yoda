@@ -1,4 +1,4 @@
-mod browser;
+pub mod browser;
 mod database;
 
 use browser::Browser;

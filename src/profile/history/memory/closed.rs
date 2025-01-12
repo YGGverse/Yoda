@@ -1,10 +1,15 @@
-use gtk::glib::GString;
+use crate::app::browser::window::tab::Item;
 use itertools::Itertools;
-use std::{cell::RefCell, collections::HashMap};
+use std::{cell::RefCell, rc::Rc};
 
-/// Reduce disk usage by cache Bookmarks index in memory
+pub struct Record {
+    pub item: Rc<Item>,
+    pub unix_timestamp: i64,
+}
+
+/// Recently closed tabs index
 pub struct Closed {
-    index: RefCell<HashMap<GString, i64>>,
+    index: RefCell<Vec<Record>>,
 }
 
 impl Default for Closed {
@@ -19,7 +24,7 @@ impl Closed {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
-            index: RefCell::new(HashMap::new()),
+            index: RefCell::new(Vec::new()),
         }
     }
 
@@ -27,21 +32,24 @@ impl Closed {
 
     /// Add new record
     /// * replace with new one if the record already exist
-    pub fn add(&self, request: GString, unix_timestamp: i64) {
-        self.index.borrow_mut().insert(request, unix_timestamp);
+    pub fn add(&self, item: Rc<Item>, unix_timestamp: i64) {
+        self.index.borrow_mut().push(Record {
+            item,
+            unix_timestamp,
+        });
     }
 
-    /// Get recent requests vector sorted by `ID` DESC
-    pub fn recent(&self, limit: usize) -> Vec<GString> {
-        let mut recent: Vec<GString> = Vec::new();
-        for (request, _) in self
+    /// Get recent `Item` vector sorted by time DESC
+    pub fn recent(&self, limit: usize) -> Vec<Rc<Item>> {
+        let mut recent: Vec<Rc<Item>> = Vec::new();
+        for record in self
             .index
             .borrow()
             .iter()
-            .sorted_by(|a, b| Ord::cmp(&b.1, &a.1))
+            .sorted_by(|a, b| Ord::cmp(&b.unix_timestamp, &a.unix_timestamp))
             .take(limit)
         {
-            recent.push(request.clone())
+            recent.push(record.item.clone())
         }
         recent
     }
