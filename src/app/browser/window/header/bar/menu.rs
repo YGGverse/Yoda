@@ -103,7 +103,7 @@ impl Menu {
                             window_action.history_forward.simple_action.name()
                         )));
 
-                    main_page_navigation.append_submenu(Some("History"), &main_page_navigation_history);
+                    main_page_navigation.append_submenu(Some("Navigation history"), &main_page_navigation_history);
 
                 main_page.append_section(None, &main_page_navigation);
 
