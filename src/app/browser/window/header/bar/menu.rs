@@ -206,7 +206,7 @@ impl Menu {
 /// * trim slash postfix
 /// * crop resulting string at the middle position on new `value` longer than `limit`
 fn label(value: &str, limit: usize) -> String {
-    let value = value.replace("gemini://", "");
+    let value = value.trim_start_matches("gemini://");
     let value = value.trim_end_matches('/');
 
     if value.len() <= limit {
