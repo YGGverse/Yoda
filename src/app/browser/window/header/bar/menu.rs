@@ -1,7 +1,7 @@
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
-    glib::{GString, Uri},
+    glib::{gformat, GString, Uri},
     prelude::{ActionExt, EditableExt, ToVariant},
     Align, MenuButton,
 };
@@ -202,7 +202,8 @@ impl Menu {
                             )), Some(&request.to_variant()));
 
                         main_bookmarks.append_item(&menu_item);
-                    }
+                    } // @TODO `menu_item`
+
                     // Show all bookmarks menu item
                     // if profile.bookmark.memory.total() > RECENT_BOOKMARKS {
                     // @TODO
@@ -220,7 +221,7 @@ impl Menu {
                             )), Some(&item_request.to_variant()));
 
                             main_history_tab.append_item(&menu_item);
-                    }
+                    } // @TODO `menu_item`
 
                     // Recently visited history
                     // * in first iteration, group records by it hostname
@@ -237,19 +238,18 @@ impl Menu {
 
                     for (group, items) in list {
                         let list = gio::Menu::new();
-                        for uri in items {
-                            let item = gio::MenuItem::new(Some(&ellipsize(
-                                &uri_to_label(&uri),
-                                LABEL_MAX_LENGTH
-                            )), None);
-                            item.set_action_and_target_value(Some(&format!(
-                                "{}.{}",
-                                window_action.id,
-                                window_action.open.simple_action.name()
-                            )), Some(&uri.to_string().to_variant()));
-                            list.append_item(&item);
+
+                        // Show first menu item only without children menu
+                        if items.len() == 1 {
+                            main_history_request.append_item(&menu_item(&window_action, &items[0], true));
+
+                        // Create children menu items related to parental host item
+                        } else {
+                            for uri in items {
+                                list.append_item(&menu_item(&window_action, &uri, false));
+                            }
+                            main_history_request.append_submenu(Some(&group), &list);
                         }
-                        main_history_request.append_submenu(Some(&group), &list);
                     }
                 }
             });
@@ -273,11 +273,34 @@ fn ellipsize(value: &str, limit: usize) -> String {
     format!("{}..{}", &value[..length], &value[value.len() - length..])
 }
 
-fn uri_to_label(uri: &Uri) -> GString {
+/// Format [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+/// as [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html) label
+fn uri_to_label(uri: &Uri, is_parent: bool) -> GString {
     let path = uri.path();
+    // Show hostname for index pages (or entire URL on possible unwrap failure)
     if path == "/" {
         uri.host().unwrap_or(uri.to_str())
+    // Parental item names have some format exception
+    } else if is_parent {
+        gformat!("{}{}", uri.host().unwrap_or(uri.to_str()), uri.path())
     } else {
         path
     }
+}
+
+/// Shared helper to create new [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html)
+fn menu_item(action: &WindowAction, uri: &Uri, is_parent: bool) -> gio::MenuItem {
+    let item = gio::MenuItem::new(
+        Some(&ellipsize(&uri_to_label(uri, is_parent), LABEL_MAX_LENGTH)),
+        None,
+    );
+    item.set_action_and_target_value(
+        Some(&format!(
+            "{}.{}",
+            action.id,
+            action.open.simple_action.name()
+        )),
+        Some(&uri.to_string().to_variant()),
+    );
+    item
 }
