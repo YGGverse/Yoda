@@ -1,14 +1,16 @@
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
+    glib::{GString, Uri},
     prelude::{ActionExt, EditableExt, ToVariant},
     Align, MenuButton,
 };
+use indexmap::IndexMap;
 use std::rc::Rc;
 
 // Config options
 
-const LABEL_MAX_LENGTH: usize = 32;
+const LABEL_MAX_LENGTH: usize = 28;
 pub struct Menu {
     pub menu_button: MenuButton,
 }
@@ -192,7 +194,7 @@ impl Menu {
                     // Bookmarks
                     main_bookmarks.remove_all();
                     for request in profile.bookmark.memory.recent() {
-                        let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
+                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
@@ -210,7 +212,7 @@ impl Menu {
                     main_history_tab.remove_all();
                     for item in profile.history.memory.tab.recent() {
                         let item_request = item.page.navigation.request.widget.entry.text(); // @TODO restore entire `Item`
-                        let menu_item = gio::MenuItem::new(Some(&label(&item_request, LABEL_MAX_LENGTH)), None);
+                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&item_request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
@@ -221,16 +223,33 @@ impl Menu {
                     }
 
                     // Recently visited history
+                    // * in first iteration, group records by it hostname
+                    // * in second iteration, collect uri path as the menu sub-item label
                     main_history_request.remove_all();
-                    for request in profile.history.memory.request.recent() {
-                        let menu_item = gio::MenuItem::new(Some(&label(&request, LABEL_MAX_LENGTH)), None);
-                            menu_item.set_action_and_target_value(Some(&format!(
+
+                    let mut list: IndexMap<GString, Vec<Uri>> = IndexMap::new();
+                    for uri in profile.history.memory.request.recent() {
+                        list.entry(match uri.host() {
+                            Some(host) => host,
+                            None => uri.to_str(),
+                        }).or_default().push(uri);
+                    }
+
+                    for (group, items) in list {
+                        let list = gio::Menu::new();
+                        for uri in items {
+                            let item = gio::MenuItem::new(Some(&ellipsize(
+                                &uri_to_label(&uri),
+                                LABEL_MAX_LENGTH
+                            )), None);
+                            item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
                                 window_action.open.simple_action.name()
-                            )), Some(&request.to_variant()));
-
-                            main_history_request.append_item(&menu_item);
+                            )), Some(&uri.to_string().to_variant()));
+                            list.append_item(&item);
+                        }
+                        main_history_request.append_submenu(Some(&group), &list);
                     }
                 }
             });
@@ -242,14 +261,9 @@ impl Menu {
     }
 }
 
-/// Format dynamically generated strings for menu item labels
-/// * trim gemini scheme prefix
-/// * trim slash postfix
+/// Format dynamically generated strings for menu item label
 /// * crop resulting string at the middle position on new `value` longer than `limit`
-fn label(value: &str, limit: usize) -> String {
-    let value = value.trim_start_matches("gemini://");
-    let value = value.trim_end_matches('/');
-
+fn ellipsize(value: &str, limit: usize) -> String {
     if value.len() <= limit {
         return value.to_string();
     }
@@ -257,4 +271,13 @@ fn label(value: &str, limit: usize) -> String {
     let length = (limit - 2) / 2;
 
     format!("{}..{}", &value[..length], &value[value.len() - length..])
+}
+
+fn uri_to_label(uri: &Uri) -> GString {
+    let path = uri.path();
+    if path == "/" {
+        uri.host().unwrap_or(uri.to_str())
+    } else {
+        path
+    }
 }

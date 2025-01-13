@@ -1,9 +1,10 @@
-use gtk::glib::GString;
+use gtk::glib::{DateTime, GString, Uri};
 use itertools::Itertools;
 use std::{cell::RefCell, collections::HashMap};
 
 pub struct Value {
     pub unix_timestamp: i64,
+    pub uri: Uri,
 }
 
 /// Recent request history
@@ -31,23 +32,27 @@ impl Request {
 
     /// Add new record with `request` as key and `unix_timestamp` as value
     /// * replace with new value if `request` already exists
-    pub fn set(&self, request: GString, unix_timestamp: i64) {
-        self.index
-            .borrow_mut()
-            .insert(request, Value { unix_timestamp });
+    pub fn set(&self, uri: &Uri) {
+        self.index.borrow_mut().insert(
+            uri.to_str(),
+            Value {
+                unix_timestamp: DateTime::now_local().unwrap().to_unix(),
+                uri: uri.clone(),
+            },
+        );
     }
 
-    /// Get recent requests vector
+    /// Get recent records vector
     /// * sorted by `unix_timestamp` DESC
-    pub fn recent(&self) -> Vec<GString> {
-        let mut recent: Vec<GString> = Vec::new();
-        for (request, _) in self
+    pub fn recent(&self) -> Vec<Uri> {
+        let mut recent: Vec<Uri> = Vec::new();
+        for (_, value) in self
             .index
             .borrow()
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.1.unix_timestamp, &a.1.unix_timestamp))
         {
-            recent.push(request.clone())
+            recent.push(value.uri.clone())
         }
         recent
     }

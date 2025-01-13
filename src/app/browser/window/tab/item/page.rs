@@ -28,7 +28,7 @@ use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
     gio::SocketClientEvent,
-    glib::{gformat, DateTime, GString, Priority, Uri, UriFlags, UriHideFlags},
+    glib::{gformat, GString, Priority, Uri, UriFlags, UriHideFlags},
     prelude::{EditableExt, FileExt, SocketClientExt},
 };
 use sqlite::Transaction;
@@ -234,7 +234,7 @@ impl Page {
                     scheme => {
                         // Add history record
                         if is_history {
-                            snap_history(&self.profile, &self.navigation);
+                            snap_history(&self.profile, &self.navigation, Some(uri));
                         }
 
                         // Update widget
@@ -322,7 +322,7 @@ impl Page {
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
                     // * just to have back/forward navigation ability
-                    snap_history(&self.profile, &self.navigation);
+                    snap_history(&self.profile, &self.navigation, None);
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -478,7 +478,7 @@ impl Page {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         response::meta::Status::Success => {
                             if is_history {
-                                snap_history(&profile, &navigation);
+                                snap_history(&profile, &navigation, Some(&uri));
                             }
                             if is_download {
                                 // Init download widget
@@ -806,7 +806,7 @@ impl Page {
                         response::meta::Status::CertificateInvalid => {
                             // Add history record
                             if is_history {
-                                snap_history(&profile, &navigation);
+                                snap_history(&profile, &navigation, Some(&uri));
                             }
 
                             // Update widget
@@ -831,7 +831,7 @@ impl Page {
                         _ => {
                             // Add history record
                             if is_history {
-                                snap_history(&profile, &navigation);
+                                snap_history(&profile, &navigation, Some(&uri));
                             }
 
                             // Update widget
@@ -854,7 +854,7 @@ impl Page {
                 Err(e) => {
                     // Add history record
                     if is_history {
-                        snap_history(&profile, &navigation);
+                        snap_history(&profile, &navigation, Some(&uri));
                     }
 
                     // Update widget
@@ -921,15 +921,13 @@ fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
 
 /// Make new history record for given `navigation` object
 /// * applies on shared conditions match only
-fn snap_history(profile: &Profile, navigation: &Navigation) {
+fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
     let request = navigation.request.widget.entry.text();
 
     // Add new record into the global memory index (used in global menu)
-    profile
-        .history
-        .memory
-        .request
-        .set(request.clone(), DateTime::now_local().unwrap().to_unix());
+    if let Some(uri) = uri {
+        profile.history.memory.request.set(uri);
+    }
 
     // Add new record into the page navigation history
     if match navigation.history.current() {
