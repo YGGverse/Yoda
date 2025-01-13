@@ -8,7 +8,6 @@ description = "Browser for Gemini Protocol"
 keywords = ["gemini", "gemini-protocol", "gtk", "browser", "client"]
 categories = ["network-programming", "gui"]
 repository = "https://github.com/YGGverse/Yoda"
-
 # homepage = "https://yggverse.github.io"
 
 [dependencies.adw]
@@ -33,27 +32,18 @@ features = ["gnome_46"]
 package = "rusqlite"
 version = "0.32.1"
 
-[dependencies.openssl]
-version = "0.10.68"
-
-[dependencies.syntect]
-version = "5.2.0"
-
-[dependencies.ansi-parser]
-version = "0.9.1"
-
 [dependencies.sourceview]
 package = "sourceview5"
 version = "0.9.1"
 
-[dependencies.plurify]
-version = "0.1.1"
-
-[dependencies.libspelling]
-version = "0.3.0"
-
 [dependencies]
+ansi-parser = "0.9.1"
+indexmap = "2.7.0"
 itertools = "0.14.0"
+libspelling = "0.3.0"
+openssl = "0.10.68"
+plurify = "0.1.1"
+syntect = "5.2.0"
 
 # development
 [patch.crates-io]
