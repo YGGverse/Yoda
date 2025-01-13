@@ -204,11 +204,6 @@ impl Menu {
                         main_bookmarks.append_item(&menu_item);
                     } // @TODO `menu_item`
 
-                    // Show all bookmarks menu item
-                    // if profile.bookmark.memory.total() > RECENT_BOOKMARKS {
-                    // @TODO
-                    // }
-
                     // Recently closed history
                     main_history_tab.remove_all();
                     for item in profile.history.memory.tab.recent() {
