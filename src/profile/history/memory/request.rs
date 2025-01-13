@@ -32,12 +32,12 @@ impl Request {
 
     /// Add new record with `request` as key and `unix_timestamp` as value
     /// * replace with new value if `request` already exists
-    pub fn set(&self, uri: &Uri) {
+    pub fn set(&self, uri: Uri) {
         self.index.borrow_mut().insert(
             uri.to_str(),
             Value {
                 unix_timestamp: DateTime::now_local().unwrap().to_unix(),
-                uri: uri.clone(),
+                uri,
             },
         );
     }

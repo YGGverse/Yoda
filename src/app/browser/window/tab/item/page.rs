@@ -919,14 +919,22 @@ fn is_external_uri(subject: &Uri, base: &Uri) -> bool {
     subject.host() != base.host()
 }
 
-/// Make new history record for given `navigation` object
-/// * applies on shared conditions match only
+/// Make new history record in related components
+/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
 fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
     let request = navigation.request.widget.entry.text();
 
     // Add new record into the global memory index (used in global menu)
-    if let Some(uri) = uri {
-        profile.history.memory.request.set(uri);
+    // * if the `Uri` is `None`, try parse it from `request`
+    match uri {
+        Some(uri) => profile.history.memory.request.set(uri.clone()),
+        None => {
+            // this case especially useful for some routes that contain redirects
+            // maybe some parental optimization wanted @TODO
+            if let Some(uri) = navigation.request.uri() {
+                profile.history.memory.request.set(uri);
+            }
+        }
     }
 
     // Add new record into the page navigation history
