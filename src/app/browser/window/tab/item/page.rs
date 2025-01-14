@@ -3,20 +3,22 @@ mod content;
 mod database;
 mod error;
 mod input;
-mod meta;
 mod mode;
 mod navigation;
+mod redirect;
 mod search;
+mod status;
 mod widget;
 
 use client::Client;
 use content::Content;
 use error::Error;
 use input::Input;
-use meta::{Meta, Status};
 use mode::Mode;
 use navigation::Navigation;
+use redirect::Redirect;
 use search::Search;
+use status::Status;
 use widget::Widget;
 
 use crate::{
@@ -34,11 +36,14 @@ use gtk::{
     prelude::{EditableExt, FileExt, SocketClientExt},
 };
 use sqlite::Transaction;
-use std::{rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
 pub struct Page {
     id: Rc<GString>,
     profile: Rc<Profile>,
+    status: Rc<RefCell<Status>>,
+    title: Rc<RefCell<GString>>,
+    redirect: Rc<Redirect>,
     // Actions
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
@@ -48,7 +53,6 @@ pub struct Page {
     pub content: Rc<Content>,
     pub search: Rc<Search>,
     pub input: Rc<Input>,
-    pub meta: Rc<Meta>,
     pub navigation: Rc<Navigation>,
     pub widget: Rc<Widget>,
 }
@@ -89,12 +93,15 @@ impl Page {
             &input.widget.clamp,
         ));
 
-        let meta = Rc::new(Meta::new(Status::New, gformat!("New page")));
+        //let meta = Rc::new(Meta::new(Status::New, gformat!("New page")));
 
         // Done
         Self {
             id: id.clone(),
             profile: profile.clone(),
+            redirect: Rc::new(Redirect::new()),
+            status: Rc::new(RefCell::new(Status::New)),
+            title: Rc::new(RefCell::new(gformat!("New page"))),
             // Actions
             browser_action: browser_action.clone(),
             tab_action: tab_action.clone(),
@@ -104,7 +111,6 @@ impl Page {
             content,
             search,
             input,
-            meta,
             navigation,
             widget,
         }
@@ -190,12 +196,12 @@ impl Page {
         self.input.unset();
 
         // Prevent infinitive redirection
-        if self.meta.redirects() > DEFAULT_MAX_REDIRECT_COUNT {
+        if self.redirect.count() > DEFAULT_MAX_REDIRECT_COUNT {
             todo!()
         }
 
         // Try redirect request
-        let request = if let Some(redirect) = self.meta.redirect() {
+        let request = if let Some(redirect) = self.redirect.last() {
             // Gemini protocol may provide background (temporarily) redirects
             if redirect.is_foreground {
                 self.navigation
@@ -209,14 +215,15 @@ impl Page {
             Mode::from(&redirect.request, redirect.referrer.as_ref())
         } else {
             // Reset redirect counter as request value taken from user input
-            self.meta.redirect.borrow_mut().clear();
+            self.redirect.clear();
 
             // Return value from navigation entry
             Mode::from(&self.navigation.request.widget.entry.text(), None)
         };
 
         // Update
-        self.meta.set_status(Status::Reload).set_title("Loading..");
+        self.status.replace(Status::Reload);
+        self.title.replace(gformat!("Loading.."));
         self.browser_action.update.activate(Some(&self.id));
 
         // Route by `Mode`
@@ -235,15 +242,12 @@ impl Page {
                         self.load_gemini(uri, is_download, is_source, is_history)
                     }
                     "titan" => {
-                        // Format response
-                        let status = Status::Input;
-                        let title = "Titan input";
-
                         // Toggle input form
                         // @TODO self.input.set_new_titan(|data|{});
 
                         // Update meta
-                        self.meta.set_status(status).set_title(title);
+                        self.status.replace(Status::Input);
+                        self.title.replace(gformat!("Titan input"));
 
                         // Update page
                         self.browser_action.update.activate(Some(&self.id));
@@ -259,9 +263,8 @@ impl Page {
                         status.set_description(Some(&format!("Scheme `{scheme}` not supported")));
 
                         // Update meta
-                        self.meta
-                            .set_status(Status::Failure)
-                            .set_title(&status.title());
+                        self.status.replace(Status::Failure);
+                        self.title.replace(status.title());
 
                         // Update window
                         self.browser_action.update.activate(Some(&self.id));
@@ -301,15 +304,14 @@ impl Page {
     pub fn clean(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            self.meta.clean(transaction, &record.id)?;
                             self.navigation.clean(transaction, &record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
@@ -318,24 +320,24 @@ impl Page {
             }
             Err(e) => return Err(e.to_string()),
         }
-
         Ok(())
     }
 
     pub fn restore(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
         // Update status
-        self.meta.set_status(Status::SessionRestore);
+        self.status.replace(Status::SessionRestore);
 
         // Begin page restore
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
+                    // Restore self by last record
+                    self.title.replace(record.title.into());
                     // Delegate restore action to the item childs
-                    self.meta.restore(transaction, &record.id)?;
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
                     // * just to have back/forward navigation ability
@@ -346,7 +348,7 @@ impl Page {
         }
 
         // Update status
-        self.meta.set_status(Status::SessionRestored);
+        self.status.replace(Status::SessionRestored);
 
         Ok(())
     }
@@ -354,14 +356,17 @@ impl Page {
     pub fn save(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
-        match database::insert(transaction, app_browser_window_tab_item_id) {
+        match database::insert(
+            transaction,
+            app_browser_window_tab_item_id,
+            self.title.borrow().as_str(),
+        ) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                self.meta.save(transaction, &id)?;
                 self.navigation.save(transaction, &id)?;
             }
             Err(e) => return Err(e.to_string()),
@@ -372,9 +377,14 @@ impl Page {
 
     // Getters
 
+    /// Get `title` copy from `Self`
+    pub fn title(&self) -> GString {
+        self.title.borrow().clone()
+    }
+
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
-        match *self.meta.status.borrow() {
+        match *self.status.borrow() {
             Status::Reload | Status::SessionRestore => Some(0.0),
             Status::Resolving => Some(0.1),
             Status::Resolved => Some(0.2),
@@ -410,20 +420,22 @@ impl Page {
         let content = self.content.clone();
         let id = self.id.clone();
         let input = self.input.clone();
-        let meta = self.meta.clone();
+        let title = self.title.clone();
+        let status = self.status.clone();
         let navigation = self.navigation.clone();
         let profile = self.profile.clone();
         let search = self.search.clone();
         let tab_action = self.tab_action.clone();
         let window_action = self.window_action.clone();
+        let redirect = self.redirect.clone();
 
         // Listen for connection status updates
         self.client.gemini.socket.connect_event({
             let id = id.clone();
-            let meta = meta.clone();
+            let status = status.clone();
             let update = browser_action.update.clone();
             move |_, event, _, _| {
-                meta.set_status(match event {
+                status.replace(match event {
                     SocketClientEvent::Resolving => Status::Resolving,
                     SocketClientEvent::Resolved => Status::Resolved,
                     SocketClientEvent::Connecting => Status::Connecting,
@@ -461,8 +473,7 @@ impl Page {
                         response::meta::Status::Input |
                         response::meta::Status::SensitiveInput => {
                             // Format response
-                            let status = Status::Input;
-                            let title = match response.meta.data {
+                            let header = match response.meta.data {
                                 Some(data) => data.value,
                                 None => gformat!("Input expected"),
                             };
@@ -473,21 +484,21 @@ impl Page {
                                     input.set_new_sensitive(
                                         tab_action.clone(),
                                         uri.clone(),
-                                        Some(&title),
+                                        Some(&header),
                                         Some(1024),
                                     ),
                                 _ =>
                                     input.set_new_response(
                                         tab_action.clone(),
                                         uri.clone(),
-                                        Some(&title),
+                                        Some(&header),
                                         Some(1024),
                                     ),
                             }
 
                             // Update meta
-                            meta.set_status(status)
-                                .set_title(&title);
+                            status.replace(Status::Input);
+                            title.replace(header);
 
                             // Update page
                             browser_action.update.activate(Some(&id));
@@ -499,7 +510,7 @@ impl Page {
                             }
                             if is_download {
                                 // Init download widget
-                                let status = content.to_status_download(
+                                let status_page = content.to_status_download(
                                     &uri_to_title(&uri), // grab default filename
                                     &cancellable,
                                     {
@@ -553,8 +564,8 @@ impl Page {
                                 );
 
                                 // Update meta
-                                meta.set_status(Status::Success)
-                                    .set_title(&status.title());
+                                status.replace(Status::Success);
+                                title.replace(status_page.title());
 
                                 // Update window
                                 browser_action.update.activate(Some(&id));
@@ -569,12 +580,13 @@ impl Page {
                                             {
                                                 let browser_action = browser_action.clone();
                                                 let content = content.clone();
-                                                let search = search.clone();
                                                 let id = id.clone();
-                                                let meta = meta.clone();
+                                                let search = search.clone();
+                                                let status = status.clone();
+                                                let title = title.clone();
                                                 let uri = uri.clone();
                                                 let window_action = window_action.clone();
-                                                move |result|{
+                                                move |result| {
                                                     match result {
                                                         Ok(buffer) => {
                                                             // Set children component,
@@ -594,11 +606,11 @@ impl Page {
                                                             search.set(Some(text_widget.text_view));
 
                                                             // Update page meta
-                                                            meta.set_status(Status::Success)
-                                                                .set_title(&match text_widget.meta.title {
-                                                                    Some(meta_title) => meta_title,
-                                                                    None => uri_to_title(&uri)
-                                                                });
+                                                            status.replace(Status::Success);
+                                                            title.replace(match text_widget.meta.title {
+                                                                Some(meta_title) => meta_title.into(), // @TODO
+                                                                None => uri_to_title(&uri)
+                                                            });
 
                                                             // Update window components
                                                             window_action.find.simple_action.set_enabled(true);
@@ -607,12 +619,12 @@ impl Page {
                                                         }
                                                         Err(e) => {
                                                             // Update widget
-                                                            let status = content.to_status_failure();
-                                                            status.set_description(Some(&e.to_string()));
+                                                            let status_page = content.to_status_failure();
+                                                            status_page.set_description(Some(&e.to_string()));
 
                                                             // Update meta
-                                                            meta.set_status(Status::Failure)
-                                                                .set_title(&status.title());
+                                                            status.replace(Status::Failure);
+                                                            title.replace(status_page.title());
 
                                                             // Update window
                                                             browser_action.update.activate(Some(&id));
@@ -624,7 +636,7 @@ impl Page {
                                     },
                                     "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                         // Final image size unknown, show loading widget
-                                        let status = content.to_status_loading(
+                                        let status_page = content.to_status_loading(
                                             Some(Duration::from_secs(1)) // show if download time > 1 second
                                         );
 
@@ -638,7 +650,7 @@ impl Page {
                                             0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
                                             move |_, total| {
                                                 // Update loading progress
-                                                status.set_description(
+                                                status_page.set_description(
                                                     Some(&gformat!("Download: {total} bytes"))
                                                 );
                                             },
@@ -647,7 +659,8 @@ impl Page {
                                                 let cancellable = cancellable.clone();
                                                 let content = content.clone();
                                                 let id = id.clone();
-                                                let meta = meta.clone();
+                                                let status = status.clone();
+                                                let title = title.clone();
                                                 let uri = uri.clone();
                                                 move |result| match result {
                                                     Ok((memory_input_stream, _)) => {
@@ -659,8 +672,8 @@ impl Page {
                                                                 match result {
                                                                     Ok(buffer) => {
                                                                         // Update page meta
-                                                                        meta.set_status(Status::Success)
-                                                                            .set_title(uri_to_title(&uri).as_str());
+                                                                        status.replace(Status::Success);
+                                                                        title.replace(uri_to_title(&uri));
 
                                                                         // Update page content
                                                                         content.to_image(&Texture::for_pixbuf(&buffer));
@@ -670,12 +683,12 @@ impl Page {
                                                                     }
                                                                     Err(e) => {
                                                                         // Update widget
-                                                                        let status = content.to_status_failure();
-                                                                        status.set_description(Some(e.message()));
+                                                                        let status_page = content.to_status_failure();
+                                                                        status_page.set_description(Some(e.message()));
 
                                                                         // Update meta
-                                                                        meta.set_status(Status::Failure)
-                                                                            .set_title(&status.title());
+                                                                        status.replace(Status::Failure);
+                                                                        title.replace(status_page.title());
                                                                     }
                                                                 }
                                                             }
@@ -683,12 +696,12 @@ impl Page {
                                                     },
                                                     Err(e) => {
                                                         // Update widget
-                                                        let status = content.to_status_failure();
-                                                        status.set_description(Some(&e.to_string()));
+                                                        let status_page = content.to_status_failure();
+                                                        status_page.set_description(Some(&e.to_string()));
 
                                                         // Update meta
-                                                        meta.set_status(Status::Failure)
-                                                            .set_title(&status.title());
+                                                        status.replace(Status::Failure);
+                                                        title.replace(status_page.title());
                                                     }
                                                 }
                                                 }
@@ -696,14 +709,14 @@ impl Page {
                                     },
                                     mime => {
                                         // Init children widget
-                                        let status = content.to_status_mime(
+                                        let status_page = content.to_status_mime(
                                             mime,
                                             Some((tab_action.clone(), navigation.request.download()))
                                         );
 
                                         // Update page meta
-                                        meta.set_status(Status::Failure)
-                                            .set_title(&status.title());
+                                        status.replace(Status::Failure);
+                                        title.replace(status_page.title());
 
                                         // Update window
                                         browser_action.update.activate(Some(&id));
@@ -734,8 +747,8 @@ impl Page {
                                                     // Client MUST prevent external redirects (by protocol specification)
                                                     if is_external_uri(&resolved_uri, &uri) {
                                                         // Update meta
-                                                        meta.set_status(Status::Failure)
-                                                            .set_title("Oops");
+                                                        status.replace(Status::Failure);
+                                                        title.replace(gformat!("Oops"));
 
                                                         // Show placeholder with manual confirmation to continue @TODO status page?
                                                         content.to_text_gemini(
@@ -746,10 +759,10 @@ impl Page {
                                                             )
                                                         );
                                                     // Client MUST limit the number of redirects they follow to 5 (by protocol specification)
-                                                    } else if meta.redirects() > 5 {
+                                                    } else if redirect.count() > 5 {
                                                         // Update meta
-                                                        meta.set_status(Status::Failure)
-                                                            .set_title("Oops");
+                                                        status.replace(Status::Failure);
+                                                        title.replace(gformat!("Oops"));
 
                                                         // Show placeholder with manual confirmation to continue @TODO status page?
                                                         content.to_text_gemini(
@@ -762,7 +775,7 @@ impl Page {
                                                     // Redirection value looks valid, create new redirect (stored in meta `Redirect` holder)
                                                     // then call page reload action to apply it by the parental controller
                                                     } else {
-                                                        meta.add_redirect(
+                                                        redirect.add(
                                                             // skip query and fragment by protocol requirements
                                                             // @TODO review fragment specification
                                                             resolved_uri.to_string_partial(
@@ -772,9 +785,10 @@ impl Page {
                                                             Some(navigation.request.widget.entry.text()),
                                                             // set follow policy based on status code
                                                             matches!(response.meta.status, response::meta::Status::PermanentRedirect),
-                                                        )
-                                                            .set_status(Status::Redirect) // @TODO is this status really wanted?
-                                                            .set_title("Redirect");
+                                                        );
+
+                                                        status.replace(Status::Redirect); // @TODO is this status really wanted here?
+                                                        title.replace(gformat!("Redirect"));
 
                                                         // Reload page to apply redirection (without history record request)
                                                         tab_action.load.activate(None, false);
@@ -782,34 +796,34 @@ impl Page {
                                                 },
                                                 Err(e) => {
                                                     // Update widget
-                                                    let status = content.to_status_failure();
-                                                    status.set_description(Some(&e.to_string()));
+                                                    let status_page = content.to_status_failure();
+                                                    status_page.set_description(Some(&e.to_string()));
 
                                                     // Update meta
-                                                    meta.set_status(Status::Failure)
-                                                        .set_title(&status.title());
+                                                    status.replace(Status::Failure);
+                                                    title.replace(status_page.title());
                                                 }
                                             }
                                         }
                                         Err(e) => {
                                             // Update widget
-                                            let status = content.to_status_failure();
-                                            status.set_description(Some(&e.to_string()));
+                                            let status_page = content.to_status_failure();
+                                            status_page.set_description(Some(&e.to_string()));
 
                                             // Update meta
-                                            meta.set_status(Status::Failure)
-                                                .set_title(&status.title());
+                                            status.replace(Status::Failure);
+                                            title.replace(status_page.title());
                                         },
                                     }
                                 },
                                 None => {
                                     // Update widget
-                                    let status = content.to_status_failure();
-                                    status.set_description(Some("Redirection target not defined"));
+                                    let status_page = content.to_status_failure();
+                                    status_page.set_description(Some("Redirection target not defined"));
 
                                     // Update meta
-                                    meta.set_status(Status::Failure)
-                                        .set_title(&status.title());
+                                    status.replace(Status::Failure);
+                                    title.replace(status_page.title());
                                 },
                             }
 
@@ -827,9 +841,9 @@ impl Page {
                             }
 
                             // Update widget
-                            let status = content.to_status_identity();
+                            let status_page = content.to_status_identity();
 
-                            status.set_description(Some(&match response.meta.data {
+                            status_page.set_description(Some(&match response.meta.data {
                                 Some(data) => data.value,
                                 None => match response.meta.status {
                                     response::meta::Status::CertificateUnauthorized => gformat!("Certificate not authorized"),
@@ -839,8 +853,8 @@ impl Page {
                             }));
 
                             // Update meta
-                            meta.set_status(Status::Success)
-                                .set_title(&status.title());
+                            status.replace(Status::Success);
+                            title.replace(status_page.title());
 
                             // Update window
                             browser_action.update.activate(Some(&id));
@@ -852,16 +866,16 @@ impl Page {
                             }
 
                             // Update widget
-                            let status = content.to_status_failure();
+                            let status_page = content.to_status_failure();
 
-                            status.set_description(Some(&match response.meta.data {
+                            status_page.set_description(Some(&match response.meta.data {
                                 Some(data) => data.value,
                                 None => gformat!("Status code not supported"),
                             }));
 
                             // Update meta
-                            meta.set_status(Status::Failure)
-                                .set_title(&status.title());
+                            status.replace(Status::Failure);
+                            title.replace(status_page.title());
 
                             // Update window
                             browser_action.update.activate(Some(&id));
@@ -875,12 +889,12 @@ impl Page {
                     }
 
                     // Update widget
-                    let status = content.to_status_failure();
-                    status.set_description(Some(&e.to_string()));
+                    let status_page = content.to_status_failure();
+                    status_page.set_description(Some(&e.to_string()));
 
                     // Update meta
-                    meta.set_status(Status::Failure)
-                        .set_title(&status.title());
+                    status.replace(Status::Failure);
+                    title.replace(status_page.title());
 
                     // Update window
                     browser_action.update.activate(Some(&id));
@@ -899,7 +913,6 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     }
 
     // Delegate migration to childs
-    meta::migrate(tx)?;
     navigation::migrate(tx)?;
 
     // Success
@@ -911,12 +924,12 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 /// Useful as common placeholder when page title could not be detected
 ///
 /// * this feature may be improved and moved outside @TODO
-fn uri_to_title(uri: &Uri) -> String {
-    let title = uri.path().split('/').last().unwrap_or_default().to_string();
-    if title.is_empty() {
+fn uri_to_title(uri: &Uri) -> GString {
+    let title = uri.path();
+    if title.split('/').last().unwrap_or_default().is_empty() {
         match uri.host() {
-            Some(host) => host.to_string(),
-            None => "Untitled".to_string(),
+            Some(host) => host,
+            None => gformat!("Untitled"),
         }
     } else {
         title

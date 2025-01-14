@@ -18,7 +18,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(tx: &Transaction, app_browser_window_id: &i64) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, app_browser_window_id: i64) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab` (
             `app_browser_window_id`
@@ -27,7 +27,7 @@ pub fn insert(tx: &Transaction, app_browser_window_id: &i64) -> Result<usize, Er
     )
 }
 
-pub fn select(tx: &Transaction, app_browser_window_id: &i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_window_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_id` FROM  `app_browser_window_tab`
@@ -51,7 +51,7 @@ pub fn select(tx: &Transaction, app_browser_window_id: &i64) -> Result<Vec<Table
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `app_browser_window_tab` WHERE `id` = ?", [id])
 }
 

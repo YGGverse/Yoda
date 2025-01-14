@@ -18,11 +18,11 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(tx: &Transaction, app_id: &i64) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, app_id: i64) -> Result<usize, Error> {
     tx.execute("INSERT INTO `app_browser` (`app_id`) VALUES (?)", [app_id])
 }
 
-pub fn select(tx: &Transaction, app_id: &i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare("SELECT `id`, `app_id` FROM `app_browser` WHERE `app_id` = ?")?;
 
     let result = stmt.query_map([app_id], |row| {
@@ -42,7 +42,7 @@ pub fn select(tx: &Transaction, app_id: &i64) -> Result<Vec<Table>, Error> {
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `app_browser` WHERE `id` = ?", [id])
 }
 

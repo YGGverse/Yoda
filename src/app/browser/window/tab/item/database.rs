@@ -27,11 +27,11 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 
 pub fn insert(
     tx: &Transaction,
-    app_browser_window_tab_id: &i64,
-    page_position: &i32,
-    is_pinned: &bool,
-    is_selected: &bool,
-    is_attention: &bool,
+    app_browser_window_tab_id: i64,
+    page_position: i32,
+    is_pinned: bool,
+    is_selected: bool,
+    is_attention: bool,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item` (
@@ -43,15 +43,15 @@ pub fn insert(
         ) VALUES (?, ?, ?, ?, ?)",
         [
             app_browser_window_tab_id,
-            &(*page_position as i64),
-            &(*is_pinned as i64),
-            &(*is_selected as i64),
-            &(*is_attention as i64),
+            page_position as i64,
+            is_pinned as i64,
+            is_selected as i64,
+            is_attention as i64,
         ],
     )
 }
 
-pub fn select(tx: &Transaction, app_browser_window_tab_id: &i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_window_tab_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_tab_id`,
@@ -83,7 +83,7 @@ pub fn select(tx: &Transaction, app_browser_window_tab_id: &i64) -> Result<Vec<T
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute(
         "DELETE FROM `app_browser_window_tab_item` WHERE `id` = ?",
         [id],

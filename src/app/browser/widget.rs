@@ -41,11 +41,11 @@ impl Widget {
     }
 
     // Actions
-    pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             // nothing yet..
@@ -60,7 +60,7 @@ impl Widget {
         Ok(())
     }
 
-    pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
@@ -79,13 +79,13 @@ impl Widget {
         Ok(())
     }
 
-    pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::insert(
             transaction,
             app_browser_id,
-            &self.application_window.default_width(),
-            &self.application_window.default_height(),
-            &self.application_window.is_maximized(),
+            self.application_window.default_width(),
+            self.application_window.default_height(),
+            self.application_window.is_maximized(),
         ) {
             Ok(_) => {
                 // Delegate save action to childs

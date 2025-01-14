@@ -32,7 +32,7 @@ pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
     tx.execute("DELETE FROM `app` WHERE `id` = ?", [id])
 }
 

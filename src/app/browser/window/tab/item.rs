@@ -129,16 +129,16 @@ impl Item {
     pub fn clean(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_id: &i64,
+        app_browser_window_tab_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_tab_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
-                            self.page.clean(transaction, &record.id)?;
-                            self.widget.clean(transaction, &record.id)?;
+                            self.page.clean(transaction, record.id)?;
+                            self.widget.clean(transaction, record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -155,7 +155,7 @@ impl Item {
     pub fn restore(
         tab_view: &TabView,
         transaction: &Transaction,
-        app_browser_window_tab_id: &i64,
+        app_browser_window_tab_id: i64,
         profile: &Rc<Profile>,
         // Actions
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
@@ -183,8 +183,8 @@ impl Item {
                     ));
 
                     // Delegate restore action to the item childs
-                    item.page.restore(transaction, &record.id)?;
-                    item.widget.restore(transaction, &record.id)?;
+                    item.page.restore(transaction, record.id)?;
+                    item.widget.restore(transaction, record.id)?;
 
                     // Result
                     items.push(item);
@@ -199,11 +199,11 @@ impl Item {
     pub fn save(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_id: &i64,
-        page_position: &i32,
-        is_pinned: &bool,
-        is_selected: &bool,
-        is_attention: &bool,
+        app_browser_window_tab_id: i64,
+        page_position: i32,
+        is_pinned: bool,
+        is_selected: bool,
+        is_attention: bool,
     ) -> Result<(), String> {
         match database::insert(
             transaction,
@@ -217,8 +217,8 @@ impl Item {
                 let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                self.page.save(transaction, &id)?;
-                self.widget.save(transaction, &id)?;
+                self.page.save(transaction, id)?;
+                self.widget.save(transaction, id)?;
             }
             Err(e) => return Err(e.to_string()),
         }

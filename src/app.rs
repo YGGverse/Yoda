@@ -51,8 +51,7 @@ impl App {
                                     Ok(records) => {
                                         // Restore child components
                                         for record in records {
-                                            if let Err(e) =
-                                                browser.restore(&transaction, &record.id)
+                                            if let Err(e) = browser.restore(&transaction, record.id)
                                             {
                                                 todo!("{e}")
                                             }
@@ -86,11 +85,11 @@ impl App {
                                     Ok(records) => {
                                         // Cleanup previous session records
                                         for record in records {
-                                            match database::delete(&transaction, &record.id) {
+                                            match database::delete(&transaction, record.id) {
                                                 Ok(_) => {
                                                     // Delegate clean action to childs
                                                     if let Err(e) =
-                                                        browser.clean(&transaction, &record.id)
+                                                        browser.clean(&transaction, record.id)
                                                     {
                                                         todo!("{e}")
                                                     }
@@ -105,7 +104,7 @@ impl App {
                                                 // Delegate save action to childs
                                                 if let Err(e) = browser.save(
                                                     &transaction,
-                                                    &database::last_insert_id(&transaction),
+                                                    database::last_insert_id(&transaction),
                                                 ) {
                                                     todo!("{e}")
                                                 }

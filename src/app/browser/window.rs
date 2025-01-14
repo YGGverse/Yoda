@@ -138,14 +138,14 @@ impl Window {
         self.tab.update(tab_item_id);
     }
 
-    pub fn clean(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            self.tab.clean(transaction, &record.id)?;
+                            self.tab.clean(transaction, record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -157,12 +157,12 @@ impl Window {
         Ok(())
     }
 
-    pub fn restore(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::select(transaction, app_browser_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    self.tab.restore(transaction, &record.id)?;
+                    self.tab.restore(transaction, record.id)?;
                 }
             }
             Err(e) => return Err(e.to_string()),
@@ -171,13 +171,13 @@ impl Window {
         Ok(())
     }
 
-    pub fn save(&self, transaction: &Transaction, app_browser_id: &i64) -> Result<(), String> {
+    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
         match database::insert(transaction, app_browser_id) {
             Ok(_) => {
                 // Delegate save action to childs
                 if let Err(e) = self
                     .tab
-                    .save(transaction, &database::last_insert_id(transaction))
+                    .save(transaction, database::last_insert_id(transaction))
                 {
                     return Err(e.to_string());
                 }

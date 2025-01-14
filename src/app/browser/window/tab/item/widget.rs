@@ -58,12 +58,12 @@ impl Widget {
     pub fn clean(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             // nothing yet..
@@ -81,7 +81,7 @@ impl Widget {
     pub fn restore(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
@@ -104,7 +104,7 @@ impl Widget {
     pub fn save(
         &self,
         transaction: &Transaction,
-        app_browser_window_tab_item_id: &i64,
+        app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
         // Keep value in memory until operation complete
         let title = self.tab_page.title();

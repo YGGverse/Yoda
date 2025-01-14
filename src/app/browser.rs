@@ -106,15 +106,15 @@ impl Browser {
 
     // Actions
 
-    pub fn clean(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+    pub fn clean(&self, transaction: &Transaction, app_id: i64) -> Result<(), String> {
         match database::select(transaction, app_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
-                            self.window.clean(transaction, &record.id)?;
-                            self.widget.clean(transaction, &record.id)?;
+                            self.window.clean(transaction, record.id)?;
+                            self.widget.clean(transaction, record.id)?;
 
                             /* @TODO
                             self.header.clean(transaction, &record.id)?; */
@@ -129,13 +129,13 @@ impl Browser {
         Ok(())
     }
 
-    pub fn restore(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+    pub fn restore(&self, transaction: &Transaction, app_id: i64) -> Result<(), String> {
         match database::select(transaction, app_id) {
             Ok(records) => {
                 for record in records {
                     // Delegate restore action to childs
-                    self.widget.restore(transaction, &record.id)?;
-                    self.window.restore(transaction, &record.id)?;
+                    self.widget.restore(transaction, record.id)?;
+                    self.window.restore(transaction, record.id)?;
 
                     /* @TODO
                     self.header.restore(transaction, &record.id)?; */
@@ -147,14 +147,14 @@ impl Browser {
         Ok(())
     }
 
-    pub fn save(&self, transaction: &Transaction, app_id: &i64) -> Result<(), String> {
+    pub fn save(&self, transaction: &Transaction, app_id: i64) -> Result<(), String> {
         match database::insert(transaction, app_id) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
-                self.widget.save(transaction, &id)?;
-                self.window.save(transaction, &id)?;
+                self.widget.save(transaction, id)?;
+                self.window.save(transaction, id)?;
 
                 /* @TODO
                 self.header.save(transaction, &id)?; */

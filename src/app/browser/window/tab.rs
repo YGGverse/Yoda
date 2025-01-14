@@ -284,9 +284,7 @@ impl Tab {
 
                 // Update tab title on loading indicator inactive
                 if !item.page.is_loading() {
-                    item.widget
-                        .tab_page
-                        .set_title(&item.page.meta.title.borrow())
+                    item.widget.tab_page.set_title(&item.page.title())
                 }
             }
             // Update all tabs
@@ -297,9 +295,7 @@ impl Tab {
 
                     // Update tab title on loading indicator inactive
                     if !item.page.is_loading() {
-                        item.widget
-                            .tab_page
-                            .set_title(&item.page.meta.title.borrow())
+                        item.widget.tab_page.set_title(&item.page.title())
                     }
                 }
             }
@@ -309,16 +305,16 @@ impl Tab {
     pub fn clean(
         &self,
         transaction: &Transaction,
-        app_browser_window_id: &i64,
+        app_browser_window_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_id) {
             Ok(records) => {
                 for record in records {
-                    match database::delete(transaction, &record.id) {
+                    match database::delete(transaction, record.id) {
                         Ok(_) => {
                             // Delegate clean action to childs
                             for (_, item) in self.index.borrow().iter() {
-                                item.clean(transaction, &record.id)?
+                                item.clean(transaction, record.id)?
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -334,7 +330,7 @@ impl Tab {
     pub fn restore(
         &self,
         transaction: &Transaction,
-        app_browser_window_id: &i64,
+        app_browser_window_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_id) {
             Ok(records) => {
@@ -342,7 +338,7 @@ impl Tab {
                     match Item::restore(
                         &self.widget.tab_view,
                         transaction,
-                        &record.id,
+                        record.id,
                         &self.profile,
                         (&self.browser_action, &self.window_action),
                     ) {
@@ -367,7 +363,7 @@ impl Tab {
     pub fn save(
         &self,
         transaction: &Transaction,
-        app_browser_window_id: &i64,
+        app_browser_window_id: i64,
     ) -> Result<(), String> {
         match database::insert(transaction, app_browser_window_id) {
             Ok(_) => {
@@ -378,11 +374,11 @@ impl Tab {
                 for (_, item) in self.index.borrow().iter() {
                     item.save(
                         transaction,
-                        &id,
-                        &self.widget.tab_view.page_position(&item.widget.tab_page),
-                        &item.widget.tab_page.is_pinned(),
-                        &item.widget.tab_page.is_selected(),
-                        &item.widget.tab_page.needs_attention(),
+                        id,
+                        self.widget.tab_view.page_position(&item.widget.tab_page),
+                        item.widget.tab_page.is_pinned(),
+                        item.widget.tab_page.is_selected(),
+                        item.widget.tab_page.needs_attention(),
                     )?;
                 }
             }
