@@ -1,9 +1,11 @@
 mod response;
 mod sensitive;
+mod titan;
 mod widget;
 
 use response::Response;
 use sensitive::Sensitive;
+use titan::Titan;
 use widget::Widget;
 
 use crate::app::browser::window::tab::item::Action as TabAction;
@@ -44,7 +46,9 @@ impl Input {
         size_limit: Option<usize>,
     ) {
         self.widget.update(Some(
-            &Response::new(action, base, title, size_limit).widget.g_box,
+            &Response::build(action, base, title, size_limit)
+                .widget
+                .g_box,
         ));
     }
 
@@ -56,7 +60,14 @@ impl Input {
         max_length: Option<i32>,
     ) {
         self.widget.update(Some(
-            Sensitive::new(action, base, title, max_length).gobject(),
+            &Sensitive::build(action, base, title, max_length)
+                .widget
+                .g_box,
         ));
+    }
+
+    pub fn set_new_titan(&self, action: Rc<TabAction>, base: Uri, title: Option<&str>) {
+        self.widget
+            .update(Some(&Titan::build(action, base, title).widget.g_box));
     }
 }

@@ -4,23 +4,23 @@ mod widget;
 use form::Form;
 use widget::Widget;
 
-use crate::app::browser::window::tab::item::action::Action as TabAction;
+use super::TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
     prelude::{EditableExt, WidgetExt},
-    Box,
 };
 use std::rc::Rc;
 
 pub struct Sensitive {
-    // Components
-    widget: Rc<Widget>,
+    pub widget: Rc<Widget>,
 }
 
 impl Sensitive {
-    // Construct
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         tab_action: Rc<TabAction>,
         base: Uri,
         title: Option<&str>,
@@ -30,7 +30,7 @@ impl Sensitive {
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
-        let form = Rc::new(Form::new(
+        let form = Rc::new(Form::build(
             action_send.clone(),
             title,
             max_length
@@ -38,7 +38,7 @@ impl Sensitive {
         ));
 
         // Init widget
-        let widget = Rc::new(Widget::new(&form.widget.password_entry_row));
+        let widget = Rc::new(Widget::build(&form.widget.password_entry_row));
 
         // Init events
         action_send.connect_activate({
@@ -55,16 +55,11 @@ impl Sensitive {
             }
         });
 
-        widget.gobject().connect_realize(move |_| {
+        widget.g_box.connect_realize(move |_| {
             form.widget.password_entry_row.grab_focus();
         });
 
         // Return activated struct
         Self { widget }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        self.widget.gobject()
     }
 }

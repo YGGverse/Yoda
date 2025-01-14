@@ -15,6 +15,10 @@ pub enum PrimaryIcon<'a> {
         name: &'a str,
         tooltip: &'a str,
     },
+    Titan {
+        name: &'a str,
+        tooltip: &'a str,
+    },
 }
 
 pub fn from(request: &str) -> PrimaryIcon {
@@ -36,6 +40,13 @@ pub fn from(request: &str) -> PrimaryIcon {
         return PrimaryIcon::Gemini {
             name: "channel-secure-symbolic",
             tooltip: ("Guest session", "User session"),
+        };
+    }
+
+    if request.starts_with("titan:") {
+        return PrimaryIcon::Titan {
+            name: "document-send-symbolic",
+            tooltip: "Titan input",
         };
     }
 

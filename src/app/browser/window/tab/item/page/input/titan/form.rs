@@ -15,7 +15,7 @@ impl Form {
     /// Build new `Self`
     pub fn build(action_update: SimpleAction) -> Self {
         Self {
-            widget: Rc::new(Widget::build(action_update)),
+            widget: Rc::new(Widget::new(action_update)),
         }
     }
 }

@@ -217,6 +217,10 @@ impl Widget {
                 self.entry.set_primary_icon_name(Some(name));
                 self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
+            PrimaryIcon::Titan { name, tooltip } => {
+                self.entry.set_primary_icon_name(Some(name));
+                self.entry.set_primary_icon_tooltip_text(Some(tooltip));
+            }
         }
 
         // Update progress

@@ -19,8 +19,8 @@ impl Widget {
     }
 
     // Actions
-    pub fn update(&self, chars_left: Option<i32>) {
-        match chars_left {
+    pub fn update(&self, bytes_left: Option<usize>) {
+        match bytes_left {
             Some(value) => {
                 // Update color on chars left reached
                 self.label

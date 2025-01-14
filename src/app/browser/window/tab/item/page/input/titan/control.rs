@@ -36,10 +36,10 @@ impl Control {
     }
 
     // Actions
-    pub fn update(&self, bytes_left: Option<usize>) {
+    pub fn update(&self, bytes: Option<usize>) {
         // Update children components
-        self.counter.update(bytes_left);
-        self.send.update(match bytes_left {
+        self.counter.update(bytes);
+        self.send.update(match bytes {
             Some(left) => left > 0,
             None => false,
         });

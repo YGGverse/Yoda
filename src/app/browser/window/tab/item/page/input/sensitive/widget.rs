@@ -5,13 +5,15 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
 
 pub struct Widget {
-    gobject: Box,
+    pub g_box: Box,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(response: &PasswordEntryRow) -> Self {
-        let gobject = Box::builder()
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(response: &PasswordEntryRow) -> Self {
+        let g_box = Box::builder()
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
             .margin_start(MARGIN)
@@ -20,13 +22,8 @@ impl Widget {
             .orientation(Orientation::Vertical)
             .build();
 
-        gobject.append(response);
+        g_box.append(response);
 
-        Self { gobject }
-    }
-
-    // Getters
-    pub fn gobject(&self) -> &Box {
-        &self.gobject
+        Self { g_box }
     }
 }

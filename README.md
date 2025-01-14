@@ -104,7 +104,9 @@ GTK 4 / Libadwaita client written in Rust
     * [x] List
     * [x] Quote
   * [ ] Gemfeed
-  * [ ] Titan
+* [ ] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
+  * [ ] Binary data (file uploads)
+  * [ ] Text input
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] Localhost
@@ -157,7 +159,7 @@ GTK 4 / Libadwaita client written in Rust
 
 ``` bash
 sudo apt install git curl build-essential\
-                 libgtk-4-dev libgtksourceview-5-dev libadwaita-1-dev libspelling-1-dev\
+                 libgtk-4-dev libgtksourceview-5-dev libglib2.0-dev libadwaita-1-dev libspelling-1-dev\
                  libsqlite3-dev libssl-dev
 ```
 
@@ -165,7 +167,7 @@ sudo apt install git curl build-essential\
 
 ``` bash
 sudo dnf install git curl gcc\
-                 gtk4-devel gtksourceview5-devel libadwaita-devel libspelling-devel\
+                 gtk4-devel gtksourceview5-devel glib2-devel libadwaita-devel libspelling-devel\
                  sqlite-devel openssl-devel
 ```
 

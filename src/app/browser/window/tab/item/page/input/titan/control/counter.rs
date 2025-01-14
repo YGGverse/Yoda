@@ -23,7 +23,7 @@ impl Counter {
     }
 
     // Actions
-    pub fn update(&self, bytes_left: Option<usize>) {
-        self.widget.update(bytes_left);
+    pub fn update(&self, bytes: Option<usize>) {
+        self.widget.update(bytes);
     }
 }

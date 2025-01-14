@@ -231,6 +231,24 @@ impl Page {
                         };
                         self.load_gemini(uri, is_download, is_source, is_history)
                     }
+                    "titan" => {
+                        // Format response
+                        let status = Status::Input;
+                        let title = gformat!("Titan input");
+
+                        // Toggle input form
+                        self.input.set_new_titan(
+                            self.tab_action.clone(),
+                            uri.clone(),
+                            Some(&title),
+                        );
+
+                        // Update meta
+                        self.meta.set_status(status).set_title(&title);
+
+                        // Update page
+                        self.browser_action.update.activate(Some(&self.id));
+                    }
                     scheme => {
                         // Add history record
                         if is_history {
@@ -385,7 +403,7 @@ impl Page {
     // @TODO move outside
     fn load_gemini(&self, uri: Uri, is_download: bool, is_source: bool, is_history: bool) {
         // Init local namespace
-        use gemini::client::connection::response;
+        use gemini::client::connection::{response, Request};
 
         // Init shared clones
         let browser_action = self.browser_action.clone();
@@ -425,7 +443,10 @@ impl Page {
 
         // Begin new socket request
         self.client.gemini.request_async(
-            uri.clone(),
+            match uri.scheme().as_str() {
+                "titan" => Request::titan(uri.clone(), Vec::new(), None, None), // @TODO
+                _ => Request::gemini(uri.clone())
+            },
             Priority::DEFAULT,
             cancellable.clone(),
             // Search for user certificate match request
@@ -512,7 +533,7 @@ impl Page {
                                                                 move |_, total| action.update.activate(
                                                                     &format!(
                                                                         "Received {}...",
-                                                                        format_bytes(total)
+                                                                        crate::tool::format_bytes(total)
                                                                     )
                                                                 )
                                                             },
@@ -943,18 +964,5 @@ fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
         None => true,
     } {
         navigation.history.add(request, true)
-    }
-}
-
-/// Format bytes to KB/MB/GB presentation
-fn format_bytes(value: usize) -> String {
-    if value < 1024 {
-        format!("{} bytes", value)
-    } else if value < 1024 * 1024 {
-        format!("{:.2} KB", value as f64 / 1024.0)
-    } else if value < 1024 * 1024 * 1024 {
-        format!("{:.2} MB", value as f64 / (1024.0 * 1024.0))
-    } else {
-        format!("{:.2} GB", value as f64 / (1024.0 * 1024.0 * 1024.0))
     }
 }

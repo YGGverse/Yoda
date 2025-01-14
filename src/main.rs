@@ -1,5 +1,6 @@
 mod app;
 mod profile;
+mod tool;
 
 use app::App;
 use profile::Profile;

@@ -2,15 +2,20 @@ use adw::{
     prelude::{EntryRowExt, PreferencesRowExt},
     PasswordEntryRow,
 };
-use gtk::{gio::SimpleAction, prelude::ActionExt};
+use gtk::{
+    gio::SimpleAction,
+    prelude::{ActionExt, WidgetExt},
+};
 
 pub struct Widget {
     pub password_entry_row: PasswordEntryRow,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(action_send: SimpleAction, title: Option<&str>, _max_length: Option<i32>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(action_send: SimpleAction, title: Option<&str>, _max_length: Option<i32>) -> Self {
         // Init main widget
         let password_entry_row = PasswordEntryRow::builder().show_apply_button(true).build();
 
@@ -26,6 +31,10 @@ impl Widget {
         // Init events
         password_entry_row.connect_apply(move |_| {
             action_send.activate(None);
+        });
+
+        password_entry_row.connect_realize(move |this| {
+            this.grab_focus();
         });
 
         // Return activated struct

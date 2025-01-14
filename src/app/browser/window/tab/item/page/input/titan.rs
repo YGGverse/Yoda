@@ -11,25 +11,20 @@ use widget::Widget;
 use super::TabAction;
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, Uri, UriHideFlags},
+    glib::{uuid_string_random, Uri},
 };
 use std::rc::Rc;
 
-pub struct Response {
+pub struct Titan {
     // Components
     pub widget: Rc<Widget>,
 }
 
-impl Response {
+impl Titan {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
-        tab_action: Rc<TabAction>,
-        base: Uri,
-        title: Option<&str>,
-        size_limit: Option<usize>,
-    ) -> Self {
+    pub fn build(_tab_action: Rc<TabAction>, _base: Uri, title: Option<&str>) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
@@ -48,29 +43,19 @@ impl Response {
 
         // Init events
         action_update.connect_activate({
-            let base = base.clone();
             let control = control.clone();
             let form = form.clone();
-            move |_, _| {
-                control.update(size_limit.map(|limit| {
-                    limit
-                        - (base.to_string_partial(UriHideFlags::QUERY).len()
-                            + Uri::escape_string(&form.widget.text(), None, false).len())
-                }))
-            }
+            move |_, _| control.update(Some(form.widget.size()))
         });
 
         action_send.connect_activate({
-            let form = form.clone();
+            // @TODO let form = form.clone();
             move |_, _| {
-                tab_action.load.activate(
-                    Some(&format!(
-                        "{}?{}",
-                        base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(&form.widget.text(), None, false),
-                    )),
+                todo!()
+                /* tab_action.load.activate(
+                    Some(&),
                     true,
-                );
+                );*/
             }
         });
 

@@ -1,6 +1,5 @@
 use gtk::{
     gio::SimpleAction,
-    glib::GString,
     prelude::{ActionExt, TextBufferExt, TextViewExt, WidgetExt},
     TextView, WrapMode,
 };
@@ -14,10 +13,8 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action_update: SimpleAction) -> Self {
+    // Construct
+    pub fn new(action_update: SimpleAction) -> Self {
         // Init [SourceView](https://gitlab.gnome.org/GNOME/gtksourceview) type buffer
         let buffer = Buffer::builder().build();
 
@@ -56,8 +53,10 @@ impl Widget {
 
     // Getters
 
-    pub fn text(&self) -> GString {
+    pub fn size(&self) -> usize {
         let buffer = self.text_view.buffer();
-        buffer.text(&buffer.start_iter(), &buffer.end_iter(), true)
+        buffer
+            .text(&buffer.start_iter(), &buffer.end_iter(), true)
+            .len()
     }
 }

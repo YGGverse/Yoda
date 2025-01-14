@@ -330,7 +330,7 @@ impl Reader {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" => {
+                                "gemini" | "titan" => {
                                     // Open new page in browser
                                     tab_action.load.activate(Some(&uri.to_str()), true);
                                 }
@@ -367,7 +367,7 @@ impl Reader {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" => {
+                                "gemini" | "titan" => {
                                     // Open new page in browser
                                     window_action.append.activate_stateful_once(
                                         Position::After,
