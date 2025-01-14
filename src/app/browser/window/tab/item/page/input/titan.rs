@@ -24,7 +24,7 @@ impl Titan {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(_tab_action: Rc<TabAction>, _base: Uri, title: Option<&str>) -> Self {
+    pub fn build(_tab_action: &Rc<TabAction>, _base: &Uri, title: Option<&str>) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);

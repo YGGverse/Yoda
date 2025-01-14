@@ -237,11 +237,8 @@ impl Page {
                         let title = gformat!("Titan input");
 
                         // Toggle input form
-                        self.input.set_new_titan(
-                            self.tab_action.clone(),
-                            uri.clone(),
-                            Some(&title),
-                        );
+                        self.input
+                            .set_new_titan(&self.tab_action, &uri, Some(&title));
 
                         // Update meta
                         self.meta.set_status(status).set_title(&title);
@@ -443,10 +440,7 @@ impl Page {
 
         // Begin new socket request
         self.client.gemini.request_async(
-            match uri.scheme().as_str() {
-                "titan" => Request::titan(uri.clone(), Vec::new(), None, None), // @TODO
-                _ => Request::gemini(uri.clone())
-            },
+            Request::gemini(uri.clone()),
             Priority::DEFAULT,
             cancellable.clone(),
             // Search for user certificate match request

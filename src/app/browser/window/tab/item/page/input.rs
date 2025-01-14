@@ -66,7 +66,7 @@ impl Input {
         ));
     }
 
-    pub fn set_new_titan(&self, action: Rc<TabAction>, base: Uri, title: Option<&str>) {
+    pub fn set_new_titan(&self, action: &Rc<TabAction>, base: &Uri, title: Option<&str>) {
         self.widget
             .update(Some(&Titan::build(action, base, title).widget.g_box));
     }
