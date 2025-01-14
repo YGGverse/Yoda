@@ -20,7 +20,7 @@ impl Titan {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(callback: impl Fn(&[u8]) + 'static) -> Self {
+    pub fn build(on_sent: impl Fn(&[u8]) + 'static) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
@@ -46,7 +46,7 @@ impl Titan {
 
         action_send.connect_activate({
             // @TODO let form = form.clone();
-            move |_, _| callback(&[]) // @TODO input data
+            move |_, _| on_sent(&[]) // @TODO input data
         });
 
         // Return activated struct
