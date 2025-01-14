@@ -234,14 +234,14 @@ impl Page {
                     "titan" => {
                         // Format response
                         let status = Status::Input;
-                        let title = gformat!("Titan input");
+                        let title = "Titan input";
 
                         // Toggle input form
                         self.input
-                            .set_new_titan(&self.tab_action, &uri, Some(&title));
+                            .set_new_titan(&self.tab_action, &uri, Some(title));
 
                         // Update meta
-                        self.meta.set_status(status).set_title(&title);
+                        self.meta.set_status(status).set_title(title);
 
                         // Update page
                         self.browser_action.update.activate(Some(&self.id));
