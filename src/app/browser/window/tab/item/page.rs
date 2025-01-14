@@ -21,13 +21,8 @@ use search::Search;
 use status::Status;
 use widget::Widget;
 
-use crate::{
-    app::browser::{
-        window::{tab::item::Action as TabAction, Action as WindowAction},
-        Action as BrowserAction,
-    },
-    Profile,
-};
+use super::{Action as TabAction, BrowserAction, Profile, WindowAction};
+
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
