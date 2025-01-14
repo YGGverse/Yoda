@@ -10,10 +10,12 @@ pub struct Bookmark {
 }
 
 impl Bookmark {
-    // Construct
-    pub fn new(action: Rc<WindowAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(action: &Rc<WindowAction>) -> Self {
         Self {
-            widget: Rc::new(Widget::new(action.clone())),
+            widget: Rc::new(Widget::build(action)),
         }
     }
 

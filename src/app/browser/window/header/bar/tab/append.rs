@@ -2,7 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use std::rc::Rc;
 
 pub struct Append {
@@ -10,10 +10,12 @@ pub struct Append {
 }
 
 impl Append {
-    // Construct
-    pub fn new(window_action: &Rc<WindowAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(window_action: &Rc<WindowAction>) -> Self {
         Self {
-            widget: Rc::new(Widget::new(window_action.clone())),
+            widget: Rc::new(Widget::build(window_action)),
         }
     }
 }

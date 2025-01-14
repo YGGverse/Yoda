@@ -20,15 +20,17 @@ pub struct App {
 }
 
 impl App {
-    // Construct
-    pub fn new(profile: Rc<Profile>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(profile: &Rc<Profile>) -> Self {
         // Init GTK
         let application = Application::builder()
             .application_id(APPLICATION_ID)
             .build();
 
         // Init components
-        let browser = Rc::new(Browser::new(profile.clone()));
+        let browser = Rc::new(Browser::build(profile));
 
         // Init events
         application.connect_activate({
@@ -250,7 +252,7 @@ impl App {
 
         // Return activated App struct
         Self {
-            profile,
+            profile: profile.clone(),
             application,
         }
     }

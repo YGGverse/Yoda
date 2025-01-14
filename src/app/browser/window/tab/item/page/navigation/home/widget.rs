@@ -1,4 +1,4 @@
-use crate::app::browser::window::Action;
+use super::WindowAction;
 use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
@@ -6,28 +6,33 @@ use gtk::{
 use std::rc::Rc;
 
 pub struct Widget {
-    pub gobject: Button,
+    pub button: Button,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(action: Rc<Action>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(action: &Rc<WindowAction>) -> Self {
         // Init gobject
-        let gobject = Button::builder()
+        let button = Button::builder()
             .icon_name("go-home-symbolic")
             .tooltip_text("Home")
             .sensitive(false)
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| action.home.activate());
+        button.connect_clicked({
+            let action = action.clone();
+            move |_| action.home.activate()
+        });
 
         // Return activated `Self`
-        Self { gobject }
+        Self { button }
     }
 
     // Actions
     pub fn update(&self, is_sensitive: bool) {
-        self.gobject.set_sensitive(is_sensitive);
+        self.button.set_sensitive(is_sensitive);
     }
 }

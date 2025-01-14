@@ -6,7 +6,7 @@ use back::Back;
 use forward::Forward;
 use widget::Widget;
 
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use gtk::glib::GString;
 use std::{cell::RefCell, rc::Rc};
 
@@ -27,14 +27,16 @@ pub struct History {
 }
 
 impl History {
-    // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(action: &Rc<WindowAction>) -> Self {
         // init components
-        let back = Rc::new(Back::new(window_action.clone()));
-        let forward = Rc::new(Forward::new(window_action));
+        let back = Rc::new(Back::build(action));
+        let forward = Rc::new(Forward::build(action));
 
         // Init widget
-        let widget = Rc::new(Widget::new(&back.widget.gobject, &forward.widget.gobject));
+        let widget = Rc::new(Widget::build(&back.widget.button, &forward.widget.button));
 
         // Init memory
         let memory = RefCell::new(Vec::new());

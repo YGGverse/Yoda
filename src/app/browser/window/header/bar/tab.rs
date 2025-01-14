@@ -16,9 +16,9 @@ impl Tab {
     // Construct
     pub fn new(window_action: &Rc<WindowAction>, view: &TabView) -> Self {
         Self {
-            widget: Rc::new(Widget::new(
+            widget: Rc::new(Widget::build(
                 view,
-                &Append::new(window_action).widget.gobject,
+                &Append::build(window_action).widget.button,
             )),
         }
     }

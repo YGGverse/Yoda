@@ -25,11 +25,13 @@ pub struct Browser {
 }
 
 impl Browser {
-    // Construct
-    pub fn new(profile: Rc<Profile>) -> Browser {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(profile: &Rc<Profile>) -> Browser {
         // Init components
         let action = Rc::new(Action::new());
-        let window = Rc::new(Window::new(profile.clone(), action.clone()));
+        let window = Rc::new(Window::build(profile, &action));
 
         // Init widget
         let widget = Rc::new(Widget::new(

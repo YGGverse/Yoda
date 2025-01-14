@@ -1,13 +1,21 @@
-use adw::TabBar;
-use gtk::{prelude::BoxExt, Box, MenuButton, Orientation, WindowControls};
+use gtk::{
+    prelude::{BoxExt, IsA},
+    Box, Orientation,
+};
 
 pub struct Widget {
     pub g_box: Box,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(control: &WindowControls, menu: &MenuButton, tab: &TabBar) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
+        control: &impl IsA<gtk::Widget>,
+        menu: &impl IsA<gtk::Widget>,
+        tab: &impl IsA<gtk::Widget>,
+    ) -> Self {
         let g_box = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(8)

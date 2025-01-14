@@ -15,17 +15,22 @@ pub struct Header {
 impl Header {
     // Constructors
 
-    pub fn new(
+    /// Build new `Self`
+    pub fn build(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
         tab_view: &TabView,
     ) -> Self {
         // Init components
-        let bar = Rc::new(Bar::new((browser_action, window_action), profile, tab_view));
+        let bar = Rc::new(Bar::build(
+            (browser_action, window_action),
+            profile,
+            tab_view,
+        ));
 
         // Return new struct
         Self {
-            widget: Rc::new(Widget::new(&bar.widget.g_box)),
+            widget: Rc::new(Widget::build(&bar.widget.g_box)),
         }
     }
 }

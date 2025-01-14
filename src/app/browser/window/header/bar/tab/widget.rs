@@ -6,8 +6,10 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
-    pub fn new(view: &TabView, start_action_widget: &impl IsA<gtk::Widget>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(view: &TabView, start_action_widget: &impl IsA<gtk::Widget>) -> Self {
         Self {
             tab_bar: TabBar::builder()
                 .autohide(false)

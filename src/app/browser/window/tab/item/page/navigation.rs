@@ -13,10 +13,7 @@ use reload::Reload;
 use request::Request;
 use widget::Widget;
 
-use crate::app::browser::window::tab::item::Action as TabAction;
-use crate::app::browser::window::Action as WindowAction;
-use crate::app::browser::Action as BrowserAction;
-use crate::Profile;
+use super::{BrowserAction, Profile, TabAction, WindowAction};
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -31,24 +28,28 @@ pub struct Navigation {
 }
 
 impl Navigation {
-    pub fn new(
-        profile: Rc<Profile>,
-        action: (Rc<BrowserAction>, Rc<WindowAction>, Rc<TabAction>),
+    pub fn build(
+        profile: &Rc<Profile>,
+        (browser_action, window_action, tab_action): (
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<TabAction>,
+        ),
     ) -> Self {
         // init children components
-        let home = Rc::new(Home::new(action.1.clone()));
-        let history = Rc::new(History::new(action.1.clone()));
-        let reload = Rc::new(Reload::new(action.1.clone()));
-        let request = Rc::new(Request::new((action.0, action.2)));
-        let bookmark = Rc::new(Bookmark::new(action.1));
+        let home = Rc::new(Home::build(window_action));
+        let history = Rc::new(History::build(window_action));
+        let reload = Rc::new(Reload::build(window_action));
+        let request = Rc::new(Request::build((browser_action, tab_action)));
+        let bookmark = Rc::new(Bookmark::build(window_action));
 
         // init main widget
-        let widget = Rc::new(Widget::new(
-            &home.widget.gobject,
-            &history.widget.gobject,
-            &reload.widget.gobject,
+        let widget = Rc::new(Widget::build(
+            &home.widget.button,
+            &history.widget.g_box,
+            &reload.widget.button,
             &request.widget.entry,
-            &bookmark.widget.gobject,
+            &bookmark.widget.button,
         ));
 
         // done
@@ -56,7 +57,7 @@ impl Navigation {
             bookmark,
             history,
             home,
-            profile,
+            profile: profile.clone(),
             reload,
             request,
             widget,

@@ -14,7 +14,8 @@ pub struct Widget {
 impl Widget {
     // Constructors
 
-    pub fn new(
+    /// Build new `Self`
+    pub fn build(
         keyword: &str, // ID
         tab_view: &TabView,
         child: &impl IsA<gtk::Widget>,

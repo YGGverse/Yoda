@@ -8,8 +8,10 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         name: &str,
         // Components
         navigation: &impl IsA<gtk::Widget>,

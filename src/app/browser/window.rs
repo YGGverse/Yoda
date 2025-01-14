@@ -22,19 +22,24 @@ pub struct Window {
 }
 
 impl Window {
-    // Construct
-    pub fn new(profile: Rc<Profile>, browser_action: Rc<BrowserAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(profile: &Rc<Profile>, browser_action: &Rc<BrowserAction>) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Rc::new(Tab::new(&profile, (&browser_action, &action)));
-        let header = Rc::new(Header::new(
-            (&browser_action, &action),
-            &profile,
+        let tab = Rc::new(Tab::build(profile, (browser_action, &action)));
+        let header = Rc::new(Header::build(
+            (browser_action, &action),
+            profile,
             &tab.widget.tab_view,
         ));
-        let widget = Rc::new(Widget::new(&header.widget.gobject, &tab.widget.tab_view));
+        let widget = Rc::new(Widget::build(
+            &header.widget.toolbar_view,
+            &tab.widget.tab_view,
+        ));
 
         // Init events
         action.append.connect_activate({

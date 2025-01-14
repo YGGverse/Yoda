@@ -1,17 +1,19 @@
 use adw::ToolbarView;
-use gtk::Box;
+use gtk::prelude::IsA;
 
 pub struct Widget {
-    pub gobject: ToolbarView,
+    pub toolbar_view: ToolbarView,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(top_bar: &Box) -> Self {
-        let gobject = ToolbarView::builder().build();
+    // Constructors
 
-        gobject.add_top_bar(top_bar);
+    /// Build new `Self`
+    pub fn build(top_bar: &impl IsA<gtk::Widget>) -> Self {
+        let toolbar_view = ToolbarView::builder().build();
 
-        Self { gobject }
+        toolbar_view.add_top_bar(top_bar);
+
+        Self { toolbar_view }
     }
 }

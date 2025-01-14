@@ -6,9 +6,12 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
-    pub fn new(header: &ToolbarView, tab: &TabView) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(header: &ToolbarView, tab: &TabView) -> Self {
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
+
         g_box.append(header);
         g_box.append(tab);
 

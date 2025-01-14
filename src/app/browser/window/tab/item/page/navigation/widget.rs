@@ -11,8 +11,10 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         base: &impl IsA<gtk::Widget>,
         history: &impl IsA<gtk::Widget>,
         reload: &impl IsA<gtk::Widget>,

@@ -31,8 +31,10 @@ pub struct Tab {
 }
 
 impl Tab {
-    // Construct
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         profile: &Rc<Profile>,
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
     ) -> Self {
@@ -154,7 +156,7 @@ impl Tab {
         is_load: bool,
     ) -> Rc<Item> {
         // Init new tab item
-        let item = Rc::new(Item::new(
+        let item = Rc::new(Item::build(
             &self.widget.tab_view,
             &self.profile,
             // Actions

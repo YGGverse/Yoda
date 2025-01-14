@@ -3,7 +3,7 @@ mod primary_icon;
 
 use primary_icon::PrimaryIcon;
 
-use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
+use super::{BrowserAction, TabAction};
 use gtk::{
     glib::{timeout_add_local, ControlFlow, SourceId},
     prelude::{EditableExt, EntryExt, WidgetExt},
@@ -33,11 +33,10 @@ pub struct Widget {
 }
 
 impl Widget {
-    // Construct
-    pub fn new(action: (Rc<BrowserAction>, Rc<TabAction>)) -> Self {
-        // Set actions name
-        let (browser_action, tab_action) = action;
+    // Constructors
 
+    /// Build new `Self`
+    pub fn build((browser_action, tab_action): (&Rc<BrowserAction>, &Rc<TabAction>)) -> Self {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -70,12 +69,18 @@ impl Widget {
             }
         });
 
-        entry.connect_changed(move |_| {
-            browser_action.update.activate(None);
+        entry.connect_changed({
+            let browser_action = browser_action.clone();
+            move |_| {
+                browser_action.update.activate(None);
+            }
         });
 
-        entry.connect_activate(move |entry| {
-            tab_action.load.activate(Some(&entry.text()), true);
+        entry.connect_activate({
+            let tab_action = tab_action.clone();
+            move |entry| {
+                tab_action.load.activate(Some(&entry.text()), true);
+            }
         });
 
         entry.connect_state_flags_changed({

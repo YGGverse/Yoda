@@ -26,11 +26,11 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn new((window_action, tab_action): (Rc<WindowAction>, Rc<TabAction>)) -> Self {
+    pub fn build((window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>)) -> Self {
         Self {
             g_box: Box::builder().orientation(Orientation::Vertical).build(),
-            window_action,
-            tab_action,
+            window_action: window_action.clone(),
+            tab_action: tab_action.clone(),
         }
     }
 

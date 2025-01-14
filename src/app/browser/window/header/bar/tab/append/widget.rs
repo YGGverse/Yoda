@@ -1,16 +1,18 @@
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use gtk::{prelude::ButtonExt, Align, Button};
 use std::rc::Rc;
 
 pub struct Widget {
-    pub gobject: Button,
+    pub button: Button,
 }
 
 impl Widget {
-    // Construct
-    pub fn new(window_action: Rc<WindowAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(window_action: &Rc<WindowAction>) -> Self {
         // Init gobject
-        let gobject = Button::builder()
+        let button = Button::builder()
             .icon_name("tab-new-symbolic")
             .css_classes(["flat"])
             .valign(Align::Center)
@@ -18,8 +20,11 @@ impl Widget {
             .build();
 
         // Init events
-        gobject.connect_clicked(move |_| window_action.append.activate_default_once());
+        button.connect_clicked({
+            let window_action = window_action.clone();
+            move |_| window_action.append.activate_default_once()
+        });
 
-        Self { gobject }
+        Self { button }
     }
 }

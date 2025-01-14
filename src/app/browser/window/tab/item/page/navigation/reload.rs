@@ -2,7 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use std::rc::Rc;
 
 pub struct Reload {
@@ -11,11 +11,13 @@ pub struct Reload {
 }
 
 impl Reload {
-    // Construct
-    pub fn new(action: Rc<WindowAction>) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(action: &Rc<WindowAction>) -> Self {
         Self {
             action: action.clone(),
-            widget: Rc::new(Widget::new(action)),
+            widget: Rc::new(Widget::build(action)),
         }
     }
 

@@ -31,8 +31,10 @@ pub struct Item {
 }
 
 impl Item {
-    // Construct
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         tab_view: &TabView,
         profile: &Rc<Profile>,
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
@@ -52,13 +54,13 @@ impl Item {
 
         let action = Rc::new(Action::new());
 
-        let page = Rc::new(Page::new(
+        let page = Rc::new(Page::build(
             &id,
             profile,
             (browser_action, window_action, &action),
         ));
 
-        let widget = Rc::new(Widget::new(
+        let widget = Rc::new(Widget::build(
             id.as_str(),
             tab_view,
             &page.widget.g_box,
@@ -166,7 +168,7 @@ impl Item {
             Ok(records) => {
                 for record in records {
                     // Construct new item object
-                    let item = Rc::new(Item::new(
+                    let item = Rc::new(Item::build(
                         tab_view,
                         profile,
                         // Actions

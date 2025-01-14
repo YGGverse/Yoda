@@ -17,7 +17,10 @@ pub struct Menu {
 
 #[rustfmt::skip] // @TODO template builder?
 impl Menu {
-    pub fn new(
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
     ) -> Self {

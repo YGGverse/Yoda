@@ -2,7 +2,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
 use gtk::glib::{gformat, GString, Uri};
 use std::{cell::RefCell, rc::Rc};
 
@@ -14,11 +14,11 @@ pub struct Home {
 
 impl Home {
     // Construct
-    pub fn new(action: Rc<WindowAction>) -> Self {
+    pub fn build(action: &Rc<WindowAction>) -> Self {
         Self {
             action: action.clone(),
             uri: RefCell::new(None),
-            widget: Rc::new(Widget::new(action)),
+            widget: Rc::new(Widget::build(action)),
         }
     }
 

@@ -19,16 +19,17 @@ pub struct Bar {
 impl Bar {
     // Constructors
 
-    pub fn new(
+    /// Build new `Self`
+    pub fn build(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
         view: &TabView,
     ) -> Self {
         let control = Control::new();
         let tab = Tab::new(window_action, view);
-        let menu = Rc::new(Menu::new((browser_action, window_action), profile));
+        let menu = Rc::new(Menu::build((browser_action, window_action), profile));
         Self {
-            widget: Rc::new(Widget::new(
+            widget: Rc::new(Widget::build(
                 &control.window_controls,
                 &menu.menu_button,
                 &tab.widget.tab_bar,

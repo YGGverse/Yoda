@@ -19,14 +19,17 @@ pub struct Request {
 }
 
 impl Request {
-    // Construct
-    pub fn new(action: (Rc<BrowserAction>, Rc<TabAction>)) -> Self {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build((browser_action, tab_action): (&Rc<BrowserAction>, &Rc<TabAction>)) -> Self {
         Self {
-            widget: Rc::new(Widget::new(action)),
+            widget: Rc::new(Widget::build((browser_action, tab_action))),
         }
     }
 
     // Actions
+
     pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
         self.widget.update(progress_fraction, is_identity_active);
     }

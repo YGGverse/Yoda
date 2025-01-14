@@ -60,7 +60,7 @@ pub struct Page {
 impl Page {
     // Constructors
 
-    pub fn new(
+    pub fn build(
         id: &Rc<GString>,
         profile: &Rc<Profile>,
         (browser_action, window_action, tab_action): (
@@ -70,22 +70,18 @@ impl Page {
         ),
     ) -> Self {
         // Init components
-        let content = Rc::new(Content::new((window_action.clone(), tab_action.clone())));
+        let content = Rc::new(Content::build((window_action, tab_action)));
 
         let search = Rc::new(Search::new());
 
-        let navigation = Rc::new(Navigation::new(
-            profile.clone(),
-            (
-                browser_action.clone(),
-                window_action.clone(),
-                tab_action.clone(),
-            ),
+        let navigation = Rc::new(Navigation::build(
+            profile,
+            (browser_action, window_action, tab_action),
         ));
 
         let input = Rc::new(Input::new());
 
-        let widget = Rc::new(Widget::new(
+        let widget = Rc::new(Widget::build(
             id,
             &navigation.widget.g_box,
             &content.g_box,
