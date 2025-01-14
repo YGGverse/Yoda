@@ -237,7 +237,7 @@ impl Page {
                         let title = "Titan input";
 
                         // Toggle input form
-                        self.input.set_new_titan(&self.tab_action, uri, Some(title));
+                        // @TODO self.input.set_new_titan(|data|{});
 
                         // Update meta
                         self.meta.set_status(status).set_title(title);

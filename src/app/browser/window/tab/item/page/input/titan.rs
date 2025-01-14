@@ -8,11 +8,7 @@ use form::Form;
 use title::Title;
 use widget::Widget;
 
-use super::TabAction;
-use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, Uri},
-};
+use gtk::{gio::SimpleAction, glib::uuid_string_random};
 use std::rc::Rc;
 
 pub struct Titan {
@@ -24,7 +20,7 @@ impl Titan {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(_tab_action: &Rc<TabAction>, _base: &Uri, title: Option<&str>) -> Self {
+    pub fn build(callback: impl Fn(&[u8]) + 'static) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
@@ -32,7 +28,7 @@ impl Titan {
         // Init components
         let control = Rc::new(Control::build(action_send.clone()));
         let form = Rc::new(Form::build(action_update.clone()));
-        let title = Rc::new(Title::build(title));
+        let title = Rc::new(Title::build(None)); // @TODO
 
         // Init widget
         let widget = Rc::new(Widget::build(
@@ -50,13 +46,7 @@ impl Titan {
 
         action_send.connect_activate({
             // @TODO let form = form.clone();
-            move |_, _| {
-                todo!()
-                /* tab_action.load.activate(
-                    Some(&),
-                    true,
-                );*/
-            }
+            move |_, _| callback(&[]) // @TODO input data
         });
 
         // Return activated struct
