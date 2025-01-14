@@ -295,12 +295,14 @@ impl Page {
         };
     }
 
+    /// Update `Self` witch children components
     pub fn update(&self) {
         // Update components
         self.navigation.update(self.progress_fraction());
         // @TODO self.content.update();
     }
 
+    /// Cleanup `Self` session
     pub fn clean(
         &self,
         transaction: &Transaction,
@@ -323,6 +325,7 @@ impl Page {
         Ok(())
     }
 
+    /// Restore `Self` session from database
     pub fn restore(
         &self,
         transaction: &Transaction,
@@ -353,6 +356,7 @@ impl Page {
         Ok(())
     }
 
+    /// Save `Self` session to database
     pub fn save(
         &self,
         transaction: &Transaction,
@@ -382,6 +386,7 @@ impl Page {
         self.title.borrow().clone()
     }
 
+    /// Get value for progress bar, depending on `Self::Status`
     pub fn progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
         match *self.status.borrow() {
@@ -400,6 +405,7 @@ impl Page {
         }
     }
 
+    /// Get `Self` loading status
     pub fn is_loading(&self) -> bool {
         match self.progress_fraction() {
             Some(progress_fraction) => progress_fraction < 1.0,
