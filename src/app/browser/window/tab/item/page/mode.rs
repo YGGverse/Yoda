@@ -1,14 +1,14 @@
 use gtk::glib::{GString, Uri, UriFlags};
 
-/// Request type for `Page` with optional value parsed
-pub enum Request {
+/// Page type for `Page` with optional value parsed
+pub enum Mode {
     Default(Uri),
     Download(Uri),
     Source(Uri),
     Search(String),
 }
 
-impl Request {
+impl Mode {
     // Constructors
 
     /// Create new `Self` from `request` string

@@ -4,8 +4,8 @@ mod database;
 mod error;
 mod input;
 mod meta;
+mod mode;
 mod navigation;
-mod request;
 mod search;
 mod widget;
 
@@ -14,16 +14,18 @@ use content::Content;
 use error::Error;
 use input::Input;
 use meta::{Meta, Status};
+use mode::Mode;
 use navigation::Navigation;
-use request::Request;
 use search::Search;
 use widget::Widget;
 
-use crate::app::browser::{
-    window::{tab::item::Action as TabAction, Action as WindowAction},
-    Action as BrowserAction,
+use crate::{
+    app::browser::{
+        window::{tab::item::Action as TabAction, Action as WindowAction},
+        Action as BrowserAction,
+    },
+    Profile,
 };
-use crate::Profile;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
@@ -194,6 +196,7 @@ impl Page {
 
         // Try redirect request
         let request = if let Some(redirect) = self.meta.redirect() {
+            // Gemini protocol may provide background (temporarily) redirects
             if redirect.is_foreground {
                 self.navigation
                     .request
@@ -203,30 +206,30 @@ impl Page {
             }
 
             // Return value from redirection holder
-            Request::from(&redirect.request, redirect.referrer.as_ref())
+            Mode::from(&redirect.request, redirect.referrer.as_ref())
         } else {
             // Reset redirect counter as request value taken from user input
             self.meta.redirect.borrow_mut().clear();
 
             // Return value from navigation entry
-            Request::from(&self.navigation.request.widget.entry.text(), None)
+            Mode::from(&self.navigation.request.widget.entry.text(), None)
         };
 
         // Update
         self.meta.set_status(Status::Reload).set_title("Loading..");
         self.browser_action.update.activate(Some(&self.id));
 
-        // Route by request
+        // Route by `Mode`
         match request {
-            Request::Default(ref uri) | Request::Download(ref uri) | Request::Source(ref uri) => {
+            Mode::Default(ref uri) | Mode::Download(ref uri) | Mode::Source(ref uri) => {
                 // Route by scheme
                 match uri.scheme().as_str() {
                     "file" => todo!(),
                     "gemini" => {
                         let (uri, is_download, is_source) = match request {
-                            Request::Default(uri) => (uri, false, false),
-                            Request::Download(uri) => (uri, true, false),
-                            Request::Source(uri) => (uri, false, true),
+                            Mode::Default(uri) => (uri, false, false),
+                            Mode::Download(uri) => (uri, true, false),
+                            Mode::Source(uri) => (uri, false, true),
                             _ => panic!(),
                         };
                         self.load_gemini(uri, is_download, is_source, is_history)
@@ -265,7 +268,7 @@ impl Page {
                     }
                 }
             }
-            Request::Search(query) => {
+            Mode::Search(query) => {
                 // try autocomplete scheme and request it on successful resolve
                 // otherwise make search request @TODO optional search provider
                 self.navigation
