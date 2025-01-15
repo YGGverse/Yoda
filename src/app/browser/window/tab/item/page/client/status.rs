@@ -1,36 +1,48 @@
+use gtk::glib::{DateTime, GString};
 use std::fmt::{Display, Formatter, Result};
 
 /// Local `Client` status
 /// * not same as the Gemini status!
 pub enum Status {
     /// Ready to use (or cancel from outside)
-    Cancellable,
+    Cancellable(DateTime),
     /// Operation cancelled, new `Cancellable` required to continue
-    Cancelled,
+    Cancelled(DateTime),
     /// Redirection count limit reached by protocol driver or global settings
-    RedirectLimit(usize),
+    RedirectLimit((DateTime, usize)),
     /// New `request` begin
-    Request(String),
+    Request((DateTime, String)),
 }
 
 impl Display for Status {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Cancellable => {
-                write!(f, "Ready to use (or cancel from outside)")
-            }
-            Self::Cancelled => {
+            Self::Cancellable(t) => {
                 write!(
                     f,
-                    "Operation cancelled, new `Cancellable` required to continue"
+                    "[{}] Ready to use (or cancel from outside)",
+                    format_time(t)
                 )
             }
-            Self::RedirectLimit(count) => {
-                write!(f, "Redirection count limit ({count}) reached by protocol driver or global settings")
+            Self::Cancelled(t) => {
+                write!(
+                    f,
+                    "[{}] Operation cancelled, new `Cancellable` required to continue",
+                    format_time(t)
+                )
             }
-            Self::Request(value) => {
-                write!(f, "Request `{value}`...")
+            Self::RedirectLimit((t, count)) => {
+                write!(f, "[{}] Redirection count limit ({count}) reached by protocol driver or global settings",
+                format_time(t))
+            }
+            Self::Request((t, value)) => {
+                write!(f, "[{}] Request `{value}`...", format_time(t))
             }
         }
     }
+}
+
+/// Format given [DateTime](https://docs.gtk.org/glib/struct.DateTime.html)
+fn format_time(t: &DateTime) -> GString {
+    t.format_iso8601().unwrap() // @TODO handle?
 }
