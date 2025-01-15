@@ -1,10 +1,10 @@
-pub enum Mode {
+pub enum Feature {
     Default { request: String },
     Download { request: String },
     Source { request: String },
 }
 
-impl Mode {
+impl Feature {
     // Constructors
 
     /// Parse new `Self` from string
