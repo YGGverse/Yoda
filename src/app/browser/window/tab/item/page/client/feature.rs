@@ -1,6 +1,6 @@
 //! Feature components in development,
 //! this asset initiated as the attempt to reduce current `Page` code size
-//! and delegate different protocol features to specified drivers under this location
+//! and delegate different protocol features to specified drivers under this location with itself implementation
 //  @TODO cleanup this message on complete
 
 mod request;
@@ -8,8 +8,7 @@ mod request;
 // Local dependencies
 use request::Request;
 
-/// Special features enumeration
-/// * may not be available for some protocols
+/// Features route for `Client`
 pub enum Feature {
     /// Common feature for protocol selected (e.g. browser view)
     Default { request: Request },
