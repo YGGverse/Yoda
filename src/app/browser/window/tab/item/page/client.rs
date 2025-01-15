@@ -43,7 +43,7 @@ impl Client {
         Self {
             cancellable: Cell::new(Cancellable::new()),
             redirect: Rc::new(Redirect::new()),
-            status: Rc::new(RefCell::new(Status::Cancellable)),
+            status: Rc::new(RefCell::new(Status::Cancellable)), // e.g. "ready to use"
             gemini: gemini::Client::new(),
         }
     }
@@ -66,6 +66,10 @@ impl Client {
         cancellable
     }
 
+    // Actions
+
+    /// Begin new request
+    /// * the `query` as string, to support system routing requests (e.g. `source:`)
     pub fn request(&self, query: &str) {
         self.status.replace(Status::Request(query.to_string()));
 
