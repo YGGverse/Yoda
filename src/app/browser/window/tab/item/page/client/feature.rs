@@ -1,3 +1,8 @@
+//! Feature components in development,
+//! this asset initiated as the attempt to reduce current `Page` code size
+//! and delegate different protocol features to specified drivers under this location
+//  @TODO cleanup this message on complete
+
 mod request;
 
 // Local dependencies
