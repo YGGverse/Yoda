@@ -1,5 +1,14 @@
+mod redirect;
+mod status;
+
+use redirect::Redirect;
+use status::Status;
+
 use gtk::{gio::Cancellable, prelude::CancellableExt};
-use std::cell::Cell;
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 /// Multi-client holder for single `Page` object
 ///
@@ -10,7 +19,11 @@ use std::cell::Cell;
 pub struct Client {
     // Shared reference to cancel async operations
     cancellable: Cell<Cancellable>,
-    // Clients
+    // Redirects resolver for different protocols
+    pub redirect: Rc<Redirect>,
+    // Track update status
+    status: Rc<RefCell<Status>>,
+    // Drivers
     pub gemini: gemini::Client,
     // other clients..
 }
@@ -28,6 +41,8 @@ impl Client {
     pub fn new() -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
+            redirect: Rc::new(Redirect::new()),
+            status: Rc::new(RefCell::new(Status::Cancellable)),
             gemini: gemini::Client::new(),
         }
     }
@@ -41,9 +56,23 @@ impl Client {
         let previous = self.cancellable.replace(cancellable.clone());
         if !previous.is_cancelled() {
             previous.cancel();
+            self.status.replace(Status::Cancelled);
+        } else {
+            self.status.replace(Status::Cancellable);
         }
 
         // Done
         cancellable
+    }
+
+    pub fn request(&self, query: &str) {
+        self.status.replace(Status::Request(query.to_string()));
+
+        // Forcefully prevent infinitive redirection
+        // * this condition just to make sure that client will never stuck by driver implementation issue
+        if self.redirect.count() > redirect::LIMIT {
+            self.status.replace(Status::RedirectLimit(redirect::LIMIT));
+            // @TODO return;
+        }
     }
 }

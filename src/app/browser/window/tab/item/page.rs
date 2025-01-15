@@ -5,7 +5,6 @@ mod error;
 mod input;
 mod mode;
 mod navigation;
-mod redirect;
 mod search;
 mod status;
 mod widget;
@@ -16,7 +15,6 @@ use error::Error;
 use input::Input;
 use mode::Mode;
 use navigation::Navigation;
-use redirect::Redirect;
 use search::Search;
 use status::Status;
 use widget::Widget;
@@ -38,7 +36,6 @@ pub struct Page {
     profile: Rc<Profile>,
     status: Rc<RefCell<Status>>,
     title: Rc<RefCell<GString>>,
-    redirect: Rc<Redirect>,
     // Actions
     browser_action: Rc<BrowserAction>,
     tab_action: Rc<TabAction>,
@@ -90,7 +87,6 @@ impl Page {
         Self {
             id: id.clone(),
             profile: profile.clone(),
-            redirect: Rc::new(Redirect::new()),
             status: Rc::new(RefCell::new(Status::New)),
             title: Rc::new(RefCell::new(gformat!("New page"))),
             // Actions
@@ -170,10 +166,6 @@ impl Page {
     /// Main loader for different protocols, that routed by scheme
     /// * every protocol has it own (children) method implementation
     pub fn load(&self, is_history: bool) {
-        /// Global limit to prevent infinitive redirects (ALL protocols)
-        /// * every protocol implementation has own value checker, according to specification
-        const DEFAULT_MAX_REDIRECT_COUNT: usize = 10;
-
         // Move focus out from navigation entry
         self.browser_action
             .escape
@@ -186,27 +178,22 @@ impl Page {
         self.search.unset();
         self.input.unset();
 
-        // Prevent infinitive redirection
-        if self.redirect.count() > DEFAULT_MAX_REDIRECT_COUNT {
-            todo!()
-        }
-
         // Try redirect request
-        let request = if let Some(redirect) = self.redirect.last() {
+        let request = if let Some(redirect) = self.client.redirect.last() {
             // Gemini protocol may provide background (temporarily) redirects
             if redirect.is_foreground {
                 self.navigation
                     .request
                     .widget
                     .entry
-                    .set_text(&redirect.request);
+                    .set_text(&redirect.request.to_string());
             }
 
             // Return value from redirection holder
-            Mode::from(&redirect.request, redirect.referrer.as_ref())
+            Mode::from(&redirect.request.to_str(), None /*redirect.referrer*/) // @TODO
         } else {
             // Reset redirect counter as request value taken from user input
-            self.redirect.clear();
+            self.client.redirect.clear();
 
             // Return value from navigation entry
             Mode::from(&self.navigation.request.widget.entry.text(), None)
@@ -424,7 +411,7 @@ impl Page {
         let search = self.search.clone();
         let tab_action = self.tab_action.clone();
         let window_action = self.window_action.clone();
-        let redirect = self.redirect.clone();
+        let redirect = self.client.redirect.clone();
 
         // Listen for connection status updates
         self.client.gemini.socket.connect_event({
@@ -775,11 +762,11 @@ impl Page {
                                                         redirect.add(
                                                             // skip query and fragment by protocol requirements
                                                             // @TODO review fragment specification
-                                                            resolved_uri.to_string_partial(
+                                                            Uri::parse(&resolved_uri.to_string_partial(
                                                                 UriHideFlags::FRAGMENT | UriHideFlags::QUERY
-                                                            ),
+                                                            ), UriFlags::NONE).unwrap(), // @TODO handle
                                                             // referrer
-                                                            Some(navigation.request.widget.entry.text()),
+                                                            Some(uri.clone()),
                                                             // set follow policy based on status code
                                                             matches!(response.meta.status, response::meta::Status::PermanentRedirect),
                                                         );
