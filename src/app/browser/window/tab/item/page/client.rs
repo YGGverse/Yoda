@@ -1,9 +1,9 @@
-mod protocol;
+mod feature;
 mod redirect;
 mod status;
 
 // Children dependencies
-use protocol::Protocol;
+use feature::Feature;
 use redirect::Redirect;
 use status::Status;
 
@@ -88,9 +88,10 @@ impl Client {
         }
 
         // Route request by protocol
-        match Protocol::from_string(query) {
-            Protocol::Gemini { uri } | Protocol::Titan { uri } => todo!("{uri}"),
-            Protocol::Undefined => todo!(),
+        match Feature::from_string(query) {
+            Feature::Default { request }
+            | Feature::Download { request }
+            | Feature::Source { request } => request.send(), // @TODO
         }
     }
 }

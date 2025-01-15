@@ -4,7 +4,7 @@
 use gtk::glib::{Uri, UriFlags};
 
 /// Build TGLS [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-pub fn tgls(request: &str) -> Uri {
+pub fn tgls(query: &str) -> Uri {
     Uri::build(
         UriFlags::NONE,
         "gemini",
@@ -12,7 +12,7 @@ pub fn tgls(request: &str) -> Uri {
         Some("tlgs.one"),
         1965,
         "search",
-        Some(&Uri::escape_string(request, None, false)), // @TODO is `escape_string` really wanted in `build` context?
+        Some(&Uri::escape_string(query, None, false)), // @TODO is `escape_string` really wanted in `build` context?
         None,
     )
 }
