@@ -24,7 +24,7 @@ pub struct Client {
     // Shared reference to cancel async operations
     // * keep it private to make sure that `status` member tracked properly
     cancellable: Cell<Cancellable>,
-    // Redirects resolver for different protocols
+    // Redirect resolver for different protocols
     pub redirect: Rc<Redirect>,
     // Track update status
     status: Rc<RefCell<Status>>,
