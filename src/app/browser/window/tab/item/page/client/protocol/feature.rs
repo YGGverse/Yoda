@@ -1,6 +1,11 @@
+/// Special features enumeration
+/// * may not be available for some protocols
 pub enum Feature {
+    /// Common feature for protocol selected (e.g. browser view)
     Default { request: String },
+    /// Download request with externally selected method (e.g. to file)
     Download { request: String },
+    /// View request as the source (like `source-view`)
     Source { request: String },
 }
 
