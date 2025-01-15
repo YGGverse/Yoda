@@ -50,7 +50,11 @@ impl Client {
         }
     }
 
+    // Actions
+
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
+    /// * this action wanted just because of `Cancelable` member constructed privately,
+    ///   where some external components may depend to sync their related processes
     pub fn cancellable(&self) -> Cancellable {
         // Init new Cancellable
         let cancellable = Cancellable::new();
@@ -67,8 +71,6 @@ impl Client {
         // Done
         cancellable
     }
-
-    // Actions
 
     /// Begin new request
     /// * the `query` as string, to support system routing requests (e.g. `source:`)
