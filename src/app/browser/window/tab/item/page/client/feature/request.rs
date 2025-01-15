@@ -1,4 +1,4 @@
-mod uri;
+mod search;
 
 // Global dependencies
 use gtk::glib::{Uri, UriFlags};
@@ -23,7 +23,7 @@ impl Request {
             // Search request if the request could not be parsed as the valid [URI](https://docs.gtk.org/glib/struct.Uri.html)
             // * @TODO implement DNS resolver lookup before assign this option
             Err(_) => Self::Gemini {
-                uri: uri::tgls(request),
+                uri: search::tgls(request),
             },
         }
     }
