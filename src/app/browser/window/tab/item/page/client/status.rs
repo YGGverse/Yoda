@@ -9,7 +9,7 @@ pub enum Status {
     /// Operation cancelled, new `Cancellable` required to continue
     Cancelled(DateTime),
     /// Redirection count limit reached by protocol driver or global settings
-    RedirectLimit((DateTime, usize)),
+    GlobalRedirectLimit((DateTime, usize)),
     /// New `request` begin
     Request((DateTime, String)),
 }
@@ -31,8 +31,8 @@ impl Display for Status {
                     format_time(t)
                 )
             }
-            Self::RedirectLimit((t, count)) => {
-                write!(f, "[{}] Redirection count limit ({count}) reached by protocol driver or global settings",
+            Self::GlobalRedirectLimit((t, count)) => {
+                write!(f, "[{}] Global redirection limit ({count}) reached by protocol driver or global settings",
                 format_time(t))
             }
             Self::Request((t, value)) => {
