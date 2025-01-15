@@ -1,9 +1,9 @@
-mod client;
+mod client; // @TODO complete new router implementation
 mod content;
 mod database;
 mod error;
 mod input;
-mod mode;
+mod mode; // @TODO deprecated
 mod navigation;
 mod search;
 mod status;
