@@ -6,7 +6,7 @@ use redirect::Redirect;
 use status::Status;
 
 // Global dependencies
-use gtk::{gio::Cancellable, glib::DateTime, prelude::CancellableExt};
+use gtk::{gio::Cancellable, prelude::CancellableExt};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -45,7 +45,7 @@ impl Client {
         Self {
             cancellable: Cell::new(Cancellable::new()),
             redirect: Rc::new(Redirect::new()),
-            status: Rc::new(RefCell::new(Status::Cancellable(now()))), // e.g. "ready to use"
+            status: Rc::new(RefCell::new(Status::cancellable())), // e.g. "ready to use"
             gemini: gemini::Client::new(),
         }
     }
@@ -63,9 +63,9 @@ impl Client {
         let previous = self.cancellable.replace(cancellable.clone());
         if !previous.is_cancelled() {
             previous.cancel();
-            self.status.replace(Status::Cancelled(now()));
+            self.status.replace(Status::cancelled());
         } else {
-            self.status.replace(Status::Cancellable(now()));
+            self.status.replace(Status::cancellable());
         }
 
         // Done
@@ -75,20 +75,14 @@ impl Client {
     /// Begin new request
     /// * the `query` as string, to support system routing requests (e.g. `source:`)
     pub fn request(&self, query: &str) {
-        self.status
-            .replace(Status::Request((now(), query.to_string())));
+        self.status.replace(Status::request(query.to_string()));
 
         // Forcefully prevent infinitive redirection
         // * this condition just to make sure that client will never stuck by driver implementation issue
         if self.redirect.count() > redirect::LIMIT {
             self.status
-                .replace(Status::GlobalRedirectLimit((now(), redirect::LIMIT)));
+                .replace(Status::failure_redirect_limit(redirect::LIMIT));
             // @TODO return;
         }
     }
-}
-
-/// Get current [DateTime](https://docs.gtk.org/glib/struct.DateTime.html)
-fn now() -> DateTime {
-    DateTime::now_local().unwrap() // @TODO handle?
 }
