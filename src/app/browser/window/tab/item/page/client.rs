@@ -1,7 +1,9 @@
+mod protocol;
 mod redirect;
 mod status;
 
 // Children dependencies
+use protocol::Protocol;
 use redirect::Redirect;
 use status::Status;
 
@@ -83,6 +85,12 @@ impl Client {
             self.status
                 .replace(Status::failure_redirect_limit(redirect::LIMIT, true));
             // @TODO return;
+        }
+
+        // Route request by protocol
+        match Protocol::from_string(query) {
+            Protocol::Gemini { uri } | Protocol::Titan { uri } => todo!("{uri}"),
+            Protocol::Undefined => todo!(),
         }
     }
 }
