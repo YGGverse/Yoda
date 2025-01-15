@@ -81,7 +81,7 @@ impl Client {
         // * this condition just to make sure that client will never stuck by driver implementation issue
         if self.redirect.count() > redirect::LIMIT {
             self.status
-                .replace(Status::failure_redirect_limit(redirect::LIMIT));
+                .replace(Status::failure_redirect_limit(redirect::LIMIT, true));
             // @TODO return;
         }
     }
