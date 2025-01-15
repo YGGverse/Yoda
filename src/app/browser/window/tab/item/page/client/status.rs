@@ -34,6 +34,7 @@ impl Status {
     }
 
     /// Create new `Self::Failure` as `Failure::RedirectLimit`
+    /// * this function is high-level wrapper for `Failure::redirect_limit`
     pub fn failure_redirect_limit(count: usize, is_global: bool) -> Self {
         Self::Failure {
             event: now(),
