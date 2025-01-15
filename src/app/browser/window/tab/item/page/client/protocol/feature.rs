@@ -13,6 +13,7 @@ impl Feature {
     // Constructors
 
     /// Parse new `Self` from string
+    /// * holds related with parsed feature data
     pub fn from_string(request: &str) -> Self {
         if let Some(postfix) = request.strip_prefix("download:") {
             return Self::Download {
