@@ -6,8 +6,8 @@ use feature::Feature;
 use gtk::glib::{Uri, UriFlags};
 
 pub enum Protocol {
-    Gemini { /*mode: Mode,*/ uri: Uri },
-    Titan { /*mode: Mode,*/ uri: Uri },
+    Gemini { /*feature: Feature,*/ uri: Uri },
+    Titan { /*feature: Feature,*/ uri: Uri },
     Undefined,
 }
 
