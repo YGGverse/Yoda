@@ -276,7 +276,7 @@ impl Page {
     /// Update `Self` witch children components
     pub fn update(&self) {
         // Update components
-        self.navigation.update(self.progress_fraction());
+        self.navigation.update(self.to_progress_fraction());
         // @TODO self.content.update();
     }
 
@@ -364,8 +364,9 @@ impl Page {
         self.title.borrow().clone()
     }
 
-    /// Get value for progress bar, depending on `Self::Status`
-    pub fn progress_fraction(&self) -> Option<f64> {
+    /// Convert `Self` to `progress-fraction` presentation
+    /// * see also: [Entry](https://docs.gtk.org/gtk4/property.Entry.progress-fraction.html)
+    pub fn to_progress_fraction(&self) -> Option<f64> {
         // Interpret status to progress fraction
         match *self.status.borrow() {
             Status::Reload | Status::SessionRestore => Some(0.0),
@@ -385,7 +386,7 @@ impl Page {
 
     /// Get `Self` loading status
     pub fn is_loading(&self) -> bool {
-        match self.progress_fraction() {
+        match self.to_progress_fraction() {
             Some(progress_fraction) => progress_fraction < 1.0,
             None => false,
         }
