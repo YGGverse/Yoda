@@ -27,15 +27,4 @@ impl Request {
             },
         }
     }
-
-    // Actions
-
-    /// Send request using protocol driver constructed
-    pub fn send(&self) {
-        match self {
-            Request::Gemini { uri } => todo!("{uri}"),
-            Request::Titan { uri } => todo!("{uri}"),
-            Request::Undefined => todo!(),
-        }
-    }
 }

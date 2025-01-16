@@ -1,88 +1,54 @@
-mod failure;
+pub mod failure;
 
 // Children dependencies
-use failure::Failure;
+pub use failure::Failure;
 
 // Global dependencies
-use gtk::glib::{DateTime, GString};
+use crate::tool::format_time;
+use gtk::glib::DateTime;
 use std::fmt::{Display, Formatter, Result};
 
 /// Local `Client` status
 /// * not same as the Gemini status!
 pub enum Status {
     /// Ready to use (or cancel from outside)
-    Cancellable { event: DateTime },
+    Cancellable { time: DateTime },
     /// Operation cancelled, new `Cancellable` required to continue
-    Cancelled { event: DateTime },
+    Cancelled { time: DateTime },
+    /// Protocol driver updates
+    Driver(super::driver::Status),
     /// Something went wrong
-    Failure { event: DateTime, failure: Failure },
+    Failure { time: DateTime, failure: Failure },
     /// New `request` begin
-    Request { event: DateTime, value: String },
-}
-
-impl Status {
-    // Constructors
-
-    /// Create new `Self::Cancellable`
-    pub fn cancellable() -> Self {
-        Self::Cancellable { event: now() }
-    }
-
-    /// Create new `Self::Cancelled`
-    pub fn cancelled() -> Self {
-        Self::Cancelled { event: now() }
-    }
-
-    /// Create new `Self::Failure` as `Failure::RedirectCount`
-    pub fn failure_redirect_limit(count: usize, is_global: bool) -> Self {
-        Self::Failure {
-            event: now(),
-            failure: Failure::redirect_count(count, is_global),
-        }
-    }
-
-    /// Create new `Self::Request`
-    pub fn request(value: String) -> Self {
-        Self::Request {
-            event: now(),
-            value,
-        }
-    }
+    Request { time: DateTime, value: String },
 }
 
 impl Display for Status {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            Self::Cancellable { event } => {
+            Self::Cancellable { time } => {
                 write!(
                     f,
                     "[{}] Ready to use (or cancel from outside)",
-                    format_time(event)
+                    format_time(time)
                 )
             }
-            Self::Cancelled { event } => {
+            Self::Cancelled { time } => {
                 write!(
                     f,
                     "[{}] Operation cancelled, new `Cancellable` required to continue",
-                    format_time(event)
+                    format_time(time)
                 )
             }
-            Self::Failure { event, failure } => {
-                write!(f, "[{}] Failure: {failure}", format_time(event))
+            Self::Driver(status) => {
+                write!(f, "{status}")
             }
-            Self::Request { event, value } => {
-                write!(f, "[{}] Request `{value}`...", format_time(event))
+            Self::Failure { time, failure } => {
+                write!(f, "[{}] Failure: {failure}", format_time(time))
+            }
+            Self::Request { time, value } => {
+                write!(f, "[{}] Request `{value}`...", format_time(time))
             }
         }
     }
-}
-
-/// Format given [DateTime](https://docs.gtk.org/glib/struct.DateTime.html)
-fn format_time(t: &DateTime) -> GString {
-    t.format_iso8601().unwrap() // @TODO handle?
-}
-
-/// Get current [DateTime](https://docs.gtk.org/glib/struct.DateTime.html)
-fn now() -> DateTime {
-    DateTime::now_local().unwrap() // @TODO handle?
 }

@@ -1,63 +1,61 @@
+pub mod driver;
 mod feature;
-mod redirect;
-mod status;
+pub mod response;
+pub mod status;
 
 // Children dependencies
+pub use driver::Driver;
 use feature::Feature;
-use redirect::Redirect;
-use status::Status;
+pub use response::Response;
+pub use status::Status;
 
 // Global dependencies
+use crate::{tool::now, Profile};
 use gtk::{gio::Cancellable, prelude::CancellableExt};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
 };
 
-/// Multi-client holder for single `Page` object
-///
-/// Unlike init new client instance on every page load,
-/// this struct creates single holder for different protocol drivers;
-/// it also provides additional client-side features
-/// e.g. session resumption or multi-thread connection management (depending of client type selected)
+/// Multi-protocol client API for `Page` object
 pub struct Client {
-    // Shared reference to cancel async operations
-    // * keep it private to make sure that `status` member tracked properly
     cancellable: Cell<Cancellable>,
-    // Redirect resolver for different protocols
-    pub redirect: Rc<Redirect>,
-    // Track update status
     status: Rc<RefCell<Status>>,
-    // Drivers
-    pub gemini: gemini::Client,
-    // other clients..
-}
-
-impl Default for Client {
-    fn default() -> Self {
-        Self::new()
-    }
+    driver: Driver,
 }
 
 impl Client {
     // Constructors
 
     /// Create new `Self`
-    pub fn new() -> Self {
+    pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            redirect: Rc::new(Redirect::new()),
-            status: Rc::new(RefCell::new(Status::cancellable())), // e.g. "ready to use"
-            gemini: gemini::Client::new(),
+            driver: Driver::init(profile, move |status| callback(Status::Driver(status))),
+            status: Rc::new(RefCell::new(Status::Cancellable { time: now() })), // e.g. "ready to use"
         }
     }
 
     // Actions
 
+    /// Begin new request
+    /// * the `query` as string, to support system routes (e.g. `source:` prefix)
+    pub fn request_async(&self, request: &str, callback: impl Fn(Response) + 'static) {
+        // Update client status
+        self.status.replace(Status::Request {
+            time: now(),
+            value: request.to_string(),
+        });
+
+        self.driver.feature_async(
+            Feature::from_string(request),
+            self.new_cancellable(),
+            Rc::new(callback),
+        );
+    }
+
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
-    /// * this action wanted just because of `Cancelable` member constructed privately,
-    ///   where some external components may depend to sync their related processes
-    pub fn cancellable(&self) -> Cancellable {
+    fn new_cancellable(&self) -> Cancellable {
         // Init new Cancellable
         let cancellable = Cancellable::new();
 
@@ -65,33 +63,12 @@ impl Client {
         let previous = self.cancellable.replace(cancellable.clone());
         if !previous.is_cancelled() {
             previous.cancel();
-            self.status.replace(Status::cancelled());
+            self.status.replace(Status::Cancelled { time: now() });
         } else {
-            self.status.replace(Status::cancellable());
+            self.status.replace(Status::Cancellable { time: now() });
         }
 
         // Done
         cancellable
-    }
-
-    /// Begin new request
-    /// * the `query` as string, to support system routing requests (e.g. `source:`)
-    pub fn request(&self, query: &str) {
-        self.status.replace(Status::request(query.to_string()));
-
-        // Forcefully prevent infinitive redirection
-        // * this condition just to make sure that client will never stuck by driver implementation issue
-        if self.redirect.count() > redirect::LIMIT {
-            self.status
-                .replace(Status::failure_redirect_limit(redirect::LIMIT, true));
-            // @TODO return;
-        }
-
-        // Route request by protocol
-        match Feature::from_string(query) {
-            Feature::Default { request }
-            | Feature::Download { request }
-            | Feature::Source { request } => request.send(), // @TODO
-        }
     }
 }
