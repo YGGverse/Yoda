@@ -13,7 +13,7 @@ const DEFAULT_BUTTON_CLASS: &str = "suggested-action";
 
 /// Create new default preset for `Identity`
 /// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-pub fn new(action: Rc<Action>) -> StatusPage {
+pub fn build(action: Rc<Action>) -> StatusPage {
     // Init certificate selection
     let button = &Button::builder()
         .css_classes([DEFAULT_BUTTON_CLASS])

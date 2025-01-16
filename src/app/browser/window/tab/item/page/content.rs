@@ -10,7 +10,7 @@ use adw::StatusPage;
 use gtk::{
     gdk::Paintable,
     gio::{Cancellable, File},
-    glib::{GString, Uri},
+    glib::Uri,
     prelude::{BoxExt, IsA, WidgetExt},
     Box, Orientation,
 };
@@ -77,10 +77,10 @@ impl Content {
     pub fn to_status_mime(
         &self,
         mime: &str,
-        download: Option<(Rc<TabAction>, GString)>,
+        download: Option<(&Rc<TabAction>, &Uri)>,
     ) -> StatusPage {
         self.clean();
-        let status = status::mime::new(mime, download);
+        let status = status::mime::build(mime, download);
         self.g_box.append(&status);
         status
     }
@@ -90,7 +90,7 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_identity(&self) -> StatusPage {
         self.clean();
-        let status = status::identity::new(self.tab_action.clone());
+        let status = status::identity::build(self.tab_action.clone());
         self.g_box.append(&status);
         status
     }
@@ -100,7 +100,7 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> StatusPage {
         self.clean();
-        let status = status::loading::new(show_with_delay);
+        let status = status::loading::build(show_with_delay);
         self.g_box.append(&status);
         status
     }

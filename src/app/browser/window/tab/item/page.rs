@@ -235,10 +235,22 @@ impl Page {
                         },
                         Response::Failure(failure) => match failure {
                             Failure::Status { message }
-                            | Failure::Mime { message }
+
                             | Failure::Error { message } => {
                                 // Update widget
                                 let status_page = content.to_status_failure();
+                                status_page.set_description(Some(&message));
+
+                                // Update meta
+                                status.replace(Status::Failure { time: now() });
+                                title.replace(status_page.title());
+
+                                // Update window
+                                browser_action.update.activate(Some(&id));
+                            }
+                            Failure::Mime { base, mime, message } => {
+                                // Update widget
+                                let status_page = content.to_status_mime(&mime, Some((&tab_action, &base)));
                                 status_page.set_description(Some(&message));
 
                                 // Update meta

@@ -85,6 +85,8 @@ pub fn handle(
                         })
                     }
                     mime => callback(Response::Failure(Failure::Mime {
+                        base,
+                        mime: mime.to_string(),
                         message: format!("Content type `{mime}` yet not supported"),
                     })),
                 } // @TODO handle `None`

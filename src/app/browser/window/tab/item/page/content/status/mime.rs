@@ -1,11 +1,11 @@
 use super::TabAction;
 use adw::StatusPage;
-use gtk::{glib::GString, prelude::ButtonExt, Align, Button};
+use gtk::{glib::Uri, prelude::ButtonExt, Align, Button};
 use std::rc::Rc;
 
 /// Create new default `GObject` preset for mime issue
 /// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-pub fn new(mime: &str, download: Option<(Rc<TabAction>, GString)>) -> StatusPage {
+pub fn build(mime: &str, download: Option<(&Rc<TabAction>, &Uri)>) -> StatusPage {
     let status_page = StatusPage::builder()
         .description(format!("Content type `{mime}` not supported!"))
         .icon_name("dialog-question-symbolic")
@@ -20,8 +20,14 @@ pub fn new(mime: &str, download: Option<(Rc<TabAction>, GString)>) -> StatusPage
             .tooltip_text("Download as file to open with external application")
             .build();
 
-        button.connect_clicked(move |_| {
-            action.load.activate(Some(request.as_str()), true);
+        button.connect_clicked({
+            let action = action.clone();
+            let request = request.clone();
+            move |_| {
+                action
+                    .load
+                    .activate(Some(&format!("download:{}", request.to_string())), true);
+            }
         });
 
         status_page.set_child(Some(&button));
