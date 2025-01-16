@@ -19,7 +19,7 @@ pub enum Response {
         cancellable: Cancellable,
     },
     Failure(Failure),
-    Gemtext {
+    TextGemini {
         base: Uri,
         source: GString,
         is_source_request: bool,

@@ -180,7 +180,7 @@ fn handle_gemini(
                         Priority::DEFAULT,
                         cancellable,
                         move |result| match result {
-                            Ok(text) => callback(Response::Gemtext {
+                            Ok(text) => callback(Response::TextGemini {
                                 base,
                                 source: text.data,
                                 is_source_request,

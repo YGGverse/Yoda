@@ -307,7 +307,7 @@ impl Page {
 
                             // @TODO request_async
                         }
-                        Response::Gemtext { base, source, is_source_request } => {
+                        Response::TextGemini { base, source, is_source_request } => {
                             let widget = if is_source_request {
                                 content.to_text_source(&source)
                             } else {
