@@ -7,7 +7,7 @@ pub use failure::Failure;
 pub use input::Input;
 
 use gtk::{
-    gio::IOStream,
+    gio::{Cancellable, IOStream},
     glib::{GString, Uri},
 };
 
@@ -16,6 +16,7 @@ pub enum Response {
     Download {
         base: Uri,
         stream: IOStream,
+        cancellable: Cancellable,
     },
     Failure(Failure),
     Gemtext {
@@ -32,5 +33,6 @@ pub enum Response {
         base: Uri,
         mime: String,
         stream: IOStream,
+        cancellable: Cancellable,
     },
 }

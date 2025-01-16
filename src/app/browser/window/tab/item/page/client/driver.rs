@@ -76,6 +76,7 @@ impl Driver {
                             Ok(response) => callback(Response::Download {
                                 base: uri.clone(),
                                 stream: response.connection.stream(),
+                                cancellable: cancellable.clone(),
                             }),
                             Err(e) => callback(Response::Failure(response::Failure::Error {
                                 message: e.to_string(),
@@ -192,6 +193,7 @@ fn handle_gemini(
                             base,
                             mime,
                             stream: response.connection.stream(),
+                            cancellable,
                         })
                     }
                     mime => callback(Response::Failure(response::Failure::Mime {

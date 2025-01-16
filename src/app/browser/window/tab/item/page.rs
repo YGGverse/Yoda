@@ -23,7 +23,6 @@ use crate::tool::now;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::Cancellable,
     glib::{gformat, GString, Priority, Uri},
     prelude::{EditableExt, FileExt},
 };
@@ -329,11 +328,7 @@ impl Page {
                             window_action.find.simple_action.set_enabled(true);
                             browser_action.update.activate(Some(&id));
                         }
-                        Response::Download { base, stream } => {
-                            // @TODO use `client` wrapper
-
-                            let cancellable = Cancellable::new(); // @TODO share with `client`
-
+                        Response::Download { base, cancellable, stream } => {
                             // Init download widget
                             let status_page = content.to_status_download(
                                 &uri_to_title(&base), // grab default filename from base URI
@@ -349,6 +344,10 @@ impl Page {
                                             Some(&cancellable)
                                         ) {
                                             Ok(file_output_stream) => {
+                                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                                // show bytes count in loading widget, validate max size for incoming data
+                                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
                                                 gemini::gio::file_output_stream::move_all_from_stream_async(
                                                     stream.clone(),
                                                     file_output_stream,
@@ -396,7 +395,7 @@ impl Page {
                             // Update window
                             browser_action.update.activate(Some(&id));
                         }
-                        Response::Stream { base, mime, stream } => match mime.as_str() {
+                        Response::Stream { base, mime, stream, cancellable } => match mime.as_str() {
                             // @TODO use client-side const or enum?
                             "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                 // Final image size unknown, show loading widget
@@ -404,12 +403,10 @@ impl Page {
                                     Some(Duration::from_secs(1)), // show if download time > 1 second
                                 );
 
-                                // @TODO use `client` wrapper
-
-                                let cancellable = Cancellable::new(); // @TODO share with `client`
-
-                                // Asynchronously move `InputStream` data from `SocketConnection` into the local `MemoryInputStream`
-                                // this action allows to count the bytes for loading widget and validate max size for incoming data
+                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                // show bytes count in loading widget, validate max size for incoming data
+                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
                                 gemini::gio::memory_input_stream::from_stream_async(
                                     stream,
                                     cancellable.clone(),
