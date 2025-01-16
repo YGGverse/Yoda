@@ -68,7 +68,7 @@ impl Driver {
     // Actions
 
     /// Make new async `Feature` request
-    /// * return shared `Response` as the callback
+    /// * return `Response` in callback function
     pub fn feature_async(
         &self,
         feature: Feature,
@@ -79,16 +79,16 @@ impl Driver {
             Feature::Download { request } => match request {
                 Request::Gemini { uri } => {
                     gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
-                        match result {
-                            Ok(response) => callback(Response::Download {
+                        callback(match result {
+                            Ok(response) => Response::Download {
                                 base: uri.clone(),
                                 stream: response.connection.stream(),
                                 cancellable: cancellable.clone(),
-                            }),
-                            Err(e) => callback(Response::Failure(Failure::Error {
+                            },
+                            Err(e) => Response::Failure(Failure::Error {
                                 message: e.to_string(),
-                            })),
-                        }
+                            }),
+                        })
                     })
                 }
                 _ => todo!(),
