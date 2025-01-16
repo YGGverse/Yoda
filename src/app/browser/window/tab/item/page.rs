@@ -349,7 +349,7 @@ impl Page {
                                                 // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                                 // show bytes count in loading widget, validate max size for incoming data
                                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                                gemini::gio::file_output_stream::move_all_from_stream_async(
+                                                ggemini::gio::file_output_stream::move_all_from_stream_async(
                                                     stream.clone(),
                                                     file_output_stream,
                                                     cancellable.clone(),
@@ -408,7 +408,7 @@ impl Page {
                                 // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                 // show bytes count in loading widget, validate max size for incoming data
                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                gemini::gio::memory_input_stream::from_stream_async(
+                                ggemini::gio::memory_input_stream::from_stream_async(
                                     stream,
                                     cancellable.clone(),
                                     Priority::DEFAULT,

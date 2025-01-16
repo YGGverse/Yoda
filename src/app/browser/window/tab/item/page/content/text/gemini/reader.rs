@@ -11,7 +11,7 @@ use widget::Widget;
 
 use super::{TabAction, WindowAction};
 use crate::app::browser::window::action::Position;
-use gemtext::line::{
+use ggemtext::line::{
     code::{Inline, Multiline},
     header::{Header, Level},
     link::Link,

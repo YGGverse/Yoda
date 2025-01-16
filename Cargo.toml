@@ -15,14 +15,6 @@ package = "libadwaita"
 version = "0.7.0"
 features = ["v1_5"]
 
-[dependencies.gemini]
-package = "ggemini"
-version = "0.14.0"
-
-[dependencies.gemtext]
-package = "ggemtext"
-version = "0.3.0"
-
 [dependencies.gtk]
 package = "gtk4"
 version = "0.9.4"
@@ -38,6 +30,8 @@ version = "0.9.1"
 
 [dependencies]
 ansi-parser = "0.9.1"
+ggemini = "0.14.0"
+ggemtext = "0.3.0"
 indexmap = "2.7.0"
 itertools = "0.14.0"
 libspelling = "0.3.0"
