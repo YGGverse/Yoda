@@ -91,7 +91,9 @@ impl Driver {
                         })
                     })
                 }
-                _ => todo!(),
+                _ => callback(Response::Failure(Failure::Error {
+                    message: "Download feature yet not supported for this request".to_string(),
+                })), // @TODO or maybe panic as unexpected
             },
             Feature::Default { request } => match request {
                 Request::Gemini { uri } => {
@@ -120,8 +122,9 @@ impl Driver {
                         )
                     })
                 }
-                Request::Titan { .. } => todo!(),
-                Request::Undefined => todo!(),
+                _ => callback(Response::Failure(Failure::Error {
+                    message: "Source view feature yet not supported for this request".to_string(),
+                })), // @TODO or maybe panic as unexpected
             },
         }
     }
