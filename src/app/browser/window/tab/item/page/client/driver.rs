@@ -29,8 +29,11 @@ pub struct Driver {
 }
 
 impl Driver {
+    // Constructors
+
+    /// Init new `Self`
     pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
-        // Init protocol driver libraries
+        // Init supported protocol libraries
         let gemini = ggemini::Client::new();
 
         // Translate driver status to `Status`
@@ -62,6 +65,10 @@ impl Driver {
         }
     }
 
+    // Actions
+
+    /// Make new async `Feature` request
+    /// * return shared `Response` as the callback
     pub fn feature_async(
         &self,
         feature: Feature,
