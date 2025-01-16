@@ -66,7 +66,10 @@ impl Save {
                                     .filters(&filters)
                                     .initial_name(format!(
                                         "{}.pem",
-                                        certificate.name.replace(MAIN_SEPARATOR, "-")
+                                        certificate
+                                            .name
+                                            .trim_matches(MAIN_SEPARATOR)
+                                            .replace(MAIN_SEPARATOR, "-")
                                     ))
                                     .build()
                                     .save(Window::NONE, Cancellable::NONE, {

@@ -27,7 +27,7 @@ use gtk::{
     prelude::{EditableExt, FileExt},
 };
 use sqlite::Transaction;
-use std::{cell::RefCell, rc::Rc, time::Duration};
+use std::{cell::RefCell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
 pub struct Page {
     id: Rc<GString>,
@@ -331,7 +331,8 @@ impl Page {
                         Response::Download { base, cancellable, stream } => {
                             // Init download widget
                             let status_page = content.to_status_download(
-                                &uri_to_title(&base), // grab default filename from base URI
+                                uri_to_title(&base).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                                                                                  // format FS entities
                                 &cancellable,
                                 {
                                     let cancellable = cancellable.clone();
@@ -609,19 +610,17 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 }
 
 /// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-///
-/// Useful as common placeholder when page title could not be detected
-///
+/// * useful as common placeholder when page title could not be detected
 /// * this feature may be improved and moved outside @TODO
 fn uri_to_title(uri: &Uri) -> GString {
-    let title = uri.path();
-    if title.split('/').last().unwrap_or_default().is_empty() {
+    let path = uri.path();
+    if path.split('/').last().unwrap_or_default().is_empty() {
         match uri.host() {
             Some(host) => host,
-            None => gformat!("Untitled"),
+            None => "Untitled".into(),
         }
     } else {
-        title
+        path
     }
 }
 

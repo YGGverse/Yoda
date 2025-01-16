@@ -31,7 +31,7 @@ const TITLE: &str = "Download";
 /// preset with children widget contain download UI
 /// * apply callback function on destination [File](https://docs.gtk.org/gio/iface.File.html) selected
 /// * require external IOStream read/write implementation (depending of protocol)
-pub fn new(
+pub fn build(
     initial_filename: &str,
     cancellable: &Cancellable,
     on_choose: impl Fn(File, Rc<Action>) + 'static,

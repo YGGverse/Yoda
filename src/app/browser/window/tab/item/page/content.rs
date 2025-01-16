@@ -56,7 +56,7 @@ impl Content {
         on_choose: impl Fn(File, Rc<status::download::Action>) + 'static,
     ) -> StatusPage {
         self.clean();
-        let status = status::download::new(initial_filename, cancellable, on_choose);
+        let status = status::download::build(initial_filename, cancellable, on_choose);
         self.g_box.append(&status);
         status
     }
