@@ -234,9 +234,7 @@ impl Page {
                             }
                         },
                         Response::Failure(failure) => match failure {
-                            Failure::Status { message }
-
-                            | Failure::Error { message } => {
+                            Failure::Status { message } | Failure::Error { message } => {
                                 // Update widget
                                 let status_page = content.to_status_failure();
                                 status_page.set_description(Some(&message));
