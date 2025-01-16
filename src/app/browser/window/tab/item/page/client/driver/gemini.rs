@@ -1,4 +1,7 @@
-use super::{response, Driver, Response};
+use super::{
+    response::{Certificate, Failure, Input},
+    Driver, Response,
+};
 use gtk::{
     gio::Cancellable,
     glib::{gformat, Priority, Uri},
@@ -42,14 +45,14 @@ pub fn handle(
     match result {
         Ok(response) => match response.meta.status {
             // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-            Status::Input => callback(Response::Input(response::Input::Response {
+            Status::Input => callback(Response::Input(Input::Response {
                 base,
                 title: match response.meta.data {
                     Some(data) => data.value,
                     None => gformat!("Input expected"),
                 },
             })),
-            Status::SensitiveInput => callback(Response::Input(response::Input::Sensitive {
+            Status::SensitiveInput => callback(Response::Input(Input::Sensitive {
                 base,
                 title: match response.meta.data {
                     Some(data) => data.value,
@@ -81,8 +84,8 @@ pub fn handle(
                             cancellable,
                         })
                     }
-                    mime => callback(Response::Failure(response::Failure::Mime {
-                        message: format!("Undefined content type `{mime}`"),
+                    mime => callback(Response::Failure(Failure::Mime {
+                        message: format!("Content type `{mime}` yet not supported"),
                     })),
                 } // @TODO handle `None`
             }
@@ -90,17 +93,15 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
             Status::Redirect | Status::PermanentRedirect => todo!(),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-            Status::CertificateRequest => {
-                callback(Response::Certificate(response::Certificate::Request {
-                    title: match response.meta.data {
-                        Some(data) => data.value,
-                        None => gformat!("Client certificate required"),
-                    },
-                }))
-            }
+            Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
+                title: match response.meta.data {
+                    Some(data) => data.value,
+                    None => gformat!("Client certificate required"),
+                },
+            })),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
             Status::CertificateUnauthorized => {
-                callback(Response::Certificate(response::Certificate::Request {
+                callback(Response::Certificate(Certificate::Request {
                     title: match response.meta.data {
                         Some(data) => data.value,
                         None => gformat!("Certificate not authorized"),
@@ -108,19 +109,17 @@ pub fn handle(
                 }))
             }
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-            Status::CertificateInvalid => {
-                callback(Response::Certificate(response::Certificate::Request {
-                    title: match response.meta.data {
-                        Some(data) => data.value,
-                        None => gformat!("Certificate not valid"),
-                    },
-                }))
-            }
-            status => callback(Response::Failure(response::Failure::Status {
+            Status::CertificateInvalid => callback(Response::Certificate(Certificate::Request {
+                title: match response.meta.data {
+                    Some(data) => data.value,
+                    None => gformat!("Certificate not valid"),
+                },
+            })),
+            status => callback(Response::Failure(Failure::Status {
                 message: format!("Undefined status code `{:?}`", status), // @TODO implement display trait for `ggemini` lib
             })),
         },
-        Err(e) => callback(Response::Failure(response::Failure::Error {
+        Err(e) => callback(Response::Failure(Failure::Error {
             message: e.to_string(),
         })),
     }
