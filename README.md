@@ -3,7 +3,7 @@
 GTK 4 / Libadwaita client written in Rust
 
 > [!IMPORTANT]
-> Project in development!
+> Project in development, for stable version use crates.io release!
 >
 
 ![image](https://github.com/user-attachments/assets/cfbbc3fb-61d2-4afd-a21f-8e36ee329941)
