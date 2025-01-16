@@ -10,7 +10,7 @@ use redirect::Redirect;
 pub use status::Status;
 
 // Global dependencies
-use super::{feature, response, Feature, Response};
+use super::{feature::Request, response, response::Failure, Feature, Response};
 use crate::{tool::now, Profile};
 use gtk::{
     gio::{Cancellable, SocketClientEvent},
@@ -77,7 +77,7 @@ impl Driver {
     ) {
         match feature {
             Feature::Download { request } => match request {
-                feature::Request::Gemini { uri } => {
+                Request::Gemini { uri } => {
                     gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
                         match result {
                             Ok(response) => callback(Response::Download {
@@ -85,7 +85,7 @@ impl Driver {
                                 stream: response.connection.stream(),
                                 cancellable: cancellable.clone(),
                             }),
-                            Err(e) => callback(Response::Failure(response::Failure::Error {
+                            Err(e) => callback(Response::Failure(Failure::Error {
                                 message: e.to_string(),
                             })),
                         }
@@ -94,7 +94,7 @@ impl Driver {
                 _ => todo!(),
             },
             Feature::Default { request } => match request {
-                feature::Request::Gemini { uri } => {
+                Request::Gemini { uri } => {
                     gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
                         gemini::handle(
                             result,
@@ -105,11 +105,11 @@ impl Driver {
                         )
                     })
                 }
-                feature::Request::Titan { .. } => todo!(),
-                feature::Request::Undefined => todo!(),
+                Request::Titan { .. } => todo!(),
+                Request::Undefined => todo!(),
             },
             Feature::Source { request } => match request {
-                feature::Request::Gemini { uri } => {
+                Request::Gemini { uri } => {
                     gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
                         gemini::handle(
                             result,
@@ -120,8 +120,8 @@ impl Driver {
                         )
                     })
                 }
-                feature::Request::Titan { .. } => todo!(),
-                feature::Request::Undefined => todo!(),
+                Request::Titan { .. } => todo!(),
+                Request::Undefined => todo!(),
             },
         }
     }
