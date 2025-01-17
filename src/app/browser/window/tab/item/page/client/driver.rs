@@ -38,9 +38,7 @@ impl Driver {
         // Init supported protocol libraries
         let gemini = Rc::new(ggemini::Client::new());
 
-        // Translate driver status to `Status`
-
-        // Gemini
+        // Retransmit gemini [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html) updates
         gemini.socket.connect_event(move |_, event, _, _| {
             callback(match event {
                 SocketClientEvent::Resolving => Status::Resolving { time: now() },
