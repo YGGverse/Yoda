@@ -24,7 +24,9 @@ pub struct Driver {
     /// Redirect resolver for different protocols
     redirect: Rc<Redirect>,
     /// Supported clients
-    gemini: ggemini::Client,
+    /// * gemini driver should be initiated once (on page object init)
+    ///   to process all it connection features properly
+    gemini: Rc<ggemini::Client>,
     // other clients here..
 }
 
@@ -34,7 +36,7 @@ impl Driver {
     /// Init new `Self`
     pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
         // Init supported protocol libraries
-        let gemini = ggemini::Client::new();
+        let gemini = Rc::new(ggemini::Client::new());
 
         // Translate driver status to `Status`
 
