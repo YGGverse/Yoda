@@ -92,8 +92,15 @@ pub fn handle(
                 } // @TODO handle `None`
             }
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
+            Status::Redirect => callback(Response::Redirect {
+                request: base,
+                is_foreground: false,
+            }),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-            Status::Redirect | Status::PermanentRedirect => todo!(),
+            Status::PermanentRedirect => callback(Response::Redirect {
+                request: base,
+                is_foreground: true,
+            }),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
             Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
