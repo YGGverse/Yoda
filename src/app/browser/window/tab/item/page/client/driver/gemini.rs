@@ -1,6 +1,6 @@
 use super::{
     response::{Certificate, Failure, Input},
-    Driver, Response,
+    Profile, Response,
 };
 use gtk::{
     gio::Cancellable,
@@ -10,18 +10,20 @@ use std::rc::Rc;
 
 /// Shared request interface for Gemini protocol
 pub fn request_async(
-    driver: &Driver,
+    profile: &Rc<Profile>,
+    client: &Rc<ggemini::Client>,
     uri: Uri,
     cancellable: Cancellable,
     callback: impl Fn(Result<ggemini::client::Response, ggemini::client::Error>) + 'static,
 ) {
-    driver.gemini.request_async(
-        ggemini::client::Request::gemini(uri.clone()),
+    let request = uri.to_string();
+    client.request_async(
+        ggemini::client::Request::gemini(uri),
         Priority::DEFAULT,
-        cancellable.clone(),
+        cancellable,
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
-        match driver.profile.identity.gemini.match_scope(&uri.to_string()) {
+        match profile.identity.gemini.match_scope(&request) {
             Some(identity) => match identity.to_tls_certificate() {
                 Ok(certificate) => Some(certificate),
                 Err(_) => todo!(),

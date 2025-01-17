@@ -77,8 +77,12 @@ impl Driver {
     ) {
         match feature {
             Feature::Download { request } => match request {
-                Request::Gemini { uri } => {
-                    gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
+                Request::Gemini { uri } => gemini::request_async(
+                    &self.profile,
+                    &self.gemini,
+                    uri.clone(),
+                    cancellable.clone(),
+                    move |result| {
                         callback(match result {
                             Ok(response) => Response::Download {
                                 base: uri.clone(),
@@ -89,15 +93,19 @@ impl Driver {
                                 message: e.to_string(),
                             }),
                         })
-                    })
-                }
+                    },
+                ),
                 _ => callback(Response::Failure(Failure::Error {
                     message: "Download feature yet not supported for this request".to_string(),
                 })), // @TODO or maybe panic as unexpected
             },
             Feature::Default { request } => match request {
-                Request::Gemini { uri } => {
-                    gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
+                Request::Gemini { uri } => gemini::request_async(
+                    &self.profile,
+                    &self.gemini,
+                    uri.clone(),
+                    cancellable.clone(),
+                    move |result| {
                         gemini::handle(
                             result,
                             uri.clone(),
@@ -105,14 +113,18 @@ impl Driver {
                             false,
                             callback.clone(),
                         )
-                    })
-                }
+                    },
+                ),
                 Request::Titan { .. } => todo!(),
                 Request::Undefined => todo!(),
             },
             Feature::Source { request } => match request {
-                Request::Gemini { uri } => {
-                    gemini::request_async(self, uri.clone(), cancellable.clone(), move |result| {
+                Request::Gemini { uri } => gemini::request_async(
+                    &self.profile,
+                    &self.gemini,
+                    uri.clone(),
+                    cancellable.clone(),
+                    move |result| {
                         gemini::handle(
                             result,
                             uri.clone(),
@@ -120,8 +132,8 @@ impl Driver {
                             true,
                             callback.clone(),
                         )
-                    })
-                }
+                    },
+                ),
                 _ => callback(Response::Failure(Failure::Error {
                     message: "Source view feature yet not supported for this request".to_string(),
                 })), // @TODO or maybe panic as unexpected
