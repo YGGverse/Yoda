@@ -147,7 +147,7 @@ pub fn handle(
                 },
             })),
             status => callback(Response::Failure(Failure::Status {
-                message: format!("Undefined status code `{:?}`", status), // @TODO implement display trait for `ggemini` lib
+                message: format!("Undefined status code `{status}`"),
             })),
         },
         Err(e) => callback(Response::Failure(Failure::Error {
