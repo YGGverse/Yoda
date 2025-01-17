@@ -81,7 +81,7 @@ impl Page {
 
         let status = Rc::new(RefCell::new(Status::New { time: now() }));
 
-        let client = Rc::new(Client::init(&profile, {
+        let client = Rc::new(Client::init(profile, {
             let id = id.clone();
             let status = status.clone();
             let update = browser_action.update.clone();
