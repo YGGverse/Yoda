@@ -31,7 +31,9 @@ impl Client {
     pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            driver: Driver::init(profile, move |status| callback(Status::Driver(status))),
+            driver: Driver::init(profile.clone(), move |status| {
+                callback(Status::Driver(status))
+            }),
             status: Rc::new(RefCell::new(Status::Cancellable { time: now() })), // e.g. "ready to use"
         }
     }

@@ -2,11 +2,9 @@
 //! by extending it features with new protocol, please make sub-module implementation
 
 mod gemini;
-mod redirect;
 pub mod status;
 
 // Local dependencies
-use redirect::Redirect;
 pub use status::Status;
 
 // Global dependencies
@@ -19,10 +17,8 @@ use gtk::{
 use std::rc::Rc;
 
 pub struct Driver {
-    /// Profile reference required for Gemini protocol auth (match request)
+    /// Profile reference required for Gemini protocol auth (match scope)
     profile: Rc<Profile>,
-    /// Redirect resolver for different protocols
-    redirect: Rc<Redirect>,
     /// Supported clients
     /// * gemini driver should be initiated once (on page object init)
     ///   to process all it connection features properly
@@ -34,7 +30,7 @@ impl Driver {
     // Constructors
 
     /// Init new `Self`
-    pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
+    pub fn init(profile: Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
         // Init supported protocol libraries
         let gemini = Rc::new(ggemini::Client::new());
 
@@ -58,11 +54,7 @@ impl Driver {
         // other client listeners here..
 
         // Done
-        Self {
-            profile: profile.clone(),
-            redirect: Rc::new(Redirect::new()),
-            gemini,
-        }
+        Self { profile, gemini }
     }
 
     // Actions
