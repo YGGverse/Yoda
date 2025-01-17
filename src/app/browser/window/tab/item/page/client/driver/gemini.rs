@@ -4,7 +4,7 @@ use super::{
 };
 use gtk::{
     gio::Cancellable,
-    glib::{Priority, Uri},
+    glib::{Priority, Uri, UriFlags},
 };
 use std::rc::Rc;
 
@@ -94,15 +94,37 @@ pub fn handle(
                 } // @TODO handle `None`
             }
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-            Status::Redirect => callback(Response::Redirect {
-                request: base,
-                is_foreground: false,
-            }),
+            Status::Redirect => callback(match response.meta.data {
+                Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
+                    Ok(request) => Response::Redirect {
+                        referrer: base,
+                        request,
+                        is_foreground: false,
+                    },
+                    Err(e) => Response::Failure(Failure::Error {
+                        message: format!("Could not parse target address: {}", e.message()),
+                    }),
+                },
+                None => Response::Failure(Failure::Error {
+                    message: "Target address not found".to_string(),
+                }),
+            }), // @TODO validate redirect count
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-            Status::PermanentRedirect => callback(Response::Redirect {
-                request: base,
-                is_foreground: true,
-            }),
+            Status::PermanentRedirect => callback(match response.meta.data {
+                Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
+                    Ok(request) => Response::Redirect {
+                        referrer: base,
+                        request,
+                        is_foreground: true,
+                    },
+                    Err(e) => Response::Failure(Failure::Error {
+                        message: format!("Could not parse target address: {}", e.message()),
+                    }),
+                },
+                None => Response::Failure(Failure::Error {
+                    message: "Target address not found".to_string(),
+                }),
+            }), // @TODO validate redirect count
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
             Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {

@@ -302,11 +302,12 @@ impl Page {
                             }
                         },
                         Response::Redirect {
+                            referrer,
                             request,
                             is_foreground,
                         } => {
-                            // Some protocols may support foreground redirects
-                            // for example status code `31` in Gemini
+                            // Some clients may support foreground redirects
+                            // e.g. status code `31` in Gemini protocol
                             if is_foreground {
                                 navigation
                                     .request

@@ -29,8 +29,9 @@ pub enum Response {
     },
     Input(Input),
     Redirect {
-        request: Uri,
         is_foreground: bool,
+        referrer: Uri,
+        request: Uri,
     },
     Stream {
         base: Uri,
