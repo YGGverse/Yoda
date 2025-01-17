@@ -194,7 +194,7 @@ impl Page {
             snap_history(&self.profile, &self.navigation, None); // @TODO
         }
 
-        use client::response::{Certificate, Failure, Input};
+        use client::response::{Certificate, Failure, Input, Redirect};
         use client::Response;
 
         self.client
@@ -211,7 +211,7 @@ impl Page {
                 let window_action = self.window_action.clone();
                 move |response| {
                     match response {
-                        Response::Certificate(certificate) => match certificate {
+                        Response::Certificate(this) => match this {
                             Certificate::Invalid {
                                 title: certificate_title,
                             }
@@ -233,7 +233,7 @@ impl Page {
                                 browser_action.update.activate(Some(&id));
                             }
                         },
-                        Response::Failure(failure) => match failure {
+                        Response::Failure(this) => match this {
                             Failure::Status { message } | Failure::Error { message } => {
                                 // Update widget
                                 let status_page = content.to_status_failure();
@@ -259,7 +259,7 @@ impl Page {
                                 browser_action.update.activate(Some(&id));
                             }
                         },
-                        Response::Input(response_input) => match response_input {
+                        Response::Input(this) => match this {
                             Input::Response {
                                 base,
                                 title: response_title,
@@ -301,22 +301,13 @@ impl Page {
                                 browser_action.update.activate(Some(&id));
                             }
                         },
-                        Response::Redirect {
-                            referrer,
-                            request,
-                            is_foreground,
-                        } => {
-                            // Some clients may support foreground redirects
-                            // e.g. status code `31` in Gemini protocol
-                            if is_foreground {
-                                navigation
-                                    .request
-                                    .widget
-                                    .entry
-                                    .set_text(&request.to_string());
-                            }
-
-                            // @TODO request_async
+                        Response::Redirect(this) => match this {
+                            Redirect::Background { source, target } => todo!(), // @TODO
+                            Redirect::Foreground { source, target } => navigation
+                            .request
+                            .widget
+                            .entry
+                            .set_text(&target.to_string()) // @TODO
                         }
                         Response::TextGemini { base, source, is_source_request } => {
                             let widget = if is_source_request {

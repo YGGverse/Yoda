@@ -1,5 +1,5 @@
 use super::{
-    response::{Certificate, Failure, Input},
+    response::{Certificate, Failure, Input, Redirect},
     Profile, Response,
 };
 use gtk::{
@@ -96,13 +96,12 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
             Status::Redirect => callback(match response.meta.data {
                 Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
-                    Ok(request) => Response::Redirect {
-                        referrer: base,
-                        request,
-                        is_foreground: false,
-                    },
+                    Ok(target) => Response::Redirect(Redirect::Foreground {
+                        source: base,
+                        target,
+                    }),
                     Err(e) => Response::Failure(Failure::Error {
-                        message: format!("Could not parse target address: {}", e.message()),
+                        message: format!("Could not parse target address: {e}"),
                     }),
                 },
                 None => Response::Failure(Failure::Error {
@@ -112,13 +111,12 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
             Status::PermanentRedirect => callback(match response.meta.data {
                 Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
-                    Ok(request) => Response::Redirect {
-                        referrer: base,
-                        request,
-                        is_foreground: true,
-                    },
+                    Ok(target) => Response::Redirect(Redirect::Background {
+                        source: base,
+                        target,
+                    }),
                     Err(e) => Response::Failure(Failure::Error {
-                        message: format!("Could not parse target address: {}", e.message()),
+                        message: format!("Could not parse target address: {e}"),
                     }),
                 },
                 None => Response::Failure(Failure::Error {

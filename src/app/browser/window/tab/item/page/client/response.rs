@@ -1,11 +1,13 @@
 pub mod certificate;
 pub mod failure;
 pub mod input;
+pub mod redirect;
 
 // Local dependencies
 pub use certificate::Certificate;
 pub use failure::Failure;
 pub use input::Input;
+pub use redirect::Redirect;
 
 // Global dependencies
 use gtk::{
@@ -28,11 +30,7 @@ pub enum Response {
         is_source_request: bool,
     },
     Input(Input),
-    Redirect {
-        is_foreground: bool,
-        referrer: Uri,
-        request: Uri,
-    },
+    Redirect(Redirect),
     Stream {
         base: Uri,
         mime: String,
