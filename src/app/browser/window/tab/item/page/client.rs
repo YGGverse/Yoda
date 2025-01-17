@@ -42,7 +42,7 @@ impl Client {
 
     /// Begin new request
     /// * the `query` as string, to support system routes (e.g. `source:` prefix)
-    pub fn request_async(&self, request: &str, callback: impl Fn(Response) + 'static) {
+    pub fn request_async(&self, request: &str, callback: impl FnOnce(Response) + 'static) {
         // Update client status
         self.status.replace(Status::Request {
             time: now(),
@@ -52,7 +52,7 @@ impl Client {
         self.driver.feature_async(
             Feature::from_string(request),
             self.new_cancellable(),
-            Rc::new(callback),
+            callback,
         );
     }
 

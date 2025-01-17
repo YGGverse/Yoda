@@ -65,7 +65,7 @@ impl Driver {
         &self,
         feature: Feature,
         cancellable: Cancellable,
-        callback: Rc<impl Fn(Response) + 'static>,
+        callback: impl FnOnce(Response) + 'static,
     ) {
         match feature {
             Feature::Download { request } => match request {
@@ -98,13 +98,7 @@ impl Driver {
                     uri.clone(),
                     cancellable.clone(),
                     move |result| {
-                        gemini::handle(
-                            result,
-                            uri.clone(),
-                            cancellable.clone(),
-                            false,
-                            callback.clone(),
-                        )
+                        gemini::handle(result, uri.clone(), cancellable.clone(), false, callback)
                     },
                 ),
                 Request::Titan { .. } => todo!(),
@@ -117,13 +111,7 @@ impl Driver {
                     uri.clone(),
                     cancellable.clone(),
                     move |result| {
-                        gemini::handle(
-                            result,
-                            uri.clone(),
-                            cancellable.clone(),
-                            true,
-                            callback.clone(),
-                        )
+                        gemini::handle(result, uri.clone(), cancellable.clone(), true, callback)
                     },
                 ),
                 _ => callback(Response::Failure(Failure::Error {

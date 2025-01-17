@@ -14,7 +14,7 @@ pub fn request_async(
     client: &Rc<ggemini::Client>,
     uri: Uri,
     cancellable: Cancellable,
-    callback: impl Fn(Result<ggemini::client::Response, ggemini::client::Error>) + 'static,
+    callback: impl FnOnce(Result<ggemini::client::Response, ggemini::client::Error>) + 'static,
 ) {
     let request = uri.to_string();
     client.request_async(
@@ -41,7 +41,7 @@ pub fn handle(
     base: Uri,
     cancellable: Cancellable,
     is_source_request: bool, // @TODO yet partial implementation
-    callback: Rc<impl Fn(Response) + 'static>,
+    callback: impl FnOnce(Response) + 'static,
 ) {
     use ggemini::client::connection::response::{data::Text, meta::Status};
     match result {
