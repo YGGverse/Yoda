@@ -30,7 +30,7 @@ pub fn request_async(
             },
             None => None,
         },
-        move |result| callback(result),
+        callback,
     )
 }
 
