@@ -77,9 +77,9 @@ impl Driver {
                     move |result| {
                         callback(match result {
                             Ok(response) => Response::Download {
-                                base: uri.clone(),
+                                base: uri,
                                 stream: response.connection.stream(),
-                                cancellable: cancellable.clone(),
+                                cancellable,
                             },
                             Err(e) => Response::Failure(Failure::Error {
                                 message: e.to_string(),
@@ -97,9 +97,7 @@ impl Driver {
                     &self.gemini,
                     uri.clone(),
                     cancellable.clone(),
-                    move |result| {
-                        gemini::handle(result, uri.clone(), cancellable.clone(), false, callback)
-                    },
+                    move |result| gemini::handle(result, uri, cancellable, false, callback),
                 ),
                 Request::Titan { .. } => todo!(),
                 Request::Undefined => todo!(),
@@ -110,9 +108,7 @@ impl Driver {
                     &self.gemini,
                     uri.clone(),
                     cancellable.clone(),
-                    move |result| {
-                        gemini::handle(result, uri.clone(), cancellable.clone(), true, callback)
-                    },
+                    move |result| gemini::handle(result, uri, cancellable, true, callback),
                 ),
                 _ => callback(Response::Failure(Failure::Error {
                     message: "Source view feature yet not supported for this request".to_string(),
