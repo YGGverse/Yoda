@@ -4,7 +4,7 @@ use super::{
 };
 use gtk::{
     gio::Cancellable,
-    glib::{gformat, Priority, Uri},
+    glib::{Priority, Uri},
 };
 use std::rc::Rc;
 
@@ -51,14 +51,14 @@ pub fn handle(
                 base,
                 title: match response.meta.data {
                     Some(data) => data.value,
-                    None => gformat!("Input expected"),
+                    None => "Input expected".into(),
                 },
             })),
             Status::SensitiveInput => callback(Response::Input(Input::Sensitive {
                 base,
                 title: match response.meta.data {
                     Some(data) => data.value,
-                    None => gformat!("Input expected"),
+                    None => "Input expected".into(),
                 },
             })),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
@@ -107,7 +107,7 @@ pub fn handle(
             Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
                     Some(data) => data.value,
-                    None => gformat!("Client certificate required"),
+                    None => "Client certificate required".into(),
                 },
             })),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
@@ -115,7 +115,7 @@ pub fn handle(
                 callback(Response::Certificate(Certificate::Request {
                     title: match response.meta.data {
                         Some(data) => data.value,
-                        None => gformat!("Certificate not authorized"),
+                        None => "Certificate not authorized".into(),
                     },
                 }))
             }
@@ -123,7 +123,7 @@ pub fn handle(
             Status::CertificateInvalid => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
                     Some(data) => data.value,
-                    None => gformat!("Certificate not valid"),
+                    None => "Certificate not valid".into(),
                 },
             })),
             status => callback(Response::Failure(Failure::Status {
