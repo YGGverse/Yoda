@@ -71,7 +71,7 @@ impl Request {
 
     // Getters
 
-    /// Get reference to `Self` [URI](https://docs.gtk.org/glib/struct.Uri.html)
+    /// Get reference to `Self` [Uri](https://docs.gtk.org/glib/struct.Uri.html)
     pub fn as_uri(&self) -> &Uri {
         match self {
             Self::Gemini {
