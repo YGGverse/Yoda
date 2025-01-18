@@ -1,7 +1,7 @@
 //! Some shared helpers collection
 
 // Global dependencies
-use gtk::glib::{DateTime, GString, Uri};
+use gtk::glib::{DateTime, GString};
 
 /// Format bytes to KB/MB/GB presentation
 pub fn format_bytes(value: usize) -> String {
@@ -34,14 +34,3 @@ pub fn format_time(t: &DateTime) -> GString {
 pub fn now() -> DateTime {
     DateTime::now_local().unwrap() // @TODO handle?
 }
-
-/// Compare `subject` with `base`
-pub fn _is_external(subject: &Uri, base: &Uri) -> bool {
-    if subject.scheme() != base.scheme() {
-        return true;
-    }
-    if subject.port() != base.port() {
-        return true;
-    }
-    subject.host() != base.host()
-} // @TODO not in use

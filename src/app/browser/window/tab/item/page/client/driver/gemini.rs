@@ -2,6 +2,7 @@ use super::{
     response::{Certificate, Failure, Input, Redirect},
     Profile, Request, Response,
 };
+
 use gtk::{
     gio::Cancellable,
     glib::{Priority, Uri, UriFlags},
@@ -99,39 +100,23 @@ pub fn handle(
                 })),
             },
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-            Status::Redirect => callback(match response.meta.data {
-                Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
-                    Ok(target) => Response::Redirect(Redirect::Foreground(Request::build(
-                        &target.to_string(),
-                        Some(referrer),
-                        cancellable,
-                        priority,
-                    ))),
-                    Err(e) => Response::Failure(Failure::Error {
-                        message: format!("Could not parse target address: {e}"),
-                    }),
-                },
-                None => Response::Failure(Failure::Error {
-                    message: "Target address not found".to_string(),
-                }),
-            }), // @TODO validate redirect count
+            Status::Redirect => callback(redirect(
+                response.meta.data,
+                base,
+                referrer,
+                cancellable,
+                priority,
+                false,
+            )),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-            Status::PermanentRedirect => callback(match response.meta.data {
-                Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
-                    Ok(target) => Response::Redirect(Redirect::Background(Request::build(
-                        &target.to_string(),
-                        Some(referrer),
-                        cancellable,
-                        priority,
-                    ))),
-                    Err(e) => Response::Failure(Failure::Error {
-                        message: format!("Could not parse target address: {e}"),
-                    }),
-                },
-                None => Response::Failure(Failure::Error {
-                    message: "Target address not found".to_string(),
-                }),
-            }), // @TODO validate redirect count
+            Status::PermanentRedirect => callback(redirect(
+                response.meta.data,
+                base,
+                referrer,
+                cancellable,
+                priority,
+                true,
+            )),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
             Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
@@ -162,5 +147,56 @@ pub fn handle(
         Err(e) => callback(Response::Failure(Failure::Error {
             message: e.to_string(),
         })),
+    }
+}
+
+/// Shared redirection `Response` builder
+fn redirect(
+    data: Option<ggemini::client::connection::response::meta::Data>,
+    base: Uri,
+    referrer: Vec<Request>,
+    cancellable: Cancellable,
+    priority: Priority,
+    is_foreground: bool,
+) -> Response {
+    // Validate redirect according to
+    // [Gemini protocol specifications](https://geminiprotocol.net/docs/protocol-specification.gmi#redirection)
+    if referrer.len() > 5 {
+        return Response::Failure(Failure::Error {
+            message: format!("Max redirection count reached"),
+        });
+    }
+    match data {
+        Some(target) => match Uri::parse_relative(&base, target.as_str(), UriFlags::NONE) {
+            Ok(target) => {
+                // Disallow external redirection
+                if base.scheme() != target.scheme()
+                    || base.port() != target.port()
+                    || base.host() != target.host()
+                {
+                    return Response::Failure(Failure::Error {
+                        message: format!(
+                            "External redirects not allowed by protocol specification"
+                        ),
+                    }); // @TODO placeholder page with optional link open button
+                }
+
+                // Build request
+                let request =
+                    Request::build(&target.to_string(), Some(referrer), cancellable, priority);
+
+                Response::Redirect(if is_foreground {
+                    Redirect::Foreground(request)
+                } else {
+                    Redirect::Background(request)
+                })
+            }
+            Err(e) => Response::Failure(Failure::Error {
+                message: format!("Could not parse target address: {e}"),
+            }),
+        },
+        None => Response::Failure(Failure::Error {
+            message: "Target address not found".to_string(),
+        }),
     }
 }
