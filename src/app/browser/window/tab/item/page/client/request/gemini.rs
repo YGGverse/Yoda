@@ -5,7 +5,7 @@ use gtk::{
     glib::{Priority, Uri, UriFlags},
 };
 
-pub fn route(
+pub fn send(
     client: &Client,
     feature: Feature,
     uri: Uri,

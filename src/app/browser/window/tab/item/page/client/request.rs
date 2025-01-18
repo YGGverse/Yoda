@@ -55,7 +55,7 @@ impl Request {
                 feature,
                 referrer,
                 uri,
-            } => gemini::route(client, feature, uri, referrer, cancellable, callback),
+            } => gemini::send(client, feature, uri, referrer, cancellable, callback),
             Self::Titan(_) => todo!(),
         }
     }
