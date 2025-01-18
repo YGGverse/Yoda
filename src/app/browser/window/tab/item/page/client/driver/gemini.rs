@@ -62,9 +62,8 @@ pub fn handle(
                 },
             })),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-            Status::Success => {
-                let mime = response.meta.mime.unwrap(); // @TODO handle
-                match mime.as_str() {
+            Status::Success => match response.meta.mime {
+                Some(mime) => match mime.as_str() {
                     "text/gemini" => Text::from_stream_async(
                         response.connection.stream(),
                         Priority::DEFAULT,
@@ -91,8 +90,11 @@ pub fn handle(
                         mime: mime.to_string(),
                         message: format!("Content type `{mime}` yet not supported"),
                     })),
-                } // @TODO handle `None`
-            }
+                },
+                None => callback(Response::Failure(Failure::Error {
+                    message: "MIME type not found".to_string(),
+                })),
+            },
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
             Status::Redirect => callback(match response.meta.data {
                 Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
