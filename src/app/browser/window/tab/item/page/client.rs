@@ -1,17 +1,17 @@
 pub mod driver;
-mod feature;
+pub mod request;
 pub mod response;
 pub mod status;
 
 // Children dependencies
 pub use driver::Driver;
-use feature::Feature;
+pub use request::Request;
 pub use response::Response;
 pub use status::Status;
 
 // Global dependencies
 use crate::{tool::now, Profile};
-use gtk::{gio::Cancellable, prelude::CancellableExt};
+use gtk::{gio::Cancellable, glib::Priority, prelude::CancellableExt};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -42,16 +42,15 @@ impl Client {
 
     /// Begin new request
     /// * the `query` as string, to support system routes (e.g. `source:` prefix)
-    pub fn request_async(&self, request: &str, callback: impl FnOnce(Response) + 'static) {
+    pub fn request_async(&self, query: &str, callback: impl FnOnce(Response) + 'static) {
         // Update client status
         self.status.replace(Status::Request {
             time: now(),
-            value: request.to_string(),
+            value: query.to_string(),
         });
 
-        self.driver.feature_async(
-            Feature::from_string(request),
-            self.new_cancellable(),
+        self.driver.request_async(
+            Request::build(query, None, self.new_cancellable(), Priority::DEFAULT),
             callback,
         );
     }

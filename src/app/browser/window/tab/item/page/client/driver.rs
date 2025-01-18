@@ -8,12 +8,14 @@ pub mod status;
 pub use status::Status;
 
 // Global dependencies
-use super::{feature::Request, response, response::Failure, Feature, Response};
-use crate::{tool::now, Profile};
-use gtk::{
-    gio::{Cancellable, SocketClientEvent},
-    prelude::SocketClientExt,
+use super::{
+    request::{feature::Protocol, Feature},
+    response,
+    response::Failure,
+    Request, Response,
 };
+use crate::{tool::now, Profile};
+use gtk::{gio::SocketClientEvent, prelude::SocketClientExt};
 use std::rc::Rc;
 
 pub struct Driver {
@@ -61,19 +63,19 @@ impl Driver {
 
     /// Make new async `Feature` request
     /// * return `Response` in callback function
-    pub fn feature_async(
-        &self,
-        feature: Feature,
-        cancellable: Cancellable,
-        callback: impl FnOnce(Response) + 'static,
-    ) {
-        match feature {
-            Feature::Download { request } => match request {
-                Request::Gemini { uri } => gemini::request_async(
+    pub fn request_async(&self, request: Request, callback: impl FnOnce(Response) + 'static) {
+        match request.feature {
+            Feature::Download(protocol) => match protocol {
+                Protocol::Gemini {
+                    uri,
+                    cancellable,
+                    priority,
+                } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
                     uri.clone(),
                     cancellable.clone(),
+                    priority,
                     move |result| {
                         callback(match result {
                             Ok(response) => Response::Download {
@@ -91,24 +93,38 @@ impl Driver {
                     message: "Download feature yet not supported for this request".to_string(),
                 })), // @TODO or maybe panic as unexpected
             },
-            Feature::Default { request } => match request {
-                Request::Gemini { uri } => gemini::request_async(
+            Feature::Default(protocol) => match protocol {
+                Protocol::Gemini {
+                    uri,
+                    cancellable,
+                    priority,
+                } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
                     uri.clone(),
                     cancellable.clone(),
-                    move |result| gemini::handle(result, uri, cancellable, false, callback),
+                    priority,
+                    move |result| {
+                        gemini::handle(result, uri, cancellable, priority, false, callback)
+                    },
                 ),
-                Request::Titan { .. } => todo!(),
-                Request::Undefined => todo!(),
+                Protocol::Titan { .. } => todo!(),
+                Protocol::Unsupported => todo!(),
             },
-            Feature::Source { request } => match request {
-                Request::Gemini { uri } => gemini::request_async(
+            Feature::Source(protocol) => match protocol {
+                Protocol::Gemini {
+                    uri,
+                    cancellable,
+                    priority,
+                } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
                     uri.clone(),
                     cancellable.clone(),
-                    move |result| gemini::handle(result, uri, cancellable, true, callback),
+                    priority,
+                    move |result| {
+                        gemini::handle(result, uri, cancellable, priority, true, callback)
+                    },
                 ),
                 _ => callback(Response::Failure(Failure::Error {
                     message: "Source view feature yet not supported for this request".to_string(),

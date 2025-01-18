@@ -14,12 +14,13 @@ pub fn request_async(
     client: &Rc<ggemini::Client>,
     uri: Uri,
     cancellable: Cancellable,
+    priority: Priority,
     callback: impl FnOnce(Result<ggemini::client::Response, ggemini::client::Error>) + 'static,
 ) {
     let request = uri.to_string();
     client.request_async(
         ggemini::client::Request::gemini(uri),
-        Priority::DEFAULT,
+        priority,
         cancellable,
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
@@ -40,6 +41,7 @@ pub fn handle(
     result: Result<ggemini::client::connection::Response, ggemini::client::Error>,
     base: Uri,
     cancellable: Cancellable,
+    priority: Priority,
     is_source_request: bool, // @TODO yet partial implementation
     callback: impl FnOnce(Response) + 'static,
 ) {
@@ -66,7 +68,7 @@ pub fn handle(
                 Some(mime) => match mime.as_str() {
                     "text/gemini" => Text::from_stream_async(
                         response.connection.stream(),
-                        Priority::DEFAULT,
+                        priority,
                         cancellable,
                         move |result| match result {
                             Ok(text) => callback(Response::TextGemini {
