@@ -1,45 +1,59 @@
-pub mod feature;
-pub use feature::Feature;
+mod feature;
+mod gemini;
 
+use super::{Client, Response};
+use feature::Feature;
 use gtk::{
     gio::Cancellable,
-    glib::{Priority, Uri},
+    glib::{Uri, UriFlags},
 };
 
-/// Request data wrapper for `Client`
-#[derive(Clone)]
-pub struct Request {
-    pub feature: Feature,
-    /// Requests chain in order to process redirection rules
-    pub referrer: Vec<Request>,
+/// Single `Request` API for multiple `Client` drivers
+pub enum Request {
+    Gemini {
+        feature: Feature,
+        referrer: Vec<Self>,
+        uri: Uri,
+    },
+    Titan(Uri),
 }
 
 impl Request {
-    // Constructors
+    // Actions
 
-    /// Build new `Self`
-    pub fn build(
+    /// Process request by routed driver
+    pub fn route(
+        client: &Client,
         query: &str,
-        referrer: Option<Vec<Request>>,
+        referrer: Option<Vec<Self>>,
         cancellable: Cancellable,
-        priority: Priority,
-    ) -> Self {
-        Self {
-            feature: Feature::build(query, cancellable, priority),
-            referrer: referrer.unwrap_or_default(),
+        callback: impl FnOnce(Response) + 'static,
+    ) {
+        let (feature, request) = Feature::parse(query);
+
+        match Uri::parse(request, UriFlags::NONE) {
+            Ok(uri) => match uri.scheme().as_str() {
+                "gemini" => gemini::route(client, feature, uri, referrer, cancellable, callback),
+                "titan" => todo!(),
+                _ => callback(Response::Redirect(
+                    todo!(), //super::response::Redirect::Foreground(()),
+                )),
+            },
+            Err(_) => todo!(),
         }
     }
 
     // Getters
 
-    /// Copy `Self` to new `referrer` vector
-    pub fn to_referrer(&self) -> Vec<Request> {
-        let mut referrer = self.referrer.to_vec();
-        referrer.push(self.clone());
-        referrer
-    }
-
-    pub fn uri(&self) -> Option<&Uri> {
-        self.feature.uri()
+    /// Get reference to `Self` [URI](https://docs.gtk.org/glib/struct.Uri.html)
+    pub fn as_uri(&self) -> &Uri {
+        match self {
+            Self::Gemini {
+                feature: _,
+                referrer: _,
+                uri,
+            }
+            | Self::Titan(uri) => &uri,
+        }
     }
 }

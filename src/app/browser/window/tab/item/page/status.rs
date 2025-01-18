@@ -1,5 +1,5 @@
 /// Global dependencies
-use super::client::{driver::Status as Driver, Status as Client};
+use super::client::{status::Gemini, Status as Client};
 use gtk::glib::DateTime;
 
 /// `Page` status
@@ -28,16 +28,16 @@ impl Status {
                 | Client::Cancelled { .. }
                 | Client::Failure { .. }
                 | Client::Request { .. } => Some(0.0),
-                Client::Driver(status) => match status {
-                    Driver::Resolving { .. } => Some(0.1),
-                    Driver::Resolved { .. } => Some(0.2),
-                    Driver::Connecting { .. } => Some(0.3),
-                    Driver::Connected { .. } => Some(0.4),
-                    Driver::ProxyNegotiating { .. } => Some(0.5),
-                    Driver::ProxyNegotiated { .. } => Some(0.6),
-                    Driver::TlsHandshaking { .. } => Some(0.7),
-                    Driver::TlsHandshaked { .. } => Some(0.8),
-                    Driver::Complete { .. } => Some(0.9),
+                Client::Gemini(status) => match status {
+                    Gemini::Resolving { .. } => Some(0.1),
+                    Gemini::Resolved { .. } => Some(0.2),
+                    Gemini::Connecting { .. } => Some(0.3),
+                    Gemini::Connected { .. } => Some(0.4),
+                    Gemini::ProxyNegotiating { .. } => Some(0.5),
+                    Gemini::ProxyNegotiated { .. } => Some(0.6),
+                    Gemini::TlsHandshaking { .. } => Some(0.7),
+                    Gemini::TlsHandshaked { .. } => Some(0.8),
+                    Gemini::Complete { .. } => Some(0.9),
                 },
             },
             Self::Failure { .. }

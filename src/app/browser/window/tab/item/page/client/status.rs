@@ -1,7 +1,9 @@
 pub mod failure;
+pub mod gemini;
 
 // Children dependencies
 pub use failure::Failure;
+pub use gemini::Gemini;
 
 // Global dependencies
 use crate::tool::format_time;
@@ -16,7 +18,7 @@ pub enum Status {
     /// Operation cancelled, new `Cancellable` required to continue
     Cancelled { time: DateTime },
     /// Protocol driver updates
-    Driver(super::driver::Status),
+    Gemini(Gemini),
     /// Something went wrong
     Failure { time: DateTime, failure: Failure },
     /// New `request` begin
@@ -40,7 +42,7 @@ impl Display for Status {
                     format_time(time)
                 )
             }
-            Self::Driver(status) => {
+            Self::Gemini(status) => {
                 write!(f, "{status}")
             }
             Self::Failure { time, failure } => {

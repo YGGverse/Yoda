@@ -23,7 +23,7 @@ use crate::tool::now;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    glib::{gformat, GString, Priority, Uri},
+    glib::{GString, Priority, Uri},
     prelude::{EditableExt, FileExt},
 };
 use sqlite::Transaction;
@@ -307,7 +307,7 @@ impl Page {
                             .request
                             .widget
                             .entry
-                            .set_text(&request.uri().unwrap().to_string())} // @TODO handle
+                            .set_text(&request.as_uri().to_string())} // @TODO handle
                         }
                         Response::TextGemini { base, source, is_source_request } => {
                             let widget = if is_source_request {

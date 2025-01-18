@@ -1,43 +1,40 @@
-pub mod protocol;
-pub use protocol::Protocol;
-
-use gtk::{
-    gio::Cancellable,
-    glib::{Priority, Uri},
-};
+// Feature conversion prefixes
+const DOWNLOAD: &str = "download:";
+const SOURCE: &str = "source:";
 
 /// Feature wrapper for client `Request`
 #[derive(Clone)]
 pub enum Feature {
-    Default(Protocol),
-    Download(Protocol),
-    Source(Protocol),
+    Default,
+    Download,
+    Source,
     // @TODO System(Action)
 }
 
 impl Feature {
     // Constructors
 
-    /// Parse new `Self` from string
-    pub fn build(query: &str, cancellable: Cancellable, priority: Priority) -> Self {
-        if let Some(postfix) = query.strip_prefix("download:") {
-            return Self::Download(Protocol::build(postfix, cancellable, priority));
+    /// Parse new `Self` from navigation entry request
+    pub fn parse(request: &str) -> (Self, &str) {
+        if let Some(postfix) = request.strip_prefix(DOWNLOAD) {
+            return (Self::Download, postfix);
         }
 
-        if let Some(postfix) = query.strip_prefix("source:") {
-            return Self::Source(Protocol::build(postfix, cancellable, priority));
+        if let Some(postfix) = request.strip_prefix(SOURCE) {
+            return (Self::Source, postfix);
         }
 
-        Self::Default(Protocol::build(query, cancellable, priority))
+        (Self::Default, request)
     }
 
     // Getters
 
-    pub fn uri(&self) -> Option<&Uri> {
+    /// Get `Self` as prefix
+    pub fn as_prefix(&self) -> Option<&str> {
         match self {
-            Self::Default(protocol) | Self::Download(protocol) | Self::Source(protocol) => {
-                protocol.uri()
-            }
+            Self::Download => Some(DOWNLOAD),
+            Self::Source => Some(SOURCE),
+            Self::Default => None,
         }
     }
 }

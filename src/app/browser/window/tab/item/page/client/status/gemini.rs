@@ -3,8 +3,8 @@ use crate::tool::format_time;
 use gtk::glib::DateTime;
 use std::fmt::{Display, Formatter, Result};
 
-/// Shared asset for `Driver` statuses
-pub enum Status {
+/// Shared asset for `Gemini` statuses
+pub enum Gemini {
     Resolving { time: DateTime },
     Resolved { time: DateTime },
     Connecting { time: DateTime },
@@ -16,7 +16,7 @@ pub enum Status {
     Complete { time: DateTime },
 }
 
-impl Display for Status {
+impl Display for Gemini {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
             Self::Resolving { time } => {

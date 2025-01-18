@@ -1,17 +1,18 @@
-pub mod driver;
 pub mod request;
 pub mod response;
 pub mod status;
 
 // Children dependencies
-pub use driver::Driver;
 pub use request::Request;
 pub use response::Response;
 pub use status::Status;
 
 // Global dependencies
 use crate::{tool::now, Profile};
-use gtk::{gio::Cancellable, glib::Priority, prelude::CancellableExt};
+use gtk::{
+    gio::{Cancellable, SocketClientEvent},
+    prelude::{CancellableExt, SocketClientExt},
+};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -21,7 +22,12 @@ use std::{
 pub struct Client {
     cancellable: Cell<Cancellable>,
     status: Rc<RefCell<Status>>,
-    driver: Driver,
+    /// Profile reference required for Gemini protocol auth (match scope)
+    profile: Rc<Profile>,
+    /// Supported clients
+    /// * gemini driver should be initiated once (on page object init)
+    ///   to process all it connection features properly
+    gemini: Rc<ggemini::Client>,
 }
 
 impl Client {
@@ -29,12 +35,32 @@ impl Client {
 
     /// Create new `Self`
     pub fn init(profile: &Rc<Profile>, callback: impl Fn(Status) + 'static) -> Self {
+        use status::Gemini;
+        // Init supported protocol libraries
+        let gemini = Rc::new(ggemini::Client::new());
+
+        // Retransmit gemini [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html) updates
+        gemini.socket.connect_event(move |_, event, _, _| {
+            callback(Status::Gemini(match event {
+                SocketClientEvent::Resolving => Gemini::Resolving { time: now() },
+                SocketClientEvent::Resolved => Gemini::Resolved { time: now() },
+                SocketClientEvent::Connecting => Gemini::Connecting { time: now() },
+                SocketClientEvent::Connected => Gemini::Connected { time: now() },
+                SocketClientEvent::ProxyNegotiating => Gemini::ProxyNegotiating { time: now() },
+                SocketClientEvent::ProxyNegotiated => Gemini::ProxyNegotiated { time: now() },
+                // * `TlsHandshaking` | `TlsHandshaked` has effect only for guest connections!
+                SocketClientEvent::TlsHandshaking => Gemini::TlsHandshaking { time: now() },
+                SocketClientEvent::TlsHandshaked => Gemini::TlsHandshaked { time: now() },
+                SocketClientEvent::Complete => Gemini::Complete { time: now() },
+                _ => todo!(), // alert on API change
+            }))
+        });
+
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            driver: Driver::init(profile.clone(), move |status| {
-                callback(Status::Driver(status))
-            }),
             status: Rc::new(RefCell::new(Status::Cancellable { time: now() })), // e.g. "ready to use"
+            profile: profile.clone(),
+            gemini,
         }
     }
 
@@ -43,16 +69,11 @@ impl Client {
     /// Begin new request
     /// * the `query` as string, to support system routes (e.g. `source:` prefix)
     pub fn request_async(&self, query: &str, callback: impl FnOnce(Response) + 'static) {
-        // Update client status
         self.status.replace(Status::Request {
             time: now(),
             value: query.to_string(),
         });
-
-        self.driver.request_async(
-            Request::build(query, None, self.new_cancellable(), Priority::DEFAULT),
-            callback,
-        );
+        Request::route(self, query, None, self.new_cancellable(), callback);
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
