@@ -302,12 +302,12 @@ impl Page {
                             }
                         },
                         Response::Redirect(this) => match this {
-                            Redirect::Background { source, target } => todo!(), // @TODO
-                            Redirect::Foreground { source, target } => navigation
+                            Redirect::Background(request) => todo!(), // @TODO
+                            Redirect::Foreground(request) => {navigation
                             .request
                             .widget
                             .entry
-                            .set_text(&target.to_string()) // @TODO
+                            .set_text(&request.uri().unwrap().to_string())} // @TODO handle
                         }
                         Response::TextGemini { base, source, is_source_request } => {
                             let widget = if is_source_request {

@@ -64,6 +64,7 @@ impl Driver {
     /// Make new async `Feature` request
     /// * return `Response` in callback function
     pub fn request_async(&self, request: Request, callback: impl FnOnce(Response) + 'static) {
+        let referrer = request.to_referrer();
         match request.feature {
             Feature::Download(protocol) => match protocol {
                 Protocol::Gemini {
@@ -73,20 +74,24 @@ impl Driver {
                 } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
-                    uri.clone(),
-                    cancellable.clone(),
-                    priority,
-                    move |result| {
-                        callback(match result {
-                            Ok(response) => Response::Download {
-                                base: uri,
-                                stream: response.connection.stream(),
-                                cancellable,
-                            },
-                            Err(e) => Response::Failure(Failure::Error {
-                                message: e.to_string(),
-                            }),
-                        })
+                    &uri,
+                    &cancellable,
+                    &priority,
+                    {
+                        let base = uri.clone();
+                        let cancellable = cancellable.clone();
+                        move |result| {
+                            callback(match result {
+                                Ok(response) => Response::Download {
+                                    base,
+                                    stream: response.connection.stream(),
+                                    cancellable,
+                                },
+                                Err(e) => Response::Failure(Failure::Error {
+                                    message: e.to_string(),
+                                }),
+                            })
+                        }
                     },
                 ),
                 _ => callback(Response::Failure(Failure::Error {
@@ -101,17 +106,30 @@ impl Driver {
                 } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
-                    uri.clone(),
-                    cancellable.clone(),
-                    priority,
-                    move |result| {
-                        gemini::handle(result, uri, cancellable, priority, false, callback)
+                    &uri,
+                    &cancellable,
+                    &priority,
+                    {
+                        let cancellable = cancellable.clone();
+                        let uri = uri.clone();
+
+                        move |result| {
+                            gemini::handle(
+                                result,
+                                uri,
+                                cancellable,
+                                priority,
+                                referrer,
+                                false,
+                                callback,
+                            )
+                        }
                     },
                 ),
                 Protocol::Titan { .. } => todo!(),
                 Protocol::Unsupported => todo!(),
             },
-            Feature::Source(protocol) => match protocol {
+            Feature::Source(ref protocol) => match protocol {
                 Protocol::Gemini {
                     uri,
                     cancellable,
@@ -119,11 +137,24 @@ impl Driver {
                 } => gemini::request_async(
                     &self.profile,
                     &self.gemini,
-                    uri.clone(),
-                    cancellable.clone(),
+                    uri,
+                    cancellable,
                     priority,
-                    move |result| {
-                        gemini::handle(result, uri, cancellable, priority, true, callback)
+                    {
+                        let cancellable = cancellable.clone();
+                        let priority = *priority;
+                        let uri = uri.clone();
+                        move |result| {
+                            gemini::handle(
+                                result,
+                                uri,
+                                cancellable,
+                                priority,
+                                request.referrer.to_vec(),
+                                true,
+                                callback,
+                            )
+                        }
                     },
                 ),
                 _ => callback(Response::Failure(Failure::Error {

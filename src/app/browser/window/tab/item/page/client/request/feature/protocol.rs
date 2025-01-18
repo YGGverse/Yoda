@@ -4,6 +4,7 @@ use gtk::{
     glib::{Priority, Uri, UriFlags},
 };
 
+#[derive(Clone)]
 pub enum Protocol {
     Gemini {
         uri: Uri,
@@ -53,6 +54,24 @@ impl Protocol {
                 cancellable,
                 priority,
             },
+        }
+    }
+
+    // Getters
+
+    pub fn uri(&self) -> Option<&Uri> {
+        match self {
+            Self::Gemini {
+                uri,
+                cancellable: _,
+                priority: _,
+            }
+            | Self::Titan {
+                uri,
+                cancellable: _,
+                priority: _,
+            } => Some(&uri),
+            Self::Unsupported => None,
         }
     }
 }

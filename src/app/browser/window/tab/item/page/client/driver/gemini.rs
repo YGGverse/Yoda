@@ -1,6 +1,6 @@
 use super::{
     response::{Certificate, Failure, Input, Redirect},
-    Profile, Response,
+    Profile, Request, Response,
 };
 use gtk::{
     gio::Cancellable,
@@ -12,16 +12,16 @@ use std::rc::Rc;
 pub fn request_async(
     profile: &Rc<Profile>,
     client: &Rc<ggemini::Client>,
-    uri: Uri,
-    cancellable: Cancellable,
-    priority: Priority,
+    uri: &Uri,
+    cancellable: &Cancellable,
+    priority: &Priority,
     callback: impl FnOnce(Result<ggemini::client::Response, ggemini::client::Error>) + 'static,
 ) {
     let request = uri.to_string();
     client.request_async(
-        ggemini::client::Request::gemini(uri),
-        priority,
-        cancellable,
+        ggemini::client::Request::gemini(uri.clone()),
+        priority.clone(),
+        cancellable.clone(),
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
         match profile.identity.gemini.match_scope(&request) {
@@ -42,6 +42,7 @@ pub fn handle(
     base: Uri,
     cancellable: Cancellable,
     priority: Priority,
+    referrer: Vec<Request>,
     is_source_request: bool, // @TODO yet partial implementation
     callback: impl FnOnce(Response) + 'static,
 ) {
@@ -68,8 +69,8 @@ pub fn handle(
                 Some(mime) => match mime.as_str() {
                     "text/gemini" => Text::from_stream_async(
                         response.connection.stream(),
-                        priority,
-                        cancellable,
+                        priority.clone(),
+                        cancellable.clone(),
                         move |result| match result {
                             Ok(text) => callback(Response::TextGemini {
                                 base,
@@ -100,10 +101,12 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
             Status::Redirect => callback(match response.meta.data {
                 Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
-                    Ok(target) => Response::Redirect(Redirect::Foreground {
-                        source: base,
-                        target,
-                    }),
+                    Ok(target) => Response::Redirect(Redirect::Foreground(Request::build(
+                        &target.to_string(),
+                        Some(referrer),
+                        cancellable,
+                        priority,
+                    ))),
                     Err(e) => Response::Failure(Failure::Error {
                         message: format!("Could not parse target address: {e}"),
                     }),
@@ -115,10 +118,12 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
             Status::PermanentRedirect => callback(match response.meta.data {
                 Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
-                    Ok(target) => Response::Redirect(Redirect::Background {
-                        source: base,
-                        target,
-                    }),
+                    Ok(target) => Response::Redirect(Redirect::Background(Request::build(
+                        &target.to_string(),
+                        Some(referrer),
+                        cancellable,
+                        priority,
+                    ))),
                     Err(e) => Response::Failure(Failure::Error {
                         message: format!("Could not parse target address: {e}"),
                     }),

@@ -1,9 +1,13 @@
 pub mod protocol;
 pub use protocol::Protocol;
 
-use gtk::{gio::Cancellable, glib::Priority};
+use gtk::{
+    gio::Cancellable,
+    glib::{Priority, Uri},
+};
 
 /// Feature wrapper for client `Request`
+#[derive(Clone)]
 pub enum Feature {
     Default(Protocol),
     Download(Protocol),
@@ -25,5 +29,15 @@ impl Feature {
         }
 
         Self::Default(Protocol::build(query, cancellable, priority))
+    }
+
+    // Getters
+
+    pub fn uri(&self) -> Option<&Uri> {
+        match self {
+            Self::Default(protocol) | Self::Download(protocol) | Self::Source(protocol) => {
+                protocol.uri()
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
-use gtk::glib::Uri;
+use crate::app::browser::window::tab::item::page::client::Request;
 
 pub enum Redirect {
-    Foreground { source: Uri, target: Uri },
-    Background { source: Uri, target: Uri },
+    Foreground(Request),
+    Background(Request),
 }
