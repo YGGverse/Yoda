@@ -43,7 +43,7 @@ impl Protocol {
             Err(_) => Self::Gemini {
                 uri: Uri::build(
                     UriFlags::NONE,
-                    "gemini",
+                    "/gemini", // beginning slash required to prevent assertion panic on construct
                     None,
                     Some("tlgs.one"),
                     1965,
