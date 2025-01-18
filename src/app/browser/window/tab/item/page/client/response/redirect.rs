@@ -1,4 +1,4 @@
-use crate::app::browser::window::tab::item::page::client::Request;
+use super::super::Request;
 
 pub enum Redirect {
     Foreground(Request),
