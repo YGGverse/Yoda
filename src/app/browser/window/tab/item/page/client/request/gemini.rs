@@ -89,10 +89,7 @@ fn handle(
                         Ok(text) => callback(Response::TextGemini {
                             base,
                             source: text.data,
-                            is_source_request: match feature {
-                                Feature::Source => true,
-                                _ => false,
-                            },
+                            is_source_request: matches!(feature, Feature::Source),
                         }),
                         Err(e) => callback(Response::Failure(Failure::Mime {
                             base,
@@ -177,7 +174,7 @@ fn redirect(
     // [Gemini protocol specifications](https://geminiprotocol.net/docs/protocol-specification.gmi#redirection)
     if referrer.len() > 5 {
         return Response::Failure(Failure::Error {
-            message: format!("Max redirection count reached"),
+            message: "Max redirection count reached".to_string(),
         });
     }
     match data {
@@ -190,9 +187,8 @@ fn redirect(
                     || base.host() != target.host()
                 {
                     return Response::Failure(Failure::Error {
-                        message: format!(
-                            "External redirects not allowed by protocol specification"
-                        ),
+                        message: "External redirects not allowed by protocol specification"
+                            .to_string(),
                     }); // @TODO placeholder page with optional link open button
                 }
 

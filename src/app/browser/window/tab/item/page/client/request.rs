@@ -79,7 +79,7 @@ impl Request {
                 referrer: _,
                 uri,
             }
-            | Self::Titan(uri) => &uri,
+            | Self::Titan(uri) => uri,
         }
     }
 }
