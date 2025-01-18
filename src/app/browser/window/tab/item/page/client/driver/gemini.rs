@@ -50,20 +50,20 @@ pub fn handle(
             Status::Input => callback(Response::Input(Input::Response {
                 base,
                 title: match response.meta.data {
-                    Some(data) => data.value,
+                    Some(data) => data.to_gstring(),
                     None => "Input expected".into(),
                 },
             })),
             Status::SensitiveInput => callback(Response::Input(Input::Sensitive {
                 base,
                 title: match response.meta.data {
-                    Some(data) => data.value,
+                    Some(data) => data.to_gstring(),
                     None => "Input expected".into(),
                 },
             })),
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
             Status::Success => {
-                let mime = response.meta.mime.unwrap().value.to_lowercase();
+                let mime = response.meta.mime.unwrap(); // @TODO handle
                 match mime.as_str() {
                     "text/gemini" => Text::from_stream_async(
                         response.connection.stream(),
@@ -81,7 +81,7 @@ pub fn handle(
                     "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                         callback(Response::Stream {
                             base,
-                            mime,
+                            mime: mime.to_string(),
                             stream: response.connection.stream(),
                             cancellable,
                         })
@@ -95,7 +95,7 @@ pub fn handle(
             }
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
             Status::Redirect => callback(match response.meta.data {
-                Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
+                Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
                     Ok(target) => Response::Redirect(Redirect::Foreground {
                         source: base,
                         target,
@@ -110,7 +110,7 @@ pub fn handle(
             }), // @TODO validate redirect count
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
             Status::PermanentRedirect => callback(match response.meta.data {
-                Some(data) => match Uri::parse_relative(&base, &data.value, UriFlags::NONE) {
+                Some(data) => match Uri::parse_relative(&base, data.as_str(), UriFlags::NONE) {
                     Ok(target) => Response::Redirect(Redirect::Background {
                         source: base,
                         target,
@@ -126,7 +126,7 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
             Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
-                    Some(data) => data.value,
+                    Some(data) => data.to_gstring(),
                     None => "Client certificate required".into(),
                 },
             })),
@@ -134,7 +134,7 @@ pub fn handle(
             Status::CertificateUnauthorized => {
                 callback(Response::Certificate(Certificate::Request {
                     title: match response.meta.data {
-                        Some(data) => data.value,
+                        Some(data) => data.to_gstring(),
                         None => "Certificate not authorized".into(),
                     },
                 }))
@@ -142,7 +142,7 @@ pub fn handle(
             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
             Status::CertificateInvalid => callback(Response::Certificate(Certificate::Request {
                 title: match response.meta.data {
-                    Some(data) => data.value,
+                    Some(data) => data.to_gstring(),
                     None => "Certificate not valid".into(),
                 },
             })),
