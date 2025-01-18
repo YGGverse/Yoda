@@ -18,7 +18,7 @@ pub fn send(
         uri.clone(),
         cancellable.clone(),
         move |result| match result {
-            Ok(response) => handle(response, uri, cancellable, referrer, feature, callback),
+            Ok(response) => handle(response, uri, referrer, feature, cancellable, callback),
             Err(e) => callback(Response::Failure(Failure::Error {
                 message: e.to_string(),
             })),
@@ -56,9 +56,9 @@ fn request(
 fn handle(
     response: ggemini::client::connection::Response,
     base: Uri,
-    cancellable: Cancellable,
     referrer: Vec<Request>,
     feature: Feature,
+    cancellable: Cancellable,
     callback: impl FnOnce(Response) + 'static,
 ) {
     use ggemini::client::connection::response::{data::Text, meta::Status};
@@ -118,7 +118,7 @@ fn handle(
         },
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
         Status::Redirect => callback(redirect(
-            response.meta.data,
+            response,
             base,
             referrer,
             cancellable,
@@ -127,7 +127,7 @@ fn handle(
         )),
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
         Status::PermanentRedirect => callback(redirect(
-            response.meta.data,
+            response,
             base,
             referrer,
             cancellable,
@@ -163,8 +163,11 @@ fn handle(
 
 /// Shared redirection `Response` builder
 fn redirect(
-    data: Option<ggemini::client::connection::response::meta::Data>,
+    // Subject to parse
+    response: ggemini::client::connection::Response,
+    // Wanted to process relative links
     base: Uri,
+    // List of previous requests to handle redirection rules
     referrer: Vec<Request>,
     cancellable: Cancellable,
     priority: Priority,
@@ -177,8 +180,8 @@ fn redirect(
             message: "Max redirection count reached".to_string(),
         });
     }
-    match data {
-        // Target address could be relative, parse using base Uri
+    // Target URL expected from client response meta data
+    match response.meta.data {
         Some(target) => match Uri::parse_relative(&base, target.as_str(), UriFlags::NONE) {
             Ok(target) => {
                 // Disallow external redirection
