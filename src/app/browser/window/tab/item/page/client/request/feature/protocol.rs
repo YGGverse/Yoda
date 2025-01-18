@@ -16,7 +16,7 @@ pub enum Protocol {
         cancellable: Cancellable,
         priority: Priority,
     },
-    Unsupported,
+    Undefined,
 }
 
 impl Protocol {
@@ -36,7 +36,7 @@ impl Protocol {
                     cancellable,
                     priority,
                 },
-                _ => Self::Unsupported,
+                _ => Self::Undefined,
             },
             // Search request if the request could not be parsed as the valid [URI](https://docs.gtk.org/glib/struct.Uri.html)
             // * @TODO implement DNS lookup before apply this option
@@ -71,7 +71,7 @@ impl Protocol {
                 cancellable: _,
                 priority: _,
             } => Some(&uri),
-            Self::Unsupported => None,
+            Self::Undefined => None,
         }
     }
 }

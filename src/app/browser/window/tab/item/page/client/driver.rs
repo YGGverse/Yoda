@@ -127,7 +127,7 @@ impl Driver {
                     },
                 ),
                 Protocol::Titan { .. } => todo!(),
-                Protocol::Unsupported => todo!(),
+                Protocol::Undefined => todo!(),
             },
             Feature::Source(ref protocol) => match protocol {
                 Protocol::Gemini {
