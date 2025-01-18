@@ -150,7 +150,7 @@ impl Driver {
                                 uri,
                                 cancellable,
                                 priority,
-                                request.referrer.to_vec(),
+                                referrer,
                                 true,
                                 callback,
                             )
