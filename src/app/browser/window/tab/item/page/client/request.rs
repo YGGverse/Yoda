@@ -1,7 +1,9 @@
+mod error;
 mod feature;
 mod gemini;
 
 use super::{Client, Response};
+use error::Error;
 use feature::Feature;
 use gtk::{
     gio::Cancellable,
@@ -19,27 +21,49 @@ pub enum Request {
 }
 
 impl Request {
-    // Actions
+    // Constructors
 
-    /// Process request by routed driver
-    pub fn route(
-        client: &Client,
-        query: &str,
-        referrer: Option<Vec<Self>>,
-        cancellable: Cancellable,
-        callback: impl FnOnce(Response) + 'static,
-    ) {
+    /// Create new `Self` from string
+    pub fn parse(query: &str, referrer: Option<Vec<Self>>) -> Result<Self, Error> {
         let (feature, request) = Feature::parse(query);
 
         match Uri::parse(request, UriFlags::NONE) {
             Ok(uri) => match uri.scheme().as_str() {
-                "gemini" => gemini::route(client, feature, uri, referrer, cancellable, callback),
-                "titan" => todo!(),
-                _ => callback(Response::Redirect(
-                    todo!(), //super::response::Redirect::Foreground(()),
-                )),
+                "gemini" => Ok(Self::Gemini {
+                    feature,
+                    referrer: referrer.unwrap_or_default(),
+                    uri,
+                }),
+                "titan" => Ok(Self::Titan(uri)),
+                _ => Err(Error::Unsupported),
             },
-            Err(_) => todo!(),
+            Err(e) => Err(Error::Glib(e)),
+        }
+    }
+
+    // Actions
+
+    /// Handle `Self` request
+    pub fn handle(
+        self,
+        client: &Client,
+        cancellable: Cancellable,
+        callback: impl FnOnce(Response) + 'static,
+    ) {
+        match self {
+            Self::Gemini {
+                feature,
+                referrer,
+                uri,
+            } => gemini::route(
+                client,
+                feature.clone(),
+                uri.clone(),
+                referrer,
+                cancellable,
+                callback,
+            ),
+            Self::Titan(_) => todo!(),
         }
     }
 

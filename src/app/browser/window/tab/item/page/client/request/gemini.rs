@@ -9,7 +9,7 @@ pub fn route(
     client: &Client,
     feature: Feature,
     uri: Uri,
-    referrer: Option<Vec<Request>>,
+    referrer: Vec<Request>,
     cancellable: Cancellable,
     callback: impl FnOnce(Response) + 'static,
 ) {
@@ -57,7 +57,7 @@ fn handle(
     response: ggemini::client::connection::Response,
     base: Uri,
     cancellable: Cancellable,
-    referrer: Option<Vec<Request>>,
+    referrer: Vec<Request>,
     feature: Feature,
     callback: impl FnOnce(Response) + 'static,
 ) {
@@ -123,7 +123,7 @@ fn handle(
         Status::Redirect => callback(redirect(
             response.meta.data,
             base,
-            referrer.unwrap_or_default(), // @TODO
+            referrer,
             cancellable,
             Priority::DEFAULT,
             false,
@@ -132,7 +132,7 @@ fn handle(
         Status::PermanentRedirect => callback(redirect(
             response.meta.data,
             base,
-            referrer.unwrap_or_default(), // @TODO
+            referrer,
             cancellable,
             Priority::DEFAULT,
             true,

@@ -73,7 +73,9 @@ impl Client {
             time: now(),
             value: query.to_string(),
         });
-        Request::route(self, query, None, self.new_cancellable(), callback);
+        Request::parse(query, None)
+            .unwrap() // @TODO
+            .handle(self, self.new_cancellable(), callback);
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
