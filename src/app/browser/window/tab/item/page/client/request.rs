@@ -23,21 +23,30 @@ pub enum Request {
 impl Request {
     // Constructors
 
-    /// Create new `Self` from string
+    /// Create new `Self` from featured string
     pub fn parse(query: &str, referrer: Option<Vec<Self>>) -> Result<Self, Error> {
         let (feature, request) = Feature::parse(query);
 
         match Uri::parse(request, UriFlags::NONE) {
-            Ok(uri) => match uri.scheme().as_str() {
-                "gemini" => Ok(Self::Gemini {
-                    feature,
-                    referrer: referrer.unwrap_or_default(),
-                    uri,
-                }),
-                "titan" => Ok(Self::Titan(uri)),
-                _ => Err(Error::Unsupported),
-            },
+            Ok(uri) => Self::from_uri(uri, Some(feature), referrer),
             Err(e) => Err(Error::Glib(e)),
+        }
+    }
+
+    /// Create new `Self` from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+    pub fn from_uri(
+        uri: Uri,
+        feature: Option<Feature>,
+        referrer: Option<Vec<Self>>,
+    ) -> Result<Self, Error> {
+        match uri.scheme().as_str() {
+            "gemini" => Ok(Self::Gemini {
+                feature: feature.unwrap_or_default(),
+                referrer: referrer.unwrap_or_default(),
+                uri,
+            }),
+            "titan" => Ok(Self::Titan(uri)),
+            _ => Err(Error::Unsupported),
         }
     }
 
