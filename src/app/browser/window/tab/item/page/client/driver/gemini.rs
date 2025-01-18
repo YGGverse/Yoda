@@ -159,7 +159,7 @@ fn redirect(
     priority: Priority,
     is_foreground: bool,
 ) -> Response {
-    // Validate redirect according to
+    // Validate redirection attempt
     // [Gemini protocol specifications](https://geminiprotocol.net/docs/protocol-specification.gmi#redirection)
     if referrer.len() > 5 {
         return Response::Failure(Failure::Error {
@@ -167,6 +167,7 @@ fn redirect(
         });
     }
     match data {
+        // Target address could be relative, parse using base Uri
         Some(target) => match Uri::parse_relative(&base, target.as_str(), UriFlags::NONE) {
             Ok(target) => {
                 // Disallow external redirection
@@ -181,7 +182,9 @@ fn redirect(
                     }); // @TODO placeholder page with optional link open button
                 }
 
-                // Build request
+                // Build new `Request` for redirection `Response`
+                // * make sure that `referrer` already contain current `Request`
+                //  (to validate redirection count in chain)
                 let request =
                     Request::build(&target.to_string(), Some(referrer), cancellable, priority);
 
