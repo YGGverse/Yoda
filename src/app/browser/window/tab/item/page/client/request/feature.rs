@@ -3,7 +3,6 @@ const DOWNLOAD: &str = "download:";
 const SOURCE: &str = "source:";
 
 /// Feature wrapper for client `Request`
-#[derive(Clone)]
 pub enum Feature {
     Default,
     Download,
@@ -36,5 +35,11 @@ impl Feature {
             Self::Source => Some(SOURCE),
             Self::Default => None,
         }
+    }
+}
+
+impl Default for Feature {
+    fn default() -> Self {
+        Feature::Default
     }
 }
