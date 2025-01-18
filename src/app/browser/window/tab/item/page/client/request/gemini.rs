@@ -94,7 +94,11 @@ fn handle(
                                 _ => false,
                             },
                         }),
-                        Err(_) => todo!(),
+                        Err(e) => callback(Response::Failure(Failure::Mime {
+                            base,
+                            mime: mime.to_string(),
+                            message: e.to_string(),
+                        })),
                     },
                 ),
                 "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
