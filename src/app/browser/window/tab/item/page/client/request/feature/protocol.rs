@@ -43,11 +43,11 @@ impl Protocol {
             Err(_) => Self::Gemini {
                 uri: Uri::build(
                     UriFlags::NONE,
-                    "/gemini", // beginning slash required to prevent assertion panic on construct
+                    "gemini",
                     None,
                     Some("tlgs.one"),
                     -1,
-                    "search",
+                    "/search", // beginning slash required to prevent assertion panic on construct
                     Some(&Uri::escape_string(query, None, false)), // @TODO is `escape_string` really wanted in `build` context?
                     None,
                 ),
