@@ -95,7 +95,7 @@ impl Page {
         Self {
             id: id.clone(),
             profile: profile.clone(),
-            title: Rc::new(RefCell::new(gformat!("New page"))),
+            title: Rc::new(RefCell::new("New page".into())),
             // Actions
             browser_action: browser_action.clone(),
             tab_action: tab_action.clone(),
@@ -187,7 +187,7 @@ impl Page {
 
         // Update
         self.status.replace(Status::Loading { time: now() });
-        self.title.replace(gformat!("Loading.."));
+        self.title.replace("Loading..".into());
         self.browser_action.update.activate(Some(&self.id));
 
         if is_history {
@@ -296,7 +296,7 @@ impl Page {
                                 input.set_new_titan(move |data| {}); // @TODO
 
                                 status.replace(Status::Input { time: now() });
-                                title.replace(gformat!("Titan input")); // @TODO
+                                title.replace("Titan input".into()); // @TODO
 
                                 browser_action.update.activate(Some(&id));
                             }
