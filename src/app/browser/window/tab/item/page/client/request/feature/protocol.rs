@@ -46,7 +46,7 @@ impl Protocol {
                     "/gemini", // beginning slash required to prevent assertion panic on construct
                     None,
                     Some("tlgs.one"),
-                    1965,
+                    -1,
                     "search",
                     Some(&Uri::escape_string(query, None, false)), // @TODO is `escape_string` really wanted in `build` context?
                     None,
