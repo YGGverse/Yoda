@@ -78,34 +78,36 @@ impl Request {
             prelude::{NetworkAddressExt, ResolverExt},
         };
 
-        const DEFAULT_SCHEME: &str = "gemini://";
+        const DEFAULT_SCHEME: &str = "gemini";
         const DEFAULT_PORT: u16 = 1965;
-        const TIMEOUT: u32 = 1000;
+        const TIMEOUT: u32 = 250; // ms
 
-        let request = match query.trim().strip_prefix(DEFAULT_SCHEME) {
-            Some(postfix) => format!("{DEFAULT_SCHEME}{postfix}"),
-            None => query.to_string(),
-        };
+        let query = query.trim();
 
-        let resolver = Resolver::default();
-        resolver.set_timeout(TIMEOUT);
+        match Uri::parse(query, UriFlags::NONE) {
+            Ok(uri) => callback(Self::from_uri(uri, None, None)),
+            Err(_) => {
+                // try default scheme suggestion
+                let suggestion = format!("{DEFAULT_SCHEME}://{query}");
 
-        match NetworkAddress::parse_uri(&request, DEFAULT_PORT) {
-            Ok(connectable) => resolver.lookup_by_name_async(
-                &connectable.hostname(),
-                cancellable,
-                move |resolve| {
-                    callback(if resolve.is_ok() {
-                        match Uri::parse(&request, UriFlags::NONE) {
-                            Ok(uri) => Self::from_uri(uri, None, None),
-                            Err(e) => Err(Error::Glib(e)),
-                        }
-                    } else {
-                        Ok(Self::search(&request))
-                    })
-                },
-            ),
-            Err(_) => callback(Ok(Self::search(&request))), // @TODO not completed yet, fix invalid URI issue
+                let resolver = Resolver::default();
+                resolver.set_timeout(TIMEOUT);
+
+                match NetworkAddress::parse_uri(&suggestion, DEFAULT_PORT) {
+                    Ok(connectable) => resolver.lookup_by_name_async(
+                        &connectable.hostname(),
+                        cancellable,
+                        move |resolve| {
+                            callback(if resolve.is_ok() {
+                                Self::parse(&suggestion, None)
+                            } else {
+                                Ok(Self::search(&suggestion))
+                            })
+                        },
+                    ),
+                    Err(_) => callback(Ok(Self::search(&suggestion))),
+                }
+            }
         }
     }
 
