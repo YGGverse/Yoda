@@ -3,14 +3,13 @@ mod sensitive;
 mod titan;
 mod widget;
 
+use super::TabAction;
+use gtk::glib::Uri;
 use response::Response;
 use sensitive::Sensitive;
+use std::rc::Rc;
 use titan::Titan;
 use widget::Widget;
-
-use crate::app::browser::window::tab::item::Action as TabAction;
-use gtk::glib::Uri;
-use std::rc::Rc;
 
 pub struct Input {
     pub widget: Rc<Widget>,
@@ -66,8 +65,12 @@ impl Input {
         ));
     }
 
-    pub fn set_new_titan(&self, callback: impl Fn(&[u8]) + 'static) {
+    pub fn set_new_titan(
+        &self,
+        titan: super::client::response::input::Titan,
+        callback: impl Fn(Result<super::client::Response, ()>) + 'static,
+    ) {
         self.widget
-            .update(Some(&Titan::build(callback).widget.g_box));
+            .update(Some(&Titan::build(titan, callback).widget.g_box));
     }
 }

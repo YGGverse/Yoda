@@ -5,11 +5,10 @@ mod widget;
 
 use control::Control;
 use form::Form;
-use title::Title;
-use widget::Widget;
-
 use gtk::{gio::SimpleAction, glib::uuid_string_random};
 use std::rc::Rc;
+use title::Title;
+use widget::Widget;
 
 pub struct Titan {
     // Components
@@ -20,7 +19,10 @@ impl Titan {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(on_sent: impl Fn(&[u8]) + 'static) -> Self {
+    pub fn build(
+        titan: super::super::client::response::input::Titan,
+        callback: impl Fn(Result<super::super::client::Response, ()>) + 'static,
+    ) -> Self {
         // Init local actions
         let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
@@ -46,7 +48,7 @@ impl Titan {
 
         action_send.connect_activate({
             // @TODO let form = form.clone();
-            move |_, _| on_sent(&[]) // @TODO input data
+            move |_, _| callback(todo!()) // @TODO input data
         });
 
         // Return activated struct

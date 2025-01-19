@@ -325,9 +325,6 @@ pub fn history_forward(page: &Rc<Page>) {
 
 /// Page load function with recursive redirection support
 pub fn load(page: &Rc<Page>, request: Option<&str>, is_history: bool) {
-    use client::response::{Certificate, Failure, Input, Redirect};
-    use client::Response;
-
     // Move focus out from navigation entry
     page.browser_action
         .escape
@@ -354,284 +351,319 @@ pub fn load(page: &Rc<Page>, request: Option<&str>, is_history: bool) {
 
     page.client.request(query, {
         let page = page.clone();
-        move |response| {
-            match response {
-                Response::Certificate(this) => match this {
-                    Certificate::Invalid {
-                        title: certificate_title,
+        move |response| handle(&page, response)
+    });
+}
+
+/// Response handler for `Page`
+/// * may call itself on Titan response
+fn handle(page: &Rc<Page>, response: client::Response) {
+    use client::{
+        response::{Certificate, Failure, Input, Redirect},
+        Response,
+    };
+    match response {
+        Response::Certificate(this) => match this {
+            Certificate::Invalid {
+                title: certificate_title,
+            }
+            | Certificate::Request {
+                title: certificate_title,
+            }
+            | Certificate::Unauthorized {
+                title: certificate_title,
+            } => {
+                // Update widget
+                let status = page.content.to_status_identity();
+                status.set_description(Some(&certificate_title));
+
+                // Update meta
+                page.status.replace(Status::Success { time: now() });
+                page.title.replace(status.title());
+
+                // Update window
+                page.browser_action.update.activate(Some(&page.id));
+            }
+        },
+        Response::Failure(this) => match this {
+            Failure::Status { message } | Failure::Error { message } => {
+                // Update widget
+                let status = page.content.to_status_failure();
+                status.set_description(Some(&message));
+
+                // Update meta
+                page.status.replace(Status::Failure { time: now() });
+                page.title.replace(status.title());
+
+                // Update window
+                page.browser_action.update.activate(Some(&page.id));
+            }
+            Failure::Mime {
+                base,
+                mime,
+                message,
+            } => {
+                // Update widget
+                let status = page
+                    .content
+                    .to_status_mime(&mime, Some((&page.tab_action, &base)));
+                status.set_description(Some(&message));
+
+                // Update meta
+                page.status.replace(Status::Failure { time: now() });
+                page.title.replace(status.title());
+
+                // Update window
+                page.browser_action.update.activate(Some(&page.id));
+            }
+        },
+        Response::Input(this) => match this {
+            Input::Response {
+                base,
+                title: response_title,
+            } => {
+                page.input.set_new_response(
+                    page.tab_action.clone(),
+                    base,
+                    Some(&response_title),
+                    Some(1024),
+                );
+
+                page.status.replace(Status::Input { time: now() });
+                page.title.replace(response_title);
+
+                page.browser_action.update.activate(Some(&page.id));
+            }
+            Input::Sensitive {
+                base,
+                title: response_title,
+            } => {
+                page.input.set_new_sensitive(
+                    page.tab_action.clone(),
+                    base,
+                    Some(&response_title),
+                    Some(1024),
+                );
+
+                page.status.replace(Status::Input { time: now() });
+                page.title.replace(response_title);
+
+                page.browser_action.update.activate(Some(&page.id));
+            }
+            Input::Titan(this) => {
+                page.input.set_new_titan(this, {
+                    let page = page.clone();
+                    move |result| match result {
+                        Ok(response) => handle(&page, response),
+                        Err(e) => {
+                            let status = page.content.to_status_failure();
+                            //status.set_description(Some(&e.to_string()));
+                            // @TODO
+
+                            page.status.replace(Status::Failure { time: now() });
+                            page.title.replace(status.title());
+                            page.browser_action.update.activate(Some(&page.id));
+                        }
                     }
-                    | Certificate::Request {
-                        title: certificate_title,
-                    }
-                    | Certificate::Unauthorized {
-                        title: certificate_title,
-                    } => {
-                        // Update widget
-                        let status = page.content.to_status_identity();
-                        status.set_description(Some(&certificate_title));
+                });
 
-                        // Update meta
-                        page.status.replace(Status::Success { time: now() });
-                        page.title.replace(status.title());
+                page.status.replace(Status::Input { time: now() });
+                page.title.replace("Titan input".into());
 
-                        // Update window
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                },
-                Response::Failure(this) => match this {
-                    Failure::Status { message } | Failure::Error { message } => {
-                        // Update widget
-                        let status = page.content.to_status_failure();
-                        status.set_description(Some(&message));
+                page.browser_action.update.activate(Some(&page.id));
+            }
+        },
+        Response::Redirect(this) => match this {
+            Redirect::Background(request) => {
+                load(&page, Some(&request.as_uri().to_string()), false)
+            }
+            Redirect::Foreground(request) => {
+                page.navigation
+                    .request
+                    .widget
+                    .entry
+                    .set_text(&request.as_uri().to_string());
+                load(&page, Some(&request.as_uri().to_string()), false);
+            }
+        },
+        Response::TextGemini {
+            base,
+            source,
+            is_source_request,
+        } => {
+            let widget = if is_source_request {
+                page.content.to_text_source(&source)
+            } else {
+                page.content.to_text_gemini(&base, &source)
+            };
 
-                        // Update meta
-                        page.status.replace(Status::Failure { time: now() });
-                        page.title.replace(status.title());
+            // Connect `TextView` widget, update `search` model
+            page.search.set(Some(widget.text_view));
 
-                        // Update window
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                    Failure::Mime { base, mime, message } => {
-                        // Update widget
-                        let status = page.content.to_status_mime(&mime, Some((&page.tab_action, &base)));
-                        status.set_description(Some(&message));
+            // Update page meta
+            page.status.replace(Status::Success { time: now() });
+            page.title.replace(match widget.meta.title {
+                Some(title) => title.into(), // @TODO
+                None => uri_to_title(&base),
+            });
 
-                        // Update meta
-                        page.status.replace(Status::Failure { time: now() });
-                        page.title.replace(status.title());
-
-                        // Update window
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                },
-                Response::Input(this) => match this {
-                    Input::Response {
-                        base,
-                        title: response_title,
-                    } => {
-                        page.input.set_new_response(
-                            page.tab_action.clone(),
-                            base,
-                            Some(&response_title),
-                            Some(1024),
-                        );
-
-                        page.status.replace(Status::Input { time: now() });
-                        page.title.replace(response_title);
-
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                    Input::Sensitive {
-                        base,
-                        title: response_title,
-                    } => {
-                        page.input.set_new_sensitive(
-                            page.tab_action.clone(),
-                            base,
-                            Some(&response_title),
-                            Some(1024),
-                        );
-
-                        page.status.replace(Status::Input { time: now() });
-                        page.title.replace(response_title);
-
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                    Input::Titan { .. } => {
-                        page.input.set_new_titan(move |_| todo!());
-
-                        page.status.replace(Status::Input { time: now() });
-                        page.title.replace("Titan input".into());
-
-                        page.browser_action.update.activate(Some(&page.id));
-                    }
-                },
-                Response::Redirect(this) => match this {
-                    Redirect::Background(request) => {
-                        load(&page, Some(&request.as_uri().to_string()), false)
-                    },
-                    Redirect::Foreground(request) => {
-                        page.navigation
-                        .request
-                        .widget
-                        .entry
-                        .set_text(&request.as_uri().to_string());
-                        load(&page, Some(&request.as_uri().to_string()), false);
-                    }
-                }
-                Response::TextGemini { base, source, is_source_request } => {
-                    let widget = if is_source_request {
-                        page.content.to_text_source(&source)
-                    } else {
-                        page.content.to_text_gemini(&base, &source)
-                    };
-
-                    // Connect `TextView` widget, update `search` model
-                    page.search.set(Some(widget.text_view));
-
-                    // Update page meta
-                    page.status.replace(Status::Success { time: now() });
-                    page.title.replace(match widget.meta.title {
-                        Some(title) => title.into(), // @TODO
-                        None => uri_to_title(&base),
-                    });
-
-                    // Update window components
-                    page.window_action.find.simple_action.set_enabled(true);
-                    page.browser_action.update.activate(Some(&page.id));
-                }
-                Response::Download { base, cancellable, stream } => {
-                    // Init download widget
-                    let status = page.content.to_status_download(
-                        uri_to_title(&base).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
-                                                                          // format FS entities
-                        &cancellable,
-                        {
-                            let cancellable = cancellable.clone();
-                            let stream = stream.clone();
-                            move |file, action| {
-                                match file.replace(
-                                    None,
-                                    false,
-                                    gtk::gio::FileCreateFlags::NONE,
-                                    Some(&cancellable)
-                                ) {
-                                    Ok(file_output_stream) => {
-                                        // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                        // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                        // show bytes count in loading widget, validate max size for incoming data
-                                        // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                        ggemini::gio::file_output_stream::move_all_from_stream_async(
-                                            stream.clone(),
-                                            file_output_stream,
-                                            cancellable.clone(),
-                                            Priority::DEFAULT,
-                                            (
-                                                0x100000, // 1M bytes per chunk
-                                                None,     // unlimited
-                                                0         // initial totals
-                                            ),
-                                            (
-                                                // on chunk
-                                                {
-                                                    let action = action.clone();
-                                                    move |_, total| action.update.activate(
-                                                        &format!(
-                                                            "Received {}...",
-                                                            crate::tool::format_bytes(total)
-                                                        )
-                                                    )
-                                                },
-                                                // on complete
-                                                {
-                                                    let action = action.clone();
-                                                    move |result| match result {
-                                                        Ok((_, total)) => action.complete.activate(
-                                                            &format!("Saved to {} ({total} bytes total)", file.parse_name())
-                                                        ),
-                                                        Err(e) => action.cancel.activate(&e.to_string())
-                                                    }
+            // Update window components
+            page.window_action.find.simple_action.set_enabled(true);
+            page.browser_action.update.activate(Some(&page.id));
+        }
+        Response::Download {
+            base,
+            cancellable,
+            stream,
+        } => {
+            // Init download widget
+            let status = page.content.to_status_download(
+                uri_to_title(&base).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                // format FS entities
+                &cancellable,
+                {
+                    let cancellable = cancellable.clone();
+                    let stream = stream.clone();
+                    move |file, action| {
+                        match file.replace(
+                            None,
+                            false,
+                            gtk::gio::FileCreateFlags::NONE,
+                            Some(&cancellable),
+                        ) {
+                            Ok(file_output_stream) => {
+                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                // show bytes count in loading widget, validate max size for incoming data
+                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                ggemini::gio::file_output_stream::move_all_from_stream_async(
+                                    stream.clone(),
+                                    file_output_stream,
+                                    cancellable.clone(),
+                                    Priority::DEFAULT,
+                                    (
+                                        0x100000, // 1M bytes per chunk
+                                        None,     // unlimited
+                                        0,        // initial totals
+                                    ),
+                                    (
+                                        // on chunk
+                                        {
+                                            let action = action.clone();
+                                            move |_, total| {
+                                                action.update.activate(&format!(
+                                                    "Received {}...",
+                                                    crate::tool::format_bytes(total)
+                                                ))
+                                            }
+                                        },
+                                        // on complete
+                                        {
+                                            let action = action.clone();
+                                            move |result| match result {
+                                                Ok((_, total)) => {
+                                                    action.complete.activate(&format!(
+                                                        "Saved to {} ({total} bytes total)",
+                                                        file.parse_name()
+                                                    ))
                                                 }
-                                            )
-                                        );
+                                                Err(e) => action.cancel.activate(&e.to_string()),
+                                            }
+                                        },
+                                    ),
+                                );
+                            }
+                            Err(e) => action.cancel.activate(&e.to_string()),
+                        }
+                    }
+                },
+            );
+
+            // Update meta
+            page.status.replace(Status::Success { time: now() });
+            page.title.replace(status.title());
+
+            // Update window
+            page.browser_action.update.activate(Some(&page.id));
+        }
+        Response::Stream {
+            base,
+            mime,
+            stream,
+            cancellable,
+        } => match mime.as_str() {
+            // @TODO use client-side const or enum?
+            "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                // Final image size unknown, show loading widget
+                let status = page.content.to_status_loading(
+                    Some(Duration::from_secs(1)), // show if download time > 1 second
+                );
+
+                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                // show bytes count in loading widget, validate max size for incoming data
+                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                ggemini::gio::memory_input_stream::from_stream_async(
+                    stream,
+                    cancellable.clone(),
+                    Priority::DEFAULT,
+                    0x400, // 1024 bytes per chunk, optional step for images download tracking
+                    0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
+                    move |_, total| {
+                        // Update loading progress
+                        status.set_description(Some(&format!("Download: {total} bytes")));
+                    },
+                    {
+                        let page = page.clone();
+                        move |result| match result {
+                            Ok((memory_input_stream, _)) => {
+                                Pixbuf::from_stream_async(
+                                    &memory_input_stream,
+                                    Some(&cancellable),
+                                    move |result| {
+                                        // Process buffer data
+                                        match result {
+                                            Ok(buffer) => {
+                                                // Update page meta
+                                                page.status
+                                                    .replace(Status::Success { time: now() });
+                                                page.title.replace(uri_to_title(&base));
+
+                                                // Update page content
+                                                page.content
+                                                    .to_image(&Texture::for_pixbuf(&buffer));
+
+                                                // Update window components
+                                                page.browser_action.update.activate(Some(&page.id));
+                                            }
+                                            Err(e) => {
+                                                // Update widget
+                                                let status = page.content.to_status_failure();
+                                                status.set_description(Some(e.message()));
+
+                                                // Update meta
+                                                page.status
+                                                    .replace(Status::Failure { time: now() });
+                                                page.title.replace(status.title());
+                                            }
+                                        }
                                     },
-                                    Err(e) => action.cancel.activate(&e.to_string())
-                                }
+                                );
+                            }
+                            Err(e) => {
+                                // Update widget
+                                let status = page.content.to_status_failure();
+                                status.set_description(Some(&e.to_string()));
+
+                                // Update meta
+                                page.status.replace(Status::Failure { time: now() });
+                                page.title.replace(status.title());
                             }
                         }
-                    );
-
-                    // Update meta
-                    page.status.replace(Status::Success { time: now() });
-                    page.title.replace(status.title());
-
-                    // Update window
-                    page.browser_action.update.activate(Some(&page.id));
-                }
-                Response::Stream { base, mime, stream, cancellable } => match mime.as_str() {
-                    // @TODO use client-side const or enum?
-                    "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                        // Final image size unknown, show loading widget
-                        let status = page.content.to_status_loading(
-                            Some(Duration::from_secs(1)), // show if download time > 1 second
-                        );
-
-                        // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                        // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                        // show bytes count in loading widget, validate max size for incoming data
-                        // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                        ggemini::gio::memory_input_stream::from_stream_async(
-                            stream,
-                            cancellable.clone(),
-                            Priority::DEFAULT,
-                            0x400, // 1024 bytes per chunk, optional step for images download tracking
-                            0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                            move |_, total| {
-                                // Update loading progress
-                                status.set_description(Some(&format!(
-                                    "Download: {total} bytes"
-                                )));
-                            },
-                            {
-                                let page = page.clone();
-                                move |result| match result {
-                                    Ok((memory_input_stream, _)) => {
-                                        Pixbuf::from_stream_async(
-                                            &memory_input_stream,
-                                            Some(&cancellable),
-                                            move |result| {
-                                                // Process buffer data
-                                                match result {
-                                                    Ok(buffer) => {
-                                                        // Update page meta
-                                                        page.status.replace(Status::Success {
-                                                            time: now(),
-                                                        });
-                                                        page.title.replace(uri_to_title(&base));
-
-                                                        // Update page content
-                                                        page.content.to_image(
-                                                            &Texture::for_pixbuf(&buffer),
-                                                        );
-
-                                                        // Update window components
-                                                        page.browser_action
-                                                            .update
-                                                            .activate(Some(&page.id));
-                                                    }
-                                                    Err(e) => {
-                                                        // Update widget
-                                                        let status = page.content.to_status_failure();
-                                                        status.set_description(Some(
-                                                            e.message(),
-                                                        ));
-
-                                                        // Update meta
-                                                        page.status.replace(Status::Failure {
-                                                            time: now(),
-                                                        });
-                                                        page.title.replace(status.title());
-                                                    }
-                                                }
-                                            },
-                                        );
-                                    }
-                                    Err(e) => {
-                                        // Update widget
-                                        let status = page.content.to_status_failure();
-                                        status.set_description(Some(&e.to_string()));
-
-                                        // Update meta
-                                        page.status.replace(Status::Failure { time: now() });
-                                        page.title.replace(status.title());
-                                    }
-                                }
-                            },
-                        );
-                    }
-                    _ => todo!(), // unexpected
-                }
+                    },
+                );
             }
-        }
-    });
+            _ => todo!(), // unexpected
+        },
+    }
 }
