@@ -352,8 +352,7 @@ pub fn load(page: &Rc<Page>, request: Option<&str>, is_history: bool) {
         None => &page.navigation.request.widget.entry.text(),
     };
 
-    page.client
-    .request(&query, {
+    page.client.request(query, {
         let page = page.clone();
         move |response| {
             match response {
