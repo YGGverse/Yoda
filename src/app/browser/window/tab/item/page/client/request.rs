@@ -57,7 +57,7 @@ impl Request {
         }
     }
 
-    /// Create new `Self` as the search query to default provider
+    /// Create new `Self` as the redirection query to default search provider
     /// @TODO
     // * implement DNS lookup before apply this option
     // * make search provider optional
