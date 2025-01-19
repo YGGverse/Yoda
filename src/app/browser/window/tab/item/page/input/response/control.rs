@@ -40,7 +40,7 @@ impl Control {
         // Update children components
         self.counter.update(is_empty, bytes_left);
         self.send.update(match bytes_left {
-            Some(left) => !is_empty && left > 0,
+            Some(left) => !is_empty && left >= 0,
             None => false,
         });
     }
