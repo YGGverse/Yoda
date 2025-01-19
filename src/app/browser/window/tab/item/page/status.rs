@@ -9,7 +9,6 @@ pub enum Status {
     Input { time: DateTime },
     Loading { time: DateTime },
     New { time: DateTime },
-    Redirect { time: DateTime },
     SessionRestore { time: DateTime },
     SessionRestored { time: DateTime },
     Success { time: DateTime },
@@ -40,10 +39,7 @@ impl Status {
                     Gemini::Complete { .. } => Some(0.9),
                 },
             },
-            Self::Failure { .. }
-            | Self::Success { .. }
-            | Self::Redirect { .. }
-            | Self::Input { .. } => Some(1.0),
+            Self::Failure { .. } | Self::Success { .. } | Self::Input { .. } => Some(1.0),
             Self::New { .. } | Self::SessionRestored { .. } => None,
         }
     }

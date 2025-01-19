@@ -1,7 +1,7 @@
 mod action;
 mod database;
 mod identity;
-mod page;
+pub mod page;
 mod widget;
 
 use action::Action;
@@ -75,7 +75,7 @@ impl Item {
             page.navigation.request.widget.entry.set_text(&text);
 
             if is_load {
-                page.load(true);
+                page::load(&page, true);
             }
         }
 
@@ -111,7 +111,7 @@ impl Item {
                 if let Some(text) = request {
                     page.navigation.request.widget.entry.set_text(&text);
                 }
-                page.load(is_history);
+                page::load(&page, is_history);
             }
         });
 

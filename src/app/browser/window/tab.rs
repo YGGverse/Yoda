@@ -219,7 +219,7 @@ impl Tab {
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.page.navigation.request.to_download();
-            item.page.load(true);
+            item::page::load(&item.page, true);
         }
     }
 
@@ -227,7 +227,7 @@ impl Tab {
     pub fn source(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.page.navigation.request.to_source();
-            item.page.load(true);
+            item::page::load(&item.page, true);
         }
     }
 
@@ -250,26 +250,26 @@ impl Tab {
 
     pub fn page_home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.home();
+            item::page::home(&item.page);
         }
     }
 
     pub fn page_history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.history_back();
+            item::page::history_back(&item.page);
         }
     }
 
     pub fn page_history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.history_forward();
+            item::page::history_forward(&item.page);
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.load(true);
+            item::page::load(&item.page, true);
         }
     }
 
