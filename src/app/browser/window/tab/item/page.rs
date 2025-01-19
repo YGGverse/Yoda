@@ -429,7 +429,6 @@ fn handle(page: &Rc<Page>, response: client::Response) {
                         Some(&response_title),
                         Some(1024),
                     );
-
                     page.title.replace(response_title);
                 }
                 Input::Sensitive {
@@ -442,7 +441,6 @@ fn handle(page: &Rc<Page>, response: client::Response) {
                         Some(&response_title),
                         Some(1024),
                     );
-
                     page.title.replace(response_title);
                 }
                 Input::Titan(this) => {
