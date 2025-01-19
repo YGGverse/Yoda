@@ -117,3 +117,41 @@ impl Request {
 pub fn search(query: &str) -> Request {
     Request::from_uri(search::tgls(query), None, None).unwrap() // no handler as unexpected
 }
+
+/// Asynchronously check request string contain resolvable query
+/// * useful for scheme-less requests, before do search redirect
+fn lookup(
+    query: &str,
+    cancellable: Option<&Cancellable>,
+    callback: impl FnOnce(Request) + 'static,
+) {
+    use gtk::{
+        gio::{NetworkAddress, Resolver},
+        prelude::{NetworkAddressExt, ResolverExt},
+    };
+
+    const DEFAULT_SCHEME: &str = "gemini://";
+    const DEFAULT_PORT: u16 = 1965;
+    const TIMEOUT: u32 = 500;
+
+    let request = match query.trim().strip_prefix(DEFAULT_SCHEME) {
+        Some(postfix) => format!("{DEFAULT_SCHEME}{postfix}"),
+        None => query.to_string(),
+    };
+
+    let resolver = Resolver::default();
+    resolver.set_timeout(TIMEOUT);
+
+    match NetworkAddress::parse_uri(&request, DEFAULT_PORT) {
+        Ok(connectable) => {
+            resolver.lookup_by_name_async(&connectable.hostname(), cancellable, move |resolve| {
+                callback(if resolve.is_ok() {
+                    search(&request) // @TODO begin direct request
+                } else {
+                    search(&request)
+                })
+            })
+        }
+        Err(_) => callback(search(&request)),
+    }
+}

@@ -6,9 +6,8 @@ use widget::Widget;
 
 use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
 use gtk::{
-    gio::{Cancellable, NetworkAddress, Resolver},
     glib::{gformat, GString, Uri, UriFlags},
-    prelude::{EditableExt, NetworkAddressExt, ResolverExt},
+    prelude::EditableExt,
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -103,28 +102,6 @@ impl Request {
         self.widget.entry.set_text(&self.source());
     }
 
-    /// Asynchronously try replace `Self` entry value with valid, resolvable Gemini request
-    /// * callback with `None` if current value does not compatible with Gemini scheme
-    pub fn to_gemini_async(
-        &self,
-        resolver_timeout: u32,
-        cancellable: Option<&Cancellable>,
-        callback: impl FnOnce(Option<GString>) + 'static,
-    ) {
-        self.gemini_async(resolver_timeout, cancellable, {
-            let entry = self.widget.entry.clone();
-            move |result| {
-                callback(match result {
-                    Some(url) => {
-                        entry.set_text(&url);
-                        Some(url)
-                    }
-                    None => None,
-                })
-            }
-        });
-    }
-
     // Getters
 
     /// Get current request value in [Uri](https://docs.gtk.org/glib/struct.Uri.html) format
@@ -151,34 +128,6 @@ impl Request {
     pub fn source(&self) -> GString {
         gformat!("source:{}", self.strip_prefix())
     }
-
-    /// Asynchronously get valid, resolvable Gemini request for current `Self` entry value
-    /// * callback with `None` if current value does not compatible with Gemini scheme
-    pub fn gemini_async(
-        &self,
-        resolver_timeout: u32,
-        cancellable: Option<&Cancellable>,
-        callback: impl FnOnce(Option<GString>) + 'static,
-    ) {
-        // suggest scheme
-        let url = gformat!("gemini://{}", self.strip_prefix().trim());
-
-        // setup default resolver
-        // * wanted to detect value contain **resolvable** hostname
-        let resolver = Resolver::default();
-        resolver.set_timeout(resolver_timeout);
-
-        // is connectable
-        if let Ok(connectable) = NetworkAddress::parse_uri(&url, 1965) {
-            // is resolvable
-            resolver.lookup_by_name_async(&connectable.hostname(), cancellable, move |result| {
-                callback(match result {
-                    Ok(_) => Some(url),
-                    Err(_) => None,
-                })
-            })
-        }
-    }
 }
 
 // Tools
@@ -195,7 +144,7 @@ pub fn strip_prefix(mut request: GString) -> GString {
     };
 
     request
-}
+} // @TODO move prefix features to page client
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
