@@ -417,62 +417,56 @@ fn handle(page: &Rc<Page>, response: client::Response) {
                 page.browser_action.update.activate(Some(&page.id));
             }
         },
-        Response::Input(this) => match this {
-            Input::Response {
-                base,
-                title: response_title,
-            } => {
-                page.input.set_new_response(
-                    page.tab_action.clone(),
+        Response::Input(this) => {
+            match this {
+                Input::Response {
                     base,
-                    Some(&response_title),
-                    Some(1024),
-                );
+                    title: response_title,
+                } => {
+                    page.input.set_new_response(
+                        page.tab_action.clone(),
+                        base,
+                        Some(&response_title),
+                        Some(1024),
+                    );
 
-                page.status.replace(Status::Input { time: now() });
-                page.title.replace(response_title);
-
-                page.browser_action.update.activate(Some(&page.id));
-            }
-            Input::Sensitive {
-                base,
-                title: response_title,
-            } => {
-                page.input.set_new_sensitive(
-                    page.tab_action.clone(),
+                    page.title.replace(response_title);
+                }
+                Input::Sensitive {
                     base,
-                    Some(&response_title),
-                    Some(1024),
-                );
+                    title: response_title,
+                } => {
+                    page.input.set_new_sensitive(
+                        page.tab_action.clone(),
+                        base,
+                        Some(&response_title),
+                        Some(1024),
+                    );
 
-                page.status.replace(Status::Input { time: now() });
-                page.title.replace(response_title);
+                    page.title.replace(response_title);
+                }
+                Input::Titan(this) => {
+                    page.input.set_new_titan(this, {
+                        let page = page.clone();
+                        move |result| match result {
+                            Ok(response) => handle(&page, response),
+                            Err(e) => {
+                                let status = page.content.to_status_failure();
+                                //status.set_description(Some(&e.to_string()));
+                                // @TODO
 
-                page.browser_action.update.activate(Some(&page.id));
-            }
-            Input::Titan(this) => {
-                page.input.set_new_titan(this, {
-                    let page = page.clone();
-                    move |result| match result {
-                        Ok(response) => handle(&page, response),
-                        Err(e) => {
-                            let status = page.content.to_status_failure();
-                            //status.set_description(Some(&e.to_string()));
-                            // @TODO
-
-                            page.status.replace(Status::Failure { time: now() });
-                            page.title.replace(status.title());
-                            page.browser_action.update.activate(Some(&page.id));
+                                page.status.replace(Status::Failure { time: now() });
+                                page.title.replace(status.title());
+                                page.browser_action.update.activate(Some(&page.id));
+                            }
                         }
-                    }
-                });
-
-                page.status.replace(Status::Input { time: now() });
-                page.title.replace("Titan input".into());
-
-                page.browser_action.update.activate(Some(&page.id));
-            }
-        },
+                    });
+                    page.title.replace("Titan input".into());
+                }
+            };
+            page.status.replace(Status::Input { time: now() });
+            page.browser_action.update.activate(Some(&page.id));
+        }
         Response::Redirect(this) => match this {
             Redirect::Background(request) => {
                 load(&page, Some(&request.as_uri().to_string()), false)
