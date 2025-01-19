@@ -57,6 +57,58 @@ impl Request {
         }
     }
 
+    /// Create new `Self` as the search query to default provider
+    /// @TODO
+    // * implement DNS lookup before apply this option
+    // * make search provider optional
+    // * validate request len by gemini specifications
+    pub fn search(query: &str) -> Self {
+        Self::from_uri(search::tgls(query), None, None).unwrap() // no handler as unexpected
+    }
+
+    /// Create new `Self` using DNS async resolver (slow method)
+    /// * useful for scheme-less requests, before apply search redirect
+    pub fn lookup(
+        query: &str,
+        cancellable: Option<&Cancellable>,
+        callback: impl FnOnce(Result<Self, Error>) + 'static,
+    ) {
+        use gtk::{
+            gio::{NetworkAddress, Resolver},
+            prelude::{NetworkAddressExt, ResolverExt},
+        };
+
+        const DEFAULT_SCHEME: &str = "gemini://";
+        const DEFAULT_PORT: u16 = 1965;
+        const TIMEOUT: u32 = 1000;
+
+        let request = match query.trim().strip_prefix(DEFAULT_SCHEME) {
+            Some(postfix) => format!("{DEFAULT_SCHEME}{postfix}"),
+            None => query.to_string(),
+        };
+
+        let resolver = Resolver::default();
+        resolver.set_timeout(TIMEOUT);
+
+        match NetworkAddress::parse_uri(&request, DEFAULT_PORT) {
+            Ok(connectable) => resolver.lookup_by_name_async(
+                &connectable.hostname(),
+                cancellable,
+                move |resolve| {
+                    callback(if resolve.is_ok() {
+                        match Uri::parse(&request, UriFlags::NONE) {
+                            Ok(uri) => Self::from_uri(uri, None, None),
+                            Err(e) => Err(Error::Glib(e)),
+                        }
+                    } else {
+                        Ok(Self::search(&request))
+                    })
+                },
+            ),
+            Err(_) => callback(Ok(Self::search(&request))), // @TODO not completed yet, fix invalid URI issue
+        }
+    }
+
     // Actions
 
     /// Handle `Self` request
@@ -104,57 +156,5 @@ impl Request {
         .as_ref()
         .map_or(0, |request| request.referrers());
         1 + count
-    }
-}
-
-// Tools
-
-/// Create new search `Request`
-/// @TODO
-// * implement DNS lookup before apply this option
-// * make search provider optional
-// * validate request len by gemini specifications
-pub fn search(query: &str) -> Request {
-    Request::from_uri(search::tgls(query), None, None).unwrap() // no handler as unexpected
-}
-
-/// Asynchronously check request string contain resolvable query
-/// * useful for scheme-less requests, before do search redirect
-pub fn lookup(
-    query: &str,
-    cancellable: Option<&Cancellable>,
-    callback: impl FnOnce(Result<Request, Error>) + 'static,
-) {
-    use gtk::{
-        gio::{NetworkAddress, Resolver},
-        prelude::{NetworkAddressExt, ResolverExt},
-    };
-
-    const DEFAULT_SCHEME: &str = "gemini://";
-    const DEFAULT_PORT: u16 = 1965;
-    const TIMEOUT: u32 = 1000;
-
-    let request = match query.trim().strip_prefix(DEFAULT_SCHEME) {
-        Some(postfix) => format!("{DEFAULT_SCHEME}{postfix}"),
-        None => query.to_string(),
-    };
-
-    let resolver = Resolver::default();
-    resolver.set_timeout(TIMEOUT);
-
-    match NetworkAddress::parse_uri(&request, DEFAULT_PORT) {
-        Ok(connectable) => {
-            resolver.lookup_by_name_async(&connectable.hostname(), cancellable, move |resolve| {
-                callback(if resolve.is_ok() {
-                    match Uri::parse(&request, UriFlags::NONE) {
-                        Ok(uri) => Request::from_uri(uri, None, None),
-                        Err(e) => Err(Error::Glib(e)),
-                    }
-                } else {
-                    Ok(search(&request))
-                })
-            })
-        }
-        Err(_) => callback(Ok(search(&request))), // @TODO not completed yet, fix invalid URI issue
     }
 }

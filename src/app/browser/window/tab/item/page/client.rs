@@ -86,11 +86,12 @@ impl Client {
                 Error::Unsupported => callback(Response::Failure(Failure::Error {
                     message: "Request scheme yet not supported".to_string(),
                 })),
-                _ => request::lookup(query, Some(&cancellable), |result| {
+                // try async resolver
+                _ => Request::lookup(query, Some(&cancellable), |result| {
                     callback(match result {
                         // redirection with scheme auto-complete or default search provider
                         Ok(request) => Response::Redirect(Redirect::Foreground(request)),
-                        // unresolvable request issue
+                        // unresolvable request.
                         Err(e) => Response::Failure(Failure::Error {
                             message: e.to_string(),
                         }),
