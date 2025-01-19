@@ -52,11 +52,14 @@ impl Response {
             let control = control.clone();
             let form = form.clone();
             move |_, _| {
-                control.update(size_limit.map(|limit| {
-                    limit
-                        - (base.to_string_partial(UriHideFlags::QUERY).len()
-                            + Uri::escape_string(&form.widget.text(), None, false).len())
-                }))
+                control.update(
+                    form.widget.text().is_empty(),
+                    size_limit.map(|limit| {
+                        limit
+                            - (base.to_string_partial(UriHideFlags::QUERY).len()
+                                + Uri::escape_string(&form.widget.text(), None, false).len())
+                    }),
+                )
             }
         });
 
