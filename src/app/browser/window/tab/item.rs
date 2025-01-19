@@ -73,9 +73,8 @@ impl Item {
 
         if let Some(text) = request {
             page.navigation.request.widget.entry.set_text(&text);
-
             if is_load {
-                page::load(&page, true);
+                page::load(&page, None, true);
             }
         }
 
@@ -111,7 +110,7 @@ impl Item {
                 if let Some(text) = request {
                     page.navigation.request.widget.entry.set_text(&text);
                 }
-                page::load(&page, is_history);
+                page::load(&page, None, is_history);
             }
         });
 

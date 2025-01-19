@@ -239,8 +239,6 @@ impl Page {
     }
 }
 
-// Private helpers
-
 // Tools
 
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
@@ -301,12 +299,8 @@ fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
 /// Navigate home URL (parsed from current navigation entry)
 /// * this method create new history record in memory as defined in `action_page_open` action
 pub fn home(page: &Rc<Page>) {
-    if let Some(url) = page.navigation.home.url() {
-        // Update navigation entry
-        page.navigation.request.widget.entry.set_text(&url);
-
-        // Load page (with history record)
-        load(page, true);
+    if let Some(request) = page.navigation.home.url() {
+        load(page, Some(request.as_str()), false);
     }
 }
 
@@ -314,11 +308,7 @@ pub fn home(page: &Rc<Page>) {
 /// * this method does not create new history record in memory
 pub fn history_back(page: &Rc<Page>) {
     if let Some(request) = page.navigation.history.back(true) {
-        // Update navigation entry
-        page.navigation.request.widget.entry.set_text(&request);
-
-        // Load page (without history record)
-        load(page, false);
+        load(page, Some(request.as_str()), false);
     }
 }
 
@@ -326,16 +316,15 @@ pub fn history_back(page: &Rc<Page>) {
 /// * this method does not create new history record in memory
 pub fn history_forward(page: &Rc<Page>) {
     if let Some(request) = page.navigation.history.forward(true) {
-        // Update navigation entry
-        page.navigation.request.widget.entry.set_text(&request);
-
-        // Load page (without history record)
-        load(page, false);
+        load(page, Some(request.as_str()), false);
     }
 }
 
 /// Page load function with recursive redirection support
-pub fn load(page: &Rc<Page>, is_history: bool) {
+pub fn load(page: &Rc<Page>, request: Option<&str>, is_history: bool) {
+    use client::response::{Certificate, Failure, Input, Redirect};
+    use client::Response;
+
     // Move focus out from navigation entry
     page.browser_action
         .escape
@@ -347,8 +336,6 @@ pub fn load(page: &Rc<Page>, is_history: bool) {
     // Reset widgets
     page.search.unset();
     page.input.unset();
-
-    // Update
     page.status.replace(Status::Loading { time: now() });
     page.title.replace("Loading..".into());
     page.browser_action.update.activate(Some(&page.id));
@@ -357,11 +344,13 @@ pub fn load(page: &Rc<Page>, is_history: bool) {
         snap_history(&page.profile, &page.navigation, None); // @TODO
     }
 
-    use client::response::{Certificate, Failure, Input, Redirect};
-    use client::Response;
+    let query = match request {
+        Some(query) => query,
+        None => &page.navigation.request.widget.entry.text(),
+    };
 
     page.client
-    .request(&page.navigation.request.widget.entry.text(), {
+    .request(&query, {
         let page = page.clone();
         move |response| {
             match response {
@@ -457,13 +446,16 @@ pub fn load(page: &Rc<Page>, is_history: bool) {
                 },
                 Response::Redirect(this) => match this {
                     Redirect::Background(request) => {
-                        println!("{}",request.as_uri());load(&page, false)
-                    }, // @TODO
-                    Redirect::Foreground(request) => {page.navigation
-                    .request
-                    .widget
-                    .entry
-                    .set_text(&request.as_uri().to_string())} // @TODO handle
+                        load(&page, Some(&request.as_uri().to_string()), false)
+                    },
+                    Redirect::Foreground(request) => {
+                        page.navigation
+                        .request
+                        .widget
+                        .entry
+                        .set_text(&request.as_uri().to_string());
+                        load(&page, Some(&request.as_uri().to_string()), false);
+                    }
                 }
                 Response::TextGemini { base, source, is_source_request } => {
                     let widget = if is_source_request {
