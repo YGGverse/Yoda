@@ -5,7 +5,7 @@ use gtk::{
     glib::{Priority, Uri, UriFlags},
 };
 
-pub fn send(
+pub fn request(
     client: &Client,
     feature: Feature,
     uri: Uri,
@@ -13,7 +13,7 @@ pub fn send(
     cancellable: Cancellable,
     callback: impl FnOnce(Response) + 'static,
 ) {
-    request(
+    send(
         client,
         uri.clone(),
         cancellable.clone(),
@@ -27,7 +27,7 @@ pub fn send(
 }
 
 /// Shared request interface for Gemini protocol
-fn request(
+fn send(
     client: &Client,
     uri: Uri,
     cancellable: Cancellable,
