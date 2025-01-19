@@ -239,63 +239,6 @@ impl Page {
     }
 }
 
-// Tools
-
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
-    // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
-
-    // Delegate migration to childs
-    navigation::migrate(tx)?;
-
-    // Success
-    Ok(())
-}
-
-/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-/// * useful as common placeholder when page title could not be detected
-/// * this feature may be improved and moved outside @TODO
-fn uri_to_title(uri: &Uri) -> GString {
-    let path = uri.path();
-    if path.split('/').last().unwrap_or_default().is_empty() {
-        match uri.host() {
-            Some(host) => host,
-            None => "Untitled".into(),
-        }
-    } else {
-        path
-    }
-}
-
-/// Make new history record in related components
-/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
-fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
-    let request = navigation.request.widget.entry.text();
-
-    // Add new record into the global memory index (used in global menu)
-    // * if the `Uri` is `None`, try parse it from `request`
-    match uri {
-        Some(uri) => profile.history.memory.request.set(uri.clone()),
-        None => {
-            // this case especially useful for some routes that contain redirects
-            // maybe some parental optimization wanted @TODO
-            if let Some(uri) = navigation.request.uri() {
-                profile.history.memory.request.set(uri);
-            }
-        }
-    }
-
-    // Add new record into the page navigation history
-    if match navigation.history.current() {
-        Some(current) => current != request, // apply additional filters
-        None => true,
-    } {
-        navigation.history.add(request, true)
-    }
-}
-
 /// Navigate home URL (parsed from current navigation entry)
 /// * this method create new history record in memory as defined in `action_page_open` action
 pub fn home(page: &Rc<Page>) {
@@ -353,6 +296,63 @@ pub fn load(page: &Rc<Page>, request: Option<&str>, is_history: bool) {
         let page = page.clone();
         move |response| handle(&page, response)
     });
+}
+
+// Tools
+
+pub fn migrate(tx: &Transaction) -> Result<(), String> {
+    // Migrate self components
+    if let Err(e) = database::init(tx) {
+        return Err(e.to_string());
+    }
+
+    // Delegate migration to childs
+    navigation::migrate(tx)?;
+
+    // Success
+    Ok(())
+}
+
+/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+/// * useful as common placeholder when page title could not be detected
+/// * this feature may be improved and moved outside @TODO
+fn uri_to_title(uri: &Uri) -> GString {
+    let path = uri.path();
+    if path.split('/').last().unwrap_or_default().is_empty() {
+        match uri.host() {
+            Some(host) => host,
+            None => "Untitled".into(),
+        }
+    } else {
+        path
+    }
+}
+
+/// Make new history record in related components
+/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
+fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
+    let request = navigation.request.widget.entry.text();
+
+    // Add new record into the global memory index (used in global menu)
+    // * if the `Uri` is `None`, try parse it from `request`
+    match uri {
+        Some(uri) => profile.history.memory.request.set(uri.clone()),
+        None => {
+            // this case especially useful for some routes that contain redirects
+            // maybe some parental optimization wanted @TODO
+            if let Some(uri) = navigation.request.uri() {
+                profile.history.memory.request.set(uri);
+            }
+        }
+    }
+
+    // Add new record into the page navigation history
+    if match navigation.history.current() {
+        Some(current) => current != request, // apply additional filters
+        None => true,
+    } {
+        navigation.history.add(request, true)
+    }
 }
 
 /// Response handler for `Page`
