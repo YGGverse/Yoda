@@ -151,12 +151,23 @@ impl Request {
     /// Recursively count referrers of `Self`
     /// * useful to apply redirection rules by protocol driver selected
     pub fn referrers(&self) -> usize {
-        let count = match self {
+        match self {
             Request::Gemini { referrer, .. } => referrer,
             Request::Titan { referrer, .. } => referrer,
         }
         .as_ref()
-        .map_or(0, |request| request.referrers());
-        1 + count
+        .map_or(0, |request| request.referrers())
+            + 1
     }
+}
+
+#[test]
+fn test_referrers() {
+    const QUERY: &str = "gemini://geminiprotocol.net";
+
+    let r1 = Request::parse(QUERY, None).unwrap();
+    let r2 = Request::parse(QUERY, Some(r1)).unwrap();
+    let r3 = Request::parse(QUERY, Some(r2)).unwrap();
+
+    assert_eq!(r3.referrers(), 3);
 }
