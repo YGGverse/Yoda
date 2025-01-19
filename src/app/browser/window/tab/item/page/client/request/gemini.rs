@@ -84,7 +84,7 @@ fn handle(
                     move |result| match result {
                         Ok(text) => callback(Response::TextGemini {
                             base: request.as_uri().clone(),
-                            source: text.data,
+                            source: text.as_gstring(),
                             is_source_request: matches!(request.feature(), Feature::Source), // @TODO return `Feature`?
                         }),
                         Err(e) => callback(Response::Failure(Failure::Mime {
