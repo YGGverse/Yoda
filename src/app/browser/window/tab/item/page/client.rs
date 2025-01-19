@@ -73,16 +73,30 @@ impl Client {
             time: now(),
             value: query.to_string(),
         });
+
+        use request::Error;
+        use response::{Failure, Redirect};
+
+        let cancellable = self.new_cancellable();
+
         match Request::parse(query, None) {
-            Ok(request) => request.handle(self, self.new_cancellable(), callback),
-            Err(e) => callback(match e {
+            Ok(request) => request.handle(self, cancellable, callback),
+            Err(e) => match e {
                 // return failure response on unsupported scheme detected
-                request::Error::Unsupported => Response::Failure(response::Failure::Error {
+                Error::Unsupported => callback(Response::Failure(Failure::Error {
                     message: "Request scheme yet not supported".to_string(),
+                })),
+                _ => request::lookup(query, Some(&cancellable), |result| {
+                    callback(match result {
+                        // redirection with scheme auto-complete or default search provider
+                        Ok(request) => Response::Redirect(Redirect::Foreground(request)),
+                        // unresolvable request issue
+                        Err(e) => Response::Failure(Failure::Error {
+                            message: e.to_string(),
+                        }),
+                    })
                 }),
-                // request redirection to default search provider
-                _ => Response::Redirect(response::Redirect::Foreground(request::search(query))),
-            }),
+            },
         }
     }
 
