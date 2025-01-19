@@ -27,7 +27,7 @@ impl Request {
     // Constructors
 
     /// Create new `Self` from featured string
-    pub fn parse(query: &str, referrer: Option<Box<Self>>) -> Result<Self, Error> {
+    pub fn parse(query: &str, referrer: Option<Self>) -> Result<Self, Error> {
         let (feature, request) = Feature::parse(query);
 
         match Uri::parse(request, UriFlags::NONE) {
@@ -40,15 +40,18 @@ impl Request {
     pub fn from_uri(
         uri: Uri,
         feature: Option<Feature>,
-        referrer: Option<Box<Self>>,
+        referrer: Option<Self>,
     ) -> Result<Self, Error> {
         match uri.scheme().as_str() {
             "gemini" => Ok(Self::Gemini {
                 feature: feature.unwrap_or_default(),
-                referrer,
+                referrer: referrer.map(Box::new),
                 uri,
             }),
-            "titan" => Ok(Self::Titan { referrer, uri }),
+            "titan" => Ok(Self::Titan {
+                referrer: referrer.map(Box::new),
+                uri,
+            }),
             _ => Err(Error::Unsupported),
         }
     }
@@ -62,16 +65,9 @@ impl Request {
         cancellable: Cancellable,
         callback: impl FnOnce(Response) + 'static,
     ) {
-        match self {
-            Self::Gemini {
-                feature,
-                referrer,
-                uri,
-            } => gemini::request(client, feature, uri, referrer, cancellable, callback),
-            Self::Titan {
-                referrer: _,
-                uri: _,
-            } => todo!(),
+        match &self {
+            Self::Gemini { .. } => gemini::request(client, self, cancellable, callback),
+            Self::Titan { .. } => todo!(),
         }
     }
 
@@ -86,6 +82,14 @@ impl Request {
                 uri,
             }
             | Self::Titan { referrer: _, uri } => uri,
+        }
+    }
+
+    /// Get `Feature` reference for `Self`
+    pub fn feature(&self) -> &Feature {
+        match self {
+            Request::Gemini { feature, .. } => feature,
+            Request::Titan { .. } => &Feature::Default,
         }
     }
 
