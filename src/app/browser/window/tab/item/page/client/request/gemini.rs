@@ -9,7 +9,7 @@ pub fn send(
     client: &Client,
     feature: Feature,
     uri: Uri,
-    referrer: Vec<Request>,
+    referrer: Option<Box<Request>>,
     cancellable: Cancellable,
     callback: impl FnOnce(Response) + 'static,
 ) {
@@ -56,7 +56,7 @@ fn request(
 fn handle(
     response: ggemini::client::connection::Response,
     base: Uri,
-    referrer: Vec<Request>,
+    referrer: Option<Box<Request>>,
     feature: Feature,
     cancellable: Cancellable,
     callback: impl FnOnce(Response) + 'static,
@@ -117,23 +117,9 @@ fn handle(
             })),
         },
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-        Status::Redirect => callback(redirect(
-            response,
-            base,
-            referrer,
-            cancellable,
-            Priority::DEFAULT,
-            false,
-        )),
+        Status::Redirect => callback(redirect(response, feature, base, referrer, false)),
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-        Status::PermanentRedirect => callback(redirect(
-            response,
-            base,
-            referrer,
-            cancellable,
-            Priority::DEFAULT,
-            true,
-        )),
+        Status::PermanentRedirect => callback(redirect(response, feature, base, referrer, true)),
         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
         Status::CertificateRequest => callback(Response::Certificate(Certificate::Request {
             title: match response.meta.data {
@@ -161,26 +147,24 @@ fn handle(
     }
 }
 
-/// Shared redirection `Response` builder
+/// `Response::Redirect` builder
+/// * [Redirect specification](https://geminiprotocol.net/docs/protocol-specification.gmi#redirection)
 fn redirect(
-    // Subject to parse
     response: ggemini::client::connection::Response,
-    // Wanted to process relative links
-    base: Uri,
-    // List of previous requests to handle redirection rules
-    referrer: Vec<Request>,
-    cancellable: Cancellable,
-    priority: Priority,
-    is_foreground: bool,
+    feature: Feature,
+    base: Uri,                      // relative links conversion
+    referrer: Option<Box<Request>>, // handles redirection rules
+    is_permanent: bool,
 ) -> Response {
-    // Validate redirection attempt
-    // [Gemini protocol specifications](https://geminiprotocol.net/docs/protocol-specification.gmi#redirection)
-    if referrer.len() > 5 {
-        return Response::Failure(Failure::Error {
-            message: "Max redirection count reached".to_string(),
-        });
+    // Validate redirection count
+    if let Some(ref referrer) = referrer {
+        if referrer.referrers() > 5 {
+            return Response::Failure(Failure::Error {
+                message: "Max redirection count reached".to_string(),
+            });
+        }
     }
-    // Target URL expected from client response meta data
+    // Target URL expected from response meta data
     match response.meta.data {
         Some(target) => match Uri::parse_relative(&base, target.as_str(), UriFlags::NONE) {
             Ok(target) => {
@@ -194,22 +178,20 @@ fn redirect(
                             .to_string(),
                     }); // @TODO placeholder page with optional link open button
                 }
-
-                // Build new `Request` for redirection `Response`
-                // * make sure that `referrer` already contain current `Request`
-                //  (to validate redirection count in chain)
-                todo!()
-                /*let request =
-                    Request::build(&target.to_string(), Some(referrer), cancellable, priority);
-
-                Response::Redirect(if is_foreground {
-                    Redirect::Foreground(request)
-                } else {
-                    Redirect::Background(request)
-                })*/
+                // Build new request
+                match Request::from_uri(target, Some(feature), referrer) {
+                    Ok(request) => Response::Redirect(if is_permanent {
+                        Redirect::Foreground(request)
+                    } else {
+                        Redirect::Background(request)
+                    }),
+                    Err(e) => Response::Failure(Failure::Error {
+                        message: e.to_string(),
+                    }),
+                }
             }
             Err(e) => Response::Failure(Failure::Error {
-                message: format!("Could not parse target address: {e}"),
+                message: e.to_string(),
             }),
         },
         None => Response::Failure(Failure::Error {
