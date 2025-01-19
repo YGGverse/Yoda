@@ -299,24 +299,27 @@ fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
 /// Navigate home URL (parsed from current navigation entry)
 /// * this method create new history record in memory as defined in `action_page_open` action
 pub fn home(page: &Rc<Page>) {
-    if let Some(request) = page.navigation.home.url() {
-        load(page, Some(request.as_str()), false);
+    if let Some(text) = page.navigation.home.url() {
+        page.navigation.request.widget.entry.set_text(&text);
+        load(page, None, false);
     }
 }
 
 /// Navigate back in history
 /// * this method does not create new history record in memory
 pub fn history_back(page: &Rc<Page>) {
-    if let Some(request) = page.navigation.history.back(true) {
-        load(page, Some(request.as_str()), false);
+    if let Some(text) = page.navigation.history.back(true) {
+        page.navigation.request.widget.entry.set_text(&text);
+        load(page, None, false);
     }
 }
 
 /// Navigate forward in history
 /// * this method does not create new history record in memory
 pub fn history_forward(page: &Rc<Page>) {
-    if let Some(request) = page.navigation.history.forward(true) {
-        load(page, Some(request.as_str()), false);
+    if let Some(text) = page.navigation.history.forward(true) {
+        page.navigation.request.widget.entry.set_text(&text);
+        load(page, None, false);
     }
 }
 
