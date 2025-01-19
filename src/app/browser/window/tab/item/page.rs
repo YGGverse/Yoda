@@ -198,7 +198,7 @@ impl Page {
         use client::Response;
 
         self.client
-            .request_async(&self.navigation.request.widget.entry.text(), {
+            .request(&self.navigation.request.widget.entry.text(), {
                 let browser_action = self.browser_action.clone();
                 let content = self.content.clone();
                 let id = self.id.clone();

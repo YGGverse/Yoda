@@ -68,7 +68,7 @@ impl Client {
 
     /// Begin new request
     /// * the `query` as string, to support system routes (e.g. `source:` prefix)
-    pub fn request_async(&self, query: &str, callback: impl FnOnce(Response) + 'static) {
+    pub fn request(&self, query: &str, callback: impl FnOnce(Response) + 'static) {
         self.status.replace(Status::Request {
             time: now(),
             value: query.to_string(),
