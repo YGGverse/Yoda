@@ -73,9 +73,17 @@ impl Client {
             time: now(),
             value: query.to_string(),
         });
-        Request::parse(query, None)
-            .unwrap() // @TODO
-            .handle(self, self.new_cancellable(), callback);
+        match Request::parse(query, None) {
+            Ok(request) => request.handle(self, self.new_cancellable(), callback),
+            Err(e) => callback(match e {
+                // return failure response on unsupported scheme detected
+                request::Error::Unsupported => Response::Failure(response::Failure::Error {
+                    message: "Request scheme yet not supported".to_string(),
+                }),
+                // request redirection to default search provider
+                _ => Response::Redirect(response::Redirect::Foreground(request::search(query))),
+            }),
+        }
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one

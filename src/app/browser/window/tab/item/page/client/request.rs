@@ -1,9 +1,10 @@
 mod error;
 mod feature;
 mod gemini;
+mod search;
 
 use super::{Client, Response};
-use error::Error;
+pub use error::Error;
 use feature::Feature;
 use gtk::{
     gio::Cancellable,
@@ -47,7 +48,7 @@ impl Request {
                 feature: feature.unwrap_or_default(),
                 referrer: referrer.map(Box::new),
                 uri,
-            }),
+            }), // @TODO validate request len by constructor
             "titan" => Ok(Self::Titan {
                 referrer: referrer.map(Box::new),
                 uri,
@@ -104,4 +105,15 @@ impl Request {
         .map_or(0, |request| request.referrers());
         1 + count
     }
+}
+
+// Tools
+
+/// Create new search `Request`
+/// @TODO
+// * implement DNS lookup before apply this option
+// * make search provider optional
+// * validate request len by gemini specifications
+pub fn search(query: &str) -> Request {
+    Request::from_uri(search::tgls(query), None, None).unwrap() // no handler as unexpected
 }
