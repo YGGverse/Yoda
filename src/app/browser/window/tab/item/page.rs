@@ -461,7 +461,7 @@ fn handle(page: &Rc<Page>, response: client::Response) {
                     });
                     page.title.replace("Titan input".into());
                 }
-            };
+            }
             page.status.replace(Status::Input { time: now() });
             page.browser_action.update.activate(Some(&page.id));
         }
