@@ -12,7 +12,7 @@ pub use redirect::Redirect;
 // Global dependencies
 use gtk::{
     gio::{Cancellable, IOStream},
-    glib::{GString, Uri},
+    glib::Uri,
 };
 
 /// Single `Client` response API for all protocol drivers
@@ -26,7 +26,7 @@ pub enum Response {
     Failure(Failure),
     TextGemini {
         base: Uri,
-        source: GString,
+        source: String,
         is_source_request: bool,
     },
     Input(Input),
