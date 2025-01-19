@@ -23,7 +23,7 @@ impl Counter {
     }
 
     // Actions
-    pub fn update(&self, is_empty: bool, bytes_left: Option<usize>) {
+    pub fn update(&self, is_empty: bool, bytes_left: Option<isize>) {
         self.widget.update(is_empty, bytes_left);
     }
 }

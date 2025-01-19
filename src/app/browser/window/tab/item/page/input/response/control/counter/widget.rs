@@ -19,7 +19,7 @@ impl Widget {
     }
 
     // Actions
-    pub fn update(&self, is_empty: bool, bytes_left: Option<usize>) {
+    pub fn update(&self, is_empty: bool, bytes_left: Option<isize>) {
         match bytes_left {
             Some(value) => {
                 // Update color on chars left reached

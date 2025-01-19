@@ -55,9 +55,10 @@ impl Response {
                 control.update(
                     form.widget.text().is_empty(),
                     size_limit.map(|limit| {
-                        limit
-                            - (base.to_string_partial(UriHideFlags::QUERY).len()
+                        limit as isize
+                            - ((base.to_string_partial(UriHideFlags::QUERY).len()
                                 + Uri::escape_string(&form.widget.text(), None, false).len())
+                                as isize)
                     }),
                 )
             }
