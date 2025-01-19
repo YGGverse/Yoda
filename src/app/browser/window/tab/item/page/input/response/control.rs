@@ -38,7 +38,7 @@ impl Control {
     // Actions
     pub fn update(&self, is_empty: bool, bytes_left: Option<usize>) {
         // Update children components
-        self.counter.update(bytes_left);
+        self.counter.update(is_empty, bytes_left);
         self.send.update(match bytes_left {
             Some(left) => !is_empty && left > 0,
             None => false,

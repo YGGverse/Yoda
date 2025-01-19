@@ -19,7 +19,7 @@ impl Widget {
     }
 
     // Actions
-    pub fn update(&self, bytes_left: Option<usize>) {
+    pub fn update(&self, is_empty: bool, bytes_left: Option<usize>) {
         match bytes_left {
             Some(value) => {
                 // Update color on chars left reached
@@ -30,7 +30,7 @@ impl Widget {
                 self.label.set_label(&value.to_string());
 
                 // Toggle visibility on chars left provided
-                self.label.set_visible(true);
+                self.label.set_visible(!is_empty);
             }
             None => self.label.set_visible(false),
         }
