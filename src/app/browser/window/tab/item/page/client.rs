@@ -79,7 +79,7 @@ impl Client {
 
         let cancellable = self.new_cancellable();
 
-        match Request::parse(query, None) {
+        match Request::parse(query) {
             Ok(request) => request.handle(self, cancellable, callback),
             Err(e) => match e {
                 // return failure response on unsupported scheme detected
@@ -90,7 +90,12 @@ impl Client {
                 _ => Request::lookup(query, Some(&cancellable), |result| {
                     callback(match result {
                         // redirection with scheme auto-complete or default search provider
-                        Ok(request) => Response::Redirect(Redirect::Foreground(request)),
+                        Ok(request) => match request {
+                            Request::Gemini(this, _) => {
+                                Response::Redirect(Redirect::Foreground(this.uri))
+                            }
+                            _ => todo!(),
+                        },
                         // unresolvable request.
                         Err(e) => Response::Failure(Failure::Error {
                             message: e.to_string(),

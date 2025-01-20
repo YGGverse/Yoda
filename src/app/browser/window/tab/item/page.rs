@@ -359,7 +359,7 @@ fn snap_history(profile: &Profile, navigation: &Navigation, uri: Option<&Uri>) {
 /// * may call itself on Titan response
 fn handle(page: &Rc<Page>, response: client::Response) {
     use client::{
-        response::{Certificate, Failure, Input, Redirect},
+        response::{text::Text, Certificate, Failure, Input, Redirect},
         Response,
     };
     match response {
@@ -466,43 +466,43 @@ fn handle(page: &Rc<Page>, response: client::Response) {
             page.browser_action.update.activate(Some(&page.id));
         }
         Response::Redirect(this) => match this {
-            Redirect::Background(request) => {
-                load(&page, Some(&request.as_uri().to_string()), false)
-            }
-            Redirect::Foreground(request) => {
+            Redirect::Background(uri) => load(&page, Some(&uri.to_string()), false),
+            Redirect::Foreground(uri) => {
                 page.navigation
                     .request
                     .widget
                     .entry
-                    .set_text(&request.as_uri().to_string());
-                load(&page, Some(&request.as_uri().to_string()), false);
+                    .set_text(&uri.to_string());
+                load(&page, Some(&uri.to_string()), false);
             }
         },
-        Response::TextGemini {
-            base,
-            source,
-            is_source_request,
-        } => {
-            let widget = if is_source_request {
-                page.content.to_text_source(&source)
-            } else {
-                page.content.to_text_gemini(&base, &source)
-            };
+        Response::Text(this) => match this {
+            Text::Gemini { base, data } => {
+                /* @TODO refactor features
+                let widget = if is_source_request {
+                    page.content.to_text_source(&data)
+                } else {
+                    page.content.to_text_gemini(&base, &data)
+                };*/
 
-            // Connect `TextView` widget, update `search` model
-            page.search.set(Some(widget.text_view));
+                let widget = page.content.to_text_gemini(&base, &data);
 
-            // Update page meta
-            page.status.replace(Status::Success { time: now() });
-            page.title.replace(match widget.meta.title {
-                Some(title) => title.into(), // @TODO
-                None => uri_to_title(&base),
-            });
+                // Connect `TextView` widget, update `search` model
+                page.search.set(Some(widget.text_view));
 
-            // Update window components
-            page.window_action.find.simple_action.set_enabled(true);
-            page.browser_action.update.activate(Some(&page.id));
-        }
+                // Update page meta
+                page.status.replace(Status::Success { time: now() });
+                page.title.replace(match widget.meta.title {
+                    Some(title) => title.into(), // @TODO
+                    None => uri_to_title(&base),
+                });
+
+                // Update window components
+                page.window_action.find.simple_action.set_enabled(true);
+                page.browser_action.update.activate(Some(&page.id));
+            }
+            Text::Plain { data } => todo!(),
+        },
         Response::Download {
             base,
             cancellable,

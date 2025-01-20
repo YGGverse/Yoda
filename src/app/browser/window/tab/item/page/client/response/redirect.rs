@@ -1,6 +1,6 @@
-use super::super::Request;
+use gtk::glib::Uri;
 
 pub enum Redirect {
-    Foreground(Request),
-    Background(Request),
+    Foreground(Uri),
+    Background(Uri),
 }

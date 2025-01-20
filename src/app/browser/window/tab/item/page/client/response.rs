@@ -2,12 +2,14 @@ pub mod certificate;
 pub mod failure;
 pub mod input;
 pub mod redirect;
+pub mod text;
 
 // Local dependencies
 pub use certificate::Certificate;
 pub use failure::Failure;
 pub use input::Input;
 pub use redirect::Redirect;
+pub use text::Text;
 
 // Global dependencies
 use gtk::{
@@ -24,11 +26,6 @@ pub enum Response {
         cancellable: Cancellable,
     },
     Failure(Failure),
-    TextGemini {
-        base: Uri,
-        source: String,
-        is_source_request: bool,
-    },
     Input(Input),
     Redirect(Redirect),
     Stream {
@@ -37,4 +34,5 @@ pub enum Response {
         stream: IOStream,
         cancellable: Cancellable,
     },
+    Text(Text),
 }
