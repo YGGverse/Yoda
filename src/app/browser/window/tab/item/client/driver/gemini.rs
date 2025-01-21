@@ -129,32 +129,27 @@ impl Gemini {
                     Ok(response) => {
                         match response.meta.status {
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                            Status::Input => {
+                            Status::Input | Status::SensitiveInput => {
                                 let title = match response.meta.data {
                                     Some(data) => data.to_string(),
                                     None => Status::Input.to_string(),
                                 };
-                                page.input.set_new_response(
-                                    page.tab_action.clone(),
-                                    uri,
-                                    Some(&title),
-                                    Some(1024),
-                                );
-                                page.title.replace(title.into()); // @TODO
-                                page.browser_action.update.activate(Some(&page.id));
-                            }
-                            Status::SensitiveInput => {
-                                let title = match response.meta.data {
-                                    Some(data) => data.to_string(),
-                                    None => Status::Input.to_string(),
-                                };
-                                page.input.set_new_sensitive(
-                                    page.tab_action.clone(),
-                                    uri,
-                                    Some(&title),
-                                    Some(1024),
-                                );
-                                page.title.replace(title.into()); // @TODO
+                                if matches!(response.meta.status, Status::SensitiveInput) {
+                                    page.input.set_new_sensitive(
+                                        page.tab_action.clone(),
+                                        uri,
+                                        Some(&title),
+                                        Some(1024),
+                                    );
+                                } else {
+                                    page.input.set_new_response(
+                                        page.tab_action.clone(),
+                                        uri,
+                                        Some(&title),
+                                        Some(1024),
+                                    );
+                                }
+                                page.title.replace(title.into());
                                 page.browser_action.update.activate(Some(&page.id));
                             }
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
