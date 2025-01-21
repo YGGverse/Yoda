@@ -37,16 +37,17 @@ impl Gemini {
                     .widget
                     .entry
                     .set_progress_fraction(match event {
-                        SocketClientEvent::Resolving => 0.1,
-                        SocketClientEvent::Resolved => 0.2,
-                        SocketClientEvent::Connecting => 0.3,
-                        SocketClientEvent::Connected => 0.4,
-                        SocketClientEvent::ProxyNegotiating => 0.5,
-                        SocketClientEvent::ProxyNegotiated => 0.6,
+                        // 0.1 reserved for handle begin
+                        SocketClientEvent::Resolving => 0.2,
+                        SocketClientEvent::Resolved => 0.3,
+                        SocketClientEvent::Connecting => 0.4,
+                        SocketClientEvent::Connected => 0.5,
+                        SocketClientEvent::ProxyNegotiating => 0.6,
+                        SocketClientEvent::ProxyNegotiated => 0.7,
                         // * `TlsHandshaking` | `TlsHandshaked` has effect only for guest connections!
-                        SocketClientEvent::TlsHandshaking => 0.7,
-                        SocketClientEvent::TlsHandshaked => 0.8,
-                        SocketClientEvent::Complete => 0.9,
+                        SocketClientEvent::TlsHandshaking => 0.8,
+                        SocketClientEvent::TlsHandshaked => 0.9,
+                        SocketClientEvent::Complete => 1.0,
                         _ => todo!(), // alert on API change
                     })
             }
@@ -81,6 +82,15 @@ impl Gemini {
         self.page.search.unset();
         self.page.input.unset();
         self.page.title.replace("Loading..".into());
+
+        // Begin action
+        self.page
+            .navigation
+            .request
+            .widget
+            .entry
+            .set_progress_fraction(0.1);
+
         self.page
             .browser_action
             .update
