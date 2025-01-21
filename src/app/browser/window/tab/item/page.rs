@@ -197,8 +197,7 @@ impl Page {
 
     /// Get `Self` loading status
     pub fn is_loading(&self) -> bool {
-        let progress_fraction = self.navigation.request.widget.entry.progress_fraction();
-        progress_fraction > 0.0 && progress_fraction < 1.0
+        self.navigation.request.widget.entry.progress_fraction() > 0.0
     }
 }
 
