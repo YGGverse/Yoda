@@ -160,6 +160,8 @@ impl Gemini {
                                     );
                                 }
                                 page.title.replace(title.into());
+                                page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                tab_page.set_loading(false);
                             }
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                             Status::Success => match feature {
@@ -253,7 +255,7 @@ impl Gemini {
                                                         None => uri_to_title(&uri),
                                                     });
 
-                                                    // Deactivate progress fraction
+                                                    // Deactivate loading indication
                                                     page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                     tab_page.set_loading(false);
 
