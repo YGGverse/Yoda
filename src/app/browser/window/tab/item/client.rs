@@ -2,6 +2,7 @@ mod driver;
 mod feature;
 
 use super::Page;
+use adw::TabPage;
 use driver::Driver;
 use feature::Feature;
 use gtk::{
@@ -21,10 +22,10 @@ impl Client {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(page: &Rc<Page>) -> Self {
+    pub fn init(page: &Rc<Page>, tab_page: &TabPage) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            driver: Rc::new(Driver::build(page)),
+            driver: Rc::new(Driver::build(page, tab_page)),
         }
     }
 

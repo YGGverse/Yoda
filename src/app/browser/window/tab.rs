@@ -288,24 +288,12 @@ impl Tab {
 
         match self.index.borrow().get(&key) {
             Some(item) => {
-                // Update item components
                 item.update();
-
-                // Update tab title on loading indicator inactive
-                if !item.page.is_loading() {
-                    item.widget.tab_page.set_title(&item.page.title.borrow())
-                }
             }
-            // Update all tabs
             None => {
+                // update all tabs
                 for (_, item) in self.index.borrow().iter() {
-                    // Update item components
                     item.update();
-
-                    // Update tab title on loading indicator inactive
-                    if !item.page.is_loading() {
-                        item.widget.tab_page.set_title(&item.page.title.borrow())
-                    }
                 }
             }
         }

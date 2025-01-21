@@ -1,4 +1,5 @@
 use super::{Feature, Page};
+use adw::TabPage;
 use ggemini::client::{
     connection::response::{data::Text, meta::Status},
     Request,
@@ -18,7 +19,8 @@ use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 pub struct Gemini {
     /// Should be initiated once
     client: Rc<ggemini::Client>,
-    /// Handle target
+    /// Handle targets
+    tab_page: TabPage,
     page: Rc<Page>,
     /// Validate redirection count by Gemini protocol specification
     redirects: Rc<Cell<usize>>,
@@ -28,38 +30,44 @@ impl Gemini {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(page: &Rc<Page>) -> Self {
+    pub fn init(page: &Rc<Page>, tab_page: &TabPage) -> Self {
         // Init supported protocol libraries
         let client = Rc::new(ggemini::Client::new());
 
         // Listen for [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html) updates
         client.socket.connect_event({
             let page = page.clone();
+            let tab_page = tab_page.clone();
             move |_, event, _, _| {
+                let progress_fraction = match event {
+                    // 0.1 reserved for handle begin
+                    SocketClientEvent::Resolving => 0.2,
+                    SocketClientEvent::Resolved => 0.3,
+                    SocketClientEvent::Connecting => 0.4,
+                    SocketClientEvent::Connected => 0.5,
+                    SocketClientEvent::ProxyNegotiating => 0.6,
+                    SocketClientEvent::ProxyNegotiated => 0.7,
+                    // * `TlsHandshaking` | `TlsHandshaked` has effect only for guest connections!
+                    SocketClientEvent::TlsHandshaking => 0.8,
+                    SocketClientEvent::TlsHandshaked => 0.9,
+                    SocketClientEvent::Complete => 1.0,
+                    _ => todo!(), // alert on API change
+                };
+
+                tab_page.set_loading(progress_fraction > 0.0);
+
                 page.navigation
                     .request
                     .widget
                     .entry
-                    .set_progress_fraction(match event {
-                        // 0.1 reserved for handle begin
-                        SocketClientEvent::Resolving => 0.2,
-                        SocketClientEvent::Resolved => 0.3,
-                        SocketClientEvent::Connecting => 0.4,
-                        SocketClientEvent::Connected => 0.5,
-                        SocketClientEvent::ProxyNegotiating => 0.6,
-                        SocketClientEvent::ProxyNegotiated => 0.7,
-                        // * `TlsHandshaking` | `TlsHandshaked` has effect only for guest connections!
-                        SocketClientEvent::TlsHandshaking => 0.8,
-                        SocketClientEvent::TlsHandshaked => 0.9,
-                        SocketClientEvent::Complete => 1.0,
-                        _ => todo!(), // alert on API change
-                    })
+                    .set_progress_fraction(progress_fraction);
             }
         });
 
         Self {
             client,
             page: page.clone(),
+            tab_page: tab_page.clone(),
             redirects: Rc::new(Cell::new(0)),
         }
     }
@@ -84,8 +92,6 @@ impl Gemini {
         self.page.search.unset();
         self.page.input.unset();
         self.page.title.replace("Loading..".into());
-
-        // Begin action
         self.page
             .navigation
             .request
@@ -93,10 +99,7 @@ impl Gemini {
             .entry
             .set_progress_fraction(0.1);
 
-        self.page
-            .browser_action
-            .update
-            .activate(Some(&self.page.id));
+        self.tab_page.set_loading(true);
 
         if is_history {
             snap_history(&self.page, None);
@@ -124,6 +127,7 @@ impl Gemini {
             {
                 let uri = uri.clone();
                 let page = self.page.clone();
+                let tab_page = self.tab_page.clone();
                 let redirects = self.redirects.clone();
                 move |result| match result {
                     Ok(response) => {
@@ -150,7 +154,6 @@ impl Gemini {
                                     );
                                 }
                                 page.title.replace(title.into());
-                                page.browser_action.update.activate(Some(&page.id));
                             }
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                             Status::Success => match feature {
@@ -220,7 +223,6 @@ impl Gemini {
                                         },
                                     );
                                     page.title.replace(status.title());
-                                    page.browser_action.update.activate(Some(&page.id));
                                 },
                                 _ => match response.meta.mime {
                                     Some(mime) => match mime.as_str() {
@@ -252,21 +254,18 @@ impl Gemini {
 
                                                     // Deactivate progress fraction
                                                     page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    tab_page.set_loading(false);
 
                                                     // Update window components
                                                     page.window_action
                                                         .find
                                                         .simple_action
                                                         .set_enabled(true);
-
-                                                    page.browser_action.update.activate(Some(&page.id));
                                                 }
                                                 Err(e) => {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some(&e.to_string()));
-
                                                     page.title.replace(status.title());
-                                                    page.browser_action.update.activate(Some(&page.id));
                                                 },
                                             },
                                         ),
@@ -286,10 +285,8 @@ impl Gemini {
                                                 Priority::DEFAULT,
                                                 0x400, // 1024 bytes per chunk, optional step for images download tracking
                                                 0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                                move |_, total| {
-                                                    // Update loading progress
-                                                    status.set_description(Some(&format!("Download: {total} bytes")));
-                                                },
+                                                move |_, total|
+                                                status.set_description(Some(&format!("Download: {total} bytes"))),
                                                 {
                                                     let page = page.clone();
                                                     move |result| match result {
@@ -304,17 +301,13 @@ impl Gemini {
                                                                             page.title.replace(uri_to_title(&uri));
                                                                             page.content
                                                                                 .to_image(&Texture::for_pixbuf(&buffer));
-                                                                            page.browser_action
-                                                                                .update
-                                                                                .activate(Some(&page.id));
                                                                         }
                                                                         Err(e) => {
                                                                             let status = page.content.to_status_failure();
                                                                             status.set_description(Some(e.message()));
                                                                             page.title.replace(status.title());
                                                                         }
-                                                                    };
-                                                                    page.browser_action.update.activate(Some(&page.id));
+                                                                    }
                                                                 },
                                                             )
                                                         }
@@ -323,7 +316,6 @@ impl Gemini {
                                                             status.set_description(Some(&e.to_string()));
 
                                                             page.title.replace(status.title());
-                                                            page.browser_action.update.activate(Some(&page.id));
                                                         }
                                                     }
                                                 },
@@ -334,17 +326,13 @@ impl Gemini {
                                                 .content
                                                 .to_status_mime(mime, Some((&page.tab_action, &uri)));
                                             status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-
                                             page.title.replace(status.title());
-                                            page.browser_action.update.activate(Some(&page.id));
                                         },
                                     },
                                     None => {
                                         let status = page.content.to_status_failure();
                                         status.set_description(Some("MIME type not found"));
-
                                         page.title.replace(status.title());
-                                        page.browser_action.update.activate(Some(&page.id));
                                     },
                                 }
                             },
@@ -362,10 +350,7 @@ impl Gemini {
                                                 if total > 5 {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some("Redirection limit reached"));
-
                                                     page.title.replace(status.title());
-                                                    page.browser_action.update.activate(Some(&page.id));
-
                                                     redirects.replace(0); // reset
 
                                                 // Disallow external redirection
@@ -374,10 +359,7 @@ impl Gemini {
                                                     || uri.host() != target.host() {
                                                         let status = page.content.to_status_failure();
                                                         status.set_description(Some("External redirects not allowed by protocol specification"));
-
                                                         page.title.replace(status.title());
-                                                        page.browser_action.update.activate(Some(&page.id));
-
                                                         redirects.replace(0); // reset
                                                 // Valid
                                                 } else {
@@ -395,18 +377,14 @@ impl Gemini {
                                             Err(e) => {
                                                 let status = page.content.to_status_failure();
                                                 status.set_description(Some(&e.to_string()));
-
                                                 page.title.replace(status.title());
-                                                page.browser_action.update.activate(Some(&page.id));
                                             }
                                         }
                                     }
                                     None => {
                                         let status = page.content.to_status_failure();
                                         status.set_description(Some("Redirection target not found"));
-
                                         page.title.replace(status.title());
-                                        page.browser_action.update.activate(Some(&page.id));
                                     }
                                 }
                             },
@@ -423,23 +401,18 @@ impl Gemini {
                                 }));
 
                                 page.title.replace(status.title());
-                                page.browser_action.update.activate(Some(&page.id));
                             }
                             status => {
                                 let _status = page.content.to_status_failure();
                                 _status.set_description(Some(&format!("Undefined status code `{status}`")));
-
                                 page.title.replace(_status.title());
-                                page.browser_action.update.activate(Some(&page.id));
                             },
                         }
                     }
                     Err(e) => {
                         let status = page.content.to_status_failure();
                         status.set_description(Some(&e.to_string()));
-
                         page.title.replace(status.title());
-                        page.browser_action.update.activate(Some(&page.id));
                     },
                 }
             },

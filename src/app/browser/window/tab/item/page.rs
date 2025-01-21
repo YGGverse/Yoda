@@ -15,10 +15,7 @@ use widget::Widget;
 
 use super::{Action as TabAction, BrowserAction, Profile, WindowAction};
 
-use gtk::{
-    glib::GString,
-    prelude::{EditableExt, EntryExt},
-};
+use gtk::{glib::GString, prelude::EditableExt};
 use sqlite::Transaction;
 use std::{cell::RefCell, rc::Rc};
 
@@ -191,13 +188,6 @@ impl Page {
         }
 
         Ok(())
-    }
-
-    // Getters
-
-    /// Get `Self` loading status
-    pub fn is_loading(&self) -> bool {
-        self.navigation.request.widget.entry.progress_fraction() > 0.0
     }
 }
 

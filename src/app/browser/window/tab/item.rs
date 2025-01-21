@@ -63,8 +63,6 @@ impl Item {
             (browser_action, window_action, &action),
         ));
 
-        let client = Rc::new(Client::init(&page));
-
         let widget = Rc::new(Widget::build(
             id.as_str(),
             tab_view,
@@ -73,6 +71,9 @@ impl Item {
             position,
             (is_pinned, is_selected, is_attention),
         ));
+
+        // Update tab loading indicator
+        let client = Rc::new(Client::init(&page, &widget.tab_page));
 
         // Init events
 
@@ -133,9 +134,6 @@ impl Item {
     pub fn update(&self) {
         // Update child components
         self.page.update();
-
-        // Update tab loading indicator
-        self.widget.tab_page.set_loading(self.page.is_loading());
     }
 
     pub fn clean(
