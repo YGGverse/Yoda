@@ -338,7 +338,7 @@ impl Gemini {
                                         mime => {
                                             let status = page
                                                 .content
-                                                .to_status_mime(&mime, Some((&page.tab_action, &uri)));
+                                                .to_status_mime(mime, Some((&page.tab_action, &uri)));
                                             status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
 
                                             page.status.replace(PageStatus::Failure { time: now() });

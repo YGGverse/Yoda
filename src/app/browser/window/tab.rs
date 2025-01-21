@@ -218,7 +218,7 @@ impl Tab {
     // Save page at given `position`, `None` to save selected page (if available)
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.request.into_download();
+            item.page.navigation.request.to_download();
             todo!()
         }
     }
@@ -226,7 +226,7 @@ impl Tab {
     // View source for page at given `position`, `None` to use selected page (if available)
     pub fn source(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.request.into_source();
+            item.page.navigation.request.to_source();
             todo!()
         }
     }

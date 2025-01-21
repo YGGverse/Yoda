@@ -94,11 +94,11 @@ impl Request {
 
     // Setters
 
-    pub fn into_download(&self) {
+    pub fn to_download(&self) {
         self.widget.entry.set_text(&self.download());
     }
 
-    pub fn into_source(&self) {
+    pub fn to_source(&self) {
         self.widget.entry.set_text(&self.source());
     }
 
