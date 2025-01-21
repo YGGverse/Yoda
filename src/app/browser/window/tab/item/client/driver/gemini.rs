@@ -405,7 +405,7 @@ impl Gemini {
                                                         .set_text(&uri.to_string());
                                                     }
                                                     redirects.replace(total);
-                                                    page.tab_action.load.activate(Some(""), is_history);
+                                                    page.tab_action.load.activate(Some(&target.to_string()), is_history);
                                                 }
                                             }
                                             Err(e) => {
