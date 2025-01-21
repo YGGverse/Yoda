@@ -3,7 +3,7 @@ use crate::tool::now;
 use super::super::super::page::status::Status as PageStatus; // @TODO
 
 use super::{Feature, Page};
-use gtk::glib::GString;
+use gtk::glib::{GString, UriFlags};
 use gtk::prelude::{EditableExt, FileExt};
 use gtk::{
     gdk::Texture,
@@ -12,12 +12,16 @@ use gtk::{
     glib::{Priority, Uri},
     prelude::{EntryExt, SocketClientExt},
 };
-use std::{path::MAIN_SEPARATOR, rc::Rc, time::Duration};
+use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
 /// Multi-protocol client API for `Page` object
 pub struct Gemini {
+    /// Should be initiated once
     client: Rc<ggemini::Client>,
+    /// Handle target
     page: Rc<Page>,
+    /// Validate redirection count by Gemini protocol specification
+    redirects: Rc<Cell<usize>>,
 }
 
 impl Gemini {
@@ -55,6 +59,7 @@ impl Gemini {
         Self {
             client,
             page: page.clone(),
+            redirects: Rc::new(Cell::new(0)),
         }
     }
 
@@ -114,6 +119,7 @@ impl Gemini {
             {
                 let uri = uri.clone();
                 let page = self.page.clone();
+                let redirects = self.redirects.clone();
                 move |result| match result {
                     Ok(response) => {
                         match response.meta.status {
@@ -357,15 +363,70 @@ impl Gemini {
                                 }
                             },
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                            Status::Redirect => todo!(),
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                            Status::PermanentRedirect => {
-                                page.navigation
-                                    .request
-                                    .widget
-                                    .entry
-                                    .set_text(&uri.to_string());
-                                todo!()
+                            Status::PermanentRedirect | Status::Redirect => {
+                                // Expected target URL in response meta
+                                match response.meta.data {
+                                    Some(data) => {
+                                        match uri.parse_relative(data.as_str(), UriFlags::NONE) {
+                                            Ok(target) => {
+                                                let total = redirects.take() + 1;
+
+                                                // Validate total redirects by protocol specification
+                                                if total > 5 {
+                                                    let status = page.content.to_status_failure();
+                                                    status.set_description(Some("Redirection limit reached"));
+
+                                                    page.status.replace(PageStatus::Failure { time: now() });
+                                                    page.title.replace(status.title());
+                                                    page.browser_action.update.activate(Some(&page.id));
+
+                                                    redirects.replace(0); // reset
+
+                                                // Disallow external redirection
+                                                } else if uri.scheme() != target.scheme()
+                                                    || uri.port() != target.port()
+                                                    || uri.host() != target.host() {
+                                                        let status = page.content.to_status_failure();
+                                                        status.set_description(Some("External redirects not allowed by protocol specification"));
+
+                                                        page.status.replace(PageStatus::Failure { time: now() });
+                                                        page.title.replace(status.title());
+                                                        page.browser_action.update.activate(Some(&page.id));
+
+                                                        redirects.replace(0); // reset
+                                                // Valid
+                                                } else {
+                                                    if matches!(response.meta.status, Status::PermanentRedirect) {
+                                                        page.navigation
+                                                        .request
+                                                        .widget
+                                                        .entry
+                                                        .set_text(&uri.to_string());
+                                                    }
+                                                    redirects.replace(total);
+                                                    page.tab_action.load.activate(Some(""), is_history);
+                                                }
+                                            }
+                                            Err(e) => {
+                                                let status = page.content.to_status_failure();
+                                                status.set_description(Some(&e.to_string()));
+
+                                                page.status.replace(PageStatus::Failure { time: now() });
+                                                page.title.replace(status.title());
+                                                page.browser_action.update.activate(Some(&page.id));
+                                            }
+                                        }
+                                    }
+                                    None => {
+                                        let status = page.content.to_status_failure();
+                                        status.set_description(Some("Redirection target not found"));
+
+                                        page.status.replace(PageStatus::Failure { time: now() });
+                                        page.title.replace(status.title());
+                                        page.browser_action.update.activate(Some(&page.id));
+                                    }
+                                }
                             },
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
                             Status::CertificateRequest => {
