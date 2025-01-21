@@ -284,10 +284,7 @@ impl Tab {
     }
 
     pub fn update(&self, item_id: Option<GString>) {
-        let key = match item_id {
-            Some(value) => value,
-            None => GString::new(), // @TODO
-        };
+        let key = item_id.unwrap_or_default();
 
         match self.index.borrow().get(&key) {
             Some(item) => {
@@ -296,7 +293,7 @@ impl Tab {
 
                 // Update tab title on loading indicator inactive
                 if !item.page.is_loading() {
-                    item.widget.tab_page.set_title(&item.page.title())
+                    item.widget.tab_page.set_title(&item.page.title.borrow())
                 }
             }
             // Update all tabs
@@ -307,7 +304,7 @@ impl Tab {
 
                     // Update tab title on loading indicator inactive
                     if !item.page.is_loading() {
-                        item.widget.tab_page.set_title(&item.page.title())
+                        item.widget.tab_page.set_title(&item.page.title.borrow())
                     }
                 }
             }

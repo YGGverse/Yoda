@@ -1,7 +1,3 @@
-use crate::tool::now;
-
-use super::super::super::page::status::Status as PageStatus; // @TODO
-
 use super::{Feature, Page};
 use gtk::glib::{GString, UriFlags};
 use gtk::prelude::{EditableExt, FileExt};
@@ -84,9 +80,6 @@ impl Gemini {
         // Reset widgets
         self.page.search.unset();
         self.page.input.unset();
-        self.page
-            .status
-            .replace(PageStatus::Loading { time: now() });
         self.page.title.replace("Loading..".into());
         self.page
             .browser_action
@@ -136,7 +129,6 @@ impl Gemini {
                                     Some(1024),
                                 );
                                 page.title.replace(title.into()); // @TODO
-                                page.status.replace(PageStatus::Input { time: now() });
                                 page.browser_action.update.activate(Some(&page.id));
                             }
                             Status::SensitiveInput => {
@@ -151,7 +143,6 @@ impl Gemini {
                                     Some(1024),
                                 );
                                 page.title.replace(title.into()); // @TODO
-                                page.status.replace(PageStatus::Input { time: now() });
                                 page.browser_action.update.activate(Some(&page.id));
                             }
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
@@ -221,7 +212,6 @@ impl Gemini {
                                             }
                                         },
                                     );
-                                    page.status.replace(PageStatus::Success { time: now() });
                                     page.title.replace(status.title());
                                     page.browser_action.update.activate(Some(&page.id));
                                 },
@@ -248,8 +238,6 @@ impl Gemini {
                                                     page.search.set(Some(widget.text_view));
 
                                                     // Update page meta
-                                                    page.status
-                                                        .replace(PageStatus::Success { time: now() });
                                                     page.title.replace(match widget.meta.title {
                                                         Some(title) => title.into(), // @TODO
                                                         None => uri_to_title(&uri),
@@ -270,7 +258,6 @@ impl Gemini {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some(&e.to_string()));
 
-                                                    page.status.replace(PageStatus::Failure { time: now() });
                                                     page.title.replace(status.title());
                                                     page.browser_action.update.activate(Some(&page.id));
                                                 },
@@ -307,8 +294,6 @@ impl Gemini {
                                                                     // Process buffer data
                                                                     match result {
                                                                         Ok(buffer) => {
-                                                                            page.status
-                                                                                .replace(PageStatus::Success { time: now() });
                                                                             page.title.replace(uri_to_title(&uri));
                                                                             page.content
                                                                                 .to_image(&Texture::for_pixbuf(&buffer));
@@ -319,9 +304,6 @@ impl Gemini {
                                                                         Err(e) => {
                                                                             let status = page.content.to_status_failure();
                                                                             status.set_description(Some(e.message()));
-
-                                                                            page.status
-                                                                                .replace(PageStatus::Failure { time: now() });
                                                                             page.title.replace(status.title());
                                                                         }
                                                                     };
@@ -333,7 +315,6 @@ impl Gemini {
                                                             let status = page.content.to_status_failure();
                                                             status.set_description(Some(&e.to_string()));
 
-                                                            page.status.replace(PageStatus::Failure { time: now() });
                                                             page.title.replace(status.title());
                                                             page.browser_action.update.activate(Some(&page.id));
                                                         }
@@ -347,7 +328,6 @@ impl Gemini {
                                                 .to_status_mime(mime, Some((&page.tab_action, &uri)));
                                             status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
 
-                                            page.status.replace(PageStatus::Failure { time: now() });
                                             page.title.replace(status.title());
                                             page.browser_action.update.activate(Some(&page.id));
                                         },
@@ -356,7 +336,6 @@ impl Gemini {
                                         let status = page.content.to_status_failure();
                                         status.set_description(Some("MIME type not found"));
 
-                                        page.status.replace(PageStatus::Failure { time: now() });
                                         page.title.replace(status.title());
                                         page.browser_action.update.activate(Some(&page.id));
                                     },
@@ -377,7 +356,6 @@ impl Gemini {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some("Redirection limit reached"));
 
-                                                    page.status.replace(PageStatus::Failure { time: now() });
                                                     page.title.replace(status.title());
                                                     page.browser_action.update.activate(Some(&page.id));
 
@@ -390,7 +368,6 @@ impl Gemini {
                                                         let status = page.content.to_status_failure();
                                                         status.set_description(Some("External redirects not allowed by protocol specification"));
 
-                                                        page.status.replace(PageStatus::Failure { time: now() });
                                                         page.title.replace(status.title());
                                                         page.browser_action.update.activate(Some(&page.id));
 
@@ -412,7 +389,6 @@ impl Gemini {
                                                 let status = page.content.to_status_failure();
                                                 status.set_description(Some(&e.to_string()));
 
-                                                page.status.replace(PageStatus::Failure { time: now() });
                                                 page.title.replace(status.title());
                                                 page.browser_action.update.activate(Some(&page.id));
                                             }
@@ -422,45 +398,23 @@ impl Gemini {
                                         let status = page.content.to_status_failure();
                                         status.set_description(Some("Redirection target not found"));
 
-                                        page.status.replace(PageStatus::Failure { time: now() });
                                         page.title.replace(status.title());
                                         page.browser_action.update.activate(Some(&page.id));
                                     }
                                 }
                             },
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                            Status::CertificateRequest => {
-                                let status = page.content.to_status_identity();
-                                status.set_description(Some(&match response.meta.data {
-                                    Some(data) => data.to_string(),
-                                    None => Status::CertificateRequest.to_string(),
-                                }));
-
-                                page.status.replace(PageStatus::Success { time: now() });
-                                page.title.replace(status.title());
-                                page.browser_action.update.activate(Some(&page.id));
-                            }
+                            Status::CertificateRequest |
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                            Status::CertificateUnauthorized => {
-                                let status = page.content.to_status_identity();
-                                status.set_description(Some(&match response.meta.data {
-                                    Some(data) => data.to_string(),
-                                    None => Status::CertificateUnauthorized.to_string(),
-                                }));
-
-                                page.status.replace(PageStatus::Success { time: now() });
-                                page.title.replace(status.title());
-                                page.browser_action.update.activate(Some(&page.id));
-                            }
+                            Status::CertificateUnauthorized |
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                             Status::CertificateInvalid => {
                                 let status = page.content.to_status_identity();
                                 status.set_description(Some(&match response.meta.data {
                                     Some(data) => data.to_string(),
-                                    None => Status::CertificateInvalid.to_string(),
+                                    None => response.meta.status.to_string(),
                                 }));
 
-                                page.status.replace(PageStatus::Success { time: now() });
                                 page.title.replace(status.title());
                                 page.browser_action.update.activate(Some(&page.id));
                             }
@@ -468,7 +422,6 @@ impl Gemini {
                                 let _status = page.content.to_status_failure();
                                 _status.set_description(Some(&format!("Undefined status code `{status}`")));
 
-                                page.status.replace(PageStatus::Failure { time: now() });
                                 page.title.replace(_status.title());
                                 page.browser_action.update.activate(Some(&page.id));
                             },
@@ -478,7 +431,6 @@ impl Gemini {
                         let status = page.content.to_status_failure();
                         status.set_description(Some(&e.to_string()));
 
-                        page.status.replace(PageStatus::Failure { time: now() });
                         page.title.replace(status.title());
                         page.browser_action.update.activate(Some(&page.id));
                     },

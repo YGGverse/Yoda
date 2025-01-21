@@ -4,7 +4,6 @@ mod error;
 mod input;
 mod navigation;
 mod search;
-pub mod status;
 mod widget;
 
 use content::Content;
@@ -12,11 +11,9 @@ use error::Error;
 use input::Input;
 use navigation::Navigation;
 use search::Search;
-use status::Status;
 use widget::Widget;
 
 use super::{Action as TabAction, BrowserAction, Profile, WindowAction};
-use crate::tool::now;
 
 use gtk::{
     glib::GString,
@@ -28,7 +25,6 @@ use std::{cell::RefCell, rc::Rc};
 pub struct Page {
     pub id: Rc<GString>,
     pub profile: Rc<Profile>,
-    pub status: Rc<RefCell<Status>>,
     pub title: Rc<RefCell<GString>>,
     // Actions
     pub browser_action: Rc<BrowserAction>,
@@ -74,8 +70,6 @@ impl Page {
             &input.widget.clamp,
         ));
 
-        let status = Rc::new(RefCell::new(Status::New { time: now() }));
-
         // Done
         Self {
             id: id.clone(),
@@ -86,7 +80,6 @@ impl Page {
             tab_action: tab_action.clone(),
             window_action: window_action.clone(),
             // Components
-            status,
             content,
             search,
             input,
@@ -157,9 +150,6 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
-        // Update status
-        self.status.replace(Status::SessionRestore { time: now() });
-
         // Begin page restore
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
@@ -177,10 +167,6 @@ impl Page {
             }
             Err(e) => return Err(e.to_string()),
         }
-
-        // Update status
-        self.status.replace(Status::SessionRestored { time: now() });
-
         Ok(())
     }
 
@@ -208,11 +194,6 @@ impl Page {
     }
 
     // Getters
-
-    /// Get `title` copy from `Self`
-    pub fn title(&self) -> GString {
-        self.title.borrow().clone()
-    }
 
     /// Get `Self` loading status
     pub fn is_loading(&self) -> bool {
