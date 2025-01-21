@@ -1,4 +1,8 @@
 use super::{Feature, Page};
+use ggemini::client::{
+    connection::response::{data::Text, meta::Status},
+    Request,
+};
 use gtk::glib::{GString, UriFlags};
 use gtk::prelude::{EditableExt, FileExt};
 use gtk::{
@@ -63,8 +67,6 @@ impl Gemini {
     // Actions
 
     pub fn handle(&self, uri: Uri, feature: Feature, cancellable: Cancellable, is_history: bool) {
-        use ggemini::client::connection::response::{data::Text, meta::Status};
-
         // Move focus out from navigation entry
         self.page
             .browser_action
@@ -101,7 +103,7 @@ impl Gemini {
         }
 
         self.client.request_async(
-            ggemini::client::Request::gemini(uri.clone()),
+            Request::gemini(uri.clone()),
             Priority::DEFAULT,
             cancellable.clone(),
             // Search for user certificate match request
