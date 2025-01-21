@@ -219,7 +219,7 @@ impl Tab {
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.page.navigation.request.to_download();
-            todo!()
+            self.window_action.reload.activate();
         }
     }
 
@@ -227,7 +227,7 @@ impl Tab {
     pub fn source(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.page.navigation.request.to_source();
-            todo!()
+            self.window_action.reload.activate();
         }
     }
 

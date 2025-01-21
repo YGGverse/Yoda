@@ -74,7 +74,13 @@ impl Gemini {
 
     // Actions
 
-    pub fn handle(&self, uri: Uri, feature: Feature, cancellable: Cancellable, is_history: bool) {
+    pub fn handle(
+        &self,
+        uri: Uri,
+        feature: Feature,
+        cancellable: Cancellable,
+        is_snap_history: bool,
+    ) {
         // Move focus out from navigation entry
         self.page
             .browser_action
@@ -101,7 +107,7 @@ impl Gemini {
 
         self.tab_page.set_loading(true);
 
-        if is_history {
+        if is_snap_history {
             snap_history(&self.page, None);
         }
 
@@ -232,16 +238,11 @@ impl Gemini {
                                             cancellable.clone(),
                                             move |result| match result {
                                                 Ok(text) => {
-                                                    /* @TODO refactor features
-                                                    let widget = if is_source_request {
-                                                        page.content.to_text_source(&data)
+                                                    let widget = if matches!(feature, Feature::Source) {
+                                                        page.content.to_text_source(&text.to_string())
                                                     } else {
-                                                        page.content.to_text_gemini(&uri, &data)
-                                                    };*/
-
-                                                    let widget = page
-                                                        .content
-                                                        .to_text_gemini(&uri, &text.to_string());
+                                                        page.content.to_text_gemini(&uri, &text.to_string())
+                                                    };
 
                                                     // Connect `TextView` widget, update `search` model
                                                     page.search.set(Some(widget.text_view));
@@ -371,7 +372,7 @@ impl Gemini {
                                                         .set_text(&uri.to_string());
                                                     }
                                                     redirects.replace(total);
-                                                    page.tab_action.load.activate(Some(&target.to_string()), is_history);
+                                                    page.tab_action.load.activate(Some(&target.to_string()), is_snap_history);
                                                 }
                                             }
                                             Err(e) => {
