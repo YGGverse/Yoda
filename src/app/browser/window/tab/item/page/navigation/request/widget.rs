@@ -188,7 +188,7 @@ impl Widget {
         Ok(())
     }
 
-    pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
+    pub fn update(&self, is_identity_active: bool) {
         // Update primary icon
         self.entry
             .first_child()
@@ -229,46 +229,46 @@ impl Widget {
         }
 
         // Update progress
-        // * skip update animation for None value
-        if let Some(value) = progress_fraction {
-            // Update shared fraction on new value was changed
-            if value != self.progress.fraction.replace(value) {
-                // Start new frame on previous process function completed (`source_id` changed to None)
-                // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
-                if self.progress.source_id.borrow().is_none() {
-                    // Start new animation frame iterator, update `source_id`
-                    self.progress.source_id.replace(Some(timeout_add_local(
-                        Duration::from_millis(PROGRESS_ANIMATION_TIME),
-                        {
-                            // Clone async pointers dependency
-                            let entry = self.entry.clone();
-                            let progress = self.progress.clone();
+        // * @TODO skip update animation for None value
+        let value = self.entry.progress_fraction();
 
-                            // Frame
-                            move || {
-                                // Animate
-                                if *progress.fraction.borrow() > entry.progress_fraction() {
-                                    entry.set_progress_fraction(
-                                        // Currently, here is no outrange validation, seems that wrapper make this work @TODO
-                                        entry.progress_fraction() + PROGRESS_ANIMATION_STEP,
-                                    );
-                                    return ControlFlow::Continue;
-                                }
-                                // Deactivate
-                                progress.source_id.replace(None);
+        // Update shared fraction on new value was changed
+        if value != self.progress.fraction.replace(value) {
+            // Start new frame on previous process function completed (`source_id` changed to None)
+            // If previous process still active, we have just updated shared fraction value before, to use it inside the active process
+            if self.progress.source_id.borrow().is_none() {
+                // Start new animation frame iterator, update `source_id`
+                self.progress.source_id.replace(Some(timeout_add_local(
+                    Duration::from_millis(PROGRESS_ANIMATION_TIME),
+                    {
+                        // Clone async pointers dependency
+                        let entry = self.entry.clone();
+                        let progress = self.progress.clone();
 
-                                // Reset on 100% (to hide progress bar)
-                                // or, just await for new value request
-                                if entry.progress_fraction() == 1.0 {
-                                    entry.set_progress_fraction(0.0);
-                                }
-
-                                // Stop iteration
-                                ControlFlow::Break
+                        // Frame
+                        move || {
+                            // Animate
+                            if *progress.fraction.borrow() > entry.progress_fraction() {
+                                entry.set_progress_fraction(
+                                    // Currently, here is no outrange validation, seems that wrapper make this work @TODO
+                                    entry.progress_fraction() + PROGRESS_ANIMATION_STEP,
+                                );
+                                return ControlFlow::Continue;
                             }
-                        },
-                    )));
-                }
+                            // Deactivate
+                            progress.source_id.replace(None);
+
+                            // Reset on 100% (to hide progress bar)
+                            // or, just await for new value request
+                            if entry.progress_fraction() == 1.0 {
+                                entry.set_progress_fraction(0.0);
+                            }
+
+                            // Stop iteration
+                            ControlFlow::Break
+                        }
+                    },
+                )));
             }
         }
     }

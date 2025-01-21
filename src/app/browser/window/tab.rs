@@ -16,7 +16,7 @@ use crate::app::browser::{
 use crate::Profile;
 use gtk::{
     glib::{DateTime, GString, Propagation},
-    prelude::WidgetExt,
+    prelude::{EditableExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
@@ -218,16 +218,16 @@ impl Tab {
     // Save page at given `position`, `None` to save selected page (if available)
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.request.to_download();
-            item::page::load(&item.page, None, true);
+            item.page.navigation.request.into_download();
+            todo!()
         }
     }
 
     // View source for page at given `position`, `None` to use selected page (if available)
     pub fn source(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.request.to_source();
-            item::page::load(&item.page, None, true);
+            item.page.navigation.request.into_source();
+            todo!()
         }
     }
 
@@ -250,26 +250,36 @@ impl Tab {
 
     pub fn page_home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item::page::home(&item.page);
+            if let Some(text) = item.page.navigation.home.url() {
+                item.page.navigation.request.widget.entry.set_text(&text);
+                self.window_action.reload.activate();
+            }
         }
     }
 
     pub fn page_history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item::page::history_back(&item.page);
+            if let Some(text) = item.page.navigation.history.back(true) {
+                item.page.navigation.request.widget.entry.set_text(&text);
+                self.window_action.reload.activate();
+            }
         }
     }
 
     pub fn page_history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item::page::history_forward(&item.page);
+            if let Some(text) = item.page.navigation.history.forward(true) {
+                item.page.navigation.request.widget.entry.set_text(&text);
+                self.window_action.reload.activate();
+            }
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item::page::load(&item.page, None, true);
+            item.client
+                .handle(&item.page.navigation.request.widget.entry.text(), false);
         }
     }
 

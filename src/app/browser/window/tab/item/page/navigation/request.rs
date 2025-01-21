@@ -29,8 +29,8 @@ impl Request {
 
     // Actions
 
-    pub fn update(&self, progress_fraction: Option<f64>, is_identity_active: bool) {
-        self.widget.update(progress_fraction, is_identity_active);
+    pub fn update(&self, is_identity_active: bool) {
+        self.widget.update(is_identity_active);
     }
 
     pub fn clean(
@@ -94,19 +94,19 @@ impl Request {
 
     // Setters
 
-    pub fn to_download(&self) {
+    pub fn into_download(&self) {
         self.widget.entry.set_text(&self.download());
     }
 
-    pub fn to_source(&self) {
+    pub fn into_source(&self) {
         self.widget.entry.set_text(&self.source());
     }
 
     // Getters
 
-    /// Get current request value in [Uri](https://docs.gtk.org/glib/struct.Uri.html) format
+    /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
     /// * `strip_prefix` on parse
-    pub fn uri(&self) -> Option<Uri> {
+    pub fn as_uri(&self) -> Option<Uri> {
         match Uri::parse(&strip_prefix(self.widget.entry.text()), UriFlags::NONE) {
             Ok(uri) => Some(uri),
             _ => None,

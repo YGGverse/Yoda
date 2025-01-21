@@ -1,30 +1,33 @@
 mod action;
+mod client;
 mod database;
 mod identity;
 pub mod page;
 mod widget;
-
-use action::Action;
-use page::Page;
-use widget::Widget;
 
 use crate::app::browser::{
     window::action::{Action as WindowAction, Position},
     Action as BrowserAction,
 };
 use crate::Profile;
+use action::Action;
 use adw::TabView;
+use client::Client;
 use gtk::{
     glib::{uuid_string_random, GString},
     prelude::{Cast, EditableExt},
 };
+use page::Page;
 use sqlite::Transaction;
 use std::rc::Rc;
+use widget::Widget;
 
 pub struct Item {
     // Auto-generated unique item ID
     // useful as widget name in GTK actions callback
     pub id: Rc<GString>,
+    // Multi-protocol handler
+    pub client: Rc<Client>,
     // Components
     pub page: Rc<Page>,
     pub widget: Rc<Widget>,
@@ -60,6 +63,8 @@ impl Item {
             (browser_action, window_action, &action),
         ));
 
+        let client = Rc::new(Client::init(&page));
+
         let widget = Rc::new(Widget::build(
             id.as_str(),
             tab_view,
@@ -74,7 +79,7 @@ impl Item {
         if let Some(text) = request {
             page.navigation.request.widget.entry.set_text(&text);
             if is_load {
-                page::load(&page, None, true);
+                client.handle(&text, true);
             }
         }
 
@@ -87,7 +92,7 @@ impl Item {
             let window_action = window_action.clone();
             move || {
                 // Request should match valid URI for all drivers supported
-                if let Some(uri) = page.navigation.request.uri() {
+                if let Some(uri) = page.navigation.request.as_uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
                         return identity::new_gemini(
@@ -106,16 +111,22 @@ impl Item {
         // Load new request for item
         action.load.connect_activate({
             let page = page.clone();
+            let client = client.clone();
             move |request, is_history| {
                 if let Some(text) = request {
                     page.navigation.request.widget.entry.set_text(&text);
+                    client.handle(&text, is_history);
                 }
-                page::load(&page, None, is_history);
             }
         });
 
         // Done
-        Self { id, page, widget }
+        Self {
+            id,
+            client,
+            page,
+            widget,
+        }
     }
 
     // Actions

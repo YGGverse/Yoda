@@ -30,6 +30,7 @@ impl Feature {
 
     // Getters
 
+    /* @TODO not in use
     /// Get `Self` as prefix
     pub fn as_prefix(&self) -> Option<&str> {
         match self {
@@ -37,5 +38,5 @@ impl Feature {
             Self::Source => Some(SOURCE),
             Self::Default => None,
         }
-    }
+    }*/
 }

@@ -66,7 +66,7 @@ impl Navigation {
 
     // Actions
 
-    pub fn update(&self, progress_fraction: Option<f64>) {
+    pub fn update(&self) {
         // init shared request value
         let request = self.request.strip_prefix();
 
@@ -74,10 +74,9 @@ impl Navigation {
         self.bookmark
             .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
-        self.home.update(self.request.uri().as_ref());
+        self.home.update(self.request.as_uri().as_ref());
         self.reload.update(!request.is_empty());
         self.request.update(
-            progress_fraction,
             self.profile
                 .identity
                 .gemini
