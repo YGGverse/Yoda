@@ -9,7 +9,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::CancellableExt,
+    prelude::{CancellableExt, EntryExt},
 };
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
@@ -30,6 +30,7 @@ impl Client {
             page: page.clone(),
             tab_page: tab_page.clone(),
         });
+
         Self {
             cancellable: Cell::new(Cancellable::new()),
             driver: Rc::new(Driver::build(&subject)),
@@ -45,8 +46,26 @@ impl Client {
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(request, self.cancellable(), {
             let driver = self.driver.clone();
-            move |feature, cancellable, uri| {
-                route(driver, feature, cancellable, uri, is_snap_history)
+            let subject = self.subject.clone();
+            // route by scheme parsed
+            move |feature, cancellable, uri| match uri.scheme().as_str() {
+                "gemini" => driver
+                    .gemini
+                    .handle(uri, feature, cancellable, is_snap_history),
+                scheme => {
+                    // no scheme match driver, complete with failure message
+                    let status = subject.page.content.to_status_failure();
+                    status.set_description(Some(&format!("Scheme `{scheme}` yet not supported")));
+                    subject.page.title.replace(status.title());
+                    subject
+                        .page
+                        .navigation
+                        .request
+                        .widget
+                        .entry
+                        .set_progress_fraction(0.0);
+                    subject.tab_page.set_loading(false);
+                }
             }
         })
     }
@@ -117,22 +136,6 @@ fn lookup(
                 Err(_) => callback(feature, cancellable, search(&suggestion)),
             }
         }
-    }
-}
-
-/// Route request (resolved by `lookup` function)
-fn route(
-    driver: Rc<Driver>,
-    feature: Feature,
-    cancellable: Cancellable,
-    uri: Uri,
-    is_snap_history: bool,
-) {
-    match uri.scheme().as_str() {
-        "gemini" => driver
-            .gemini
-            .handle(uri, feature, cancellable, is_snap_history),
-        _ => todo!(),
     }
 }
 
