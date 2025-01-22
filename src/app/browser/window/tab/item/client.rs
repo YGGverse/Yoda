@@ -3,14 +3,16 @@ mod feature;
 mod subject;
 
 use super::Page;
+use crate::tool::format_bytes;
 use adw::TabPage;
 use driver::Driver;
 use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{CancellableExt, EditableExt, EntryExt},
+    prelude::{CancellableExt, EditableExt, EntryExt, WidgetExt},
 };
+use plurify::ns as plural;
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
 
@@ -80,33 +82,54 @@ impl Client {
         lookup(request, self.cancellable(), {
             let driver = self.driver.clone();
             let subject = self.subject.clone();
-            move |feature, cancellable, result| match result {
-                // route by scheme
-                Ok(uri) => match uri.scheme().as_str() {
-                    "gemini" => driver.gemini.handle(uri, feature, cancellable),
-                    "titan" => subject.page.input.set_new_titan(|_data, _label| todo!()),
-                    scheme => {
-                        // no scheme match driver, complete with failure message
-                        let status = subject.page.content.to_status_failure();
-                        status
-                            .set_description(Some(&format!("Scheme `{scheme}` yet not supported")));
-                        subject.page.title.replace(status.title());
-                        subject
-                            .page
-                            .navigation
-                            .request
-                            .widget
-                            .entry
-                            .set_progress_fraction(0.0);
-                        subject.tab_page.set_loading(false);
-                    }
-                },
-                // begin redirection to new address suggested
-                Err(uri) => subject
-                    .page
-                    .tab_action
-                    .load
-                    .activate(Some(&uri.to_string()), false),
+            move |feature, cancellable, result| {
+                match result {
+                    // route by scheme
+                    Ok(uri) => match uri.scheme().as_str() {
+                        "gemini" => driver.gemini.handle(uri, feature, cancellable),
+                        "titan" => subject.page.input.set_new_titan(|data, label| {
+                            // init data to send
+                            const CHUNK: usize = 0x400;
+                            let bytes_sent = 0;
+                            let bytes_total = data.len();
+
+                            // send by chunks for large content size
+                            if bytes_total > CHUNK {
+                                label.set_label(&format!(
+                                    "sent {}/{} {}",
+                                    format_bytes(bytes_sent),
+                                    format_bytes(bytes_total),
+                                    plural(bytes_sent, &["byte", "bytes", "bytes"])
+                                ));
+                            } else {
+                                label.set_visible(false);
+                            }
+                            todo!()
+                        }),
+                        scheme => {
+                            // no scheme match driver, complete with failure message
+                            let status = subject.page.content.to_status_failure();
+                            status.set_description(Some(&format!(
+                                "Scheme `{scheme}` yet not supported"
+                            )));
+                            subject.page.title.replace(status.title());
+                            subject
+                                .page
+                                .navigation
+                                .request
+                                .widget
+                                .entry
+                                .set_progress_fraction(0.0);
+                            subject.tab_page.set_loading(false);
+                        }
+                    },
+                    // begin redirection to new address suggested
+                    Err(uri) => subject
+                        .page
+                        .tab_action
+                        .load
+                        .activate(Some(&uri.to_string()), false),
+                }
             }
         })
     }
