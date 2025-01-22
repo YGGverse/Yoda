@@ -22,7 +22,9 @@ impl Widget {
 
         // Init events
         button.connect_clicked({
-            move |_| {
+            move |this| {
+                this.set_sensitive(false);
+                this.set_label("Sending..");
                 action_send.activate(None);
             }
         });
