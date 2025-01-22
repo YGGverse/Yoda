@@ -84,6 +84,7 @@ impl Client {
                 // route by scheme
                 Ok(uri) => match uri.scheme().as_str() {
                     "gemini" => driver.gemini.handle(uri, feature, cancellable),
+                    "titan" => subject.page.input.set_new_titan(|_data| todo!()),
                     scheme => {
                         // no scheme match driver, complete with failure message
                         let status = subject.page.content.to_status_failure();

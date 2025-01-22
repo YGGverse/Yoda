@@ -1,5 +1,6 @@
 mod response;
 mod sensitive;
+mod titan;
 mod widget;
 
 use super::TabAction;
@@ -7,6 +8,7 @@ use gtk::glib::Uri;
 use response::Response;
 use sensitive::Sensitive;
 use std::rc::Rc;
+use titan::Titan;
 use widget::Widget;
 
 pub struct Input {
@@ -61,5 +63,10 @@ impl Input {
                 .widget
                 .g_box,
         ));
+    }
+
+    pub fn set_new_titan(&self, on_send: impl Fn(&[u8]) + 'static) {
+        self.widget
+            .update(Some(&Titan::build(on_send).widget.g_box));
     }
 }

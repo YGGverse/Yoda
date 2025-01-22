@@ -23,8 +23,11 @@ impl Widget {
         match bytes_left {
             Some(value) => {
                 // Update color on chars left reached
-                self.label
-                    .set_css_classes(&[if value > 0 { "success" } else { "error" }]); // @TODO add warning step?
+                self.label.set_css_classes(&[if value.is_positive() {
+                    "success"
+                } else {
+                    "error"
+                }]); // @TODO add warning step?
 
                 // Update text
                 self.label.set_label(&value.to_string());
