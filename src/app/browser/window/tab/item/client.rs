@@ -3,16 +3,14 @@ mod feature;
 mod subject;
 
 use super::Page;
-use crate::tool::format_bytes;
 use adw::TabPage;
 use driver::Driver;
 use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{CancellableExt, EditableExt, EntryExt, WidgetExt},
+    prelude::{CancellableExt, EditableExt, EntryExt},
 };
-use plurify::ns as plural;
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
 
@@ -86,26 +84,7 @@ impl Client {
                 match result {
                     // route by scheme
                     Ok(uri) => match uri.scheme().as_str() {
-                        "gemini" => driver.gemini.handle(uri, feature, cancellable),
-                        "titan" => subject.page.input.set_new_titan(|data, label| {
-                            // init data to send
-                            const CHUNK: usize = 0x400;
-                            let bytes_sent = 0;
-                            let bytes_total = data.len();
-
-                            // send by chunks for large content size
-                            if bytes_total > CHUNK {
-                                label.set_label(&format!(
-                                    "sent {}/{} {}",
-                                    format_bytes(bytes_sent),
-                                    format_bytes(bytes_total),
-                                    plural(bytes_sent, &["byte", "bytes", "bytes"])
-                                ));
-                            } else {
-                                label.set_visible(false);
-                            }
-                            todo!()
-                        }),
+                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = subject.page.content.to_status_failure();
@@ -155,7 +134,7 @@ impl Client {
 fn lookup(
     query: &str,
     cancellable: Cancellable,
-    callback: impl FnOnce(Feature, Cancellable, Result<Uri, Uri>) + 'static,
+    callback: impl FnOnce(Rc<Feature>, Cancellable, Result<Uri, Uri>) + 'static,
 ) {
     use gtk::{
         gio::{NetworkAddress, Resolver},
@@ -167,6 +146,7 @@ fn lookup(
     const TIMEOUT: u32 = 250; // ms
 
     let (feature, query) = Feature::parse(query.trim());
+    let feature = Rc::new(feature);
 
     match Uri::parse(query, UriFlags::NONE) {
         Ok(uri) => callback(feature, cancellable, Ok(uri)),
