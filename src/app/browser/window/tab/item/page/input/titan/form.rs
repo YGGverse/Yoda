@@ -47,7 +47,7 @@ impl Form {
             action_update.activate(None);
         });
 
-        text_view.connect_realize(move |this| {
+        text_view.connect_realize(|this| {
             this.grab_focus();
         });
 

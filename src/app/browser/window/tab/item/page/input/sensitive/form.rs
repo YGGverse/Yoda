@@ -33,7 +33,7 @@ impl Form {
             action_send.activate(None);
         });
 
-        password_entry_row.connect_realize(move |this| {
+        password_entry_row.connect_realize(|this| {
             this.grab_focus();
         });
 
