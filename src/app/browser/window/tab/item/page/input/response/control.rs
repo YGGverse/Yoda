@@ -25,7 +25,7 @@ impl Control {
         let send = Rc::new(Send::build(action_send));
 
         // Init widget
-        let widget = Rc::new(Widget::build(&counter.widget.label, &send.widget.button));
+        let widget = Rc::new(Widget::build(&counter.label, &send.button));
 
         // Return activated struct
         Self {

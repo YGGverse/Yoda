@@ -1,11 +1,11 @@
-mod widget;
-use widget::Widget;
-
-use gtk::gio::SimpleAction;
-use std::rc::Rc;
+use gtk::{
+    gio::SimpleAction,
+    prelude::{ActionExt, ButtonExt, WidgetExt},
+    Button,
+};
 
 pub struct Send {
-    pub widget: Rc<Widget>,
+    pub button: Button,
 }
 
 impl Send {
@@ -13,15 +13,28 @@ impl Send {
 
     /// Build new `Self`
     pub fn build(action_send: SimpleAction) -> Self {
-        // Init widget
-        let widget = Rc::new(Widget::build(action_send));
+        // Init main widget
+        let button = Button::builder()
+            .css_classes(["accent"]) // | `suggested-action`
+            .label("Send")
+            .sensitive(false)
+            .build();
 
-        // Result
-        Self { widget }
+        // Init events
+        button.connect_clicked({
+            move |this| {
+                this.set_sensitive(false);
+                this.set_label("Sending..");
+                action_send.activate(None);
+            }
+        });
+
+        // Return activated `Self`
+        Self { button }
     }
 
     // Actions
     pub fn update(&self, is_sensitive: bool) {
-        self.widget.update(is_sensitive);
+        self.button.set_sensitive(is_sensitive);
     }
 }

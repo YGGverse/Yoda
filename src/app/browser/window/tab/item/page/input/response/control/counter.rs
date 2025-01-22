@@ -1,11 +1,7 @@
-mod widget;
-
-use widget::Widget;
-
-use std::rc::Rc;
+use gtk::{prelude::WidgetExt, Label};
 
 pub struct Counter {
-    pub widget: Rc<Widget>,
+    pub label: Label,
 }
 
 impl Default for Counter {
@@ -18,12 +14,28 @@ impl Counter {
     // Construct
     pub fn new() -> Self {
         Self {
-            widget: Rc::new(Widget::new()),
+            label: Label::builder().build(),
         }
     }
 
     // Actions
     pub fn update(&self, is_empty: bool, bytes_left: Option<isize>) {
-        self.widget.update(is_empty, bytes_left);
+        match bytes_left {
+            Some(value) => {
+                // Update color on chars left reached
+                self.label.set_css_classes(&[if value.is_positive() {
+                    "success"
+                } else {
+                    "error"
+                }]); // @TODO add warning step?
+
+                // Update text
+                self.label.set_label(&value.to_string());
+
+                // Toggle visibility on chars left provided
+                self.label.set_visible(!is_empty);
+            }
+            None => self.label.set_visible(false),
+        }
     }
 }
