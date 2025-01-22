@@ -87,47 +87,59 @@ impl Gemini {
                 feature,
                 cancellable,
             ),
-            "titan" => self.subject.page.input.set_new_titan({
-                let client = self.client.clone();
-                let subject = self.subject.clone();
-                let redirects = self.redirects.clone();
-                move |data, _label| {
-                    handle(
-                        Request::Titan(Titan {
-                            uri: uri.clone(),
-                            data: Bytes::from(data),
-                            mime: None,  // @TODO
-                            token: None, // @TODO
-                        }),
-                        client.clone(),
-                        subject.clone(),
-                        redirects.clone(),
-                        feature.clone(),
-                        cancellable.clone(),
-                    )
-                    // init data to send
-                    /* @TODO
-                    use crate::tool::format_bytes;
-                    use plurify::ns as plural;
+            "titan" => {
+                self.subject.page.input.set_new_titan({
+                    let client = self.client.clone();
+                    let subject = self.subject.clone();
+                    let redirects = self.redirects.clone();
+                    move |data, _label| {
+                        handle(
+                            Request::Titan(Titan {
+                                uri: uri.clone(),
+                                data: Bytes::from(data),
+                                mime: None,  // @TODO
+                                token: None, // @TODO
+                            }),
+                            client.clone(),
+                            subject.clone(),
+                            redirects.clone(),
+                            feature.clone(),
+                            cancellable.clone(),
+                        )
+                        // init data to send
+                        /* @TODO
+                        use crate::tool::format_bytes;
+                        use plurify::ns as plural;
 
-                    const CHUNK: usize = 0x400;
-                    let bytes_sent = 0;
-                    let bytes_total = data.len();
+                        const CHUNK: usize = 0x400;
+                        let bytes_sent = 0;
+                        let bytes_total = data.len();
 
-                    // send by chunks for large content size
-                    if bytes_total > CHUNK {
-                        label.set_label(&format!(
-                            "sent {}/{} {}",
-                            format_bytes(bytes_sent),
-                            format_bytes(bytes_total),
-                            plural(bytes_sent, &["byte", "bytes", "bytes"])
-                        ));
-                    } else {
-                        label.set_visible(false);
+                        // send by chunks for large content size
+                        if bytes_total > CHUNK {
+                            label.set_label(&format!(
+                                "sent {}/{} {}",
+                                format_bytes(bytes_sent),
+                                format_bytes(bytes_total),
+                                plural(bytes_sent, &["byte", "bytes", "bytes"])
+                            ));
+                        } else {
+                            label.set_visible(false);
+                        }
+                        todo!()*/
                     }
-                    todo!()*/
-                }
-            }),
+                });
+
+                self.subject.page.title.replace("Titan input".into());
+                self.subject
+                    .page
+                    .navigation
+                    .request
+                    .widget
+                    .entry
+                    .set_progress_fraction(0.0);
+                self.subject.tab_page.set_loading(false);
+            }
             _ => panic!(), // unexpected
         }
     }
@@ -164,7 +176,7 @@ fn handle(
         {
             let subject = subject.clone();
             let redirects = redirects.clone();
-            move |result|     match result {
+            move |result| match result {
                 Ok(response) => {
                     match response.meta.status {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
