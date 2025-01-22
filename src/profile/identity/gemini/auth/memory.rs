@@ -66,7 +66,7 @@ impl Memory {
 
         // Get all records starts with `scope`
         for (scope, &profile_identity_gemini_id) in self.index.borrow().iter() {
-            if request.starts_with(scope) {
+            if alias(request).starts_with(scope) {
                 result.push(Auth {
                     profile_identity_gemini_id,
                     scope: scope.clone(),
@@ -80,4 +80,13 @@ impl Memory {
         // Get first copy
         result.first().cloned()
     }
+}
+
+// Tools
+
+// @TODO optional
+fn alias(request: &str) -> String {
+    request
+        .replace("gemini://", "titan://")
+        .replace("titan://", "gemini://")
 }
