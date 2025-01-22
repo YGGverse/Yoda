@@ -48,24 +48,33 @@ impl Client {
             let driver = self.driver.clone();
             let subject = self.subject.clone();
             // route by scheme parsed
-            move |feature, cancellable, uri| match uri.scheme().as_str() {
-                "gemini" => driver
-                    .gemini
-                    .handle(uri, feature, cancellable, is_snap_history),
-                scheme => {
-                    // no scheme match driver, complete with failure message
-                    let status = subject.page.content.to_status_failure();
-                    status.set_description(Some(&format!("Scheme `{scheme}` yet not supported")));
-                    subject.page.title.replace(status.title());
-                    subject
-                        .page
-                        .navigation
-                        .request
-                        .widget
-                        .entry
-                        .set_progress_fraction(0.0);
-                    subject.tab_page.set_loading(false);
-                }
+            move |feature, cancellable, result| match result {
+                Ok(uri) => match uri.scheme().as_str() {
+                    "gemini" => driver
+                        .gemini
+                        .handle(uri, feature, cancellable, is_snap_history),
+                    scheme => {
+                        // no scheme match driver, complete with failure message
+                        let status = subject.page.content.to_status_failure();
+                        status
+                            .set_description(Some(&format!("Scheme `{scheme}` yet not supported")));
+                        subject.page.title.replace(status.title());
+                        subject
+                            .page
+                            .navigation
+                            .request
+                            .widget
+                            .entry
+                            .set_progress_fraction(0.0);
+                        subject.tab_page.set_loading(false);
+                    }
+                },
+                // begin redirection to new address suggested
+                Err(uri) => subject
+                    .page
+                    .tab_action
+                    .load
+                    .activate(Some(&uri.to_string()), false),
             }
         })
     }
@@ -87,12 +96,11 @@ impl Client {
 }
 
 /// Create request using async DNS resolver (slow method)
-/// * useful for scheme-less requests, before apply search redirect
-/// * the `query` should not contain `feature` prefix
+/// * return suggestion [Uri](https://docs.gtk.org/glib/struct.Uri.html) on failure (to handle as redirect)
 fn lookup(
     query: &str,
     cancellable: Cancellable,
-    callback: impl FnOnce(Feature, Cancellable, Uri) + 'static,
+    callback: impl FnOnce(Feature, Cancellable, Result<Uri, Uri>) + 'static,
 ) {
     use gtk::{
         gio::{NetworkAddress, Resolver},
@@ -106,7 +114,7 @@ fn lookup(
     let (feature, query) = Feature::parse(query.trim());
 
     match Uri::parse(query, UriFlags::NONE) {
-        Ok(uri) => callback(feature, cancellable, uri),
+        Ok(uri) => callback(feature, cancellable, Ok(uri)),
         Err(_) => {
             // try default scheme suggestion
             let suggestion = format!("{DEFAULT_SCHEME}://{query}");
@@ -124,16 +132,16 @@ fn lookup(
                             cancellable,
                             if resolve.is_ok() {
                                 match Uri::parse(&suggestion, UriFlags::NONE) {
-                                    Ok(uri) => uri,
-                                    Err(_) => search(&suggestion),
+                                    Ok(uri) => Err(uri),
+                                    Err(_) => Err(search(&suggestion)),
                                 }
                             } else {
-                                search(&suggestion)
+                                Err(search(&suggestion))
                             },
                         )
                     },
                 ),
-                Err(_) => callback(feature, cancellable, search(&suggestion)),
+                Err(_) => callback(feature, cancellable, Err(search(&suggestion))),
             }
         }
     }
