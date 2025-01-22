@@ -404,21 +404,8 @@ fn handle(
                             // Expected target URL in response meta
                             match response.meta.data {
                                 Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                    Ok(absolute) => {
-                                        // Replace Titan base
-                                        let target = Uri::build(
-                                            UriFlags::NONE,
-                                            "gemini",
-                                            absolute.userinfo().as_deref(),
-                                            absolute.host().as_deref(),
-                                            absolute.port(),
-                                            absolute.path().as_str(),
-                                            absolute.query().as_deref(),
-                                            absolute.fragment().as_deref(),
-                                        );
-
+                                    Ok(target) => {
                                         let total = redirects.take() + 1;
-
                                         // Validate total redirects by protocol specification
                                         if total > 5 {
                                             let status = subject.page.content.to_status_failure();
@@ -429,7 +416,7 @@ fn handle(
                                             redirects.replace(0); // reset
 
                                         // Disallow external redirection
-                                        } else if "gemini" != target.scheme()
+                                        } else if (target.scheme() != "titan" && target.scheme() != "gemini")
                                             || uri.port() != target.port()
                                             || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
@@ -448,7 +435,18 @@ fn handle(
                                                 .set_text(&uri.to_string());
                                             }
                                             redirects.replace(total);
-                                            subject.page.tab_action.load.activate(Some(&target.to_string()), false);
+                                            subject.page.tab_action.load.activate(Some(
+                                                &Uri::build(
+                                                    UriFlags::NONE,
+                                                    "gemini",
+                                                    target.userinfo().as_deref(),
+                                                    target.host().as_deref(),
+                                                    target.port(),
+                                                    target.path().as_str(),
+                                                    target.query().as_deref(),
+                                                    target.fragment().as_deref(),
+                                                ).to_string()
+                                            ), false);
                                         }
                                     }
                                     Err(e) => {
