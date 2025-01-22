@@ -399,48 +399,46 @@ fn handle(
                         Status::PermanentRedirect | Status::Redirect => {
                             // Expected target URL in response meta
                             match response.meta.data {
-                                Some(data) => {
-                                    match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                        Ok(target) => {
-                                            let total = redirects.take() + 1;
+                                Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
+                                    Ok(target) => {
+                                        let total = redirects.take() + 1;
 
-                                            // Validate total redirects by protocol specification
-                                            if total > 5 {
+                                        // Validate total redirects by protocol specification
+                                        if total > 5 {
+                                            let status = subject.page.content.to_status_failure();
+                                            status.set_description(Some("Redirection limit reached"));
+                                            subject.page.title.replace(status.title());
+                                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                            subject.tab_page.set_loading(false);
+                                            redirects.replace(0); // reset
+
+                                        // Disallow external redirection
+                                        } else if "gemini" != target.scheme()
+                                            || uri.port() != target.port()
+                                            || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
-                                                status.set_description(Some("Redirection limit reached"));
+                                                status.set_description(Some("External redirects not allowed by protocol specification"));
                                                 subject.page.title.replace(status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
                                                 redirects.replace(0); // reset
-
-                                            // Disallow external redirection
-                                            } else if uri.scheme() != target.scheme()
-                                                || uri.port() != target.port()
-                                                || uri.host() != target.host() {
-                                                    let status = subject.page.content.to_status_failure();
-                                                    status.set_description(Some("External redirects not allowed by protocol specification"));
-                                                    subject.page.title.replace(status.title());
-                                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                    subject.tab_page.set_loading(false);
-                                                    redirects.replace(0); // reset
-                                            // Valid
-                                            } else {
-                                                if matches!(response.meta.status, Status::PermanentRedirect) {
-                                                    subject.page.navigation
-                                                    .request
-                                                    .widget
-                                                    .entry
-                                                    .set_text(&uri.to_string());
-                                                }
-                                                redirects.replace(total);
-                                                subject.page.tab_action.load.activate(Some(&target.to_string()), false);
+                                        // Valid
+                                        } else {
+                                            if matches!(response.meta.status, Status::PermanentRedirect) {
+                                                subject.page.navigation
+                                                .request
+                                                .widget
+                                                .entry
+                                                .set_text(&uri.to_string());
                                             }
+                                            redirects.replace(total);
+                                            subject.page.tab_action.load.activate(Some(&target.to_string()), false);
                                         }
-                                        Err(e) => {
-                                            let status = subject.page.content.to_status_failure();
-                                            status.set_description(Some(&e.to_string()));
-                                            subject.page.title.replace(status.title());
-                                        }
+                                    }
+                                    Err(e) => {
+                                        let status = subject.page.content.to_status_failure();
+                                        status.set_description(Some(&e.to_string()));
+                                        subject.page.title.replace(status.title());
                                     }
                                 }
                                 None => {
