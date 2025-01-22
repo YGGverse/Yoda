@@ -9,7 +9,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{CancellableExt, EntryExt},
+    prelude::{CancellableExt, EditableExt, EntryExt},
 };
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
@@ -43,16 +43,47 @@ impl Client {
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
+        // Move focus out from navigation entry
+        self.subject
+            .page
+            .browser_action
+            .escape
+            .activate_stateful_once(Some(self.subject.page.id.as_str().into()));
+
+        // Initially disable find action
+        self.subject
+            .page
+            .window_action
+            .find
+            .simple_action
+            .set_enabled(false);
+
+        // Reset widgets
+        self.subject.page.search.unset();
+        self.subject.page.input.unset();
+        self.subject.page.title.replace("Loading..".into());
+        self.subject
+            .page
+            .navigation
+            .request
+            .widget
+            .entry
+            .set_progress_fraction(0.1);
+
+        self.subject.tab_page.set_loading(true);
+
+        if is_snap_history {
+            snap_history(&self.subject, None);
+        }
+
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(request, self.cancellable(), {
             let driver = self.driver.clone();
             let subject = self.subject.clone();
             move |feature, cancellable, result| match result {
-                // route by scheme parsed
+                // route by scheme
                 Ok(uri) => match uri.scheme().as_str() {
-                    "gemini" => driver
-                        .gemini
-                        .handle(uri, feature, cancellable, is_snap_history),
+                    "gemini" => driver.gemini.handle(uri, feature, cancellable),
                     scheme => {
                         // no scheme match driver, complete with failure message
                         let status = subject.page.content.to_status_failure();
@@ -159,4 +190,31 @@ fn search(query: &str) -> Uri {
         Some(&Uri::escape_string(query, None, false)),
         None,
     ) // @TODO optional settings
+}
+
+/// Make new history record in related components
+/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
+fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
+    let request = subject.page.navigation.request.widget.entry.text();
+
+    // Add new record into the global memory index (used in global menu)
+    // * if the `Uri` is `None`, try parse it from `request`
+    match uri {
+        Some(uri) => subject.page.profile.history.memory.request.set(uri.clone()),
+        None => {
+            // this case especially useful for some routes that contain redirects
+            // maybe some parental optimization wanted @TODO
+            if let Some(uri) = subject.page.navigation.request.as_uri() {
+                subject.page.profile.history.memory.request.set(uri);
+            }
+        }
+    }
+
+    // Add new record into the page navigation history
+    if match subject.page.navigation.history.current() {
+        Some(current) => current != request, // apply additional filters
+        None => true,
+    } {
+        subject.page.navigation.history.add(request, true)
+    }
 }

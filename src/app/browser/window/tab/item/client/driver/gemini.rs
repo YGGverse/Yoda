@@ -72,46 +72,7 @@ impl Gemini {
 
     // Actions
 
-    pub fn handle(
-        &self,
-        uri: Uri,
-        feature: Feature,
-        cancellable: Cancellable,
-        is_snap_history: bool,
-    ) {
-        // Move focus out from navigation entry
-        self.subject
-            .page
-            .browser_action
-            .escape
-            .activate_stateful_once(Some(self.subject.page.id.as_str().into()));
-
-        // Initially disable find action
-        self.subject
-            .page
-            .window_action
-            .find
-            .simple_action
-            .set_enabled(false);
-
-        // Reset widgets
-        self.subject.page.search.unset();
-        self.subject.page.input.unset();
-        self.subject.page.title.replace("Loading..".into());
-        self.subject
-            .page
-            .navigation
-            .request
-            .widget
-            .entry
-            .set_progress_fraction(0.1);
-
-        self.subject.tab_page.set_loading(true);
-
-        if is_snap_history {
-            snap_history(&self.subject, None);
-        }
-
+    pub fn handle(&self, uri: Uri, feature: Feature, cancellable: Cancellable) {
         self.client.request_async(
             Request::gemini(uri.clone()),
             Priority::DEFAULT,
@@ -392,7 +353,7 @@ impl Gemini {
                                                         .set_text(&uri.to_string());
                                                     }
                                                     redirects.replace(total);
-                                                    subject.page.tab_action.load.activate(Some(&target.to_string()), is_snap_history);
+                                                    subject.page.tab_action.load.activate(Some(&target.to_string()), false);
                                                 }
                                             }
                                             Err(e) => {
@@ -457,32 +418,5 @@ fn uri_to_title(uri: &Uri) -> GString {
         }
     } else {
         path
-    }
-}
-
-/// Make new history record in related components
-/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
-fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
-    let request = subject.page.navigation.request.widget.entry.text();
-
-    // Add new record into the global memory index (used in global menu)
-    // * if the `Uri` is `None`, try parse it from `request`
-    match uri {
-        Some(uri) => subject.page.profile.history.memory.request.set(uri.clone()),
-        None => {
-            // this case especially useful for some routes that contain redirects
-            // maybe some parental optimization wanted @TODO
-            if let Some(uri) = subject.page.navigation.request.as_uri() {
-                subject.page.profile.history.memory.request.set(uri);
-            }
-        }
-    }
-
-    // Add new record into the page navigation history
-    if match subject.page.navigation.history.current() {
-        Some(current) => current != request, // apply additional filters
-        None => true,
-    } {
-        subject.page.navigation.history.add(request, true)
     }
 }
