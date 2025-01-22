@@ -404,7 +404,19 @@ fn handle(
                             // Expected target URL in response meta
                             match response.meta.data {
                                 Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                    Ok(target) => {
+                                    Ok(absolute) => {
+                                        // Replace Titan base
+                                        let target = Uri::build(
+                                            UriFlags::NONE,
+                                            "gemini",
+                                            absolute.userinfo().as_deref(),
+                                            absolute.host().as_deref(),
+                                            absolute.port(),
+                                            absolute.path().as_str(),
+                                            absolute.query().as_deref(),
+                                            absolute.fragment().as_deref(),
+                                        );
+
                                         let total = redirects.take() + 1;
 
                                         // Validate total redirects by protocol specification
@@ -417,7 +429,7 @@ fn handle(
                                             redirects.replace(0); // reset
 
                                         // Disallow external redirection
-                                        } else if "gemini" != target.scheme().replace("titan", "gemini") // alias
+                                        } else if "gemini" != target.scheme()
                                             || uri.port() != target.port()
                                             || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
