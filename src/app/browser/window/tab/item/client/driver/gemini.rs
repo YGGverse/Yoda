@@ -413,7 +413,7 @@ fn handle(
                                             redirects.replace(0); // reset
 
                                         // Disallow external redirection
-                                        } else if "gemini" != target.scheme()
+                                        } else if "gemini" != target.scheme().replace("titan", "gemini") // alias
                                             || uri.port() != target.port()
                                             || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
