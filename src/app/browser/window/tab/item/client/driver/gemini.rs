@@ -223,7 +223,7 @@ impl Gemini {
                                                                     }
                                                                 },
                                                             ),
-                                                        );
+                                                        )
                                                     }
                                                     Err(e) => action.cancel.activate(&e.to_string()),
                                                 }
@@ -231,6 +231,8 @@ impl Gemini {
                                         },
                                     );
                                     page.title.replace(status.title());
+                                    page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                    tab_page.set_loading(false);
                                 },
                                 _ => match response.meta.mime {
                                     Some(mime) => match mime.as_str() {
@@ -269,6 +271,8 @@ impl Gemini {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some(&e.to_string()));
                                                     page.title.replace(status.title());
+                                                    page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    tab_page.set_loading(false);
                                                 },
                                             },
                                         ),
@@ -304,11 +308,15 @@ impl Gemini {
                                                                             page.title.replace(uri_to_title(&uri));
                                                                             page.content
                                                                                 .to_image(&Texture::for_pixbuf(&buffer));
+                                                                            page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                                            tab_page.set_loading(false);
                                                                         }
                                                                         Err(e) => {
                                                                             let status = page.content.to_status_failure();
                                                                             status.set_description(Some(e.message()));
                                                                             page.title.replace(status.title());
+                                                                            page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                                            tab_page.set_loading(false);
                                                                         }
                                                                     }
                                                                 },
@@ -319,10 +327,12 @@ impl Gemini {
                                                             status.set_description(Some(&e.to_string()));
 
                                                             page.title.replace(status.title());
+                                                            page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                            tab_page.set_loading(false);
                                                         }
                                                     }
                                                 },
-                                            );
+                                            )
                                         }
                                         mime => {
                                             let status = page
@@ -330,12 +340,16 @@ impl Gemini {
                                                 .to_status_mime(mime, Some((&page.tab_action, &uri)));
                                             status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                             page.title.replace(status.title());
+                                            page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                            tab_page.set_loading(false);
                                         },
                                     },
                                     None => {
                                         let status = page.content.to_status_failure();
                                         status.set_description(Some("MIME type not found"));
                                         page.title.replace(status.title());
+                                        page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                        tab_page.set_loading(false);
                                     },
                                 }
                             },
@@ -354,6 +368,8 @@ impl Gemini {
                                                     let status = page.content.to_status_failure();
                                                     status.set_description(Some("Redirection limit reached"));
                                                     page.title.replace(status.title());
+                                                    page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    tab_page.set_loading(false);
                                                     redirects.replace(0); // reset
 
                                                 // Disallow external redirection
@@ -363,6 +379,8 @@ impl Gemini {
                                                         let status = page.content.to_status_failure();
                                                         status.set_description(Some("External redirects not allowed by protocol specification"));
                                                         page.title.replace(status.title());
+                                                        page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                        tab_page.set_loading(false);
                                                         redirects.replace(0); // reset
                                                 // Valid
                                                 } else {
@@ -404,11 +422,15 @@ impl Gemini {
                                 }));
 
                                 page.title.replace(status.title());
+                                page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                tab_page.set_loading(false);
                             }
                             status => {
                                 let _status = page.content.to_status_failure();
                                 _status.set_description(Some(&format!("Undefined status code `{status}`")));
                                 page.title.replace(_status.title());
+                                page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                tab_page.set_loading(false);
                             },
                         }
                     }
