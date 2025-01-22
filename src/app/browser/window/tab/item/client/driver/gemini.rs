@@ -203,6 +203,7 @@ fn handle(
                             subject.page.title.replace(title.into());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            redirects.replace(0); // reset
                         }
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         Status::Success => match *feature {
@@ -274,6 +275,7 @@ fn handle(
                                 subject.page.title.replace(status.title());
                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                 subject.tab_page.set_loading(false);
+                                redirects.replace(0); // reset
                             },
                             _ => match response.meta.mime {
                                 Some(mime) => match mime.as_str() {
@@ -301,6 +303,7 @@ fn handle(
                                                 // Deactivate loading indication
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
+                                                redirects.replace(0); // reset
 
                                                 // Update window components
                                                 subject.page.window_action
@@ -314,6 +317,7 @@ fn handle(
                                                 subject.page.title.replace(status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
+                                                redirects.replace(0); // reset
                                             },
                                         },
                                     ),
@@ -343,23 +347,20 @@ fn handle(
                                                             &memory_input_stream,
                                                             Some(&cancellable),
                                                             move |result| {
-                                                                // Process buffer data
                                                                 match result {
                                                                     Ok(buffer) => {
                                                                         subject.page.title.replace(uri_to_title(&uri));
-                                                                        subject.page.content
-                                                                            .to_image(&Texture::for_pixbuf(&buffer));
-                                                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                                        subject.tab_page.set_loading(false);
+                                                                        subject.page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                     }
                                                                     Err(e) => {
                                                                         let status = subject.page.content.to_status_failure();
                                                                         status.set_description(Some(e.message()));
                                                                         subject.page.title.replace(status.title());
-                                                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                                        subject.tab_page.set_loading(false);
                                                                     }
                                                                 }
+                                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                                subject.tab_page.set_loading(false);
+                                                                redirects.replace(0); // reset
                                                             },
                                                         )
                                                     }
@@ -370,6 +371,7 @@ fn handle(
                                                         subject.page.title.replace(status.title());
                                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                         subject.tab_page.set_loading(false);
+                                                        redirects.replace(0); // reset
                                                     }
                                                 }
                                             },
@@ -383,6 +385,7 @@ fn handle(
                                         subject.page.title.replace(status.title());
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
+                                        redirects.replace(0); // reset
                                     },
                                 },
                                 None => {
@@ -391,6 +394,7 @@ fn handle(
                                     subject.page.title.replace(status.title());
                                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                     subject.tab_page.set_loading(false);
+                                    redirects.replace(0); // reset
                                 },
                             }
                         },
@@ -463,6 +467,7 @@ fn handle(
                             subject.page.title.replace(status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            redirects.replace(0); // reset
                         }
                         status => {
                             let _status = subject.page.content.to_status_failure();
@@ -470,6 +475,7 @@ fn handle(
                             subject.page.title.replace(_status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            redirects.replace(0); // reset
                         },
                     }
                 }
