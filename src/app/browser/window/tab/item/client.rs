@@ -35,14 +35,12 @@ impl Client {
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
         // run async resolver to detect Uri, scheme-less host, or search query
-        lookup(
-            request,
-            self.driver.clone(),
-            self.cancellable(),
-            move |driver, feature, cancellable, uri| {
+        lookup(request, self.cancellable(), {
+            let driver = self.driver.clone();
+            move |feature, cancellable, uri| {
                 route(driver, feature, cancellable, uri, is_snap_history)
-            },
-        )
+            }
+        })
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
@@ -66,9 +64,8 @@ impl Client {
 /// * the `query` should not contain `feature` prefix
 fn lookup(
     query: &str,
-    driver: Rc<Driver>,
     cancellable: Cancellable,
-    callback: impl FnOnce(Rc<Driver>, Feature, Cancellable, Uri) + 'static,
+    callback: impl FnOnce(Feature, Cancellable, Uri) + 'static,
 ) {
     use gtk::{
         gio::{NetworkAddress, Resolver},
@@ -82,7 +79,7 @@ fn lookup(
     let (feature, query) = Feature::parse(query.trim());
 
     match Uri::parse(query, UriFlags::NONE) {
-        Ok(uri) => callback(driver, feature, cancellable, uri),
+        Ok(uri) => callback(feature, cancellable, uri),
         Err(_) => {
             // try default scheme suggestion
             let suggestion = format!("{DEFAULT_SCHEME}://{query}");
@@ -96,7 +93,6 @@ fn lookup(
                     Some(&cancellable.clone()),
                     move |resolve| {
                         callback(
-                            driver,
                             feature,
                             cancellable,
                             if resolve.is_ok() {
@@ -110,7 +106,7 @@ fn lookup(
                         )
                     },
                 ),
-                Err(_) => callback(driver, feature, cancellable, search(&suggestion)),
+                Err(_) => callback(feature, cancellable, search(&suggestion)),
             }
         }
     }
