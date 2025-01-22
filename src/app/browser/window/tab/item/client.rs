@@ -1,5 +1,6 @@
 mod driver;
 mod feature;
+mod subject;
 
 use super::Page;
 use adw::TabPage;
@@ -11,11 +12,13 @@ use gtk::{
     prelude::CancellableExt,
 };
 use std::{cell::Cell, rc::Rc};
+use subject::Subject;
 
 /// Multi-protocol client API for tab `Item`
 pub struct Client {
     cancellable: Cell<Cancellable>,
     driver: Rc<Driver>,
+    subject: Rc<Subject>,
 }
 
 impl Client {
@@ -23,9 +26,14 @@ impl Client {
 
     /// Create new `Self`
     pub fn init(page: &Rc<Page>, tab_page: &TabPage) -> Self {
+        let subject = Rc::new(Subject {
+            page: page.clone(),
+            tab_page: tab_page.clone(),
+        });
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            driver: Rc::new(Driver::build(page, tab_page)),
+            driver: Rc::new(Driver::build(&subject)),
+            subject,
         }
     }
 
