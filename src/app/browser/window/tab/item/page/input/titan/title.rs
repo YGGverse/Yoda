@@ -14,7 +14,6 @@ impl Title {
                 .css_classes(["heading"])
                 .halign(Align::Start)
                 .label(title.unwrap_or("Titan input"))
-                .visible(false)
                 .build(),
         }
     }

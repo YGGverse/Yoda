@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, Align, Label};
+use gtk::{Align, Label};
 
 pub struct Title {
     pub label: Label,
@@ -12,15 +12,8 @@ impl Title {
         let label = Label::builder()
             .css_classes(["heading"])
             .halign(Align::Start)
-            .visible(false)
+            .label(title.unwrap_or("Input expected"))
             .build();
-
-        if let Some(value) = title {
-            if !value.is_empty() {
-                label.set_label(value);
-                label.set_visible(true)
-            }
-        }
 
         Self { label }
     }
