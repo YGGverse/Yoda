@@ -47,8 +47,8 @@ impl Client {
         lookup(request, self.cancellable(), {
             let driver = self.driver.clone();
             let subject = self.subject.clone();
-            // route by scheme parsed
             move |feature, cancellable, result| match result {
+                // route by scheme parsed
                 Ok(uri) => match uri.scheme().as_str() {
                     "gemini" => driver
                         .gemini
