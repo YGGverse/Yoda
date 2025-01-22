@@ -1,18 +1,18 @@
 mod counter;
 mod send;
-mod widget;
 
 use counter::Counter;
 use send::Send;
-use widget::Widget;
 
-use gtk::gio::SimpleAction;
+use gtk::{gio::SimpleAction, prelude::BoxExt, Align, Box, Orientation};
 use std::rc::Rc;
+
+const SPACING: i32 = 8;
 
 pub struct Control {
     pub counter: Rc<Counter>,
     pub send: Rc<Send>,
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Control {
@@ -24,14 +24,21 @@ impl Control {
         let counter = Rc::new(Counter::new());
         let send = Rc::new(Send::build(action_send));
 
-        // Init widget
-        let widget = Rc::new(Widget::build(&counter.label, &send.button));
+        // Init main widget
+        let g_box = Box::builder()
+            .halign(Align::End)
+            .orientation(Orientation::Horizontal)
+            .spacing(SPACING)
+            .build();
+
+        g_box.append(&counter.label);
+        g_box.append(&send.button);
 
         // Return activated struct
         Self {
             counter,
             send,
-            widget,
+            g_box,
         }
     }
 

@@ -1,18 +1,19 @@
 mod response;
 mod sensitive;
 mod titan;
-mod widget;
 
 use super::TabAction;
-use gtk::{glib::Uri, Label};
+use adw::Clamp;
+use gtk::{glib::Uri, prelude::WidgetExt, Box, Label};
 use response::Response;
 use sensitive::Sensitive;
 use std::rc::Rc;
 use titan::Titan;
-use widget::Widget;
+
+const MARGIN: i32 = 6;
 
 pub struct Input {
-    pub widget: Rc<Widget>,
+    pub clamp: Clamp,
 }
 
 impl Default for Input {
@@ -24,16 +25,28 @@ impl Default for Input {
 impl Input {
     // Construct
     pub fn new() -> Self {
-        // Init widget
-        let widget = Rc::new(Widget::new());
+        let clamp = Clamp::builder()
+            .margin_bottom(MARGIN)
+            .margin_top(MARGIN)
+            .maximum_size(800)
+            .visible(false)
+            .build();
 
-        // Result
-        Self { widget }
+        Self { clamp }
     }
 
     // Actions
     pub fn unset(&self) {
-        self.widget.update(None);
+        self.update(None);
+    }
+
+    pub fn update(&self, child: Option<&Box>) {
+        if child.is_some() {
+            self.clamp.set_visible(true); // widget may be hidden, make it visible to child redraw
+            self.clamp.set_child(child);
+        } else {
+            self.clamp.set_visible(false)
+        }
     }
 
     // Setters
@@ -44,10 +57,8 @@ impl Input {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.widget.update(Some(
-            &Response::build(action, base, title, size_limit)
-                .widget
-                .g_box,
+        self.update(Some(
+            &Response::build(action, base, title, size_limit).g_box,
         ));
     }
 
@@ -58,15 +69,12 @@ impl Input {
         title: Option<&str>,
         max_length: Option<i32>,
     ) {
-        self.widget.update(Some(
-            &Sensitive::build(action, base, title, max_length)
-                .widget
-                .g_box,
+        self.update(Some(
+            &Sensitive::build(action, base, title, max_length).g_box,
         ));
     }
 
     pub fn set_new_titan(&self, on_send: impl Fn(&[u8], &Label) + 'static) {
-        self.widget
-            .update(Some(&Titan::build(on_send).widget.g_box));
+        self.update(Some(&Titan::build(on_send).g_box));
     }
 }

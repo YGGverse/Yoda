@@ -1,19 +1,20 @@
 mod control;
 mod form;
 mod title;
-mod widget;
 
 use control::Control;
 use form::Form;
 use title::Title;
-use widget::Widget;
 
-use gtk::{gio::SimpleAction, glib::uuid_string_random, Label};
+use gtk::{gio::SimpleAction, glib::uuid_string_random, prelude::BoxExt, Box, Label, Orientation};
 use std::rc::Rc;
+
+const MARGIN: i32 = 6;
+const SPACING: i32 = 8;
 
 pub struct Titan {
     // Components
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Titan {
@@ -31,24 +32,30 @@ impl Titan {
         let title = Title::build(None);
 
         // Init widget
-        let widget = Rc::new(Widget::build(
-            &title.label,
-            &form.widget.text_view,
-            &control.widget.g_box,
-        ));
+        let g_box = Box::builder()
+            .margin_bottom(MARGIN)
+            .margin_end(MARGIN)
+            .margin_start(MARGIN)
+            .margin_top(MARGIN)
+            .spacing(SPACING)
+            .orientation(Orientation::Vertical)
+            .build();
+
+        g_box.append(&title.label);
+        g_box.append(&form.text_view);
+        g_box.append(&control.g_box);
 
         // Init events
         action_update.connect_activate({
             let control = control.clone();
             let form = form.clone();
-            move |_, _| control.update(Some(form.widget.text().as_bytes().len()))
+            move |_, _| control.update(Some(form.text().as_bytes().len()))
         });
 
-        action_send.connect_activate(move |_, _| {
-            on_send(form.widget.text().as_bytes(), &control.counter.label)
-        });
+        action_send
+            .connect_activate(move |_, _| on_send(form.text().as_bytes(), &control.counter.label));
 
         // Return activated struct
-        Self { widget }
+        Self { g_box }
     }
 }

@@ -64,7 +64,7 @@ impl Page {
             &navigation.widget.g_box,
             &content.g_box,
             &search.g_box,
-            &input.widget.clamp,
+            &input.clamp,
         ));
 
         // Done

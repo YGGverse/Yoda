@@ -1,19 +1,20 @@
 mod form;
-mod widget;
-
-use form::Form;
-use widget::Widget;
 
 use super::TabAction;
+use form::Form;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::{EditableExt, WidgetExt},
+    prelude::{BoxExt, EditableExt, WidgetExt},
+    Box, Orientation,
 };
 use std::rc::Rc;
 
+const MARGIN: i32 = 6;
+const SPACING: i32 = 8;
+
 pub struct Sensitive {
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Sensitive {
@@ -38,7 +39,16 @@ impl Sensitive {
         ));
 
         // Init widget
-        let widget = Rc::new(Widget::build(&form.widget.password_entry_row));
+        let g_box = Box::builder()
+            .margin_bottom(MARGIN)
+            .margin_end(MARGIN)
+            .margin_start(MARGIN)
+            .margin_top(MARGIN)
+            .spacing(SPACING)
+            .orientation(Orientation::Vertical)
+            .build();
+
+        g_box.append(&form.password_entry_row);
 
         // Init events
         action_send.connect_activate({
@@ -48,18 +58,18 @@ impl Sensitive {
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(&form.widget.password_entry_row.text(), None, false),
+                        Uri::escape_string(&form.password_entry_row.text(), None, false),
                     )),
                     true,
                 );
             }
         });
 
-        widget.g_box.connect_realize(move |_| {
-            form.widget.password_entry_row.grab_focus();
+        g_box.connect_realize(move |_| {
+            form.password_entry_row.grab_focus();
         });
 
         // Return activated struct
-        Self { widget }
+        Self { g_box }
     }
 }

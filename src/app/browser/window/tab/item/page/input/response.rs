@@ -1,23 +1,26 @@
 mod control;
 mod form;
 mod title;
-mod widget;
 
 use control::Control;
 use form::Form;
 use title::Title;
-use widget::Widget;
 
 use super::TabAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
+    prelude::BoxExt,
+    Box, Orientation,
 };
 use std::rc::Rc;
 
+const MARGIN: i32 = 6;
+const SPACING: i32 = 8;
+
 pub struct Response {
     // Components
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Response {
@@ -39,12 +42,19 @@ impl Response {
         let form = Rc::new(Form::build(action_update.clone()));
         let title = Rc::new(Title::build(title));
 
-        // Init widget
-        let widget = Rc::new(Widget::build(
-            &title.widget.label,
-            &form.widget.text_view,
-            &control.widget.g_box,
-        ));
+        // Init main widget
+        let g_box = Box::builder()
+            .margin_bottom(MARGIN)
+            .margin_end(MARGIN)
+            .margin_start(MARGIN)
+            .margin_top(MARGIN)
+            .spacing(SPACING)
+            .orientation(Orientation::Vertical)
+            .build();
+
+        g_box.append(&title.label);
+        g_box.append(&form.text_view);
+        g_box.append(&control.g_box);
 
         // Init events
         action_update.connect_activate({
@@ -53,11 +63,11 @@ impl Response {
             let form = form.clone();
             move |_, _| {
                 control.update(
-                    form.widget.text().is_empty(),
+                    form.text().is_empty(),
                     size_limit.map(|limit| {
                         limit as isize
                             - ((base.to_string_partial(UriHideFlags::QUERY).len()
-                                + Uri::escape_string(&form.widget.text(), None, false).len())
+                                + Uri::escape_string(&form.text(), None, false).len())
                                 as isize)
                     }),
                 )
@@ -71,7 +81,7 @@ impl Response {
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(&form.widget.text(), None, false),
+                        Uri::escape_string(&form.text(), None, false),
                     )),
                     true,
                 );
@@ -79,6 +89,6 @@ impl Response {
         });
 
         // Return activated struct
-        Self { widget }
+        Self { g_box }
     }
 }
