@@ -106,7 +106,7 @@ impl Request {
 
     /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
     /// * `strip_prefix` on parse
-    pub fn as_uri(&self) -> Option<Uri> {
+    pub fn uri(&self) -> Option<Uri> {
         match Uri::parse(&strip_prefix(self.widget.entry.text()), UriFlags::NONE) {
             Ok(uri) => Some(uri),
             _ => None,
@@ -117,6 +117,24 @@ impl Request {
     /// * the `prefix` is not `scheme`
     pub fn strip_prefix(&self) -> GString {
         strip_prefix(self.widget.entry.text())
+    }
+
+    /// Parse home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for self
+    pub fn home(&self) -> Option<GString> {
+        match self.uri() {
+            Some(uri) => {
+                let scheme = uri.scheme().replace("titan", "gemini");
+                let port = uri.port();
+                uri.host().map(|host| {
+                    if port.is_positive() {
+                        gformat!("{scheme}://{host}:{port}/")
+                    } else {
+                        gformat!("{scheme}://{host}/")
+                    }
+                })
+            }
+            None => None,
+        }
     }
 
     /// Get request value in `download:` format

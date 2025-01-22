@@ -37,15 +37,16 @@ impl Navigation {
         ),
     ) -> Self {
         // init children components
-        let home = Rc::new(Home::build(window_action));
+
         let history = Rc::new(History::build(window_action));
         let reload = Rc::new(Reload::build(window_action));
         let request = Rc::new(Request::build((browser_action, tab_action)));
         let bookmark = Rc::new(Bookmark::build(window_action));
+        let home = Rc::new(Home::build(window_action, &request));
 
         // init main widget
         let widget = Rc::new(Widget::build(
-            &home.widget.button,
+            &home.button,
             &history.widget.g_box,
             &reload.widget.button,
             &request.widget.entry,
@@ -74,7 +75,6 @@ impl Navigation {
         self.bookmark
             .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
-        self.home.update(self.request.as_uri().as_ref());
         self.reload.update(!request.is_empty());
         self.request.update(
             self.profile
@@ -85,6 +85,7 @@ impl Navigation {
                 .match_scope(&request)
                 .is_some(),
         );
+        self.home.update();
     }
 
     pub fn clean(

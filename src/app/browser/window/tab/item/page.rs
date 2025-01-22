@@ -157,7 +157,7 @@ impl Page {
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
                     // * just to have back/forward navigation ability
-                    if let Some(uri) = self.navigation.request.as_uri() {
+                    if let Some(uri) = self.navigation.request.uri() {
                         self.profile.history.memory.request.set(uri);
                     }
                 }

@@ -250,8 +250,8 @@ impl Tab {
 
     pub fn page_home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(text) = item.page.navigation.home.url() {
-                item.page.navigation.request.widget.entry.set_text(&text);
+            if let Some(home) = item.page.navigation.request.home() {
+                item.page.navigation.request.widget.entry.set_text(&home);
                 self.window_action.reload.activate();
             }
         }

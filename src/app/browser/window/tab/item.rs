@@ -93,7 +93,7 @@ impl Item {
             let window_action = window_action.clone();
             move || {
                 // Request should match valid URI for all drivers supported
-                if let Some(uri) = page.navigation.request.as_uri() {
+                if let Some(uri) = page.navigation.request.uri() {
                     // Rout by scheme
                     if uri.scheme().to_lowercase() == "gemini" {
                         return identity::new_gemini(

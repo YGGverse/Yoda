@@ -208,7 +208,7 @@ fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
         None => {
             // this case especially useful for some routes that contain redirects
             // maybe some parental optimization wanted @TODO
-            if let Some(uri) = subject.page.navigation.request.as_uri() {
+            if let Some(uri) = subject.page.navigation.request.uri() {
                 subject.page.profile.history.memory.request.set(uri);
             }
         }

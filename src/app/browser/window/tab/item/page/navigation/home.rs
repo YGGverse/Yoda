@@ -1,57 +1,44 @@
-mod widget;
-
-use widget::Widget;
-
-use super::WindowAction;
-use gtk::glib::{gformat, GString, Uri};
-use std::{cell::RefCell, rc::Rc};
+use super::{Request, WindowAction};
+use gtk::{
+    prelude::{ButtonExt, WidgetExt},
+    Button,
+};
+use std::rc::Rc;
 
 pub struct Home {
     action: Rc<WindowAction>,
-    uri: RefCell<Option<Uri>>,
-    pub widget: Rc<Widget>,
+    request: Rc<Request>,
+    pub button: Button,
 }
 
 impl Home {
     // Construct
-    pub fn build(action: &Rc<WindowAction>) -> Self {
+    pub fn build(action: &Rc<WindowAction>, request: &Rc<Request>) -> Self {
+        // Init gobject
+        let button = Button::builder()
+            .icon_name("go-home-symbolic")
+            .tooltip_text("Home")
+            .sensitive(false)
+            .build();
+
+        // Init events
+        button.connect_clicked({
+            let action = action.clone();
+            move |_| action.home.activate()
+        });
+
+        // Return activated `Self`
         Self {
             action: action.clone(),
-            uri: RefCell::new(None),
-            widget: Rc::new(Widget::build(action)),
+            request: request.clone(),
+            button,
         }
     }
 
     // Actions
-    pub fn update(&self, request: Option<&Uri>) {
-        let has_home = match request {
-            Some(uri) => {
-                self.uri.replace(Some(uri.clone()));
-                uri.path().len() > 1
-            }
-            None => {
-                self.uri.replace(None);
-                false
-            }
-        };
+    pub fn update(&self) {
+        let has_home = self.request.home().is_some();
         self.action.home.simple_action.set_enabled(has_home);
-        self.widget.update(has_home);
-    }
-
-    // Getters
-
-    pub fn url(&self) -> Option<GString> {
-        if let Some(uri) = &*self.uri.borrow() {
-            let scheme = uri.scheme();
-            let port = uri.port();
-            if let Some(host) = uri.host() {
-                return Some(if port.is_positive() {
-                    gformat!("{scheme}://{host}:{port}/")
-                } else {
-                    gformat!("{scheme}://{host}/")
-                });
-            }
-        }
-        None
+        self.button.set_sensitive(has_home);
     }
 }
