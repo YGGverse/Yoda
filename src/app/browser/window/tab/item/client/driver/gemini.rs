@@ -443,12 +443,18 @@ fn handle(
                                         let status = subject.page.content.to_status_failure();
                                         status.set_description(Some(&e.to_string()));
                                         subject.page.title.replace(status.title());
+                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                        subject.tab_page.set_loading(false);
+                                        redirects.replace(0); // reset
                                     }
                                 }
                                 None => {
                                     let status = subject.page.content.to_status_failure();
                                     status.set_description(Some("Redirection target not found"));
                                     subject.page.title.replace(status.title());
+                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                    subject.tab_page.set_loading(false);
+                                    redirects.replace(0); // reset
                                 }
                             }
                         },
@@ -483,6 +489,9 @@ fn handle(
                     let status = subject.page.content.to_status_failure();
                     status.set_description(Some(&e.to_string()));
                     subject.page.title.replace(status.title());
+                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                    subject.tab_page.set_loading(false);
+                    redirects.replace(0); // reset
                 }
             }
         },
