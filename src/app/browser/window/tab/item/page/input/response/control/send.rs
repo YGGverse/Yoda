@@ -24,7 +24,7 @@ impl Send {
         button.connect_clicked({
             move |this| {
                 this.set_sensitive(false);
-                this.set_label("Sending..");
+                this.set_label("sending..");
                 action_send.activate(None);
             }
         });
