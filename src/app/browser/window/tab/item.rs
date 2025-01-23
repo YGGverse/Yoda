@@ -94,8 +94,9 @@ impl Item {
             move || {
                 // Request should match valid URI for all drivers supported
                 if let Some(uri) = page.navigation.request.uri() {
-                    // Rout by scheme
-                    if uri.scheme().to_lowercase() == "gemini" {
+                    // Route by scheme
+                    let scheme = uri.scheme();
+                    if scheme == "gemini" || scheme == "titan" {
                         return identity::new_gemini(
                             (&browser_action, &window_action),
                             &profile,

@@ -17,7 +17,7 @@ pub enum PrimaryIcon<'a> {
     },
     Titan {
         name: &'a str,
-        tooltip: &'a str,
+        tooltip: (&'a str, &'a str),
     },
 }
 
@@ -46,7 +46,7 @@ pub fn from(request: &str) -> PrimaryIcon {
     if request.starts_with("titan:") {
         return PrimaryIcon::Titan {
             name: "document-send-symbolic",
-            tooltip: "Titan input",
+            tooltip: ("Guest titan input", "User titan input"),
         };
     }
 

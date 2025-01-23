@@ -203,7 +203,7 @@ impl Widget {
                 self.entry.set_primary_icon_name(Some(name));
                 self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
-            PrimaryIcon::Gemini { name, tooltip } => {
+            PrimaryIcon::Gemini { name, tooltip } | PrimaryIcon::Titan { name, tooltip } => {
                 self.entry.set_primary_icon_activatable(true);
                 self.entry.set_primary_icon_sensitive(true);
                 self.entry.set_primary_icon_name(Some(name));
@@ -219,10 +219,6 @@ impl Widget {
                 self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
             PrimaryIcon::Source { name, tooltip } => {
-                self.entry.set_primary_icon_name(Some(name));
-                self.entry.set_primary_icon_tooltip_text(Some(tooltip));
-            }
-            PrimaryIcon::Titan { name, tooltip } => {
                 self.entry.set_primary_icon_name(Some(name));
                 self.entry.set_primary_icon_tooltip_text(Some(tooltip));
             }
