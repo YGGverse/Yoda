@@ -33,6 +33,7 @@ impl Default {
         });
 
         widget.on_apply({
+            let browser_action = browser_action.clone();
             let profile = profile.clone();
             let request = request.clone();
             let widget = widget.clone();
@@ -77,7 +78,8 @@ impl Default {
                     }
                 }
 
-                // Reload page to apply changes
+                // Apply changes
+                browser_action.update.activate(None);
                 window_action.reload.activate();
             }
         });
