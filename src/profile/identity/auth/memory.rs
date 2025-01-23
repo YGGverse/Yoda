@@ -65,7 +65,7 @@ impl Memory {
         let mut result = Vec::new();
 
         // Get all records starts with `scope`
-        let query = filter_scope(request);
+        let query = super::filter_scope(request);
 
         for (scope, &profile_identity_id) in self.index.borrow().iter() {
             if query.starts_with(scope) {
@@ -82,25 +82,4 @@ impl Memory {
         // Get first copy
         result.first().cloned()
     }
-}
-
-/// Get valid identity scope for given URL
-/// * helper function for different protocol drivers implementation
-fn filter_scope(url: &str) -> String {
-    use gtk::glib::{Regex, RegexCompileFlags, RegexMatchFlags};
-
-    match Regex::split_simple(
-        r"^\w+://(.*)",
-        url,
-        RegexCompileFlags::DEFAULT,
-        RegexMatchFlags::DEFAULT,
-    )
-    .get(1)
-    {
-        Some(postfix) => postfix.to_string(),
-        None => url.to_string(),
-    }
-    .trim()
-    .trim_end_matches("/")
-    .to_lowercase()
 }

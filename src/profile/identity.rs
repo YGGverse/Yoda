@@ -34,7 +34,7 @@ impl Identity {
         profile_identity_id: &Rc<i64>,
     ) -> Result<Self, Error> {
         // Init components
-        let auth = match Auth::new(connection) {
+        let auth = match Auth::build(connection) {
             Ok(auth) => Rc::new(auth),
             Err(e) => return Err(Error::Auth(e)),
         };

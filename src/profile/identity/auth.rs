@@ -21,10 +21,10 @@ impl Auth {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: &Rc<RwLock<Connection>>) -> Result<Self, Error> {
+    pub fn build(connection: &Rc<RwLock<Connection>>) -> Result<Self, Error> {
         // Init `Self`
         let this = Self {
-            database: Rc::new(Database::new(connection)),
+            database: Rc::new(Database::build(connection)),
             memory: Rc::new(Memory::new()),
         };
 
@@ -41,12 +41,14 @@ impl Auth {
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_auth_id` on success
-    pub fn apply(&self, profile_identity_id: i64, scope: &str) -> Result<i64, Error> {
+    pub fn apply(&self, profile_identity_id: i64, auth_url: &str) -> Result<i64, Error> {
+        let scope = filter_scope(auth_url);
+
         // Cleanup records match `scope` (unauthorize)
-        self.remove_scope(scope)?;
+        self.remove_scope(&scope)?;
 
         // Create new record (auth)
-        let profile_identity_auth_id = match self.database.add(profile_identity_id, scope) {
+        let profile_identity_auth_id = match self.database.add(profile_identity_id, &scope) {
             Ok(id) => id,
             Err(e) => return Err(Error::Database(e)),
         };
@@ -125,4 +127,25 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // nothing yet..
 
     Ok(())
+}
+
+/// Get valid identity scope for given URL
+/// * helper function for different protocol drivers implementation
+fn filter_scope(url: &str) -> String {
+    use gtk::glib::{Regex, RegexCompileFlags, RegexMatchFlags};
+
+    match Regex::split_simple(
+        r"^\w+://(.*)",
+        url,
+        RegexCompileFlags::DEFAULT,
+        RegexMatchFlags::DEFAULT,
+    )
+    .get(1)
+    {
+        Some(postfix) => postfix.to_string(),
+        None => url.to_string(),
+    }
+    .trim()
+    .trim_end_matches("/")
+    .to_lowercase()
 }
