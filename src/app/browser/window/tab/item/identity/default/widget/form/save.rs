@@ -23,7 +23,7 @@ impl Save {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
+    pub fn build(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)

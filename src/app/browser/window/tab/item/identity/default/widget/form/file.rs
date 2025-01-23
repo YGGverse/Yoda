@@ -21,7 +21,7 @@ impl File {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(widget_action: &Rc<WidgetAction>) -> Self {
+    pub fn build(widget_action: &Rc<WidgetAction>) -> Self {
         // Init PEM
         let pem = Rc::new(RefCell::new(None));
 

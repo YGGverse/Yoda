@@ -2,31 +2,49 @@ mod widget;
 use widget::{form::list::item::value::Value, Widget};
 
 use super::{BrowserAction, Profile, WindowAction};
-use gtk::{glib::Uri, prelude::IsA};
+use gtk::{
+    glib::{Regex, RegexCompileFlags, RegexMatchFlags, Uri},
+    prelude::IsA,
+};
 use std::rc::Rc;
 
-pub struct Gemini {
+pub struct Default {
     // profile: Rc<Profile>,
     widget: Rc<Widget>,
 }
 
-impl Gemini {
+impl Default {
     // Construct
 
     /// Create new `Self` for given `Profile`
-    pub fn new(
+    pub fn build(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
         auth_uri: &Uri,
     ) -> Self {
-        // Init shared URL string from URI
+        // Init scope
         let auth_url = auth_uri.to_string();
 
+        let scope = match Regex::split_simple(
+            r"^\w+://(.*)",
+            &auth_url,
+            RegexCompileFlags::DEFAULT,
+            RegexMatchFlags::DEFAULT,
+        )
+        .get(1)
+        {
+            Some(postfix) => postfix.to_string(),
+            None => auth_url, // @TODO warn?
+        }
+        .trim()
+        .trim_end_matches("/")
+        .to_lowercase();
+
         // Init widget
-        let widget = Rc::new(Widget::new(
+        let widget = Rc::new(Widget::build(
             (browser_action, window_action),
             profile,
-            auth_uri,
+            &scope,
         ));
 
         // Init events
@@ -63,16 +81,15 @@ impl Gemini {
 
                 // Apply auth
                 match option {
-                    // Activate identity for `auth_uri`
+                    // Activate identity for `scope`
                     Some(profile_identity_id) => {
-                        if let Err(e) = profile.identity.auth.apply(profile_identity_id, &auth_url)
-                        {
+                        if let Err(e) = profile.identity.auth.apply(profile_identity_id, &scope) {
                             todo!("{}", e.to_string())
                         };
                     }
-                    // Remove all identity auths for `auth_uri`
+                    // Remove all identity auths for `scope`
                     None => {
-                        if let Err(e) = profile.identity.auth.remove_scope(&auth_url) {
+                        if let Err(e) = profile.identity.auth.remove_scope(&scope) {
                             todo!("{}", e.to_string())
                         };
                     }

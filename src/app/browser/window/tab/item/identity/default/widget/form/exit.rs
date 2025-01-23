@@ -1,5 +1,8 @@
-use super::list::{item::Value, List};
-use crate::profile::Profile;
+use super::{
+    list::{item::Value, List},
+    WidgetAction,
+};
+use crate::{app::browser::Action as BrowserAction, Profile};
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
@@ -12,24 +15,29 @@ use std::rc::Rc;
 
 // Defaults
 
-const LABEL: &str = "Delete";
-const TOOLTIP_TEXT: &str = "Drop selected identity from profile";
+const LABEL: &str = "Disconnect";
+const TOOLTIP_TEXT: &str = "Stop use selected identity everywhere";
 const MARGIN: i32 = 8;
 
-const HEADING: &str = "Delete";
-const BODY: &str = "Delete selected identity from profile?";
+const HEADING: &str = "Disconnect";
+const BODY: &str = "Stop use selected identity for all scopes?";
 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
-pub struct Drop {
+pub struct Exit {
     pub button: Button,
 }
 
-impl Drop {
+impl Exit {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
+    pub fn build(
+        (browser_action, widget_action): (&Rc<BrowserAction>, &Rc<WidgetAction>),
+        profile: &Rc<Profile>,
+        list: &Rc<List>,
+        scope: &str,
+    ) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -40,10 +48,14 @@ impl Drop {
 
         // Init events
         button.connect_clicked({
+            let scope = scope.to_string();
+            let browser_action = browser_action.clone();
             let button = button.clone();
             let list = list.clone();
             let profile = profile.clone();
+            let widget_action = widget_action.clone();
             move |_| {
+                // Get selected identity from holder
                 match list.selected().value_enum() {
                     Value::ProfileIdentityId(profile_identity_id) => {
                         // Init sub-widget
@@ -71,23 +83,34 @@ impl Drop {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
+                            let scope = scope.clone();
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            move |_, _| match profile.identity.delete(profile_identity_id) {
-                                Ok(_) => {
-                                    if list.remove(profile_identity_id).is_some() {
-                                        button.set_css_classes(&["success"]);
-                                        button.set_label("Identity successfully deleted")
-                                    } else {
+                            let browser_action = browser_action.clone();
+                            let widget_action = widget_action.clone();
+                            move |_, _| {
+                                match profile.identity.auth.remove_ref(profile_identity_id) {
+                                    Ok(_) => {
+                                        match list.selected().update(&profile, &scope.to_string()) {
+                                            Ok(_) => {
+                                                button.set_css_classes(&["success"]);
+                                                button
+                                                    .set_label("Identity successfully disconnected")
+                                            }
+                                            Err(e) => {
+                                                button.set_css_classes(&["error"]);
+                                                button.set_label(&e.to_string())
+                                            }
+                                        }
+                                    }
+                                    Err(e) => {
                                         button.set_css_classes(&["error"]);
-                                        button.set_label("List item not found")
+                                        button.set_label(&e.to_string())
                                     }
                                 }
-                                Err(e) => {
-                                    button.set_css_classes(&["error"]);
-                                    button.set_label(&e.to_string())
-                                }
+                                browser_action.update.activate(None);
+                                widget_action.update.activate();
                             }
                         });
 
@@ -105,7 +128,8 @@ impl Drop {
 
     // Actions
 
-    pub fn update(&self, is_visible: bool) {
-        self.button.set_visible(is_visible)
+    pub fn update(&self, is_visible: bool, is_sensitive: bool) {
+        self.button.set_visible(is_visible);
+        self.button.set_sensitive(is_sensitive);
     }
 }

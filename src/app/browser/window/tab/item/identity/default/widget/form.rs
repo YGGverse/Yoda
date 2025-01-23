@@ -17,7 +17,7 @@ use crate::{
     app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
     Profile,
 };
-use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
+use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Form {
@@ -29,7 +29,7 @@ pub struct Form {
     pub name: Rc<Name>,
     pub save: Rc<Save>,
     pub g_box: Box,
-    auth_uri: Uri,
+    scope: String,
     profile: Rc<Profile>,
 }
 
@@ -37,26 +37,26 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(
+    pub fn build(
         (browser_action, _window_action, widget_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
             &Rc<WidgetAction>,
         ),
         profile: &Rc<Profile>,
-        auth_uri: &Uri,
+        scope: &str,
     ) -> Self {
         // Init components
-        let list = Rc::new(List::new(widget_action, profile, auth_uri));
-        let file = Rc::new(File::new(widget_action));
-        let name = Rc::new(Name::new(widget_action));
-        let save = Rc::new(Save::new(profile, &list));
-        let drop = Rc::new(Drop::new(profile, &list));
-        let exit = Rc::new(Exit::new(
+        let list = Rc::new(List::build(widget_action, profile, scope));
+        let file = Rc::new(File::build(widget_action));
+        let name = Rc::new(Name::build(widget_action));
+        let save = Rc::new(Save::build(profile, &list));
+        let drop = Rc::new(Drop::build(profile, &list));
+        let exit = Rc::new(Exit::build(
             (browser_action, widget_action),
             profile,
             &list,
-            auth_uri,
+            scope,
         ));
 
         // Init main container
@@ -79,7 +79,7 @@ impl Form {
             name,
             save,
             g_box,
-            auth_uri: auth_uri.clone(),
+            scope: scope.to_string(),
             profile: profile.clone(),
         }
     }
@@ -112,7 +112,7 @@ impl Form {
                         .identity
                         .auth
                         .memory
-                        .match_scope(&self.auth_uri.to_string())
+                        .match_scope(&self.scope)
                         .is_some_and(|auth| auth.profile_identity_id == profile_identity_id),
                 );
                 self.save.update(true);

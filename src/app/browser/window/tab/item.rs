@@ -97,7 +97,7 @@ impl Item {
                     // Route by scheme
                     let scheme = uri.scheme();
                     if scheme == "gemini" || scheme == "titan" {
-                        return identity::new_gemini(
+                        return identity::default(
                             (&browser_action, &window_action),
                             &profile,
                             &uri,
@@ -106,7 +106,7 @@ impl Item {
                     }
                 }
                 // Show dialog with unsupported request message
-                identity::new_unsupported().present(Some(&parent));
+                identity::unsupported().present(Some(&parent));
             }
         });
 

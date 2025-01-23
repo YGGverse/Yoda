@@ -1,14 +1,10 @@
-use super::{
-    list::{item::Value, List},
-    WidgetAction,
-};
-use crate::{app::browser::Action as BrowserAction, Profile};
+use super::list::{item::Value, List};
+use crate::profile::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
 };
 use gtk::{
-    glib::Uri,
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
@@ -16,29 +12,24 @@ use std::rc::Rc;
 
 // Defaults
 
-const LABEL: &str = "Disconnect";
-const TOOLTIP_TEXT: &str = "Stop use selected identity everywhere";
+const LABEL: &str = "Delete";
+const TOOLTIP_TEXT: &str = "Drop selected identity from profile";
 const MARGIN: i32 = 8;
 
-const HEADING: &str = "Disconnect";
-const BODY: &str = "Stop use selected identity for all scopes?";
+const HEADING: &str = "Delete";
+const BODY: &str = "Delete selected identity from profile?";
 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
-pub struct Exit {
+pub struct Drop {
     pub button: Button,
 }
 
-impl Exit {
+impl Drop {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(
-        (browser_action, widget_action): (&Rc<BrowserAction>, &Rc<WidgetAction>),
-        profile: &Rc<Profile>,
-        list: &Rc<List>,
-        auth_uri: &Uri,
-    ) -> Self {
+    pub fn build(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -49,14 +40,10 @@ impl Exit {
 
         // Init events
         button.connect_clicked({
-            let auth_uri = auth_uri.clone();
-            let browser_action = browser_action.clone();
             let button = button.clone();
             let list = list.clone();
             let profile = profile.clone();
-            let widget_action = widget_action.clone();
             move |_| {
-                // Get selected identity from holder
                 match list.selected().value_enum() {
                     Value::ProfileIdentityId(profile_identity_id) => {
                         // Init sub-widget
@@ -84,34 +71,23 @@ impl Exit {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
-                            let auth_uri = auth_uri.clone();
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            let browser_action = browser_action.clone();
-                            let widget_action = widget_action.clone();
-                            move |_, _| {
-                                match profile.identity.auth.remove_ref(profile_identity_id) {
-                                    Ok(_) => match list
-                                        .selected()
-                                        .update(&profile, &auth_uri.to_string())
-                                    {
-                                        Ok(_) => {
-                                            button.set_css_classes(&["success"]);
-                                            button.set_label("Identity successfully disconnected")
-                                        }
-                                        Err(e) => {
-                                            button.set_css_classes(&["error"]);
-                                            button.set_label(&e.to_string())
-                                        }
-                                    },
-                                    Err(e) => {
+                            move |_, _| match profile.identity.delete(profile_identity_id) {
+                                Ok(_) => {
+                                    if list.remove(profile_identity_id).is_some() {
+                                        button.set_css_classes(&["success"]);
+                                        button.set_label("Identity successfully deleted")
+                                    } else {
                                         button.set_css_classes(&["error"]);
-                                        button.set_label(&e.to_string())
+                                        button.set_label("List item not found")
                                     }
                                 }
-                                browser_action.update.activate(None);
-                                widget_action.update.activate();
+                                Err(e) => {
+                                    button.set_css_classes(&["error"]);
+                                    button.set_label(&e.to_string())
+                                }
                             }
                         });
 
@@ -129,8 +105,7 @@ impl Exit {
 
     // Actions
 
-    pub fn update(&self, is_visible: bool, is_sensitive: bool) {
-        self.button.set_visible(is_visible);
-        self.button.set_sensitive(is_sensitive);
+    pub fn update(&self, is_visible: bool) {
+        self.button.set_visible(is_visible)
     }
 }

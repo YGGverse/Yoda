@@ -76,14 +76,8 @@ impl Navigation {
             .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
         self.reload.update(!request.is_empty());
-        self.request.update(
-            self.profile
-                .identity
-                .auth
-                .memory
-                .match_scope(&request)
-                .is_some(),
-        );
+        self.request
+            .update(self.profile.identity.match_scope(&request).is_some());
         self.home.update();
     }
 
