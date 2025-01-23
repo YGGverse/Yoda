@@ -252,25 +252,25 @@ impl Tab {
         if let Some(item) = self.item(page_position) {
             if let Some(home) = item.page.navigation.request.home() {
                 item.page.navigation.request.widget.entry.set_text(&home);
-                self.window_action.reload.activate();
+                item.client.handle(&home, false);
             }
         }
     }
 
     pub fn page_history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(text) = item.page.navigation.history.back(true) {
-                item.page.navigation.request.widget.entry.set_text(&text);
-                self.window_action.reload.activate();
+            if let Some(back) = item.page.navigation.history.back(true) {
+                item.page.navigation.request.widget.entry.set_text(&back);
+                item.client.handle(&back, false);
             }
         }
     }
 
     pub fn page_history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(text) = item.page.navigation.history.forward(true) {
-                item.page.navigation.request.widget.entry.set_text(&text);
-                self.window_action.reload.activate();
+            if let Some(forward) = item.page.navigation.history.forward(true) {
+                item.page.navigation.request.widget.entry.set_text(&forward);
+                item.client.handle(&forward, false);
             }
         }
     }
