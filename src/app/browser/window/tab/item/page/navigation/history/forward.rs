@@ -1,48 +1,21 @@
-use gtk::{
-    prelude::{ButtonExt, WidgetExt},
-    Button,
-};
-
 use super::WindowAction;
+use gtk::{prelude::ActionExt, Button};
 use std::rc::Rc;
 
-pub struct Forward {
-    action: Rc<WindowAction>,
-    pub button: Button,
+pub trait Forward {
+    fn forward(action: &Rc<WindowAction>) -> Self;
 }
 
-impl Forward {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action: &Rc<WindowAction>) -> Self {
-        // Init gobject
-        let button = Button::builder()
+impl Forward for Button {
+    fn forward(action: &Rc<WindowAction>) -> Self {
+        Button::builder()
+            .action_name(format!(
+                "{}.{}",
+                action.id,
+                action.history_back.simple_action.name()
+            )) // @TODO
             .icon_name("go-next-symbolic")
             .tooltip_text("Forward")
-            .sensitive(false)
-            .build();
-
-        // Init events
-        button.connect_clicked({
-            let action = action.clone();
-            move |_| action.history_forward.activate()
-        });
-
-        // Return activated `Self`
-        Self {
-            action: action.clone(),
-            button,
-        }
-    }
-
-    // Actions
-    pub fn update(&self, status: bool) {
-        self.action
-            .history_forward
-            .simple_action
-            .set_enabled(status);
-
-        self.button.set_sensitive(status);
+            .build()
     }
 }

@@ -7,6 +7,7 @@ mod request;
 mod widget;
 
 use bookmark::Bookmark;
+use gtk::Button;
 use history::History;
 use home::Home;
 use reload::Reload;
@@ -18,11 +19,8 @@ use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Navigation {
-    pub bookmark: Rc<Bookmark>,
     pub history: Rc<History>,
-    pub home: Rc<Home>,
     pub profile: Rc<Profile>,
-    pub reload: Rc<Reload>,
     pub request: Rc<Request>,
     pub widget: Rc<Widget>,
 }
@@ -39,27 +37,21 @@ impl Navigation {
         // init children components
 
         let history = Rc::new(History::build(window_action));
-        let reload = Rc::new(Reload::build(window_action));
         let request = Rc::new(Request::build((browser_action, tab_action)));
-        let bookmark = Rc::new(Bookmark::build(window_action));
-        let home = Rc::new(Home::build(window_action));
 
         // init main widget
         let widget = Rc::new(Widget::build(
-            &home.button,
-            &history.widget.g_box,
-            &reload.widget.button,
-            &request.widget.entry,
-            &bookmark.widget.button,
+            &Button::home(window_action),
+            &history.widget.g_box, // @TODO
+            &Button::reload(window_action),
+            &request.widget.entry, // @TODO
+            &Button::bookmark(window_action),
         ));
 
         // done
         Self {
-            bookmark,
             history,
-            home,
             profile: profile.clone(),
-            reload,
             request,
             widget,
         }
@@ -68,6 +60,7 @@ impl Navigation {
     // Actions
 
     pub fn update(&self) {
+        /* @TODO
         // init shared request value
         let request = self.request.strip_prefix();
 
@@ -86,7 +79,7 @@ impl Navigation {
             self.request
                 .home()
                 .is_some_and(|home| home.to_string() != request),
-        );
+        );*/
     }
 
     pub fn clean(

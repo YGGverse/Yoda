@@ -1,44 +1,21 @@
 use super::WindowAction;
-use gtk::{
-    prelude::{ButtonExt, WidgetExt},
-    Button,
-};
+use gtk::{prelude::ActionExt, Button};
 use std::rc::Rc;
 
-pub struct Back {
-    action: Rc<WindowAction>,
-    pub button: Button,
+pub trait Back {
+    fn back(action: &Rc<WindowAction>) -> Self;
 }
 
-impl Back {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action: &Rc<WindowAction>) -> Self {
-        // Init gobject
-        let button = Button::builder()
+impl Back for Button {
+    fn back(action: &Rc<WindowAction>) -> Self {
+        Button::builder()
+            .action_name(format!(
+                "{}.{}",
+                action.id,
+                action.history_back.simple_action.name()
+            )) // @TODO
             .icon_name("go-previous-symbolic")
             .tooltip_text("Back")
-            .sensitive(false)
-            .build();
-
-        // Init events
-        button.connect_clicked({
-            let action = action.clone();
-            move |_| action.history_back.activate()
-        });
-
-        // Return activated `Self`
-        Self {
-            action: action.clone(),
-            button,
-        }
-    }
-
-    // Actions
-
-    pub fn update(&self, status: bool) {
-        self.action.history_back.simple_action.set_enabled(status);
-        self.button.set_sensitive(status);
+            .build()
     }
 }

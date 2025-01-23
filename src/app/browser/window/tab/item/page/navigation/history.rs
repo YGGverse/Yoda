@@ -7,7 +7,7 @@ use forward::Forward;
 use widget::Widget;
 
 use super::WindowAction;
-use gtk::glib::GString;
+use gtk::{glib::GString, Button};
 use std::{cell::RefCell, rc::Rc};
 
 struct Memory {
@@ -16,9 +16,6 @@ struct Memory {
 }
 
 pub struct History {
-    // Components
-    back: Rc<Back>,
-    forward: Rc<Forward>,
     // Extras
     memory: RefCell<Vec<Memory>>,
     index: RefCell<Option<usize>>,
@@ -31,12 +28,11 @@ impl History {
 
     /// Build new `Self`
     pub fn build(action: &Rc<WindowAction>) -> Self {
-        // init components
-        let back = Rc::new(Back::build(action));
-        let forward = Rc::new(Forward::build(action));
-
         // Init widget
-        let widget = Rc::new(Widget::build(&back.button, &forward.button));
+        let widget = Rc::new(Widget::build(
+            &Button::back(action),
+            &Button::forward(action),
+        ));
 
         // Init memory
         let memory = RefCell::new(Vec::new());
@@ -45,8 +41,6 @@ impl History {
         let index = RefCell::new(None);
 
         Self {
-            back,
-            forward,
             memory,
             index,
             widget,
@@ -109,17 +103,5 @@ impl History {
             }
         }
         None
-    }
-
-    pub fn update(&self) {
-        match self.back(false) {
-            Some(_) => self.back.update(true),
-            None => self.back.update(false),
-        };
-
-        match self.forward(false) {
-            Some(_) => self.forward.update(true),
-            None => self.forward.update(false),
-        };
     }
 }

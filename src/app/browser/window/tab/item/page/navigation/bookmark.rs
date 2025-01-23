@@ -1,26 +1,32 @@
-mod widget;
-
-use widget::Widget;
-
-use crate::app::browser::window::action::Action as WindowAction;
+use super::WindowAction;
+use gtk::{
+    prelude::{ActionExt, ButtonExt},
+    Button,
+};
 use std::rc::Rc;
 
-pub struct Bookmark {
-    pub widget: Rc<Widget>,
+const ICON_YES: &str = "starred-symbolic";
+const ICON_NON: &str = "non-starred-symbolic";
+
+pub trait Bookmark {
+    fn bookmark(action: &Rc<WindowAction>) -> Self;
+    fn _update(&self, has_bookmark: bool); // @TODO
 }
 
-impl Bookmark {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action: &Rc<WindowAction>) -> Self {
-        Self {
-            widget: Rc::new(Widget::build(action)),
-        }
+impl Bookmark for Button {
+    fn bookmark(action: &Rc<WindowAction>) -> Self {
+        Button::builder()
+            .action_name(format!(
+                "{}.{}",
+                action.id,
+                action.bookmark.simple_action.name()
+            )) // @TODO
+            .icon_name(ICON_NON)
+            .tooltip_text("Bookmark")
+            .build()
     }
 
-    // Actions
-    pub fn update(&self, has_bookmark: bool) {
-        self.widget.update(has_bookmark);
+    fn _update(&self, has_bookmark: bool) {
+        self.set_icon_name(if has_bookmark { ICON_YES } else { ICON_NON });
     }
 }

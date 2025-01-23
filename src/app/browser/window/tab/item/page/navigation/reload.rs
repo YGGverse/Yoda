@@ -1,33 +1,21 @@
-mod widget;
-
-use widget::Widget;
-
 use super::WindowAction;
+use gtk::{prelude::ActionExt, Button};
 use std::rc::Rc;
 
-pub struct Reload {
-    action: Rc<WindowAction>,
-    pub widget: Rc<Widget>,
+pub trait Reload {
+    fn reload(action: &Rc<WindowAction>) -> Self;
 }
 
-impl Reload {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action: &Rc<WindowAction>) -> Self {
-        Self {
-            action: action.clone(),
-            widget: Rc::new(Widget::build(action)),
-        }
-    }
-
-    // Actions
-
-    pub fn update(&self, is_enabled: bool) {
-        // Update actions
-        self.action.reload.simple_action.set_enabled(is_enabled);
-
-        // Update child components
-        self.widget.update(is_enabled);
+impl Reload for Button {
+    fn reload(action: &Rc<WindowAction>) -> Self {
+        Button::builder()
+            .action_name(format!(
+                "{}.{}",
+                action.id,
+                action.reload.simple_action.name()
+            )) // @TODO
+            .icon_name("view-refresh-symbolic")
+            .tooltip_text("Reload")
+            .build()
     }
 }
