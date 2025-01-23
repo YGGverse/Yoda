@@ -29,9 +29,9 @@ impl Memory {
 
     // Actions
 
-    /// Add new record with `scope` as key and `profile_identity_gemini_id` as value
+    /// Add new record with `scope` as key and `profile_identity_id` as value
     /// * validate record with same key does not exist yet
-    pub fn add(&self, scope: String, profile_identity_gemini_id: i64) -> Result<(), Error> {
+    pub fn add(&self, scope: String, profile_identity_id: i64) -> Result<(), Error> {
         // Borrow shared index access
         let mut index = self.index.borrow_mut();
 
@@ -41,7 +41,7 @@ impl Memory {
         }
 
         // Slot should be free, let check it twice
-        match index.insert(scope, profile_identity_gemini_id) {
+        match index.insert(scope, profile_identity_id) {
             Some(_) => Err(Error::Unexpected),
             None => Ok(()),
         }
@@ -65,10 +65,10 @@ impl Memory {
         let mut result = Vec::new();
 
         // Get all records starts with `scope`
-        for (scope, &profile_identity_gemini_id) in self.index.borrow().iter() {
-            if alias(request).starts_with(scope) {
+        for (scope, &profile_identity_id) in self.index.borrow().iter() {
+            if request.starts_with(scope) {
                 result.push(Auth {
-                    profile_identity_gemini_id,
+                    profile_identity_id,
                     scope: scope.clone(),
                 })
             }
@@ -80,13 +80,4 @@ impl Memory {
         // Get first copy
         result.first().cloned()
     }
-}
-
-// Tools
-
-// @TODO optional
-fn alias(request: &str) -> String {
-    request
-        .replace("gemini://", "titan://")
-        .replace("titan://", "gemini://")
 }

@@ -14,8 +14,8 @@ impl Display for Error {
             Self::Database(e) => {
                 write!(f, "Database error: {e}")
             }
-            Self::NotFound(profile_identity_gemini_id) => {
-                write!(f, "Record for `{profile_identity_gemini_id}` not found")
+            Self::NotFound(profile_identity_id) => {
+                write!(f, "Record for `{profile_identity_id}` not found")
             }
             Self::TlsCertificate(e) => {
                 write!(f, "TLS certificate error: {e}")

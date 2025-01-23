@@ -28,17 +28,17 @@ impl Memory {
 
     /// Add new record with `id` as key and `pem` as value
     /// * validate record with same key does not exist yet
-    pub fn add(&self, profile_identity_gemini_id: i64, pem: String) -> Result<(), Error> {
+    pub fn add(&self, profile_identity_id: i64, pem: String) -> Result<(), Error> {
         // Borrow shared index access
         let mut index = self.index.borrow_mut();
 
         // Prevent existing key overwrite
-        if index.contains_key(&profile_identity_gemini_id) {
-            return Err(Error::Overwrite(profile_identity_gemini_id));
+        if index.contains_key(&profile_identity_id) {
+            return Err(Error::Overwrite(profile_identity_id));
         }
 
         // Slot should be free, let check it twice
-        match index.insert(profile_identity_gemini_id, pem) {
+        match index.insert(profile_identity_id, pem) {
             Some(_) => Err(Error::Unexpected),
             None => Ok(()),
         }

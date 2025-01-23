@@ -40,12 +40,12 @@ impl Save {
             move |_| {
                 // Get selected identity from holder
                 match list.selected().value_enum() {
-                    Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+                    Value::ProfileIdentityId(profile_identity_id) => {
                         // Lock open button (prevent double click)
                         button.set_sensitive(false);
 
                         // Create PEM file based on option ID selected
-                        match Certificate::new(profile.clone(), profile_identity_gemini_id) {
+                        match Certificate::new(profile.clone(), profile_identity_id) {
                             Ok(certificate) => {
                                 // Init file filters related with PEM extension
                                 let filters = ListStore::new::<FileFilter>();

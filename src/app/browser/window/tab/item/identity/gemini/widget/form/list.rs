@@ -38,15 +38,12 @@ impl List {
         list_store.append(&generate_pem);
         list_store.append(&import_pem);
 
-        match profile.identity.gemini.database.records() {
+        match profile.identity.database.records() {
             Ok(identities) => {
                 let mut is_guest_session = true;
                 for identity in identities {
-                    match Item::new_profile_identity_gemini_id(
-                        profile,
-                        identity.id,
-                        &auth_uri.to_string(),
-                    ) {
+                    match Item::new_profile_identity_id(profile, identity.id, &auth_uri.to_string())
+                    {
                         Ok(item) => {
                             if item.is_active() {
                                 is_guest_session = false;
@@ -178,18 +175,18 @@ impl List {
 
     // Actions
 
-    /// Find list item by `profile_identity_gemini_id`
+    /// Find list item by `profile_identity_id`
     /// * return `position` found
-    pub fn find(&self, profile_identity_gemini_id: i64) -> Option<u32> {
+    pub fn find(&self, profile_identity_id: i64) -> Option<u32> {
         self.list_store.find_with_equal_func(|this| {
-            profile_identity_gemini_id == this.downcast_ref::<Item>().unwrap().value()
+            profile_identity_id == this.downcast_ref::<Item>().unwrap().value()
         })
     }
 
-    /// Remove list item by `profile_identity_gemini_id`
+    /// Remove list item by `profile_identity_id`
     /// * return `position` of removed list item
-    pub fn remove(&self, profile_identity_gemini_id: i64) -> Option<u32> {
-        match self.find(profile_identity_gemini_id) {
+    pub fn remove(&self, profile_identity_id: i64) -> Option<u32> {
+        match self.find(profile_identity_id) {
             Some(position) => {
                 self.list_store.remove(position);
                 Some(position)

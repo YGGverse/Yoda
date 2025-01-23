@@ -45,7 +45,7 @@ impl Drop {
             let profile = profile.clone();
             move |_| {
                 match list.selected().value_enum() {
-                    Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+                    Value::ProfileIdentityId(profile_identity_id) => {
                         // Init sub-widget
                         let alert_dialog = AlertDialog::builder()
                             .heading(HEADING)
@@ -74,13 +74,9 @@ impl Drop {
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            move |_, _| match profile
-                                .identity
-                                .gemini
-                                .delete(profile_identity_gemini_id)
-                            {
+                            move |_, _| match profile.identity.delete(profile_identity_id) {
                                 Ok(_) => {
-                                    if list.remove(profile_identity_gemini_id).is_some() {
+                                    if list.remove(profile_identity_id).is_some() {
                                         button.set_css_classes(&["success"]);
                                         button.set_label("Identity successfully deleted")
                                     } else {

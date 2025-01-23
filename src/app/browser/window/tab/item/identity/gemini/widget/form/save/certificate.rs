@@ -15,13 +15,8 @@ impl Certificate {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, profile_identity_gemini_id: i64) -> Result<Self, Error> {
-        match profile
-            .identity
-            .gemini
-            .database
-            .record(profile_identity_gemini_id)
-        {
+    pub fn new(profile: Rc<Profile>, profile_identity_id: i64) -> Result<Self, Error> {
+        match profile.identity.database.record(profile_identity_id) {
             Ok(record) => match record {
                 Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
                     Ok(certificate) => Ok(Self {
@@ -30,7 +25,7 @@ impl Certificate {
                     }),
                     Err(e) => Err(Error::TlsCertificate(e)),
                 },
-                None => Err(Error::NotFound(profile_identity_gemini_id)),
+                None => Err(Error::NotFound(profile_identity_id)),
             },
             Err(e) => Err(Error::Database(e)),
         }

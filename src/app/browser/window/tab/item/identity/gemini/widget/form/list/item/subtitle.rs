@@ -2,10 +2,7 @@ use gtk::{gio::TlsCertificate, prelude::TlsCertificateExt};
 
 const DATE_FORMAT: &str = "%Y.%m.%d";
 
-pub fn new_for_profile_identity_gemini_id(
-    certificate: &TlsCertificate,
-    scope: &[String],
-) -> String {
+pub fn new_for_profile_identity_id(certificate: &TlsCertificate, scope: &[String]) -> String {
     format!(
         "{} - {} | scope: {}",
         certificate

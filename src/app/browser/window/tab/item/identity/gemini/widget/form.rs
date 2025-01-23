@@ -104,19 +104,16 @@ impl Form {
         self.file.update(matches!(value, Value::ImportPem));
 
         match value {
-            Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+            Value::ProfileIdentityId(profile_identity_id) => {
                 self.drop.update(true);
                 self.exit.update(
                     true,
                     self.profile
                         .identity
-                        .gemini
                         .auth
                         .memory
                         .match_scope(&self.auth_uri.to_string())
-                        .is_some_and(|auth| {
-                            auth.profile_identity_gemini_id == profile_identity_gemini_id
-                        }),
+                        .is_some_and(|auth| auth.profile_identity_id == profile_identity_id),
                 );
                 self.save.update(true);
             }

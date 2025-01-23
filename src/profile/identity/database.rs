@@ -3,57 +3,37 @@ use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
     pub id: i64,
-    pub profile_id: i64,
-    pub is_active: bool,
+    //pub profile_id: i64,
+    pub pem: String,
 }
 
+/// Storage for Gemini auth certificates
 pub struct Database {
-    pub connection: Rc<RwLock<Connection>>,
+    connection: Rc<RwLock<Connection>>,
+    profile_id: Rc<i64>, // multi-profile relationship
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
         Self {
             connection: connection.clone(),
+            profile_id: profile_id.clone(),
         }
     }
 
-    // Getters
+    // Actions
 
-    /// Get all records
-    pub fn records(&self) -> Result<Vec<Table>, Error> {
-        let readable = self.connection.read().unwrap();
-        let tx = readable.unchecked_transaction()?;
-        select(&tx)
-    }
-
-    /// Get active identity record if exist
-    pub fn active(&self) -> Result<Option<Table>, Error> {
-        let records = self.records()?;
-        Ok(records.into_iter().find(|record| record.is_active))
-    }
-
-    // Setters
-
-    /// Create new record in `Self` database connected
-    pub fn add(&self, profile_id: &Rc<i64>, is_active: bool) -> Result<i64, Error> {
+    /// Create new record in database
+    pub fn add(&self, pem: &str) -> Result<i64, Error> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap();
+        let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
 
-        // New record has active status
-        if is_active {
-            // Deactivate other records as only one profile should be active
-            for record in select(&tx)? {
-                update(&tx, record.profile_id, record.id, false)?;
-            }
-        }
-
         // Create new record
-        insert(&tx, profile_id, is_active)?;
+        insert(&tx, *self.profile_id, pem)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -63,6 +43,44 @@ impl Database {
             Ok(_) => Ok(id),
             Err(e) => Err(e),
         }
+    }
+
+    /// Delete record with given `id` from database
+    pub fn delete(&self, id: i64) -> Result<(), Error> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap(); // @TODO
+        let tx = writable.transaction()?;
+
+        // Create new record
+        delete(&tx, id)?;
+
+        // Done
+        match tx.commit() {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+
+    /// Get single record match `id`
+    pub fn record(&self, id: i64) -> Result<Option<Table>, Error> {
+        let readable = self.connection.read().unwrap();
+        let tx = readable.unchecked_transaction()?;
+        let records = select(&tx, *self.profile_id)?; // @TODO single record query
+
+        for record in records {
+            if record.id == id {
+                return Ok(Some(record));
+            }
+        }
+
+        Ok(None)
+    }
+
+    /// Get all records match current `profile_id`
+    pub fn records(&self) -> Result<Vec<Table>, Error> {
+        let readable = self.connection.read().unwrap(); // @TODO
+        let tx = readable.unchecked_transaction()?;
+        select(&tx, *self.profile_id)
     }
 }
 
@@ -74,7 +92,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
-            `is_active`  INTEGER NOT NULL,
+            `pem`        TEXT NOT NULL,
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
         )",
@@ -82,34 +100,34 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(tx: &Transaction, profile_id: &Rc<i64>, is_active: bool) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_id: i64, pem: &str) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_identity` (
             `profile_id`,
-            `is_active`
+            `pem`
         ) VALUES (?, ?)",
-        (profile_id, is_active),
+        (profile_id, pem),
     )
 }
 
-pub fn update(tx: &Transaction, id: i64, profile_id: i64, is_active: bool) -> Result<usize, Error> {
-    tx.execute(
-        "UPDATE `profile_identity`
-        SET `profile_id` = ?,
-            `is_active`  = ?
-        WHERE
-            `id` = ?",
-        (profile_id, is_active, id),
-    )
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
+    tx.execute("DELETE FROM `profile_identity` WHERE `id` = ?", [id])
 }
 
-pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
-    let mut stmt = tx.prepare("SELECT `id`, `profile_id`, `is_active` FROM `profile_identity`")?;
-    let result = stmt.query_map([], |row| {
+pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
+    let mut stmt = tx.prepare(
+        "SELECT `id`,
+                `profile_id`,
+                `pem`
+
+        FROM `profile_identity` WHERE `profile_id` = ?",
+    )?;
+
+    let result = stmt.query_map([profile_id], |row| {
         Ok(Table {
             id: row.get(0)?,
-            profile_id: row.get(1)?,
-            is_active: row.get(2)?,
+            //profile_id: row.get(1)?,
+            pem: row.get(2)?,
         })
     })?;
 

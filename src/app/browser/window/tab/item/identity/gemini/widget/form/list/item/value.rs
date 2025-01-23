@@ -3,5 +3,5 @@ pub enum Value {
     GeneratePem,
     GuestSession,
     ImportPem,
-    ProfileIdentityGeminiId(i64),
+    ProfileIdentityId(i64),
 }

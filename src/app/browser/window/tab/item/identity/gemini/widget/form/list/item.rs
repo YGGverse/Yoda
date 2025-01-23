@@ -21,7 +21,7 @@ glib::wrapper! {
 }
 
 // C-type property `value` conversion for `Item`
-// * values > 0 reserved for `profile_identity_gemini_id`
+// * values > 0 reserved for `profile_identity_id`
 const G_VALUE_GENERATE_PEM: i64 = 0;
 const G_VALUE_IMPORT_PEM: i64 = -1;
 const G_VALUE_GUEST_SESSION: i64 = -2;
@@ -53,42 +53,34 @@ impl Item {
             .build()
     }
 
-    pub fn new_profile_identity_gemini_id(
+    pub fn new_profile_identity_id(
         profile: &Rc<Profile>,
-        profile_identity_gemini_id: i64,
+        profile_identity_id: i64,
         auth_url: &str,
     ) -> Result<Self, Error> {
         // Get PEM by ID
-        match profile
-            .identity
-            .gemini
-            .memory
-            .get(profile_identity_gemini_id)
-        {
+        match profile.identity.memory.get(profile_identity_id) {
             // Extract certificate details from PEM string
             Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                 // Collect certificate scopes for item
-                Ok(ref certificate) => match scope(profile, profile_identity_gemini_id) {
+                Ok(ref certificate) => match scope(profile, profile_identity_id) {
                     // Ready to build `Item` GObject
                     Ok(ref scope) => Ok(Object::builder()
-                        .property("value", profile_identity_gemini_id)
-                        .property(
-                            "title",
-                            title::new_for_profile_identity_gemini_id(certificate),
-                        )
+                        .property("value", profile_identity_id)
+                        .property("title", title::new_for_profile_identity_id(certificate))
                         .property(
                             "subtitle",
-                            subtitle::new_for_profile_identity_gemini_id(certificate, scope),
+                            subtitle::new_for_profile_identity_id(certificate, scope),
                         )
                         .property(
                             "tooltip",
-                            tooltip::new_for_profile_identity_gemini_id(certificate, scope),
+                            tooltip::new_for_profile_identity_id(certificate, scope),
                         )
                         .property(
                             "is-active",
-                            is_active::new_for_profile_identity_gemini_id(
+                            is_active::new_for_profile_identity_id(
                                 profile,
-                                profile_identity_gemini_id,
+                                profile_identity_id,
                                 auth_url,
                             ),
                         )
@@ -107,36 +99,31 @@ impl Item {
     pub fn update(&self, profile: &Rc<Profile>, auth_url: &str) -> Result<(), Error> {
         // Update item depending on value type
         match self.value_enum() {
-            Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+            Value::ProfileIdentityId(profile_identity_id) => {
                 // Get PEM by ID
-                match profile
-                    .identity
-                    .gemini
-                    .memory
-                    .get(profile_identity_gemini_id)
-                {
+                match profile.identity.memory.get(profile_identity_id) {
                     // Extract certificate details from PEM string
                     Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                         Ok(ref certificate) => {
                             // Get current scope
-                            let scope = &scope(profile, profile_identity_gemini_id)?;
+                            let scope = &scope(profile, profile_identity_id)?;
 
                             // Update properties
-                            self.set_title(title::new_for_profile_identity_gemini_id(certificate));
+                            self.set_title(title::new_for_profile_identity_id(certificate));
 
-                            self.set_subtitle(subtitle::new_for_profile_identity_gemini_id(
+                            self.set_subtitle(subtitle::new_for_profile_identity_id(
                                 certificate,
                                 scope,
                             ));
 
-                            self.set_tooltip(tooltip::new_for_profile_identity_gemini_id(
+                            self.set_tooltip(tooltip::new_for_profile_identity_id(
                                 certificate,
                                 scope,
                             ));
 
-                            self.set_is_active(is_active::new_for_profile_identity_gemini_id(
+                            self.set_is_active(is_active::new_for_profile_identity_id(
                                 profile,
-                                profile_identity_gemini_id,
+                                profile_identity_id,
                                 auth_url,
                             ));
 
@@ -162,21 +149,21 @@ impl Item {
             G_VALUE_GENERATE_PEM => Value::GeneratePem,
             G_VALUE_GUEST_SESSION => Value::GuestSession,
             G_VALUE_IMPORT_PEM => Value::ImportPem,
-            value => Value::ProfileIdentityGeminiId(value),
+            value => Value::ProfileIdentityId(value),
         }
     }
 }
 
 // Tools
 
-/// Collect certificate scope vector from `Profile` database for `profile_identity_gemini_id`
-fn scope(profile: &Rc<Profile>, profile_identity_gemini_id: i64) -> Result<Vec<String>, Error> {
-    match profile.identity.gemini.auth.database.records_scope(None) {
+/// Collect certificate scope vector from `Profile` database for `profile_identity_id`
+fn scope(profile: &Rc<Profile>, profile_identity_id: i64) -> Result<Vec<String>, Error> {
+    match profile.identity.auth.database.records_scope(None) {
         Ok(result) => {
             let mut scope = Vec::new();
             for auth in result
                 .iter()
-                .filter(|this| this.profile_identity_gemini_id == profile_identity_gemini_id)
+                .filter(|this| this.profile_identity_id == profile_identity_id)
             {
                 scope.push(auth.scope.clone())
             }

@@ -58,7 +58,7 @@ impl Exit {
             move |_| {
                 // Get selected identity from holder
                 match list.selected().value_enum() {
-                    Value::ProfileIdentityGeminiId(profile_identity_gemini_id) => {
+                    Value::ProfileIdentityId(profile_identity_id) => {
                         // Init sub-widget
                         let alert_dialog = AlertDialog::builder()
                             .heading(HEADING)
@@ -91,12 +91,7 @@ impl Exit {
                             let browser_action = browser_action.clone();
                             let widget_action = widget_action.clone();
                             move |_, _| {
-                                match profile
-                                    .identity
-                                    .gemini
-                                    .auth
-                                    .remove_ref(profile_identity_gemini_id)
-                                {
+                                match profile.identity.auth.remove_ref(profile_identity_id) {
                                     Ok(_) => match list
                                         .selected()
                                         .update(&profile, &auth_uri.to_string())

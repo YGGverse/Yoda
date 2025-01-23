@@ -1,9 +1,6 @@
 use gtk::{gio::TlsCertificate, prelude::TlsCertificateExt};
 
-pub fn new_for_profile_identity_gemini_id(
-    certificate: &TlsCertificate,
-    scope: &[String],
-) -> String {
+pub fn new_for_profile_identity_id(certificate: &TlsCertificate, scope: &[String]) -> String {
     let mut tooltip = "<b>Certificate</b>\n".to_string();
 
     if let Some(subject_name) = certificate.subject_name() {

@@ -79,7 +79,6 @@ impl Navigation {
         self.request.update(
             self.profile
                 .identity
-                .gemini
                 .auth
                 .memory
                 .match_scope(&request)

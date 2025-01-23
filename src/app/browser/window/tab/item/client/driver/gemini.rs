@@ -164,7 +164,6 @@ fn handle(
             .page
             .profile
             .identity
-            .gemini
             .match_scope(&uri.to_string())
         {
             Some(identity) => match identity.to_tls_certificate() {

@@ -42,25 +42,20 @@ impl Gemini {
             move |response| {
                 // Get option match user choice
                 let option = match response {
-                    Value::ProfileIdentityGeminiId(value) => Some(value),
+                    Value::ProfileIdentityId(value) => Some(value),
                     Value::GuestSession => None,
                     Value::GeneratePem => Some(
                         match profile
                             .identity
-                            .gemini
                             .make(None, &widget.form.name.value().unwrap())
                         {
-                            Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
+                            Ok(profile_identity_id) => profile_identity_id,
                             Err(e) => todo!("{}", e.to_string()),
                         },
                     ),
                     Value::ImportPem => Some(
-                        match profile
-                            .identity
-                            .gemini
-                            .add(&widget.form.file.pem.take().unwrap())
-                        {
-                            Ok(profile_identity_gemini_id) => profile_identity_gemini_id,
+                        match profile.identity.add(&widget.form.file.pem.take().unwrap()) {
+                            Ok(profile_identity_id) => profile_identity_id,
                             Err(e) => todo!("{}", e.to_string()),
                         },
                     ),
@@ -69,19 +64,15 @@ impl Gemini {
                 // Apply auth
                 match option {
                     // Activate identity for `auth_uri`
-                    Some(profile_identity_gemini_id) => {
-                        if let Err(e) = profile
-                            .identity
-                            .gemini
-                            .auth
-                            .apply(profile_identity_gemini_id, &auth_url)
+                    Some(profile_identity_id) => {
+                        if let Err(e) = profile.identity.auth.apply(profile_identity_id, &auth_url)
                         {
                             todo!("{}", e.to_string())
                         };
                     }
                     // Remove all identity auths for `auth_uri`
                     None => {
-                        if let Err(e) = profile.identity.gemini.auth.remove_scope(&auth_url) {
+                        if let Err(e) = profile.identity.auth.remove_scope(&auth_url) {
                             todo!("{}", e.to_string())
                         };
                     }
