@@ -135,7 +135,7 @@ impl Identity {
                         pem,
                     });
                 }
-                Err(e) => todo!("{:?}", e.to_string()),
+                Err(e) => todo!("{e}"),
             }
         }
         None
