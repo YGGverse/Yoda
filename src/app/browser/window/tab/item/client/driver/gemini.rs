@@ -198,9 +198,9 @@ fn handle(
                                     Some(1024),
                                 );
                             }
-                            subject.tab_page.set_title(&title);
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            subject.tab_page.set_title(&title);
                             redirects.replace(0); // reset
                         }
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
@@ -270,9 +270,9 @@ fn handle(
                                         }
                                     },
                                 );
-                                subject.tab_page.set_title(&status.title());
                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                 subject.tab_page.set_loading(false);
+                                subject.tab_page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             },
                             _ => match response.meta.mime {
@@ -288,33 +288,25 @@ fn handle(
                                                 } else {
                                                     subject.page.content.to_text_gemini(&uri, &text.to_string())
                                                 };
-
-                                                // Connect `TextView` widget, update `search` model
                                                 subject.page.search.set(Some(widget.text_view));
-
-                                                // Update page meta
                                                 subject.tab_page.set_title(&match widget.meta.title {
                                                     Some(title) => title.into(), // @TODO
                                                     None => uri_to_title(&uri),
                                                 });
-
-                                                // Deactivate loading indication
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
-                                                redirects.replace(0); // reset
-
-                                                // Update window components
                                                 subject.page.window_action
                                                     .find
                                                     .simple_action
                                                     .set_enabled(true);
+                                                redirects.replace(0); // reset
                                             }
                                             Err(e) => {
                                                 let status = subject.page.content.to_status_failure();
                                                 status.set_description(Some(&e.to_string()));
-                                                subject.tab_page.set_title(&status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
+                                                subject.tab_page.set_title(&status.title());
                                                 redirects.replace(0); // reset
                                             },
                                         },
@@ -365,10 +357,9 @@ fn handle(
                                                     Err(e) => {
                                                         let status = subject.page.content.to_status_failure();
                                                         status.set_description(Some(&e.to_string()));
-
-                                                        subject.tab_page.set_title(&status.title());
                                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                         subject.tab_page.set_loading(false);
+                                                        subject.tab_page.set_title(&status.title());
                                                         redirects.replace(0); // reset
                                                     }
                                                 }
@@ -380,18 +371,18 @@ fn handle(
                                             .content
                                             .to_status_mime(mime, Some((&subject.page.tab_action, &uri)));
                                         status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                        subject.tab_page.set_title(&status.title());
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
+                                        subject.tab_page.set_title(&status.title());
                                         redirects.replace(0); // reset
                                     },
                                 },
                                 None => {
                                     let status = subject.page.content.to_status_failure();
                                     status.set_description(Some("MIME type not found"));
-                                    subject.tab_page.set_title(&status.title());
                                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                     subject.tab_page.set_loading(false);
+                                    subject.tab_page.set_title(&status.title());
                                     redirects.replace(0); // reset
                                 },
                             }
@@ -427,9 +418,9 @@ fn handle(
                                         if total > 5 {
                                             let status = subject.page.content.to_status_failure();
                                             status.set_description(Some("Redirection limit reached"));
-                                            subject.tab_page.set_title(&status.title());
                                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                             subject.tab_page.set_loading(false);
+                                            subject.tab_page.set_title(&status.title());
                                             redirects.replace(0); // reset
 
                                         // Disallow external redirection by protocol restrictions
@@ -438,9 +429,9 @@ fn handle(
                                              || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
                                                 status.set_description(Some("External redirects not allowed by protocol specification"));
-                                                subject.tab_page.set_title(&status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
+                                                subject.tab_page.set_title(&status.title());
                                                 redirects.replace(0); // reset
                                         // Valid
                                         } else {
@@ -458,18 +449,18 @@ fn handle(
                                     Err(e) => {
                                         let status = subject.page.content.to_status_failure();
                                         status.set_description(Some(&e.to_string()));
-                                        subject.tab_page.set_title(&status.title());
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
+                                        subject.tab_page.set_title(&status.title());
                                         redirects.replace(0); // reset
                                     }
                                 }
                                 None => {
                                     let status = subject.page.content.to_status_failure();
                                     status.set_description(Some("Redirection target not found"));
-                                    subject.tab_page.set_title(&status.title());
                                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                     subject.tab_page.set_loading(false);
+                                    subject.tab_page.set_title(&status.title());
                                     redirects.replace(0); // reset
                                 }
                             }
@@ -486,17 +477,17 @@ fn handle(
                                 None => response.meta.status.to_string(),
                             }));
 
-                            subject.tab_page.set_title(&status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            subject.tab_page.set_title(&status.title());
                             redirects.replace(0); // reset
                         }
                         status => {
                             let _status = subject.page.content.to_status_failure();
                             _status.set_description(Some(&format!("Undefined status code `{status}`")));
-                            subject.tab_page.set_title(&_status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
+                            subject.tab_page.set_title(&_status.title());
                             redirects.replace(0); // reset
                         },
                     }
@@ -504,9 +495,9 @@ fn handle(
                 Err(e) => {
                     let status = subject.page.content.to_status_failure();
                     status.set_description(Some(&e.to_string()));
-                    subject.tab_page.set_title(&status.title());
                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                     subject.tab_page.set_loading(false);
+                    subject.tab_page.set_title(&status.title());
                     redirects.replace(0); // reset
                 }
             }
