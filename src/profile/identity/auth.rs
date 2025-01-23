@@ -11,10 +11,10 @@ use memory::Memory;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
-/// API for `profile_identity_id` + `scope` auth pairs operations
+/// Auth pair operations
 pub struct Auth {
-    pub database: Rc<Database>,
-    pub memory: Rc<Memory>,
+    database: Rc<Database>,
+    memory: Rc<Memory>,
 }
 
 impl Auth {
@@ -122,6 +122,23 @@ impl Auth {
         self.memory
             .match_scope(&filter_scope(request))
             .is_some_and(|auth| auth.profile_identity_id == profile_identity_id)
+    }
+
+    /// Collect certificate scope vector from `Profile` database for `profile_identity_id`
+    pub fn scope(&self, profile_identity_id: i64) -> Vec<String> {
+        let mut scope = Vec::new();
+        match self.database.records_scope(None) {
+            Ok(result) => {
+                for auth in result
+                    .iter()
+                    .filter(|this| this.profile_identity_id == profile_identity_id)
+                {
+                    scope.push(auth.scope.clone())
+                }
+            }
+            Err(_) => todo!(),
+        }
+        scope
     }
 
     /// Get memory item string match request

@@ -63,9 +63,10 @@ impl Item {
             // Extract certificate details from PEM string
             Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                 // Collect certificate scopes for item
-                Ok(ref certificate) => match scope(profile, profile_identity_id) {
-                    // Ready to build `Item` GObject
-                    Ok(ref scope) => Ok(Object::builder()
+                Ok(ref certificate) => {
+                    let scope = &profile.identity.auth.scope(profile_identity_id);
+
+                    Ok(Object::builder()
                         .property("value", profile_identity_id)
                         .property("title", title::new_for_profile_identity_id(certificate))
                         .property(
@@ -84,9 +85,8 @@ impl Item {
                                 auth_url,
                             ),
                         )
-                        .build()),
-                    Err(_) => todo!(),
-                },
+                        .build())
+                }
                 Err(e) => Err(Error::TlsCertificate(e)),
             },
             Err(_) => todo!(),
@@ -106,7 +106,7 @@ impl Item {
                     Ok(ref pem) => match TlsCertificate::from_pem(pem) {
                         Ok(ref certificate) => {
                             // Get current scope
-                            let scope = &scope(profile, profile_identity_id)?;
+                            let scope = &profile.identity.auth.scope(profile_identity_id);
 
                             // Update properties
                             self.set_title(title::new_for_profile_identity_id(certificate));
@@ -151,24 +151,5 @@ impl Item {
             G_VALUE_IMPORT_PEM => Value::ImportPem,
             value => Value::ProfileIdentityId(value),
         }
-    }
-}
-
-// Tools
-
-/// Collect certificate scope vector from `Profile` database for `profile_identity_id`
-fn scope(profile: &Rc<Profile>, profile_identity_id: i64) -> Result<Vec<String>, Error> {
-    match profile.identity.auth.database.records_scope(None) {
-        Ok(result) => {
-            let mut scope = Vec::new();
-            for auth in result
-                .iter()
-                .filter(|this| this.profile_identity_id == profile_identity_id)
-            {
-                scope.push(auth.scope.clone())
-            }
-            Ok(scope)
-        }
-        Err(_) => todo!(),
     }
 }
