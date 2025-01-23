@@ -12,7 +12,7 @@ use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
 };
-use gtk::prelude::IsA;
+use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
 // Defaults
@@ -39,7 +39,7 @@ impl Widget {
     pub fn build(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
-        scope: &str,
+        request: &Uri,
     ) -> Self {
         // Init actions
         let widget_action = Rc::new(WidgetAction::new());
@@ -48,7 +48,7 @@ impl Widget {
         let form = Rc::new(Form::build(
             (browser_action, window_action, &widget_action),
             profile,
-            scope,
+            request,
         ));
 
         // Init main widget

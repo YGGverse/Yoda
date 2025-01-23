@@ -12,9 +12,9 @@ use std::rc::Rc;
 pub fn default(
     action: (&Rc<BrowserAction>, &Rc<WindowAction>),
     profile: &Rc<Profile>,
-    auth_uri: &Uri,
+    request: &Uri,
 ) -> Default {
-    Default::build(action, profile, auth_uri)
+    Default::build(action, profile, request)
 }
 
 /// Create new identity widget for unknown request

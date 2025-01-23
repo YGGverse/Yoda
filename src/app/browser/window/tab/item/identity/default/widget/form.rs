@@ -17,7 +17,7 @@ use crate::{
     app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
     Profile,
 };
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Form {
@@ -29,7 +29,7 @@ pub struct Form {
     pub name: Rc<Name>,
     pub save: Rc<Save>,
     pub g_box: Box,
-    scope: String,
+    request: Uri,
     profile: Rc<Profile>,
 }
 
@@ -44,10 +44,10 @@ impl Form {
             &Rc<WidgetAction>,
         ),
         profile: &Rc<Profile>,
-        scope: &str,
+        request: &Uri,
     ) -> Self {
         // Init components
-        let list = Rc::new(List::build(widget_action, profile, scope));
+        let list = Rc::new(List::build(widget_action, profile, request));
         let file = Rc::new(File::build(widget_action));
         let name = Rc::new(Name::build(widget_action));
         let save = Rc::new(Save::build(profile, &list));
@@ -56,7 +56,7 @@ impl Form {
             (browser_action, widget_action),
             profile,
             &list,
-            scope,
+            request,
         ));
 
         // Init main container
@@ -79,7 +79,7 @@ impl Form {
             name,
             save,
             g_box,
-            scope: scope.to_string(),
+            request: request.clone(),
             profile: profile.clone(),
         }
     }
@@ -112,7 +112,7 @@ impl Form {
                         .identity
                         .auth
                         .memory
-                        .match_scope(&self.scope)
+                        .match_scope(&self.request.to_string())
                         .is_some_and(|auth| auth.profile_identity_id == profile_identity_id),
                 );
                 self.save.update(true);

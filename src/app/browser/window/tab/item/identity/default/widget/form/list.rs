@@ -11,6 +11,7 @@ use gtk::{
         prelude::{Cast, CastNone},
         ListStore,
     },
+    glib::Uri,
     prelude::{BoxExt, ListItemExt, ObjectExt, WidgetExt},
     Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
 };
@@ -24,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, scope: &str) -> Self {
+    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
         // Init dropdown items
         let guest_session = Item::new_guest_session();
         let generate_pem = Item::new_generate_pem();
@@ -41,7 +42,8 @@ impl List {
             Ok(identities) => {
                 let mut is_guest_session = true;
                 for identity in identities {
-                    match Item::new_profile_identity_id(profile, identity.id, scope) {
+                    match Item::new_profile_identity_id(profile, identity.id, &request.to_string())
+                    {
                         Ok(item) => {
                             if item.is_active() {
                                 is_guest_session = false;

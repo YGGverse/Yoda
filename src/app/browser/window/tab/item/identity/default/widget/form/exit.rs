@@ -8,6 +8,7 @@ use adw::{
     AlertDialog, ResponseAppearance,
 };
 use gtk::{
+    glib::Uri,
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
@@ -36,7 +37,7 @@ impl Exit {
         (browser_action, widget_action): (&Rc<BrowserAction>, &Rc<WidgetAction>),
         profile: &Rc<Profile>,
         list: &Rc<List>,
-        scope: &str,
+        request: &Uri,
     ) -> Self {
         // Init main widget
         let button = Button::builder()
@@ -48,11 +49,11 @@ impl Exit {
 
         // Init events
         button.connect_clicked({
-            let scope = scope.to_string();
             let browser_action = browser_action.clone();
             let button = button.clone();
             let list = list.clone();
             let profile = profile.clone();
+            let request = request.clone();
             let widget_action = widget_action.clone();
             move |_| {
                 // Get selected identity from holder
@@ -83,16 +84,17 @@ impl Exit {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
-                            let scope = scope.clone();
+                            let browser_action = browser_action.clone();
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
-                            let browser_action = browser_action.clone();
+                            let request = request.clone();
                             let widget_action = widget_action.clone();
                             move |_, _| {
                                 match profile.identity.auth.remove_ref(profile_identity_id) {
                                     Ok(_) => {
-                                        match list.selected().update(&profile, &scope.to_string()) {
+                                        match list.selected().update(&profile, &request.to_string())
+                                        {
                                             Ok(_) => {
                                                 button.set_css_classes(&["success"]);
                                                 button
