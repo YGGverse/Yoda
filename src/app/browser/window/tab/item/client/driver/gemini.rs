@@ -404,7 +404,26 @@ fn handle(
                             // Expected target URL in response meta
                             match response.meta.data {
                                 Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                    Ok(target) => {
+                                    Ok(absolute) => {
+                                        // Base donor scheme could be `titan`, rewrite new relative links resolved with `gemini`
+                                        // otherwise, keep original scheme to handle external redirect rules properly
+                                        // * in this case, `titan` scheme redirects unexpected
+                                        let scheme = absolute.scheme();
+                                        let target = Uri::build(
+                                            UriFlags::NONE,
+                                            &if "titan" == scheme {
+                                                scheme.replace("titan", "gemini")
+                                            } else {
+                                                scheme.to_string()
+                                            },
+                                            absolute.userinfo().as_deref(),
+                                            absolute.host().as_deref(),
+                                            absolute.port(),
+                                            absolute.path().as_str(),
+                                            absolute.query().as_deref(),
+                                            absolute.fragment().as_deref(),
+                                        );
+                                        // Increase client redirection counter
                                         let total = redirects.take() + 1;
                                         // Validate total redirects by protocol specification
                                         if total > 5 {
@@ -415,10 +434,10 @@ fn handle(
                                             subject.tab_page.set_loading(false);
                                             redirects.replace(0); // reset
 
-                                        // Disallow external redirection
-                                        } else if (target.scheme() != "titan" && target.scheme() != "gemini")
-                                            || uri.port() != target.port()
-                                            || uri.host() != target.host() {
+                                        // Disallow external redirection by protocol restrictions
+                                        } else if "gemini" != target.scheme()
+                                             || uri.port() != target.port()
+                                             || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
                                                 status.set_description(Some("External redirects not allowed by protocol specification"));
                                                 subject.page.title.replace(status.title());
@@ -435,18 +454,7 @@ fn handle(
                                                 .set_text(&uri.to_string());
                                             }
                                             redirects.replace(total);
-                                            subject.page.tab_action.load.activate(Some(
-                                                &Uri::build(
-                                                    UriFlags::NONE,
-                                                    "gemini",
-                                                    target.userinfo().as_deref(),
-                                                    target.host().as_deref(),
-                                                    target.port(),
-                                                    target.path().as_str(),
-                                                    target.query().as_deref(),
-                                                    target.fragment().as_deref(),
-                                                ).to_string()
-                                            ), false);
+                                            subject.page.tab_action.load.activate(Some(&target.to_string()), false);
                                         }
                                     }
                                     Err(e) => {
