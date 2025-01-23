@@ -9,7 +9,5 @@ pub fn new_for_profile_identity_id(
     profile
         .identity
         .auth
-        .memory
-        .match_scope(auth_url)
-        .is_some_and(|auth| auth.profile_identity_id == profile_identity_id)
+        .is_matches(auth_url, profile_identity_id) // @TODO direct call?
 }

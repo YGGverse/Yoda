@@ -43,19 +43,16 @@ impl Default {
                     Value::ProfileIdentityId(value) => Some(value),
                     Value::GuestSession => None,
                     Value::GeneratePem => Some(
-                        match profile
+                        profile
                             .identity
                             .make(None, &widget.form.name.value().unwrap())
-                        {
-                            Ok(profile_identity_id) => profile_identity_id,
-                            Err(e) => todo!("{e}"),
-                        },
+                            .unwrap(), // @TODO handle
                     ),
                     Value::ImportPem => Some(
-                        match profile.identity.add(&widget.form.file.pem.take().unwrap()) {
-                            Ok(profile_identity_id) => profile_identity_id,
-                            Err(e) => todo!("{e}"),
-                        },
+                        profile
+                            .identity
+                            .add(&widget.form.file.pem.take().unwrap())
+                            .unwrap(), // @TODO handle
                     ),
                 };
 
@@ -63,19 +60,20 @@ impl Default {
                 match option {
                     // Activate identity for `scope`
                     Some(profile_identity_id) => {
-                        if let Err(e) = profile
+                        if profile
                             .identity
                             .auth
                             .apply(profile_identity_id, &request.to_string())
+                            .is_err()
                         {
-                            todo!("{e}")
-                        };
+                            panic!() // unexpected @TODO
+                        }
                     }
                     // Remove all identity auths for `scope`
                     None => {
-                        if let Err(e) = profile.identity.auth.remove_scope(&request.to_string()) {
-                            todo!("{e}")
-                        };
+                        if profile.identity.auth.remove(&request.to_string()).is_err() {
+                            panic!() // unexpected @TODO
+                        }
                     }
                 }
 

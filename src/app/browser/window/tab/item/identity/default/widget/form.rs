@@ -111,9 +111,7 @@ impl Form {
                     self.profile
                         .identity
                         .auth
-                        .memory
-                        .match_scope(&self.request.to_string())
-                        .is_some_and(|auth| auth.profile_identity_id == profile_identity_id),
+                        .is_matches(&self.request.to_string(), profile_identity_id),
                 );
                 self.save.update(true);
             }

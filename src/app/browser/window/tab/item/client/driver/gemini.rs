@@ -164,7 +164,7 @@ fn handle(
             .page
             .profile
             .identity
-            .match_scope(&uri.to_string())
+            .get(&uri.to_string())
         {
             Some(identity) => match identity.to_tls_certificate() {
                 Ok(certificate) => Some(certificate),

@@ -77,7 +77,7 @@ impl Navigation {
         self.history.update();
         self.reload.update(!request.is_empty());
         self.request
-            .update(self.profile.identity.match_scope(&request).is_some());
+            .update(self.profile.identity.get(&request).is_some());
         self.home.update();
     }
 

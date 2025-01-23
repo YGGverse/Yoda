@@ -58,20 +58,17 @@ impl Memory {
         }
     }
 
-    /// Get identity match `request`
+    /// Get identity exactly match `scope`
     /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
-    /// * contain unspecified length priority implementation @TODO
-    pub fn match_scope(&self, request: &str) -> Option<Auth> {
+    /// * see also parent `is_match_request`
+    pub fn match_scope(&self, scope: &str) -> Option<Auth> {
         let mut result = Vec::new();
 
-        // Get all records starts with `scope`
-        let query = super::filter_scope(request);
-
-        for (scope, &profile_identity_id) in self.index.borrow().iter() {
-            if query.starts_with(scope) {
+        for (value, &profile_identity_id) in self.index.borrow().iter() {
+            if scope.starts_with(value) {
                 result.push(Auth {
                     profile_identity_id,
-                    scope: scope.clone(),
+                    scope: value.clone(),
                 })
             }
         }

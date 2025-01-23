@@ -41,14 +41,15 @@ impl Auth {
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_auth_id` on success
-    pub fn apply(&self, profile_identity_id: i64, auth_url: &str) -> Result<i64, Error> {
-        let scope = filter_scope(auth_url);
-
+    pub fn apply(&self, profile_identity_id: i64, request: &str) -> Result<i64, Error> {
         // Cleanup records match `scope` (unauthorize)
-        self.remove_scope(&scope)?;
+        self.remove(request)?;
 
         // Create new record (auth)
-        let profile_identity_auth_id = match self.database.add(profile_identity_id, &scope) {
+        let profile_identity_auth_id = match self
+            .database
+            .add(profile_identity_id, &filter_scope(request))
+        {
             Ok(id) => id,
             Err(e) => return Err(Error::Database(e)),
         };
@@ -61,8 +62,8 @@ impl Auth {
     }
 
     /// Remove all records match request (unauthorize)
-    pub fn remove_scope(&self, scope: &str) -> Result<(), Error> {
-        match self.database.records_scope(Some(scope)) {
+    pub fn remove(&self, request: &str) -> Result<(), Error> {
+        match self.database.records_scope(Some(&filter_scope(request))) {
             Ok(records) => {
                 for record in records {
                     if let Err(e) = self.database.delete(record.id) {
@@ -112,6 +113,20 @@ impl Auth {
         }
 
         Ok(())
+    }
+
+    // Getters
+
+    /// Check request string matches condition
+    pub fn is_matches(&self, request: &str, profile_identity_id: i64) -> bool {
+        self.memory
+            .match_scope(&filter_scope(request))
+            .is_some_and(|auth| auth.profile_identity_id == profile_identity_id)
+    }
+
+    /// Get memory item string match request
+    pub fn get(&self, request: &str) -> Option<memory::Auth> {
+        self.memory.match_scope(&filter_scope(request))
     }
 }
 
