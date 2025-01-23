@@ -251,8 +251,9 @@ impl Tab {
     pub fn page_home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             if let Some(home) = item.page.navigation.request.home() {
+                let home = home.to_string();
                 item.page.navigation.request.widget.entry.set_text(&home);
-                item.client.handle(&home, false);
+                item.client.handle(&home, true);
             }
         }
     }
@@ -279,7 +280,7 @@ impl Tab {
     pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.client
-                .handle(&item.page.navigation.request.widget.entry.text(), false);
+                .handle(&item.page.navigation.request.widget.entry.text(), true);
         }
     }
 
