@@ -49,7 +49,7 @@ impl Titan {
         action_update.connect_activate({
             let control = control.clone();
             let form = form.clone();
-            move |_, _| control.update(Some(form.text().as_bytes().len()))
+            move |_, _| control.update(Some(form.text().len()))
         });
 
         action_send
