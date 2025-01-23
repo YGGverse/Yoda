@@ -1,13 +1,14 @@
-mod widget;
-
-use widget::Widget;
+use gtk::{
+    prelude::{ButtonExt, WidgetExt},
+    Button,
+};
 
 use super::WindowAction;
 use std::rc::Rc;
 
 pub struct Forward {
     action: Rc<WindowAction>,
-    pub widget: Rc<Widget>,
+    pub button: Button,
 }
 
 impl Forward {
@@ -15,21 +16,33 @@ impl Forward {
 
     /// Build new `Self`
     pub fn build(action: &Rc<WindowAction>) -> Self {
+        // Init gobject
+        let button = Button::builder()
+            .icon_name("go-next-symbolic")
+            .tooltip_text("Forward")
+            .sensitive(false)
+            .build();
+
+        // Init events
+        button.connect_clicked({
+            let action = action.clone();
+            move |_| action.history_forward.activate()
+        });
+
+        // Return activated `Self`
         Self {
             action: action.clone(),
-            widget: Rc::new(Widget::build(action)),
+            button,
         }
     }
 
     // Actions
     pub fn update(&self, status: bool) {
-        // Update actions
         self.action
             .history_forward
             .simple_action
             .set_enabled(status);
 
-        // Update child components
-        self.widget.update(status);
+        self.button.set_sensitive(status);
     }
 }

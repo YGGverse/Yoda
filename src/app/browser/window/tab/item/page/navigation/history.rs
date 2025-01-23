@@ -36,7 +36,7 @@ impl History {
         let forward = Rc::new(Forward::build(action));
 
         // Init widget
-        let widget = Rc::new(Widget::build(&back.widget.button, &forward.widget.button));
+        let widget = Rc::new(Widget::build(&back.button, &forward.button));
 
         // Init memory
         let memory = RefCell::new(Vec::new());
