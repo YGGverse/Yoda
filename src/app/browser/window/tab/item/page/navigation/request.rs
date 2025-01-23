@@ -121,8 +121,8 @@ impl Request {
 
     /// Parse home [Uri](https://docs.gtk.org/glib/struct.Uri.html) of `Self`
     pub fn home(&self) -> Option<Uri> {
-        match self.uri() {
-            Some(uri) => Some(Uri::build(
+        self.uri().map(|uri| {
+            Uri::build(
                 UriFlags::NONE,
                 &uri.scheme(),
                 uri.userinfo().as_deref(),
@@ -131,9 +131,8 @@ impl Request {
                 "/",
                 None,
                 None,
-            )),
-            None => None,
-        }
+            )
+        })
     }
 
     /// Get request value in `download:` format
