@@ -61,7 +61,7 @@ impl Client {
         // Reset widgets
         self.subject.page.search.unset();
         self.subject.page.input.unset();
-        self.subject.page.title.replace("Loading..".into());
+        self.subject.tab_page.set_title("Loading..");
         self.subject
             .page
             .navigation
@@ -91,7 +91,7 @@ impl Client {
                             status.set_description(Some(&format!(
                                 "Scheme `{scheme}` yet not supported"
                             )));
-                            subject.page.title.replace(status.title());
+                            subject.tab_page.set_title(&status.title());
                             subject
                                 .page
                                 .navigation

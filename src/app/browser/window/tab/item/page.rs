@@ -17,12 +17,11 @@ use super::{Action as TabAction, BrowserAction, Profile, WindowAction};
 
 use gtk::{glib::GString, prelude::EditableExt};
 use sqlite::Transaction;
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 pub struct Page {
     pub id: Rc<GString>,
     pub profile: Rc<Profile>,
-    pub title: Rc<RefCell<GString>>,
     // Actions
     pub browser_action: Rc<BrowserAction>,
     pub tab_action: Rc<TabAction>,
@@ -71,7 +70,6 @@ impl Page {
         Self {
             id: id.clone(),
             profile: profile.clone(),
-            title: Rc::new(RefCell::new("New page".into())),
             // Actions
             browser_action: browser_action.clone(),
             tab_action: tab_action.clone(),
@@ -152,7 +150,6 @@ impl Page {
             Ok(records) => {
                 for record in records {
                     // Restore self by last record
-                    self.title.replace(record.title.into());
                     // Delegate restore action to the item childs
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
@@ -173,11 +170,7 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
-        match database::insert(
-            transaction,
-            app_browser_window_tab_item_id,
-            self.title.borrow().as_str(),
-        ) {
+        match database::insert(transaction, app_browser_window_tab_item_id) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 

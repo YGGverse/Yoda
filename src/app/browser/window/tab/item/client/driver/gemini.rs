@@ -129,8 +129,7 @@ impl Gemini {
                         todo!()*/
                     }
                 });
-
-                self.subject.page.title.replace("Titan input".into());
+                self.subject.tab_page.set_title("Titan input");
                 self.subject
                     .page
                     .navigation
@@ -199,7 +198,7 @@ fn handle(
                                     Some(1024),
                                 );
                             }
-                            subject.page.title.replace(title.into());
+                            subject.tab_page.set_title(&title);
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
                             redirects.replace(0); // reset
@@ -271,7 +270,7 @@ fn handle(
                                         }
                                     },
                                 );
-                                subject.page.title.replace(status.title());
+                                subject.tab_page.set_title(&status.title());
                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                 subject.tab_page.set_loading(false);
                                 redirects.replace(0); // reset
@@ -294,7 +293,7 @@ fn handle(
                                                 subject.page.search.set(Some(widget.text_view));
 
                                                 // Update page meta
-                                                subject.page.title.replace(match widget.meta.title {
+                                                subject.tab_page.set_title(&match widget.meta.title {
                                                     Some(title) => title.into(), // @TODO
                                                     None => uri_to_title(&uri),
                                                 });
@@ -313,7 +312,7 @@ fn handle(
                                             Err(e) => {
                                                 let status = subject.page.content.to_status_failure();
                                                 status.set_description(Some(&e.to_string()));
-                                                subject.page.title.replace(status.title());
+                                                subject.tab_page.set_title(&status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
                                                 redirects.replace(0); // reset
@@ -348,13 +347,13 @@ fn handle(
                                                             move |result| {
                                                                 match result {
                                                                     Ok(buffer) => {
-                                                                        subject.page.title.replace(uri_to_title(&uri));
+                                                                        subject.tab_page.set_title(&uri_to_title(&uri));
                                                                         subject.page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                     }
                                                                     Err(e) => {
                                                                         let status = subject.page.content.to_status_failure();
                                                                         status.set_description(Some(e.message()));
-                                                                        subject.page.title.replace(status.title());
+                                                                        subject.tab_page.set_title(&status.title());
                                                                     }
                                                                 }
                                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
@@ -367,7 +366,7 @@ fn handle(
                                                         let status = subject.page.content.to_status_failure();
                                                         status.set_description(Some(&e.to_string()));
 
-                                                        subject.page.title.replace(status.title());
+                                                        subject.tab_page.set_title(&status.title());
                                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                         subject.tab_page.set_loading(false);
                                                         redirects.replace(0); // reset
@@ -381,7 +380,7 @@ fn handle(
                                             .content
                                             .to_status_mime(mime, Some((&subject.page.tab_action, &uri)));
                                         status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                        subject.page.title.replace(status.title());
+                                        subject.tab_page.set_title(&status.title());
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
                                         redirects.replace(0); // reset
@@ -390,7 +389,7 @@ fn handle(
                                 None => {
                                     let status = subject.page.content.to_status_failure();
                                     status.set_description(Some("MIME type not found"));
-                                    subject.page.title.replace(status.title());
+                                    subject.tab_page.set_title(&status.title());
                                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                     subject.tab_page.set_loading(false);
                                     redirects.replace(0); // reset
@@ -428,7 +427,7 @@ fn handle(
                                         if total > 5 {
                                             let status = subject.page.content.to_status_failure();
                                             status.set_description(Some("Redirection limit reached"));
-                                            subject.page.title.replace(status.title());
+                                            subject.tab_page.set_title(&status.title());
                                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                             subject.tab_page.set_loading(false);
                                             redirects.replace(0); // reset
@@ -439,7 +438,7 @@ fn handle(
                                              || uri.host() != target.host() {
                                                 let status = subject.page.content.to_status_failure();
                                                 status.set_description(Some("External redirects not allowed by protocol specification"));
-                                                subject.page.title.replace(status.title());
+                                                subject.tab_page.set_title(&status.title());
                                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                                 subject.tab_page.set_loading(false);
                                                 redirects.replace(0); // reset
@@ -459,7 +458,7 @@ fn handle(
                                     Err(e) => {
                                         let status = subject.page.content.to_status_failure();
                                         status.set_description(Some(&e.to_string()));
-                                        subject.page.title.replace(status.title());
+                                        subject.tab_page.set_title(&status.title());
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
                                         redirects.replace(0); // reset
@@ -468,7 +467,7 @@ fn handle(
                                 None => {
                                     let status = subject.page.content.to_status_failure();
                                     status.set_description(Some("Redirection target not found"));
-                                    subject.page.title.replace(status.title());
+                                    subject.tab_page.set_title(&status.title());
                                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                     subject.tab_page.set_loading(false);
                                     redirects.replace(0); // reset
@@ -487,7 +486,7 @@ fn handle(
                                 None => response.meta.status.to_string(),
                             }));
 
-                            subject.page.title.replace(status.title());
+                            subject.tab_page.set_title(&status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
                             redirects.replace(0); // reset
@@ -495,7 +494,7 @@ fn handle(
                         status => {
                             let _status = subject.page.content.to_status_failure();
                             _status.set_description(Some(&format!("Undefined status code `{status}`")));
-                            subject.page.title.replace(_status.title());
+                            subject.tab_page.set_title(&_status.title());
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
                             redirects.replace(0); // reset
@@ -505,7 +504,7 @@ fn handle(
                 Err(e) => {
                     let status = subject.page.content.to_status_failure();
                     status.set_description(Some(&e.to_string()));
-                    subject.page.title.replace(status.title());
+                    subject.tab_page.set_title(&status.title());
                     subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                     subject.tab_page.set_loading(false);
                     redirects.replace(0); // reset
