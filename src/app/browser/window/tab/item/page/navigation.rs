@@ -42,7 +42,7 @@ impl Navigation {
         let reload = Rc::new(Reload::build(window_action));
         let request = Rc::new(Request::build((browser_action, tab_action)));
         let bookmark = Rc::new(Bookmark::build(window_action));
-        let home = Rc::new(Home::build(window_action, &request));
+        let home = Rc::new(Home::build(window_action));
 
         // init main widget
         let widget = Rc::new(Widget::build(
@@ -76,9 +76,17 @@ impl Navigation {
             .update(self.profile.bookmark.get(&request).is_ok());
         self.history.update();
         self.reload.update(!request.is_empty());
-        self.request
-            .update(self.profile.identity.get(&request).is_some());
-        self.home.update();
+        self.request.update(
+            self.profile
+                .identity
+                .get(&self.request.strip_prefix())
+                .is_some(),
+        );
+        self.home.update(
+            self.request
+                .home()
+                .is_some_and(|home| home.to_string() != request),
+        );
     }
 
     pub fn clean(

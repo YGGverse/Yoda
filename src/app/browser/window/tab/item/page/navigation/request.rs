@@ -119,20 +119,19 @@ impl Request {
         strip_prefix(self.widget.entry.text())
     }
 
-    /// Parse home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for self
-    pub fn home(&self) -> Option<GString> {
+    /// Parse home [Uri](https://docs.gtk.org/glib/struct.Uri.html) of `Self`
+    pub fn home(&self) -> Option<Uri> {
         match self.uri() {
-            Some(uri) => {
-                let scheme = uri.scheme().replace("titan", "gemini");
-                let port = uri.port();
-                uri.host().map(|host| {
-                    if port.is_positive() {
-                        gformat!("{scheme}://{host}:{port}/")
-                    } else {
-                        gformat!("{scheme}://{host}/")
-                    }
-                })
-            }
+            Some(uri) => Some(Uri::build(
+                UriFlags::NONE,
+                &uri.scheme(),
+                uri.userinfo().as_deref(),
+                uri.host().as_deref(),
+                uri.port(),
+                "/",
+                None,
+                None,
+            )),
             None => None,
         }
     }
