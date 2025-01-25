@@ -152,7 +152,12 @@ fn lookup(
         Ok(uri) => callback(feature, cancellable, Ok(uri)),
         Err(_) => {
             // try default scheme suggestion
-            let suggestion = format!("{DEFAULT_SCHEME}://{query}");
+            let suggestion = format!(
+                "{DEFAULT_SCHEME}://{}",
+                query
+                    .strip_prefix(&format!("{DEFAULT_SCHEME}://"))
+                    .unwrap_or(query)
+            );
 
             let resolver = Resolver::default();
             resolver.set_timeout(TIMEOUT);
@@ -161,22 +166,25 @@ fn lookup(
                 Ok(connectable) => resolver.lookup_by_name_async(
                     &connectable.hostname(),
                     Some(&cancellable.clone()),
-                    move |resolve| {
-                        callback(
-                            feature,
-                            cancellable,
-                            if resolve.is_ok() {
-                                match Uri::parse(&suggestion, UriFlags::NONE) {
-                                    Ok(uri) => Err(uri),
-                                    Err(_) => Err(search(&suggestion)),
-                                }
-                            } else {
-                                Err(search(&suggestion))
-                            },
-                        )
+                    {
+                        let query = query.to_owned();
+                        move |resolve| {
+                            callback(
+                                feature,
+                                cancellable,
+                                if resolve.is_ok() {
+                                    match Uri::parse(&suggestion, UriFlags::NONE) {
+                                        Ok(uri) => Err(uri),
+                                        Err(_) => Err(search(&query)),
+                                    }
+                                } else {
+                                    Err(search(&query))
+                                },
+                            )
+                        }
                     },
                 ),
-                Err(_) => callback(feature, cancellable, Err(search(&suggestion))),
+                Err(_) => callback(feature, cancellable, Err(search(&query))),
             }
         }
     }
