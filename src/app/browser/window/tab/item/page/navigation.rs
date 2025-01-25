@@ -71,8 +71,6 @@ impl Navigation {
         let request = self.request.strip_prefix();
 
         // update children components
-        self.bookmark
-            .set_sensitive(self.profile.bookmark.get(&request).is_ok());
         self.reload.set_sensitive(!request.is_empty());
         self.request.update(
             self.profile
