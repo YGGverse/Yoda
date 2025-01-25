@@ -124,7 +124,11 @@ impl Request {
         self.uri().map(|uri| {
             Uri::build(
                 UriFlags::NONE,
-                &uri.scheme(),
+                &if uri.scheme() == "titan" {
+                    GString::from("gemini")
+                } else {
+                    uri.scheme()
+                },
                 uri.userinfo().as_deref(),
                 uri.host().as_deref(),
                 uri.port(),
