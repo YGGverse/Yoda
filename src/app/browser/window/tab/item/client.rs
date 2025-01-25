@@ -184,7 +184,7 @@ fn lookup(
                         }
                     },
                 ),
-                Err(_) => callback(feature, cancellable, Err(search(&query))),
+                Err(_) => callback(feature, cancellable, Err(search(query))),
             }
         }
     }
