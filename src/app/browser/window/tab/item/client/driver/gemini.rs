@@ -97,7 +97,8 @@ impl Gemini {
                             Request::Titan(Titan {
                                 uri: uri.clone(),
                                 data: Bytes::from(data),
-                                mime: None,  // @TODO
+                                // * some servers may reject the request without content type // @TODO handle file uploads
+                                mime: Some(titan::DEFAULT_MIME.to_string()),
                                 token: None, // @TODO
                             }),
                             client.clone(),
