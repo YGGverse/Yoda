@@ -10,7 +10,7 @@ const ICON_NON: &str = "non-starred-symbolic";
 
 pub trait Bookmark {
     fn bookmark(action: &Rc<WindowAction>) -> Self;
-    fn _update(&self, has_bookmark: bool); // @TODO
+    fn update(&self, has_bookmark: bool);
 }
 
 impl Bookmark for Button {
@@ -26,7 +26,7 @@ impl Bookmark for Button {
             .build()
     }
 
-    fn _update(&self, has_bookmark: bool) {
+    fn update(&self, has_bookmark: bool) {
         self.set_icon_name(if has_bookmark { ICON_YES } else { ICON_NON });
     }
 }
