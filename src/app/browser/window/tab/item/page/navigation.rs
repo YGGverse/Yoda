@@ -6,20 +6,18 @@ mod reload;
 mod request;
 mod widget;
 
+use super::{BrowserAction, ItemAction, Profile, WindowAction};
 use bookmark::Bookmark;
-use gtk::Button;
+use gtk::{Box, Button};
 use history::History;
 use home::Home;
 use reload::Reload;
 use request::Request;
-use widget::Widget;
-
-use super::{BrowserAction, Profile, TabAction, WindowAction};
 use sqlite::Transaction;
 use std::rc::Rc;
+use widget::Widget;
 
 pub struct Navigation {
-    pub history: Rc<History>,
     pub profile: Rc<Profile>,
     pub request: Rc<Request>,
     pub widget: Rc<Widget>,
@@ -28,21 +26,21 @@ pub struct Navigation {
 impl Navigation {
     pub fn build(
         profile: &Rc<Profile>,
-        (browser_action, window_action, tab_action): (
+        (browser_action, window_action, item_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
-            &Rc<TabAction>,
+            &Rc<ItemAction>,
         ),
+        (back_action_name, forward_action_name): (&str, &str),
     ) -> Self {
         // init children components
 
-        let history = Rc::new(History::build(window_action));
-        let request = Rc::new(Request::build((browser_action, tab_action)));
+        let request = Rc::new(Request::build((browser_action, item_action)));
 
         // init main widget
         let widget = Rc::new(Widget::build(
             &Button::home(window_action),
-            &history.widget.g_box, // @TODO
+            &Box::history(back_action_name, forward_action_name),
             &Button::reload(window_action),
             &request.widget.entry, // @TODO
             &Button::bookmark(window_action),
@@ -50,7 +48,6 @@ impl Navigation {
 
         // done
         Self {
-            history,
             profile: profile.clone(),
             request,
             widget,

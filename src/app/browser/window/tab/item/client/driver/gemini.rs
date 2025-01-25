@@ -185,14 +185,14 @@ fn handle(
                             };
                             if matches!(response.meta.status, Status::SensitiveInput) {
                                 subject.page.input.set_new_sensitive(
-                                    subject.page.tab_action.clone(),
+                                    subject.page.item_action.clone(),
                                     uri,
                                     Some(&title),
                                     Some(1024),
                                 );
                             } else {
                                 subject.page.input.set_new_response(
-                                    subject.page.tab_action.clone(),
+                                    subject.page.item_action.clone(),
                                     uri,
                                     Some(&title),
                                     Some(1024),
@@ -369,7 +369,7 @@ fn handle(
                                     mime => {
                                         let status = subject.page
                                             .content
-                                            .to_status_mime(mime, Some((&subject.page.tab_action, &uri)));
+                                            .to_status_mime(mime, Some((&subject.page.item_action, &uri)));
                                         status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                         subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                         subject.tab_page.set_loading(false);
@@ -443,7 +443,7 @@ fn handle(
                                                 .set_text(&uri.to_string());
                                             }
                                             redirects.replace(total);
-                                            subject.page.tab_action.load.activate(Some(&target.to_string()), false);
+                                            subject.page.item_action.load.activate(Some(&target.to_string()), false);
                                         }
                                     }
                                     Err(e) => {

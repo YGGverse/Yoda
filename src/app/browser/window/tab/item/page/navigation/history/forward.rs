@@ -1,19 +1,13 @@
-use super::WindowAction;
-use gtk::{prelude::ActionExt, Button};
-use std::rc::Rc;
+use gtk::Button;
 
 pub trait Forward {
-    fn forward(action: &Rc<WindowAction>) -> Self;
+    fn forward(action_name: &str) -> Self;
 }
 
 impl Forward for Button {
-    fn forward(action: &Rc<WindowAction>) -> Self {
+    fn forward(action_name: &str) -> Self {
         Button::builder()
-            .action_name(format!(
-                "{}.{}",
-                action.id,
-                action.history_back.simple_action.name()
-            )) // @TODO
+            .action_name(action_name)
             .icon_name("go-next-symbolic")
             .tooltip_text("Forward")
             .build()

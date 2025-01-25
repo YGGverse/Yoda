@@ -1,6 +1,6 @@
 mod form;
 
-use super::TabAction;
+use super::ItemAction;
 use form::Form;
 use gtk::{
     gio::SimpleAction,
@@ -22,7 +22,7 @@ impl Sensitive {
 
     /// Build new `Self`
     pub fn build(
-        tab_action: Rc<TabAction>,
+        item_action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,
@@ -54,7 +54,7 @@ impl Sensitive {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                tab_action.load.activate(
+                item_action.load.activate(
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),

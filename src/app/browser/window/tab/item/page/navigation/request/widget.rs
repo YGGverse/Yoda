@@ -3,7 +3,7 @@ mod primary_icon;
 
 use primary_icon::PrimaryIcon;
 
-use super::{BrowserAction, TabAction};
+use super::{BrowserAction, ItemAction};
 use gtk::{
     glib::{timeout_add_local, ControlFlow, SourceId},
     prelude::{EditableExt, EntryExt, WidgetExt},
@@ -36,7 +36,7 @@ impl Widget {
     // Constructors
 
     /// Build new `Self`
-    pub fn build((browser_action, tab_action): (&Rc<BrowserAction>, &Rc<TabAction>)) -> Self {
+    pub fn build((browser_action, item_action): (&Rc<BrowserAction>, &Rc<ItemAction>)) -> Self {
         // Init animated progress bar state
         let progress = Rc::new(Progress {
             fraction: RefCell::new(0.0),
@@ -52,10 +52,10 @@ impl Widget {
 
         // Connect events
         entry.connect_icon_release({
-            let tab_action = tab_action.clone();
+            let item_action = item_action.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => tab_action.ident.activate(), // @TODO PrimaryIcon impl
-                EntryIconPosition::Secondary => tab_action.load.activate(Some(&this.text()), true),
+                EntryIconPosition::Primary => item_action.ident.activate(), // @TODO PrimaryIcon impl
+                EntryIconPosition::Secondary => item_action.load.activate(Some(&this.text()), true),
                 _ => todo!(), // unexpected
             }
         });
@@ -77,9 +77,9 @@ impl Widget {
         });
 
         entry.connect_activate({
-            let tab_action = tab_action.clone();
+            let item_action = item_action.clone();
             move |entry| {
-                tab_action.load.activate(Some(&entry.text()), true);
+                item_action.load.activate(Some(&entry.text()), true);
             }
         });
 

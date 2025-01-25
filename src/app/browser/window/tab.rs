@@ -1,9 +1,11 @@
+mod action;
 mod database;
 mod error;
 mod item;
 mod menu;
 mod widget;
 
+use action::Action;
 use error::Error;
 pub use item::Item;
 use menu::Menu;
@@ -27,6 +29,7 @@ pub struct Tab {
     window_action: Rc<WindowAction>,
     profile: Rc<Profile>,
     index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>>,
+    pub action: Rc<Action>,
     pub widget: Rc<Widget>,
 }
 
@@ -38,6 +41,8 @@ impl Tab {
         profile: &Rc<Profile>,
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
     ) -> Self {
+        let action = Rc::new(Action::new());
+
         // Init empty HashMap index
         let index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>> =
             Rc::new(RefCell::new(HashMap::new()));
@@ -142,6 +147,7 @@ impl Tab {
             window_action: window_action.clone(),
             index,
             widget,
+            action,
         }
     }
 
@@ -160,7 +166,7 @@ impl Tab {
             &self.widget.tab_view,
             &self.profile,
             // Actions
-            (&self.browser_action, &self.window_action),
+            (&self.browser_action, &self.window_action, &self.action),
             // Options
             (
                 position,
@@ -260,19 +266,13 @@ impl Tab {
 
     pub fn page_history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(back) = item.page.navigation.history.back(true) {
-                item.page.navigation.request.widget.entry.set_text(&back);
-                item.client.handle(&back, false);
-            }
+            item.action.history.back(true);
         }
     }
 
     pub fn page_history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(forward) = item.page.navigation.history.forward(true) {
-                item.page.navigation.request.widget.entry.set_text(&forward);
-                item.client.handle(&forward, false);
-            }
+            item.action.history.forward(true);
         }
     }
 
@@ -338,7 +338,7 @@ impl Tab {
                         transaction,
                         record.id,
                         &self.profile,
-                        (&self.browser_action, &self.window_action),
+                        (&self.browser_action, &self.window_action, &self.action),
                     ) {
                         Ok(items) => {
                             for item in items {

@@ -2,7 +2,7 @@ mod response;
 mod sensitive;
 mod titan;
 
-use super::TabAction;
+use super::ItemAction;
 use adw::Clamp;
 use gtk::{glib::Uri, prelude::WidgetExt, Box, Label};
 use response::Response;
@@ -52,7 +52,7 @@ impl Input {
     // Setters
     pub fn set_new_response(
         &self,
-        action: Rc<TabAction>,
+        action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
@@ -64,7 +64,7 @@ impl Input {
 
     pub fn set_new_sensitive(
         &self,
-        action: Rc<TabAction>,
+        action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
         max_length: Option<i32>,

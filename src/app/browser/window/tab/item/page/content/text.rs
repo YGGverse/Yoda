@@ -4,7 +4,7 @@ mod source;
 use gemini::Gemini;
 use source::Source;
 
-use super::{TabAction, WindowAction};
+use super::{ItemAction, WindowAction};
 use gtk::{
     glib::Uri,
     prelude::{BoxExt, Cast},
@@ -28,10 +28,10 @@ impl Text {
     pub fn new_gemini(
         gemtext: &str,
         base: &Uri,
-        (window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>),
+        (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
     ) -> Self {
         // Init components
-        let gemini = Gemini::new(gemtext, base, (window_action, tab_action));
+        let gemini = Gemini::new(gemtext, base, (window_action, item_action));
 
         // Init main widget
         let g_box = Box::builder().orientation(Orientation::Vertical).build();

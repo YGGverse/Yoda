@@ -37,16 +37,21 @@ impl Browser {
         let widget = Rc::new(Widget::new(
             &window.widget.g_box,
             &[
-                // Connect action groups (to apply accels)
+                // action groups
                 (
-                    // Browser
+                    // browser
                     &action.id,
                     action.simple_action_group.clone(),
                 ),
                 (
-                    // Window
+                    // window
                     &window.action.id,
                     window.action.simple_action_group.clone(),
+                ),
+                (
+                    // tab
+                    &window.tab.action.id,
+                    window.tab.action.simple_action_group.clone(),
                 ),
             ],
         ));

@@ -13,7 +13,7 @@ use navigation::Navigation;
 use search::Search;
 use widget::Widget;
 
-use super::{Action as TabAction, BrowserAction, Profile, WindowAction};
+use super::{Action as ItemAction, BrowserAction, Profile, WindowAction};
 
 use gtk::{glib::GString, prelude::EditableExt};
 use sqlite::Transaction;
@@ -24,7 +24,7 @@ pub struct Page {
     pub profile: Rc<Profile>,
     // Actions
     pub browser_action: Rc<BrowserAction>,
-    pub tab_action: Rc<TabAction>,
+    pub item_action: Rc<ItemAction>,
     pub window_action: Rc<WindowAction>,
     // Components
     pub content: Rc<Content>,
@@ -40,20 +40,22 @@ impl Page {
     pub fn build(
         id: &Rc<GString>,
         profile: &Rc<Profile>,
-        (browser_action, window_action, tab_action): (
+        (browser_action, window_action, item_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
-            &Rc<TabAction>,
+            &Rc<ItemAction>,
         ),
+        (back_action_name, forward_action_name): (&str, &str),
     ) -> Self {
         // Init components
-        let content = Rc::new(Content::build((window_action, tab_action)));
+        let content = Rc::new(Content::build((window_action, item_action)));
 
         let search = Rc::new(Search::new());
 
         let navigation = Rc::new(Navigation::build(
             profile,
-            (browser_action, window_action, tab_action),
+            (browser_action, window_action, item_action),
+            (back_action_name, forward_action_name),
         ));
 
         let input = Rc::new(Input::new());
@@ -72,7 +74,7 @@ impl Page {
             profile: profile.clone(),
             // Actions
             browser_action: browser_action.clone(),
-            tab_action: tab_action.clone(),
+            item_action: item_action.clone(),
             window_action: window_action.clone(),
             // Components
             content,

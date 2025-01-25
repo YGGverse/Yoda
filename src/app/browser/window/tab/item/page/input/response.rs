@@ -6,7 +6,7 @@ use control::Control;
 use form::Form;
 use title::Title;
 
-use super::TabAction;
+use super::ItemAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
@@ -28,7 +28,7 @@ impl Response {
 
     /// Build new `Self`
     pub fn build(
-        tab_action: Rc<TabAction>,
+        item_action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
@@ -77,7 +77,7 @@ impl Response {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                tab_action.load.activate(
+                item_action.load.activate(
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),

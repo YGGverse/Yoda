@@ -15,7 +15,7 @@ use adw::TabView;
 use client::Client;
 use gtk::{
     glib::{uuid_string_random, GString},
-    prelude::{Cast, EditableExt},
+    prelude::{ActionExt, ActionMapExt, Cast, EditableExt},
 };
 use page::Page;
 use sqlite::Transaction;
@@ -31,6 +31,7 @@ pub struct Item {
     // Components
     pub page: Rc<Page>,
     pub widget: Rc<Widget>,
+    pub action: Rc<Action>,
 }
 
 impl Item {
@@ -40,7 +41,11 @@ impl Item {
     pub fn build(
         tab_view: &TabView,
         profile: &Rc<Profile>,
-        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        (browser_action, window_action, tab_action): (
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<super::Action>,
+        ),
         (position, request, is_pinned, is_selected, is_attention, is_load): (
             Position,
             Option<String>,
@@ -57,10 +62,22 @@ impl Item {
 
         let action = Rc::new(Action::new());
 
+        tab_action
+            .simple_action_group
+            .add_action(&action.history.back);
+
+        tab_action
+            .simple_action_group
+            .add_action(&action.history.forward);
+
         let page = Rc::new(Page::build(
             &id,
             profile,
             (browser_action, window_action, &action),
+            (
+                &format!("{}.{}", &tab_action.id, action.history.back.name()),
+                &format!("{}.{}", &tab_action.id, action.history.forward.name()),
+            ),
         ));
 
         let widget = Rc::new(Widget::build(
@@ -128,6 +145,7 @@ impl Item {
             client,
             page,
             widget,
+            action,
         }
     }
 
@@ -169,7 +187,11 @@ impl Item {
         app_browser_window_tab_id: i64,
         profile: &Rc<Profile>,
         // Actions
-        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
+        (browser_action, window_action, item_action): (
+            &Rc<BrowserAction>,
+            &Rc<WindowAction>,
+            &Rc<super::Action>,
+        ),
     ) -> Result<Vec<Rc<Item>>, String> {
         let mut items = Vec::new();
 
@@ -181,7 +203,7 @@ impl Item {
                         tab_view,
                         profile,
                         // Actions
-                        (browser_action, window_action),
+                        (browser_action, window_action, item_action),
                         // Options tuple
                         (
                             Position::End,

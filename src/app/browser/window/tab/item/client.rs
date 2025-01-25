@@ -105,7 +105,7 @@ impl Client {
                     // begin redirection to new address suggested
                     Err(uri) => subject
                         .page
-                        .tab_action
+                        .item_action
                         .load
                         .activate(Some(&uri.to_string()), false),
                 }
@@ -215,10 +215,5 @@ fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
     }
 
     // Add new record into the page navigation history
-    if match subject.page.navigation.history.current() {
-        Some(current) => current != request, // apply additional filters
-        None => true,
-    } {
-        subject.page.navigation.history.add(request, true)
-    }
+    subject.page.item_action.history.add(request, true)
 }

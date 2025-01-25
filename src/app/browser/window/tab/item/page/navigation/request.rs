@@ -4,7 +4,7 @@ mod widget;
 
 use widget::Widget;
 
-use crate::app::browser::{window::tab::item::Action as TabAction, Action as BrowserAction};
+use crate::app::browser::{window::tab::item::Action as ItemAction, Action as BrowserAction};
 use gtk::{
     glib::{gformat, GString, Uri, UriFlags},
     prelude::EditableExt,
@@ -21,9 +21,9 @@ impl Request {
     // Constructors
 
     /// Build new `Self`
-    pub fn build((browser_action, tab_action): (&Rc<BrowserAction>, &Rc<TabAction>)) -> Self {
+    pub fn build((browser_action, item_action): (&Rc<BrowserAction>, &Rc<ItemAction>)) -> Self {
         Self {
-            widget: Rc::new(Widget::build((browser_action, tab_action))),
+            widget: Rc::new(Widget::build((browser_action, item_action))),
         }
     }
 

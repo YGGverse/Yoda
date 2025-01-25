@@ -9,7 +9,7 @@ use syntax::Syntax;
 use tag::Tag;
 use widget::Widget;
 
-use super::{TabAction, WindowAction};
+use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
 use ggemtext::line::{
     code::{Inline, Multiline},
@@ -43,7 +43,7 @@ impl Reader {
     pub fn new(
         gemtext: &str,
         base: &Uri,
-        (window_action, tab_action): (Rc<WindowAction>, Rc<TabAction>),
+        (window_action, item_action): (Rc<WindowAction>, Rc<ItemAction>),
     ) -> Result<Self, Error> {
         // Init default values
         let mut title = None;
@@ -332,7 +332,7 @@ impl Reader {
                             return match uri.scheme().as_str() {
                                 "gemini" | "titan" => {
                                     // Open new page in browser
-                                    tab_action.load.activate(Some(&uri.to_str()), true);
+                                    item_action.load.activate(Some(&uri.to_str()), true);
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(

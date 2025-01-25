@@ -5,7 +5,7 @@ mod text;
 use image::Image;
 use text::Text;
 
-use super::{TabAction, WindowAction};
+use super::{ItemAction, WindowAction};
 use adw::StatusPage;
 use gtk::{
     gdk::Paintable,
@@ -18,7 +18,7 @@ use std::{rc::Rc, time::Duration};
 
 pub struct Content {
     window_action: Rc<WindowAction>,
-    tab_action: Rc<TabAction>,
+    item_action: Rc<ItemAction>,
     pub g_box: Box,
 }
 
@@ -26,11 +26,11 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn build((window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>)) -> Self {
+    pub fn build((window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>)) -> Self {
         Self {
             g_box: Box::builder().orientation(Orientation::Vertical).build(),
             window_action: window_action.clone(),
-            tab_action: tab_action.clone(),
+            item_action: item_action.clone(),
         }
     }
 
@@ -77,7 +77,7 @@ impl Content {
     pub fn to_status_mime(
         &self,
         mime: &str,
-        download: Option<(&Rc<TabAction>, &Uri)>,
+        download: Option<(&Rc<ItemAction>, &Uri)>,
     ) -> StatusPage {
         self.clean();
         let status = status::mime::build(mime, download);
@@ -90,7 +90,7 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_identity(&self) -> StatusPage {
         self.clean();
-        let status = status::identity::build(self.tab_action.clone());
+        let status = status::identity::build(self.item_action.clone());
         self.g_box.append(&status);
         status
     }
@@ -122,7 +122,7 @@ impl Content {
     /// * could be useful to extract document title parsed from Gemtext
     pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-        let text = Text::new_gemini(data, base, (&self.window_action, &self.tab_action));
+        let text = Text::new_gemini(data, base, (&self.window_action, &self.item_action));
         self.g_box.append(&text.g_box);
         text
     }
