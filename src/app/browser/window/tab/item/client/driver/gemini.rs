@@ -483,12 +483,12 @@ fn handle(
                             subject.tab_page.set_title(&status.title());
                             redirects.replace(0); // reset
                         }
-                        status => {
-                            let _status = subject.page.content.to_status_failure();
-                            _status.set_description(Some(&format!("Undefined status code `{status}`")));
+                        error => {
+                            let status = subject.page.content.to_status_failure();
+                            status.set_description(Some(&error.to_string()));
                             subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
-                            subject.tab_page.set_title(&_status.title());
+                            subject.tab_page.set_title(&status.title());
                             redirects.replace(0); // reset
                         },
                     }

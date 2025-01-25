@@ -61,18 +61,18 @@ GTK 4 / Libadwaita client written in Rust
     * [x] Redirection
       * [x] `30` Temporary
       * [x] `31` Permanent
-    * [ ] Temporary failure
-      * [ ] `40` Unspecified condition
-      * [ ] `41` Server unavailable
-      * [ ] `42` CGI error
-      * [ ] `43` Proxy error
-      * [ ] `44` Slow down
-    * [ ] Permanent failure
-      * [ ] `50` General
-      * [ ] `51` Not found
-      * [ ] `52` Gone
-      * [ ] `53` Proxy request refused
-      * [ ] `59` Bad request
+    * [x] Temporary failure
+      * [x] `40` Unspecified condition
+      * [x] `41` Server unavailable
+      * [x] `42` CGI error
+      * [x] `43` Proxy error
+      * [x] `44` Slow down
+    * [x] Permanent failure
+      * [x] `50` General
+      * [x] `51` Not found
+      * [x] `52` Gone
+      * [x] `53` Proxy request refused
+      * [x] `59` Bad request
     * [x] Client certificates
       * [x] `60` Certificate requested
       * [x] `61` Certificate not authorized
