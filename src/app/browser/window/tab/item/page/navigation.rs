@@ -8,7 +8,7 @@ mod widget;
 
 use super::{BrowserAction, ItemAction, Profile, WindowAction};
 use bookmark::Bookmark;
-use gtk::{Box, Button};
+use gtk::{prelude::WidgetExt, Box, Button};
 use history::History;
 use home::Home;
 use reload::Reload;
@@ -19,6 +19,9 @@ use widget::Widget;
 
 pub struct Navigation {
     pub profile: Rc<Profile>,
+    pub home: Button,
+    pub reload: Button,
+    pub bookmark: Button,
     pub request: Rc<Request>,
     pub widget: Rc<Widget>,
 }
@@ -35,21 +38,28 @@ impl Navigation {
     ) -> Self {
         // init children components
 
+        let home = Button::home(window_action);
+        let history = Box::history(back_action_name, forward_action_name);
+        let reload = Button::reload(window_action);
         let request = Rc::new(Request::build((browser_action, item_action)));
+        let bookmark = Button::bookmark(window_action);
 
         // init main widget
         let widget = Rc::new(Widget::build(
-            &Button::home(window_action),
-            &Box::history(back_action_name, forward_action_name),
-            &Button::reload(window_action),
+            &home,
+            &history,
+            &reload,
             &request.widget.entry, // @TODO
-            &Button::bookmark(window_action),
+            &bookmark,
         ));
 
         // done
         Self {
             profile: profile.clone(),
+            home,
             request,
+            reload,
+            bookmark,
             widget,
         }
     }
@@ -57,26 +67,24 @@ impl Navigation {
     // Actions
 
     pub fn update(&self) {
-        /* @TODO
         // init shared request value
         let request = self.request.strip_prefix();
 
         // update children components
         self.bookmark
-            .update(self.profile.bookmark.get(&request).is_ok());
-        self.history.update();
-        self.reload.update(!request.is_empty());
+            .set_sensitive(self.profile.bookmark.get(&request).is_ok());
+        self.reload.set_sensitive(!request.is_empty());
         self.request.update(
             self.profile
                 .identity
                 .get(&self.request.strip_prefix())
                 .is_some(),
         );
-        self.home.update(
+        self.home.set_sensitive(
             self.request
                 .home()
                 .is_some_and(|home| home.to_string() != request),
-        );*/
+        );
     }
 
     pub fn clean(
