@@ -5,6 +5,7 @@ pub mod tab;
 mod widget;
 
 use action::{Action, Position};
+use adw::ToolbarView;
 use header::Header;
 use sqlite::Transaction;
 use tab::Tab;
@@ -31,13 +32,8 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::build(profile, (browser_action, &action)));
-        let header = Rc::new(Header::build(
-            (browser_action, &action),
-            profile,
-            &tab.widget.tab_view,
-        ));
         let widget = Rc::new(Widget::build(
-            &header.widget.toolbar_view,
+            &ToolbarView::header((browser_action, &action), profile, &tab.widget.tab_view),
             &tab.widget.tab_view,
         ));
 
