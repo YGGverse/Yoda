@@ -1,39 +1,41 @@
 mod control;
 mod menu;
 mod tab;
-mod widget;
 
 use control::Control;
 use menu::Menu;
 use tab::Tab;
-use widget::Widget;
 
 use super::{BrowserAction, Profile, WindowAction};
 use adw::TabView;
+use gtk::{prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
-pub struct Bar {
-    pub widget: Rc<Widget>,
+pub trait Bar {
+    fn bar(
+        action: (&Rc<BrowserAction>, &Rc<WindowAction>),
+        profile: &Rc<Profile>,
+        view: &TabView,
+    ) -> Self;
 }
 
-impl Bar {
+impl Bar for Box {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
+    fn bar(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
         view: &TabView,
     ) -> Self {
-        let control = Control::new();
-        let tab = Tab::new(window_action, view);
-        let menu = Rc::new(Menu::build((browser_action, window_action), profile));
-        Self {
-            widget: Rc::new(Widget::build(
-                &control.window_controls,
-                &menu.menu_button,
-                &tab.widget.tab_bar,
-            )),
-        }
+        let g_box = Box::builder()
+            .orientation(Orientation::Horizontal)
+            .spacing(8)
+            .build();
+
+        g_box.append(&Tab::new(window_action, view).widget.tab_bar);
+        g_box.append(&Menu::build((browser_action, window_action), profile).menu_button);
+        g_box.append(&Control::new().window_controls);
+        g_box
     }
 }
