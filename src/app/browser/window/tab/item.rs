@@ -88,9 +88,9 @@ impl Item {
         // Init events
 
         if let Some(text) = request {
-            page.navigation.request.widget.entry.set_text(&text);
+            page.navigation.request.widget.entry.set_text(text);
             if is_load {
-                client.handle(&text, true);
+                client.handle(text, true);
             }
         }
 
