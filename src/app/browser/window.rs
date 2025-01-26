@@ -2,24 +2,22 @@ mod action;
 mod database;
 mod header;
 pub mod tab;
-mod widget;
 
 use action::{Action, Position};
 use adw::ToolbarView;
 use header::Header;
 use sqlite::Transaction;
 use tab::Tab;
-use widget::Widget;
 
 use super::Action as BrowserAction;
 use crate::Profile;
-use gtk::glib::GString;
+use gtk::{glib::GString, prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
 pub struct Window {
     pub action: Rc<Action>,
     pub tab: Rc<Tab>,
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Window {
@@ -32,10 +30,16 @@ impl Window {
 
         // Init components
         let tab = Rc::new(Tab::build(profile, (browser_action, &action)));
-        let widget = Rc::new(Widget::build(
-            &ToolbarView::header((browser_action, &action), profile, &tab.widget.tab_view),
+
+        // Init widget
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
+
+        g_box.append(&ToolbarView::header(
+            (browser_action, &action),
+            profile,
             &tab.widget.tab_view,
         ));
+        g_box.append(&tab.widget.tab_view);
 
         // Init events
         action.append.connect_activate({
@@ -123,11 +127,7 @@ impl Window {
         });
 
         // Init struct
-        Self {
-            action,
-            tab,
-            widget,
-        }
+        Self { action, tab, g_box }
     }
 
     // Actions

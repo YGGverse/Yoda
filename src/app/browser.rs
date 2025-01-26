@@ -35,7 +35,7 @@ impl Browser {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            &window.widget.g_box,
+            &window.g_box,
             &[
                 // action groups
                 (
@@ -59,7 +59,7 @@ impl Browser {
         // Connect events
         action.about.connect_activate({
             let window = window.clone();
-            move || About::new().present(Some(&window.widget.g_box))
+            move || About::new().present(Some(&window.g_box))
         });
 
         action.close.connect_activate({
