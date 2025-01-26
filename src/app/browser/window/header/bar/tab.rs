@@ -1,25 +1,21 @@
 mod append;
-mod widget;
-
-use append::Append;
-use widget::Widget;
 
 use super::WindowAction;
-use adw::TabView;
+use adw::{TabBar, TabView};
+use append::Append;
 use std::rc::Rc;
 
-pub struct Tab {
-    pub widget: Rc<Widget>,
+pub trait Tab {
+    fn tab(window_action: &Rc<WindowAction>, view: &TabView) -> Self;
 }
 
-impl Tab {
-    // Construct
-    pub fn new(window_action: &Rc<WindowAction>, view: &TabView) -> Self {
-        Self {
-            widget: Rc::new(Widget::build(
-                view,
-                &Append::build(window_action).widget.button,
-            )),
-        }
+impl Tab for TabBar {
+    fn tab(window_action: &Rc<WindowAction>, view: &TabView) -> Self {
+        TabBar::builder()
+            .autohide(false)
+            .expand_tabs(false)
+            .end_action_widget(&Append::build(window_action).widget.button) // @TODO find solution to append after tabs
+            .view(view)
+            .build()
     }
 }
