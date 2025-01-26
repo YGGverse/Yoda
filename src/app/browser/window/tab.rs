@@ -152,7 +152,7 @@ impl Tab {
     pub fn append(
         &self,
         position: Position,
-        request: Option<String>,
+        request: Option<&str>,
         is_pinned: bool,
         is_selected: bool,
         is_attention: bool,
@@ -175,12 +175,16 @@ impl Tab {
             ),
         ));
 
+        // Expect user input on tab appended has empty request entry
+        // * this action initiated here because should be applied on tab appending event only
+        if request.is_none() || request.is_some_and(|value| value.is_empty()) {
+            item.page.navigation.request.widget.entry.grab_focus();
+        }
+
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
             .insert(item.id.clone(), item.clone());
-
-        item.page.navigation.request.widget.entry.grab_focus();
 
         item
     }

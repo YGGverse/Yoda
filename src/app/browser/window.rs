@@ -47,7 +47,7 @@ impl Window {
             move |position, request, is_pinned, is_selected, is_attention, is_load| {
                 tab.append(
                     position,
-                    request,
+                    request.as_deref(),
                     is_pinned,
                     is_selected,
                     is_attention,
@@ -122,7 +122,7 @@ impl Window {
         action.open.on_activate({
             let tab = tab.clone();
             move |_, request| {
-                tab.append(Position::End, Some(request), false, true, false, true);
+                tab.append(Position::End, Some(&request), false, true, false, true);
             }
         });
 

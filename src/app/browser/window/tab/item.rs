@@ -45,7 +45,7 @@ impl Item {
         ),
         (position, request, is_pinned, is_selected, is_attention, is_load): (
             Position,
-            Option<String>,
+            Option<&str>,
             bool,
             bool,
             bool,
