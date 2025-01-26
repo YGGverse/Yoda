@@ -77,8 +77,8 @@ impl Browser {
         action.escape.connect_activate({
             let widget = widget.clone();
             let window = window.clone();
-            move |tab_item_id| {
-                window.escape(tab_item_id);
+            move |_, _| {
+                window.escape();
                 widget.application_window.set_focus(gtk::Window::NONE);
             }
         });
@@ -96,11 +96,6 @@ impl Browser {
                     },
                 ); // @TODO move out?
             }
-        });
-
-        action.update.connect_activate({
-            let window = window.clone();
-            move |tab_item_id| window.update(tab_item_id)
         });
 
         // Return new activated `Self`
@@ -184,10 +179,6 @@ impl Browser {
     pub fn present(&self) -> &Self {
         self.widget.application_window.present();
         self
-    }
-
-    pub fn update(&self) {
-        self.window.update(None);
     }
 }
 

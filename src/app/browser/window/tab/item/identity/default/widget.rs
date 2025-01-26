@@ -4,10 +4,7 @@ pub mod form;
 use action::Action as WidgetAction;
 use form::{list::item::value::Value, Form};
 
-use crate::{
-    app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
-    Profile,
-};
+use crate::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
@@ -36,20 +33,12 @@ impl Widget {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(
-        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
-        request: &Uri,
-    ) -> Self {
+    pub fn build(profile: &Rc<Profile>, request: &Uri) -> Self {
         // Init actions
-        let widget_action = Rc::new(WidgetAction::new());
+        let action = Rc::new(WidgetAction::new());
 
         // Init child container
-        let form = Rc::new(Form::build(
-            (browser_action, window_action, &widget_action),
-            profile,
-            request,
-        ));
+        let form = Rc::new(Form::build(&action, profile, request));
 
         // Init main widget
         let alert_dialog = AlertDialog::builder()
@@ -76,7 +65,7 @@ impl Widget {
         alert_dialog.set_response_appearance(RESPONSE_CANCEL.0, ResponseAppearance::Destructive); */
 
         // Init events
-        widget_action.update.connect_activate({
+        action.update.connect_activate({
             let form = form.clone();
             let alert_dialog = alert_dialog.clone();
             move || {
@@ -89,7 +78,7 @@ impl Widget {
         });
 
         // Make initial update
-        widget_action.update.activate();
+        action.update.activate();
 
         // Return new activated `Self`
         Self {
@@ -114,20 +103,6 @@ impl Widget {
                 callback(form.list.selected().value_enum())
             }
         });
-    }
-
-    /// Callback wrapper to cancel
-    /// [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
-    /// * return require reload state
-    pub fn on_cancel(&self, callback: impl Fn() + 'static) {
-        self.alert_dialog
-            .connect_response(Some(RESPONSE_CANCEL.0), move |this, response| {
-                // Prevent double-click action
-                this.set_response_enabled(response, false);
-
-                // Result
-                callback()
-            });
     }
 
     /// Show dialog with new preset

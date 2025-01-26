@@ -6,6 +6,7 @@ mod menu;
 mod widget;
 
 use action::Action;
+use adw::TabPage;
 use error::Error;
 pub use item::Item;
 use menu::Menu;
@@ -14,7 +15,7 @@ use widget::Widget;
 use super::{Action as WindowAction, BrowserAction, Position};
 use crate::Profile;
 use gtk::{
-    glib::{DateTime, GString, Propagation},
+    glib::{DateTime, Propagation},
     prelude::{ActionExt, EditableExt, WidgetExt},
 };
 use sqlite::Transaction;
@@ -25,7 +26,7 @@ pub struct Tab {
     browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
     profile: Rc<Profile>,
-    index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>>,
+    index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     pub action: Rc<Action>,
     pub widget: Rc<Widget>,
 }
@@ -41,8 +42,7 @@ impl Tab {
         let action = Rc::new(Action::new());
 
         // Init empty HashMap index
-        let index: Rc<RefCell<HashMap<Rc<GString>, Rc<Item>>>> =
-            Rc::new(RefCell::new(HashMap::new()));
+        let index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
         let menu = Menu::new(window_action);
@@ -58,21 +58,18 @@ impl Tab {
             move |tab_view, tab_page| {
                 let state = match tab_page {
                     // on menu open
-                    Some(this) => {
-                        if let Some(id) = this.keyword() {
-                            if let Some(item) = index.borrow().get(&id) {
-                                item.page.update(); // update window actions using page of tab activated
-                            }
+                    Some(tab_page) => {
+                        if let Some(item) = index.borrow().get(tab_page) {
+                            item.page.update(); // update window actions using page of tab activated
                         }
-                        Some(tab_view.page_position(this)) // activated tab
+
+                        Some(tab_view.page_position(tab_page)) // activated tab
                     }
                     // on menu close
                     None => {
-                        if let Some(page) = widget.page(None) {
-                            if let Some(id) = page.keyword() {
-                                if let Some(item) = index.borrow().get(&id) {
-                                    item.page.update(); // update window actions using page of current tab
-                                }
+                        if let Some(tab_page) = widget.page(None) {
+                            if let Some(item) = index.borrow().get(&tab_page) {
+                                item.page.update(); // update window actions using page of current tab
                             }
                         }
                         None // current tab
@@ -97,28 +94,29 @@ impl Tab {
         widget.tab_view.connect_close_page({
             let index = index.clone();
             let profile = profile.clone();
-            move |_, item| {
-                // Get index ID by keyword saved
-                match item.keyword() {
-                    Some(id) => {
-                        if id.is_empty() {
-                            panic!("Tab index can not be empty!")
-                        }
-                        // Cleanup HashMap index
-                        if let Some(item) = index.borrow_mut().remove(&id) {
-                            // Add history record into profile memory pool
-                            // * this action allows to recover recently closed tab (e.g. from the main menu)
-                            profile
-                                .history
-                                .memory
-                                .tab
-                                .add(item, DateTime::now_local().unwrap().to_unix());
-                        }
-                    }
-                    None => panic!("Undefined tab index!"),
+            move |_, tab_page| {
+                // Cleanup HashMap index
+                if let Some(item) = index.borrow_mut().remove(tab_page) {
+                    // Add history record into profile memory pool
+                    // * this action allows to recover recently closed tab (e.g. from the main menu)
+                    profile
+                        .history
+                        .memory
+                        .tab
+                        .add(item, DateTime::now_local().unwrap().to_unix());
                 }
 
                 Propagation::Proceed
+            }
+        });
+
+        widget.tab_view.connect_page_attached({
+            let window_action = window_action.clone();
+            let index = index.clone();
+            move |_, tab_page, _| {
+                if tab_page.is_selected() {
+                    update_actions(tab_page, &index, &window_action);
+                }
             }
         });
 
@@ -126,28 +124,9 @@ impl Tab {
             let window_action = window_action.clone();
             let index = index.clone();
             move |this| {
-                if let Some(page) = this.selected_page() {
-                    if let Some(id) = page.keyword() {
-                        if let Some(item) = index.borrow().get(&id) {
-                            window_action
-                                .home
-                                .simple_action
-                                .set_enabled(item.action.home.is_enabled());
-                            window_action
-                                .reload
-                                .simple_action
-                                .set_enabled(item.action.reload.is_enabled());
-                            window_action
-                                .history_back
-                                .simple_action
-                                .set_enabled(item.action.history.back.is_enabled());
-                            window_action
-                                .history_forward
-                                .simple_action
-                                .set_enabled(item.action.history.forward.is_enabled());
-                        }
-                    }
-                    page.set_needs_attention(false);
+                if let Some(tab_page) = this.selected_page() {
+                    tab_page.set_needs_attention(false);
+                    update_actions(&tab_page, &index, &window_action);
                 }
             }
         });
@@ -193,13 +172,13 @@ impl Tab {
         // Expect user input on tab appended has empty request entry
         // * this action initiated here because should be applied on tab appending event only
         if request.is_none() || request.is_some_and(|value| value.is_empty()) {
-            item.page.navigation.request.widget.entry.grab_focus();
+            item.page.navigation.request.entry.grab_focus();
         }
 
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
-            .insert(item.id.clone(), item.clone());
+            .insert(item.widget.tab_page.clone(), item.clone());
 
         item
     }
@@ -215,18 +194,9 @@ impl Tab {
     }
 
     // Toggle escape action for specified or current item
-    pub fn escape(&self, item_id: Option<GString>) {
-        match item_id {
-            Some(id) => {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    item.page.escape()
-                }
-            }
-            None => {
-                if let Some(item) = self.item(None) {
-                    item.page.escape();
-                }
-            }
+    pub fn escape(&self) {
+        if let Some(item) = self.item(None) {
+            item.page.escape();
         }
     }
 
@@ -274,7 +244,7 @@ impl Tab {
         if let Some(item) = self.item(page_position) {
             if let Some(home) = item.page.navigation.request.home() {
                 let home = home.to_string();
-                item.page.navigation.request.widget.entry.set_text(&home);
+                item.page.navigation.request.entry.set_text(&home);
                 item.client.handle(&home, true);
             }
         }
@@ -296,23 +266,7 @@ impl Tab {
     pub fn page_reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.client
-                .handle(&item.page.navigation.request.widget.entry.text(), true);
-        }
-    }
-
-    pub fn update(&self, item_id: Option<GString>) {
-        let key = item_id.unwrap_or_default();
-
-        match self.index.borrow().get(&key) {
-            Some(item) => {
-                item.update();
-            }
-            None => {
-                // update all tabs
-                for (_, item) in self.index.borrow().iter() {
-                    item.update();
-                }
-            }
+                .handle(&item.page.navigation.request.entry.text(), true);
         }
     }
 
@@ -361,7 +315,7 @@ impl Tab {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index
                                     .borrow_mut()
-                                    .insert(item.id.clone(), item.clone());
+                                    .insert(item.widget.tab_page.clone(), item.clone());
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -412,11 +366,9 @@ impl Tab {
     }
 
     fn item(&self, position: Option<i32>) -> Option<Rc<Item>> {
-        if let Some(page) = self.widget.page(position) {
-            if let Some(id) = page.keyword() {
-                if let Some(item) = self.index.borrow().get(&id) {
-                    return Some(item.clone());
-                }
+        if let Some(tab_page) = self.widget.page(position) {
+            if let Some(item) = self.index.borrow().get(&tab_page) {
+                return Some(item.clone());
             }
         }
         None
@@ -424,6 +376,7 @@ impl Tab {
 }
 
 // Tools
+
 pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Migrate self components
     if let Err(e) = database::init(tx) {
@@ -435,4 +388,38 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Success
     Ok(())
+}
+
+fn update_actions(
+    tab_page: &TabPage,
+    index: &Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
+    window_action: &Rc<WindowAction>,
+) {
+    if let Some(item) = index.borrow().get(tab_page) {
+        window_action
+            .home
+            .simple_action
+            .set_enabled(item.action.home.is_enabled());
+        window_action
+            .reload
+            .simple_action
+            .set_enabled(item.action.reload.is_enabled());
+        window_action
+            .history_back
+            .simple_action
+            .set_enabled(item.action.history.back.is_enabled());
+        window_action
+            .history_forward
+            .simple_action
+            .set_enabled(item.action.history.forward.is_enabled());
+        return;
+    }
+
+    window_action.home.simple_action.set_enabled(false);
+    window_action.reload.simple_action.set_enabled(false);
+    window_action.history_back.simple_action.set_enabled(false);
+    window_action
+        .history_forward
+        .simple_action
+        .set_enabled(false);
 }

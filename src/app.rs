@@ -32,12 +32,10 @@ impl App {
         // Init components
         let browser = Rc::new(Browser::build(profile));
 
-        // Init events
-        application.connect_activate({
-            let browser = browser.clone();
-            move |_| browser.update()
-        });
+        // Prevent startup warning @TODO
+        application.connect_activate(|_| {});
 
+        // Init events
         application.connect_startup({
             let browser = browser.clone();
             let profile = profile.clone();
@@ -150,11 +148,7 @@ impl App {
                 &["<Primary>i"],
             ),
             (
-                format!(
-                    "{}.{}",
-                    browser.action.id,
-                    browser.action.escape.simple_action.name()
-                ),
+                format!("{}.{}", browser.action.id, browser.action.escape.name()),
                 &["Escape"],
             ),
             // Tab actions

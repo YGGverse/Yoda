@@ -9,7 +9,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{CancellableExt, EditableExt, EntryExt},
+    prelude::{ActionExt, CancellableExt, EditableExt, EntryExt},
 };
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
@@ -43,12 +43,8 @@ impl Client {
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
-        // Move focus out from navigation entry
-        self.subject
-            .page
-            .browser_action
-            .escape
-            .activate_stateful_once(Some(self.subject.page.id.as_str().into()));
+        // Move focus out from navigation entry @TODO
+        self.subject.page.browser_action.escape.activate(None);
 
         // Initially disable find action
         self.subject
@@ -66,7 +62,6 @@ impl Client {
             .page
             .navigation
             .request
-            .widget
             .entry
             .set_progress_fraction(0.1);
 
@@ -96,7 +91,6 @@ impl Client {
                                 .page
                                 .navigation
                                 .request
-                                .widget
                                 .entry
                                 .set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
@@ -207,7 +201,7 @@ fn search(query: &str) -> Uri {
 /// Make new history record in related components
 /// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
 fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
-    let request = subject.page.navigation.request.widget.entry.text();
+    let request = subject.page.navigation.request.entry.text();
 
     // Add new record into the global memory index (used in global menu)
     // * if the `Uri` is `None`, try parse it from `request`

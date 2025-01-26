@@ -3,6 +3,7 @@ use sqlite::{Error, Transaction};
 pub struct Table {
     pub id: i64,
     // pub app_browser_window_tab_item_page_navigation_id: i64, not in use
+    pub text: Option<String>, // can be stored as NULL
 }
 
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
@@ -11,6 +12,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `app_browser_window_tab_item_page_navigation_id` INTEGER NOT NULL,
+            `text` VARCHAR(1024),
 
             FOREIGN KEY (`app_browser_window_tab_item_page_navigation_id`) REFERENCES `app_browser_window_tab_item_page_navigation`(`id`)
         )",
@@ -21,12 +23,14 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
 pub fn insert(
     tx: &Transaction,
     app_browser_window_tab_item_page_navigation_id: &i64,
+    text: Option<&str>,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item_page_navigation_request` (
-            `app_browser_window_tab_item_page_navigation_id`
-        ) VALUES (?)",
-        [app_browser_window_tab_item_page_navigation_id],
+            `app_browser_window_tab_item_page_navigation_id`,
+            `text`
+        ) VALUES (?, ?)",
+        (app_browser_window_tab_item_page_navigation_id, text),
     )
 }
 
@@ -36,7 +40,8 @@ pub fn select(
 ) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
-                `app_browser_window_tab_item_page_navigation_id`
+                `app_browser_window_tab_item_page_navigation_id`,
+                `text`
                 FROM `app_browser_window_tab_item_page_navigation_request`
                 WHERE `app_browser_window_tab_item_page_navigation_id` = ?",
     )?;
@@ -45,6 +50,7 @@ pub fn select(
         Ok(Table {
             id: row.get(0)?,
             // app_browser_window_tab_item_page_navigation_id: row.get(1)?, not in use
+            text: row.get(2)?,
         })
     })?;
 
@@ -65,6 +71,7 @@ pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
     )
 }
 
+/* not in use
 pub fn last_insert_id(tx: &Transaction) -> i64 {
     tx.last_insert_rowid()
-}
+} */

@@ -2,7 +2,7 @@ use super::{
     list::{item::Value, List},
     WidgetAction,
 };
-use crate::{app::browser::Action as BrowserAction, Profile};
+use crate::Profile;
 use adw::{
     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
@@ -34,7 +34,7 @@ impl Exit {
 
     /// Create new `Self`
     pub fn build(
-        (browser_action, widget_action): (&Rc<BrowserAction>, &Rc<WidgetAction>),
+        widget_action: &Rc<WidgetAction>,
         profile: &Rc<Profile>,
         list: &Rc<List>,
         request: &Uri,
@@ -49,7 +49,6 @@ impl Exit {
 
         // Init events
         button.connect_clicked({
-            let browser_action = browser_action.clone();
             let button = button.clone();
             let list = list.clone();
             let profile = profile.clone();
@@ -84,7 +83,6 @@ impl Exit {
 
                         // Connect confirmation event
                         alert_dialog.connect_response(Some(RESPONSE_CONFIRM.0), {
-                            let browser_action = browser_action.clone();
                             let button = button.clone();
                             let list = list.clone();
                             let profile = profile.clone();
@@ -111,7 +109,6 @@ impl Exit {
                                         button.set_label(&e.to_string())
                                     }
                                 }
-                                browser_action.update.activate(None);
                                 widget_action.update.activate();
                             }
                         });

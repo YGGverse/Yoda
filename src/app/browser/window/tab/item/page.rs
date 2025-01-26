@@ -54,7 +54,7 @@ impl Page {
 
         let navigation = Rc::new(Navigation::build(
             profile,
-            (browser_action, window_action, tab_action, item_action),
+            (window_action, tab_action, item_action),
         ));
 
         let input = Rc::new(Input::new());
@@ -92,7 +92,7 @@ impl Page {
         let result = match self
             .profile
             .bookmark
-            .toggle(self.navigation.request.widget.entry.text().as_str())
+            .toggle(self.navigation.request.entry.text().as_str())
         {
             Ok(result) => Ok(result),
             Err(_) => Err(Error::Bookmark), // @TODO

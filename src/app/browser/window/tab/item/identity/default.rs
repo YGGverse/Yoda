@@ -1,7 +1,7 @@
 mod widget;
 use widget::{form::list::item::value::Value, Widget};
 
-use super::{BrowserAction, Profile, WindowAction};
+use super::{Profile, WindowAction};
 use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
@@ -14,26 +14,12 @@ impl Default {
     // Construct
 
     /// Create new `Self` for given `Profile`
-    pub fn build(
-        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
-        request: &Uri,
-    ) -> Self {
+    pub fn build(window_action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
         // Init widget
-        let widget = Rc::new(Widget::build(
-            (browser_action, window_action),
-            profile,
-            request,
-        ));
+        let widget = Rc::new(Widget::build(profile, request));
 
         // Init events
-        widget.on_cancel({
-            let browser_action = browser_action.clone();
-            move || browser_action.update.activate(None)
-        });
-
         widget.on_apply({
-            let browser_action = browser_action.clone();
             let profile = profile.clone();
             let request = request.clone();
             let widget = widget.clone();
@@ -79,7 +65,6 @@ impl Default {
                 }
 
                 // Apply changes
-                browser_action.update.activate(None);
                 window_action.reload.activate();
             }
         });

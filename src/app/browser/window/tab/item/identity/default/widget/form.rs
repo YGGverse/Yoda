@@ -13,10 +13,7 @@ use name::Name;
 use save::Save;
 
 use super::WidgetAction;
-use crate::{
-    app::browser::{action::Action as BrowserAction, window::action::Action as WindowAction},
-    Profile,
-};
+use crate::Profile;
 use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
 use std::rc::Rc;
 
@@ -37,27 +34,14 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(
-        (browser_action, _window_action, widget_action): (
-            &Rc<BrowserAction>,
-            &Rc<WindowAction>,
-            &Rc<WidgetAction>,
-        ),
-        profile: &Rc<Profile>,
-        request: &Uri,
-    ) -> Self {
+    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
         // Init components
         let list = Rc::new(List::build(widget_action, profile, request));
         let file = Rc::new(File::build(widget_action));
         let name = Rc::new(Name::build(widget_action));
         let save = Rc::new(Save::build(profile, &list));
         let drop = Rc::new(Drop::build(profile, &list));
-        let exit = Rc::new(Exit::build(
-            (browser_action, widget_action),
-            profile,
-            &list,
-            request,
-        ));
+        let exit = Rc::new(Exit::build(widget_action, profile, &list, request));
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Vertical).build();

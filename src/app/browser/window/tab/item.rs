@@ -95,14 +95,13 @@ impl Item {
                 this.set_enabled(false);
                 if let Some(uri) = page.navigation.request.home() {
                     let request = uri.to_string();
-                    page.navigation.request.widget.entry.set_text(&request);
+                    page.navigation.request.entry.set_text(&request);
                     client.handle(&request, true);
                 }
             }
         });
 
         action.ident.connect_activate({
-            let browser_action = browser_action.clone();
             let page = page.clone();
             let parent = tab_view.clone().upcast::<gtk::Widget>();
             let profile = profile.clone();
@@ -111,12 +110,8 @@ impl Item {
                 if let Some(uri) = page.navigation.request.uri() {
                     let scheme = uri.scheme();
                     if scheme == "gemini" || scheme == "titan" {
-                        return identity::default(
-                            (&browser_action, &window_action),
-                            &profile,
-                            &uri,
-                        )
-                        .present(Some(&parent));
+                        return identity::default(&window_action, &profile, &uri)
+                            .present(Some(&parent));
                     }
                 }
                 identity::unsupported().present(Some(&parent));
@@ -128,7 +123,7 @@ impl Item {
             let client = client.clone();
             move |request, is_history| {
                 if let Some(text) = request {
-                    page.navigation.request.widget.entry.set_text(&text);
+                    page.navigation.request.entry.set_text(&text);
                     client.handle(&text, is_history);
                 }
             }
@@ -138,13 +133,13 @@ impl Item {
             let page = page.clone();
             let client = client.clone();
             move |_, _| {
-                client.handle(&page.navigation.request.widget.entry.text(), false);
+                client.handle(&page.navigation.request.entry.text(), false);
             }
         });
 
         // Handle immediately on request
         if let Some(text) = request {
-            page.navigation.request.widget.entry.set_text(text);
+            page.navigation.request.entry.set_text(text);
             if is_load {
                 client.handle(text, true);
             }
@@ -162,15 +157,17 @@ impl Item {
     // Actions
     pub fn update(&self) {
         // Update self actions
-        self.action
-            .home
-            .set_enabled(self.page.navigation.request.home().is_some_and(|home| {
-                home.to_string() != self.page.navigation.request.widget.entry.text()
-            }));
+        self.action.home.set_enabled(
+            self.page
+                .navigation
+                .request
+                .home()
+                .is_some_and(|home| home.to_string() != self.page.navigation.request.entry.text()),
+        );
 
         self.action
             .reload
-            .set_enabled(!self.page.navigation.request.widget.entry.text().is_empty());
+            .set_enabled(!self.page.navigation.request.entry.text().is_empty());
 
         // Update child components
         self.page.update();
