@@ -175,331 +175,338 @@ fn handle(
         {
             let subject = subject.clone();
             let redirects = redirects.clone();
-            move |result| match result {
-                Ok(response) => {
-                    match response.meta.status {
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
-                        Status::Input | Status::SensitiveInput => {
-                            let title = match response.meta.data {
-                                Some(data) => data.to_string(),
-                                None => Status::Input.to_string(),
-                            };
-                            if matches!(response.meta.status, Status::SensitiveInput) {
-                                subject.page.input.set_new_sensitive(
-                                    subject.page.item_action.clone(),
-                                    uri,
-                                    Some(&title),
-                                    Some(1024),
-                                );
-                            } else {
-                                subject.page.input.set_new_response(
-                                    subject.page.item_action.clone(),
-                                    uri,
-                                    Some(&title),
-                                    Some(1024),
-                                );
+            move |result| {
+                // Remove input forms when redirection expected has been not applied (e.g. failure status)
+                // @TODO implement input data recovery on error (it's also available before unset, but reference lost at this point)
+                subject.page.input.unset();
+
+                // Begin result handle
+                match result {
+                    Ok(response) => {
+                        match response.meta.status {
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
+                            Status::Input | Status::SensitiveInput => {
+                                let title = match response.meta.data {
+                                    Some(data) => data.to_string(),
+                                    None => Status::Input.to_string(),
+                                };
+                                if matches!(response.meta.status, Status::SensitiveInput) {
+                                    subject.page.input.set_new_sensitive(
+                                        subject.page.item_action.clone(),
+                                        uri,
+                                        Some(&title),
+                                        Some(1024),
+                                    );
+                                } else {
+                                    subject.page.input.set_new_response(
+                                        subject.page.item_action.clone(),
+                                        uri,
+                                        Some(&title),
+                                        Some(1024),
+                                    );
+                                }
+                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                subject.tab_page.set_loading(false);
+                                subject.tab_page.set_title(&title);
+                                redirects.replace(0); // reset
                             }
-                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                            subject.tab_page.set_loading(false);
-                            subject.tab_page.set_title(&title);
-                            redirects.replace(0); // reset
-                        }
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-                        Status::Success => match *feature {
-                            Feature::Download => {
-                                // Init download widget
-                                let status = subject.page.content.to_status_download(
-                                    uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
-                                    // format FS entities
-                                    &cancellable,
-                                    {
-                                        let cancellable = cancellable.clone();
-                                        let stream = response.connection.stream();
-                                        move |file, action| {
-                                            match file.replace(
-                                                None,
-                                                false,
-                                                gtk::gio::FileCreateFlags::NONE,
-                                                Some(&cancellable),
-                                            ) {
-                                                Ok(file_output_stream) => {
-                                                    // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                                    // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                                    // show bytes count in loading widget, validate max size for incoming data
-                                                    // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                                    ggemini::gio::file_output_stream::move_all_from_stream_async(
-                                                        stream.clone(),
-                                                        file_output_stream,
-                                                        cancellable.clone(),
-                                                        Priority::DEFAULT,
-                                                        (
-                                                            0x100000, // 1M bytes per chunk
-                                                            None,     // unlimited
-                                                            0,        // initial totals
-                                                        ),
-                                                        (
-                                                            // on chunk
-                                                            {
-                                                                let action = action.clone();
-                                                                move |_, total| {
-                                                                    action.update.activate(&format!(
-                                                                        "Received {}...",
-                                                                        crate::tool::format_bytes(total)
-                                                                    ))
-                                                                }
-                                                            },
-                                                            // on complete
-                                                            {
-                                                                let action = action.clone();
-                                                                move |result| match result {
-                                                                    Ok((_, total)) => {
-                                                                        action.complete.activate(&format!(
-                                                                            "Saved to {} ({total} bytes total)",
-                                                                            file.parse_name()
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
+                            Status::Success => match *feature {
+                                Feature::Download => {
+                                    // Init download widget
+                                    let status = subject.page.content.to_status_download(
+                                        uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                                        // format FS entities
+                                        &cancellable,
+                                        {
+                                            let cancellable = cancellable.clone();
+                                            let stream = response.connection.stream();
+                                            move |file, action| {
+                                                match file.replace(
+                                                    None,
+                                                    false,
+                                                    gtk::gio::FileCreateFlags::NONE,
+                                                    Some(&cancellable),
+                                                ) {
+                                                    Ok(file_output_stream) => {
+                                                        // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                                        // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                                        // show bytes count in loading widget, validate max size for incoming data
+                                                        // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                                        ggemini::gio::file_output_stream::move_all_from_stream_async(
+                                                            stream.clone(),
+                                                            file_output_stream,
+                                                            cancellable.clone(),
+                                                            Priority::DEFAULT,
+                                                            (
+                                                                0x100000, // 1M bytes per chunk
+                                                                None,     // unlimited
+                                                                0,        // initial totals
+                                                            ),
+                                                            (
+                                                                // on chunk
+                                                                {
+                                                                    let action = action.clone();
+                                                                    move |_, total| {
+                                                                        action.update.activate(&format!(
+                                                                            "Received {}...",
+                                                                            crate::tool::format_bytes(total)
                                                                         ))
                                                                     }
-                                                                    Err(e) => {
-                                                                        action.cancel.activate(&e.to_string())
+                                                                },
+                                                                // on complete
+                                                                {
+                                                                    let action = action.clone();
+                                                                    move |result| match result {
+                                                                        Ok((_, total)) => {
+                                                                            action.complete.activate(&format!(
+                                                                                "Saved to {} ({total} bytes total)",
+                                                                                file.parse_name()
+                                                                            ))
+                                                                        }
+                                                                        Err(e) => {
+                                                                            action.cancel.activate(&e.to_string())
+                                                                        }
                                                                     }
-                                                                }
-                                                            },
-                                                        ),
-                                                    )
+                                                                },
+                                                            ),
+                                                        )
+                                                    }
+                                                    Err(e) => action.cancel.activate(&e.to_string()),
                                                 }
-                                                Err(e) => action.cancel.activate(&e.to_string()),
+                                            }
+                                        },
+                                    );
+                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                    subject.tab_page.set_loading(false);
+                                    subject.tab_page.set_title(&status.title());
+                                    redirects.replace(0); // reset
+                                },
+                                _ => match response.meta.mime {
+                                    Some(mime) => match mime.as_str() {
+                                        "text/gemini" => Text::from_stream_async(
+                                            response.connection.stream(),
+                                            Priority::DEFAULT,
+                                            cancellable.clone(),
+                                            move |result| match result {
+                                                Ok(text) => {
+                                                    let widget = if matches!(*feature, Feature::Source) {
+                                                        subject.page.content.to_text_source(&text.to_string())
+                                                    } else {
+                                                        subject.page.content.to_text_gemini(&uri, &text.to_string())
+                                                    };
+                                                    subject.page.search.set(Some(widget.text_view));
+                                                    subject.tab_page.set_title(&match widget.meta.title {
+                                                        Some(title) => title.into(), // @TODO
+                                                        None => uri_to_title(&uri),
+                                                    });
+                                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    subject.tab_page.set_loading(false);
+                                                    subject.page.window_action
+                                                        .find
+                                                        .simple_action
+                                                        .set_enabled(true);
+                                                    redirects.replace(0); // reset
+                                                }
+                                                Err(e) => {
+                                                    let status = subject.page.content.to_status_failure();
+                                                    status.set_description(Some(&e.to_string()));
+                                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    subject.tab_page.set_loading(false);
+                                                    subject.tab_page.set_title(&status.title());
+                                                    redirects.replace(0); // reset
+                                                },
+                                            },
+                                        ),
+                                        "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                            // Final image size unknown, show loading widget
+                                            let status = subject.page.content.to_status_loading(
+                                                Some(Duration::from_secs(1)), // show if download time > 1 second
+                                            );
+
+                                            // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                            // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                            // show bytes count in loading widget, validate max size for incoming data
+                                            // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                            ggemini::gio::memory_input_stream::from_stream_async(
+                                                response.connection.stream(),
+                                                cancellable.clone(),
+                                                Priority::DEFAULT,
+                                                0x400, // 1024 bytes per chunk, optional step for images download tracking
+                                                0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
+                                                move |_, total|
+                                                status.set_description(Some(&format!("Download: {total} bytes"))),
+                                                {
+                                                    let subject = subject.clone();
+                                                    move |result| match result {
+                                                        Ok((memory_input_stream, _)) => {
+                                                            Pixbuf::from_stream_async(
+                                                                &memory_input_stream,
+                                                                Some(&cancellable),
+                                                                move |result| {
+                                                                    match result {
+                                                                        Ok(buffer) => {
+                                                                            subject.tab_page.set_title(&uri_to_title(&uri));
+                                                                            subject.page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                                        }
+                                                                        Err(e) => {
+                                                                            let status = subject.page.content.to_status_failure();
+                                                                            status.set_description(Some(e.message()));
+                                                                            subject.tab_page.set_title(&status.title());
+                                                                        }
+                                                                    }
+                                                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                                    subject.tab_page.set_loading(false);
+                                                                    redirects.replace(0); // reset
+                                                                },
+                                                            )
+                                                        }
+                                                        Err(e) => {
+                                                            let status = subject.page.content.to_status_failure();
+                                                            status.set_description(Some(&e.to_string()));
+                                                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                            subject.tab_page.set_loading(false);
+                                                            subject.tab_page.set_title(&status.title());
+                                                            redirects.replace(0); // reset
+                                                        }
+                                                    }
+                                                },
+                                            )
+                                        }
+                                        mime => {
+                                            let status = subject.page
+                                                .content
+                                                .to_status_mime(mime, Some((&subject.page.item_action, &uri)));
+                                            status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
+                                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                            subject.tab_page.set_loading(false);
+                                            subject.tab_page.set_title(&status.title());
+                                            redirects.replace(0); // reset
+                                        },
+                                    },
+                                    None => {
+                                        let status = subject.page.content.to_status_failure();
+                                        status.set_description(Some("MIME type not found"));
+                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                        subject.tab_page.set_loading(false);
+                                        subject.tab_page.set_title(&status.title());
+                                        redirects.replace(0); // reset
+                                    },
+                                }
+                            },
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
+                            Status::PermanentRedirect | Status::Redirect => {
+                                // Expected target URL in response meta
+                                match response.meta.data {
+                                    Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
+                                        Ok(absolute) => {
+                                            // Base donor scheme could be `titan`, rewrite new relative links resolved with `gemini`
+                                            // otherwise, keep original scheme to handle external redirect rules properly
+                                            // * in this case, `titan` scheme redirects unexpected
+                                            let scheme = absolute.scheme();
+                                            let target = Uri::build(
+                                                UriFlags::NONE,
+                                                &if "titan" == scheme {
+                                                    scheme.replace("titan", "gemini")
+                                                } else {
+                                                    scheme.to_string()
+                                                },
+                                                absolute.userinfo().as_deref(),
+                                                absolute.host().as_deref(),
+                                                absolute.port(),
+                                                absolute.path().as_str(),
+                                                absolute.query().as_deref(),
+                                                absolute.fragment().as_deref(),
+                                            );
+                                            // Increase client redirection counter
+                                            let total = redirects.take() + 1;
+                                            // Validate total redirects by protocol specification
+                                            if total > 5 {
+                                                let status = subject.page.content.to_status_failure();
+                                                status.set_description(Some("Redirection limit reached"));
+                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                subject.tab_page.set_loading(false);
+                                                subject.tab_page.set_title(&status.title());
+                                                redirects.replace(0); // reset
+
+                                            // Disallow external redirection by protocol restrictions
+                                            } else if "gemini" != target.scheme()
+                                                || uri.port() != target.port()
+                                                || uri.host() != target.host() {
+                                                    let status = subject.page.content.to_status_failure();
+                                                    status.set_description(Some("External redirects not allowed by protocol specification"));
+                                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                                    subject.tab_page.set_loading(false);
+                                                    subject.tab_page.set_title(&status.title());
+                                                    redirects.replace(0); // reset
+                                            // Valid
+                                            } else {
+                                                if matches!(response.meta.status, Status::PermanentRedirect) {
+                                                    subject.page.navigation
+                                                    .request
+                                                    .widget
+                                                    .entry
+                                                    .set_text(&uri.to_string());
+                                                }
+                                                redirects.replace(total);
+                                                subject.page.item_action.load.activate(Some(&target.to_string()), false);
                                             }
                                         }
-                                    },
-                                );
+                                        Err(e) => {
+                                            let status = subject.page.content.to_status_failure();
+                                            status.set_description(Some(&e.to_string()));
+                                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                            subject.tab_page.set_loading(false);
+                                            subject.tab_page.set_title(&status.title());
+                                            redirects.replace(0); // reset
+                                        }
+                                    }
+                                    None => {
+                                        let status = subject.page.content.to_status_failure();
+                                        status.set_description(Some("Redirection target not found"));
+                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                        subject.tab_page.set_loading(false);
+                                        subject.tab_page.set_title(&status.title());
+                                        redirects.replace(0); // reset
+                                    }
+                                }
+                            },
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
+                            Status::CertificateRequest |
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
+                            Status::CertificateUnauthorized |
+                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
+                            Status::CertificateInvalid => {
+                                let status = subject.page.content.to_status_identity();
+                                status.set_description(Some(&match response.meta.data {
+                                    Some(data) => data.to_string(),
+                                    None => response.meta.status.to_string(),
+                                }));
+
+                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                                subject.tab_page.set_loading(false);
+                                subject.tab_page.set_title(&status.title());
+                                redirects.replace(0); // reset
+                            }
+                            error => {
+                                let status = subject.page.content.to_status_failure();
+                                status.set_description(Some(&error.to_string()));
                                 subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
                                 subject.tab_page.set_loading(false);
                                 subject.tab_page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             },
-                            _ => match response.meta.mime {
-                                Some(mime) => match mime.as_str() {
-                                    "text/gemini" => Text::from_stream_async(
-                                        response.connection.stream(),
-                                        Priority::DEFAULT,
-                                        cancellable.clone(),
-                                        move |result| match result {
-                                            Ok(text) => {
-                                                let widget = if matches!(*feature, Feature::Source) {
-                                                    subject.page.content.to_text_source(&text.to_string())
-                                                } else {
-                                                    subject.page.content.to_text_gemini(&uri, &text.to_string())
-                                                };
-                                                subject.page.search.set(Some(widget.text_view));
-                                                subject.tab_page.set_title(&match widget.meta.title {
-                                                    Some(title) => title.into(), // @TODO
-                                                    None => uri_to_title(&uri),
-                                                });
-                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                subject.tab_page.set_loading(false);
-                                                subject.page.window_action
-                                                    .find
-                                                    .simple_action
-                                                    .set_enabled(true);
-                                                redirects.replace(0); // reset
-                                            }
-                                            Err(e) => {
-                                                let status = subject.page.content.to_status_failure();
-                                                status.set_description(Some(&e.to_string()));
-                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                subject.tab_page.set_loading(false);
-                                                subject.tab_page.set_title(&status.title());
-                                                redirects.replace(0); // reset
-                                            },
-                                        },
-                                    ),
-                                    "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                                        // Final image size unknown, show loading widget
-                                        let status = subject.page.content.to_status_loading(
-                                            Some(Duration::from_secs(1)), // show if download time > 1 second
-                                        );
-
-                                        // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                        // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                        // show bytes count in loading widget, validate max size for incoming data
-                                        // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                        ggemini::gio::memory_input_stream::from_stream_async(
-                                            response.connection.stream(),
-                                            cancellable.clone(),
-                                            Priority::DEFAULT,
-                                            0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                            0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                            move |_, total|
-                                            status.set_description(Some(&format!("Download: {total} bytes"))),
-                                            {
-                                                let subject = subject.clone();
-                                                move |result| match result {
-                                                    Ok((memory_input_stream, _)) => {
-                                                        Pixbuf::from_stream_async(
-                                                            &memory_input_stream,
-                                                            Some(&cancellable),
-                                                            move |result| {
-                                                                match result {
-                                                                    Ok(buffer) => {
-                                                                        subject.tab_page.set_title(&uri_to_title(&uri));
-                                                                        subject.page.content.to_image(&Texture::for_pixbuf(&buffer));
-                                                                    }
-                                                                    Err(e) => {
-                                                                        let status = subject.page.content.to_status_failure();
-                                                                        status.set_description(Some(e.message()));
-                                                                        subject.tab_page.set_title(&status.title());
-                                                                    }
-                                                                }
-                                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                                subject.tab_page.set_loading(false);
-                                                                redirects.replace(0); // reset
-                                                            },
-                                                        )
-                                                    }
-                                                    Err(e) => {
-                                                        let status = subject.page.content.to_status_failure();
-                                                        status.set_description(Some(&e.to_string()));
-                                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                        subject.tab_page.set_loading(false);
-                                                        subject.tab_page.set_title(&status.title());
-                                                        redirects.replace(0); // reset
-                                                    }
-                                                }
-                                            },
-                                        )
-                                    }
-                                    mime => {
-                                        let status = subject.page
-                                            .content
-                                            .to_status_mime(mime, Some((&subject.page.item_action, &uri)));
-                                        status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                        subject.tab_page.set_loading(false);
-                                        subject.tab_page.set_title(&status.title());
-                                        redirects.replace(0); // reset
-                                    },
-                                },
-                                None => {
-                                    let status = subject.page.content.to_status_failure();
-                                    status.set_description(Some("MIME type not found"));
-                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                    subject.tab_page.set_loading(false);
-                                    subject.tab_page.set_title(&status.title());
-                                    redirects.replace(0); // reset
-                                },
-                            }
-                        },
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        Status::PermanentRedirect | Status::Redirect => {
-                            // Expected target URL in response meta
-                            match response.meta.data {
-                                Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                    Ok(absolute) => {
-                                        // Base donor scheme could be `titan`, rewrite new relative links resolved with `gemini`
-                                        // otherwise, keep original scheme to handle external redirect rules properly
-                                        // * in this case, `titan` scheme redirects unexpected
-                                        let scheme = absolute.scheme();
-                                        let target = Uri::build(
-                                            UriFlags::NONE,
-                                            &if "titan" == scheme {
-                                                scheme.replace("titan", "gemini")
-                                            } else {
-                                                scheme.to_string()
-                                            },
-                                            absolute.userinfo().as_deref(),
-                                            absolute.host().as_deref(),
-                                            absolute.port(),
-                                            absolute.path().as_str(),
-                                            absolute.query().as_deref(),
-                                            absolute.fragment().as_deref(),
-                                        );
-                                        // Increase client redirection counter
-                                        let total = redirects.take() + 1;
-                                        // Validate total redirects by protocol specification
-                                        if total > 5 {
-                                            let status = subject.page.content.to_status_failure();
-                                            status.set_description(Some("Redirection limit reached"));
-                                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                            subject.tab_page.set_loading(false);
-                                            subject.tab_page.set_title(&status.title());
-                                            redirects.replace(0); // reset
-
-                                        // Disallow external redirection by protocol restrictions
-                                        } else if "gemini" != target.scheme()
-                                             || uri.port() != target.port()
-                                             || uri.host() != target.host() {
-                                                let status = subject.page.content.to_status_failure();
-                                                status.set_description(Some("External redirects not allowed by protocol specification"));
-                                                subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                                subject.tab_page.set_loading(false);
-                                                subject.tab_page.set_title(&status.title());
-                                                redirects.replace(0); // reset
-                                        // Valid
-                                        } else {
-                                            if matches!(response.meta.status, Status::PermanentRedirect) {
-                                                subject.page.navigation
-                                                .request
-                                                .widget
-                                                .entry
-                                                .set_text(&uri.to_string());
-                                            }
-                                            redirects.replace(total);
-                                            subject.page.item_action.load.activate(Some(&target.to_string()), false);
-                                        }
-                                    }
-                                    Err(e) => {
-                                        let status = subject.page.content.to_status_failure();
-                                        status.set_description(Some(&e.to_string()));
-                                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                        subject.tab_page.set_loading(false);
-                                        subject.tab_page.set_title(&status.title());
-                                        redirects.replace(0); // reset
-                                    }
-                                }
-                                None => {
-                                    let status = subject.page.content.to_status_failure();
-                                    status.set_description(Some("Redirection target not found"));
-                                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                                    subject.tab_page.set_loading(false);
-                                    subject.tab_page.set_title(&status.title());
-                                    redirects.replace(0); // reset
-                                }
-                            }
-                        },
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                        Status::CertificateRequest |
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                        Status::CertificateUnauthorized |
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                        Status::CertificateInvalid => {
-                            let status = subject.page.content.to_status_identity();
-                            status.set_description(Some(&match response.meta.data {
-                                Some(data) => data.to_string(),
-                                None => response.meta.status.to_string(),
-                            }));
-
-                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                            subject.tab_page.set_loading(false);
-                            subject.tab_page.set_title(&status.title());
-                            redirects.replace(0); // reset
                         }
-                        error => {
-                            let status = subject.page.content.to_status_failure();
-                            status.set_description(Some(&error.to_string()));
-                            subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                            subject.tab_page.set_loading(false);
-                            subject.tab_page.set_title(&status.title());
-                            redirects.replace(0); // reset
-                        },
                     }
-                }
-                Err(e) => {
-                    let status = subject.page.content.to_status_failure();
-                    status.set_description(Some(&e.to_string()));
-                    subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
-                    subject.tab_page.set_loading(false);
-                    subject.tab_page.set_title(&status.title());
-                    redirects.replace(0); // reset
+                    Err(e) => {
+                        let status = subject.page.content.to_status_failure();
+                        status.set_description(Some(&e.to_string()));
+                        subject.page.navigation.request.widget.entry.set_progress_fraction(0.0);
+                        subject.tab_page.set_loading(false);
+                        subject.tab_page.set_title(&status.title());
+                        redirects.replace(0); // reset
+                    }
                 }
             }
         },
