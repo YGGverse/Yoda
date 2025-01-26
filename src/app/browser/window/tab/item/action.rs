@@ -2,12 +2,14 @@ mod history;
 mod home;
 mod ident;
 mod load;
+mod reload;
 
 use gtk::gio::SimpleAction;
 use history::History;
 use home::Home;
 use ident::Ident;
 use load::Load;
+use reload::Reload;
 
 use std::rc::Rc;
 
@@ -17,6 +19,7 @@ pub struct Action {
     pub home: SimpleAction,
     pub ident: Rc<Ident>,
     pub load: Rc<Load>,
+    pub reload: SimpleAction,
 }
 
 impl Default for Action {
@@ -33,6 +36,7 @@ impl Action {
         let ident = Rc::new(Ident::new());
         let load = Rc::new(Load::new());
         let home = SimpleAction::home();
+        let reload = SimpleAction::reload();
 
         let history = Rc::new(History::build({
             let load = load.clone();
@@ -41,6 +45,7 @@ impl Action {
 
         Self {
             history,
+            reload,
             home,
             ident,
             load,

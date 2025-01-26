@@ -59,6 +59,7 @@ impl Item {
         let action = Rc::new(Action::new());
 
         tab_action.simple_action_group.add_action(&action.home);
+        tab_action.simple_action_group.add_action(&action.reload);
 
         tab_action
             .simple_action_group
@@ -133,6 +134,14 @@ impl Item {
             }
         });
 
+        action.reload.connect_activate({
+            let page = page.clone();
+            let client = client.clone();
+            move |_, _| {
+                client.handle(&page.navigation.request.widget.entry.text(), false);
+            }
+        });
+
         // Handle immediately on request
         if let Some(text) = request {
             page.navigation.request.widget.entry.set_text(text);
@@ -158,6 +167,10 @@ impl Item {
             .set_enabled(self.page.navigation.request.home().is_some_and(|home| {
                 home.to_string() != self.page.navigation.request.widget.entry.text()
             }));
+
+        self.action
+            .reload
+            .set_enabled(!self.page.navigation.request.widget.entry.text().is_empty());
 
         // Update child components
         self.page.update();
