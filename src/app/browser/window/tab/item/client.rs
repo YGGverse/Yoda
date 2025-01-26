@@ -190,7 +190,7 @@ fn search(query: &str) -> Uri {
         UriFlags::NONE,
         "gemini",
         None,
-        Some("tlgs.one"),
+        Some("kennedy.gemi.dev"), // tlgs.one was replaced by response time issue
         -1,
         "/search",
         Some(&Uri::escape_string(query, None, false)),
