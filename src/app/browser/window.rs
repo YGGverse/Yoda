@@ -158,7 +158,6 @@ impl Window {
             }
             Err(e) => return Err(e.to_string()),
         }
-
         Ok(())
     }
 

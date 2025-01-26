@@ -15,7 +15,7 @@ use super::{Action as WindowAction, BrowserAction, Position};
 use crate::Profile;
 use gtk::{
     glib::{DateTime, GString, Propagation},
-    prelude::{EditableExt, WidgetExt},
+    prelude::{ActionExt, EditableExt, WidgetExt},
 };
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
@@ -123,15 +123,30 @@ impl Tab {
         });
 
         widget.tab_view.connect_selected_page_notify({
+            let window_action = window_action.clone();
             let index = index.clone();
             move |this| {
                 if let Some(page) = this.selected_page() {
                     if let Some(id) = page.keyword() {
                         if let Some(item) = index.borrow().get(&id) {
-                            item.update();
+                            window_action
+                                .home
+                                .simple_action
+                                .set_enabled(item.action.home.is_enabled());
+                            window_action
+                                .reload
+                                .simple_action
+                                .set_enabled(item.action.reload.is_enabled());
+                            window_action
+                                .history_back
+                                .simple_action
+                                .set_enabled(item.action.history.back.is_enabled());
+                            window_action
+                                .history_forward
+                                .simple_action
+                                .set_enabled(item.action.history.forward.is_enabled());
                         }
                     }
-                    // Reset attention decorator
                     page.set_needs_attention(false);
                 }
             }
