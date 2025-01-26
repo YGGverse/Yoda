@@ -3,6 +3,7 @@ mod append;
 use super::WindowAction;
 use adw::{TabBar, TabView};
 use append::Append;
+use gtk::Button;
 use std::rc::Rc;
 
 pub trait Tab {
@@ -14,7 +15,7 @@ impl Tab for TabBar {
         TabBar::builder()
             .autohide(false)
             .expand_tabs(false)
-            .end_action_widget(&Append::build(window_action).widget.button) // @TODO find solution to append after tabs
+            .end_action_widget(&Button::append(window_action)) // @TODO find solution to append after tabs
             .view(view)
             .build()
     }

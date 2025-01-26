@@ -1,21 +1,25 @@
-mod widget;
-
-use widget::Widget;
-
 use super::WindowAction;
+use gtk::{prelude::ButtonExt, Align, Button};
 use std::rc::Rc;
 
-pub struct Append {
-    pub widget: Rc<Widget>,
+pub trait Append {
+    fn append(window_action: &Rc<WindowAction>) -> Self;
 }
 
-impl Append {
-    // Constructors
+impl Append for Button {
+    fn append(window_action: &Rc<WindowAction>) -> Self {
+        let button = Button::builder()
+            .icon_name("tab-new-symbolic")
+            .css_classes(["flat"])
+            .valign(Align::Center)
+            .tooltip_text("New tab")
+            .build();
 
-    /// Build new `Self`
-    pub fn build(window_action: &Rc<WindowAction>) -> Self {
-        Self {
-            widget: Rc::new(Widget::build(window_action)),
-        }
+        button.connect_clicked({
+            let window_action = window_action.clone();
+            move |_| window_action.append.activate_default_once()
+        });
+
+        button
     }
 }
