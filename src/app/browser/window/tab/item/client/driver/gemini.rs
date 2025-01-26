@@ -176,7 +176,7 @@ fn handle(
             let subject = subject.clone();
             let redirects = redirects.clone();
             move |result| {
-                // Remove input forms when redirection expected has been not applied (e.g. failure status)
+                // Remove input forms when redirection expected has not been applied (e.g. failure status)
                 // @TODO implement input data recovery on error (it's also available before unset, but reference lost at this point)
                 subject.page.input.unset();
 
