@@ -38,10 +38,10 @@ impl Navigation {
     ) -> Self {
         // init children components
 
-        let home = Button::home(window_action);
         let history = Box::history((window_action, tab_action, item_action));
         let reload = Button::reload(window_action);
         let request = Rc::new(Request::build((browser_action, item_action)));
+        let home = Button::home((window_action, tab_action, item_action), &request);
         let bookmark = Button::bookmark(window_action);
 
         // init main widget
@@ -79,11 +79,6 @@ impl Navigation {
                 .identity
                 .get(&self.request.strip_prefix())
                 .is_some(),
-        );
-        self.home.set_sensitive(
-            self.request
-                .home()
-                .is_some_and(|home| home.to_string() != request),
         );
     }
 

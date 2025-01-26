@@ -56,8 +56,9 @@ impl Item {
         let id = Rc::new(uuid_string_random());
 
         // Init components
-
         let action = Rc::new(Action::new());
+
+        tab_action.simple_action_group.add_action(&action.home);
 
         tab_action
             .simple_action_group
@@ -85,16 +86,20 @@ impl Item {
         // Update tab loading indicator
         let client = Rc::new(Client::init(&page, &widget.tab_page));
 
-        // Init events
-
-        if let Some(text) = request {
-            page.navigation.request.widget.entry.set_text(text);
-            if is_load {
-                client.handle(text, true);
+        // Connect events
+        action.home.connect_activate({
+            let client = client.clone();
+            let page = page.clone();
+            move |this, _| {
+                this.set_enabled(false);
+                if let Some(uri) = page.navigation.request.home() {
+                    let request = uri.to_string();
+                    page.navigation.request.widget.entry.set_text(&request);
+                    client.handle(&request, true);
+                }
             }
-        }
+        });
 
-        // Show identity selection for item
         action.ident.connect_activate({
             let browser_action = browser_action.clone();
             let page = page.clone();
@@ -102,9 +107,7 @@ impl Item {
             let profile = profile.clone();
             let window_action = window_action.clone();
             move || {
-                // Request should match valid URI for all drivers supported
                 if let Some(uri) = page.navigation.request.uri() {
-                    // Route by scheme
                     let scheme = uri.scheme();
                     if scheme == "gemini" || scheme == "titan" {
                         return identity::default(
@@ -115,12 +118,10 @@ impl Item {
                         .present(Some(&parent));
                     }
                 }
-                // Show dialog with unsupported request message
                 identity::unsupported().present(Some(&parent));
             }
         });
 
-        // Load new request for item
         action.load.connect_activate({
             let page = page.clone();
             let client = client.clone();
@@ -132,6 +133,13 @@ impl Item {
             }
         });
 
+        // Handle immediately on request
+        if let Some(text) = request {
+            page.navigation.request.widget.entry.set_text(text);
+            if is_load {
+                client.handle(text, true);
+            }
+        }
         // Done
         Self {
             id,
@@ -144,6 +152,13 @@ impl Item {
 
     // Actions
     pub fn update(&self) {
+        // Update self actions
+        self.action
+            .home
+            .set_enabled(self.page.navigation.request.home().is_some_and(|home| {
+                home.to_string() != self.page.navigation.request.widget.entry.text()
+            }));
+
         // Update child components
         self.page.update();
     }
