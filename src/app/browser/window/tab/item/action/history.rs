@@ -69,11 +69,11 @@ impl History {
         self.forward.set_enabled(self.forward(false).is_some());
     }
 
-    pub fn back(&self, follow_to_index: bool) -> Option<GString> {
-        self.memory.back(follow_to_index)
+    pub fn back(&self, is_follow_to_index: bool) -> Option<GString> {
+        self.memory.back(is_follow_to_index)
     }
 
-    pub fn forward(&self, follow_to_index: bool) -> Option<GString> {
-        self.memory.next(follow_to_index)
+    pub fn forward(&self, is_follow_to_index: bool) -> Option<GString> {
+        self.memory.next(is_follow_to_index)
     }
 }

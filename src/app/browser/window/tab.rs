@@ -11,10 +11,7 @@ pub use item::Item;
 use menu::Menu;
 use widget::Widget;
 
-use crate::app::browser::{
-    window::action::{Action as WindowAction, Position},
-    Action as BrowserAction,
-};
+use super::{Action as WindowAction, BrowserAction, Position};
 use crate::Profile;
 use gtk::{
     glib::{DateTime, GString, Propagation},

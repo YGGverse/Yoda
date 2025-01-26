@@ -5,17 +5,14 @@ mod identity;
 pub mod page;
 mod widget;
 
-use crate::app::browser::{
-    window::action::{Action as WindowAction, Position},
-    Action as BrowserAction,
-};
+use super::{Action as TabAction, BrowserAction, Position, WindowAction};
 use crate::Profile;
 use action::Action;
 use adw::TabView;
 use client::Client;
 use gtk::{
     glib::{uuid_string_random, GString},
-    prelude::{ActionExt, ActionMapExt, Cast, EditableExt},
+    prelude::{ActionMapExt, Cast, EditableExt},
 };
 use page::Page;
 use sqlite::Transaction;
@@ -44,7 +41,7 @@ impl Item {
         (browser_action, window_action, tab_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
-            &Rc<super::Action>,
+            &Rc<TabAction>,
         ),
         (position, request, is_pinned, is_selected, is_attention, is_load): (
             Position,
@@ -73,11 +70,7 @@ impl Item {
         let page = Rc::new(Page::build(
             &id,
             profile,
-            (browser_action, window_action, &action),
-            (
-                &format!("{}.{}", &tab_action.id, action.history.back.name()),
-                &format!("{}.{}", &tab_action.id, action.history.forward.name()),
-            ),
+            (browser_action, window_action, tab_action, &action),
         ));
 
         let widget = Rc::new(Widget::build(

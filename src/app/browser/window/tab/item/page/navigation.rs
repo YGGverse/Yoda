@@ -6,7 +6,7 @@ mod reload;
 mod request;
 mod widget;
 
-use super::{BrowserAction, ItemAction, Profile, WindowAction};
+use super::{BrowserAction, ItemAction, Profile, TabAction, WindowAction};
 use bookmark::Bookmark;
 use gtk::{prelude::WidgetExt, Box, Button};
 use history::History;
@@ -29,17 +29,17 @@ pub struct Navigation {
 impl Navigation {
     pub fn build(
         profile: &Rc<Profile>,
-        (browser_action, window_action, item_action): (
+        (browser_action, window_action, tab_action, item_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
+            &Rc<TabAction>,
             &Rc<ItemAction>,
         ),
-        (back_action_name, forward_action_name): (&str, &str),
     ) -> Self {
         // init children components
 
         let home = Button::home(window_action);
-        let history = Box::history(back_action_name, forward_action_name);
+        let history = Box::history((window_action, tab_action, item_action));
         let reload = Button::reload(window_action);
         let request = Rc::new(Request::build((browser_action, item_action)));
         let bookmark = Button::bookmark(window_action);

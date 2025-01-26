@@ -13,7 +13,7 @@ use navigation::Navigation;
 use search::Search;
 use widget::Widget;
 
-use super::{Action as ItemAction, BrowserAction, Profile, WindowAction};
+use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
 
 use gtk::{glib::GString, prelude::EditableExt};
 use sqlite::Transaction;
@@ -40,12 +40,12 @@ impl Page {
     pub fn build(
         id: &Rc<GString>,
         profile: &Rc<Profile>,
-        (browser_action, window_action, item_action): (
+        (browser_action, window_action, tab_action, item_action): (
             &Rc<BrowserAction>,
             &Rc<WindowAction>,
+            &Rc<TabAction>,
             &Rc<ItemAction>,
         ),
-        (back_action_name, forward_action_name): (&str, &str),
     ) -> Self {
         // Init components
         let content = Rc::new(Content::build((window_action, item_action)));
@@ -54,8 +54,7 @@ impl Page {
 
         let navigation = Rc::new(Navigation::build(
             profile,
-            (browser_action, window_action, item_action),
-            (back_action_name, forward_action_name),
+            (browser_action, window_action, tab_action, item_action),
         ));
 
         let input = Rc::new(Input::new());

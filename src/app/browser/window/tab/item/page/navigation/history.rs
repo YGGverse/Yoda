@@ -4,14 +4,16 @@ pub mod forward;
 pub use back::Back;
 pub use forward::Forward;
 
+use super::{ItemAction, TabAction, WindowAction};
 use gtk::{prelude::BoxExt, Box, Button, Orientation};
+use std::rc::Rc;
 
 pub trait History {
-    fn history(back_action_name: &str, forward_action_name: &str) -> Self;
+    fn history(action: (&Rc<WindowAction>, &Rc<TabAction>, &Rc<ItemAction>)) -> Self;
 }
 
 impl History for Box {
-    fn history(back_action_name: &str, forward_action_name: &str) -> Self {
+    fn history(action: (&Rc<WindowAction>, &Rc<TabAction>, &Rc<ItemAction>)) -> Self {
         let g_box = Box::builder()
             .orientation(Orientation::Horizontal)
             .css_classes([
@@ -19,8 +21,8 @@ impl History for Box {
             ])
             .build();
 
-        g_box.append(&Button::back(back_action_name));
-        g_box.append(&Button::forward(forward_action_name));
+        g_box.append(&Button::back(action));
+        g_box.append(&Button::forward(action));
         g_box
     }
 }
