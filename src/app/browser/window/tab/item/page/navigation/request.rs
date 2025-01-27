@@ -57,7 +57,7 @@ impl Request {
                 item_action.reload.set_enabled(!this.text().is_empty());
                 item_action
                     .home
-                    .set_enabled(home(uri(&this.text())).is_some());
+                    .set_enabled(uri(&this.text()).is_some_and(|uri| uri.path().len() > 1));
 
                 // Update primary icon
                 this.first_child().unwrap().remove_css_class("success"); // @TODO handle
