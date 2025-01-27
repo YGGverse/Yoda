@@ -26,6 +26,17 @@ impl Bookmark for Button {
             .tooltip_text("Bookmark")
             .build();
 
+        action.bookmark.simple_action.connect_activate({
+            let button = button.clone();
+            let profile = profile.clone();
+            let request = request.clone();
+            move |_, _| {
+                button.set_icon_name(icon_name(
+                    profile.bookmark.get(&request.entry.text()).is_ok(),
+                ))
+            }
+        }); // @TODO use local action
+
         button.connect_clicked(move |this| this.set_icon_name(icon_name(has_bookmark)));
 
         button
