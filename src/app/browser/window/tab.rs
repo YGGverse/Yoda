@@ -78,7 +78,7 @@ impl Tab {
                             .simple_action
                             .set_enabled(item.action.reload.is_enabled());
 
-                        // Update target (for all actions)
+                        // Update target state (for all actions)
                         action.change_state(Some(tab_view.page_position(tab_page)));
                     })
                 });
