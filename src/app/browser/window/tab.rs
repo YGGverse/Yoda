@@ -84,14 +84,6 @@ impl Tab {
             }
         });
 
-        tab_view.connect_page_attached({
-            let window_action = window_action.clone();
-            let index = index.clone();
-            move |tab_view, _, _| {
-                update_actions(tab_view, tab_view.selected_page(), &index, &window_action)
-            }
-        });
-
         tab_view.connect_selected_page_notify({
             let window_action = window_action.clone();
             let index = index.clone();
@@ -151,6 +143,13 @@ impl Tab {
         self.index
             .borrow_mut()
             .insert(item.widget.tab_page.clone(), item.clone());
+
+        update_actions(
+            &self.tab_view,
+            self.tab_view.selected_page(),
+            &self.index,
+            &self.window_action,
+        );
 
         item
     }
