@@ -58,7 +58,7 @@ impl Page {
         let input = Rc::new(Input::new());
 
         let widget = Rc::new(Widget::build(
-            &navigation.widget.g_box,
+            &navigation.g_box,
             &content.g_box,
             &search.g_box,
             &input.clamp,

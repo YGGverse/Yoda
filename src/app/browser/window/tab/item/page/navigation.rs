@@ -4,18 +4,19 @@ mod history;
 mod home;
 mod reload;
 mod request;
-mod widget;
 
 use super::{ItemAction, Profile, TabAction, WindowAction};
 use bookmark::Bookmark;
-use gtk::{Box, Button};
+use gtk::{prelude::BoxExt, Box, Button, Orientation};
 use history::History;
 use home::Home;
 use reload::Reload;
 use request::Request;
 use sqlite::Transaction;
 use std::rc::Rc;
-use widget::Widget;
+
+const MARGIN: i32 = 6;
+const SPACING: i32 = 6;
 
 pub struct Navigation {
     pub profile: Rc<Profile>,
@@ -23,7 +24,7 @@ pub struct Navigation {
     pub reload: Button,
     pub bookmark: Button,
     pub request: Rc<Request>,
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Navigation {
@@ -43,23 +44,27 @@ impl Navigation {
         let home = Button::home((window_action, tab_action, item_action), &request);
         let bookmark = Button::bookmark(window_action, profile, &request);
 
-        // init main widget
-        let widget = Rc::new(Widget::build(
-            &home,
-            &history,
-            &reload,
-            &request.entry, // @TODO
-            &bookmark,
-        ));
+        let g_box = Box::builder()
+            .orientation(Orientation::Horizontal)
+            .spacing(SPACING)
+            .margin_start(MARGIN)
+            .margin_end(MARGIN)
+            .margin_bottom(MARGIN)
+            .build();
 
-        // done
+        g_box.append(&home);
+        g_box.append(&history);
+        g_box.append(&reload);
+        g_box.append(&request.entry); // @TODO
+        g_box.append(&bookmark);
+
         Self {
             profile: profile.clone(),
             home,
             request,
             reload,
             bookmark,
-            widget,
+            g_box,
         }
     }
 
