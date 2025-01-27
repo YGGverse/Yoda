@@ -159,8 +159,8 @@ impl Tab {
     /// * this action includes `pinned` pages, to prevent that:
     ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
     ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
-    pub fn close(&self, page_position: Option<i32>) {
-        if let Some(page) = match page_position {
+    pub fn close(&self, tab_page_position: Option<i32>) {
+        if let Some(page) = match tab_page_position {
             Some(value) => Some(self.tab_view.nth_page(value)),
             None => self.tab_view.selected_page(),
         } {
@@ -188,23 +188,23 @@ impl Tab {
     }
 
     // Toggle search widget
-    pub fn find(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn find(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.page.find();
         }
     }
 
     // Save page at given `position`, `None` to save selected page (if available)
-    pub fn save_as(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn save_as(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.page.navigation.request.to_download();
             self.window_action.reload.activate();
         }
     }
 
     // View source for page at given `position`, `None` to use selected page (if available)
-    pub fn source(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn source(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.page.navigation.request.to_source();
             self.window_action.reload.activate();
         }
@@ -212,8 +212,8 @@ impl Tab {
 
     /// Toggle `Bookmark` in current `Profile` for `Page` at given `position` (current page on `None`)
     /// * return `true` on bookmark created, `false` on deleted; `Error` otherwise.
-    pub fn bookmark(&self, page_position: Option<i32>) -> Result<bool, Error> {
-        if let Some(item) = self.item(page_position) {
+    pub fn bookmark(&self, tab_page_position: Option<i32>) -> Result<bool, Error> {
+        if let Some(item) = self.item(tab_page_position) {
             return match item.page.bookmark() {
                 Ok(result) => Ok(result),
                 Err(_) => Err(Error::Bookmark),
@@ -223,8 +223,8 @@ impl Tab {
     }
 
     /// Toggle pin for page at given `position`, `None` to pin selected page (if available)
-    pub fn pin(&self, page_position: Option<i32>) {
-        if let Some(page) = match page_position {
+    pub fn pin(&self, tab_page_position: Option<i32>) {
+        if let Some(page) = match tab_page_position {
             Some(value) => Some(self.tab_view.nth_page(value)),
             None => self.tab_view.selected_page(),
         } {
@@ -232,8 +232,8 @@ impl Tab {
         }
     }
 
-    pub fn page_home(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn page_home(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             if let Some(home) = item.page.navigation.request.home() {
                 let home = home.to_string();
                 item.page.navigation.request.entry.set_text(&home);
@@ -242,21 +242,21 @@ impl Tab {
         }
     }
 
-    pub fn page_history_back(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn page_history_back(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.action.history.back(true);
         }
     }
 
-    pub fn page_history_forward(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn page_history_forward(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.action.history.forward(true);
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
-    pub fn page_reload(&self, page_position: Option<i32>) {
-        if let Some(item) = self.item(page_position) {
+    pub fn page_reload(&self, tab_page_position: Option<i32>) {
+        if let Some(item) = self.item(tab_page_position) {
             item.client
                 .handle(&item.page.navigation.request.entry.text(), true);
         }
@@ -357,8 +357,8 @@ impl Tab {
         // @TODO other/child features..
     }
 
-    fn item(&self, page_position: Option<i32>) -> Option<Rc<Item>> {
-        if let Some(tab_page) = match page_position {
+    fn item(&self, tab_page_position: Option<i32>) -> Option<Rc<Item>> {
+        if let Some(tab_page) = match tab_page_position {
             Some(value) => Some(self.tab_view.nth_page(value)),
             None => self.tab_view.selected_page(),
         } {
