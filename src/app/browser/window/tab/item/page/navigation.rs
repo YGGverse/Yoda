@@ -141,8 +141,8 @@ impl Navigation {
         self.request.set_text(value);
     }
 
-    pub fn set_progress_fraction(&self, fraction: f64) {
-        self.request.set_progress_fraction(fraction);
+    pub fn set_progress_fraction(&self, value: f64) {
+        self.request.set_progress_fraction(value);
     }
 
     pub fn to_download(&self) {
