@@ -70,7 +70,7 @@ impl Gemini {
     // Actions
 
     pub fn handle(&self, uri: Uri, feature: Rc<Feature>, cancellable: Cancellable) {
-        use ggemini::client::connection::request::*;
+        use ggemini::client::connection::Request;
 
         match uri.scheme().as_str() {
             "gemini" => handle(
