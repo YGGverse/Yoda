@@ -11,16 +11,16 @@ use std::rc::Rc;
 // Config options
 
 const LABEL_MAX_LENGTH: usize = 28;
-pub struct Menu {
-    pub menu_button: MenuButton,
+pub trait Menu {
+    fn menu(action: (&Rc<BrowserAction>, &Rc<WindowAction>), profile: &Rc<Profile>) -> Self;
 }
 
 #[rustfmt::skip] // @TODO template builder?
-impl Menu {
+impl Menu for MenuButton {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
+     fn menu(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
         profile: &Rc<Profile>,
     ) -> Self {
@@ -252,10 +252,7 @@ impl Menu {
                 }
             });
 
-        // Result
-        Self {
-            menu_button
-        }
+        menu_button
     }
 }
 
