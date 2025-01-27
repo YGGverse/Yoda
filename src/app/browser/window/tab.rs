@@ -60,7 +60,7 @@ impl Tab {
                 //   as it will be updated on the next init for new tab selected
                 tab_page.map(|tab_page| {
                     index.borrow().get(tab_page).map(|item| {
-                        // Update actions status
+                        // Update enabled status (for some actions)
                         action
                             .history_back
                             .simple_action
@@ -78,20 +78,8 @@ impl Tab {
                             .simple_action
                             .set_enabled(item.action.reload.is_enabled());
 
-                        // Update actions target
-                        let state = Some(tab_view.page_position(tab_page));
-
-                        action.bookmark.change_state(state);
-                        action.close_all.change_state(state);
-                        action.close.change_state(state);
-                        action.find.change_state(state);
-                        action.history_back.change_state(state);
-                        action.history_forward.change_state(state);
-                        action.home.change_state(state);
-                        action.pin.change_state(state);
-                        action.reload.change_state(state);
-                        action.save_as.change_state(state);
-                        action.source.change_state(state);
+                        // Update target (for all actions)
+                        action.change_state(Some(tab_view.page_position(tab_page)));
                     })
                 });
             }

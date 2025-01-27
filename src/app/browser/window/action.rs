@@ -122,4 +122,20 @@ impl Action {
             simple_action_group,
         }
     }
+
+    /// Update state [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) for child members
+    /// * useful on popover menu init
+    pub fn change_state(&self, state: Option<i32>) {
+        self.bookmark.change_state(state);
+        self.close_all.change_state(state);
+        self.close.change_state(state);
+        self.find.change_state(state);
+        self.history_back.change_state(state);
+        self.history_forward.change_state(state);
+        self.home.change_state(state);
+        self.pin.change_state(state);
+        self.reload.change_state(state);
+        self.save_as.change_state(state);
+        self.source.change_state(state);
+    }
 }
