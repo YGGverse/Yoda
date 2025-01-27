@@ -19,7 +19,6 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Navigation {
-    pub profile: Rc<Profile>,
     pub home: Button,
     pub reload: Button,
     pub bookmark: Button,
@@ -59,7 +58,6 @@ impl Navigation {
         g_box.append(&bookmark);
 
         Self {
-            profile: profile.clone(),
             home,
             request,
             reload,
