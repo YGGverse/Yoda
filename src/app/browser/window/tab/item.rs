@@ -10,7 +10,7 @@ use crate::Profile;
 use action::Action;
 use adw::TabView;
 use client::Client;
-use gtk::prelude::{ActionMapExt, Cast, EditableExt};
+use gtk::prelude::{ActionMapExt, Cast};
 use page::Page;
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -84,7 +84,7 @@ impl Item {
                 this.set_enabled(false);
                 if let Some(uri) = page.navigation.home() {
                     let request = uri.to_string();
-                    page.navigation.request.set_text(&request);
+                    page.navigation.set_request(&request);
                     client.handle(&request, true);
                 }
             }
@@ -112,7 +112,7 @@ impl Item {
             let client = client.clone();
             move |request, is_history| {
                 if let Some(text) = request {
-                    page.navigation.request.set_text(&text);
+                    page.navigation.set_request(&text);
                     client.handle(&text, is_history);
                 }
             }
@@ -122,13 +122,13 @@ impl Item {
             let page = page.clone();
             let client = client.clone();
             move |_, _| {
-                client.handle(&page.navigation.request.text(), false);
+                client.handle(&page.navigation.request(), false);
             }
         });
 
         // Handle immediately on request
         if let Some(text) = request {
-            page.navigation.request.set_text(text);
+            page.navigation.set_request(text);
             if is_load {
                 client.handle(text, true);
             }

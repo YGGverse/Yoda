@@ -2,7 +2,7 @@ use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
     glib::{gformat, GString, Uri},
-    prelude::{ActionExt, EditableExt, ToVariant},
+    prelude::{ActionExt, ToVariant},
     Align, MenuButton,
 };
 use indexmap::IndexMap;
@@ -210,7 +210,7 @@ impl Menu for MenuButton {
                     // Recently closed history
                     main_history_tab.remove_all();
                     for item in profile.history.memory.tab.recent() {
-                        let item_request = item.page.navigation.request.text(); // @TODO restore entire `Item`
+                        let item_request = item.page.navigation.request(); // @TODO restore entire `Item`
                         let menu_item = gio::MenuItem::new(Some(&ellipsize(&item_request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",

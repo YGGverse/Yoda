@@ -9,7 +9,7 @@ use super::{ItemAction, Profile, TabAction, WindowAction};
 use bookmark::Bookmark;
 use gtk::{
     glib::{GString, Uri},
-    prelude::{BoxExt, EditableExt, WidgetExt},
+    prelude::{BoxExt, EditableExt, EntryExt, WidgetExt},
     Box, Button, Entry, Orientation,
 };
 use history::History;
@@ -23,10 +23,10 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Navigation {
-    pub home: Button,
-    pub reload: Button,
-    pub bookmark: Button,
-    pub request: Entry,
+    //home: Button,
+    //reload: Button,
+    //bookmark: Button,
+    request: Entry,
     pub g_box: Box,
 }
 
@@ -62,10 +62,10 @@ impl Navigation {
         g_box.append(&bookmark);
 
         Self {
-            home,
+            //home,
             request,
-            reload,
-            bookmark,
+            //reload,
+            //bookmark,
             g_box,
         }
     }
@@ -133,6 +133,16 @@ impl Navigation {
 
     pub fn grab_focus(&self) -> bool {
         self.request.grab_focus()
+    }
+
+    // Setters
+
+    pub fn set_request(&self, value: &str) {
+        self.request.set_text(value);
+    }
+
+    pub fn set_progress_fraction(&self, fraction: f64) {
+        self.request.set_progress_fraction(fraction);
     }
 
     pub fn to_download(&self) {

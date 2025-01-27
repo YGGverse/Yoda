@@ -9,7 +9,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{ActionExt, CancellableExt, EntryExt},
+    prelude::{ActionExt, CancellableExt},
 };
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
@@ -58,11 +58,7 @@ impl Client {
         self.subject.page.search.unset();
         self.subject.page.input.unset();
         self.subject.tab_page.set_title("Loading..");
-        self.subject
-            .page
-            .navigation
-            .request
-            .set_progress_fraction(0.1);
+        self.subject.page.navigation.set_progress_fraction(0.1);
 
         self.subject.tab_page.set_loading(true);
 
@@ -86,7 +82,7 @@ impl Client {
                                 "Scheme `{scheme}` yet not supported"
                             )));
                             subject.tab_page.set_title(&status.title());
-                            subject.page.navigation.request.set_progress_fraction(0.0);
+                            subject.page.navigation.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
                         }
                     },

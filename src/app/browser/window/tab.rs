@@ -12,7 +12,7 @@ use error::Error;
 use gtk::{
     gio::Icon,
     glib::{DateTime, Propagation},
-    prelude::{ActionExt, EditableExt},
+    prelude::ActionExt,
 };
 pub use item::Item;
 use menu::Menu;
@@ -235,7 +235,7 @@ impl Tab {
         if let Some(item) = self.item(tab_page_position) {
             if let Some(home) = item.page.navigation.home() {
                 let home = home.to_string();
-                item.page.navigation.request.set_text(&home);
+                item.page.navigation.set_request(&home);
                 item.client.handle(&home, true);
             }
         }
