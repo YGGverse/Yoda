@@ -67,7 +67,7 @@ impl Item {
 
         let widget = Rc::new(Widget::build(
             tab_view,
-            &page.widget.g_box,
+            &page.g_box,
             None,
             position,
             (is_pinned, is_selected, is_attention),

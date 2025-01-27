@@ -4,17 +4,16 @@ mod error;
 mod input;
 mod navigation;
 mod search;
-mod widget;
 
 use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
 use content::Content;
 use error::Error;
+use gtk::{prelude::BoxExt, Box, Orientation};
 use input::Input;
 use navigation::Navigation;
 use search::Search;
 use sqlite::Transaction;
 use std::rc::Rc;
-use widget::Widget;
 
 pub struct Page {
     pub profile: Rc<Profile>,
@@ -27,7 +26,7 @@ pub struct Page {
     pub search: Rc<Search>,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
-    pub widget: Rc<Widget>,
+    pub g_box: Box,
 }
 
 impl Page {
@@ -54,12 +53,13 @@ impl Page {
 
         let input = Rc::new(Input::new());
 
-        let widget = Rc::new(Widget::build(
-            &navigation.g_box,
-            &content.g_box,
-            &search.g_box,
-            &input.clamp,
-        ));
+        // Init main widget
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
+
+        g_box.append(&navigation.g_box);
+        g_box.append(&content.g_box);
+        g_box.append(&search.g_box);
+        g_box.append(&input.clamp);
 
         // Done
         Self {
@@ -73,7 +73,8 @@ impl Page {
             search,
             input,
             navigation,
-            widget,
+            // Widget
+            g_box,
         }
     }
 
