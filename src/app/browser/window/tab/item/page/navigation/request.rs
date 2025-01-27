@@ -14,15 +14,50 @@ use std::{cell::Cell, rc::Rc};
 
 const PLACEHOLDER_TEXT: &str = "URL or search term...";
 
-pub struct Request {
-    pub entry: Entry,
+pub trait Request {
+    // Constructors
+
+    fn request(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self;
+
+    // Actions
+
+    fn clean(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String>;
+
+    fn restore(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String>;
+
+    fn save(
+        &self,
+        transaction: &Transaction,
+        app_browser_window_tab_item_page_navigation_id: &i64,
+    ) -> Result<(), String>;
+
+    // Setters
+
+    fn to_download(&self);
+    fn to_source(&self);
+
+    // Getters
+
+    fn strip_prefix(&self) -> GString;
+    fn download(&self) -> GString;
+    fn source(&self) -> GString;
+    fn uri(&self) -> Option<Uri>;
+    fn home(&self) -> Option<Uri>;
 }
 
-impl Request {
+impl Request for Entry {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
+    fn request(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text(PLACEHOLDER_TEXT)
@@ -122,12 +157,11 @@ impl Request {
             }
         });
 
-        // Return activated `Self`
-        Self { entry }
+        entry
     }
 
     // Actions
-    pub fn clean(
+    fn clean(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
@@ -150,7 +184,7 @@ impl Request {
         Ok(())
     }
 
-    pub fn restore(
+    fn restore(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
@@ -159,7 +193,7 @@ impl Request {
             Ok(records) => {
                 for record in records {
                     if let Some(text) = record.text {
-                        self.entry.set_text(&text);
+                        self.set_text(&text);
                     }
 
                     // Delegate restore action to the item childs
@@ -172,13 +206,13 @@ impl Request {
         Ok(())
     }
 
-    pub fn save(
+    fn save(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String> {
         // Keep value in memory until operation complete
-        let text = self.entry.text();
+        let text = self.text();
 
         match database::insert(
             transaction,
@@ -202,40 +236,40 @@ impl Request {
 
     // Setters
 
-    pub fn to_download(&self) {
-        self.entry.set_text(&self.download());
+    fn to_download(&self) {
+        self.set_text(&self.download());
     }
 
-    pub fn to_source(&self) {
-        self.entry.set_text(&self.source());
+    fn to_source(&self) {
+        self.set_text(&self.source());
     }
 
     // Getters
 
     /// Get current request value without system prefix
     /// * the `prefix` is not `scheme`
-    pub fn strip_prefix(&self) -> GString {
-        strip_prefix(self.entry.text())
+    fn strip_prefix(&self) -> GString {
+        strip_prefix(self.text())
     }
 
     /// Get request value in `download:` format
-    pub fn download(&self) -> GString {
+    fn download(&self) -> GString {
         gformat!("download:{}", self.strip_prefix())
     }
 
     /// Get request value in `source:` format
-    pub fn source(&self) -> GString {
+    fn source(&self) -> GString {
         gformat!("source:{}", self.strip_prefix())
     }
 
     /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
     /// * `strip_prefix` on parse
-    pub fn uri(&self) -> Option<Uri> {
-        uri(&strip_prefix(self.entry.text()))
+    fn uri(&self) -> Option<Uri> {
+        uri(&strip_prefix(self.text()))
     }
 
     /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
-    pub fn home(&self) -> Option<Uri> {
+    fn home(&self) -> Option<Uri> {
         home(self.uri())
     }
 }

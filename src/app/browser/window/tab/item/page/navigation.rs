@@ -7,7 +7,11 @@ mod request;
 
 use super::{ItemAction, Profile, TabAction, WindowAction};
 use bookmark::Bookmark;
-use gtk::{prelude::BoxExt, Box, Button, Orientation};
+use gtk::{
+    glib::{GString, Uri},
+    prelude::{BoxExt, EditableExt, WidgetExt},
+    Box, Button, Entry, Orientation,
+};
 use history::History;
 use home::Home;
 use reload::Reload;
@@ -22,7 +26,7 @@ pub struct Navigation {
     pub home: Button,
     pub reload: Button,
     pub bookmark: Button,
-    pub request: Rc<Request>,
+    pub request: Entry,
     pub g_box: Box,
 }
 
@@ -35,14 +39,14 @@ impl Navigation {
             &Rc<ItemAction>,
         ),
     ) -> Self {
-        // init children components
-
+        // Init children components
         let history = Box::history((window_action, tab_action, item_action));
-        let request = Rc::new(Request::build(item_action, profile));
+        let request = Entry::request(item_action, profile);
         let reload = Button::reload((window_action, tab_action, item_action), &request);
         let home = Button::home((window_action, tab_action, item_action), &request);
         let bookmark = Button::bookmark(window_action, profile, &request);
 
+        // Init main widget
         let g_box = Box::builder()
             .orientation(Orientation::Horizontal)
             .spacing(SPACING)
@@ -54,7 +58,7 @@ impl Navigation {
         g_box.append(&home);
         g_box.append(&history);
         g_box.append(&reload);
-        g_box.append(&request.entry); // @TODO
+        g_box.append(&request);
         g_box.append(&bookmark);
 
         Self {
@@ -125,6 +129,32 @@ impl Navigation {
         }
 
         Ok(())
+    }
+
+    pub fn grab_focus(&self) -> bool {
+        self.request.grab_focus()
+    }
+
+    pub fn to_download(&self) {
+        self.request.to_download();
+    }
+
+    pub fn to_source(&self) {
+        self.request.to_source();
+    }
+
+    // Getters
+
+    pub fn request(&self) -> GString {
+        self.request.text()
+    }
+
+    pub fn uri(&self) -> Option<Uri> {
+        self.request.uri()
+    }
+
+    pub fn home(&self) -> Option<Uri> {
+        self.request.home()
     }
 }
 

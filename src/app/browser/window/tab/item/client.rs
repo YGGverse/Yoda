@@ -9,7 +9,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{ActionExt, CancellableExt, EditableExt, EntryExt},
+    prelude::{ActionExt, CancellableExt, EntryExt},
 };
 use std::{cell::Cell, rc::Rc};
 use subject::Subject;
@@ -62,7 +62,6 @@ impl Client {
             .page
             .navigation
             .request
-            .entry
             .set_progress_fraction(0.1);
 
         self.subject.tab_page.set_loading(true);
@@ -87,12 +86,7 @@ impl Client {
                                 "Scheme `{scheme}` yet not supported"
                             )));
                             subject.tab_page.set_title(&status.title());
-                            subject
-                                .page
-                                .navigation
-                                .request
-                                .entry
-                                .set_progress_fraction(0.0);
+                            subject.page.navigation.request.set_progress_fraction(0.0);
                             subject.tab_page.set_loading(false);
                         }
                     },
@@ -201,7 +195,7 @@ fn search(query: &str) -> Uri {
 /// Make new history record in related components
 /// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
 fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
-    let request = subject.page.navigation.request.entry.text();
+    let request = subject.page.navigation.request();
 
     // Add new record into the global memory index (used in global menu)
     // * if the `Uri` is `None`, try parse it from `request`
@@ -210,7 +204,7 @@ fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
         None => {
             // this case especially useful for some routes that contain redirects
             // maybe some parental optimization wanted @TODO
-            if let Some(uri) = subject.page.navigation.request.uri() {
+            if let Some(uri) = subject.page.navigation.uri() {
                 subject.page.profile.history.memory.request.set(uri);
             }
         }

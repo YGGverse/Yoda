@@ -1,7 +1,7 @@
-use super::{Profile, Request, WindowAction};
+use super::{Profile, WindowAction};
 use gtk::{
     prelude::{ActionExt, ButtonExt, EditableExt},
-    Button,
+    Button, Entry,
 };
 use std::rc::Rc;
 
@@ -9,12 +9,12 @@ const ICON_YES: &str = "starred-symbolic";
 const ICON_NON: &str = "non-starred-symbolic";
 
 pub trait Bookmark {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Rc<Request>) -> Self;
+    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self;
 }
 
 impl Bookmark for Button {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Rc<Request>) -> Self {
-        let has_bookmark = profile.bookmark.get(&request.entry.text()).is_ok();
+    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self {
+        let has_bookmark = profile.bookmark.get(&request.text()).is_ok();
 
         let button = Button::builder()
             .action_name(format!(
@@ -31,9 +31,7 @@ impl Bookmark for Button {
             let profile = profile.clone();
             let request = request.clone();
             move |_, _| {
-                button.set_icon_name(icon_name(
-                    profile.bookmark.get(&request.entry.text()).is_ok(),
-                ))
+                button.set_icon_name(icon_name(profile.bookmark.get(&request.text()).is_ok()))
             }
         }); // @TODO use local action
 

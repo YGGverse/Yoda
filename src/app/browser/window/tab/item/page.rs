@@ -6,18 +6,15 @@ mod navigation;
 mod search;
 mod widget;
 
+use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
 use content::Content;
 use error::Error;
 use input::Input;
 use navigation::Navigation;
 use search::Search;
-use widget::Widget;
-
-use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
-
-use gtk::prelude::EditableExt;
 use sqlite::Transaction;
 use std::rc::Rc;
+use widget::Widget;
 
 pub struct Page {
     pub profile: Rc<Profile>,
@@ -88,7 +85,7 @@ impl Page {
         let result = match self
             .profile
             .bookmark
-            .toggle(self.navigation.request.entry.text().as_str())
+            .toggle(self.navigation.request().as_str())
         {
             Ok(result) => Ok(result),
             Err(_) => Err(Error::Bookmark), // @TODO
@@ -144,7 +141,7 @@ impl Page {
                     self.navigation.restore(transaction, &record.id)?;
                     // Make initial page history snap using `navigation` values restored
                     // * just to have back/forward navigation ability
-                    if let Some(uri) = self.navigation.request.uri() {
+                    if let Some(uri) = self.navigation.uri() {
                         self.profile.history.memory.request.set(uri);
                     }
                 }

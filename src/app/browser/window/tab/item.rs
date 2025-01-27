@@ -82,9 +82,9 @@ impl Item {
             let page = page.clone();
             move |this, _| {
                 this.set_enabled(false);
-                if let Some(uri) = page.navigation.request.home() {
+                if let Some(uri) = page.navigation.home() {
                     let request = uri.to_string();
-                    page.navigation.request.entry.set_text(&request);
+                    page.navigation.request.set_text(&request);
                     client.handle(&request, true);
                 }
             }
@@ -96,7 +96,7 @@ impl Item {
             let profile = profile.clone();
             let window_action = window_action.clone();
             move || {
-                if let Some(uri) = page.navigation.request.uri() {
+                if let Some(uri) = page.navigation.uri() {
                     let scheme = uri.scheme();
                     if scheme == "gemini" || scheme == "titan" {
                         return identity::default(&window_action, &profile, &uri)
@@ -112,7 +112,7 @@ impl Item {
             let client = client.clone();
             move |request, is_history| {
                 if let Some(text) = request {
-                    page.navigation.request.entry.set_text(&text);
+                    page.navigation.request.set_text(&text);
                     client.handle(&text, is_history);
                 }
             }
@@ -122,13 +122,13 @@ impl Item {
             let page = page.clone();
             let client = client.clone();
             move |_, _| {
-                client.handle(&page.navigation.request.entry.text(), false);
+                client.handle(&page.navigation.request.text(), false);
             }
         });
 
         // Handle immediately on request
         if let Some(text) = request {
-            page.navigation.request.entry.set_text(text);
+            page.navigation.request.set_text(text);
             if is_load {
                 client.handle(text, true);
             }

@@ -3,14 +3,14 @@ use crate::app::browser::window::action::Position;
 use gtk::{
     gdk::BUTTON_MIDDLE,
     prelude::{ActionExt, WidgetExt},
-    Button, GestureClick,
+    Button, Entry, GestureClick,
 };
 use std::rc::Rc;
 
 pub trait Reload {
     fn reload(
         action: (&Rc<WindowAction>, &Rc<TabAction>, &Rc<ItemAction>),
-        request: &Rc<Request>,
+        request: &Entry,
     ) -> Self;
 }
 
@@ -21,7 +21,7 @@ impl Reload for Button {
             &Rc<TabAction>,
             &Rc<ItemAction>,
         ),
-        request: &Rc<Request>,
+        request: &Entry,
     ) -> Self {
         let button = Button::builder()
             .action_name(format!("{}.{}", tab_action.id, item_action.reload.name()))

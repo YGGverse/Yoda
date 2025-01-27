@@ -12,7 +12,7 @@ use error::Error;
 use gtk::{
     gio::Icon,
     glib::{DateTime, Propagation},
-    prelude::{ActionExt, EditableExt, WidgetExt},
+    prelude::{ActionExt, EditableExt},
 };
 pub use item::Item;
 use menu::Menu;
@@ -136,7 +136,7 @@ impl Tab {
         // Expect user input on tab appended has empty request entry
         // * this action initiated here because should be applied on tab appending event only
         if request.is_none() || request.is_some_and(|value| value.is_empty()) {
-            item.page.navigation.request.entry.grab_focus();
+            item.page.navigation.grab_focus();
         }
 
         // Register dynamically created tab components in the HashMap index
@@ -196,7 +196,7 @@ impl Tab {
     // Save page at given `position`, `None` to save selected page (if available)
     pub fn save_as(&self, tab_page_position: Option<i32>) {
         if let Some(item) = self.item(tab_page_position) {
-            item.page.navigation.request.to_download();
+            item.page.navigation.to_download();
             self.window_action.reload.activate();
         }
     }
@@ -204,7 +204,7 @@ impl Tab {
     // View source for page at given `position`, `None` to use selected page (if available)
     pub fn source(&self, tab_page_position: Option<i32>) {
         if let Some(item) = self.item(tab_page_position) {
-            item.page.navigation.request.to_source();
+            item.page.navigation.to_source();
             self.window_action.reload.activate();
         }
     }
@@ -233,9 +233,9 @@ impl Tab {
 
     pub fn page_home(&self, tab_page_position: Option<i32>) {
         if let Some(item) = self.item(tab_page_position) {
-            if let Some(home) = item.page.navigation.request.home() {
+            if let Some(home) = item.page.navigation.home() {
                 let home = home.to_string();
-                item.page.navigation.request.entry.set_text(&home);
+                item.page.navigation.request.set_text(&home);
                 item.client.handle(&home, true);
             }
         }
@@ -256,8 +256,7 @@ impl Tab {
     /// Reload page at `i32` position or selected page on `None` given
     pub fn page_reload(&self, tab_page_position: Option<i32>) {
         if let Some(item) = self.item(tab_page_position) {
-            item.client
-                .handle(&item.page.navigation.request.entry.text(), true);
+            item.client.handle(&item.page.navigation.request(), true);
         }
     }
 
