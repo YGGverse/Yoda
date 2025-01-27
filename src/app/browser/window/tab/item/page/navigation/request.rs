@@ -13,6 +13,8 @@ use sqlite::Transaction;
 use std::{cell::Cell, rc::Rc};
 
 const PLACEHOLDER_TEXT: &str = "URL or search term...";
+const PREFIX_DOWNLOAD: &str = "download:";
+const PREFIX_SOURCE: &str = "source:";
 
 pub trait Request {
     // Constructors
@@ -252,14 +254,14 @@ impl Request for Entry {
         strip_prefix(self.text())
     }
 
-    /// Get request value in `download:` format
+    /// Get request value with formatted `download` prefix
     fn download(&self) -> GString {
-        gformat!("download:{}", self.strip_prefix())
+        gformat!("{PREFIX_DOWNLOAD}{}", self.strip_prefix())
     }
 
-    /// Get request value in `source:` format
+    /// Get request value with formatted `source` prefix
     fn source(&self) -> GString {
-        gformat!("source:{}", self.strip_prefix())
+        gformat!("{PREFIX_SOURCE}{}", self.strip_prefix())
     }
 
     /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
@@ -292,11 +294,11 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 /// Strip system prefix from request string
 /// * the `prefix` is not `scheme`
 fn strip_prefix(mut request: GString) -> GString {
-    if let Some(postfix) = request.strip_prefix("source:") {
+    if let Some(postfix) = request.strip_prefix(PREFIX_SOURCE) {
         request = postfix.into()
     };
 
-    if let Some(postfix) = request.strip_prefix("download:") {
+    if let Some(postfix) = request.strip_prefix(PREFIX_DOWNLOAD) {
         request = postfix.into()
     };
 
