@@ -3,21 +3,19 @@ mod database;
 mod error;
 mod item;
 mod menu;
-mod widget;
-
-use action::Action;
-use adw::{TabPage, TabView};
-use error::Error;
-pub use item::Item;
-use menu::Menu;
-use widget::Widget;
 
 use super::{Action as WindowAction, BrowserAction, Position};
 use crate::Profile;
+use action::Action;
+use adw::{TabPage, TabView};
+use error::Error;
 use gtk::{
+    gio::Icon,
     glib::{DateTime, Propagation},
     prelude::{ActionExt, EditableExt, WidgetExt},
 };
+pub use item::Item;
+use menu::Menu;
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -28,7 +26,7 @@ pub struct Tab {
     profile: Rc<Profile>,
     index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     pub action: Rc<Action>,
-    pub widget: Rc<Widget>,
+    pub tab_view: TabView,
 }
 
 impl Tab {
@@ -44,14 +42,20 @@ impl Tab {
         // Init empty HashMap index
         let index = Rc::new(RefCell::new(HashMap::new()));
 
-        // Init context menu
-        let menu = Menu::new(window_action);
+        // Init model
+        let tab_view = TabView::builder()
+            .menu_model(&gtk::gio::Menu::menu(window_action))
+            .build();
 
-        // Init widget
-        let widget = Rc::new(Widget::new(&menu.main));
+        // Change default icon (if available in the system icon set)
+        // * visible for pinned tabs only
+        // * @TODO not default GTK behavior, make this feature optional
+        if let Ok(default_icon) = Icon::for_string("view-pin-symbolic") {
+            tab_view.set_default_icon(&default_icon);
+        }
 
         // Init events
-        widget.tab_view.connect_setup_menu({
+        tab_view.connect_setup_menu({
             let index = index.clone();
             let window_action = window_action.clone();
             move |tab_view, tab_page| {
@@ -62,7 +66,7 @@ impl Tab {
             }
         });
 
-        widget.tab_view.connect_close_page({
+        tab_view.connect_close_page({
             let index = index.clone();
             let profile = profile.clone();
             let window_action = window_action.clone();
@@ -80,7 +84,7 @@ impl Tab {
             }
         });
 
-        widget.tab_view.connect_page_attached({
+        tab_view.connect_page_attached({
             let window_action = window_action.clone();
             let index = index.clone();
             move |tab_view, _, _| {
@@ -88,7 +92,7 @@ impl Tab {
             }
         });
 
-        widget.tab_view.connect_selected_page_notify({
+        tab_view.connect_selected_page_notify({
             let window_action = window_action.clone();
             let index = index.clone();
             move |tab_view| {
@@ -105,7 +109,7 @@ impl Tab {
             browser_action: browser_action.clone(),
             window_action: window_action.clone(),
             index,
-            widget,
+            tab_view,
             action,
         }
     }
@@ -122,7 +126,7 @@ impl Tab {
     ) -> Rc<Item> {
         // Init new tab item
         let item = Rc::new(Item::build(
-            &self.widget.tab_view,
+            &self.tab_view,
             &self.profile,
             // Actions
             (&self.browser_action, &self.window_action, &self.action),
@@ -151,14 +155,29 @@ impl Tab {
         item
     }
 
-    /// Close page at given `page_position`, `None` to close selected page (if available)
+    /// Close page at given `position`, `None` to close selected page (if available)
+    /// * this action includes `pinned` pages, to prevent that:
+    ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
+    ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
     pub fn close(&self, page_position: Option<i32>) {
-        self.widget.close(page_position);
+        if let Some(page) = match page_position {
+            Some(value) => Some(self.tab_view.nth_page(value)),
+            None => self.tab_view.selected_page(),
+        } {
+            self.tab_view.set_page_pinned(&page, false);
+            self.tab_view.close_page(&page);
+        }
     }
 
-    // Close all pages
+    /// Close all pages
+    /// * this action includes `pinned` pages, to prevent that:
+    ///   * deactivate [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) outside if selected page should not be closed
+    ///   * use native [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) API with `GObject` reference getter
     pub fn close_all(&self) {
-        self.widget.close_all();
+        while let Some(page) = self.tab_view.selected_page() {
+            self.tab_view.set_page_pinned(&page, false);
+            self.tab_view.close_page(&page);
+        }
     }
 
     // Toggle escape action for specified or current item
@@ -203,9 +222,14 @@ impl Tab {
         Err(Error::PageNotFound)
     }
 
-    // Toggle pin status for active tab
+    /// Toggle pin for page at given `position`, `None` to pin selected page (if available)
     pub fn pin(&self, page_position: Option<i32>) {
-        self.widget.pin(page_position);
+        if let Some(page) = match page_position {
+            Some(value) => Some(self.tab_view.nth_page(value)),
+            None => self.tab_view.selected_page(),
+        } {
+            self.tab_view.set_page_pinned(&page, !page.is_pinned()); // toggle
+        }
     }
 
     pub fn page_home(&self, page_position: Option<i32>) {
@@ -272,7 +296,7 @@ impl Tab {
             Ok(records) => {
                 for record in records {
                     match Item::restore(
-                        &self.widget.tab_view,
+                        &self.tab_view,
                         transaction,
                         record.id,
                         &self.profile,
@@ -311,7 +335,7 @@ impl Tab {
                     item.save(
                         transaction,
                         id,
-                        self.widget.tab_view.page_position(&item.widget.tab_page),
+                        self.tab_view.page_position(&item.widget.tab_page),
                         item.widget.tab_page.is_pinned(),
                         item.widget.tab_page.is_selected(),
                         item.widget.tab_page.needs_attention(),
@@ -333,8 +357,11 @@ impl Tab {
         // @TODO other/child features..
     }
 
-    fn item(&self, position: Option<i32>) -> Option<Rc<Item>> {
-        if let Some(tab_page) = self.widget.page(position) {
+    fn item(&self, page_position: Option<i32>) -> Option<Rc<Item>> {
+        if let Some(tab_page) = match page_position {
+            Some(value) => Some(self.tab_view.nth_page(value)),
+            None => self.tab_view.selected_page(),
+        } {
             if let Some(item) = self.index.borrow().get(&tab_page) {
                 return Some(item.clone());
             }

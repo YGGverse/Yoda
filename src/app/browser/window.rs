@@ -37,9 +37,9 @@ impl Window {
         g_box.append(&ToolbarView::header(
             (browser_action, &action),
             profile,
-            &tab.widget.tab_view,
+            &tab.tab_view,
         ));
-        g_box.append(&tab.widget.tab_view);
+        g_box.append(&tab.tab_view);
 
         // Init events
         action.append.connect_activate({
