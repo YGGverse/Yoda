@@ -5,15 +5,15 @@ use std::rc::Rc;
 /// Context menu wrapper
 ///
 /// https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/method.TabView.get_menu_model.html
-pub struct Menu {
-    pub main: gtk::gio::Menu,
+pub trait Menu {
+    fn menu(window_action: &Rc<WindowAction>) -> Self;
 }
 
-impl Menu {
+impl Menu for gtk::gio::Menu {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(window_action: &Rc<WindowAction>) -> Self {
+    fn menu(window_action: &Rc<WindowAction>) -> Self {
         let main = gtk::gio::Menu::new();
 
         main.append(
@@ -135,6 +135,6 @@ impl Menu {
 
         main.append_submenu(Some("Close"), &close);
 
-        Self { main }
+        main
     }
 }
