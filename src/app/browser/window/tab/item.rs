@@ -122,7 +122,7 @@ impl Item {
             let page = page.clone();
             let client = client.clone();
             move |_, _| {
-                client.handle(&page.navigation.request(), false);
+                client.handle(&page.navigation.request(), true);
             }
         });
 
