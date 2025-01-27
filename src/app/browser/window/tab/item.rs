@@ -2,7 +2,7 @@ mod action;
 mod client;
 mod database;
 mod identity;
-pub mod page;
+mod page;
 mod widget;
 
 use super::{Action as TabAction, BrowserAction, Position, WindowAction};
