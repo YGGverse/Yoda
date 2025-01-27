@@ -54,40 +54,46 @@ impl Tab {
         widget.tab_view.connect_setup_menu({
             let action = window_action.clone();
             let index = index.clone();
-            let widget = widget.clone();
             move |tab_view, tab_page| {
-                let state = match tab_page {
-                    // on menu open
-                    Some(tab_page) => {
-                        if let Some(item) = index.borrow().get(tab_page) {
-                            item.page.update(); // update window actions using page of tab activated
-                        }
+                // Update actions on open popover request (`tab_page` == `Some`)
+                // * it's no handle for popover close event (`tab_page` == `None`)
+                //   as it will be updated on the next init for new tab selected
+                tab_page.map(|tab_page| {
+                    index.borrow().get(tab_page).map(|item| {
+                        // Update actions status
+                        action
+                            .history_back
+                            .simple_action
+                            .set_enabled(item.action.history.back.is_enabled());
+                        action
+                            .history_forward
+                            .simple_action
+                            .set_enabled(item.action.history.forward.is_enabled());
+                        action
+                            .home
+                            .simple_action
+                            .set_enabled(item.action.home.is_enabled());
+                        action
+                            .reload
+                            .simple_action
+                            .set_enabled(item.action.reload.is_enabled());
 
-                        Some(tab_view.page_position(tab_page)) // activated tab
-                    }
-                    // on menu close
-                    None => {
-                        if let Some(tab_page) = widget.page(None) {
-                            if let Some(item) = index.borrow().get(&tab_page) {
-                                item.page.update(); // update window actions using page of current tab
-                            }
-                        }
-                        None // current tab
-                    }
-                };
+                        // Update actions target
+                        let state = Some(tab_view.page_position(tab_page));
 
-                // Update actions with new state value
-                action.bookmark.change_state(state);
-                action.close_all.change_state(state);
-                action.close.change_state(state);
-                action.find.change_state(state);
-                action.history_back.change_state(state);
-                action.history_forward.change_state(state);
-                action.home.change_state(state);
-                action.pin.change_state(state);
-                action.reload.change_state(state);
-                action.save_as.change_state(state);
-                action.source.change_state(state);
+                        action.bookmark.change_state(state);
+                        action.close_all.change_state(state);
+                        action.close.change_state(state);
+                        action.find.change_state(state);
+                        action.history_back.change_state(state);
+                        action.history_forward.change_state(state);
+                        action.home.change_state(state);
+                        action.pin.change_state(state);
+                        action.reload.change_state(state);
+                        action.save_as.change_state(state);
+                        action.source.change_state(state);
+                    })
+                });
             }
         });
 
