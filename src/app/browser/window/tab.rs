@@ -92,15 +92,10 @@ impl Tab {
             let window_action = window_action.clone();
             let index = index.clone();
             move |tab_view| {
-                update_actions(
-                    tab_view,
-                    tab_view.selected_page().map(|tab_page| {
-                        tab_page.set_needs_attention(false);
-                        tab_page
-                    }),
-                    &index,
-                    &window_action,
-                )
+                if let Some(tab_page) = tab_view.selected_page() {
+                    tab_page.set_needs_attention(false);
+                }
+                update_actions(tab_view, tab_view.selected_page(), &index, &window_action)
             }
         });
 
