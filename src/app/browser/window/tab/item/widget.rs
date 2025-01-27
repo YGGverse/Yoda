@@ -16,7 +16,6 @@ impl Widget {
 
     /// Build new `Self`
     pub fn build(
-        keyword: &str, // ID
         tab_view: &TabView,
         child: &impl IsA<gtk::Widget>,
         title: Option<&str>,
@@ -38,7 +37,6 @@ impl Widget {
 
         // Setup
         tab_page.set_needs_attention(is_attention);
-        tab_page.set_keyword(keyword);
         tab_page.set_title(match title {
             Some(value) => value,
             None => DEFAULT_TITLE,

@@ -12,7 +12,6 @@ impl Widget {
 
     /// Build new `Self`
     pub fn build(
-        name: &str,
         // Components
         navigation: &impl IsA<gtk::Widget>,
         content: &impl IsA<gtk::Widget>,
@@ -20,10 +19,7 @@ impl Widget {
         input: &impl IsA<gtk::Widget>,
     ) -> Self {
         // Init self
-        let g_box = Box::builder()
-            .orientation(Orientation::Vertical)
-            .name(name)
-            .build();
+        let g_box = Box::builder().orientation(Orientation::Vertical).build();
 
         g_box.append(navigation);
         g_box.append(content);

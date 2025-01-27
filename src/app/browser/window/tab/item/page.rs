@@ -15,12 +15,11 @@ use widget::Widget;
 
 use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
 
-use gtk::{glib::GString, prelude::EditableExt};
+use gtk::prelude::EditableExt;
 use sqlite::Transaction;
 use std::rc::Rc;
 
 pub struct Page {
-    pub id: Rc<GString>,
     pub profile: Rc<Profile>,
     // Actions
     pub browser_action: Rc<BrowserAction>,
@@ -38,7 +37,6 @@ impl Page {
     // Constructors
 
     pub fn build(
-        id: &Rc<GString>,
         profile: &Rc<Profile>,
         (browser_action, window_action, tab_action, item_action): (
             &Rc<BrowserAction>,
@@ -60,7 +58,6 @@ impl Page {
         let input = Rc::new(Input::new());
 
         let widget = Rc::new(Widget::build(
-            id,
             &navigation.widget.g_box,
             &content.g_box,
             &search.g_box,
@@ -69,7 +66,6 @@ impl Page {
 
         // Done
         Self {
-            id: id.clone(),
             profile: profile.clone(),
             // Actions
             browser_action: browser_action.clone(),

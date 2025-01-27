@@ -10,19 +10,13 @@ use crate::Profile;
 use action::Action;
 use adw::TabView;
 use client::Client;
-use gtk::{
-    glib::{uuid_string_random, GString},
-    prelude::{ActionMapExt, Cast, EditableExt},
-};
+use gtk::prelude::{ActionMapExt, Cast, EditableExt};
 use page::Page;
 use sqlite::Transaction;
 use std::rc::Rc;
 use widget::Widget;
 
 pub struct Item {
-    // Auto-generated unique item ID
-    // useful as widget name in GTK actions callback
-    pub id: Rc<GString>,
     // Multi-protocol handler
     pub client: Rc<Client>,
     // Components
@@ -52,9 +46,6 @@ impl Item {
             bool,
         ),
     ) -> Self {
-        // Generate unique ID for new page components
-        let id = Rc::new(uuid_string_random());
-
         // Init components
         let action = Rc::new(Action::new());
 
@@ -70,13 +61,11 @@ impl Item {
             .add_action(&action.history.forward);
 
         let page = Rc::new(Page::build(
-            &id,
             profile,
             (browser_action, window_action, tab_action, &action),
         ));
 
         let widget = Rc::new(Widget::build(
-            id.as_str(),
             tab_view,
             &page.widget.g_box,
             None,
@@ -146,7 +135,6 @@ impl Item {
         }
         // Done
         Self {
-            id,
             client,
             page,
             widget,
