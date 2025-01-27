@@ -97,7 +97,6 @@ impl Page {
             Ok(result) => Ok(result),
             Err(_) => Err(Error::Bookmark), // @TODO
         };
-        self.update();
         result
     }
 
@@ -109,12 +108,6 @@ impl Page {
     /// Toggle `Find` widget
     pub fn find(&self) {
         self.search.show()
-    }
-
-    /// Update `Self` witch children components
-    pub fn update(&self) {
-        // Update children components
-        self.navigation.update();
     }
 
     /// Cleanup session for `Self`

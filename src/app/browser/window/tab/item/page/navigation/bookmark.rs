@@ -1,6 +1,6 @@
-use super::WindowAction;
+use super::{Profile, Request, WindowAction};
 use gtk::{
-    prelude::{ActionExt, ButtonExt},
+    prelude::{ActionExt, ButtonExt, EditableExt},
     Button,
 };
 use std::rc::Rc;
@@ -9,24 +9,33 @@ const ICON_YES: &str = "starred-symbolic";
 const ICON_NON: &str = "non-starred-symbolic";
 
 pub trait Bookmark {
-    fn bookmark(action: &Rc<WindowAction>) -> Self;
-    fn update(&self, has_bookmark: bool);
+    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Rc<Request>) -> Self;
 }
 
 impl Bookmark for Button {
-    fn bookmark(action: &Rc<WindowAction>) -> Self {
-        Button::builder()
+    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Rc<Request>) -> Self {
+        let has_bookmark = profile.bookmark.get(&request.entry.text()).is_ok();
+
+        let button = Button::builder()
             .action_name(format!(
                 "{}.{}",
                 action.id,
                 action.bookmark.simple_action.name()
             )) // @TODO
-            .icon_name(ICON_NON)
+            .icon_name(icon_name(has_bookmark))
             .tooltip_text("Bookmark")
-            .build()
-    }
+            .build();
 
-    fn update(&self, has_bookmark: bool) {
-        self.set_icon_name(if has_bookmark { ICON_YES } else { ICON_NON });
+        button.connect_clicked(move |this| this.set_icon_name(icon_name(has_bookmark)));
+
+        button
+    }
+}
+
+fn icon_name(has_bookmark: bool) -> &'static str {
+    if has_bookmark {
+        ICON_YES
+    } else {
+        ICON_NON
     }
 }

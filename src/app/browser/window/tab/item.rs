@@ -154,25 +154,6 @@ impl Item {
         }
     }
 
-    // Actions
-    pub fn update(&self) {
-        // Update self actions
-        self.action.home.set_enabled(
-            self.page
-                .navigation
-                .request
-                .home()
-                .is_some_and(|home| home.to_string() != self.page.navigation.request.entry.text()),
-        );
-
-        self.action
-            .reload
-            .set_enabled(!self.page.navigation.request.entry.text().is_empty());
-
-        // Update child components
-        self.page.update();
-    }
-
     pub fn clean(
         &self,
         transaction: &Transaction,

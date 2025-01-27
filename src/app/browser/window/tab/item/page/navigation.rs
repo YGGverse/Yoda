@@ -41,7 +41,7 @@ impl Navigation {
         let request = Rc::new(Request::build(item_action, profile));
         let reload = Button::reload((window_action, tab_action, item_action), &request);
         let home = Button::home((window_action, tab_action, item_action), &request);
-        let bookmark = Button::bookmark(window_action);
+        let bookmark = Button::bookmark(window_action, profile, &request);
 
         // init main widget
         let widget = Rc::new(Widget::build(
@@ -64,15 +64,6 @@ impl Navigation {
     }
 
     // Actions
-
-    pub fn update(&self) {
-        // init shared request value
-        let request = self.request.strip_prefix();
-
-        // update children components
-        self.bookmark
-            .update(self.profile.bookmark.get(&request).is_ok());
-    }
 
     pub fn clean(
         &self,
