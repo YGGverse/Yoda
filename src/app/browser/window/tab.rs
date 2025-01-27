@@ -6,7 +6,7 @@ mod menu;
 mod widget;
 
 use action::Action;
-use adw::TabPage;
+use adw::{TabPage, TabView};
 use error::Error;
 pub use item::Item;
 use menu::Menu;
@@ -42,7 +42,7 @@ impl Tab {
         let action = Rc::new(Action::new());
 
         // Init empty HashMap index
-        let index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>> = Rc::new(RefCell::new(HashMap::new()));
+        let index = Rc::new(RefCell::new(HashMap::new()));
 
         // Init context menu
         let menu = Menu::new(window_action);
@@ -52,54 +52,30 @@ impl Tab {
 
         // Init events
         widget.tab_view.connect_setup_menu({
-            let action = window_action.clone();
             let index = index.clone();
+            let window_action = window_action.clone();
             move |tab_view, tab_page| {
-                // Update actions on open popover request (`tab_page` == `Some`)
-                // * it's no handle for popover close event (`tab_page` == `None`)
-                //   as it will be updated on the next init for new tab selected
-                tab_page.map(|tab_page| {
-                    index.borrow().get(tab_page).map(|item| {
-                        // Update enabled status (for some actions)
-                        action
-                            .history_back
-                            .simple_action
-                            .set_enabled(item.action.history.back.is_enabled());
-                        action
-                            .history_forward
-                            .simple_action
-                            .set_enabled(item.action.history.forward.is_enabled());
-                        action
-                            .home
-                            .simple_action
-                            .set_enabled(item.action.home.is_enabled());
-                        action
-                            .reload
-                            .simple_action
-                            .set_enabled(item.action.reload.is_enabled());
-
-                        // Update target state (for all actions)
-                        action.change_state(Some(tab_view.page_position(tab_page)));
-                    })
-                });
+                // by documentation:
+                // * `tab_page` == `Some` - popover open
+                // * `tab_page` == `None` - popover closed
+                update_actions(tab_view, tab_page.cloned(), &index, &window_action);
             }
         });
 
         widget.tab_view.connect_close_page({
             let index = index.clone();
             let profile = profile.clone();
-            move |_, tab_page| {
-                // Cleanup HashMap index
-                if let Some(item) = index.borrow_mut().remove(tab_page) {
-                    // Add history record into profile memory pool
-                    // * this action allows to recover recently closed tab (e.g. from the main menu)
-                    profile
-                        .history
-                        .memory
-                        .tab
-                        .add(item, DateTime::now_local().unwrap().to_unix());
-                }
+            let window_action = window_action.clone();
+            move |tab_view, tab_page| {
+                // cleanup HashMap index
+                // add history record into profile memory pool
+                // * this action allows to recover recently closed tab (e.g. from the main menu)
+                profile.history.memory.tab.add(
+                    index.borrow_mut().remove(tab_page).unwrap(),
+                    DateTime::now_local().unwrap().to_unix(),
+                );
 
+                update_actions(tab_view, tab_view.selected_page(), &index, &window_action);
                 Propagation::Proceed
             }
         });
@@ -107,21 +83,24 @@ impl Tab {
         widget.tab_view.connect_page_attached({
             let window_action = window_action.clone();
             let index = index.clone();
-            move |_, tab_page, _| {
-                if tab_page.is_selected() {
-                    update_actions(tab_page, &index, &window_action);
-                }
+            move |tab_view, _, _| {
+                update_actions(tab_view, tab_view.selected_page(), &index, &window_action)
             }
         });
 
         widget.tab_view.connect_selected_page_notify({
             let window_action = window_action.clone();
             let index = index.clone();
-            move |this| {
-                if let Some(tab_page) = this.selected_page() {
-                    tab_page.set_needs_attention(false);
-                    update_actions(&tab_page, &index, &window_action);
-                }
+            move |tab_view| {
+                update_actions(
+                    tab_view,
+                    tab_view.selected_page().map(|tab_page| {
+                        tab_page.set_needs_attention(false);
+                        tab_page
+                    }),
+                    &index,
+                    &window_action,
+                )
             }
         });
 
@@ -385,35 +364,45 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 }
 
 fn update_actions(
-    tab_page: &TabPage,
+    tab_view: &TabView,
+    tab_page: Option<TabPage>,
     index: &Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     window_action: &Rc<WindowAction>,
 ) {
-    if let Some(item) = index.borrow().get(tab_page) {
-        window_action
-            .home
-            .simple_action
-            .set_enabled(item.action.home.is_enabled());
-        window_action
-            .reload
-            .simple_action
-            .set_enabled(item.action.reload.is_enabled());
-        window_action
-            .history_back
-            .simple_action
-            .set_enabled(item.action.history.back.is_enabled());
-        window_action
-            .history_forward
-            .simple_action
-            .set_enabled(item.action.history.forward.is_enabled());
-        return;
-    }
+    match tab_page {
+        Some(tab_page) => {
+            if let Some(item) = index.borrow().get(&tab_page) {
+                window_action
+                    .home
+                    .simple_action
+                    .set_enabled(item.action.home.is_enabled());
+                window_action
+                    .reload
+                    .simple_action
+                    .set_enabled(item.action.reload.is_enabled());
+                window_action
+                    .history_back
+                    .simple_action
+                    .set_enabled(item.action.history.back.is_enabled());
+                window_action
+                    .history_forward
+                    .simple_action
+                    .set_enabled(item.action.history.forward.is_enabled());
 
-    window_action.home.simple_action.set_enabled(false);
-    window_action.reload.simple_action.set_enabled(false);
-    window_action.history_back.simple_action.set_enabled(false);
-    window_action
-        .history_forward
-        .simple_action
-        .set_enabled(false);
+                window_action.change_state(Some(tab_view.page_position(&tab_page)));
+            } // @TODO incorrect index init implementation, tabs refactory wanted
+        }
+        None => {
+            // Reset to defaults
+            window_action.home.simple_action.set_enabled(false);
+            window_action.reload.simple_action.set_enabled(false);
+            window_action.history_back.simple_action.set_enabled(false);
+            window_action
+                .history_forward
+                .simple_action
+                .set_enabled(false);
+
+            window_action.change_state(None);
+        }
+    }
 }
