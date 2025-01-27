@@ -12,7 +12,6 @@ use gtk::{
 use sqlite::Transaction;
 use std::{cell::Cell, rc::Rc};
 
-const PLACEHOLDER_TEXT: &str = "URL or search term...";
 const PREFIX_DOWNLOAD: &str = "download:";
 const PREFIX_SOURCE: &str = "source:";
 
@@ -62,7 +61,7 @@ impl Request for Entry {
     fn request(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
         // Init main widget
         let entry = Entry::builder()
-            .placeholder_text(PLACEHOLDER_TEXT)
+            .placeholder_text("URL or search term...")
             .secondary_icon_tooltip_text("Go to the location")
             .hexpand(true)
             .build();
