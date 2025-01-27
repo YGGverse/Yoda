@@ -74,7 +74,7 @@ impl Gemini {
 
         match uri.scheme().as_str() {
             "gemini" => handle(
-                Request::Gemini(Gemini { uri }),
+                Request::Gemini { uri },
                 self.client.clone(),
                 self.subject.clone(),
                 self.redirects.clone(),
@@ -88,13 +88,13 @@ impl Gemini {
                     let redirects = self.redirects.clone();
                     move |data, _label| {
                         handle(
-                            Request::Titan(Titan {
+                            Request::Titan {
                                 uri: uri.clone(),
                                 data: Bytes::from(data),
                                 // * some servers may reject the request without content type
                                 mime: Some("text/plain".to_string()),
                                 token: None, // @TODO
-                            }),
+                            },
                             client.clone(),
                             subject.clone(),
                             redirects.clone(),
