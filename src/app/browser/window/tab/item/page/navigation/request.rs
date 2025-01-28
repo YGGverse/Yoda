@@ -49,7 +49,7 @@ pub trait Request {
 
     // Getters
 
-    fn strip_prefix(&self) -> GString;
+    fn prefix_less(&self) -> GString;
     fn download(&self) -> GString;
     fn source(&self) -> GString;
     fn uri(&self) -> Option<Uri>;
@@ -93,11 +93,7 @@ impl Request for Entry {
             move |this| {
                 // Update actions
                 item_action.reload.set_enabled(!this.text().is_empty());
-                item_action
-                    .home
-                    .set_enabled(uri(&this.text()).is_some_and(|uri| {
-                        uri.path().len() > 1 || uri.query().is_some() || uri.fragment().is_some()
-                    }));
+                item_action.home.set_enabled(this.home().is_some());
 
                 // Update primary icon
                 this.update(&profile)
@@ -225,7 +221,7 @@ impl Request for Entry {
                 self.set_primary_icon_activatable(true);
                 self.set_primary_icon_sensitive(true);
                 self.set_primary_icon_name(Some(name));
-                if profile.identity.get(&strip_prefix(self.text())).is_some() {
+                if profile.identity.get(&self.prefix_less()).is_some() {
                     self.first_child().unwrap().add_css_class("success"); // @TODO handle
                     self.set_primary_icon_tooltip_text(Some(tooltip.1));
                 } else {
@@ -257,29 +253,59 @@ impl Request for Entry {
 
     /// Get current request value without system prefix
     /// * the `prefix` is not `scheme`
-    fn strip_prefix(&self) -> GString {
-        strip_prefix(self.text())
+    fn prefix_less(&self) -> GString {
+        let mut request = self.text();
+
+        if let Some(postfix) = request.strip_prefix(PREFIX_SOURCE) {
+            request = postfix.into()
+        }
+        if let Some(postfix) = request.strip_prefix(PREFIX_DOWNLOAD) {
+            request = postfix.into()
+        }
+        request
     }
 
     /// Get request value with formatted `download` prefix
     fn download(&self) -> GString {
-        gformat!("{PREFIX_DOWNLOAD}{}", self.strip_prefix())
+        gformat!("{PREFIX_DOWNLOAD}{}", self.prefix_less())
     }
 
     /// Get request value with formatted `source` prefix
     fn source(&self) -> GString {
-        gformat!("{PREFIX_SOURCE}{}", self.strip_prefix())
+        gformat!("{PREFIX_SOURCE}{}", self.prefix_less())
     }
 
     /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
     /// * `strip_prefix` on parse
     fn uri(&self) -> Option<Uri> {
-        uri(&strip_prefix(self.text()))
+        match Uri::parse(&self.prefix_less(), UriFlags::NONE) {
+            Ok(uri) => Some(uri),
+            _ => None,
+        }
     }
 
     /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
+    /// * return `None` if current request already match home or Uri not parsable
     fn home(&self) -> Option<Uri> {
-        home(self.uri())
+        let uri = self.uri()?;
+        if uri.path().len() > 1 || uri.query().is_some() || uri.fragment().is_some() {
+            Some(Uri::build(
+                UriFlags::NONE,
+                &if uri.scheme() == "titan" {
+                    GString::from("gemini")
+                } else {
+                    uri.scheme()
+                },
+                uri.userinfo().as_deref(),
+                uri.host().as_deref(),
+                uri.port(),
+                "/",
+                None,
+                None,
+            ))
+        } else {
+            None
+        }
     }
 }
 
@@ -296,45 +322,4 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Success
     Ok(())
-}
-
-/// Strip system prefix from request string
-/// * the `prefix` is not `scheme`
-fn strip_prefix(mut request: GString) -> GString {
-    if let Some(postfix) = request.strip_prefix(PREFIX_SOURCE) {
-        request = postfix.into()
-    };
-
-    if let Some(postfix) = request.strip_prefix(PREFIX_DOWNLOAD) {
-        request = postfix.into()
-    };
-
-    request
-} // @TODO move prefix features to page client
-
-fn uri(value: &str) -> Option<Uri> {
-    match Uri::parse(value, UriFlags::NONE) {
-        Ok(uri) => Some(uri),
-        _ => None,
-    }
-}
-
-/// Parse home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `subject`
-fn home(subject: Option<Uri>) -> Option<Uri> {
-    subject.map(|uri| {
-        Uri::build(
-            UriFlags::NONE,
-            &if uri.scheme() == "titan" {
-                GString::from("gemini")
-            } else {
-                uri.scheme()
-            },
-            uri.userinfo().as_deref(),
-            uri.host().as_deref(),
-            uri.port(),
-            "/",
-            None,
-            None,
-        )
-    })
 }
