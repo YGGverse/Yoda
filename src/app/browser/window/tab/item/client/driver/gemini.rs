@@ -1,5 +1,4 @@
 use super::{Feature, Subject};
-use crate::tool::format_bytes;
 use ggemini::client::{
     connection::response::{data::Text, meta::Status},
     Client, Request,
@@ -217,6 +216,7 @@ fn handle(
                                                     Some(&cancellable),
                                                 ) {
                                                     Ok(file_output_stream) => {
+                                                        use crate::tool::Format;
                                                         // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
                                                         // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                                         // show bytes count in loading widget, validate max size for incoming data
@@ -237,7 +237,7 @@ fn handle(
                                                                     let action = action.clone();
                                                                     move |_, total| action.update.activate(&format!(
                                                                         "Received {}...",
-                                                                        format_bytes(total)
+                                                                        total.bytes()
                                                                     ))
                                                                 },
                                                                 // on complete
@@ -248,7 +248,7 @@ fn handle(
                                                                             action.complete.activate(&format!(
                                                                                 "Saved to {} ({} total)",
                                                                                 file.parse_name(),
-                                                                                format_bytes(total)
+                                                                                total.bytes()
                                                                             ))
                                                                         }
                                                                         Err(e) => action.cancel.activate(&e.to_string())
