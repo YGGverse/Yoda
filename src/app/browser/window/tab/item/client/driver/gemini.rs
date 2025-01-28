@@ -235,12 +235,10 @@ fn handle(
                                                                 // on chunk
                                                                 {
                                                                     let action = action.clone();
-                                                                    move |_, total| {
-                                                                        action.update.activate(&format!(
-                                                                            "Received {}...",
-                                                                            format_bytes(total)
-                                                                        ))
-                                                                    }
+                                                                    move |_, total| action.update.activate(&format!(
+                                                                        "Received {}...",
+                                                                        format_bytes(total)
+                                                                    ))
                                                                 },
                                                                 // on complete
                                                                 {
@@ -253,9 +251,7 @@ fn handle(
                                                                                 format_bytes(total)
                                                                             ))
                                                                         }
-                                                                        Err(e) => {
-                                                                            action.cancel.activate(&e.to_string())
-                                                                        }
+                                                                        Err(e) => action.cancel.activate(&e.to_string())
                                                                     }
                                                                 },
                                                             ),
