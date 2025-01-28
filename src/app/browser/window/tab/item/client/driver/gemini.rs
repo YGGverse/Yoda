@@ -1,4 +1,5 @@
 use super::{Feature, Subject};
+use crate::tool::format_bytes;
 use ggemini::client::{
     connection::response::{data::Text, meta::Status},
     Client, Request,
@@ -103,7 +104,6 @@ impl Gemini {
                         )
                         // init data to send
                         /* @TODO
-                        use crate::tool::format_bytes;
                         use plurify::ns as plural;
 
                         const CHUNK: usize = 0x400;
@@ -238,7 +238,7 @@ fn handle(
                                                                     move |_, total| {
                                                                         action.update.activate(&format!(
                                                                             "Received {}...",
-                                                                            crate::tool::format_bytes(total)
+                                                                            format_bytes(total)
                                                                         ))
                                                                     }
                                                                 },
@@ -248,8 +248,9 @@ fn handle(
                                                                     move |result| match result {
                                                                         Ok((_, total)) => {
                                                                             action.complete.activate(&format!(
-                                                                                "Saved to {} ({total} bytes total)",
-                                                                                file.parse_name()
+                                                                                "Saved to {} ({} total)",
+                                                                                file.parse_name(),
+                                                                                format_bytes(total)
                                                                             ))
                                                                         }
                                                                         Err(e) => {
