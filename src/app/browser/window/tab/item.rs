@@ -91,16 +91,22 @@ impl Item {
         });
 
         action.ident.connect_activate({
+            let client = client.clone();
             let page = page.clone();
             let parent = tab_view.clone().upcast::<gtk::Widget>();
             let profile = profile.clone();
-            let window_action = window_action.clone();
             move || {
-                if let Some(uri) = page.navigation.uri() {
-                    let scheme = uri.scheme();
-                    if scheme == "gemini" || scheme == "titan" {
-                        return identity::default(&window_action, &profile, &uri)
-                            .present(Some(&parent));
+                if let Some(request) = page.navigation.uri() {
+                    if ["gemini", "titan"].contains(&request.scheme().as_str()) {
+                        return identity::default(&profile, &request, {
+                            let client = client.clone();
+                            let page = page.clone();
+                            move || {
+                                page.navigation.update(); // update indicators immediately
+                                client.handle(&page.navigation.request(), false);
+                            } // on apply
+                        })
+                        .present(Some(&parent));
                     }
                 }
                 identity::unsupported().present(Some(&parent));

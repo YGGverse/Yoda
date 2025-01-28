@@ -1,7 +1,7 @@
 mod widget;
 use widget::{form::list::item::value::Value, Widget};
 
-use super::{Profile, WindowAction};
+use super::Profile;
 use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
@@ -14,7 +14,7 @@ impl Default {
     // Construct
 
     /// Create new `Self` for given `Profile`
-    pub fn build(window_action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
+    pub fn build(profile: &Rc<Profile>, request: &Uri, on_apply: impl Fn() + 'static) -> Self {
         // Init widget
         let widget = Rc::new(Widget::build(profile, request));
 
@@ -23,7 +23,6 @@ impl Default {
             let profile = profile.clone();
             let request = request.clone();
             let widget = widget.clone();
-            let window_action = window_action.clone();
             move |response| {
                 // Get option match user choice
                 let option = match response {
@@ -64,8 +63,8 @@ impl Default {
                     }
                 }
 
-                // Apply changes
-                window_action.reload.activate();
+                // Run callback function
+                on_apply()
             }
         });
 
