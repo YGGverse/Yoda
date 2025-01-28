@@ -5,13 +5,15 @@ mod input;
 mod navigation;
 mod search;
 
-use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
+use super::{Action as ItemAction, BrowserAction, Position, Profile, TabAction, WindowAction};
+use adw::{TabPage, TabView};
 use content::Content;
 use error::Error;
 use gtk::{prelude::BoxExt, Box, Orientation};
 use input::Input;
 use navigation::Navigation;
 use search::Search;
+use sourceview::prelude::IsA;
 use sqlite::Transaction;
 use std::rc::Rc;
 
@@ -26,7 +28,8 @@ pub struct Page {
     pub search: Rc<Search>,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
-    pub g_box: Box,
+    // System
+    pub tab_page: TabPage,
 }
 
 impl Page {
@@ -40,17 +43,16 @@ impl Page {
             &Rc<TabAction>,
             &Rc<ItemAction>,
         ),
+        tab_view: &TabView,
+        (position, is_pinned, is_selected, is_needs_attention): (Position, bool, bool, bool),
     ) -> Self {
         // Init components
         let content = Rc::new(Content::build((window_action, item_action)));
-
         let search = Rc::new(Search::new());
-
         let navigation = Rc::new(Navigation::build(
             profile,
             (window_action, tab_action, item_action),
         ));
-
         let input = Rc::new(Input::new());
 
         // Init main widget
@@ -61,9 +63,29 @@ impl Page {
         g_box.append(&search.g_box);
         g_box.append(&input.clamp);
 
+        // Generate `TabPage` by append widget into given `TabView`
+        let tab_page = match position {
+            Position::After => match tab_view.selected_page() {
+                Some(page) => add(tab_view, &g_box, tab_view.page_position(&page) + 1),
+                None => tab_view.append(&g_box),
+            },
+            Position::End => tab_view.append(&g_box),
+            Position::Number(value) => add(tab_view, &g_box, value),
+        };
+
+        // Setup
+        tab_page.set_needs_attention(is_needs_attention);
+        tab_page.set_title("New page");
+
+        tab_view.set_page_pinned(&tab_page, is_pinned);
+        if is_selected {
+            tab_view.set_selected_page(&tab_page);
+        }
+
         // Done
         Self {
             profile: profile.clone(),
+            tab_page: tab_page.clone(),
             // Actions
             browser_action: browser_action.clone(),
             item_action: item_action.clone(),
@@ -73,8 +95,6 @@ impl Page {
             search,
             input,
             navigation,
-            // Widget
-            g_box,
         }
     }
 
@@ -137,6 +157,10 @@ impl Page {
         match database::select(transaction, app_browser_window_tab_item_id) {
             Ok(records) => {
                 for record in records {
+                    // Restore main widget
+                    if let Some(title) = record.title {
+                        self.set_title(title.as_str());
+                    }
                     // Restore self by last record
                     // Delegate restore action to the item childs
                     self.navigation.restore(transaction, &record.id)?;
@@ -158,7 +182,17 @@ impl Page {
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
     ) -> Result<(), String> {
-        match database::insert(transaction, app_browser_window_tab_item_id) {
+        // Keep value in memory until operation complete
+        let title = self.tab_page.title();
+
+        match database::insert(
+            transaction,
+            app_browser_window_tab_item_id,
+            match title.is_empty() {
+                true => None,
+                false => Some(title.as_str()),
+            },
+        ) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 
@@ -169,6 +203,19 @@ impl Page {
         }
 
         Ok(())
+    }
+
+    // Setters
+
+    /// Set title for `Self`
+    /// * this method allows to keep `tab_page` isolated from driver implementation
+    pub fn set_title(&self, title: &str) {
+        self.tab_page.set_title(title);
+    }
+
+    pub fn set_progress(&self, progress_fraction: f64) {
+        self.navigation.set_progress_fraction(progress_fraction);
+        self.tab_page.set_loading(progress_fraction > 0.0)
     }
 }
 
@@ -185,4 +232,18 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Success
     Ok(())
+}
+
+/// Create new [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
+/// in [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) at given position
+///
+/// * if given `position` match pinned tab, GTK will panic with notice:
+///   adw_tab_view_insert: assertion 'position >= self->n_pinned_pages'\
+///   as the solution, prepend new page after pinned tabs in this case
+fn add(tab_view: &TabView, child: &impl IsA<gtk::Widget>, position: i32) -> TabPage {
+    if position > tab_view.n_pinned_pages() {
+        tab_view.insert(child, position)
+    } else {
+        tab_view.prepend(child)
+    }
 }

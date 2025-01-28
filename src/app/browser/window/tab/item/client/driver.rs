@@ -1,6 +1,6 @@
 mod gemini;
 
-use super::{Feature, Subject};
+use super::{Feature, Page};
 use gemini::Gemini;
 use std::rc::Rc;
 
@@ -13,9 +13,9 @@ impl Driver {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(subject: &Rc<Subject>) -> Self {
+    pub fn build(page: &Rc<Page>) -> Self {
         Driver {
-            gemini: Gemini::init(subject),
+            gemini: Gemini::init(page),
         }
     }
 }

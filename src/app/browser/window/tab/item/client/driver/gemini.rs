@@ -1,17 +1,17 @@
-use super::{Feature, Subject};
+use super::{Feature, Page};
 use ggemini::client::{
     connection::response::{data::Text, meta::Status},
     Client, Request,
 };
+use gtk::glib::Bytes;
 use gtk::glib::{GString, UriFlags};
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
     gio::{Cancellable, SocketClientEvent},
     glib::{Priority, Uri},
-    prelude::SocketClientExt,
+    prelude::{FileExt, SocketClientExt},
 };
-use gtk::{glib::Bytes, prelude::FileExt};
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
 /// Multi-protocol client API for `Page` object
@@ -21,22 +21,22 @@ pub struct Gemini {
     /// Validate redirection count by Gemini protocol specification
     redirects: Rc<Cell<usize>>,
     /// Handle target
-    subject: Rc<Subject>,
+    page: Rc<Page>,
 }
 
 impl Gemini {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(subject: &Rc<Subject>) -> Self {
+    pub fn init(page: &Rc<Page>) -> Self {
         // Init supported protocol libraries
         let client = Rc::new(ggemini::Client::new());
 
         // Listen for [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html) updates
         client.socket.connect_event({
-            let subject = subject.clone();
+            let page = page.clone();
             move |_, event, _, _| {
-                let progress_fraction = match event {
+                page.set_progress(match event {
                     // 0.1 reserved for handle begin
                     SocketClientEvent::Resolving => 0.2,
                     SocketClientEvent::Resolved => 0.3,
@@ -49,21 +49,14 @@ impl Gemini {
                     SocketClientEvent::TlsHandshaked => 0.9,
                     SocketClientEvent::Complete => 1.0,
                     _ => todo!(), // alert on API change
-                };
-
-                subject.tab_page.set_loading(progress_fraction > 0.0);
-
-                subject
-                    .page
-                    .navigation
-                    .set_progress_fraction(progress_fraction);
+                })
             }
         });
 
         Self {
             client,
             redirects: Rc::new(Cell::new(0)),
-            subject: subject.clone(),
+            page: page.clone(),
         }
     }
 
@@ -76,15 +69,15 @@ impl Gemini {
             "gemini" => handle(
                 Request::Gemini { uri },
                 self.client.clone(),
-                self.subject.clone(),
+                self.page.clone(),
                 self.redirects.clone(),
                 feature,
                 cancellable,
             ),
             "titan" => {
-                self.subject.page.input.set_new_titan({
+                self.page.input.set_new_titan({
                     let client = self.client.clone();
-                    let subject = self.subject.clone();
+                    let page = self.page.clone();
                     let redirects = self.redirects.clone();
                     move |data, _label| {
                         handle(
@@ -96,7 +89,7 @@ impl Gemini {
                                 token: None, // @TODO
                             },
                             client.clone(),
-                            subject.clone(),
+                            page.clone(),
                             redirects.clone(),
                             feature.clone(),
                             cancellable.clone(),
@@ -123,9 +116,8 @@ impl Gemini {
                         todo!()*/
                     }
                 });
-                self.subject.tab_page.set_title("Titan input");
-                self.subject.page.navigation.set_progress_fraction(0.0);
-                self.subject.tab_page.set_loading(false);
+                self.page.set_title("Titan input");
+                self.page.set_progress(0.0);
             }
             _ => panic!(), // unexpected
         }
@@ -135,7 +127,7 @@ impl Gemini {
 fn handle(
     request: Request,
     client: Rc<Client>,
-    subject: Rc<Subject>,
+    page: Rc<Page>,
     redirects: Rc<Cell<usize>>,
     feature: Rc<Feature>,
     cancellable: Cancellable,
@@ -147,8 +139,7 @@ fn handle(
         cancellable.clone(),
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
-        match subject
-            .page
+        match page
             .profile
             .identity
             .get(&uri.to_string())
@@ -160,12 +151,12 @@ fn handle(
             None => None,
         },
         {
-            let subject = subject.clone();
+            let page = page.clone();
             let redirects = redirects.clone();
             move |result| {
                 // Remove input forms when redirection expected has not been applied (e.g. failure status)
                 // @TODO implement input data recovery on error (it's also available before unset, but reference lost at this point)
-                subject.page.input.unset();
+                page.input.unset();
 
                 // Begin result handle
                 match result {
@@ -178,30 +169,29 @@ fn handle(
                                     None => Status::Input.to_string(),
                                 };
                                 if matches!(response.meta.status, Status::SensitiveInput) {
-                                    subject.page.input.set_new_sensitive(
-                                        subject.page.item_action.clone(),
+                                    page.input.set_new_sensitive(
+                                        page.item_action.clone(),
                                         uri,
                                         Some(&title),
                                         Some(1024),
                                     );
                                 } else {
-                                    subject.page.input.set_new_response(
-                                        subject.page.item_action.clone(),
+                                    page.input.set_new_response(
+                                        page.item_action.clone(),
                                         uri,
                                         Some(&title),
                                         Some(1024),
                                     );
                                 }
-                                subject.page.navigation.set_progress_fraction(0.0);
-                                subject.tab_page.set_loading(false);
-                                subject.tab_page.set_title(&title);
+                                page.set_progress(0.0);
+                                page.set_title(&title);
                                 redirects.replace(0); // reset
                             }
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                             Status::Success => match *feature {
                                 Feature::Download => {
                                     // Init download widget
-                                    let status = subject.page.content.to_status_download(
+                                    let status = page.content.to_status_download(
                                         uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
                                         // format FS entities
                                         &cancellable,
@@ -262,9 +252,8 @@ fn handle(
                                             }
                                         },
                                     );
-                                    subject.page.navigation.set_progress_fraction(0.0);
-                                    subject.tab_page.set_loading(false);
-                                    subject.tab_page.set_title(&status.title());
+                                    page.set_progress(0.0);
+                                    page.set_title(&status.title());
                                     redirects.replace(0); // reset
                                 },
                                 _ => match response.meta.mime {
@@ -276,36 +265,34 @@ fn handle(
                                             move |result| match result {
                                                 Ok(text) => {
                                                     let widget = if matches!(*feature, Feature::Source) {
-                                                        subject.page.content.to_text_source(&text.to_string())
+                                                        page.content.to_text_source(&text.to_string())
                                                     } else {
-                                                        subject.page.content.to_text_gemini(&uri, &text.to_string())
+                                                        page.content.to_text_gemini(&uri, &text.to_string())
                                                     };
-                                                    subject.page.search.set(Some(widget.text_view));
-                                                    subject.tab_page.set_title(&match widget.meta.title {
+                                                    page.search.set(Some(widget.text_view));
+                                                    page.set_title(&match widget.meta.title {
                                                         Some(title) => title.into(), // @TODO
                                                         None => uri_to_title(&uri),
                                                     });
-                                                    subject.page.navigation.set_progress_fraction(0.0);
-                                                    subject.tab_page.set_loading(false);
-                                                    subject.page.window_action
+                                                    page.set_progress(0.0);
+                                                    page.window_action
                                                         .find
                                                         .simple_action
                                                         .set_enabled(true);
                                                     redirects.replace(0); // reset
                                                 }
                                                 Err(e) => {
-                                                    let status = subject.page.content.to_status_failure();
+                                                    let status = page.content.to_status_failure();
                                                     status.set_description(Some(&e.to_string()));
-                                                    subject.page.navigation.set_progress_fraction(0.0);
-                                                    subject.tab_page.set_loading(false);
-                                                    subject.tab_page.set_title(&status.title());
+                                                    page.set_progress(0.0);
+                                                    page.set_title(&status.title());
                                                     redirects.replace(0); // reset
                                                 },
                                             },
                                         ),
                                         "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                             // Final image size unknown, show loading widget
-                                            let status = subject.page.content.to_status_loading(
+                                            let status = page.content.to_status_loading(
                                                 Some(Duration::from_secs(1)), // show if download time > 1 second
                                             );
 
@@ -322,7 +309,7 @@ fn handle(
                                                 move |_, total|
                                                 status.set_description(Some(&format!("Download: {total} bytes"))),
                                                 {
-                                                    let subject = subject.clone();
+                                                    let page = page.clone();
                                                     move |result| match result {
                                                         Ok((memory_input_stream, _)) => {
                                                             Pixbuf::from_stream_async(
@@ -331,27 +318,25 @@ fn handle(
                                                                 move |result| {
                                                                     match result {
                                                                         Ok(buffer) => {
-                                                                            subject.tab_page.set_title(&uri_to_title(&uri));
-                                                                            subject.page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                                            page.set_title(&uri_to_title(&uri));
+                                                                            page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                         }
                                                                         Err(e) => {
-                                                                            let status = subject.page.content.to_status_failure();
+                                                                            let status = page.content.to_status_failure();
                                                                             status.set_description(Some(e.message()));
-                                                                            subject.tab_page.set_title(&status.title());
+                                                                            page.set_title(&status.title());
                                                                         }
                                                                     }
-                                                                    subject.page.navigation.set_progress_fraction(0.0);
-                                                                    subject.tab_page.set_loading(false);
+                                                                    page.set_progress(0.0);
                                                                     redirects.replace(0); // reset
                                                                 },
                                                             )
                                                         }
                                                         Err(e) => {
-                                                            let status = subject.page.content.to_status_failure();
+                                                            let status = page.content.to_status_failure();
                                                             status.set_description(Some(&e.to_string()));
-                                                            subject.page.navigation.set_progress_fraction(0.0);
-                                                            subject.tab_page.set_loading(false);
-                                                            subject.tab_page.set_title(&status.title());
+                                                            page.set_progress(0.0);
+                                                            page.set_title(&status.title());
                                                             redirects.replace(0); // reset
                                                         }
                                                     }
@@ -359,22 +344,20 @@ fn handle(
                                             )
                                         }
                                         mime => {
-                                            let status = subject.page
+                                            let status = page
                                                 .content
-                                                .to_status_mime(mime, Some((&subject.page.item_action, &uri)));
+                                                .to_status_mime(mime, Some((&page.item_action, &uri)));
                                             status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                            subject.page.navigation.set_progress_fraction(0.0);
-                                            subject.tab_page.set_loading(false);
-                                            subject.tab_page.set_title(&status.title());
+                                            page.set_progress(0.0);
+                                            page.set_title(&status.title());
                                             redirects.replace(0); // reset
                                         },
                                     },
                                     None => {
-                                        let status = subject.page.content.to_status_failure();
+                                        let status = page.content.to_status_failure();
                                         status.set_description(Some("MIME type not found"));
-                                        subject.page.navigation.set_progress_fraction(0.0);
-                                        subject.tab_page.set_loading(false);
-                                        subject.tab_page.set_title(&status.title());
+                                        page.set_progress(0.0);
+                                        page.set_title(&status.title());
                                         redirects.replace(0); // reset
                                     },
                                 }
@@ -408,48 +391,43 @@ fn handle(
                                             let total = redirects.take() + 1;
                                             // Validate total redirects by protocol specification
                                             if total > 5 {
-                                                let status = subject.page.content.to_status_failure();
+                                                let status = page.content.to_status_failure();
                                                 status.set_description(Some("Redirection limit reached"));
-                                                subject.page.navigation.set_progress_fraction(0.0);
-                                                subject.tab_page.set_loading(false);
-                                                subject.tab_page.set_title(&status.title());
+                                                page.set_progress(0.0);
+                                                page.set_title(&status.title());
                                                 redirects.replace(0); // reset
 
                                             // Disallow external redirection by protocol restrictions
                                             } else if "gemini" != target.scheme()
                                                 || uri.port() != target.port()
                                                 || uri.host() != target.host() {
-                                                    let status = subject.page.content.to_status_failure();
+                                                    let status = page.content.to_status_failure();
                                                     status.set_description(Some("External redirects not allowed by protocol specification"));
-                                                    subject.page.navigation.set_progress_fraction(0.0);
-                                                    subject.tab_page.set_loading(false);
-                                                    subject.tab_page.set_title(&status.title());
+                                                    page.set_progress(0.0);
+                                                    page.set_title(&status.title());
                                                     redirects.replace(0); // reset
                                             // Valid
                                             } else {
                                                 if matches!(response.meta.status, Status::PermanentRedirect) {
-                                                    subject.page.navigation
-                                                    .set_request(&uri.to_string());
+                                                    page.navigation.set_request(&uri.to_string());
                                                 }
                                                 redirects.replace(total);
-                                                subject.page.item_action.load.activate(Some(&target.to_string()), false);
+                                                page.item_action.load.activate(Some(&target.to_string()), false);
                                             }
                                         }
                                         Err(e) => {
-                                            let status = subject.page.content.to_status_failure();
+                                            let status = page.content.to_status_failure();
                                             status.set_description(Some(&e.to_string()));
-                                            subject.page.navigation.set_progress_fraction(0.0);
-                                            subject.tab_page.set_loading(false);
-                                            subject.tab_page.set_title(&status.title());
+                                            page.set_progress(0.0);
+                                            page.set_title(&status.title());
                                             redirects.replace(0); // reset
                                         }
                                     }
                                     None => {
-                                        let status = subject.page.content.to_status_failure();
+                                        let status = page.content.to_status_failure();
                                         status.set_description(Some("Redirection target not found"));
-                                        subject.page.navigation.set_progress_fraction(0.0);
-                                        subject.tab_page.set_loading(false);
-                                        subject.tab_page.set_title(&status.title());
+                                        page.set_progress(0.0);
+                                        page.set_title(&status.title());
                                         redirects.replace(0); // reset
                                     }
                                 }
@@ -460,33 +438,30 @@ fn handle(
                             Status::CertificateUnauthorized |
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                             Status::CertificateInvalid => {
-                                let status = subject.page.content.to_status_identity();
+                                let status = page.content.to_status_identity();
                                 status.set_description(Some(&match response.meta.data {
                                     Some(data) => data.to_string(),
                                     None => response.meta.status.to_string(),
                                 }));
 
-                                subject.page.navigation.set_progress_fraction(0.0);
-                                subject.tab_page.set_loading(false);
-                                subject.tab_page.set_title(&status.title());
+                                page.set_progress(0.0);
+                                page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             }
                             error => {
-                                let status = subject.page.content.to_status_failure();
+                                let status = page.content.to_status_failure();
                                 status.set_description(Some(&error.to_string()));
-                                subject.page.navigation.set_progress_fraction(0.0);
-                                subject.tab_page.set_loading(false);
-                                subject.tab_page.set_title(&status.title());
+                                page.set_progress(0.0);
+                                page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             },
                         }
                     }
                     Err(e) => {
-                        let status = subject.page.content.to_status_failure();
+                        let status = page.content.to_status_failure();
                         status.set_description(Some(&e.to_string()));
-                        subject.page.navigation.set_progress_fraction(0.0);
-                        subject.tab_page.set_loading(false);
-                        subject.tab_page.set_title(&status.title());
+                        page.set_progress(0.0);
+                        page.set_title(&status.title());
                         redirects.replace(0); // reset
                     }
                 }

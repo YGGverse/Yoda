@@ -5,7 +5,7 @@ pub struct Table {
     // pub app_browser_window_tab_id: i64, not in use
     pub is_pinned: bool,
     pub is_selected: bool,
-    pub is_attention: bool,
+    pub is_needs_attention: bool,
 }
 
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
@@ -17,7 +17,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `page_position` INTEGER NOT NULL,
             `is_pinned` INTEGER NOT NULL,
             `is_selected` INTEGER NOT NULL,
-            `is_attention` INTEGER NOT NULL,
+            `is_needs_attention` INTEGER NOT NULL,
 
             FOREIGN KEY (`app_browser_window_tab_id`) REFERENCES `app_browser_window_tab`(`id`)
         )",
@@ -31,7 +31,7 @@ pub fn insert(
     page_position: i32,
     is_pinned: bool,
     is_selected: bool,
-    is_attention: bool,
+    is_needs_attention: bool,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item` (
@@ -39,14 +39,14 @@ pub fn insert(
             `page_position`,
             `is_pinned`,
             `is_selected`,
-            `is_attention`
+            `is_needs_attention`
         ) VALUES (?, ?, ?, ?, ?)",
         [
             app_browser_window_tab_id,
             page_position as i64,
             is_pinned as i64,
             is_selected as i64,
-            is_attention as i64,
+            is_needs_attention as i64,
         ],
     )
 }
@@ -57,7 +57,7 @@ pub fn select(tx: &Transaction, app_browser_window_tab_id: i64) -> Result<Vec<Ta
                 `app_browser_window_tab_id`,
                 `is_pinned`,
                 `is_selected`,
-                `is_attention`
+                `is_needs_attention`
                 FROM `app_browser_window_tab_item`
                 WHERE `app_browser_window_tab_id` = ?
                 ORDER BY `page_position` ASC", // just order by, no store in struct wanted
@@ -69,7 +69,7 @@ pub fn select(tx: &Transaction, app_browser_window_tab_id: i64) -> Result<Vec<Ta
             // app_browser_window_tab_id: row.get(1)?, not in use
             is_pinned: row.get(2)?,
             is_selected: row.get(3)?,
-            is_attention: row.get(4)?,
+            is_needs_attention: row.get(4)?,
         })
     })?;
 

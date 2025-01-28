@@ -1,9 +1,7 @@
 mod driver;
 mod feature;
-mod subject;
 
 use super::Page;
-use adw::TabPage;
 use driver::Driver;
 use feature::Feature;
 use gtk::{
@@ -12,29 +10,23 @@ use gtk::{
     prelude::{ActionExt, CancellableExt},
 };
 use std::{cell::Cell, rc::Rc};
-use subject::Subject;
 
 /// Multi-protocol client API for tab `Item`
 pub struct Client {
     cancellable: Cell<Cancellable>,
     driver: Rc<Driver>,
-    subject: Rc<Subject>,
+    page: Rc<Page>,
 }
 
 impl Client {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(page: &Rc<Page>, tab_page: &TabPage) -> Self {
-        let subject = Rc::new(Subject {
-            page: page.clone(),
-            tab_page: tab_page.clone(),
-        });
-
+    pub fn init(page: &Rc<Page>) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
-            driver: Rc::new(Driver::build(&subject)),
-            subject,
+            driver: Rc::new(Driver::build(page)),
+            page: page.clone(),
         }
     }
 
@@ -44,32 +36,29 @@ impl Client {
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
         // Move focus out from navigation entry @TODO
-        self.subject.page.browser_action.escape.activate(None);
+        self.page.browser_action.escape.activate(None);
 
         // Initially disable find action
-        self.subject
-            .page
+        self.page
             .window_action
             .find
             .simple_action
             .set_enabled(false);
 
         // Reset widgets
-        self.subject.page.search.unset();
-        self.subject.page.input.unset();
-        self.subject.tab_page.set_title("Loading..");
-        self.subject.page.navigation.set_progress_fraction(0.1);
-
-        self.subject.tab_page.set_loading(true);
+        self.page.search.unset();
+        self.page.input.unset();
+        self.page.set_title("Loading..");
+        self.page.set_progress(0.1);
 
         if is_snap_history {
-            snap_history(&self.subject, None);
+            snap_history(&self.page, None);
         }
 
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(request, self.cancellable(), {
             let driver = self.driver.clone();
-            let subject = self.subject.clone();
+            let page = self.page.clone();
             move |feature, cancellable, result| {
                 match result {
                     // route by scheme
@@ -77,18 +66,16 @@ impl Client {
                         "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
                         scheme => {
                             // no scheme match driver, complete with failure message
-                            let status = subject.page.content.to_status_failure();
+                            let status = page.content.to_status_failure();
                             status.set_description(Some(&format!(
                                 "Scheme `{scheme}` yet not supported"
                             )));
-                            subject.tab_page.set_title(&status.title());
-                            subject.page.navigation.set_progress_fraction(0.0);
-                            subject.tab_page.set_loading(false);
+                            page.set_title(&status.title());
+                            page.set_progress(0.0);
                         }
                     },
                     // begin redirection to new address suggested
-                    Err(uri) => subject
-                        .page
+                    Err(uri) => page
                         .item_action
                         .load
                         .activate(Some(&uri.to_string()), false),
@@ -190,22 +177,22 @@ fn search(query: &str) -> Uri {
 
 /// Make new history record in related components
 /// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
-fn snap_history(subject: &Rc<Subject>, uri: Option<&Uri>) {
-    let request = subject.page.navigation.request();
+fn snap_history(page: &Page, uri: Option<&Uri>) {
+    let request = page.navigation.request();
 
     // Add new record into the global memory index (used in global menu)
     // * if the `Uri` is `None`, try parse it from `request`
     match uri {
-        Some(uri) => subject.page.profile.history.memory.request.set(uri.clone()),
+        Some(uri) => page.profile.history.memory.request.set(uri.clone()),
         None => {
             // this case especially useful for some routes that contain redirects
             // maybe some parental optimization wanted @TODO
-            if let Some(uri) = subject.page.navigation.uri() {
-                subject.page.profile.history.memory.request.set(uri);
+            if let Some(uri) = page.navigation.uri() {
+                page.profile.history.memory.request.set(uri);
             }
         }
     }
 
     // Add new record into the page navigation history
-    subject.page.item_action.history.add(request, true)
+    page.item_action.history.add(request, true)
 }

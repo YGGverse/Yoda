@@ -3,7 +3,6 @@ mod client;
 mod database;
 mod identity;
 mod page;
-mod widget;
 
 use super::{Action as TabAction, BrowserAction, Position, WindowAction};
 use crate::Profile;
@@ -14,14 +13,12 @@ use gtk::prelude::{ActionMapExt, Cast};
 use page::Page;
 use sqlite::Transaction;
 use std::rc::Rc;
-use widget::Widget;
 
 pub struct Item {
     // Multi-protocol handler
     pub client: Rc<Client>,
     // Components
     pub page: Rc<Page>,
-    pub widget: Rc<Widget>,
     pub action: Rc<Action>,
 }
 
@@ -37,7 +34,7 @@ impl Item {
             &Rc<WindowAction>,
             &Rc<TabAction>,
         ),
-        (position, request, is_pinned, is_selected, is_attention, is_load): (
+        (position, request, is_pinned, is_selected, is_needs_attention, is_load): (
             Position,
             Option<&str>,
             bool,
@@ -63,18 +60,12 @@ impl Item {
         let page = Rc::new(Page::build(
             profile,
             (browser_action, window_action, tab_action, &action),
-        ));
-
-        let widget = Rc::new(Widget::build(
             tab_view,
-            &page.g_box,
-            None,
-            position,
-            (is_pinned, is_selected, is_attention),
+            (position, is_pinned, is_selected, is_needs_attention),
         ));
 
         // Update tab loading indicator
-        let client = Rc::new(Client::init(&page, &widget.tab_page));
+        let client = Rc::new(Client::init(&page));
 
         // Connect events
         action.home.connect_activate({
@@ -143,7 +134,6 @@ impl Item {
         Self {
             client,
             page,
-            widget,
             action,
         }
     }
@@ -160,7 +150,6 @@ impl Item {
                         Ok(_) => {
                             // Delegate clean action to the item childs
                             self.page.clean(transaction, record.id)?;
-                            self.widget.clean(transaction, record.id)?;
                         }
                         Err(e) => return Err(e.to_string()),
                     }
@@ -203,14 +192,13 @@ impl Item {
                             None,
                             record.is_pinned,
                             record.is_selected,
-                            record.is_attention,
+                            record.is_needs_attention,
                             false,
                         ),
                     ));
 
                     // Delegate restore action to the item childs
                     item.page.restore(transaction, record.id)?;
-                    item.widget.restore(transaction, record.id)?;
 
                     // Result
                     items.push(item);
@@ -229,7 +217,7 @@ impl Item {
         page_position: i32,
         is_pinned: bool,
         is_selected: bool,
-        is_attention: bool,
+        is_needs_attention: bool,
     ) -> Result<(), String> {
         match database::insert(
             transaction,
@@ -237,14 +225,13 @@ impl Item {
             page_position,
             is_pinned,
             is_selected,
-            is_attention,
+            is_needs_attention,
         ) {
             Ok(_) => {
                 let id = database::last_insert_id(transaction);
 
                 // Delegate save action to childs
                 self.page.save(transaction, id)?;
-                self.widget.save(transaction, id)?;
             }
             Err(e) => return Err(e.to_string()),
         }
@@ -262,7 +249,6 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
     // Delegate migration to childs
     page::migrate(tx)?;
-    widget::migrate(tx)?;
 
     // Success
     Ok(())

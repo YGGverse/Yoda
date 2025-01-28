@@ -3,6 +3,7 @@ use sqlite::{Error, Transaction};
 pub struct Table {
     pub id: i64,
     // pub app_browser_window_tab_item_id: i64, not in use,
+    pub title: Option<String>,
 }
 
 pub fn init(tx: &Transaction) -> Result<usize, Error> {
@@ -11,6 +12,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `app_browser_window_tab_item_id` INTEGER NOT NULL,
+            `title` VARCHAR(1024),
 
             FOREIGN KEY (`app_browser_window_tab_item_id`) REFERENCES `app_browser_window_tab_item`(`id`)
         )",
@@ -18,19 +20,25 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
     )
 }
 
-pub fn insert(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<usize, Error> {
+pub fn insert(
+    tx: &Transaction,
+    app_browser_window_tab_item_id: i64,
+    title: Option<&str>,
+) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item_page` (
-            `app_browser_window_tab_item_id`
-        ) VALUES (?)",
-        [app_browser_window_tab_item_id],
+            `app_browser_window_tab_item_id`,
+            `title`
+        ) VALUES (?, ?)",
+        (app_browser_window_tab_item_id, title),
     )
 }
 
 pub fn select(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<Vec<Table>, Error> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
-                `app_browser_window_tab_item_id`
+                `app_browser_window_tab_item_id`,
+                `title`
                 FROM `app_browser_window_tab_item_page`
                 WHERE `app_browser_window_tab_item_id` = ?",
     )?;
@@ -39,6 +47,7 @@ pub fn select(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<V
         Ok(Table {
             id: row.get(0)?,
             // app_browser_window_tab_item_id: row.get(1)?, not in use
+            title: row.get(2)?,
         })
     })?;
 

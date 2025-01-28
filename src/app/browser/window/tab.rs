@@ -142,7 +142,7 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
-            .insert(item.widget.tab_page.clone(), item.clone());
+            .insert(item.page.tab_page.clone(), item.clone());
 
         update_actions(
             &self.tab_view,
@@ -305,7 +305,7 @@ impl Tab {
                                 // Register dynamically created tab item in the HashMap index
                                 self.index
                                     .borrow_mut()
-                                    .insert(item.widget.tab_page.clone(), item.clone());
+                                    .insert(item.page.tab_page.clone(), item.clone());
                             }
                         }
                         Err(e) => return Err(e.to_string()),
@@ -333,10 +333,10 @@ impl Tab {
                     item.save(
                         transaction,
                         id,
-                        self.tab_view.page_position(&item.widget.tab_page),
-                        item.widget.tab_page.is_pinned(),
-                        item.widget.tab_page.is_selected(),
-                        item.widget.tab_page.needs_attention(),
+                        self.tab_view.page_position(&item.page.tab_page),
+                        item.page.tab_page.is_pinned(),
+                        item.page.tab_page.is_selected(),
+                        item.page.tab_page.needs_attention(),
                     )?;
                 }
             }
