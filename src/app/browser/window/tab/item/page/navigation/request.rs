@@ -40,6 +40,8 @@ pub trait Request {
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String>;
 
+    fn update(&self, profile: &Profile);
+
     // Setters
 
     fn to_download(&self);
@@ -96,37 +98,7 @@ impl Request for Entry {
                     .set_enabled(uri(&this.text()).is_some_and(|uri| uri.path().len() > 1));
 
                 // Update primary icon
-                this.first_child().unwrap().remove_css_class("success"); // @TODO handle
-
-                this.set_primary_icon_activatable(false);
-                this.set_primary_icon_sensitive(false);
-
-                match primary_icon::from(&this.text()) {
-                    PrimaryIcon::Download { name, tooltip } => {
-                        this.set_primary_icon_name(Some(name));
-                        this.set_primary_icon_tooltip_text(Some(tooltip));
-                    }
-                    PrimaryIcon::Gemini { name, tooltip }
-                    | PrimaryIcon::Titan { name, tooltip } => {
-                        this.set_primary_icon_activatable(true);
-                        this.set_primary_icon_sensitive(true);
-                        this.set_primary_icon_name(Some(name));
-                        if profile.identity.get(&strip_prefix(this.text())).is_some() {
-                            this.first_child().unwrap().add_css_class("success"); // @TODO handle
-                            this.set_primary_icon_tooltip_text(Some(tooltip.1));
-                        } else {
-                            this.set_primary_icon_tooltip_text(Some(tooltip.0));
-                        }
-                    }
-                    PrimaryIcon::Search { name, tooltip } => {
-                        this.set_primary_icon_name(Some(name));
-                        this.set_primary_icon_tooltip_text(Some(tooltip));
-                    }
-                    PrimaryIcon::Source { name, tooltip } => {
-                        this.set_primary_icon_name(Some(name));
-                        this.set_primary_icon_tooltip_text(Some(tooltip));
-                    }
-                }
+                this.update(&profile)
             }
         });
 
@@ -233,6 +205,40 @@ impl Request for Entry {
         }
 
         Ok(())
+    }
+
+    fn update(&self, profile: &Profile) {
+        // Update primary icon
+        self.first_child().unwrap().remove_css_class("success"); // @TODO handle
+
+        self.set_primary_icon_activatable(false);
+        self.set_primary_icon_sensitive(false);
+
+        match primary_icon::from(&self.text()) {
+            PrimaryIcon::Download { name, tooltip } => {
+                self.set_primary_icon_name(Some(name));
+                self.set_primary_icon_tooltip_text(Some(tooltip));
+            }
+            PrimaryIcon::Gemini { name, tooltip } | PrimaryIcon::Titan { name, tooltip } => {
+                self.set_primary_icon_activatable(true);
+                self.set_primary_icon_sensitive(true);
+                self.set_primary_icon_name(Some(name));
+                if profile.identity.get(&strip_prefix(self.text())).is_some() {
+                    self.first_child().unwrap().add_css_class("success"); // @TODO handle
+                    self.set_primary_icon_tooltip_text(Some(tooltip.1));
+                } else {
+                    self.set_primary_icon_tooltip_text(Some(tooltip.0));
+                }
+            }
+            PrimaryIcon::Search { name, tooltip } => {
+                self.set_primary_icon_name(Some(name));
+                self.set_primary_icon_tooltip_text(Some(tooltip));
+            }
+            PrimaryIcon::Source { name, tooltip } => {
+                self.set_primary_icon_name(Some(name));
+                self.set_primary_icon_tooltip_text(Some(tooltip));
+            }
+        }
     }
 
     // Setters

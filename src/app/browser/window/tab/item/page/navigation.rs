@@ -23,9 +23,10 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Navigation {
+    profile: Rc<Profile>,
     //home: Button,
     //reload: Button,
-    //bookmark: Button,
+    bookmark: Button,
     request: Entry,
     pub g_box: Box,
 }
@@ -62,10 +63,11 @@ impl Navigation {
         g_box.append(&bookmark);
 
         Self {
+            profile: profile.clone(),
             //home,
             request,
             //reload,
-            //bookmark,
+            bookmark,
             g_box,
         }
     }
@@ -133,6 +135,11 @@ impl Navigation {
 
     pub fn grab_focus(&self) -> bool {
         self.request.grab_focus()
+    }
+
+    pub fn update(&self) {
+        self.bookmark.update(&self.profile, &self.request);
+        self.request.update(&self.profile);
     }
 
     // Setters
