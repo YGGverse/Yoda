@@ -8,7 +8,7 @@ mod widget;
 use super::{Action as TabAction, BrowserAction, Position, WindowAction};
 use crate::Profile;
 use action::Action;
-use adw::TabView;
+use adw::{prelude::AdwDialogExt, TabView};
 use client::Client;
 use gtk::prelude::{ActionMapExt, Cast};
 use page::Page;

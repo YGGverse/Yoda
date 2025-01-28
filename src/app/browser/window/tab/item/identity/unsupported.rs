@@ -1,33 +1,44 @@
-mod widget;
-use widget::Widget;
+use adw::{
+    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
+    AlertDialog,
+};
 
-use gtk::prelude::IsA;
-use std::rc::Rc;
+const HEADING: &str = "Oops";
+const BODY: &str = "Identity not supported for this request";
+const RESPONSE_QUIT: (&str, &str) = ("close", "Close");
 
-pub struct Unsupported {
-    widget: Rc<Widget>,
+pub trait Unsupported {
+    fn unsupported() -> Self;
 }
 
-impl Default for Unsupported {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Unsupported {
+impl Unsupported for AlertDialog {
     // Construct
 
     /// Create new `Self`
-    pub fn new() -> Self {
-        Self {
-            widget: Rc::new(Widget::new()),
-        }
-    }
+    fn unsupported() -> Self {
+        // Init gobject
+        let this = AlertDialog::builder()
+            .heading(HEADING)
+            .body(BODY)
+            .close_response(RESPONSE_QUIT.0)
+            .default_response(RESPONSE_QUIT.0)
+            .build();
 
-    // Actions
+        // Set response variants
+        this.add_responses(&[RESPONSE_QUIT]);
 
-    /// Show dialog for given parent
-    pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
-        self.widget.present(parent)
+        // Decorate default response preset
+        /* contrast issue with Ubuntu orange accents
+        this.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive); */
+
+        // Init events
+        this.connect_response(None, move |dialog, response| {
+            if response == RESPONSE_QUIT.0 {
+                dialog.close();
+            }
+        });
+
+        // Return new activated `Self`
+        this
     }
 }

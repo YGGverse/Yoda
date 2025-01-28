@@ -1,6 +1,7 @@
 mod default;
 mod unsupported;
 
+use adw::AlertDialog;
 use default::Default;
 use unsupported::Unsupported;
 
@@ -14,6 +15,6 @@ pub fn default(profile: &Rc<Profile>, request: &Uri, on_apply: impl Fn() + 'stat
 }
 
 /// Create new identity widget for unknown request
-pub fn unsupported() -> Unsupported {
-    Unsupported::new()
+pub fn unsupported() -> AlertDialog {
+    AlertDialog::unsupported()
 }
