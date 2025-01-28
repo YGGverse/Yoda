@@ -1,50 +1,71 @@
 use super::{Profile, WindowAction};
 use gtk::{
-    prelude::{ActionExt, ButtonExt, EditableExt},
+    prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
     Button, Entry,
 };
 use std::rc::Rc;
 
-const ICON_YES: &str = "starred-symbolic";
-const ICON_NON: &str = "non-starred-symbolic";
+const ICON_NAME: (&str, &str) = ("non-starred-symbolic", "starred-symbolic");
+const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
 pub trait Bookmark {
     fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self;
+    fn update(&self, profile: &Profile, request: &Entry);
 }
 
 impl Bookmark for Button {
     fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self {
-        let has_bookmark = profile.bookmark.get(&request.text()).is_ok();
-
         let button = Button::builder()
             .action_name(format!(
                 "{}.{}",
                 action.id,
                 action.bookmark.simple_action.name()
-            )) // @TODO
-            .icon_name(icon_name(has_bookmark))
-            .tooltip_text("Bookmark")
+            ))
             .build();
+        button.update(profile, request);
 
+        // Setup events
         action.bookmark.simple_action.connect_activate({
             let button = button.clone();
             let profile = profile.clone();
             let request = request.clone();
-            move |_, _| {
-                button.set_icon_name(icon_name(profile.bookmark.get(&request.text()).is_ok()))
-            }
-        }); // @TODO use local action
+            move |_, _| button.update(&profile, &request)
+        });
 
-        button.connect_clicked(move |this| this.set_icon_name(icon_name(has_bookmark)));
+        request.connect_changed({
+            let profile = profile.clone();
+            let button = button.clone();
+            move |this| button.update(&profile, this)
+        });
+
+        button.connect_clicked({
+            let profile = profile.clone();
+            let request = request.clone();
+            move |this| this.update(&profile, &request)
+        });
 
         button
+    }
+
+    fn update(&self, profile: &Profile, request: &Entry) {
+        let has_bookmark = profile.bookmark.get(&request.text()).is_ok();
+        self.set_icon_name(icon_name(has_bookmark));
+        self.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+    }
+}
+
+fn tooltip_text(has_bookmark: bool) -> &'static str {
+    if has_bookmark {
+        TOOLTIP_TEXT.1
+    } else {
+        TOOLTIP_TEXT.0
     }
 }
 
 fn icon_name(has_bookmark: bool) -> &'static str {
     if has_bookmark {
-        ICON_YES
+        ICON_NAME.1
     } else {
-        ICON_NON
+        ICON_NAME.0
     }
 }
