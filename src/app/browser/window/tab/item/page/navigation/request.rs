@@ -95,7 +95,9 @@ impl Request for Entry {
                 item_action.reload.set_enabled(!this.text().is_empty());
                 item_action
                     .home
-                    .set_enabled(uri(&this.text()).is_some_and(|uri| uri.path().len() > 1));
+                    .set_enabled(uri(&this.text()).is_some_and(|uri| {
+                        uri.path().len() > 1 || uri.query().is_some() || uri.fragment().is_some()
+                    }));
 
                 // Update primary icon
                 this.update(&profile)
