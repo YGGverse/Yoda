@@ -1,8 +1,8 @@
-use gtk::{pango::Style, TextTag, WrapMode};
+use gtk::{TextTag, WrapMode};
 
 pub fn new() -> TextTag {
     TextTag::builder()
-        .style(Style::Italic)
+        .left_margin(28)
         .wrap_mode(WrapMode::Word)
         .build()
 }

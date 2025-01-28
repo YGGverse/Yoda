@@ -1,10 +1,12 @@
 mod ansi;
 pub mod error;
+mod icon;
 mod syntax;
 mod tag;
 mod widget;
 
 pub use error::Error;
+use icon::Icon;
 use syntax::Syntax;
 use tag::Tag;
 use widget::Widget;
@@ -58,12 +60,18 @@ impl Reader {
         // Init multiline code builder features
         let mut multiline = None;
 
+        // Init quote icon feature
+        let mut is_line_after_quote = false;
+
         // Init colors
         // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
         let link_color = (RGBA::new(0.2, 0.5, 0.9, 1.0), RGBA::new(0.2, 0.5, 0.9, 0.9));
 
         // Init syntect highlight features
         let syntax = Syntax::new();
+
+        // Init icons
+        let icon = Icon::new();
 
         // Init tags
         let tag = Tag::new();
@@ -282,12 +290,24 @@ impl Reader {
 
             // Is quote
             if let Some(quote) = Quote::from(line) {
+                // Show quote indicator if last line is not quote (to prevent duplicates)
+                if !is_line_after_quote {
+                    // Show only if the icons resolved for default `Display`
+                    if let Some(ref icon) = icon {
+                        buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
+                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                    }
+                }
+                is_line_after_quote = true;
+
                 // Append value to buffer
                 buffer.insert_with_tags(&mut buffer.end_iter(), &quote.value, &[&tag.quote]);
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                 // Skip other actions for this line
                 continue;
+            } else {
+                is_line_after_quote = false;
             }
 
             // Nothing match custom tags above,
