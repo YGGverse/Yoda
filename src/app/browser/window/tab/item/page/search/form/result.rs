@@ -29,8 +29,9 @@ impl Result {
     // Actions
 
     pub fn update(&self, current: Option<usize>, total: usize) {
+        use plurify::*;
         if total > 0 {
-            let matches = plurify::ns(total, &["match", "matches", "matches"]);
+            let matches = total.plurify(&["match", "matches", "matches"]);
             match current {
                 Some(position) => self
                     .label
