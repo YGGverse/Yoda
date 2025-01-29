@@ -247,14 +247,20 @@ impl Request for Entry {
     fn identity(&self, profile: &Rc<Profile>) {
         if let Some(uri) = self.uri() {
             if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
-                return identity::default(profile, &uri, {
-                    let profile = profile.clone();
-                    let this = self.clone();
-                    move || {
-                        this.update(&profile);
-                        this.emit_activate();
-                    } // on apply
-                })
+                return identity::default(
+                    profile,
+                    &uri,
+                    &Rc::new({
+                        let profile = profile.clone();
+                        let this = self.clone();
+                        move |is_reload| {
+                            this.update(&profile);
+                            if is_reload {
+                                this.emit_activate();
+                            }
+                        }
+                    }),
+                )
                 .present(Some(self));
             }
         }

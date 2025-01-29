@@ -10,8 +10,12 @@ use gtk::glib::Uri;
 use std::rc::Rc;
 
 /// Create new identity widget for Gemini protocol match given URI
-pub fn default(profile: &Rc<Profile>, request: &Uri, on_apply: impl Fn() + 'static) -> Default {
-    Default::build(profile, request, on_apply)
+pub fn default(
+    profile: &Rc<Profile>,
+    request: &Uri,
+    callback: &Rc<impl Fn(bool) + 'static>,
+) -> Default {
+    Default::build(profile, request, callback)
 }
 
 /// Create new identity widget for unknown request

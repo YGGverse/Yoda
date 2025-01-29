@@ -24,16 +24,18 @@ const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 // Select options
 
 pub struct Widget {
-    // pub action: Rc<Action>,
-    pub form: Rc<Form>,
-    pub alert_dialog: AlertDialog,
+    alert_dialog: AlertDialog,
 }
 
 impl Widget {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>, request: &Uri) -> Self {
+    pub fn build(
+        profile: &Rc<Profile>,
+        request: &Uri,
+        callback: &Rc<impl Fn(bool) + 'static>,
+    ) -> Self {
         // Init actions
         let action = Rc::new(WidgetAction::new());
 
@@ -49,12 +51,64 @@ impl Widget {
             .extra_child(&form.g_box)
             .build();
 
-        // Set response variants
         alert_dialog.add_responses(&[
             RESPONSE_CANCEL,
             // RESPONSE_MANAGE,
             RESPONSE_APPLY,
         ]);
+
+        alert_dialog.connect_response(Some(RESPONSE_APPLY.0), {
+            let callback = callback.clone();
+            let form = form.clone();
+            let profile = profile.clone();
+            let request = request.clone();
+            move |this, response| {
+                // Prevent double-click action
+                this.set_response_enabled(response, false);
+
+                // Get option match user choice
+                let option = match form.list.selected().value_enum() {
+                    Value::ProfileIdentityId(value) => Some(value),
+                    Value::GuestSession => None,
+                    Value::GeneratePem => Some(
+                        profile
+                            .identity
+                            .make(None, &form.name.value().unwrap())
+                            .unwrap(), // @TODO handle
+                    ),
+                    Value::ImportPem => Some(
+                        profile
+                            .identity
+                            .add(&form.file.pem.take().unwrap())
+                            .unwrap(), // @TODO handle
+                    ),
+                };
+
+                // Apply auth
+                match option {
+                    // Activate identity for `scope`
+                    Some(profile_identity_id) => {
+                        if profile
+                            .identity
+                            .auth
+                            .apply(profile_identity_id, &request.to_string())
+                            .is_err()
+                        {
+                            panic!() // unexpected @TODO
+                        }
+                    }
+                    // Remove all identity auths for `scope`
+                    None => {
+                        if profile.identity.auth.remove(&request.to_string()).is_err() {
+                            panic!() // unexpected @TODO
+                        }
+                    }
+                }
+
+                // Run callback function
+                callback(true)
+            }
+        });
 
         // Deactivate not implemented feature @TODO
         // alert_dialog.set_response_enabled(RESPONSE_MANAGE.0, false);
@@ -67,6 +121,7 @@ impl Widget {
         // Init events
         action.update.connect_activate({
             let form = form.clone();
+            let callback = callback.clone();
             let alert_dialog = alert_dialog.clone();
             move || {
                 // Update child components
@@ -74,6 +129,8 @@ impl Widget {
 
                 // Deactivate apply button if the form values could not be processed
                 alert_dialog.set_response_enabled(RESPONSE_APPLY.0, form.is_applicable());
+
+                callback(false);
             }
         });
 
@@ -81,29 +138,10 @@ impl Widget {
         action.update.activate();
 
         // Return new activated `Self`
-        Self {
-            // action,
-            form,
-            alert_dialog,
-        }
+        Self { alert_dialog }
     }
 
     // Actions
-
-    /// Callback wrapper to apply
-    /// [response](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/signal.AlertDialog.response.html)
-    pub fn on_apply(&self, callback: impl Fn(Value) + 'static) {
-        self.alert_dialog.connect_response(Some(RESPONSE_APPLY.0), {
-            let form = self.form.clone();
-            move |this, response| {
-                // Prevent double-click action
-                this.set_response_enabled(response, false);
-
-                // Result
-                callback(form.list.selected().value_enum())
-            }
-        });
-    }
 
     /// Show dialog with new preset
     pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
