@@ -5,12 +5,12 @@ use super::Profile;
 use gtk::{glib::Uri, prelude::IsA};
 use std::rc::Rc;
 
-pub struct Default {
+pub struct Common {
     // profile: Rc<Profile>,
     widget: Rc<Widget>,
 }
 
-impl Default {
+impl Common {
     // Construct
 
     /// Create new `Self` for given `Profile`

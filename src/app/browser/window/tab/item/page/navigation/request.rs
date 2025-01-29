@@ -247,7 +247,7 @@ impl Request for Entry {
     fn identity(&self, profile: &Rc<Profile>) {
         if let Some(uri) = self.uri() {
             if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
-                return identity::default(
+                return identity::common(
                     profile,
                     &uri,
                     &Rc::new({
