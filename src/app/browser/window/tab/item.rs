@@ -94,7 +94,7 @@ impl Item {
 
         action.identity.connect_activate({
             let page = page.clone();
-            move |_, _| page.navigation.identity()
+            move |_, _| page.navigation.show_identity_dialog()
         });
 
         action.reload.connect_activate({

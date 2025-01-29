@@ -42,8 +42,8 @@ pub trait Request {
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<(), String>;
 
-    fn update(&self, profile: &Profile);
-    fn identity(&self, profile: &Rc<Profile>);
+    fn update_primary_icon(&self, profile: &Profile);
+    fn show_identity_dialog(&self, profile: &Rc<Profile>);
 
     // Setters
 
@@ -71,11 +71,14 @@ impl Request for Entry {
             .hexpand(true)
             .build();
 
+        // Detect primary icon on construct
+        entry.update_primary_icon(profile);
+
         // Connect events
         entry.connect_icon_release({
             let profile = profile.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => this.identity(&profile),
+                EntryIconPosition::Primary => this.show_identity_dialog(&profile),
                 EntryIconPosition::Secondary => {
                     this.activate();
                 }
@@ -101,7 +104,7 @@ impl Request for Entry {
                 item_action.home.set_enabled(this.home().is_some());
 
                 // Update primary icon
-                this.update(&profile)
+                this.update_primary_icon(&profile)
             }
         });
 
@@ -210,7 +213,7 @@ impl Request for Entry {
         Ok(())
     }
 
-    fn update(&self, profile: &Profile) {
+    fn update_primary_icon(&self, profile: &Profile) {
         // Update primary icon
         self.first_child().unwrap().remove_css_class("success"); // @TODO handle
 
@@ -245,7 +248,7 @@ impl Request for Entry {
     }
 
     /// Present identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-    fn identity(&self, profile: &Rc<Profile>) {
+    fn show_identity_dialog(&self, profile: &Rc<Profile>) {
         // connect identity traits
         use identity::{Common, Unsupported};
         if let Some(uri) = self.uri() {
@@ -257,7 +260,7 @@ impl Request for Entry {
                         let profile = profile.clone();
                         let this = self.clone();
                         move |is_reload| {
-                            this.update(&profile);
+                            this.update_primary_icon(&profile);
                             if is_reload {
                                 this.emit_activate();
                             }

@@ -131,8 +131,8 @@ impl Navigation {
         self.request.grab_focus()
     }
 
-    pub fn identity(&self) {
-        self.request.identity(&self.profile)
+    pub fn show_identity_dialog(&self) {
+        self.request.show_identity_dialog(&self.profile)
     }
 
     // Setters
