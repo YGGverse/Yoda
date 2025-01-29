@@ -137,6 +137,10 @@ impl Navigation {
         self.request.grab_focus()
     }
 
+    pub fn identity(&self) {
+        self.request.identity(&self.profile)
+    }
+
     pub fn update(&self) {
         self.bookmark.update(&self.profile, &self.request);
         self.request.update(&self.profile);

@@ -91,6 +91,11 @@ impl Item {
             }
         });
 
+        action.identity.connect_activate({
+            let page = page.clone();
+            move |_, _| page.navigation.identity()
+        });
+
         action.reload.connect_activate({
             let page = page.clone();
             let client = client.clone();

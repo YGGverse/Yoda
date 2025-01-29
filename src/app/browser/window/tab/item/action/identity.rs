@@ -6,8 +6,6 @@ pub trait Identity {
 
 impl Identity for SimpleAction {
     fn identity() -> Self {
-        let identity = SimpleAction::new(&uuid_string_random(), None);
-        identity.set_enabled(false);
-        identity
+        SimpleAction::new(&uuid_string_random(), None)
     }
 }

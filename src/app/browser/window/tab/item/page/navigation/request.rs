@@ -43,6 +43,7 @@ pub trait Request {
     ) -> Result<(), String>;
 
     fn update(&self, profile: &Profile);
+    fn identity(&self, profile: &Rc<Profile>);
 
     // Setters
 
@@ -72,27 +73,12 @@ impl Request for Entry {
 
         // Connect events
         entry.connect_icon_release({
-            let item_action = item_action.clone();
             let profile = profile.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => {
-                    if let Some(request) = this.uri() {
-                        if ["gemini", "titan"].contains(&request.scheme().as_str()) {
-                            return identity::default(&profile, &request, {
-                                let item_action = item_action.clone();
-                                let profile = profile.clone();
-                                let this = this.clone();
-                                move || {
-                                    this.update(&profile);
-                                    item_action.load.activate(Some(&this.text()), false);
-                                } // on apply
-                            })
-                            .present(Some(this));
-                        }
-                    }
-                    identity::unsupported().present(Some(this));
+                EntryIconPosition::Primary => this.identity(&profile),
+                EntryIconPosition::Secondary => {
+                    this.activate();
                 }
-                EntryIconPosition::Secondary => item_action.load.activate(Some(&this.text()), true),
                 _ => todo!(), // unexpected
             }
         });
@@ -121,15 +107,15 @@ impl Request for Entry {
 
         entry.connect_activate({
             let item_action = item_action.clone();
-            move |entry| {
-                item_action.load.activate(Some(&entry.text()), true);
+            move |this| {
+                item_action.load.activate(Some(&this.text()), true);
             }
         });
 
         entry.connect_state_flags_changed({
             // Define last focus state container
             let has_focus = Cell::new(false);
-            move |entry, state| {
+            move |this, state| {
                 // Select entire text on first click (release)
                 // this behavior implemented in most web-browsers,
                 // to simply overwrite current request with new value
@@ -138,9 +124,9 @@ impl Request for Entry {
                 // * This is experimental feature does not follow native GTK behavior @TODO make optional
                 if !has_focus.take()
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
-                    && entry.selection_bounds().is_none()
+                    && this.selection_bounds().is_none()
                 {
-                    entry.select_region(0, entry.text_length().into());
+                    this.select_region(0, this.text_length().into());
                 }
                 // Update last focus state
                 has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
@@ -256,6 +242,23 @@ impl Request for Entry {
                 self.set_primary_icon_tooltip_text(Some(tooltip));
             }
         }
+    }
+
+    fn identity(&self, profile: &Rc<Profile>) {
+        if let Some(uri) = self.uri() {
+            if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
+                return identity::default(profile, &uri, {
+                    let profile = profile.clone();
+                    let this = self.clone();
+                    move || {
+                        this.update(&profile);
+                        this.emit_activate();
+                    } // on apply
+                })
+                .present(Some(self));
+            }
+        }
+        identity::unsupported().present(Some(self));
     }
 
     // Setters
