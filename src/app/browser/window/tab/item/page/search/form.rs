@@ -85,7 +85,6 @@ impl Form {
                     if !this.text().is_empty() {
                         match navigation.forward(subject) {
                             Some((mut start, _)) => {
-                                navigation.update();
                                 result.update(navigation.position(), navigation.total());
                                 scroll_to_iter(&subject.text_view, &mut start)
                             }
@@ -130,7 +129,6 @@ impl Form {
                 Some(subject) => {
                     match navigation.back(subject) {
                         Some((mut start, _)) => {
-                            navigation.update();
                             result.update(navigation.position(), navigation.total());
                             scroll_to_iter(&subject.text_view, &mut start)
                         }
@@ -148,7 +146,6 @@ impl Form {
             move |_| match subject.borrow().as_ref() {
                 Some(subject) => match navigation.forward(subject) {
                     Some((mut start, _)) => {
-                        navigation.update();
                         result.update(navigation.position(), navigation.total());
                         scroll_to_iter(&subject.text_view, &mut start)
                     }

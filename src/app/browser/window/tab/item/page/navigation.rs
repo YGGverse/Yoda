@@ -24,9 +24,6 @@ const SPACING: i32 = 6;
 
 pub struct Navigation {
     profile: Rc<Profile>,
-    //home: Button,
-    //reload: Button,
-    bookmark: Button,
     request: Entry,
     pub g_box: Box,
 }
@@ -64,10 +61,7 @@ impl Navigation {
 
         Self {
             profile: profile.clone(),
-            //home,
             request,
-            //reload,
-            bookmark,
             g_box,
         }
     }
@@ -139,11 +133,6 @@ impl Navigation {
 
     pub fn identity(&self) {
         self.request.identity(&self.profile)
-    }
-
-    pub fn update(&self) {
-        self.bookmark.update(&self.profile, &self.request);
-        self.request.update(&self.profile);
     }
 
     // Setters
