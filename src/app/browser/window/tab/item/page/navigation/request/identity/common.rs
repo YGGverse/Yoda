@@ -4,7 +4,7 @@ mod form;
 use crate::Profile;
 use action::Action as WidgetAction;
 use adw::AlertDialog;
-use gtk::glib::Uri;
+use gtk::{glib::Uri, prelude::EditableExt};
 use std::rc::Rc;
 
 // Select options
@@ -69,10 +69,7 @@ impl Common for AlertDialog {
                     Value::ProfileIdentityId(value) => Some(value),
                     Value::GuestSession => None,
                     Value::GeneratePem => Some(
-                        profile
-                            .identity
-                            .make(None, &form.name.value().unwrap())
-                            .unwrap(), // @TODO handle
+                        profile.identity.make(None, &form.name.text()).unwrap(), // @TODO handle
                     ),
                     Value::ImportPem => Some(
                         profile

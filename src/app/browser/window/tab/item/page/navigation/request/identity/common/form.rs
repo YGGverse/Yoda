@@ -17,7 +17,7 @@ use crate::Profile;
 use gtk::{
     glib::Uri,
     prelude::{BoxExt, WidgetExt},
-    Box, Button, Orientation,
+    Box, Button, Entry, Orientation,
 };
 use std::rc::Rc;
 
@@ -27,7 +27,7 @@ pub struct Form {
     pub exit: Button,
     pub file: Rc<File>,
     pub list: Rc<List>,
-    pub name: Rc<Name>,
+    pub name: Entry,
     pub save: Rc<Save>,
     pub g_box: Box,
     profile: Rc<Profile>,
@@ -41,7 +41,7 @@ impl Form {
         // Init components
         let list = Rc::new(List::build(widget_action, profile, request));
         let file = Rc::new(File::build(widget_action));
-        let name = Rc::new(Name::build(widget_action));
+        let name = Entry::name(widget_action);
         let save = Rc::new(Save::build(profile, &list));
         let drop = Rc::new(Drop::build(profile, &list));
         let exit = Button::exit(widget_action, profile, &list, request);
@@ -50,7 +50,7 @@ impl Form {
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
 
         g_box.append(&list.dropdown);
-        g_box.append(&name.entry);
+        g_box.append(&name);
         g_box.append(&file.button);
         g_box.append(&exit);
         g_box.append(&drop.button);

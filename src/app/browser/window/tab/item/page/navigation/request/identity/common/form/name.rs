@@ -1,25 +1,35 @@
 use super::WidgetAction;
 use gtk::{
-    glib::GString,
     prelude::{EditableExt, EntryExt, WidgetExt},
     Entry,
 };
 use std::rc::Rc;
 
-const PLACEHOLDER_TEXT: &str = "Identity name (required)";
-const MARGIN: i32 = 8;
 const MIN_LENGTH: u16 = 1;
 const MAX_LENGTH: u16 = 36;
 
-pub struct Name {
-    pub entry: Entry,
+pub trait Name {
+    // Constructors
+
+    fn name(widget_action: &Rc<WidgetAction>) -> Self;
+
+    // Actions
+
+    fn update(&self, is_visible: bool);
+
+    // Getters
+
+    fn is_valid(&self) -> bool;
 }
 
-impl Name {
+impl Name for Entry {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(widget_action: &Rc<WidgetAction>) -> Self {
+    fn name(widget_action: &Rc<WidgetAction>) -> Self {
+        const PLACEHOLDER_TEXT: &str = "Identity name (required)";
+        const MARGIN: i32 = 8;
+
         // Init main gobject
         let entry = Entry::builder()
             .margin_top(MARGIN)
@@ -35,32 +45,23 @@ impl Name {
         });
 
         // Return activated `Self`
-        Self { entry }
+        entry
     }
 
     // Actions
 
     /// Change visibility status
     /// * grab focus on `is_visible` is `true`
-    pub fn update(&self, is_visible: bool) {
-        self.entry.set_visible(is_visible);
-        if is_visible && self.entry.focus_child().is_none() {
-            self.entry.grab_focus();
+    fn update(&self, is_visible: bool) {
+        self.set_visible(is_visible);
+        if is_visible && self.focus_child().is_none() {
+            self.grab_focus();
         }
     }
 
     // Getters
 
-    pub fn is_valid(&self) -> bool {
-        self.entry.text_length() >= MIN_LENGTH && self.entry.text_length() <= MAX_LENGTH
-    }
-
-    pub fn value(&self) -> Option<GString> {
-        let text = self.entry.text();
-        if text.is_empty() {
-            None
-        } else {
-            Some(text)
-        }
+    fn is_valid(&self) -> bool {
+        self.text_length() >= MIN_LENGTH && self.text_length() <= MAX_LENGTH
     }
 }
