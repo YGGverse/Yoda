@@ -47,6 +47,7 @@ impl Item {
 
         tab_action.simple_action_group.add_action(&action.home);
         tab_action.simple_action_group.add_action(&action.reload);
+        tab_action.simple_action_group.add_action(&action.identity);
 
         tab_action
             .simple_action_group
