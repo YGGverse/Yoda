@@ -3,27 +3,12 @@ use super::{
     WidgetAction,
 };
 use crate::Profile;
-use adw::{
-    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
-    AlertDialog, ResponseAppearance,
-};
 use gtk::{
     glib::Uri,
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
 use std::rc::Rc;
-
-// Defaults
-
-const LABEL: &str = "Disconnect";
-const TOOLTIP_TEXT: &str = "Stop use selected identity everywhere";
-const MARGIN: i32 = 8;
-
-const HEADING: &str = "Disconnect";
-const BODY: &str = "Stop use selected identity for all scopes?";
-const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
-const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
 pub trait Exit {
     fn exit(
@@ -44,6 +29,20 @@ impl Exit for Button {
         list: &Rc<List>,
         request: &Uri,
     ) -> Self {
+        use adw::{
+            prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
+            AlertDialog, ResponseAppearance,
+        };
+
+        const LABEL: &str = "Disconnect";
+        const TOOLTIP_TEXT: &str = "Stop use selected identity everywhere";
+        const MARGIN: i32 = 8;
+
+        const HEADING: &str = "Disconnect";
+        const BODY: &str = "Stop use selected identity for all scopes?";
+        const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
+        const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
+
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
