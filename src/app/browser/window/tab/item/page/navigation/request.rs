@@ -2,7 +2,7 @@ mod database;
 mod identity;
 mod primary_icon;
 
-use adw::prelude::AdwDialogExt;
+use adw::{prelude::AdwDialogExt, AlertDialog};
 use primary_icon::PrimaryIcon;
 
 use super::{ItemAction, Profile};
@@ -244,10 +244,13 @@ impl Request for Entry {
         }
     }
 
+    /// Present identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
     fn identity(&self, profile: &Rc<Profile>) {
+        // connect identity traits
+        use identity::{Common, Unsupported};
         if let Some(uri) = self.uri() {
             if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
-                return identity::common(
+                return AlertDialog::common(
                     profile,
                     &uri,
                     &Rc::new({
@@ -264,7 +267,7 @@ impl Request for Entry {
                 .present(Some(self));
             }
         }
-        identity::unsupported().present(Some(self));
+        AlertDialog::unsupported().present(Some(self));
     }
 
     // Setters

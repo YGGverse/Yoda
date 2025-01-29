@@ -1,11 +1,4 @@
-use adw::{
-    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
-    AlertDialog,
-};
-
-const HEADING: &str = "Oops";
-const BODY: &str = "Identity not supported for this request";
-const RESPONSE_QUIT: (&str, &str) = ("close", "Close");
+use adw::AlertDialog;
 
 pub trait Unsupported {
     fn unsupported() -> Self;
@@ -16,8 +9,14 @@ impl Unsupported for AlertDialog {
 
     /// Create new `Self`
     fn unsupported() -> Self {
+        use adw::prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual};
+
+        const HEADING: &str = "Oops";
+        const BODY: &str = "Identity not supported for this request";
+        const RESPONSE_QUIT: (&str, &str) = ("close", "Close");
+
         // Init gobject
-        let this = AlertDialog::builder()
+        let alert_dialog = AlertDialog::builder()
             .heading(HEADING)
             .body(BODY)
             .close_response(RESPONSE_QUIT.0)
@@ -25,20 +24,20 @@ impl Unsupported for AlertDialog {
             .build();
 
         // Set response variants
-        this.add_responses(&[RESPONSE_QUIT]);
+        alert_dialog.add_responses(&[RESPONSE_QUIT]);
 
         // Decorate default response preset
         /* contrast issue with Ubuntu orange accents
-        this.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive); */
+        alert_dialog.set_response_appearance(RESPONSE_QUIT.0, ResponseAppearance::Destructive); */
 
         // Init events
-        this.connect_response(None, move |dialog, response| {
+        alert_dialog.connect_response(None, move |dialog, response| {
             if response == RESPONSE_QUIT.0 {
                 dialog.close();
             }
         });
 
         // Return new activated `Self`
-        this
+        alert_dialog
     }
 }

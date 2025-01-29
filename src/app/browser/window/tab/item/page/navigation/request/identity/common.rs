@@ -1,25 +1,11 @@
 mod action;
-pub mod form;
-
-use action::Action as WidgetAction;
-use form::{list::item::value::Value, Form};
+mod form;
 
 use crate::Profile;
-use adw::{
-    prelude::{AlertDialogExt, AlertDialogExtManual},
-    AlertDialog, ResponseAppearance,
-};
+use action::Action as WidgetAction;
+use adw::AlertDialog;
 use gtk::glib::Uri;
 use std::rc::Rc;
-
-// Defaults
-const HEADING: &str = "Identity";
-const BODY: &str = "Select identity certificate";
-
-// Response variants
-const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");
-const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
-// const RESPONSE_MANAGE: (&str, &str) = ("manage", "Manage");
 
 // Select options
 
@@ -37,6 +23,17 @@ impl Common for AlertDialog {
         request: &Uri,
         callback: &Rc<impl Fn(bool) + 'static>,
     ) -> Self {
+        use adw::{
+            prelude::{AlertDialogExt, AlertDialogExtManual},
+            ResponseAppearance,
+        };
+        use form::{list::item::value::Value, Form};
+
+        // Response variants
+        const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");
+        const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
+        // const RESPONSE_MANAGE: (&str, &str) = ("manage", "Manage");
+
         // Init actions
         let action = Rc::new(WidgetAction::new());
 
@@ -45,8 +42,8 @@ impl Common for AlertDialog {
 
         // Init main widget
         let alert_dialog = AlertDialog::builder()
-            .heading(HEADING)
-            .body(BODY)
+            .heading("Identity")
+            .body("Select identity certificate")
             .close_response(RESPONSE_CANCEL.0)
             .default_response(RESPONSE_APPLY.0)
             .extra_child(&form.g_box)
