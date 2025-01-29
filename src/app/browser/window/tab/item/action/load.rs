@@ -34,14 +34,7 @@ impl Load {
     /// with formatted for this action [Variant](https://docs.gtk.org/glib/struct.Variant.html) value
     pub fn activate(&self, request: Option<&str>, is_history: bool) {
         self.simple_action.activate(Some(
-            &(
-                match request {
-                    Some(value) => String::from(value),
-                    None => String::new(),
-                },
-                is_history,
-            )
-                .to_variant(),
+            &(request.unwrap_or_default(), is_history).to_variant(),
         ));
     }
 
