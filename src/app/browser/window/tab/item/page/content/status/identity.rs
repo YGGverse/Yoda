@@ -1,6 +1,6 @@
-use crate::app::browser::window::tab::item::Action;
+use super::{ItemAction, TabAction};
 use adw::StatusPage;
-use gtk::{prelude::ButtonExt, Align, Button};
+use gtk::{prelude::ActionExt, Align, Button};
 use std::rc::Rc;
 
 // Defaults
@@ -13,17 +13,15 @@ const DEFAULT_BUTTON_CLASS: &str = "suggested-action";
 
 /// Create new default preset for `Identity`
 /// [StatusPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.StatusPage.html)
-pub fn build(action: Rc<Action>) -> StatusPage {
+pub fn build((tab_action, item_action): (&Rc<TabAction>, &Rc<ItemAction>)) -> StatusPage {
     // Init certificate selection
     let button = &Button::builder()
+        .action_name(format!("{}.{}", tab_action.id, item_action.identity.name()))
         .css_classes([DEFAULT_BUTTON_CLASS])
         .label(DEFAULT_BUTTON_LABEL)
         .tooltip_text(DEFAULT_BUTTON_TOOLTIP_TEXT)
         .halign(Align::Center)
         .build();
-
-    // Init events
-    button.connect_clicked(move |_| action.ident.activate());
 
     // Init status page
     StatusPage::builder()

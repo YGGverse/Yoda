@@ -1,15 +1,14 @@
 mod action;
 mod client;
 mod database;
-mod identity;
 mod page;
 
 use super::{Action as TabAction, BrowserAction, Position, WindowAction};
 use crate::Profile;
 use action::Action;
-use adw::{prelude::AdwDialogExt, TabView};
+use adw::TabView;
 use client::Client;
-use gtk::prelude::{ActionMapExt, Cast};
+use gtk::prelude::ActionMapExt;
 use page::Page;
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -78,29 +77,6 @@ impl Item {
                     page.navigation.set_request(&request);
                     client.handle(&request, true);
                 }
-            }
-        });
-
-        action.ident.connect_activate({
-            let client = client.clone();
-            let page = page.clone();
-            let parent = tab_view.clone().upcast::<gtk::Widget>();
-            let profile = profile.clone();
-            move || {
-                if let Some(request) = page.navigation.uri() {
-                    if ["gemini", "titan"].contains(&request.scheme().as_str()) {
-                        return identity::default(&profile, &request, {
-                            let client = client.clone();
-                            let page = page.clone();
-                            move || {
-                                page.navigation.update(); // update indicators immediately
-                                client.handle(&page.navigation.request(), false);
-                            } // on apply
-                        })
-                        .present(Some(&parent));
-                    }
-                }
-                identity::unsupported().present(Some(&parent));
             }
         });
 

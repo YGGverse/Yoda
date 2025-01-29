@@ -5,7 +5,7 @@ mod text;
 use image::Image;
 use text::Text;
 
-use super::{ItemAction, WindowAction};
+use super::{ItemAction, TabAction, WindowAction};
 use adw::StatusPage;
 use gtk::{
     gdk::Paintable,
@@ -19,6 +19,7 @@ use std::{rc::Rc, time::Duration};
 pub struct Content {
     window_action: Rc<WindowAction>,
     item_action: Rc<ItemAction>,
+    tab_action: Rc<TabAction>,
     pub g_box: Box,
 }
 
@@ -26,11 +27,18 @@ impl Content {
     // Construct
 
     /// Create new container for different components
-    pub fn build((window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>)) -> Self {
+    pub fn build(
+        (window_action, tab_action, item_action): (
+            &Rc<WindowAction>,
+            &Rc<TabAction>,
+            &Rc<ItemAction>,
+        ),
+    ) -> Self {
         Self {
             g_box: Box::builder().orientation(Orientation::Vertical).build(),
             window_action: window_action.clone(),
             item_action: item_action.clone(),
+            tab_action: tab_action.clone(),
         }
     }
 
@@ -90,7 +98,7 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_identity(&self) -> StatusPage {
         self.clean();
-        let status = status::identity::build(self.item_action.clone());
+        let status = status::identity::build((&self.tab_action, &self.item_action));
         self.g_box.append(&status);
         status
     }

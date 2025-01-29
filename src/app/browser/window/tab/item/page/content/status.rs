@@ -4,4 +4,4 @@ pub mod identity;
 pub mod loading;
 pub mod mime;
 
-use super::ItemAction;
+use super::{ItemAction, TabAction};

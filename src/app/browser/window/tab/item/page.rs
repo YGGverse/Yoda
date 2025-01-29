@@ -47,7 +47,7 @@ impl Page {
         (position, is_pinned, is_selected, is_needs_attention): (Position, bool, bool, bool),
     ) -> Self {
         // Init components
-        let content = Rc::new(Content::build((window_action, item_action)));
+        let content = Rc::new(Content::build((window_action, tab_action, item_action)));
         let search = Rc::new(Search::new());
         let navigation = Rc::new(Navigation::build(
             profile,

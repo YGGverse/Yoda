@@ -1,6 +1,8 @@
 mod database;
+mod identity;
 mod primary_icon;
 
+use adw::prelude::AdwDialogExt;
 use primary_icon::PrimaryIcon;
 
 use super::{ItemAction, Profile};
@@ -71,8 +73,25 @@ impl Request for Entry {
         // Connect events
         entry.connect_icon_release({
             let item_action = item_action.clone();
+            let profile = profile.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => item_action.ident.activate(), // @TODO PrimaryIcon impl
+                EntryIconPosition::Primary => {
+                    if let Some(request) = this.uri() {
+                        if ["gemini", "titan"].contains(&request.scheme().as_str()) {
+                            return identity::default(&profile, &request, {
+                                let item_action = item_action.clone();
+                                let profile = profile.clone();
+                                let this = this.clone();
+                                move || {
+                                    this.update(&profile);
+                                    item_action.load.activate(Some(&this.text()), false);
+                                } // on apply
+                            })
+                            .present(Some(this));
+                        }
+                    }
+                    identity::unsupported().present(Some(this));
+                }
                 EntryIconPosition::Secondary => item_action.load.activate(Some(&this.text()), true),
                 _ => todo!(), // unexpected
             }
