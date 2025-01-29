@@ -14,8 +14,8 @@ pub fn common(
     profile: &Rc<Profile>,
     request: &Uri,
     callback: &Rc<impl Fn(bool) + 'static>,
-) -> Common {
-    Common::build(profile, request, callback)
+) -> AlertDialog {
+    AlertDialog::common(profile, request, callback)
 }
 
 /// Create new identity widget for unknown request
