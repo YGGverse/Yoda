@@ -124,6 +124,11 @@ impl Auth {
             .is_some_and(|auth| auth.profile_identity_id == profile_identity_id)
     }
 
+    /// Check request string matches condition
+    pub fn total(&self, profile_identity_id: i64) -> usize {
+        self.memory.total(profile_identity_id)
+    }
+
     /// Collect certificate scope vector from `Profile` database for `profile_identity_id`
     pub fn scope(&self, profile_identity_id: i64) -> Vec<String> {
         let mut scope = Vec::new();

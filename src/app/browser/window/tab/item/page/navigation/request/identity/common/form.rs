@@ -14,19 +14,22 @@ use save::Save;
 
 use super::WidgetAction;
 use crate::Profile;
-use gtk::{glib::Uri, prelude::BoxExt, Box, Orientation};
+use gtk::{
+    glib::Uri,
+    prelude::{BoxExt, WidgetExt},
+    Box, Button, Orientation,
+};
 use std::rc::Rc;
 
 pub struct Form {
     // pub action_widget: Rc<Action>,
     pub drop: Rc<Drop>,
-    pub exit: Rc<Exit>,
+    pub exit: Button,
     pub file: Rc<File>,
     pub list: Rc<List>,
     pub name: Rc<Name>,
     pub save: Rc<Save>,
     pub g_box: Box,
-    request: Uri,
     profile: Rc<Profile>,
 }
 
@@ -41,7 +44,7 @@ impl Form {
         let name = Rc::new(Name::build(widget_action));
         let save = Rc::new(Save::build(profile, &list));
         let drop = Rc::new(Drop::build(profile, &list));
-        let exit = Rc::new(Exit::build(widget_action, profile, &list, request));
+        let exit = Button::exit(widget_action, profile, &list, request);
 
         // Init main container
         let g_box = Box::builder().orientation(Orientation::Vertical).build();
@@ -49,7 +52,7 @@ impl Form {
         g_box.append(&list.dropdown);
         g_box.append(&name.entry);
         g_box.append(&file.button);
-        g_box.append(&exit.button);
+        g_box.append(&exit);
         g_box.append(&drop.button);
         g_box.append(&save.button);
 
@@ -63,7 +66,6 @@ impl Form {
             name,
             save,
             g_box,
-            request: request.clone(),
             profile: profile.clone(),
         }
     }
@@ -90,18 +92,15 @@ impl Form {
         match value {
             Value::ProfileIdentityId(profile_identity_id) => {
                 self.drop.update(true);
-                self.exit.update(
-                    true,
-                    self.profile
-                        .identity
-                        .auth
-                        .is_matches(&self.request.to_string(), profile_identity_id),
-                );
+                self.exit.set_visible(true);
+                self.exit
+                    .set_sensitive(self.profile.identity.auth.total(profile_identity_id) > 0);
                 self.save.update(true);
             }
             _ => {
                 self.drop.update(false);
-                self.exit.update(false, false);
+                self.exit.set_visible(false);
+                self.exit.set_sensitive(false);
                 self.save.update(false);
             }
         }

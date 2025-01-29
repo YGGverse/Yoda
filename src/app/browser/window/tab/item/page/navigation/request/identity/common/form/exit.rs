@@ -25,15 +25,20 @@ const BODY: &str = "Stop use selected identity for all scopes?";
 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
 
-pub struct Exit {
-    pub button: Button,
+pub trait Exit {
+    fn exit(
+        widget_action: &Rc<WidgetAction>,
+        profile: &Rc<Profile>,
+        list: &Rc<List>,
+        request: &Uri,
+    ) -> Self;
 }
 
-impl Exit {
+impl Exit for Button {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(
+    fn exit(
         widget_action: &Rc<WidgetAction>,
         profile: &Rc<Profile>,
         list: &Rc<List>,
@@ -122,13 +127,6 @@ impl Exit {
         });
 
         // Return activated `Self`
-        Self { button }
-    }
-
-    // Actions
-
-    pub fn update(&self, is_visible: bool, is_sensitive: bool) {
-        self.button.set_visible(is_visible);
-        self.button.set_sensitive(is_sensitive);
+        button
     }
 }

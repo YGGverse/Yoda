@@ -79,4 +79,17 @@ impl Memory {
         // Get first copy
         result.first().cloned()
     }
+
+    /// Get identity exactly match `scope`
+    /// * [Client certificates specification](https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates)
+    /// * see also parent `is_match_request`
+    pub fn total(&self, profile_identity_id: i64) -> usize {
+        let mut total = 0;
+        for (_, _profile_identity_id) in self.index.borrow().iter() {
+            if *_profile_identity_id == profile_identity_id {
+                total += 1
+            }
+        }
+        total
+    }
 }
