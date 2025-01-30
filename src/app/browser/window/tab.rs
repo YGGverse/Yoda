@@ -57,6 +57,26 @@ impl Tab {
         }
 
         // Init events
+        tab_view.connect_setup_menu({
+            let index = index.clone();
+            let window_action = window_action.clone();
+            move |tab_view, tab_page| {
+                // by documentation:
+                // * `tab_page` == `Some` - popover open
+                // * `tab_page` == `None` - popover closed
+                update_actions(
+                    tab_view,
+                    match tab_page {
+                        Some(this) => Some(this.clone()),
+                        None => tab_view.selected_page(),
+                    }
+                    .as_ref(),
+                    &index,
+                    &window_action,
+                );
+            }
+        });
+
         tab_view.connect_close_page({
             let index = index.clone();
             let profile = profile.clone();
@@ -83,12 +103,16 @@ impl Tab {
             let window_action = window_action.clone();
             let index = index.clone();
             move |tab_view| {
-                if let Some(tab_page) = tab_view.selected_page() {
-                    tab_page.set_needs_attention(false);
-                }
                 update_actions(
                     tab_view,
-                    tab_view.selected_page().as_ref(),
+                    match tab_view.selected_page() {
+                        Some(this) => {
+                            this.set_needs_attention(false);
+                            Some(this.clone())
+                        }
+                        None => None,
+                    }
+                    .as_ref(),
                     &index,
                     &window_action,
                 )
@@ -392,42 +416,39 @@ fn update_actions(
     index: &Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     window_action: &Rc<WindowAction>,
 ) {
-    match tab_page {
-        Some(tab_page) => {
-            if let Some(item) = index.borrow().get(tab_page) {
-                window_action
-                    .home
-                    .simple_action
-                    .set_enabled(item.action.home.is_enabled());
-                window_action
-                    .reload
-                    .simple_action
-                    .set_enabled(item.action.reload.is_enabled());
-                window_action
-                    .history_back
-                    .simple_action
-                    .set_enabled(item.action.history.back.is_enabled());
-                window_action
-                    .history_forward
-                    .simple_action
-                    .set_enabled(item.action.history.forward.is_enabled());
-
-                window_action.change_state(Some(tab_view.page_position(tab_page)));
-            } // @TODO incorrect index init implementation, tabs refactory wanted
-        }
-        None => {
-            // Reset to defaults
-            window_action.home.simple_action.set_enabled(false);
-            window_action.reload.simple_action.set_enabled(false);
-            window_action.history_back.simple_action.set_enabled(false);
+    if let Some(tab_page) = tab_page {
+        if let Some(item) = index.borrow().get(tab_page) {
+            window_action
+                .home
+                .simple_action
+                .set_enabled(item.action.home.is_enabled());
+            window_action
+                .reload
+                .simple_action
+                .set_enabled(item.action.reload.is_enabled());
+            window_action
+                .history_back
+                .simple_action
+                .set_enabled(item.action.history.back.is_enabled());
             window_action
                 .history_forward
                 .simple_action
-                .set_enabled(false);
+                .set_enabled(item.action.history.forward.is_enabled());
 
-            window_action.change_state(None);
+            window_action.change_state(Some(tab_view.page_position(tab_page)));
+            return;
         }
     }
+    // Reset to defaults
+    window_action.home.simple_action.set_enabled(false);
+    window_action.reload.simple_action.set_enabled(false);
+    window_action.history_back.simple_action.set_enabled(false);
+    window_action
+        .history_forward
+        .simple_action
+        .set_enabled(false);
+
+    window_action.change_state(None);
 }
 
 /// Create new [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
