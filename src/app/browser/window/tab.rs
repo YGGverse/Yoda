@@ -13,9 +13,11 @@ use gtk::{
     gio::Icon,
     glib::{DateTime, Propagation},
     prelude::ActionExt,
+    Box, Orientation,
 };
 pub use item::Item;
 use menu::Menu;
+use sourceview::prelude::IsA;
 use sqlite::Transaction;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -113,25 +115,26 @@ impl Tab {
         request: Option<&str>,
         is_pinned: bool,
         is_selected: bool,
-        is_attention: bool,
+        is_needs_attention: bool,
         is_load: bool,
     ) -> Rc<Item> {
+        // Generate new `TabPage` with blank `Widget`
+        let (tab_page, target_child) = new_tab_page(&self.tab_view, position);
+
         // Init new tab item
         let item = Rc::new(Item::build(
-            &self.tab_view,
+            (&tab_page, &target_child),
             &self.profile,
             // Actions
             (&self.browser_action, &self.window_action, &self.action),
             // Options
-            (
-                position,
-                request,
-                is_pinned,
-                is_selected,
-                is_attention,
-                is_load,
-            ),
+            request,
+            is_load,
         ));
+
+        // Make initial setup
+        item.page.set_needs_attention(is_needs_attention);
+        item.page.set_title("New page");
 
         // Expect user input on tab appended has empty request entry
         // * this action initiated here because should be applied on tab appending event only
@@ -142,7 +145,14 @@ impl Tab {
         // Register dynamically created tab components in the HashMap index
         self.index
             .borrow_mut()
-            .insert(item.page.tab_page.clone(), item.clone());
+            .insert(item.tab_page.clone(), item.clone());
+
+        // Setup
+        // * important to call these actions after index!
+        self.tab_view.set_page_pinned(&item.tab_page, is_pinned);
+        if is_selected {
+            self.tab_view.set_selected_page(&item.tab_page);
+        }
 
         update_actions(
             &self.tab_view,
@@ -281,7 +291,6 @@ impl Tab {
             }
             Err(e) => return Err(e.to_string()),
         }
-
         Ok(())
     }
 
@@ -291,30 +300,44 @@ impl Tab {
         app_browser_window_id: i64,
     ) -> Result<(), String> {
         match database::select(transaction, app_browser_window_id) {
-            Ok(records) => {
-                for record in records {
-                    match Item::restore(
-                        &self.tab_view,
-                        transaction,
-                        record.id,
-                        &self.profile,
-                        (&self.browser_action, &self.window_action, &self.action),
-                    ) {
-                        Ok(items) => {
-                            for item in items {
-                                // Register dynamically created tab item in the HashMap index
-                                self.index
-                                    .borrow_mut()
-                                    .insert(item.page.tab_page.clone(), item.clone());
-                            }
+            Ok(tab_records) => {
+                for tab_record in tab_records {
+                    for item_record in item::restore(transaction, tab_record.id)? {
+                        // Generate new `TabPage` with blank `Widget`
+                        let (tab_page, target_child) =
+                            new_tab_page(&self.tab_view, Position::After);
+
+                        // Init new tab item
+                        let item = Rc::new(Item::build(
+                            (&tab_page, &target_child),
+                            &self.profile,
+                            // Actions
+                            (&self.browser_action, &self.window_action, &self.action),
+                            // Options
+                            None,
+                            false,
+                        ));
+
+                        self.index
+                            .borrow_mut()
+                            .insert(item.tab_page.clone(), item.clone());
+
+                        // Restore `Self`
+                        // * important to call these actions after index!
+                        self.tab_view
+                            .set_page_pinned(&item.tab_page, item_record.is_pinned);
+
+                        if item_record.is_selected {
+                            self.tab_view.set_selected_page(&item.tab_page);
                         }
-                        Err(e) => return Err(e.to_string()),
+
+                        // Restore children components
+                        item.page.restore(transaction, item_record.id)?;
                     }
                 }
             }
             Err(e) => return Err(e.to_string()),
         }
-
         Ok(())
     }
 
@@ -327,22 +350,12 @@ impl Tab {
             Ok(_) => {
                 // Delegate save action to childs
                 let id = database::last_insert_id(transaction);
-
-                // Read collected HashMap index
                 for (_, item) in self.index.borrow().iter() {
-                    item.save(
-                        transaction,
-                        id,
-                        self.tab_view.page_position(&item.page.tab_page),
-                        item.page.tab_page.is_pinned(),
-                        item.page.tab_page.is_selected(),
-                        item.page.tab_page.needs_attention(),
-                    )?;
+                    item.save(transaction, id, self.tab_view.page_position(&item.tab_page))?;
                 }
             }
             Err(e) => return Err(e.to_string()),
         }
-
         Ok(())
     }
 
@@ -355,8 +368,8 @@ impl Tab {
         // @TODO other/child features..
     }
 
-    fn item(&self, tab_page_position: Option<i32>) -> Option<Rc<Item>> {
-        if let Some(tab_page) = match tab_page_position {
+    fn item(&self, page_position: Option<i32>) -> Option<Rc<Item>> {
+        if let Some(tab_page) = match page_position {
             Some(value) => Some(self.tab_view.nth_page(value)),
             None => self.tab_view.selected_page(),
         } {
@@ -425,4 +438,34 @@ fn update_actions(
             window_action.change_state(None);
         }
     }
+}
+
+/// Create new [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
+/// in [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) at given position
+///
+/// * if given `position` match pinned tab, GTK will panic with notice:
+///   adw_tab_view_insert: assertion 'position >= self->n_pinned_pages'\
+///   as the solution, prepend new page after pinned tabs in this case
+fn add_tab_page(tab_view: &TabView, child: &impl IsA<gtk::Widget>, position: i32) -> TabPage {
+    if position > tab_view.n_pinned_pages() {
+        tab_view.insert(child, position)
+    } else {
+        tab_view.prepend(child)
+    }
+}
+fn new_tab_page(tab_view: &TabView, position: Position) -> (TabPage, Box) {
+    let child = Box::builder().orientation(Orientation::Vertical).build();
+    (
+        match position {
+            Position::After => match tab_view.selected_page() {
+                Some(selected_page) => {
+                    add_tab_page(tab_view, &child, tab_view.page_position(&selected_page) + 1)
+                }
+                None => tab_view.append(&child),
+            },
+            Position::End => tab_view.append(&child),
+            Position::Number(value) => add_tab_page(tab_view, &child, value),
+        },
+        child,
+    )
 }
