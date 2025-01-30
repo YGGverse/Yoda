@@ -4,7 +4,7 @@ use super::{
 };
 use crate::Profile;
 use gtk::{
-    glib::Uri,
+    glib::{timeout_add_seconds_local_once, Uri},
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
@@ -107,6 +107,14 @@ impl Exit for Button {
                                                 button.set_label(&e.to_string())
                                             }
                                         }
+                                        timeout_add_seconds_local_once(1, {
+                                            let button = button.clone();
+                                            move || {
+                                                button.remove_css_class("error");
+                                                button.remove_css_class("success");
+                                                button.set_label(LABEL)
+                                            }
+                                        });
                                     }
                                     Err(e) => {
                                         button.set_css_classes(&["error"]);

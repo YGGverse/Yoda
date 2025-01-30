@@ -5,7 +5,7 @@ use super::list::{item::Value, List};
 use crate::profile::Profile;
 use gtk::{
     gio::{Cancellable, FileCreateFlags, ListStore},
-    glib::Priority,
+    glib::{timeout_add_seconds_local_once, Priority},
     prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
@@ -14,6 +14,7 @@ use std::{path::MAIN_SEPARATOR, rc::Rc};
 const LABEL: &str = "Export";
 const TOOLTIP_TEXT: &str = "Export selected identity to file";
 const MARGIN: i32 = 8;
+const TIMEOUT_RENEW: u32 = 1; // seconds
 
 pub struct Save {
     pub button: Button,
@@ -88,33 +89,40 @@ impl Save {
                                                         Cancellable::NONE, // @TODO
                                                         {
                                                             let button = button.clone();
-                                                            move |result| match result {
-                                                                Ok(_) => {
-                                                                    button.set_css_classes(&[
-                                                                        "success",
-                                                                    ]);
-                                                                    button.set_label(&format!(
-                                                                        "Saved to {}",
-                                                                        file.parse_name()
-                                                                    ))
+                                                            move |result| {
+                                                                match result {
+                                                                    Ok(_) => {
+                                                                        button.set_css_classes(&[
+                                                                            "success",
+                                                                        ]);
+                                                                        button.set_label(&format!(
+                                                                            "Saved to {}",
+                                                                            file.parse_name()
+                                                                        ))
+                                                                    }
+                                                                    Err((_, e)) => {
+                                                                        button.set_css_classes(&[
+                                                                            "error",
+                                                                        ]);
+                                                                        button.set_label(
+                                                                            &e.to_string(),
+                                                                        )
+                                                                    }
                                                                 }
-                                                                Err((_, e)) => {
-                                                                    button.set_css_classes(&[
-                                                                        "error",
-                                                                    ]);
-                                                                    button.set_label(&e.to_string())
-                                                                }
+                                                                renew_button(&button, TIMEOUT_RENEW)
                                                             }
                                                         },
                                                     ),
                                                     Err(e) => {
                                                         button.set_css_classes(&["error"]);
-                                                        button.set_label(&e.to_string())
+                                                        button.set_label(&e.to_string());
+                                                        renew_button(&button, TIMEOUT_RENEW)
                                                     }
                                                 },
                                                 Err(e) => {
                                                     button.set_css_classes(&["warning"]);
-                                                    button.set_label(e.message())
+                                                    button.set_label(e.message());
+                                                    renew_button(&button, TIMEOUT_RENEW)
                                                 }
                                             }
                                             button.set_sensitive(true); // unlock
@@ -123,7 +131,8 @@ impl Save {
                             }
                             Err(e) => {
                                 button.set_css_classes(&["error"]);
-                                button.set_label(&e.to_string())
+                                button.set_label(&e.to_string());
+                                renew_button(&button, TIMEOUT_RENEW)
                             }
                         }
                     }
@@ -141,4 +150,17 @@ impl Save {
     pub fn update(&self, is_visible: bool) {
         self.button.set_visible(is_visible)
     }
+}
+
+/// Return default button state after timeout
+fn renew_button(button: &Button, timeout: u32) {
+    timeout_add_seconds_local_once(timeout, {
+        let button = button.clone();
+        move || {
+            button.remove_css_class("error");
+            button.remove_css_class("success");
+            button.remove_css_class("warning");
+            button.set_label(LABEL)
+        }
+    });
 }

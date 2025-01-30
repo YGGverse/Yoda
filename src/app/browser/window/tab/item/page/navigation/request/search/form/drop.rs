@@ -5,6 +5,7 @@ use adw::{
     AlertDialog, ResponseAppearance,
 };
 use gtk::{
+    glib::timeout_add_seconds_local_once,
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
@@ -83,6 +84,14 @@ impl Drop for Button {
                                         button.set_css_classes(&["error"]);
                                         button.set_label("List item not found")
                                     }
+                                    timeout_add_seconds_local_once(1, {
+                                        let button = button.clone();
+                                        move || {
+                                            button.remove_css_class("error");
+                                            button.remove_css_class("success");
+                                            button.set_label(LABEL)
+                                        }
+                                    });
                                 }
                                 Err(e) => {
                                     button.set_css_classes(&["error"]);
