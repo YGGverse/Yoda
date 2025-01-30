@@ -9,7 +9,7 @@ use action::Action;
 use adw::TabPage;
 use client::Client;
 use gtk::{
-    prelude::{ActionMapExt, BoxExt},
+    prelude::{ActionExt, ActionMapExt, BoxExt},
     Box,
 };
 use page::Page;
@@ -71,6 +71,16 @@ impl Item {
         let client = Rc::new(Client::init(profile, &page));
 
         // Connect events
+        action.home.connect_enabled_notify({
+            let window_action = window_action.clone();
+            move |this| {
+                window_action
+                    .home
+                    .simple_action
+                    .set_enabled(this.is_enabled())
+            }
+        });
+
         action.home.connect_activate({
             let client = client.clone();
             let page = page.clone();
@@ -105,6 +115,36 @@ impl Item {
             let client = client.clone();
             move |_, _| {
                 client.handle(&page.navigation.request(), true);
+            }
+        });
+
+        action.reload.connect_enabled_notify({
+            let window_action = window_action.clone();
+            move |this| {
+                window_action
+                    .reload
+                    .simple_action
+                    .set_enabled(this.is_enabled())
+            }
+        });
+
+        action.history.back.connect_enabled_notify({
+            let window_action = window_action.clone();
+            move |this| {
+                window_action
+                    .history_back
+                    .simple_action
+                    .set_enabled(this.is_enabled())
+            }
+        });
+
+        action.history.forward.connect_enabled_notify({
+            let window_action = window_action.clone();
+            move |this| {
+                window_action
+                    .history_forward
+                    .simple_action
+                    .set_enabled(this.is_enabled())
             }
         });
 
