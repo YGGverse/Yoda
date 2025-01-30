@@ -264,7 +264,7 @@ impl Tab {
         }
     }
 
-    pub fn page_home(&self, page_position: Option<i32>) {
+    pub fn home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             if let Some(home) = item.page.navigation.home() {
                 let home = home.to_string();
@@ -274,20 +274,20 @@ impl Tab {
         }
     }
 
-    pub fn page_history_back(&self, page_position: Option<i32>) {
+    pub fn history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.action.history.back(true);
         }
     }
 
-    pub fn page_history_forward(&self, page_position: Option<i32>) {
+    pub fn history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.action.history.forward(true);
         }
     }
 
     /// Reload page at `i32` position or selected page on `None` given
-    pub fn page_reload(&self, page_position: Option<i32>) {
+    pub fn reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.client.handle(&item.page.navigation.request(), true);
         }

@@ -72,12 +72,12 @@ impl Window {
 
         action.reload.connect_activate({
             let tab = tab.clone();
-            move |position| tab.page_reload(position)
+            move |position| tab.reload(position)
         });
 
         action.home.connect_activate({
             let tab = tab.clone();
-            move |position| tab.page_home(position)
+            move |position| tab.home(position)
         });
 
         action.close.connect_activate({
@@ -108,15 +108,15 @@ impl Window {
         action.history_back.connect_activate({
             let tab = tab.clone();
             move |position| {
-                tab.page_history_back(position);
-            } // @TODO rename destination method
+                tab.history_back(position);
+            }
         });
 
         action.history_forward.connect_activate({
             let tab = tab.clone();
             move |position| {
-                tab.page_history_forward(position);
-            } // @TODO rename destination method
+                tab.history_forward(position);
+            }
         });
 
         action.open.on_activate({
