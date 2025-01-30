@@ -164,17 +164,25 @@ impl Tab {
             item.page.navigation.grab_focus();
         }
 
-        // Register dynamically created tab components in the HashMap index
+        // Relate with GTK `TabPage` with app `Item`
         self.index
             .borrow_mut()
             .insert(item.tab_page.clone(), item.clone());
 
         // Setup
-        // * important to call these actions after index!
         self.tab_view.set_page_pinned(&item.tab_page, is_pinned);
         if is_selected {
             self.tab_view.set_selected_page(&item.tab_page);
         }
+
+        // Forcefully update global actions on HashMap index build complete
+        // * `selected_page_notify` runs this action also, just before Item init @TODO
+        update_actions(
+            &self.tab_view,
+            self.tab_view.selected_page().as_ref(),
+            &self.index,
+            &self.window_action,
+        );
 
         item
     }
@@ -333,18 +341,27 @@ impl Tab {
                             false,
                         ));
 
+                        // Relate with GTK `TabPage` with app `Item`
                         self.index
                             .borrow_mut()
                             .insert(item.tab_page.clone(), item.clone());
 
-                        // Restore `Self`
-                        // * important to call these actions after index!
+                        // Setup
                         self.tab_view
                             .set_page_pinned(&item.tab_page, item_record.is_pinned);
 
                         if item_record.is_selected {
                             self.tab_view.set_selected_page(&item.tab_page);
                         }
+
+                        // Forcefully update global actions on HashMap index build complete
+                        // * `selected_page_notify` runs this action also, just before Item init @TODO
+                        update_actions(
+                            &self.tab_view,
+                            self.tab_view.selected_page().as_ref(),
+                            &self.index,
+                            &self.window_action,
+                        );
 
                         // Restore children components
                         item.page.restore(transaction, item_record.id)?;
@@ -437,7 +454,7 @@ fn update_actions(
 
             window_action.change_state(Some(tab_view.page_position(tab_page)));
             return;
-        }
+        } // @TODO `connect_selected_page_notify` panics on unwrap
     }
     // Reset to defaults
     window_action.home.simple_action.set_enabled(false);
