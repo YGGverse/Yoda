@@ -384,6 +384,8 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     Ok(())
 }
 
+/// Update global actions for given [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
+/// using `Item` match relation in the HashMap `index`
 fn update_actions(
     tab_view: &TabView,
     tab_page: Option<&TabPage>,
@@ -429,11 +431,12 @@ fn update_actions(
 }
 
 /// Create new [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
-/// in [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) at given position
+/// in [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html)
+/// with given child Widget at given position
 ///
-/// * if given `position` match pinned tab, GTK will panic with notice:
+/// * if the `position` match pinned tab, GTK will panic with notice:
 ///   adw_tab_view_insert: assertion 'position >= self->n_pinned_pages'\
-///   as the solution, prepend new page after pinned tabs in this case
+///   this shared method prepends new page after pinned tabs as the solution
 fn add_tab_page(tab_view: &TabView, child: &impl IsA<gtk::Widget>, position: i32) -> TabPage {
     if position > tab_view.n_pinned_pages() {
         tab_view.insert(child, position)
@@ -441,6 +444,9 @@ fn add_tab_page(tab_view: &TabView, child: &impl IsA<gtk::Widget>, position: i32
         tab_view.prepend(child)
     }
 }
+
+/// Create new [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
+/// in [TabView](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabView.html) at app `Position`
 fn new_tab_page(tab_view: &TabView, position: Position) -> (TabPage, Box) {
     let child = Box::builder().orientation(Orientation::Vertical).build();
     (
