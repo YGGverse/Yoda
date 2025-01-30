@@ -1,7 +1,7 @@
 mod driver;
 mod feature;
 
-use super::Page;
+use super::{Page, Profile};
 use driver::Driver;
 use feature::Feature;
 use gtk::{
@@ -16,17 +16,19 @@ pub struct Client {
     cancellable: Cell<Cancellable>,
     driver: Rc<Driver>,
     page: Rc<Page>,
+    profile: Rc<Profile>,
 }
 
 impl Client {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(page: &Rc<Page>) -> Self {
+    pub fn init(profile: &Rc<Profile>, page: &Rc<Page>) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
             driver: Rc::new(Driver::build(page)),
             page: page.clone(),
+            profile: profile.clone(),
         }
     }
 
@@ -56,7 +58,7 @@ impl Client {
         }
 
         // run async resolver to detect Uri, scheme-less host, or search query
-        lookup(request, self.cancellable(), {
+        lookup(&self.profile, request, self.cancellable(), {
             let driver = self.driver.clone();
             let page = self.page.clone();
             move |feature, cancellable, result| {
@@ -103,6 +105,7 @@ impl Client {
 /// Create request using async DNS resolver (slow method)
 /// * return suggestion [Uri](https://docs.gtk.org/glib/struct.Uri.html) on failure (to handle as redirect)
 fn lookup(
+    profile: &Rc<Profile>,
     query: &str,
     cancellable: Cancellable,
     callback: impl FnOnce(Rc<Feature>, Cancellable, Result<Uri, Uri>) + 'static,
@@ -138,6 +141,7 @@ fn lookup(
                     &connectable.hostname(),
                     Some(&cancellable.clone()),
                     {
+                        let profile = profile.clone();
                         let query = query.to_owned();
                         move |resolve| {
                             callback(
@@ -146,33 +150,32 @@ fn lookup(
                                 if resolve.is_ok() {
                                     match Uri::parse(&suggestion, UriFlags::NONE) {
                                         Ok(uri) => Err(uri),
-                                        Err(_) => Err(search(&query)),
+                                        Err(_) => Err(search(&profile, &query)),
                                     }
                                 } else {
-                                    Err(search(&query))
+                                    Err(search(&profile, &query))
                                 },
                             )
                         }
                     },
                 ),
-                Err(_) => callback(feature, cancellable, Err(search(query))),
+                Err(_) => callback(feature, cancellable, Err(search(profile, query))),
             }
         }
     }
 }
 
 /// Convert `query` to default search provider [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-fn search(query: &str) -> Uri {
-    Uri::build(
+fn search(profile: &Profile, query: &str) -> Uri {
+    Uri::parse(
+        &format!(
+            "{}?{}",
+            profile.search.default().unwrap().query, // @TODO handle
+            Uri::escape_string(query, None, false)
+        ),
         UriFlags::NONE,
-        "gemini",
-        None,
-        Some("kennedy.gemi.dev"), // tlgs.one was replaced by response time issue
-        -1,
-        "/search",
-        Some(&Uri::escape_string(query, None, false)),
-        None,
-    ) // @TODO optional settings
+    )
+    .unwrap() // @TODO handle or skip extra URI parse by String return
 }
 
 /// Make new history record in related components

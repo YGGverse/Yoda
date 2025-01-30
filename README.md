@@ -49,6 +49,7 @@ GTK 4 / Libadwaita client written in Rust
           * [x] Request
           * [ ] History
 * [ ] User settings
+  * [x] Custom search providers
 
 ### Protocols
 * [ ] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)

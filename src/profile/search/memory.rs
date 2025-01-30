@@ -32,8 +32,20 @@ impl Memory {
         self.index.borrow_mut().clear()
     }
 
-    /// Get record by `ID`
+    // Getters
+
+    /// Get all records
     pub fn records(&self) -> Vec<Row> {
         self.index.borrow().clone()
+    }
+
+    /// Get all records
+    pub fn default(&self) -> Option<Row> {
+        for record in self.index.borrow().iter() {
+            if record.is_default {
+                return Some(record.clone());
+            }
+        }
+        None
     }
 }

@@ -1,6 +1,7 @@
 mod database;
 mod identity;
 mod primary_icon;
+mod search;
 
 use adw::{prelude::AdwDialogExt, AlertDialog};
 use primary_icon::PrimaryIcon;
@@ -44,6 +45,7 @@ pub trait Request {
 
     fn update_primary_icon(&self, profile: &Profile);
     fn show_identity_dialog(&self, profile: &Rc<Profile>);
+    fn show_search_dialog(&self, profile: &Rc<Profile>);
 
     // Setters
 
@@ -78,7 +80,13 @@ impl Request for Entry {
         entry.connect_icon_release({
             let profile = profile.clone();
             move |this, position| match position {
-                EntryIconPosition::Primary => this.show_identity_dialog(&profile),
+                EntryIconPosition::Primary => {
+                    if matches!(primary_icon::from(&this.text()), PrimaryIcon::Search { .. }) {
+                        this.show_search_dialog(&profile)
+                    } else {
+                        this.show_identity_dialog(&profile)
+                    }
+                }
                 EntryIconPosition::Secondary => {
                     this.activate();
                 }
@@ -217,11 +225,10 @@ impl Request for Entry {
         // Update primary icon
         self.first_child().unwrap().remove_css_class("success"); // @TODO handle
 
-        self.set_primary_icon_activatable(false);
-        self.set_primary_icon_sensitive(false);
-
         match primary_icon::from(&self.text()) {
             PrimaryIcon::Download { name, tooltip } => {
+                self.set_primary_icon_activatable(false);
+                self.set_primary_icon_sensitive(false);
                 self.set_primary_icon_name(Some(name));
                 self.set_primary_icon_tooltip_text(Some(tooltip));
             }
@@ -237,17 +244,21 @@ impl Request for Entry {
                 }
             }
             PrimaryIcon::Search { name, tooltip } => {
+                self.set_primary_icon_activatable(true);
+                self.set_primary_icon_sensitive(true);
                 self.set_primary_icon_name(Some(name));
                 self.set_primary_icon_tooltip_text(Some(tooltip));
             }
             PrimaryIcon::Source { name, tooltip } => {
+                self.set_primary_icon_activatable(false);
+                self.set_primary_icon_sensitive(false);
                 self.set_primary_icon_name(Some(name));
                 self.set_primary_icon_tooltip_text(Some(tooltip));
             }
         }
     }
 
-    /// Present identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
+    /// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
     fn show_identity_dialog(&self, profile: &Rc<Profile>) {
         // connect identity traits
         use identity::{Common, Unsupported};
@@ -271,6 +282,12 @@ impl Request for Entry {
             }
         }
         AlertDialog::unsupported().present(Some(self));
+    }
+
+    /// Present Search providers [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
+    fn show_search_dialog(&self, profile: &Rc<Profile>) {
+        use search::Search;
+        AlertDialog::search(profile).present(Some(self))
     }
 
     // Setters

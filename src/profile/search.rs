@@ -23,11 +23,21 @@ impl Search {
         let database = Database::init(connection, profile_id);
         let memory = Memory::init();
 
-        // Build initial index
-        index(&database, &memory)?;
+        match database.records() {
+            Ok(records) => {
+                // Init default search providers list on database empty
+                if records.is_empty() {
+                    restore_defaults(&database)?
+                }
 
-        // Return new `Self`
-        Ok(Self { database, memory })
+                // Build initial index
+                index(&database, &memory)?;
+
+                // Return new `Self`
+                Ok(Self { database, memory })
+            }
+            Err(e) => Err(Error::Database(e)),
+        }
     }
 
     // Actions
@@ -57,9 +67,24 @@ impl Search {
     /// Delete record from `database` and `memory` index
     pub fn delete(&self, id: i64) -> Result<(), Error> {
         match self.database.delete(id) {
-            Ok(_) => Ok(index(&self.database, &self.memory)?),
+            Ok(_) => match self.database.records() {
+                Ok(records) => {
+                    if records.is_empty() {
+                        restore_defaults(&self.database)?
+                    }
+                    Ok(index(&self.database, &self.memory)?)
+                }
+                Err(e) => Err(Error::Database(e)),
+            },
             Err(e) => Err(Error::Database(e)),
         }
+    }
+
+    // Getters
+
+    /// Get default search provider from memory
+    pub fn default(&self) -> Option<database::Row> {
+        self.memory.default()
     }
 }
 
@@ -88,6 +113,19 @@ fn index(database: &Database, memory: &Memory) -> Result<(), Error> {
             }
         }
         Err(e) => return Err(Error::Database(e)),
+    }
+    Ok(())
+}
+
+/// Create default search providers list for given profile
+fn restore_defaults(database: &Database) -> Result<(), Error> {
+    for (provider, is_default) in &[
+        ("gemini://kennedy.gemi.dev/search", true),
+        ("gemini://tlgs.one/search/search", false),
+    ] {
+        if let Err(e) = database.add(provider.to_string(), *is_default) {
+            return Err(Error::Database(e));
+        }
     }
     Ok(())
 }

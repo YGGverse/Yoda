@@ -54,6 +54,6 @@ pub fn from(request: &str) -> PrimaryIcon {
 
     PrimaryIcon::Search {
         name: "system-search-symbolic",
-        tooltip: "Search",
+        tooltip: "Choose default search provider",
     }
 }

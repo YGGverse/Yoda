@@ -65,7 +65,7 @@ impl Item {
         ));
 
         // Update tab loading indicator
-        let client = Rc::new(Client::init(&page));
+        let client = Rc::new(Client::init(profile, &page));
 
         // Connect events
         action.home.connect_activate({
