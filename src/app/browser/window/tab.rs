@@ -64,7 +64,7 @@ impl Tab {
                 // by documentation:
                 // * `tab_page` == `Some` - popover open
                 // * `tab_page` == `None` - popover closed
-                update_actions(tab_view, tab_page.cloned(), &index, &window_action);
+                update_actions(tab_view, tab_page, &index, &window_action);
             }
         });
 
@@ -81,7 +81,12 @@ impl Tab {
                     DateTime::now_local().unwrap().to_unix(),
                 );
 
-                update_actions(tab_view, tab_view.selected_page(), &index, &window_action);
+                update_actions(
+                    tab_view,
+                    tab_view.selected_page().as_ref(),
+                    &index,
+                    &window_action,
+                );
                 Propagation::Proceed
             }
         });
@@ -93,7 +98,12 @@ impl Tab {
                 if let Some(tab_page) = tab_view.selected_page() {
                     tab_page.set_needs_attention(false);
                 }
-                update_actions(tab_view, tab_view.selected_page(), &index, &window_action)
+                update_actions(
+                    tab_view,
+                    tab_view.selected_page().as_ref(),
+                    &index,
+                    &window_action,
+                )
             }
         });
 
@@ -156,7 +166,7 @@ impl Tab {
 
         update_actions(
             &self.tab_view,
-            self.tab_view.selected_page(),
+            self.tab_view.selected_page().as_ref(),
             &self.index,
             &self.window_action,
         );
@@ -329,6 +339,12 @@ impl Tab {
 
                         if item_record.is_selected {
                             self.tab_view.set_selected_page(&item.tab_page);
+                            update_actions(
+                                &self.tab_view,
+                                Some(&item.tab_page),
+                                &self.index,
+                                &self.window_action,
+                            );
                         }
 
                         // Restore children components
@@ -398,13 +414,13 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 
 fn update_actions(
     tab_view: &TabView,
-    tab_page: Option<TabPage>,
+    tab_page: Option<&TabPage>,
     index: &Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     window_action: &Rc<WindowAction>,
 ) {
     match tab_page {
         Some(tab_page) => {
-            if let Some(item) = index.borrow().get(&tab_page) {
+            if let Some(item) = index.borrow().get(tab_page) {
                 window_action
                     .home
                     .simple_action
@@ -422,7 +438,7 @@ fn update_actions(
                     .simple_action
                     .set_enabled(item.action.history.forward.is_enabled());
 
-                window_action.change_state(Some(tab_view.page_position(&tab_page)));
+                window_action.change_state(Some(tab_view.page_position(tab_page)));
             } // @TODO incorrect index init implementation, tabs refactory wanted
         }
         None => {
