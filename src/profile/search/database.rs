@@ -75,6 +75,25 @@ impl Database {
             Err(e) => Err(e),
         }
     }
+
+    /// Delete record from database
+    pub fn set_default(&self, id: i64) -> Result<(), Error> {
+        // Begin new transaction
+        let mut writable = self.connection.write().unwrap(); // @TODO
+        let tx = writable.transaction()?;
+
+        // Make sure only one default provider in set
+        reset(&tx, *self.profile_id, false)?;
+
+        // Delete record by ID
+        match set_default(&tx, *self.profile_id, id, true) {
+            Ok(_) => match tx.commit() {
+                Ok(_) => Ok(()),
+                Err(e) => Err(e),
+            },
+            Err(e) => Err(e),
+        }
+    }
 }
 
 // Low-level DB API
@@ -144,6 +163,18 @@ fn reset(tx: &Transaction, profile_id: i64, is_default: bool) -> Result<usize, E
     tx.execute(
         "UPDATE `profile_search` SET `is_default` = ? WHERE `profile_id` = ?",
         (is_default, profile_id),
+    )
+}
+
+fn set_default(
+    tx: &Transaction,
+    profile_id: i64,
+    id: i64,
+    is_default: bool,
+) -> Result<usize, Error> {
+    tx.execute(
+        "UPDATE `profile_search` SET `is_default` = ? WHERE `profile_id` = ? AND `id` = ?",
+        (is_default, profile_id, id),
     )
 }
 

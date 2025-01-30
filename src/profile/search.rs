@@ -18,24 +18,32 @@ impl Search {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self, Error> {
         // Init children components
         let database = Database::init(connection, profile_id);
         let memory = Memory::init();
 
         // Build initial index
-        index(&database, &memory);
+        index(&database, &memory)?;
 
         // Return new `Self`
-        Self { database, memory }
+        Ok(Self { database, memory })
     }
 
     // Actions
 
     /// Add new search provider record
     /// * requires valid [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-    pub fn add(&self, query: Uri, is_default: bool) -> Result<(), Error> {
+    pub fn add(&self, query: &Uri, is_default: bool) -> Result<(), Error> {
         match self.database.add(query.to_string(), is_default) {
+            Ok(_) => Ok(index(&self.database, &self.memory)?),
+            Err(e) => Err(Error::Database(e)),
+        }
+    }
+    /// Add new search provider record
+    /// * requires valid [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+    pub fn set_default(&self, profile_search_id: i64) -> Result<(), Error> {
+        match self.database.set_default(profile_search_id) {
             Ok(_) => Ok(index(&self.database, &self.memory)?),
             Err(e) => Err(Error::Database(e)),
         }
