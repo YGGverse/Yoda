@@ -50,7 +50,7 @@ impl List {
                 .build();
 
             // Title
-            child.append(&Label::builder().halign(Align::Start).build());
+            child.append(&Label::new(None));
 
             // Done
             this.downcast_ref::<ListItem>()
