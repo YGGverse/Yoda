@@ -2,11 +2,13 @@ mod bookmark;
 mod database;
 mod history;
 mod identity;
+mod search;
 
 use bookmark::Bookmark;
 use database::Database;
 use history::History;
 use identity::Identity;
+use search::Search;
 
 use gtk::glib::{user_config_dir, DateTime};
 use sqlite::{Connection, Transaction};
@@ -23,6 +25,7 @@ pub struct Profile {
     pub database: Rc<Database>,
     pub history: Rc<History>,
     pub identity: Rc<Identity>,
+    pub search: Rc<Search>,
     pub config_path: PathBuf,
 }
 
@@ -103,6 +106,7 @@ impl Profile {
         // Init components
         let bookmark = Rc::new(Bookmark::build(&connection, &profile_id));
         let history = Rc::new(History::build(&connection, &profile_id));
+        let search = Rc::new(Search::build(&connection, &profile_id));
         let identity = Rc::new(match Identity::build(&connection, &profile_id) {
             Ok(result) => result,
             Err(e) => todo!("{:?}", e.to_string()),
@@ -114,6 +118,7 @@ impl Profile {
             database,
             history,
             identity,
+            search,
             config_path,
         }
     }
@@ -128,6 +133,7 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
     // Delegate migration to children components
     bookmark::migrate(tx)?;
     identity::migrate(tx)?;
+    search::migrate(tx)?;
     // @TODO not in use yet
     // history::migrate(tx)?;
 
