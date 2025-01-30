@@ -26,6 +26,7 @@ GTK 4 / Libadwaita client written in Rust
   * [x] Export to PEM
   * [x] Import from PEM
   * [x] Delete
+* [x] Custom search providers
 * [ ] Downloads
   * [ ] Browser window
   * [x] Save page as file
@@ -49,7 +50,6 @@ GTK 4 / Libadwaita client written in Rust
           * [x] Request
           * [ ] History
 * [ ] User settings
-  * [x] Custom search providers
 
 ### Protocols
 * [ ] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
