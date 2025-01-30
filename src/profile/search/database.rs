@@ -1,6 +1,7 @@
 use sqlite::{Connection, Error, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
+#[derive(Clone)]
 pub struct Row {
     pub id: i64,
     //pub profile_id: i64,
