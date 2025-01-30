@@ -276,13 +276,19 @@ impl Tab {
 
     pub fn history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.action.history.back(true);
+            if let Some(back) = item.action.history.back(true) {
+                item.page.navigation.set_request(&back);
+                item.client.handle(&back, true);
+            }
         }
     }
 
     pub fn history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.action.history.forward(true);
+            if let Some(forward) = item.action.history.forward(true) {
+                item.page.navigation.set_request(&forward);
+                item.client.handle(&forward, true);
+            }
         }
     }
 
