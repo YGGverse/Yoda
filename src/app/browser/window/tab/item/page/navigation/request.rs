@@ -87,9 +87,7 @@ impl Request for Entry {
                         this.show_identity_dialog(&profile)
                     }
                 }
-                EntryIconPosition::Secondary => {
-                    this.activate();
-                }
+                EntryIconPosition::Secondary => this.emit_activate(),
                 _ => todo!(), // unexpected
             }
         });
