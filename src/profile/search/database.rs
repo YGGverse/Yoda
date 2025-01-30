@@ -18,11 +18,21 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
-        Self {
+    pub fn init(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self, Error> {
+        let mut writable = connection.write().unwrap(); // @TODO handle
+        let tx = writable.transaction()?;
+
+        let records = select(&tx, **profile_id)?;
+
+        if records.is_empty() {
+            add_defaults(&tx, **profile_id)?;
+            tx.commit()?;
+        }
+
+        Ok(Self {
             connection: connection.clone(),
             profile_id: profile_id.clone(),
-        }
+        })
     }
 
     // Getters
@@ -67,13 +77,30 @@ impl Database {
         let tx = writable.transaction()?;
 
         // Delete record by ID
-        match delete(&tx, id) {
-            Ok(_) => match tx.commit() {
-                Ok(_) => Ok(()),
-                Err(e) => Err(e),
-            },
-            Err(e) => Err(e),
+        delete(&tx, id)?;
+
+        let records = select(&tx, *self.profile_id)?;
+
+        // Restore defaults if DB becomes empty
+        if records.is_empty() {
+            add_defaults(&tx, *self.profile_id)?;
+        } else {
+            // At least one provider should be selected as default
+            let mut has_default = false;
+            for record in &records {
+                if record.is_default {
+                    has_default = true;
+                    break;
+                }
+            }
+            // Select first
+            if !has_default {
+                set_default(&tx, *self.profile_id, records[0].id, true)?;
+            }
         }
+
+        // Done
+        tx.commit()
     }
 
     /// Delete record from database
@@ -86,13 +113,8 @@ impl Database {
         reset(&tx, *self.profile_id, false)?;
 
         // Delete record by ID
-        match set_default(&tx, *self.profile_id, id, true) {
-            Ok(_) => match tx.commit() {
-                Ok(_) => Ok(()),
-                Err(e) => Err(e),
-            },
-            Err(e) => Err(e),
-        }
+        set_default(&tx, *self.profile_id, id, true)?;
+        tx.commit()
     }
 }
 
@@ -180,4 +202,15 @@ fn set_default(
 
 fn last_insert_id(tx: &Transaction) -> i64 {
     tx.last_insert_rowid()
+}
+
+/// Init default search providers list for given profile
+fn add_defaults(tx: &Transaction, profile_id: i64) -> Result<(), Error> {
+    for (provider, is_default) in &[
+        ("gemini://kennedy.gemi.dev/search", true),
+        ("gemini://tlgs.one/search/search", false),
+    ] {
+        insert(tx, profile_id, provider.to_string(), *is_default)?;
+    }
+    Ok(())
 }
