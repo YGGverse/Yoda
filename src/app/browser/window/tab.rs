@@ -57,17 +57,6 @@ impl Tab {
         }
 
         // Init events
-        tab_view.connect_setup_menu({
-            let index = index.clone();
-            let window_action = window_action.clone();
-            move |tab_view, tab_page| {
-                // by documentation:
-                // * `tab_page` == `Some` - popover open
-                // * `tab_page` == `None` - popover closed
-                update_actions(tab_view, tab_page, &index, &window_action);
-            }
-        });
-
         tab_view.connect_close_page({
             let index = index.clone();
             let profile = profile.clone();
@@ -80,7 +69,6 @@ impl Tab {
                     index.borrow_mut().remove(tab_page).unwrap(),
                     DateTime::now_local().unwrap().to_unix(),
                 );
-
                 update_actions(
                     tab_view,
                     tab_view.selected_page().as_ref(),
@@ -163,13 +151,6 @@ impl Tab {
         if is_selected {
             self.tab_view.set_selected_page(&item.tab_page);
         }
-
-        update_actions(
-            &self.tab_view,
-            self.tab_view.selected_page().as_ref(),
-            &self.index,
-            &self.window_action,
-        );
 
         item
     }
@@ -339,12 +320,6 @@ impl Tab {
 
                         if item_record.is_selected {
                             self.tab_view.set_selected_page(&item.tab_page);
-                            update_actions(
-                                &self.tab_view,
-                                Some(&item.tab_page),
-                                &self.index,
-                                &self.window_action,
-                            );
                         }
 
                         // Restore children components
