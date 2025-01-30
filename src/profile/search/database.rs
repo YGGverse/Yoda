@@ -6,7 +6,6 @@ pub struct Row {
     //pub profile_id: i64,
     pub is_default: bool,
     pub query: String,
-    pub name: String,
 }
 
 pub struct Database {
@@ -38,7 +37,7 @@ impl Database {
 
     /// Create new record in database
     /// * return last insert ID on success
-    pub fn add(&self, query: String, name: Option<String>, is_default: bool) -> Result<i64, Error> {
+    pub fn add(&self, query: String, is_default: bool) -> Result<i64, Error> {
         // Begin new transaction
         let mut writable = self.connection.write().unwrap(); // @TODO handle
         let tx = writable.transaction()?;
@@ -48,7 +47,7 @@ impl Database {
             // make sure only one default provider in set
             reset(&tx, *self.profile_id, !is_default)?;
         }
-        insert(&tx, *self.profile_id, query, name, is_default)?;
+        insert(&tx, *self.profile_id, query, is_default)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -87,7 +86,6 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `profile_id` INTEGER NOT NULL,
             `is_default` INTEGER NOT NULL,
             `query`      TEXT NOT NULL,
-            `name`       VARCHAR(64),
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
         )",
@@ -99,23 +97,21 @@ fn insert(
     tx: &Transaction,
     profile_id: i64,
     query: String,
-    name: Option<String>,
     is_default: bool,
 ) -> Result<usize, Error> {
     tx.execute(
         "INSERT INTO `profile_search` (
             `profile_id`,
             `is_default`,
-            `query`,
-            `name`
-        ) VALUES (?, ?, ?, ?)",
-        (profile_id, is_default, query, name),
+            `query`
+        ) VALUES (?, ?, ?)",
+        (profile_id, is_default, query),
     )
 }
 
 fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>, Error> {
     let mut stmt = tx.prepare(
-        "SELECT `id`, `profile_id`, `is_default`, `query`, `name`
+        "SELECT `id`, `profile_id`, `is_default`, `query`
             FROM `profile_search`
             WHERE `profile_id` = ?",
     )?;
@@ -125,8 +121,7 @@ fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>, Error> {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
             is_default: row.get(2)?,
-            name: row.get(3)?,
-            query: row.get(4)?,
+            query: row.get(3)?,
         })
     })?;
 
