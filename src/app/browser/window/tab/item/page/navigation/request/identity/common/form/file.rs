@@ -1,7 +1,7 @@
 use super::WidgetAction;
 use gtk::{
     gio::{Cancellable, ListStore, TlsCertificate},
-    glib::{gformat, timeout_add_seconds_local_once, GString},
+    glib::{gformat, GString},
     prelude::{ButtonExt, FileExt, TlsCertificateExt, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
@@ -90,17 +90,6 @@ impl File {
                             }
                             button.set_sensitive(true); // unlock
                             widget_action.update.activate();
-
-                            // Renew button with timeout
-                            timeout_add_seconds_local_once(1, {
-                                let button = button.clone();
-                                move || {
-                                    button.remove_css_class("error");
-                                    button.remove_css_class("success");
-                                    button.remove_css_class("warning");
-                                    button.set_label(LABEL)
-                                }
-                            });
                         }
                     });
             }
