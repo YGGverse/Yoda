@@ -4,6 +4,7 @@ mod memory;
 
 use database::Database;
 use error::Error;
+use gtk::glib::Uri;
 use memory::Memory;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
@@ -30,6 +31,15 @@ impl Search {
     }
 
     // Actions
+
+    /// Add new search provider record
+    /// * requires valid [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+    pub fn add(&self, query: Uri, is_default: bool) -> Result<(), Error> {
+        match self.database.add(query.to_string(), is_default) {
+            Ok(_) => Ok(index(&self.database, &self.memory)?),
+            Err(e) => Err(Error::Database(e)),
+        }
+    }
 
     /// Get records from the memory index
     pub fn records(&self) -> Vec<database::Row> {
