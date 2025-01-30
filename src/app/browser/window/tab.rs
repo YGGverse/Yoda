@@ -266,29 +266,19 @@ impl Tab {
 
     pub fn home(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(home) = item.page.navigation.home() {
-                let home = home.to_string();
-                item.page.navigation.set_request(&home);
-                item.client.handle(&home, true);
-            }
+            item.action.home.activate(None)
         }
     }
 
     pub fn history_back(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(back) = item.action.history.back(true) {
-                item.page.navigation.set_request(&back);
-                item.client.handle(&back, true);
-            }
+            item.action.history.back.activate(None)
         }
     }
 
     pub fn history_forward(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            if let Some(forward) = item.action.history.forward(true) {
-                item.page.navigation.set_request(&forward);
-                item.client.handle(&forward, true);
-            }
+            item.action.history.forward.activate(None)
         }
     }
 
