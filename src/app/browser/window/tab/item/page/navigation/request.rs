@@ -44,6 +44,8 @@ pub trait Request {
     ) -> Result<(), String>;
 
     fn update_primary_icon(&self, profile: &Profile);
+    fn update_secondary_icon(&self);
+
     fn show_identity_dialog(&self, profile: &Rc<Profile>);
     fn show_search_dialog(&self, profile: &Rc<Profile>);
 
@@ -92,14 +94,7 @@ impl Request for Entry {
             }
         });
 
-        entry.connect_has_focus_notify(|this| {
-            if this.focus_child().is_some_and(|text| text.has_focus()) {
-                this.set_secondary_icon_name(Some("pan-end-symbolic"));
-            } else {
-                this.set_secondary_icon_name(None);
-                this.select_region(0, 0);
-            }
-        });
+        entry.connect_has_focus_notify(|this| this.update_secondary_icon());
 
         entry.connect_changed({
             let profile = profile.clone();
@@ -109,8 +104,9 @@ impl Request for Entry {
                 item_action.reload.set_enabled(!this.text().is_empty());
                 item_action.home.set_enabled(this.home().is_some());
 
-                // Update primary icon
-                this.update_primary_icon(&profile)
+                // Update icons
+                this.update_primary_icon(&profile);
+                this.update_secondary_icon();
             }
         });
 
@@ -220,7 +216,6 @@ impl Request for Entry {
     }
 
     fn update_primary_icon(&self, profile: &Profile) {
-        // Update primary icon
         self.first_child().unwrap().remove_css_class("success"); // @TODO handle
 
         match primary_icon::from(&self.text()) {
@@ -253,6 +248,15 @@ impl Request for Entry {
                 self.set_primary_icon_name(Some(name));
                 self.set_primary_icon_tooltip_text(Some(tooltip));
             }
+        }
+    }
+
+    fn update_secondary_icon(&self) {
+        if !self.text().is_empty() && self.focus_child().is_some_and(|text| text.has_focus()) {
+            self.set_secondary_icon_name(Some("pan-end-symbolic"));
+        } else {
+            self.set_secondary_icon_name(None);
+            self.select_region(0, 0);
         }
     }
 
