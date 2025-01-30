@@ -359,16 +359,13 @@ impl Tab {
         // @TODO other/child features..
     }
 
+    /// Find `Item` by `TabPage` position in HashMap `index`
     fn item(&self, page_position: Option<i32>) -> Option<Rc<Item>> {
-        if let Some(tab_page) = match page_position {
+        match page_position {
             Some(value) => Some(self.tab_view.nth_page(value)),
             None => self.tab_view.selected_page(),
-        } {
-            if let Some(item) = self.index.borrow().get(&tab_page) {
-                return Some(item.clone());
-            }
         }
-        None
+        .map(|tab_page| self.index.borrow().get(&tab_page).unwrap().clone())
     }
 }
 
