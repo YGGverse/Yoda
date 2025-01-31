@@ -31,7 +31,7 @@ impl Search for AlertDialog {
         // Init main widget
         let alert_dialog = AlertDialog::builder()
             .heading("Search")
-            .body("Select default provider")
+            .body("Choose default provider")
             .close_response(RESPONSE_CANCEL.0)
             .default_response(RESPONSE_APPLY.0)
             .extra_child(&form.g_box)

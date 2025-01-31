@@ -29,7 +29,7 @@ impl Query for Entry {
         Entry::builder()
             .margin_top(8)
             .max_length(MAX_LENGTH as i32)
-            .placeholder_text("Provider query URL")
+            .placeholder_text("Request URL (without query)")
             .visible(false)
             .build()
     }
