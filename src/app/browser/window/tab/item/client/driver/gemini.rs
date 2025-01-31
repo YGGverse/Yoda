@@ -450,7 +450,12 @@ fn handle(
                             }
                             error => {
                                 let status = page.content.to_status_failure();
-                                status.set_description(Some(&error.to_string()));
+                                status.set_description(
+                                    Some(&match response.meta.data {
+                                        Some(message) => message.to_string(),
+                                        None => error.to_string()
+                                    })
+                                );
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
