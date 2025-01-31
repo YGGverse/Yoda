@@ -82,13 +82,19 @@ impl Tab {
             let profile = profile.clone();
             let window_action = window_action.clone();
             move |tab_view, tab_page| {
-                // cleanup HashMap index
-                // add history record into profile memory pool
-                // * this action allows to recover recently closed tab (e.g. from the main menu)
-                profile.history.memory.tab.add(
-                    index.borrow_mut().remove(tab_page).unwrap(),
-                    DateTime::now_local().unwrap().to_unix(),
-                );
+                // remove closed Item from Tab index
+                if let Some(item) = index.borrow_mut().remove(tab_page) {
+                    // keep removed `Item` reference in the memory (to reopen from the main menu)
+                    // * skip item with blank request
+                    if !item.page.navigation.request().is_empty() {
+                        profile
+                            .history
+                            .memory
+                            .tab
+                            .add(item, DateTime::now_local().unwrap().to_unix());
+                    }
+                }
+                // reassign global actions to active tab
                 update_actions(
                     tab_view,
                     tab_view.selected_page().as_ref(),
