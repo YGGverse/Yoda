@@ -331,8 +331,10 @@ impl Tab {
                 for tab_record in tab_records {
                     for item_record in item::restore(transaction, tab_record.id)? {
                         // Generate new `TabPage` with blank `Widget`
-                        let (tab_page, target_child) =
-                            new_tab_page(&self.tab_view, Position::After);
+                        let (tab_page, target_child) = new_tab_page(
+                            &self.tab_view,
+                            Position::Number(item_record.page_position),
+                        );
 
                         // Init new tab item
                         let item = Rc::new(Item::build(

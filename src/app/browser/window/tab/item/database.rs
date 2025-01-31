@@ -3,6 +3,7 @@ use sqlite::{Error, Transaction};
 pub struct Table {
     pub id: i64,
     // pub app_browser_window_tab_id: i64, not in use
+    pub page_position: i32,
     pub is_pinned: bool,
     pub is_selected: bool,
 }
@@ -50,19 +51,21 @@ pub fn select(tx: &Transaction, app_browser_window_tab_id: i64) -> Result<Vec<Ta
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_tab_id`,
+                `page_position`,
                 `is_pinned`,
                 `is_selected`
                 FROM `app_browser_window_tab_item`
                 WHERE `app_browser_window_tab_id` = ?
-                ORDER BY `page_position` ASC", // just order by, no store in struct wanted
+                ORDER BY `page_position` ASC", // important to keep this order on items restore
     )?;
 
     let result = stmt.query_map([app_browser_window_tab_id], |row| {
         Ok(Table {
             id: row.get(0)?,
             // app_browser_window_tab_id: row.get(1)?, not in use
-            is_pinned: row.get(2)?,
-            is_selected: row.get(3)?,
+            page_position: row.get(2)?,
+            is_pinned: row.get(3)?,
+            is_selected: row.get(4)?,
         })
     })?;
 
