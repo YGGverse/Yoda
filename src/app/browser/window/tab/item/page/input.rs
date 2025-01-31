@@ -57,9 +57,7 @@ impl Input {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.update(Some(
-            &Response::build(action, base, title, size_limit).g_box,
-        ));
+        self.update(Some(&gtk::Box::response(action, base, title, size_limit)));
     }
 
     pub fn set_new_sensitive(
@@ -69,9 +67,7 @@ impl Input {
         title: Option<&str>,
         max_length: Option<i32>,
     ) {
-        self.update(Some(
-            &Sensitive::build(action, base, title, max_length).g_box,
-        ));
+        self.update(Some(&gtk::Box::sensitive(action, base, title, max_length)));
     }
 
     pub fn set_new_titan(&self, on_send: impl Fn(&[u8], Box<dyn Fn()>) + 'static) {

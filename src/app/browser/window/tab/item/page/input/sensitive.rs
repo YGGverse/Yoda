@@ -13,15 +13,20 @@ use std::rc::Rc;
 const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
 
-pub struct Sensitive {
-    pub g_box: Box,
+pub trait Sensitive {
+    fn sensitive(
+        item_action: Rc<ItemAction>,
+        base: Uri,
+        title: Option<&str>,
+        max_length: Option<i32>,
+    ) -> Self;
 }
 
-impl Sensitive {
+impl Sensitive for Box {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
+    fn sensitive(
         item_action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
@@ -69,7 +74,7 @@ impl Sensitive {
             form.password_entry_row.grab_focus();
         });
 
-        // Return activated struct
-        Self { g_box }
+        // Return activated `Self`
+        g_box
     }
 }

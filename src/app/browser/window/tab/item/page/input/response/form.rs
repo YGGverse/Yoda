@@ -9,15 +9,16 @@ use sourceview::Buffer;
 
 const MARGIN: i32 = 8;
 
-pub struct Form {
-    pub text_view: TextView,
+pub trait Form {
+    fn form(action_update: SimpleAction) -> Self;
+    fn text(&self) -> GString;
 }
 
-impl Form {
+impl Form for TextView {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(action_update: SimpleAction) -> Self {
+    fn form(action_update: SimpleAction) -> Self {
         // Init [SourceView](https://gitlab.gnome.org/GNOME/gtksourceview) type buffer
         let buffer = Buffer::builder().build();
 
@@ -52,13 +53,13 @@ impl Form {
         });
 
         // Return activated `Self`
-        Self { text_view }
+        text_view
     }
 
     // Getters
 
-    pub fn text(&self) -> GString {
-        let buffer = self.text_view.buffer();
+    fn text(&self) -> GString {
+        let buffer = self.buffer();
         buffer.text(&buffer.start_iter(), &buffer.end_iter(), true)
     }
 }

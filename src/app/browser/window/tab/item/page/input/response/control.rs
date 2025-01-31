@@ -2,16 +2,14 @@ mod counter;
 mod send;
 
 use counter::Counter;
+use gtk::{gio::SimpleAction, prelude::BoxExt, Align, Box, Button, Label, Orientation};
 use send::Send;
-
-use gtk::{gio::SimpleAction, prelude::BoxExt, Align, Box, Orientation};
-use std::rc::Rc;
 
 const SPACING: i32 = 8;
 
 pub struct Control {
-    pub counter: Rc<Counter>,
-    pub send: Rc<Send>,
+    pub counter: Label,
+    pub send: Button,
     pub g_box: Box,
 }
 
@@ -21,8 +19,8 @@ impl Control {
     /// Build new `Self`
     pub fn build(action_send: SimpleAction) -> Self {
         // Init components
-        let counter = Rc::new(Counter::new());
-        let send = Rc::new(Send::build(action_send));
+        let counter = Label::counter();
+        let send = Button::send(action_send);
 
         // Init main widget
         let g_box = Box::builder()
@@ -31,8 +29,8 @@ impl Control {
             .spacing(SPACING)
             .build();
 
-        g_box.append(&counter.label);
-        g_box.append(&send.button);
+        g_box.append(&counter);
+        g_box.append(&send);
 
         // Return activated struct
         Self {

@@ -11,23 +11,27 @@ use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
     prelude::BoxExt,
-    Box, Orientation,
+    Box, Label, Orientation, TextView,
 };
 use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
 
-pub struct Response {
-    // Components
-    pub g_box: Box,
+pub trait Response {
+    fn response(
+        item_action: Rc<ItemAction>,
+        base: Uri,
+        title: Option<&str>,
+        size_limit: Option<usize>,
+    ) -> Self;
 }
 
-impl Response {
+impl Response for Box {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
+    fn response(
         item_action: Rc<ItemAction>,
         base: Uri,
         title: Option<&str>,
@@ -39,8 +43,8 @@ impl Response {
 
         // Init components
         let control = Rc::new(Control::build(action_send.clone()));
-        let form = Rc::new(Form::build(action_update.clone()));
-        let title = Rc::new(Title::build(title));
+        let form = TextView::form(action_update.clone());
+        let title = Label::title(title);
 
         // Init main widget
         let g_box = Box::builder()
@@ -52,8 +56,8 @@ impl Response {
             .orientation(Orientation::Vertical)
             .build();
 
-        g_box.append(&title.label);
-        g_box.append(&form.text_view);
+        g_box.append(&title);
+        g_box.append(&form);
         g_box.append(&control.g_box);
 
         // Init events
@@ -88,7 +92,7 @@ impl Response {
             }
         });
 
-        // Return activated struct
-        Self { g_box }
+        // Return activated `Self`
+        g_box
     }
 }

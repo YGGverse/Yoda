@@ -4,15 +4,16 @@ use gtk::{
     Button,
 };
 
-pub struct Send {
-    pub button: Button,
+pub trait Send {
+    fn send(action_send: SimpleAction) -> Self;
+    fn update(&self, is_sensitive: bool);
 }
 
-impl Send {
+impl Send for Button {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(action_send: SimpleAction) -> Self {
+    fn send(action_send: SimpleAction) -> Self {
         // Init main widget
         let button = Button::builder()
             .css_classes(["accent"]) // | `suggested-action`
@@ -30,11 +31,11 @@ impl Send {
         });
 
         // Return activated `Self`
-        Self { button }
+        button
     }
 
     // Actions
-    pub fn update(&self, is_sensitive: bool) {
-        self.button.set_sensitive(is_sensitive);
+    fn update(&self, is_sensitive: bool) {
+        self.set_sensitive(is_sensitive);
     }
 }
