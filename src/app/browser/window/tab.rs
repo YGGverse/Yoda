@@ -99,6 +99,14 @@ impl Tab {
             }
         });
 
+        tab_view.connect_page_reordered({
+            let window_action = window_action.clone();
+            let index = index.clone();
+            move |tab_view, tab_page, _| {
+                update_actions(tab_view, Some(tab_page), &index, &window_action)
+            }
+        });
+
         tab_view.connect_selected_page_notify({
             let window_action = window_action.clone();
             let index = index.clone();
