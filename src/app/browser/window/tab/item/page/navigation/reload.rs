@@ -36,7 +36,7 @@ impl Reload for Button {
             let request = request.clone();
             let window_action = window_action.clone();
             move |_, _, _, _| {
-                if let Some(uri) = request.home() {
+                if let Some(uri) = request.uri() {
                     window_action.append.activate_stateful_once(
                         Position::After,
                         Some(uri.to_string()),
