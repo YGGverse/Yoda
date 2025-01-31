@@ -18,7 +18,7 @@ impl Item {
     pub fn add() -> Self {
         Object::builder()
             .property("value", G_VALUE_ADD)
-            .property("title", "Add new..")
+            .property("title", "Add..")
             .property("is-default", false)
             .build()
     }
