@@ -53,7 +53,7 @@ GTK 4 / Libadwaita client written in Rust
 
 ### Protocols
 * [ ] [Gemini](https://geminiprotocol.net/docs/protocol-specification.gmi)
-  * [ ] [Status code](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
+  * [x] [Status code](https://geminiprotocol.net/docs/protocol-specification.gmi#status-codes)
     * [x] Success
       * [x] `20`
     * [x] Input
@@ -92,7 +92,6 @@ GTK 4 / Libadwaita client written in Rust
           * [ ] underline
           * [ ] blink
           * [ ] reversed
-          * [ ] hidden
           * [ ] strikethrough
     * [x] Header
       * [x] H1
@@ -105,9 +104,9 @@ GTK 4 / Libadwaita client written in Rust
     * [x] List
     * [x] Quote
   * [ ] Gemfeed
-* [ ] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
-  * [ ] Binary data (file uploads)
-  * [x] Text input
+  * [ ] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
+    * [ ] Binary data (file uploads)
+    * [x] Text input
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [ ] Localhost
