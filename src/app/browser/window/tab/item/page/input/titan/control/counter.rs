@@ -1,31 +1,26 @@
 use gtk::{prelude::WidgetExt, Label};
 
-pub struct Counter {
-    pub label: Label,
+pub trait Counter {
+    fn counter() -> Self;
+    fn update(&self, char_count: Option<i32>);
 }
 
-impl Default for Counter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl Counter for Label {
+    // Constructors
 
-impl Counter {
-    // Construct
-    pub fn new() -> Self {
-        Self {
-            label: Label::builder().css_classes(["dim-label"]).build(), // @TODO use `dimmed` in Adw 1.6,
-        }
+    fn counter() -> Self {
+        Label::builder().css_classes(["dim-label"]).build() // @TODO use `dimmed` in Adw 1.6,
     }
 
     // Actions
-    pub fn update(&self, bytes_total: Option<usize>) {
-        match bytes_total {
+
+    fn update(&self, char_count: Option<i32>) {
+        match char_count {
             Some(value) => {
-                self.label.set_label(&value.to_string());
-                self.label.set_visible(value > 0);
+                self.set_label(&value.to_string());
+                self.set_visible(value > 0);
             }
-            None => self.label.set_visible(false),
+            None => self.set_visible(false),
         }
     }
 }

@@ -3,36 +3,31 @@ mod form;
 mod title;
 
 use control::Control;
+use control::Send;
 use form::Form;
-use title::Title;
-
-use gtk::{gio::SimpleAction, glib::uuid_string_random, prelude::BoxExt, Box, Label, Orientation};
+use gtk::{
+    prelude::{BoxExt, ButtonExt, TextBufferExt, TextViewExt},
+    Label, Orientation, TextView,
+};
 use std::rc::Rc;
+use title::Title;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 8;
 
-pub struct Titan {
-    // Components
-    pub g_box: Box,
+pub trait Titan {
+    fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self;
 }
 
-impl Titan {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(on_send: impl Fn(&[u8], &Label) + 'static) -> Self {
-        // Init local actions
-        let action_update = SimpleAction::new(&uuid_string_random(), None);
-        let action_send = SimpleAction::new(&uuid_string_random(), None);
-
+impl Titan for gtk::Box {
+    fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self {
         // Init components
-        let control = Rc::new(Control::build(action_send.clone()));
-        let form = Rc::new(Form::build(action_update.clone()));
-        let title = Title::build(None);
+        let control = Rc::new(Control::build());
+        let form = TextView::form();
+        let title = Label::title(None);
 
         // Init widget
-        let g_box = Box::builder()
+        let g_box = gtk::Box::builder()
             .margin_bottom(MARGIN)
             .margin_end(MARGIN)
             .margin_start(MARGIN)
@@ -41,21 +36,31 @@ impl Titan {
             .orientation(Orientation::Vertical)
             .build();
 
-        g_box.append(&title.label);
-        g_box.append(&form.text_view);
+        g_box.append(&title);
+        g_box.append(&form);
         g_box.append(&control.g_box);
 
-        // Init events
-        action_update.connect_activate({
-            let control = control.clone();
+        // Connect events
+        control.send.connect_clicked({
             let form = form.clone();
-            move |_, _| control.update(Some(form.text().len()))
+            move |this| {
+                this.set_sending();
+                callback(
+                    form.text().as_bytes(),
+                    Box::new({
+                        let this = this.clone();
+                        move || this.set_resend() // on failure
+                    }),
+                )
+            }
         });
 
-        action_send
-            .connect_activate(move |_, _| on_send(form.text().as_bytes(), &control.counter.label));
+        form.buffer().connect_changed({
+            let control = control.clone();
+            move |this| control.update(Some(this.char_count()))
+        });
 
-        // Return activated struct
-        Self { g_box }
+        // Return activated `Self`
+        g_box
     }
 }

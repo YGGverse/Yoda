@@ -4,7 +4,7 @@ mod titan;
 
 use super::ItemAction;
 use adw::Clamp;
-use gtk::{glib::Uri, prelude::WidgetExt, Box, Label};
+use gtk::{glib::Uri, prelude::WidgetExt};
 use response::Response;
 use sensitive::Sensitive;
 use std::rc::Rc;
@@ -40,7 +40,7 @@ impl Input {
         self.update(None);
     }
 
-    pub fn update(&self, child: Option<&Box>) {
+    pub fn update(&self, child: Option<&gtk::Box>) {
         if child.is_some() {
             self.clamp.set_visible(true); // widget may be hidden, make it visible to child redraw
             self.clamp.set_child(child);
@@ -74,7 +74,7 @@ impl Input {
         ));
     }
 
-    pub fn set_new_titan(&self, on_send: impl Fn(&[u8], &Label) + 'static) {
-        self.update(Some(&Titan::build(on_send).g_box));
+    pub fn set_new_titan(&self, on_send: impl Fn(&[u8], Box<dyn Fn()>) + 'static) {
+        self.update(Some(&gtk::Box::titan(on_send)));
     }
 }

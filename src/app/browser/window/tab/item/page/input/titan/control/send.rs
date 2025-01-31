@@ -1,40 +1,28 @@
 use gtk::{
-    gio::SimpleAction,
-    prelude::{ActionExt, ButtonExt, WidgetExt},
+    prelude::{ButtonExt, WidgetExt},
     Button,
 };
 
-pub struct Send {
-    pub button: Button,
+pub trait Send {
+    fn send() -> Self;
+    fn set_sending(&self);
+    fn set_resend(&self);
 }
 
-impl Send {
-    // Constructors
-
-    /// Build new `Self`
-    pub fn build(action_send: SimpleAction) -> Self {
-        // Init main widget
-        let button = Button::builder()
+impl Send for Button {
+    fn send() -> Self {
+        Button::builder()
             .css_classes(["accent"]) // | `suggested-action`
             .label("Send")
             .sensitive(false)
-            .build();
-
-        // Init events
-        button.connect_clicked({
-            move |this| {
-                this.set_sensitive(false);
-                this.set_label("sending..");
-                action_send.activate(None);
-            }
-        });
-
-        // Return activated `Self`
-        Self { button }
+            .build()
     }
-
-    // Actions
-    pub fn update(&self, is_sensitive: bool) {
-        self.button.set_sensitive(is_sensitive);
+    fn set_sending(&self) {
+        self.set_sensitive(false);
+        self.set_label("sending..");
+    }
+    fn set_resend(&self) {
+        self.set_sensitive(true);
+        self.set_label("Resend");
     }
 }

@@ -2,16 +2,17 @@ mod counter;
 mod send;
 
 use counter::Counter;
-use gtk::gio::SimpleAction;
-use gtk::{prelude::BoxExt, Align, Box, Orientation};
-use send::Send;
-use std::rc::Rc;
+use gtk::{
+    prelude::{BoxExt, WidgetExt},
+    Align, Box, Button, Label, Orientation,
+};
+pub use send::Send;
 
 const SPACING: i32 = 8;
 
 pub struct Control {
-    pub counter: Rc<Counter>,
-    pub send: Rc<Send>,
+    pub counter: Label,
+    pub send: Button,
     pub g_box: Box,
 }
 
@@ -19,10 +20,10 @@ impl Control {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(action_send: SimpleAction) -> Self {
+    pub fn build() -> Self {
         // Init components
-        let counter = Rc::new(Counter::new());
-        let send = Rc::new(Send::build(action_send));
+        let counter = Label::counter();
+        let send = Button::send();
 
         // Init main widget
         let g_box = Box::builder()
@@ -31,8 +32,8 @@ impl Control {
             .spacing(SPACING)
             .build();
 
-        g_box.append(&counter.label);
-        g_box.append(&send.button);
+        g_box.append(&counter);
+        g_box.append(&send);
 
         // Return activated struct
         Self {
@@ -43,10 +44,10 @@ impl Control {
     }
 
     // Actions
-    pub fn update(&self, bytes_total: Option<usize>) {
+    pub fn update(&self, char_count: Option<i32>) {
         // Update children components
-        self.counter.update(bytes_total);
-        self.send.update(match bytes_total {
+        self.counter.update(char_count);
+        self.send.set_sensitive(match char_count {
             Some(total) => total > 0,
             None => false,
         });
