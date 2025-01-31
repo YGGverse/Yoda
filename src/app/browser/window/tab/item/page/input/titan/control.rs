@@ -44,12 +44,9 @@ impl Control {
     }
 
     // Actions
-    pub fn update(&self, char_count: Option<i32>) {
+    pub fn update(&self, chars_count: i32, bytes_total: usize) {
         // Update children components
-        self.counter.update(char_count);
-        self.send.set_sensitive(match char_count {
-            Some(total) => total > 0,
-            None => false,
-        });
+        self.counter.update(chars_count, bytes_total);
+        self.send.set_sensitive(bytes_total > 0);
     }
 }

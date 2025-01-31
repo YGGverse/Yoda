@@ -1,4 +1,5 @@
 use gtk::{prelude::WidgetExt, Label};
+use plurify::Plurify;
 
 pub struct Counter {
     pub label: Label,
@@ -34,6 +35,11 @@ impl Counter {
 
                 // Toggle visibility on chars left provided
                 self.label.set_visible(!is_empty);
+
+                self.label.set_tooltip_text(Some(&format!(
+                    "{value} {} left",
+                    (value as usize).plurify(&["byte", "bytes", "bytes"])
+                )));
             }
             None => self.label.set_visible(false),
         }

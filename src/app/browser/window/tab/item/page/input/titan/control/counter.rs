@@ -1,8 +1,9 @@
 use gtk::{prelude::WidgetExt, Label};
+use plurify::Plurify;
 
 pub trait Counter {
     fn counter() -> Self;
-    fn update(&self, char_count: Option<i32>);
+    fn update(&self, char_count: i32, bytes_total: usize);
 }
 
 impl Counter for Label {
@@ -14,13 +15,17 @@ impl Counter for Label {
 
     // Actions
 
-    fn update(&self, char_count: Option<i32>) {
-        match char_count {
-            Some(value) => {
-                self.set_label(&value.to_string());
-                self.set_visible(value > 0);
-            }
-            None => self.set_visible(false),
-        }
+    fn update(&self, chars_count: i32, bytes_total: usize) {
+        self.set_visible(if bytes_total > 0 {
+            self.set_label(&bytes_total.to_string());
+            self.set_tooltip_markup(Some(&format!(
+                "{bytes_total} {} <sup>/ {chars_count} {}</sup>",
+                (bytes_total).plurify(&["byte", "bytes", "bytes"]),
+                (chars_count as usize).plurify(&["char", "chars", "chars"]),
+            )));
+            true
+        } else {
+            false
+        })
     }
 }

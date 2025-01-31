@@ -57,7 +57,8 @@ impl Titan for gtk::Box {
 
         form.buffer().connect_changed({
             let control = control.clone();
-            move |this| control.update(Some(this.char_count()))
+            let form = form.clone();
+            move |this| control.update(this.char_count(), form.text().len())
         });
 
         // Return activated `Self`
