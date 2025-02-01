@@ -65,7 +65,7 @@ impl Sensitive for Box {
                         base.to_string_partial(UriHideFlags::QUERY),
                         Uri::escape_string(&form.password_entry_row.text(), None, false),
                     )),
-                    true,
+                    false, // prevent re-send on history navigation
                 );
             }
         });

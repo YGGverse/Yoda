@@ -87,7 +87,7 @@ impl Response for Box {
                         base.to_string_partial(UriHideFlags::QUERY),
                         Uri::escape_string(&form.text(), None, false),
                     )),
-                    true,
+                    false, // prevent re-send on history navigation
                 );
             }
         });
