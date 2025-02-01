@@ -373,7 +373,7 @@ fn handle(
                                             page.set_progress(0.0);
                                             page.set_title(&status.title());
                                             redirects.replace(0); // reset
-
+                                        /* @TODO can't find that in specification:
                                         // Disallow external redirection by protocol restrictions
                                         } else if "gemini" != target.scheme()
                                             || uri.port() != target.port()
@@ -383,6 +383,7 @@ fn handle(
                                                 page.set_progress(0.0);
                                                 page.set_title(&status.title());
                                                 redirects.replace(0); // reset
+                                        */
                                         // Valid
                                         } else {
                                             if matches!(response.meta.status, Status::PermanentRedirect) {
