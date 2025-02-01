@@ -342,28 +342,9 @@ fn handle(
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                         Status::PermanentRedirect | Status::Redirect => {
-                            // Build safe base `Uri` from the current request as the donor
-                            // to resolve relative target `String` by Gemini specification
-                            let base = Uri::build(
-                                UriFlags::NONE,
-                                uri.scheme().as_str(),
-                                None, // unexpected
-                                uri.host().as_deref(),
-                                uri.port(),
-                                uri.path().as_str(),
-                                // > If a server sends a redirection in response to a request with a query string,
-                                // > the client MUST NOT apply the query string to the new location
-                                // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-                                None,
-                                // > A server SHOULD NOT include fragments in redirections,
-                                // > but if one is given, and a client already has a fragment it could apply (from the original URI),
-                                // > it is up to the client which fragment to apply.
-                                // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-                                None // @TODO
-                            );
                             // Expected target URL in response meta
                             match response.meta.data {
-                                Some(data) => match base.parse_relative(data.as_str(), UriFlags::NONE) {
+                                Some(data) => match redirection_base(uri).parse_relative(data.as_str(), UriFlags::NONE) {
                                     Ok(target) => {
                                         // Increase client redirection counter
                                         let total = redirects.take() + 1;
@@ -472,4 +453,27 @@ fn uri_to_title(uri: &Uri) -> GString {
     } else {
         path
     }
+}
+
+// Build safe base `Uri` from the current request as the donor
+// to resolve relative target `String` by Gemini specification
+fn redirection_base(request: Uri) -> Uri {
+    Uri::build(
+        UriFlags::NONE,
+        request.scheme().as_str(),
+        None, // unexpected
+        request.host().as_deref(),
+        request.port(),
+        request.path().as_str(),
+        // > If a server sends a redirection in response to a request with a query string,
+        // > the client MUST NOT apply the query string to the new location
+        // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+        None,
+        // > A server SHOULD NOT include fragments in redirections,
+        // > but if one is given, and a client already has a fragment it could apply (from the original URI),
+        // > it is up to the client which fragment to apply.
+        // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+        //   @TODO
+        None,
+    )
 }
