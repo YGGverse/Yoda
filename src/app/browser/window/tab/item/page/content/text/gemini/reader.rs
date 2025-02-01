@@ -65,7 +65,10 @@ impl Reader {
 
         // Init colors
         // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
-        let link_color = (RGBA::new(0.2, 0.5, 0.9, 1.0), RGBA::new(0.2, 0.5, 0.9, 0.9));
+        let link_color = (
+            RGBA::new(0.208, 0.518, 0.894, 1.0),
+            RGBA::new(0.208, 0.518, 0.894, 0.9),
+        );
 
         // Init syntect highlight features
         let syntax = Syntax::new();
