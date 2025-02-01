@@ -207,8 +207,9 @@ fn last_insert_id(tx: &Transaction) -> i64 {
 /// Init default search providers list for given profile
 fn add_defaults(tx: &Transaction, profile_id: i64) -> Result<(), Error> {
     for (provider, is_default) in &[
-        ("gemini://kennedy.gemi.dev/search", true),
-        ("gemini://tlgs.one/search/search", false),
+        ("gemini://tlgs.one/search/search", true),
+        ("gemini://kennedy.gemi.dev/search", false),
+        ("gemini://auragem.ddns.net/search/s", false),
     ] {
         insert(tx, profile_id, provider.to_string(), *is_default)?;
     }
