@@ -1,12 +1,15 @@
-mod h1;
-mod h2;
-mod h3;
+mod header;
 mod list;
 mod plain;
 mod quote;
 mod title;
 
 use gtk::{TextTag, TextTagTable};
+use header::Header;
+use list::List;
+use plain::Plain;
+use quote::Quote;
+use title::Title;
 
 pub struct Tag {
     pub text_tag_table: TextTagTable,
@@ -30,13 +33,13 @@ impl Tag {
     // Construct
     pub fn new() -> Self {
         // Init components
-        let h1 = h1::new();
-        let h2 = h2::new();
-        let h3 = h3::new();
-        let list = list::new();
-        let quote = quote::new();
-        let title = title::new();
-        let plain = plain::new();
+        let h1 = TextTag::h1();
+        let h2 = TextTag::h2();
+        let h3 = TextTag::h3();
+        let list = TextTag::list();
+        let quote = TextTag::quote();
+        let title = TextTag::title();
+        let plain = TextTag::plain();
 
         // Init tag table
         let text_tag_table = TextTagTable::new();
