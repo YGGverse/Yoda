@@ -117,7 +117,7 @@ fn lookup(
 
     const DEFAULT_SCHEME: &str = "gemini";
     const DEFAULT_PORT: u16 = 1965;
-    const TIMEOUT: u32 = 250; // ms
+    const TIMEOUT: u32 = 1000; // ms @TODO optional
 
     let (feature, query) = Feature::parse(query.trim());
     let feature = Rc::new(feature);
