@@ -342,31 +342,33 @@ fn handle(
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
                         Status::PermanentRedirect | Status::Redirect => {
+                            // Build safe base `Uri` from the current request as the donor
+                            // to resolve relative target `String` by Gemini specification
+                            let base = Uri::build(
+                                UriFlags::NONE,
+                                uri.scheme().as_str(),
+                                None, // unexpected
+                                uri.host().as_deref(),
+                                uri.port(),
+                                uri.path().as_str(),
+                                // > If a server sends a redirection in response to a request with a query string,
+                                // > the client MUST NOT apply the query string to the new location
+                                // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+                                None,
+                                // > A server SHOULD NOT include fragments in redirections,
+                                // > but if one is given, and a client already has a fragment it could apply (from the original URI),
+                                // > it is up to the client which fragment to apply.
+                                // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+                                None // @TODO
+                            );
                             // Expected target URL in response meta
                             match response.meta.data {
-                                Some(data) => match uri.parse_relative(data.as_str(), UriFlags::NONE) {
-                                    Ok(absolute) => {
-                                        // Base donor scheme could be `titan`, rewrite new relative links resolved with `gemini`
-                                        // otherwise, keep original scheme to handle external redirect rules properly
-                                        // * in this case, `titan` scheme redirects unexpected
-                                        let scheme = absolute.scheme();
-                                        let target = Uri::build(
-                                            UriFlags::NONE,
-                                            &if "titan" == scheme {
-                                                scheme.replace("titan", "gemini")
-                                            } else {
-                                                scheme.to_string()
-                                            },
-                                            absolute.userinfo().as_deref(),
-                                            absolute.host().as_deref(),
-                                            absolute.port(),
-                                            absolute.path().as_str(),
-                                            absolute.query().as_deref(),
-                                            absolute.fragment().as_deref(),
-                                        );
+                                Some(data) => match base.parse_relative(data.as_str(), UriFlags::NONE) {
+                                    Ok(target) => {
                                         // Increase client redirection counter
                                         let total = redirects.take() + 1;
-                                        // Validate total redirects by protocol specification
+                                        // > Client MUST limit the number of redirections they follow to 5 redirections
+                                        // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
                                         if total > 5 {
                                             let status = page.content.to_status_failure();
                                             status.set_description(Some("Redirection limit reached"));
@@ -387,7 +389,7 @@ fn handle(
                                         // Valid
                                         } else {
                                             if matches!(response.meta.status, Status::PermanentRedirect) {
-                                                page.navigation.set_request(&uri.to_string());
+                                                page.navigation.set_request(&target.to_string());
                                             }
                                             redirects.replace(total);
                                             page.item_action.load.activate(Some(&target.to_string()), false);
