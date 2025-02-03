@@ -5,7 +5,7 @@ use ggemini::client::connection::response::{
 };
 use ggemini::{
     client::{Client, Request, Response},
-    gio::memory_input_stream::from_stream_async,
+    gio::{file_output_stream, memory_input_stream},
 };
 use gtk::glib::Bytes;
 use gtk::glib::GString;
@@ -190,7 +190,7 @@ fn handle(
                                                 // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                                 // show bytes count in loading widget, validate max size for incoming data
                                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                                ggemini::gio::file_output_stream::move_all_from_stream_async(
+                                                file_output_stream::from_stream_async(
                                                     stream.clone(),
                                                     file_output_stream,
                                                     cancellable.clone(),
@@ -236,7 +236,7 @@ fn handle(
                             redirects.replace(0); // reset
                         },
                         _ => match success.mime() {
-                            "text/gemini" => from_stream_async(
+                            "text/gemini" => memory_input_stream::from_stream_async(
                                 connection.stream(),
                                 Priority::DEFAULT,
                                 cancellable.clone(),
@@ -308,7 +308,7 @@ fn handle(
                                 // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                 // show bytes count in loading widget, validate max size for incoming data
                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                from_stream_async(
+                                memory_input_stream::from_stream_async(
                                     connection.stream(),
                                     Priority::DEFAULT,
                                     cancellable.clone(),
