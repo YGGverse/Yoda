@@ -83,18 +83,20 @@ impl Gemini {
         let buffer = TextBuffer::new(Some(&tag.text_tag_table));
 
         // Init main widget
-        const MARGIN: i32 = 8;
-        let text_view = TextView::builder()
-            .bottom_margin(MARGIN)
-            .buffer(&buffer)
-            .cursor_visible(false)
-            .editable(false)
-            .left_margin(MARGIN)
-            .right_margin(MARGIN)
-            .top_margin(MARGIN)
-            .vexpand(true)
-            .wrap_mode(WrapMode::Word)
-            .build();
+        let text_view = {
+            const MARGIN: i32 = 8;
+            TextView::builder()
+                .bottom_margin(MARGIN)
+                .buffer(&buffer)
+                .cursor_visible(false)
+                .editable(false)
+                .left_margin(MARGIN)
+                .right_margin(MARGIN)
+                .top_margin(MARGIN)
+                .vexpand(true)
+                .wrap_mode(WrapMode::Word)
+                .build()
+        };
 
         // Parse gemtext lines
         for line in gemtext.lines() {
