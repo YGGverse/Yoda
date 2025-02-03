@@ -163,215 +163,211 @@ fn handle(
                         }
                     }
                     // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
-                    Response::Success(success) => match success {
-                        _ => match *feature {
-                            Feature::Download => {
-                                // Init download widget
-                                let status = page.content.to_status_download(
-                                    uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
-                                    // format FS entities
-                                    &cancellable,
-                                    {
-                                        let cancellable = cancellable.clone();
-                                        let stream = connection.stream();
-                                        move |file, action| {
-                                            match file.replace(
-                                                None,
-                                                false,
-                                                gtk::gio::FileCreateFlags::NONE,
-                                                Some(&cancellable),
-                                            ) {
-                                                Ok(file_output_stream) => {
-                                                    use crate::tool::Format;
-                                                    // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                                    // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                                    // show bytes count in loading widget, validate max size for incoming data
-                                                    // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                                    ggemini::gio::file_output_stream::move_all_from_stream_async(
-                                                        stream.clone(),
-                                                        file_output_stream,
-                                                        cancellable.clone(),
-                                                        Priority::DEFAULT,
-                                                        (
-                                                            0x100000, // 1M bytes per chunk
-                                                            None,     // unlimited
-                                                            0,        // initial totals
-                                                        ),
-                                                        (
-                                                            // on chunk
-                                                            {
-                                                                let action = action.clone();
-                                                                move |_, total| action.update.activate(&format!(
-                                                                    "Received {}...",
-                                                                    total.bytes()
-                                                                ))
-                                                            },
-                                                            // on complete
-                                                            {
-                                                                let action = action.clone();
-                                                                move |result| match result {
-                                                                    Ok((_, total)) => {
-                                                                        action.complete.activate(&format!(
-                                                                            "Saved to {} ({} total)",
-                                                                            file.parse_name(),
-                                                                            total.bytes()
-                                                                        ))
-                                                                    }
-                                                                    Err(e) => action.cancel.activate(&e.to_string())
+                    Response::Success(success) => match *feature {
+                        Feature::Download => {
+                            // Init download widget
+                            let status = page.content.to_status_download(
+                                uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                                // format FS entities
+                                &cancellable,
+                                {
+                                    let cancellable = cancellable.clone();
+                                    let stream = connection.stream();
+                                    move |file, action| {
+                                        match file.replace(
+                                            None,
+                                            false,
+                                            gtk::gio::FileCreateFlags::NONE,
+                                            Some(&cancellable),
+                                        ) {
+                                            Ok(file_output_stream) => {
+                                                use crate::tool::Format;
+                                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                                // show bytes count in loading widget, validate max size for incoming data
+                                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                                ggemini::gio::file_output_stream::move_all_from_stream_async(
+                                                    stream.clone(),
+                                                    file_output_stream,
+                                                    cancellable.clone(),
+                                                    Priority::DEFAULT,
+                                                    (
+                                                        0x100000, // 1M bytes per chunk
+                                                        None,     // unlimited
+                                                        0,        // initial totals
+                                                    ),
+                                                    (
+                                                        // on chunk
+                                                        {
+                                                            let action = action.clone();
+                                                            move |_, total| action.update.activate(&format!(
+                                                                "Received {}...",
+                                                                total.bytes()
+                                                            ))
+                                                        },
+                                                        // on complete
+                                                        {
+                                                            let action = action.clone();
+                                                            move |result| match result {
+                                                                Ok((_, total)) => {
+                                                                    action.complete.activate(&format!(
+                                                                        "Saved to {} ({} total)",
+                                                                        file.parse_name(),
+                                                                        total.bytes()
+                                                                    ))
                                                                 }
-                                                            },
-                                                        ),
-                                                    )
-                                                }
-                                                Err(e) => action.cancel.activate(&e.to_string()),
+                                                                Err(e) => action.cancel.activate(&e.to_string())
+                                                            }
+                                                        },
+                                                    ),
+                                                )
+                                            }
+                                            Err(e) => action.cancel.activate(&e.to_string()),
+                                        }
+                                    }
+                                },
+                            );
+                            page.set_progress(0.0);
+                            page.set_title(&status.title());
+                            redirects.replace(0); // reset
+                        },
+                        _ => match success.mime() {
+                            "text/gemini" => Text::from_stream_async(
+                                connection.stream(),
+                                Priority::DEFAULT,
+                                cancellable.clone(),
+                                move |result| match result {
+                                    Ok(text) => {
+                                        let widget = if matches!(*feature, Feature::Source) {
+                                            page.content.to_text_source(&text.to_string())
+                                        } else {
+                                            page.content.to_text_gemini(&uri, &text.to_string())
+                                        };
+                                        page.search.set(Some(widget.text_view));
+                                        page.set_title(&match widget.meta.title {
+                                            Some(title) => title.into(), // @TODO
+                                            None => uri_to_title(&uri),
+                                        });
+                                        page.set_progress(0.0);
+                                        page.window_action
+                                            .find
+                                            .simple_action
+                                            .set_enabled(true);
+                                        redirects.replace(0); // reset
+                                    }
+                                    Err(e) => {
+                                        let status = page.content.to_status_failure();
+                                        status.set_description(Some(&e.to_string()));
+                                        page.set_progress(0.0);
+                                        page.set_title(&status.title());
+                                        redirects.replace(0); // reset
+                                    },
+                                },
+                            ),
+                            "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                // Final image size unknown, show loading widget
+                                let status = page.content.to_status_loading(
+                                    Some(Duration::from_secs(1)), // show if download time > 1 second
+                                );
+
+                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                // show bytes count in loading widget, validate max size for incoming data
+                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                ggemini::gio::memory_input_stream::from_stream_async(
+                                    connection.stream(),
+                                    cancellable.clone(),
+                                    Priority::DEFAULT,
+                                    0x400, // 1024 bytes per chunk, optional step for images download tracking
+                                    0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
+                                    move |_, total|
+                                    status.set_description(Some(&format!("Download: {total} bytes"))),
+                                    {
+                                        let page = page.clone();
+                                        move |result| match result {
+                                            Ok((memory_input_stream, _)) => {
+                                                Pixbuf::from_stream_async(
+                                                    &memory_input_stream,
+                                                    Some(&cancellable),
+                                                    move |result| {
+                                                        match result {
+                                                            Ok(buffer) => {
+                                                                page.set_title(&uri_to_title(&uri));
+                                                                page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                            }
+                                                            Err(e) => {
+                                                                let status = page.content.to_status_failure();
+                                                                status.set_description(Some(e.message()));
+                                                                page.set_title(&status.title());
+                                                            }
+                                                        }
+                                                        page.set_progress(0.0);
+                                                        redirects.replace(0); // reset
+                                                    },
+                                                )
+                                            }
+                                            Err(e) => {
+                                                let status = page.content.to_status_failure();
+                                                status.set_description(Some(&e.to_string()));
+                                                page.set_progress(0.0);
+                                                page.set_title(&status.title());
+                                                redirects.replace(0); // reset
                                             }
                                         }
                                     },
-                                );
+                                )
+                            }
+                            mime => {
+                                let status = page
+                                    .content
+                                    .to_status_mime(mime, Some((&page.item_action, &uri)));
+                                status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             },
-                            _ => match success.mime() {
-                                "text/gemini" => Text::from_stream_async(
-                                    connection.stream(),
-                                    Priority::DEFAULT,
-                                    cancellable.clone(),
-                                    move |result| match result {
-                                        Ok(text) => {
-                                            let widget = if matches!(*feature, Feature::Source) {
-                                                page.content.to_text_source(&text.to_string())
-                                            } else {
-                                                page.content.to_text_gemini(&uri, &text.to_string())
-                                            };
-                                            page.search.set(Some(widget.text_view));
-                                            page.set_title(&match widget.meta.title {
-                                                Some(title) => title.into(), // @TODO
-                                                None => uri_to_title(&uri),
-                                            });
-                                            page.set_progress(0.0);
-                                            page.window_action
-                                                .find
-                                                .simple_action
-                                                .set_enabled(true);
-                                            redirects.replace(0); // reset
-                                        }
-                                        Err(e) => {
-                                            let status = page.content.to_status_failure();
-                                            status.set_description(Some(&e.to_string()));
-                                            page.set_progress(0.0);
-                                            page.set_title(&status.title());
-                                            redirects.replace(0); // reset
-                                        },
-                                    },
-                                ),
-                                "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                                    // Final image size unknown, show loading widget
-                                    let status = page.content.to_status_loading(
-                                        Some(Duration::from_secs(1)), // show if download time > 1 second
-                                    );
-
-                                    // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                    // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                    // show bytes count in loading widget, validate max size for incoming data
-                                    // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                    ggemini::gio::memory_input_stream::from_stream_async(
-                                        connection.stream(),
-                                        cancellable.clone(),
-                                        Priority::DEFAULT,
-                                        0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                        0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                        move |_, total|
-                                        status.set_description(Some(&format!("Download: {total} bytes"))),
-                                        {
-                                            let page = page.clone();
-                                            move |result| match result {
-                                                Ok((memory_input_stream, _)) => {
-                                                    Pixbuf::from_stream_async(
-                                                        &memory_input_stream,
-                                                        Some(&cancellable),
-                                                        move |result| {
-                                                            match result {
-                                                                Ok(buffer) => {
-                                                                    page.set_title(&uri_to_title(&uri));
-                                                                    page.content.to_image(&Texture::for_pixbuf(&buffer));
-                                                                }
-                                                                Err(e) => {
-                                                                    let status = page.content.to_status_failure();
-                                                                    status.set_description(Some(e.message()));
-                                                                    page.set_title(&status.title());
-                                                                }
-                                                            }
-                                                            page.set_progress(0.0);
-                                                            redirects.replace(0); // reset
-                                                        },
-                                                    )
-                                                }
-                                                Err(e) => {
-                                                    let status = page.content.to_status_failure();
-                                                    status.set_description(Some(&e.to_string()));
-                                                    page.set_progress(0.0);
-                                                    page.set_title(&status.title());
-                                                    redirects.replace(0); // reset
-                                                }
-                                            }
-                                        },
-                                    )
-                                }
-                                mime => {
-                                    let status = page
-                                        .content
-                                        .to_status_mime(mime, Some((&page.item_action, &uri)));
-                                    status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                    page.set_progress(0.0);
-                                    page.set_title(&status.title());
-                                    redirects.replace(0); // reset
-                                },
-                            }
                         }
                     },
-                    Response::Redirect(redirect) => match &redirect {
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
-                        // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        _ => match redirect.to_uri(&uri) {
-                            Ok(target) => {
-                                // Increase client redirection counter
-                                let total = redirects.take() + 1;
-                                // > Client MUST limit the number of redirections they follow to 5 redirections
-                                // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-                                if total > 5 {
-                                    let status = page.content.to_status_failure();
-                                    status.set_description(Some("Redirection limit reached"));
-                                    page.set_progress(0.0);
-                                    page.set_title(&status.title());
-                                    redirects.replace(0); // reset
-                                /* @TODO can't find that in specification:
-                                // Disallow external redirection by protocol restrictions
-                                } else if "gemini" != target.scheme()
-                                    || uri.port() != target.port()
-                                    || uri.host() != target.host() {
-                                        let status = page.content.to_status_failure();
-                                        status.set_description(Some("External redirects not allowed by protocol specification"));
-                                        page.set_progress(0.0);
-                                        page.set_title(&status.title());
-                                        redirects.replace(0); // reset
-                                */
-                                // Valid
-                                } else {
-                                    if matches!(redirect, Redirect::Permanent { .. }) {
-                                        page.navigation.set_request(&target.to_string());
-                                    }
-                                    redirects.replace(total);
-                                    page.item_action.load.activate(Some(&target.to_string()), false);
-                                }
-                            }
-                            Err(e) => {
+                    // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
+                    // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
+                    Response::Redirect(redirect) => match redirect.to_uri(&uri) {
+                        Ok(target) => {
+                            // Increase client redirection counter
+                            let total = redirects.take() + 1;
+                            // > Client MUST limit the number of redirections they follow to 5 redirections
+                            // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
+                            if total > 5 {
                                 let status = page.content.to_status_failure();
-                                status.set_description(Some(&e.to_string()));
+                                status.set_description(Some("Redirection limit reached"));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
+                            /* @TODO can't find that in specification:
+                            // Disallow external redirection by protocol restrictions
+                            } else if "gemini" != target.scheme()
+                                || uri.port() != target.port()
+                                || uri.host() != target.host() {
+                                    let status = page.content.to_status_failure();
+                                    status.set_description(Some("External redirects not allowed by protocol specification"));
+                                    page.set_progress(0.0);
+                                    page.set_title(&status.title());
+                                    redirects.replace(0); // reset
+                            */
+                            // Valid
+                            } else {
+                                if matches!(redirect, Redirect::Permanent { .. }) {
+                                    page.navigation.set_request(&target.to_string());
+                                }
+                                redirects.replace(total);
+                                page.item_action.load.activate(Some(&target.to_string()), false);
                             }
+                        }
+                        Err(e) => {
+                            let status = page.content.to_status_failure();
+                            status.set_description(Some(&e.to_string()));
+                            page.set_progress(0.0);
+                            page.set_title(&status.title());
+                            redirects.replace(0); // reset
                         }
                     }
                     Response::Certificate(ref certificate) => match certificate {
