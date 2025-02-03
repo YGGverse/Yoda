@@ -255,9 +255,9 @@ fn handle(
                                                 Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
                                                     Ok(data) => {
                                                         let widget = if matches!(*feature, Feature::Source) {
-                                                            page.content.to_text_source(&data.to_string())
+                                                            page.content.to_text_source(data)
                                                         } else {
-                                                            page.content.to_text_gemini(&uri, &data.to_string())
+                                                            page.content.to_text_gemini(&uri, data)
                                                         };
                                                         page.search.set(Some(widget.text_view));
                                                         page.set_title(&match widget.meta.title {
