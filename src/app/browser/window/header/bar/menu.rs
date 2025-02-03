@@ -272,8 +272,12 @@ fn ellipsize(value: &str, limit: usize) -> String {
 /// as [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html) label
 fn uri_to_label(uri: &Uri, is_parent: bool) -> GString {
     let path = uri.path();
-    if path == "/" || path.is_empty() || is_parent {
-        uri.host().unwrap_or(uri.to_str())
+    if path == "/" || path.is_empty() {
+        if is_parent {
+            uri.host().unwrap_or(uri.to_str())
+        } else {
+            gtk::glib::gformat!("{}{path}", uri.host().unwrap_or(uri.to_str()))
+        }
     } else {
         path
     }
