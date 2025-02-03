@@ -3,7 +3,10 @@ use ggemini::client::connection::response::{
     failure::{Permanent, Temporary},
     Certificate, Failure, Input, Redirect,
 };
-use ggemini::client::{connection::response::data::Text, Client, Request, Response};
+use ggemini::{
+    client::{Client, Request, Response},
+    gio::memory_input_stream::from_stream_async,
+};
 use gtk::glib::Bytes;
 use gtk::glib::GString;
 use gtk::{
@@ -13,6 +16,7 @@ use gtk::{
     glib::{Priority, Uri},
     prelude::{FileExt, SocketClientExt},
 };
+use sourceview::prelude::InputStreamExtManual;
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
 /// Multi-protocol client API for `Page` object
@@ -232,37 +236,67 @@ fn handle(
                             redirects.replace(0); // reset
                         },
                         _ => match success.mime() {
-                            "text/gemini" => Text::from_stream_async(
+                            "text/gemini" => from_stream_async(
                                 connection.stream(),
-                                Priority::DEFAULT,
                                 cancellable.clone(),
-                                move |result| match result {
-                                    Ok(text) => {
-                                        let widget = if matches!(*feature, Feature::Source) {
-                                            page.content.to_text_source(&text.to_string())
-                                        } else {
-                                            page.content.to_text_gemini(&uri, &text.to_string())
-                                        };
-                                        page.search.set(Some(widget.text_view));
-                                        page.set_title(&match widget.meta.title {
-                                            Some(title) => title.into(), // @TODO
-                                            None => uri_to_title(&uri),
-                                        });
-                                        page.set_progress(0.0);
-                                        page.window_action
-                                            .find
-                                            .simple_action
-                                            .set_enabled(true);
-                                        redirects.replace(0); // reset
+                                Priority::DEFAULT,
+                                (
+                                    0x400,   // 1024 chunk
+                                    0xfffff, // 1M limit
+                                ),
+                                (
+                                    |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
+                                    move |result| match result { // on complete
+                                        Ok((memory_input_stream, total)) => memory_input_stream.read_all_async(
+                                            vec![0;total],
+                                            Priority::DEFAULT,
+                                            Some(&cancellable),
+                                            move |result| match result {
+                                                Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
+                                                    Ok(data) => {
+                                                        let widget = if matches!(*feature, Feature::Source) {
+                                                            page.content.to_text_source(&data.to_string())
+                                                        } else {
+                                                            page.content.to_text_gemini(&uri, &data.to_string())
+                                                        };
+                                                        page.search.set(Some(widget.text_view));
+                                                        page.set_title(&match widget.meta.title {
+                                                            Some(title) => title.into(), // @TODO
+                                                            None => uri_to_title(&uri),
+                                                        });
+                                                        page.set_progress(0.0);
+                                                        page.window_action
+                                                            .find
+                                                            .simple_action
+                                                            .set_enabled(true);
+                                                        redirects.replace(0); // reset
+                                                    },
+                                                    Err(e) => {
+                                                        let status = page.content.to_status_failure();
+                                                        status.set_description(Some(&e.to_string()));
+                                                        page.set_progress(0.0);
+                                                        page.set_title(&status.title());
+                                                        redirects.replace(0); // reset
+                                                    },
+                                                },
+                                                Err((_, e)) => {
+                                                    let status = page.content.to_status_failure();
+                                                    status.set_description(Some(&e.to_string()));
+                                                    page.set_progress(0.0);
+                                                    page.set_title(&status.title());
+                                                    redirects.replace(0); // reset
+                                                }
+                                            }
+                                        ),
+                                        Err(e) => {
+                                            let status = page.content.to_status_failure();
+                                            status.set_description(Some(&e.to_string()));
+                                            page.set_progress(0.0);
+                                            page.set_title(&status.title());
+                                            redirects.replace(0); // reset
+                                        },
                                     }
-                                    Err(e) => {
-                                        let status = page.content.to_status_failure();
-                                        status.set_description(Some(&e.to_string()));
-                                        page.set_progress(0.0);
-                                        page.set_title(&status.title());
-                                        redirects.replace(0); // reset
-                                    },
-                                },
+                                )
                             ),
                             "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                 // Final image size unknown, show loading widget
@@ -274,47 +308,50 @@ fn handle(
                                 // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
                                 // show bytes count in loading widget, validate max size for incoming data
                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                ggemini::gio::memory_input_stream::from_stream_async(
+                                from_stream_async(
                                     connection.stream(),
                                     cancellable.clone(),
                                     Priority::DEFAULT,
-                                    0x400, // 1024 bytes per chunk, optional step for images download tracking
-                                    0xA00000, // 10M bytes max to prevent memory overflow if server play with promises
-                                    move |_, total|
-                                    status.set_description(Some(&format!("Download: {total} bytes"))),
-                                    {
-                                        let page = page.clone();
-                                        move |result| match result {
-                                            Ok((memory_input_stream, _)) => {
-                                                Pixbuf::from_stream_async(
-                                                    &memory_input_stream,
-                                                    Some(&cancellable),
-                                                    move |result| {
-                                                        match result {
-                                                            Ok(buffer) => {
-                                                                page.set_title(&uri_to_title(&uri));
-                                                                page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                    (
+                                        0x400,   // 1024 bytes per chunk, optional step for images download tracking
+                                        0xA00000 // 10M bytes max to prevent memory overflow if server play with promises
+                                    ),
+                                    (
+                                        move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
+                                        {
+                                            //let page = page.clone();
+                                            move | result | match result {
+                                                Ok((memory_input_stream, _)) => {
+                                                    Pixbuf::from_stream_async(
+                                                        &memory_input_stream,
+                                                        Some(&cancellable),
+                                                        move |result| {
+                                                            match result {
+                                                                Ok(buffer) => {
+                                                                    page.set_title(&uri_to_title(&uri));
+                                                                    page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                                }
+                                                                Err(e) => {
+                                                                    let status = page.content.to_status_failure();
+                                                                    status.set_description(Some(e.message()));
+                                                                    page.set_title(&status.title());
+                                                                }
                                                             }
-                                                            Err(e) => {
-                                                                let status = page.content.to_status_failure();
-                                                                status.set_description(Some(e.message()));
-                                                                page.set_title(&status.title());
-                                                            }
-                                                        }
-                                                        page.set_progress(0.0);
-                                                        redirects.replace(0); // reset
-                                                    },
-                                                )
-                                            }
-                                            Err(e) => {
-                                                let status = page.content.to_status_failure();
-                                                status.set_description(Some(&e.to_string()));
-                                                page.set_progress(0.0);
-                                                page.set_title(&status.title());
-                                                redirects.replace(0); // reset
+                                                            page.set_progress(0.0);
+                                                            redirects.replace(0); // reset
+                                                        },
+                                                    )
+                                                }
+                                                Err(e) => {
+                                                    let status = page.content.to_status_failure();
+                                                    status.set_description(Some(&e.to_string()));
+                                                    page.set_progress(0.0);
+                                                    page.set_title(&status.title());
+                                                    redirects.replace(0); // reset
+                                                }
                                             }
                                         }
-                                    },
+                                    ),
                                 )
                             }
                             mime => {
