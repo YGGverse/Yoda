@@ -130,15 +130,15 @@ impl Content {
     /// * could be useful to extract document title parsed from Gemtext
     pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-        let text = Text::new_gemini(data, base, (&self.window_action, &self.item_action));
-        self.g_box.append(&text.g_box);
+        let text = Text::gemini((&self.window_action, &self.item_action), base, data);
+        self.g_box.append(&text.scrolled_window);
         text
     }
 
     pub fn to_text_source(&self, data: &str) -> Text {
         self.clean();
-        let text = Text::new_source(data);
-        self.g_box.append(&text.g_box);
+        let text = Text::source(data);
+        self.g_box.append(&text.scrolled_window);
         text
     }
 

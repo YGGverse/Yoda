@@ -1,15 +1,11 @@
 mod gemini;
 mod source;
 
-use gemini::Gemini;
-use source::Source;
-
 use super::{ItemAction, WindowAction};
-use gtk::{
-    glib::Uri,
-    prelude::{BoxExt, Cast},
-    Box, Orientation, ScrolledWindow, TextView,
-};
+use adw::ClampScrollable;
+use gemini::Gemini;
+use gtk::{glib::Uri, prelude::Cast, ScrolledWindow, TextView};
+use source::Source;
 use std::rc::Rc;
 
 pub struct Meta {
@@ -17,52 +13,40 @@ pub struct Meta {
 } // @TODO move to separated mod
 
 pub struct Text {
-    pub text_view: TextView,
-    pub g_box: Box,
     pub meta: Meta,
+    pub scrolled_window: ScrolledWindow,
+    pub text_view: TextView,
 }
 
 impl Text {
-    // Constructors
-
-    pub fn new_gemini(
-        gemtext: &str,
+    pub fn gemini(
+        actions: (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
-        (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
+        gemtext: &str,
     ) -> Self {
-        // Init components
-        let gemini = Gemini::new(gemtext, base, (window_action, item_action));
+        let gemini = Gemini::build(actions, base, gemtext).unwrap(); // @TODO handle
 
-        // Init main widget
-        let g_box = Box::builder().orientation(Orientation::Vertical).build();
-
-        g_box.append(
-            &ScrolledWindow::builder()
-                .child(&gemini.widget.clamp_scrollable)
-                .build(),
-        );
+        let clamp_scrollable = ClampScrollable::builder()
+            .child(&gemini.text_view)
+            .css_classes(["view"])
+            .maximum_size(800)
+            .build();
 
         Self {
-            text_view: gemini.reader.widget.text_view.clone(),
+            text_view: gemini.text_view,
             meta: Meta {
-                title: gemini.reader.title.clone(),
+                title: gemini.title,
             },
-            g_box,
+            scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
         }
     }
 
-    pub fn new_source(data: &str) -> Self {
-        // Init components
+    pub fn source(data: &str) -> Self {
         let source = Source::new(data);
-
-        let g_box = Box::builder().orientation(Orientation::Vertical).build();
-
-        g_box.append(&ScrolledWindow::builder().child(&source.text_view).build());
-
         Self {
+            scrolled_window: ScrolledWindow::builder().child(&source.text_view).build(),
             text_view: source.text_view.upcast::<TextView>(),
             meta: Meta { title: None },
-            g_box,
         }
     }
 }
