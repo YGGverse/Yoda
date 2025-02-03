@@ -5,7 +5,7 @@ use ggemini::client::connection::response::{
 };
 use ggemini::client::{connection::response::data::Text, Client, Request, Response};
 use gtk::glib::Bytes;
-use gtk::glib::{GString, UriFlags};
+use gtk::glib::GString;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
@@ -333,8 +333,8 @@ fn handle(
                     Response::Redirect(redirect) => match &redirect {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        Redirect::Temporary  { target } |
-                        Redirect::Permanent { target } => match redirection_base(uri).parse_relative(target, UriFlags::NONE) {
+                        Redirect::Temporary  { .. } |
+                        Redirect::Permanent { .. } => match redirect.to_uri(&uri) {
                             Ok(target) => {
                                 // Increase client redirection counter
                                 let total = redirects.take() + 1;
@@ -449,27 +449,4 @@ fn uri_to_title(uri: &Uri) -> GString {
     } else {
         path
     }
-}
-
-// Build safe base `Uri` from the current request as the donor
-// to resolve relative target `String` by Gemini specification
-fn redirection_base(request: Uri) -> Uri {
-    Uri::build(
-        UriFlags::NONE,
-        request.scheme().as_str(),
-        None, // unexpected
-        request.host().as_deref(),
-        request.port(),
-        request.path().as_str(),
-        // > If a server sends a redirection in response to a request with a query string,
-        // > the client MUST NOT apply the query string to the new location
-        // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-        None,
-        // > A server SHOULD NOT include fragments in redirections,
-        // > but if one is given, and a client already has a fragment it could apply (from the original URI),
-        // > it is up to the client which fragment to apply.
-        // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
-        //   @TODO
-        None,
-    )
 }
