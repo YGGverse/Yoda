@@ -238,8 +238,8 @@ fn handle(
                         _ => match success.mime() {
                             "text/gemini" => from_stream_async(
                                 connection.stream(),
-                                cancellable.clone(),
                                 Priority::DEFAULT,
+                                cancellable.clone(),
                                 (
                                     0x400,   // 1024 chunk
                                     0xfffff, // 1M limit
@@ -310,8 +310,8 @@ fn handle(
                                 // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
                                 from_stream_async(
                                     connection.stream(),
-                                    cancellable.clone(),
                                     Priority::DEFAULT,
+                                    cancellable.clone(),
                                     (
                                         0x400,   // 1024 bytes per chunk, optional step for images download tracking
                                         0xA00000 // 10M bytes max to prevent memory overflow if server play with promises
