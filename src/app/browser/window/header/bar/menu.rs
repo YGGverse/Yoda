@@ -1,7 +1,7 @@
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
-    glib::{gformat, GString, Uri},
+    glib::{GString, Uri},
     prelude::{ActionExt, ToVariant},
     Align, MenuButton,
 };
@@ -272,12 +272,8 @@ fn ellipsize(value: &str, limit: usize) -> String {
 /// as [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html) label
 fn uri_to_label(uri: &Uri, is_parent: bool) -> GString {
     let path = uri.path();
-    // Show hostname for index pages (or entire URL on possible unwrap failure)
-    if path == "/" {
+    if path == "/" || path.is_empty() || is_parent {
         uri.host().unwrap_or(uri.to_str())
-    // Parental item names have some format exception
-    } else if is_parent {
-        gformat!("{}{}", uri.host().unwrap_or(uri.to_str()), uri.path())
     } else {
         path
     }
