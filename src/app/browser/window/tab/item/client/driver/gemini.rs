@@ -1,7 +1,7 @@
 use super::{Feature, Page};
 use ggemini::client::connection::response::{
     failure::{Permanent, Temporary},
-    Certificate, Failure, Input, Redirect, Success,
+    Certificate, Failure, Input, Redirect,
 };
 use ggemini::client::{connection::response::data::Text, Client, Request, Response};
 use gtk::glib::Bytes;
@@ -164,7 +164,7 @@ fn handle(
                     }
                     // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                     Response::Success(success) => match success {
-                        Success::Default { mime } => match *feature {
+                        _ => match *feature {
                             Feature::Download => {
                                 // Init download widget
                                 let status = page.content.to_status_download(
@@ -232,7 +232,7 @@ fn handle(
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
                             },
-                            _ => match mime.as_str() {
+                            _ => match success.mime() {
                                 "text/gemini" => Text::from_stream_async(
                                     connection.stream(),
                                     Priority::DEFAULT,
@@ -333,8 +333,7 @@ fn handle(
                     Response::Redirect(redirect) => match &redirect {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        Redirect::Temporary  { .. } |
-                        Redirect::Permanent { .. } => match redirect.to_uri(&uri) {
+                        _ => match redirect.to_uri(&uri) {
                             Ok(target) => {
                                 // Increase client redirection counter
                                 let total = redirects.take() + 1;
