@@ -24,13 +24,30 @@ impl Text {
         base: &Uri,
         gemtext: &str,
     ) -> Self {
+        // Define some local dependencies
+        use gtk::{prelude::WidgetExt, GestureClick};
+
+        // Init gemtext reader
         let gemini = Gemini::build(actions, base, gemtext).unwrap(); // @TODO handle
 
+        // Init container widget
         let clamp_scrollable = ClampScrollable::builder()
             .child(&gemini.text_view)
             .css_classes(["view"])
             .maximum_size(800)
             .build();
+
+        // Grab focus into the `TextView` on click empty `ClampScrollable` area
+        let controller = GestureClick::new();
+
+        controller.connect_released({
+            let text_view = gemini.text_view.clone();
+            move |_, _, _, _| {
+                text_view.grab_focus();
+            }
+        });
+
+        clamp_scrollable.add_controller(controller);
 
         Self {
             text_view: gemini.text_view,
