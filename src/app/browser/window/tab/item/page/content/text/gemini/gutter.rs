@@ -16,10 +16,7 @@ impl Gutter {
         const MARGIN_X: i32 = 8;
         const MARGIN_Y: i32 = 2;
         let label = Label::builder()
-            .css_classes([
-                // "caption",
-                "dim-label",
-            ])
+            .css_classes(["caption", "dim-label"])
             .ellipsize(EllipsizeMode::Middle)
             .halign(Align::Start)
             .margin_bottom(MARGIN_Y)
