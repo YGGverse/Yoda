@@ -1,10 +1,12 @@
 mod ansi;
 pub mod error;
+mod gutter;
 mod icon;
 mod syntax;
 mod tag;
 
 pub use error::Error;
+use gutter::Gutter;
 use icon::Icon;
 use syntax::Syntax;
 use tag::Tag;
@@ -97,6 +99,9 @@ impl Gemini {
                 .wrap_mode(WrapMode::Word)
                 .build()
         };
+
+        // Init gutter widget (the tooltip on URL tags hover)
+        let gutter = Gutter::build(&text_view);
 
         // Parse gemtext lines
         for line in gemtext.lines() {
@@ -375,8 +380,8 @@ impl Gemini {
                                     Window::NONE,
                                     Cancellable::NONE,
                                     |result| {
-                                        if let Err(error) = result {
-                                            println!("{error}")
+                                        if let Err(e) = result {
+                                            println!("{e}")
                                         }
                                     },
                                 ),
@@ -460,11 +465,11 @@ impl Gemini {
                             // Keep hovered tag in memory
                             hover.replace(Some(tag.clone()));
 
+                            // Show tooltip
+                            gutter.set_uri(Some(uri));
+
                             // Toggle cursor
                             text_view.set_cursor_from_name(Some("pointer"));
-
-                            // Show tooltip | @TODO set_gutter option?
-                            text_view.set_tooltip_text(Some(&uri.to_string()));
 
                             // Redraw required to apply changes immediately
                             text_view.queue_draw();
@@ -475,8 +480,8 @@ impl Gemini {
                 }
 
                 // Restore defaults
+                gutter.set_uri(None);
                 text_view.set_cursor_from_name(Some("text"));
-                text_view.set_tooltip_text(None);
                 text_view.queue_draw();
             }
         }); // @TODO may be expensive for CPU, add timeout?
