@@ -5,7 +5,7 @@ mod source;
 use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
-use gtk::{glib::Uri, prelude::Cast, ScrolledWindow, TextView};
+use gtk::{glib::Uri, ScrolledWindow, TextView};
 use plain::Plain;
 use source::Source;
 use std::rc::Rc;
@@ -64,10 +64,10 @@ impl Text {
     }
 
     pub fn source(data: &str) -> Self {
-        let source = Source::new(data);
+        let source = sourceview::View::source(data);
         Self {
-            scrolled_window: ScrolledWindow::builder().child(&source.text_view).build(),
-            text_view: source.text_view.upcast::<TextView>(),
+            scrolled_window: ScrolledWindow::builder().child(&source).build(),
+            text_view: source.into_text_view(),
             meta: Meta { title: None },
         }
     }
