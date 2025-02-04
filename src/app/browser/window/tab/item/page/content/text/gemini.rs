@@ -355,7 +355,7 @@ impl Gemini {
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
-                    TextWindowType::Text,
+                    TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
@@ -394,7 +394,7 @@ impl Gemini {
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
-                    TextWindowType::Text,
+                    TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
@@ -439,7 +439,7 @@ impl Gemini {
             move |_, window_x, window_y| {
                 // Detect tag match current coords hovered
                 let (buffer_x, buffer_y) = text_view.window_to_buffer_coords(
-                    TextWindowType::Text,
+                    TextWindowType::Widget,
                     window_x as i32,
                     window_y as i32,
                 );
