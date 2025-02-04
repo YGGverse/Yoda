@@ -1,10 +1,12 @@
 mod gemini;
+mod plain;
 mod source;
 
 use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
 use gtk::{glib::Uri, prelude::Cast, ScrolledWindow, TextView};
+use plain::Plain;
 use source::Source;
 use std::rc::Rc;
 
@@ -34,19 +36,7 @@ impl Text {
             .maximum_size(800)
             .build();
 
-        // Grab focus into the `TextView` on click empty `ClampScrollable` area
-        {
-            use gtk::{prelude::WidgetExt, GestureClick};
-            let controller = GestureClick::new();
-
-            controller.connect_pressed({
-                let text_view = gemini.text_view.clone();
-                move |_, _, _, _| {
-                    text_view.grab_focus();
-                }
-            });
-            clamp_scrollable.add_controller(controller);
-        }
+        grab_focus_patch(&clamp_scrollable, &gemini.text_view);
 
         Self {
             text_view: gemini.text_view,
@@ -54,6 +44,22 @@ impl Text {
                 title: gemini.title,
             },
             scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
+        }
+    }
+
+    pub fn plain(data: &str) -> Self {
+        let text_view = TextView::plain(data);
+        let clamp_scrollable = ClampScrollable::builder()
+            .child(&text_view)
+            .css_classes(["view"])
+            .build();
+
+        grab_focus_patch(&clamp_scrollable, &text_view);
+
+        Self {
+            scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
+            text_view,
+            meta: Meta { title: None },
         }
     }
 
@@ -65,4 +71,21 @@ impl Text {
             meta: Meta { title: None },
         }
     }
+}
+
+// Tools
+
+// Grab focus into the `TextView` on click empty `ClampScrollable` area
+fn grab_focus_patch(clamp_scrollable: &ClampScrollable, text_view: &TextView) {
+    use gtk::{prelude::WidgetExt, GestureClick};
+    let controller = GestureClick::new();
+
+    controller.connect_pressed({
+        let text_view = text_view.clone();
+        move |_, _, _, _| {
+            text_view.grab_focus();
+        }
+    });
+
+    clamp_scrollable.add_controller(controller);
 }

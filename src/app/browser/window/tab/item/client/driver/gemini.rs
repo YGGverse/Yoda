@@ -236,7 +236,7 @@ fn handle(
                             redirects.replace(0); // reset
                         },
                         _ => match success.mime() {
-                            "text/gemini" => memory_input_stream::from_stream_async(
+                            "text/gemini" | "text/plain" => memory_input_stream::from_stream_async(
                                 connection.stream(),
                                 Priority::DEFAULT,
                                 cancellable.clone(),
@@ -257,7 +257,11 @@ fn handle(
                                                         let widget = if matches!(*feature, Feature::Source) {
                                                             page.content.to_text_source(data)
                                                         } else {
-                                                            page.content.to_text_gemini(&uri, data)
+                                                            match success.mime() {
+                                                                "text/gemini" => page.content.to_text_gemini(&uri, data),
+                                                                "text/plain" => page.content.to_text_plain(data),
+                                                                _ => panic!() // unexpected
+                                                            }
                                                         };
                                                         page.search.set(Some(widget.text_view));
                                                         page.set_title(&match widget.meta.title {

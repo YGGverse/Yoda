@@ -113,21 +113,7 @@ impl Content {
         status
     }
 
-    /// Set new `content::Text` component for `Self` with new `text::Gemini` preset
-    ///
-    /// Useful as reader for [Gemtext](https://geminiprotocol.net/docs/gemtext.gmi)
-    ///
-    /// * action removes previous children component from `Self`
-    ///
-    /// **Arguments**
-    ///
-    /// * `base` - [Uri](https://docs.gtk.org/glib/struct.Uri.html) to resolve relative links in Gemtext
-    /// * `data` - Gemtext source to be parsed
-    ///
-    /// **Return**
-    ///
-    /// `Text` component with it public API
-    /// * could be useful to extract document title parsed from Gemtext
+    /// `text/gemini`
     pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
         let text = Text::gemini((&self.window_action, &self.item_action), base, data);
@@ -135,6 +121,15 @@ impl Content {
         text
     }
 
+    /// `text/plain`
+    pub fn to_text_plain(&self, data: &str) -> Text {
+        self.clean();
+        let text = Text::plain(data);
+        self.g_box.append(&text.scrolled_window);
+        text
+    }
+
+    /// * system `source:`
     pub fn to_text_source(&self, data: &str) -> Text {
         self.clean();
         let text = Text::source(data);

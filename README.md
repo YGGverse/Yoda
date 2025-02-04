@@ -123,7 +123,7 @@ GTK 4 / Libadwaita client written in Rust
 
 #### Text
   * [x] `text/gemini`
-  * [ ] `text/plain`
+  * [x] `text/plain`
 
 #### Images
   * [x] `image/gif`
