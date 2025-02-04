@@ -45,7 +45,7 @@ impl Gutter {
             Some(uri) => {
                 if !self.label.is_visible() {
                     if !self.is_active.replace(true) {
-                        timeout_add_local_once(Duration::from_millis(500), {
+                        timeout_add_local_once(Duration::from_millis(250), {
                             let label = self.label.clone();
                             let is_active = self.is_active.clone();
                             let uri = uri.clone();
