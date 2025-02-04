@@ -20,12 +20,13 @@ impl Gutter {
                 // "caption",
                 "dim-label",
             ])
-            .halign(Align::Start)
-            .margin_start(MARGIN_X)
-            .margin_end(MARGIN_X)
-            .margin_top(MARGIN_Y)
-            .margin_bottom(MARGIN_Y)
             .ellipsize(EllipsizeMode::Middle)
+            .halign(Align::Start)
+            .margin_bottom(MARGIN_Y)
+            .margin_end(MARGIN_X)
+            .margin_start(MARGIN_X)
+            .margin_top(MARGIN_Y)
+            .visible(false)
             .build();
 
         text_view.set_gutter(TextWindowType::Bottom, Some(&label));
