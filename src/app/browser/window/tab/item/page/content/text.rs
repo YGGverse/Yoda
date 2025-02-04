@@ -39,7 +39,7 @@ impl Text {
             use gtk::{prelude::WidgetExt, GestureClick};
             let controller = GestureClick::new();
 
-            controller.connect_released({
+            controller.connect_pressed({
                 let text_view = gemini.text_view.clone();
                 move |_, _, _, _| {
                     text_view.grab_focus();
