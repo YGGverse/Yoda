@@ -1,15 +1,14 @@
-use gtk::{Align, Label};
+use gtk::Label;
 
 pub trait Title {
-    fn title(title: Option<&str>) -> Self;
+    fn title(label: &str) -> Self;
 }
 
 impl Title for Label {
-    fn title(title: Option<&str>) -> Self {
+    fn title(label: &str) -> Self {
         Label::builder()
             .css_classes(["heading"])
-            .halign(Align::Start)
-            .label(title.unwrap_or("Titan input"))
+            .label(label)
             .build()
     }
 }

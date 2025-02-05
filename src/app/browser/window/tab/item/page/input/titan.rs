@@ -1,67 +1,55 @@
-mod control;
-mod form;
+mod file;
+mod text;
 mod title;
 
-use control::Control;
-use control::Send;
-use form::Form;
-use gtk::{
-    prelude::{BoxExt, ButtonExt, TextBufferExt, TextViewExt},
-    Label, Orientation, TextView,
-};
-use std::rc::Rc;
+use file::File;
+use gtk::{glib::uuid_string_random, prelude::WidgetExt, Label, Notebook};
+use text::Text;
 use title::Title;
-
-const MARGIN: i32 = 6;
-const SPACING: i32 = 8;
 
 pub trait Titan {
     fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self;
 }
 
-impl Titan for gtk::Box {
+impl Titan for Notebook {
     fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self {
-        // Init components
-        let control = Rc::new(Control::build());
-        let form = TextView::form();
-        let title = Label::title(None);
-
-        // Init widget
-        let g_box = gtk::Box::builder()
-            .margin_bottom(MARGIN)
-            .margin_end(MARGIN)
-            .margin_start(MARGIN)
-            .margin_top(MARGIN)
-            .spacing(SPACING)
-            .orientation(Orientation::Vertical)
+        let notebook = Notebook::builder()
+            .name(format!("s{}", uuid_string_random()))
+            .show_border(false)
             .build();
 
-        g_box.append(&title);
-        g_box.append(&form);
-        g_box.append(&control.g_box);
+        notebook.append_page(&gtk::Box::text(callback), Some(&Label::title("Text")));
+        notebook.append_page(&gtk::Box::file(), Some(&Label::title("File")));
 
-        // Connect events
-        control.send.connect_clicked({
-            let form = form.clone();
-            move |this| {
-                this.set_sending();
-                callback(
-                    form.text().as_bytes(),
-                    Box::new({
-                        let this = this.clone();
-                        move || this.set_resend() // on failure
-                    }),
-                )
-            }
-        });
-
-        form.buffer().connect_changed({
-            let control = control.clone();
-            let form = form.clone();
-            move |this| control.update(this.char_count(), form.text().len())
-        });
-
-        // Return activated `Self`
-        g_box
+        notebook_css_patch(&notebook);
+        notebook
     }
 }
+
+// Tools
+
+fn notebook_css_patch(notebook: &Notebook) {
+    let name = notebook.widget_name();
+    let provider = gtk::CssProvider::new();
+
+    provider.load_from_string(&format!(
+        "
+            #{name} stack {{
+                background-color:rgba(0,0,0,0);
+            }}
+            #{name} header {{
+                border-bottom-color:rgba(0,0,0,0);
+            }}
+            #{name} tab {{
+                opacity:0.9;
+            }}
+        "
+    ));
+
+    gtk::style_context_add_provider_for_display(
+        &notebook.display(),
+        &provider,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
+} // @TODO replace `Notebook` with `ToggleGroup` in Adw 1.7 / Ubuntu 26.04
+  // https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ToggleGroup.html

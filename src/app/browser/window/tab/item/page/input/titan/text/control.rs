@@ -1,18 +1,18 @@
 mod counter;
-mod send;
+mod upload;
 
 use counter::Counter;
 use gtk::{
     prelude::{BoxExt, WidgetExt},
     Align, Box, Button, Label, Orientation,
 };
-pub use send::Send;
+pub use upload::Upload;
 
 const SPACING: i32 = 8;
 
 pub struct Control {
     pub counter: Label,
-    pub send: Button,
+    pub upload: Button,
     pub g_box: Box,
 }
 
@@ -23,7 +23,7 @@ impl Control {
     pub fn build() -> Self {
         // Init components
         let counter = Label::counter();
-        let send = Button::send();
+        let upload = Button::upload();
 
         // Init main widget
         let g_box = Box::builder()
@@ -33,12 +33,12 @@ impl Control {
             .build();
 
         g_box.append(&counter);
-        g_box.append(&send);
+        g_box.append(&upload);
 
         // Return activated struct
         Self {
             counter,
-            send,
+            upload,
             g_box,
         }
     }
@@ -47,6 +47,6 @@ impl Control {
     pub fn update(&self, chars_count: i32, bytes_total: usize) {
         // Update children components
         self.counter.update(chars_count, bytes_total);
-        self.send.set_sensitive(bytes_total > 0);
+        self.upload.set_sensitive(bytes_total > 0);
     }
 }

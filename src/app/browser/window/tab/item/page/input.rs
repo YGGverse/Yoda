@@ -4,7 +4,11 @@ mod titan;
 
 use super::ItemAction;
 use adw::Clamp;
-use gtk::{glib::Uri, prelude::WidgetExt};
+use gtk::{
+    glib::Uri,
+    prelude::{IsA, WidgetExt},
+    Widget,
+};
 use response::Response;
 use sensitive::Sensitive;
 use std::rc::Rc;
@@ -37,10 +41,10 @@ impl Input {
 
     // Actions
     pub fn unset(&self) {
-        self.update(None);
+        self.update(Widget::NONE);
     }
 
-    pub fn update(&self, child: Option<&gtk::Box>) {
+    pub fn update(&self, child: Option<&impl IsA<Widget>>) {
         if child.is_some() {
             self.clamp.set_visible(true); // widget may be hidden, make it visible to child redraw
             self.clamp.set_child(child);
@@ -71,6 +75,6 @@ impl Input {
     }
 
     pub fn set_new_titan(&self, on_send: impl Fn(&[u8], Box<dyn Fn()>) + 'static) {
-        self.update(Some(&gtk::Box::titan(on_send)));
+        self.update(Some(&gtk::Notebook::titan(on_send)));
     }
 }
