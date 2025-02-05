@@ -105,6 +105,7 @@ GTK 4 / Libadwaita client written in Rust
     * [x] Quote
   * [ ] Gemfeed
   * [ ] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
+    * [ ] Custom headers
     * [ ] Binary data (file uploads)
     * [x] Text input
 * [ ] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
