@@ -52,6 +52,7 @@ impl Text {
         let clamp_scrollable = ClampScrollable::builder()
             .child(&text_view)
             .css_classes(["view"])
+            .maximum_size(800) // @TODO auto-expand
             .build();
 
         grab_focus_patch(&clamp_scrollable, &text_view);
