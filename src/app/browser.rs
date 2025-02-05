@@ -10,6 +10,7 @@ use widget::Widget;
 use window::Window;
 
 use crate::Profile;
+use adw::{prelude::AdwDialogExt, AboutDialog};
 use gtk::{
     gio::{Cancellable, File},
     prelude::{GtkWindowExt, IsA},
@@ -59,7 +60,7 @@ impl Browser {
         // Connect events
         action.about.connect_activate({
             let window = window.clone();
-            move || About::new().present(Some(&window.g_box))
+            move || AboutDialog::about().present(Some(&window.g_box))
         });
 
         action.close.connect_activate({

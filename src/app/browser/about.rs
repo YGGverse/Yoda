@@ -1,20 +1,9 @@
-use adw::{prelude::AdwDialogExt, AboutDialog};
-use gtk::{prelude::IsA, License};
-
-pub struct About {
-    gobject: AboutDialog,
+pub trait About {
+    fn about() -> Self;
 }
 
-impl Default for About {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl About {
-    // Construct
-    pub fn new() -> Self {
-        // Collect debug info
+impl About for adw::AboutDialog {
+    fn about() -> Self {
         let debug = &[
             format!(
                 "Adwaita {}.{}.{}",
@@ -38,22 +27,13 @@ impl About {
             // @TODO
         ];
 
-        // Init gobject
-        let gobject = AboutDialog::builder()
+        adw::AboutDialog::builder()
             .application_name(env!("CARGO_PKG_NAME"))
             .debug_info(debug.join("\n"))
             .developer_name(env!("CARGO_PKG_DESCRIPTION"))
             .issue_url(env!("CARGO_PKG_REPOSITORY"))
-            .license_type(License::MitX11)
+            .license_type(gtk::License::MitX11)
             .version(env!("CARGO_PKG_VERSION"))
-            .build();
-
-        // Return new struct
-        Self { gobject }
-    }
-
-    // Actions
-    pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
-        self.gobject.present(parent);
+            .build()
     }
 }
