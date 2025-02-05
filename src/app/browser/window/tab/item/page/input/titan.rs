@@ -35,13 +35,13 @@ fn notebook_css_patch(notebook: &Notebook) {
     provider.load_from_string(&format!(
         "
             #{name} stack {{
-                background-color:rgba(0,0,0,0);
+                background: transparent;
             }}
             #{name} header {{
-                border-bottom-color:rgba(0,0,0,0);
+                border-bottom-color: transparent;
             }}
             #{name} tab {{
-                opacity:0.9;
+                opacity: 0.9;
             }}
         "
     ));
