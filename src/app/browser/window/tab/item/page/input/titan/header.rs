@@ -2,7 +2,7 @@ mod form;
 
 use gtk::{glib::GString, prelude::IsA, Widget};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Header {
     pub mime: Option<GString>,
     pub token: Option<GString>,
@@ -24,8 +24,8 @@ impl Header {
 
         // Init form components
         let form = Form::build(
-            &self.mime.unwrap_or_default(),
-            &self.token.unwrap_or_default(),
+            &self.mime.clone().unwrap_or_default(),
+            &self.token.clone().unwrap_or_default(),
         );
 
         // Init main widget
@@ -48,14 +48,14 @@ impl Header {
 
         alert_dialog.connect_response(None, move |this, response| {
             this.set_response_enabled(response, false); // prevent double-click
-            if response == RESPONSE_APPLY.0 {
-                callback(Self {
+            callback(if response == RESPONSE_APPLY.0 {
+                Self {
                     mime: form.mime(),
                     token: form.token(),
-                })
+                }
             } else {
-                // @TODO restore
-            }
+                self.clone()
+            })
         });
 
         // Show
