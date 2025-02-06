@@ -50,9 +50,10 @@ impl Text for gtk::Box {
         form.buffer().connect_changed({
             let control = control.clone();
             move |this| {
-                control.update(this.char_count(), {
-                    this.text(&this.start_iter(), &this.end_iter(), true).len()
-                })
+                control.update(
+                    this.char_count(),
+                    this.text(&this.start_iter(), &this.end_iter(), true).len(),
+                )
             }
         });
 
