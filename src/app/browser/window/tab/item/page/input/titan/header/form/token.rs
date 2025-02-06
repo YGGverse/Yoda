@@ -6,9 +6,11 @@ pub trait Token {
 
 impl Token for Entry {
     fn token(text: &str) -> Self {
+        const TEXT: &str = "Token";
         Entry::builder()
-            .placeholder_text("Token")
+            .placeholder_text(TEXT)
             .text(text)
+            //.tooltip_text(TEXT)
             .build()
     }
 }

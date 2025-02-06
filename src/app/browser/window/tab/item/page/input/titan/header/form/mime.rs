@@ -6,11 +6,13 @@ pub trait Mime {
 impl Mime for gtk::Entry {
     fn mime(text: &str) -> Self {
         use gtk::prelude::EditableExt;
+        const TEXT: &str = "Content type (MIME)";
 
         let mime = gtk::Entry::builder()
             .margin_bottom(8)
-            .placeholder_text("Content type (MIME)")
+            .placeholder_text(TEXT)
             .text(text)
+            //.tooltip_text(TEXT)
             .build();
 
         mime.connect_changed(|this| {
