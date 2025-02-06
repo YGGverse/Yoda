@@ -31,7 +31,7 @@ impl Header {
         // Init main widget
         let alert_dialog = AlertDialog::builder()
             .heading("Options")
-            .body("Custom response header")
+            .body("Customize response header")
             .close_response(RESPONSE_CANCEL.0)
             .default_response(RESPONSE_APPLY.0)
             .extra_child(&form.g_box)
