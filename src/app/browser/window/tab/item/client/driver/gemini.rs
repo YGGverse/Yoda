@@ -7,7 +7,6 @@ use ggemini::{
     client::{Client, Request, Response},
     gio::{file_output_stream, memory_input_stream},
 };
-use gtk::glib::Bytes;
 use gtk::glib::GString;
 use gtk::{
     gdk::Texture,
@@ -85,14 +84,13 @@ impl Gemini {
                     let client = self.client.clone();
                     let page = self.page.clone();
                     let redirects = self.redirects.clone();
-                    move |data, on_failure| {
+                    move |header, bytes, on_failure| {
                         handle(
                             Request::Titan {
                                 uri: uri.clone(),
-                                data: Bytes::from(data),
-                                // * some servers may reject the request without content type
-                                mime: Some("text/plain".to_string()),
-                                token: None, // @TODO
+                                data: bytes,
+                                mime: header.mime.map(|mime| mime.into()),
+                                token: header.token.map(|token| token.into()),
                             },
                             client.clone(),
                             page.clone(),

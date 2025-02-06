@@ -1,11 +1,15 @@
 mod counter;
+mod options;
 mod upload;
 
+use super::Header;
 use counter::Counter;
 use gtk::{
     prelude::{BoxExt, WidgetExt},
     Align, Box, Button, Label, Orientation,
 };
+use options::Options;
+use std::{cell::Cell, rc::Rc};
 pub use upload::Upload;
 
 const SPACING: i32 = 8;
@@ -20,9 +24,10 @@ impl Control {
     // Constructors
 
     /// Build new `Self`
-    pub fn build() -> Self {
+    pub fn build(header: &Rc<Cell<Header>>) -> Self {
         // Init components
         let counter = Label::counter();
+        let options = Button::options(header);
         let upload = Button::upload();
 
         // Init main widget
@@ -33,6 +38,7 @@ impl Control {
             .build();
 
         g_box.append(&counter);
+        g_box.append(&options);
         g_box.append(&upload);
 
         // Return activated struct

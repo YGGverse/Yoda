@@ -5,7 +5,7 @@ mod titan;
 use super::ItemAction;
 use adw::Clamp;
 use gtk::{
-    glib::Uri,
+    glib::{Bytes, Uri},
     prelude::{IsA, WidgetExt},
     Widget,
 };
@@ -74,7 +74,7 @@ impl Input {
         self.update(Some(&gtk::Box::sensitive(action, base, title, max_length)));
     }
 
-    pub fn set_new_titan(&self, on_send: impl Fn(&[u8], Box<dyn Fn()>) + 'static) {
+    pub fn set_new_titan(&self, on_send: impl Fn(titan::Header, Bytes, Box<dyn Fn()>) + 'static) {
         self.update(Some(&gtk::Notebook::titan(on_send)));
     }
 }

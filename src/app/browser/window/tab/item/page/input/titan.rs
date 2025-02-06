@@ -1,25 +1,35 @@
 mod file;
+mod header;
 mod text;
 mod title;
 
 use file::File;
-use gtk::{glib::uuid_string_random, prelude::WidgetExt, Label, Notebook};
+use gtk::{
+    glib::{uuid_string_random, Bytes},
+    Label, Notebook,
+};
+pub use header::Header;
 use text::Text;
 use title::Title;
 
 pub trait Titan {
-    fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self;
+    fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self;
 }
 
 impl Titan for Notebook {
-    fn titan(callback: impl Fn(&[u8], Box<dyn Fn()>) + 'static) -> Self {
+    fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
+        use gtk::Box;
+        use std::{cell::Cell, rc::Rc};
+
         let notebook = Notebook::builder()
             .name(format!("s{}", uuid_string_random()))
             .show_border(false)
             .build();
 
-        notebook.append_page(&gtk::Box::text(callback), Some(&Label::title("Text")));
-        notebook.append_page(&gtk::Box::file(), Some(&Label::title("File")));
+        let header = Rc::new(Cell::new(Header::new()));
+
+        notebook.append_page(&Box::text(&header, callback), Some(&Label::title("Text")));
+        notebook.append_page(&Box::file(), Some(&Label::title("File")));
 
         notebook_css_patch(&notebook);
         notebook
@@ -29,6 +39,8 @@ impl Titan for Notebook {
 // Tools
 
 fn notebook_css_patch(notebook: &Notebook) {
+    use gtk::prelude::WidgetExt;
+
     let name = notebook.widget_name();
     let provider = gtk::CssProvider::new();
 
