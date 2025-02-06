@@ -5,7 +5,9 @@ pub trait Mime {
 
 impl Mime for gtk::Entry {
     fn mime(text: &str) -> Self {
-        use gtk::prelude::EditableExt;
+        use gtk::prelude::{EditableExt, WidgetExt};
+        use std::time::Duration;
+
         const TEXT: &str = "Content type (MIME)";
 
         let mime = gtk::Entry::builder()
@@ -15,10 +17,15 @@ impl Mime for gtk::Entry {
             //.tooltip_text(TEXT)
             .build();
 
-        mime.connect_changed(|this| {
-            this.validate();
+        mime.connect_realize(|this| {
+            gtk::glib::timeout_add_local_once(Duration::from_millis(100), {
+                let this = this.clone();
+                move || {
+                    this.select_region(0, 0);
+                }
+            }); // remove auto-selection for the first child @TODO unstable
         });
-
+        mime.connect_changed(|this| this.validate());
         mime
     }
 
