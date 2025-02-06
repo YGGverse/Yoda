@@ -6,7 +6,7 @@ mod title;
 use file::File;
 use gtk::{
     glib::{uuid_string_random, Bytes},
-    Label, Notebook,
+    Notebook,
 };
 pub use header::Header;
 use text::Text;
@@ -18,17 +18,14 @@ pub trait Titan {
 
 impl Titan for Notebook {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use gtk::Box;
-        use std::{cell::Cell, rc::Rc};
+        use gtk::{Box, Label};
 
         let notebook = Notebook::builder()
             .name(format!("s{}", uuid_string_random()))
             .show_border(false)
             .build();
 
-        let header = Rc::new(Cell::new(Header::new()));
-
-        notebook.append_page(&Box::text(&header, callback), Some(&Label::title("Text")));
+        notebook.append_page(&Box::text(callback), Some(&Label::title("Text")));
         notebook.append_page(&Box::file(), Some(&Label::title("File")));
 
         notebook_css_patch(&notebook);

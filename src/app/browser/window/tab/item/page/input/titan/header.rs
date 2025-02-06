@@ -9,13 +9,6 @@ pub struct Header {
 }
 
 impl Header {
-    pub fn new() -> Self {
-        Self {
-            mime: None,
-            token: None,
-        }
-    }
-
     /// Show header options dialog for the referrer `widget`
     /// * takes ownership of `Self`, return new updated copy in `callback` function
     pub fn dialog(self, widget: Option<&impl IsA<Widget>>, callback: impl Fn(Self) + 'static) {
