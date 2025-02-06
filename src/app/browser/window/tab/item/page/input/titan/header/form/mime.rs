@@ -8,8 +8,8 @@ impl Mime for gtk::Entry {
         use gtk::prelude::EditableExt;
 
         let mime = gtk::Entry::builder()
-            .placeholder_text("Content type (MIME)")
             .margin_bottom(8)
+            .placeholder_text("Content type (MIME)")
             .text(text)
             .build();
 
