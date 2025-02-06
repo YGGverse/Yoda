@@ -17,17 +17,16 @@ impl Header {
             AlertDialog, ResponseAppearance,
         };
         use form::Form;
-        use std::rc::Rc;
 
         // Response variants
         const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");
         const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 
         // Init form components
-        let form = Rc::new(Form::build(
+        let form = Form::build(
             &self.mime.unwrap_or_default(),
             &self.token.unwrap_or_default(),
-        ));
+        );
 
         // Init main widget
         let alert_dialog = AlertDialog::builder()
@@ -47,18 +46,15 @@ impl Header {
 
         // Init events
 
-        alert_dialog.connect_response(None, {
-            let form = form.clone();
-            move |this, response| {
-                this.set_response_enabled(response, false); // prevent double-click
-                if response == RESPONSE_APPLY.0 {
-                    callback(Self {
-                        mime: form.mime(),
-                        token: form.token(),
-                    })
-                } else {
-                    // @TODO restore
-                }
+        alert_dialog.connect_response(None, move |this, response| {
+            this.set_response_enabled(response, false); // prevent double-click
+            if response == RESPONSE_APPLY.0 {
+                callback(Self {
+                    mime: form.mime(),
+                    token: form.token(),
+                })
+            } else {
+                // @TODO restore
             }
         });
 
