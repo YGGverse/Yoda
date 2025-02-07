@@ -10,7 +10,7 @@ impl Token for Entry {
         Entry::builder()
             .placeholder_text(TEXT)
             .text(text)
-            //.tooltip_text(TEXT)
+            .tooltip_text(TEXT)
             .build()
     }
 }

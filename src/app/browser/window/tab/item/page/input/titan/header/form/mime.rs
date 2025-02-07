@@ -14,7 +14,7 @@ impl Mime for gtk::Entry {
             .margin_bottom(8)
             .placeholder_text(TEXT)
             .text(text)
-            //.tooltip_text(TEXT)
+            .tooltip_text(TEXT)
             .build();
 
         mime.connect_realize(|this| {
