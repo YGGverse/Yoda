@@ -17,7 +17,7 @@ impl Counter for Label {
     fn update(&self, bytes_total: Option<usize>) {
         self.set_visible(if let Some(bytes_total) = bytes_total {
             use crate::tool::Format;
-            self.set_tooltip_text(Some(&bytes_total.bytes()));
+            self.set_text(&bytes_total.bytes());
             true
         } else {
             false
