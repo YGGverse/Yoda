@@ -1,35 +1,93 @@
+mod control;
 mod file;
 mod header;
+mod tab;
 mod text;
-mod title;
 
+use control::Control;
 use file::File;
-use gtk::{
-    glib::{uuid_string_random, Bytes},
-    Notebook,
-};
+use gtk::{glib::Bytes, Notebook};
 pub use header::Header;
+use tab::Tab;
 use text::Text;
-use title::Title;
 
 pub trait Titan {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self;
 }
 
-impl Titan for Notebook {
+impl Titan for gtk::Box {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use gtk::{Box, Label};
+        use gtk::{glib::uuid_string_random, Box, Label, TextView};
+        use std::{cell::Cell, rc::Rc};
 
-        let notebook = Notebook::builder()
-            .name(format!("s{}", uuid_string_random()))
-            .show_border(false)
-            .build();
+        // Init components
+        let header = Rc::new(Cell::new(Header {
+            mime: None,
+            token: None,
+        }));
+        let control = Rc::new(Control::build(&header));
 
-        notebook.append_page(&Box::text(callback), Some(&Label::title("Text")));
-        notebook.append_page(&Box::file(), Some(&Label::title("File")));
+        let text = TextView::text(&control);
+        let file = File::build(&control);
 
-        notebook_css_patch(&notebook);
-        notebook
+        let notebook = {
+            let notebook = Notebook::builder()
+                .name(format!("s{}", uuid_string_random()))
+                .show_border(false)
+                .build();
+
+            notebook.append_page(&text, Some(&Label::tab("Text")));
+            notebook.append_page(&file.button, Some(&Label::tab("File")));
+
+            notebook.connect_switch_page({
+                let control = control.clone();
+                let text = text.clone();
+                move |_, _, i| {
+                    if i == 0 {
+                        control.update(Some(text.len()), Some(text.count()))
+                    } else {
+                        control.update(file.size(), None)
+                    }
+                }
+            });
+
+            notebook_css_patch(&notebook);
+            notebook
+        };
+
+        // Init main widget
+        let g_box = {
+            use gtk::{prelude::BoxExt, Orientation};
+
+            let g_box = {
+                const MARGIN: i32 = 8;
+                Box::builder()
+                    .margin_end(MARGIN)
+                    .margin_start(MARGIN)
+                    .orientation(Orientation::Vertical)
+                    .spacing(MARGIN)
+                    .build()
+            };
+
+            g_box.append(&notebook);
+            g_box.append(&control.g_box);
+            g_box
+        };
+
+        // Init events
+        /*control.upload.connect_clicked(move |this| {
+            this.set_uploading();
+            callback(
+                header.take(),
+                Bytes::from(form.text().as_bytes()),
+                Box::new({
+                    let this = this.clone();
+                    move || this.set_resend() // on failure
+                }),
+            )
+        });*/
+
+        g_box
     }
 }
 

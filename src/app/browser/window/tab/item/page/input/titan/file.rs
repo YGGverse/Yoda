@@ -1,97 +1,86 @@
-mod control;
-mod form;
+use super::Control;
+use gtk::{glib::Bytes, Button};
+use std::{cell::RefCell, rc::Rc};
 
-use super::Header;
-use control::Control;
-use gtk::Box;
-
-pub trait File {
-    fn file() -> Self;
+pub struct File {
+    buffer: Rc<RefCell<Option<Bytes>>>,
+    pub button: Button,
 }
 
-impl File for Box {
-    fn file() -> Self {
-        use form::Form;
+impl File {
+    pub fn build(control: &Rc<Control>) -> Self {
         use gtk::{
             gio::Cancellable,
             prelude::{ButtonExt, FileExt, WidgetExt},
             Button, FileDialog, Window,
         };
-        use std::{cell::Cell, rc::Rc};
 
         // Init components
-        let header = Rc::new(Cell::new(Header {
-            mime: None,
-            token: None,
-        }));
-        let control = Rc::new(Control::build(&header));
-        let form = Button::form();
+        let buffer = Rc::new(RefCell::new(None));
 
-        // Init main widget
-        let g_box = {
-            use gtk::{prelude::BoxExt, Orientation};
-
-            const MARGIN: i32 = 8;
-
-            let g_box = Box::builder()
-                .margin_end(MARGIN)
-                .margin_start(MARGIN)
-                .orientation(Orientation::Vertical)
-                .spacing(MARGIN)
-                .build();
-
-            g_box.append(&form);
-            g_box.append(&control.g_box);
-            g_box
-        };
+        let button = Button::builder()
+            .label("Choose a file..")
+            .margin_top(4)
+            .build();
 
         // Init events
-        form.connect_clicked(move |form| {
-            const CLASS: (&str, &str, &str) = ("error", "warning", "success");
+        button.connect_clicked({
+            let control = control.clone();
+            let buffer = buffer.clone();
+            move |this| {
+                const CLASS: (&str, &str, &str) = ("error", "warning", "success");
 
-            // reset
-            control.update(None);
-            form.set_sensitive(false);
-            form.remove_css_class(CLASS.0);
-            form.remove_css_class(CLASS.1);
-            form.remove_css_class(CLASS.2);
+                // reset
+                control.update(None, None);
+                this.set_sensitive(false);
+                this.remove_css_class(CLASS.0);
+                this.remove_css_class(CLASS.1);
+                this.remove_css_class(CLASS.2);
 
-            FileDialog::builder()
-                .build()
-                .open(Window::NONE, Cancellable::NONE, {
-                    let control = control.clone();
-                    let form = form.clone();
-                    move |result| match result {
-                        Ok(file) => match file.path() {
-                            Some(path) => {
-                                form.set_label("Buffering, please wait..");
-                                file.load_bytes_async(Cancellable::NONE, move |result| match result
-                                {
-                                    Ok((bytes, _)) => {
-                                        control.update(Some(bytes.len()));
+                FileDialog::builder()
+                    .build()
+                    .open(Window::NONE, Cancellable::NONE, {
+                        let control = control.clone();
+                        let buffer = buffer.clone();
+                        let this = this.clone();
+                        move |result| match result {
+                            Ok(file) => match file.path() {
+                                Some(path) => {
+                                    this.set_label("Buffering, please wait.."); // @TODO progress
+                                    file.load_bytes_async(Cancellable::NONE, move |result| {
+                                        match result {
+                                            Ok((bytes, _)) => {
+                                                control.update(Some(bytes.len()), None);
+                                                buffer.replace(Some(bytes));
 
-                                        form.set_label(path.to_str().unwrap());
-                                        form.set_css_classes(&[CLASS.2]);
-                                        form.set_sensitive(true);
-                                    }
-                                    Err(e) => {
-                                        form.set_css_classes(&[CLASS.0]);
-                                        form.set_label(e.message());
-                                        form.set_sensitive(true);
-                                    }
-                                })
+                                                this.set_css_classes(&[CLASS.2]);
+                                                this.set_label(path.to_str().unwrap());
+                                                this.set_sensitive(true);
+                                            }
+                                            Err(e) => {
+                                                this.set_css_classes(&[CLASS.0]);
+                                                this.set_label(e.message());
+                                                this.set_sensitive(true);
+                                            }
+                                        }
+                                    })
+                                }
+                                None => todo!(),
+                            },
+                            Err(e) => {
+                                this.set_css_classes(&[CLASS.1]);
+                                this.set_label(e.message());
+                                this.set_sensitive(true);
                             }
-                            None => todo!(),
-                        },
-                        Err(e) => {
-                            form.set_css_classes(&[CLASS.1]);
-                            form.set_label(e.message());
-                            form.set_sensitive(true);
                         }
-                    }
-                });
+                    });
+            }
         });
 
-        g_box
+        Self { buffer, button }
+    }
+
+    pub fn size(&self) -> Option<usize> {
+        self.buffer.borrow().as_ref().map(|bytes| bytes.len())
     }
 }

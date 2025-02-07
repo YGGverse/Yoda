@@ -75,6 +75,6 @@ impl Input {
     }
 
     pub fn set_new_titan(&self, on_send: impl Fn(titan::Header, Bytes, Box<dyn Fn()>) + 'static) {
-        self.update(Some(&gtk::Notebook::titan(on_send)));
+        self.update(Some(&gtk::Box::titan(on_send)));
     }
 }

@@ -1,14 +1,9 @@
-use gtk::{
-    glib::GString,
-    prelude::{TextBufferExt, TextViewExt, WidgetExt},
-    TextView, WrapMode,
-};
+use gtk::{prelude::WidgetExt, TextView, WrapMode};
 use libspelling::{Checker, TextBufferAdapter};
 use sourceview::Buffer;
 
 pub trait Form {
     fn form() -> Self;
-    fn text(&self) -> GString;
 }
 
 impl Form for TextView {
@@ -50,12 +45,5 @@ impl Form for TextView {
 
         // Return activated `Self`
         text_view
-    }
-
-    // Getters
-
-    fn text(&self) -> GString {
-        let buffer = self.buffer();
-        buffer.text(&buffer.start_iter(), &buffer.end_iter(), true)
     }
 }

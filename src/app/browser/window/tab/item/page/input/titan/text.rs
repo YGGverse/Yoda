@@ -1,71 +1,42 @@
-mod control;
 mod form;
 
-use super::Header;
-use gtk::glib::Bytes;
+use super::Control;
+use gtk::{
+    prelude::{TextBufferExt, TextViewExt},
+    TextView,
+};
+use std::rc::Rc;
 
 pub trait Text {
-    fn text(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self;
+    fn text(control: &Rc<Control>) -> Self;
+    fn len(&self) -> usize;
+    fn count(&self) -> i32;
 }
 
-impl Text for gtk::Box {
-    fn text(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use control::{Control, Upload};
+impl Text for TextView {
+    fn text(control: &Rc<Control>) -> Self {
         use form::Form;
-        use gtk::{
-            prelude::{BoxExt, ButtonExt, TextBufferExt, TextViewExt},
-            Orientation, TextView,
-        };
-        use std::{cell::Cell, rc::Rc};
 
-        // Init components
-        let header = Rc::new(Cell::new(Header {
-            mime: Some("text/plain".into()), // some servers require not empty content type
-            token: None,
-        }));
-        let control = Rc::new(Control::build(&header));
-        let form = TextView::form();
+        let text_view = TextView::form();
 
-        // Init widget
-        let g_box = {
-            const MARGIN: i32 = 8;
-            let g_box = gtk::Box::builder()
-                .margin_bottom(MARGIN / 2)
-                .margin_end(MARGIN)
-                .margin_start(MARGIN)
-                .orientation(Orientation::Vertical)
-                .spacing(MARGIN)
-                .build();
-
-            g_box.append(&form);
-            g_box.append(&control.g_box);
-            g_box
-        };
-
-        // Connect events
-
-        form.buffer().connect_changed({
+        text_view.buffer().connect_changed({
             let control = control.clone();
-            move |this| {
-                control.update(
-                    this.char_count(),
-                    this.text(&this.start_iter(), &this.end_iter(), true).len(),
-                )
-            }
+            let text_view = text_view.clone();
+            move |text_buffer| control.update(Some(text_view.len()), Some(text_buffer.char_count()))
         });
 
-        control.upload.connect_clicked(move |this| {
-            this.set_uploading();
-            callback(
-                header.take(),
-                Bytes::from(form.text().as_bytes()),
-                Box::new({
-                    let this = this.clone();
-                    move || this.set_resend() // on failure
-                }),
-            )
-        });
+        text_view
+    }
 
-        g_box
+    fn count(&self) -> i32 {
+        self.buffer().char_count()
+    }
+
+    fn len(&self) -> usize {
+        let buffer = self.buffer();
+
+        buffer
+            .text(&buffer.start_iter(), &buffer.end_iter(), true)
+            .len()
     }
 }

@@ -12,8 +12,6 @@ use options::Options;
 use std::{cell::Cell, rc::Rc};
 pub use upload::Upload;
 
-const SPACING: i32 = 8;
-
 pub struct Control {
     pub counter: Label,
     pub upload: Button,
@@ -31,11 +29,15 @@ impl Control {
         let upload = Button::upload();
 
         // Init main widget
-        let g_box = Box::builder()
-            .halign(Align::End)
-            .orientation(Orientation::Horizontal)
-            .spacing(SPACING)
-            .build();
+        let g_box = {
+            const MARGIN: i32 = 8;
+            Box::builder()
+                .halign(Align::End)
+                .margin_bottom(MARGIN)
+                .orientation(Orientation::Horizontal)
+                .spacing(MARGIN)
+                .build()
+        };
 
         g_box.append(&counter);
         g_box.append(&options);
@@ -50,9 +52,10 @@ impl Control {
     }
 
     // Actions
-    pub fn update(&self, chars_count: i32, bytes_total: usize) {
+    pub fn update(&self, bytes_total: Option<usize>, chars_count: Option<i32>) {
         // Update children components
-        self.counter.update(chars_count, bytes_total);
-        self.upload.set_sensitive(bytes_total > 0);
+        self.counter.update(bytes_total, chars_count);
+        self.upload
+            .set_sensitive(bytes_total.is_some_and(|this| this > 0));
     }
 }
