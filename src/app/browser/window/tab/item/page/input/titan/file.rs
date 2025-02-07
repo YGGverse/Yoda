@@ -34,7 +34,6 @@ impl File for Box {
             const MARGIN: i32 = 8;
 
             let g_box = Box::builder()
-                .margin_bottom(MARGIN)
                 .margin_end(MARGIN)
                 .margin_start(MARGIN)
                 .orientation(Orientation::Vertical)

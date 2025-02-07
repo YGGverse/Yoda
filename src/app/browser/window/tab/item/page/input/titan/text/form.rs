@@ -6,8 +6,6 @@ use gtk::{
 use libspelling::{Checker, TextBufferAdapter};
 use sourceview::Buffer;
 
-const MARGIN: i32 = 8;
-
 pub trait Form {
     fn form() -> Self;
     fn text(&self) -> GString;
@@ -27,17 +25,20 @@ impl Form for TextView {
         adapter.set_enabled(true);
 
         // Init main widget
-        let text_view = TextView::builder()
-            .bottom_margin(MARGIN)
-            .buffer(&buffer)
-            .css_classes(["frame", "view"])
-            .extra_menu(&adapter.menu_model())
-            .left_margin(MARGIN)
-            .margin_bottom(MARGIN / 2)
-            .right_margin(MARGIN)
-            .top_margin(MARGIN)
-            .wrap_mode(WrapMode::Word)
-            .build();
+
+        let text_view = {
+            const MARGIN: i32 = 8;
+            TextView::builder()
+                .bottom_margin(MARGIN)
+                .buffer(&buffer)
+                .css_classes(["frame", "view"])
+                .extra_menu(&adapter.menu_model())
+                .left_margin(MARGIN)
+                .right_margin(MARGIN)
+                .top_margin(MARGIN)
+                .wrap_mode(WrapMode::Word)
+                .build()
+        };
 
         text_view.insert_action_group("spelling", Some(&adapter));
         text_view.set_size_request(-1, 38); // @TODO [#635](https://gitlab.gnome.org/GNOME/pygobject/-/issues/635)

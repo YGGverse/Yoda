@@ -29,14 +29,12 @@ impl Text for gtk::Box {
         // Init widget
         let g_box = {
             const MARGIN: i32 = 8;
-            const SPACING: i32 = 8;
-
             let g_box = gtk::Box::builder()
-                .margin_bottom(MARGIN)
+                .margin_bottom(MARGIN / 2)
                 .margin_end(MARGIN)
                 .margin_start(MARGIN)
                 .orientation(Orientation::Vertical)
-                .spacing(SPACING)
+                .spacing(MARGIN)
                 .build();
 
             g_box.append(&form);
