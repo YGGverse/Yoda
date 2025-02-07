@@ -107,8 +107,8 @@ GTK 4 / Libadwaita client written in Rust
     * [ ] by headers
     * [ ] by links
     * [ ] by content hash
-  * [ ] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
-    * [ ] Binary data (file uploads)
+  * [x] [Titan](https://transjovian.org/titan/page/The%20Titan%20Specification)
+    * [x] Binary data (file uploads)
     * [x] Text input
     * [x] Header options
       * [x] MIME
