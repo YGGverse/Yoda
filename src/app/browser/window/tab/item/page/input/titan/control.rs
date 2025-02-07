@@ -33,7 +33,7 @@ impl Control {
             const MARGIN: i32 = 8;
             Box::builder()
                 .halign(Align::End)
-                .margin_bottom(MARGIN)
+                .margin_bottom(MARGIN / 2)
                 .orientation(Orientation::Horizontal)
                 .spacing(MARGIN)
                 .build()
