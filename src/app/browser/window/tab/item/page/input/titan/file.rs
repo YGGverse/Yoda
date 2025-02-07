@@ -1,4 +1,5 @@
 mod control;
+mod form;
 
 use super::Header;
 use gtk::Box;
@@ -10,6 +11,8 @@ pub trait File {
 impl File for Box {
     fn file() -> Self {
         use control::Control;
+        use form::Form;
+        use gtk::Button;
         use std::{cell::Cell, rc::Rc};
 
         // Init components
@@ -18,14 +21,7 @@ impl File for Box {
             token: None,
         }));
         let control = Box::control(&header);
-        let form = {
-            const MARGIN: i32 = 8;
-            gtk::Button::builder()
-                .label("Choose a file..")
-                .margin_bottom(MARGIN)
-                .margin_top(MARGIN)
-                .build()
-        };
+        let form = Button::form();
 
         // Init main widget
         {
