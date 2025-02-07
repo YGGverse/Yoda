@@ -1,8 +1,9 @@
-use super::Control;
+use super::{Control, Header};
 use gtk::{glib::Bytes, Button};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct File {
+    header: Rc<RefCell<Header>>,
     buffer: Rc<RefCell<Option<Bytes>>>,
     pub button: Button,
 }
@@ -16,6 +17,11 @@ impl File {
         };
 
         // Init components
+        let header = Rc::new(RefCell::new(Header {
+            mime: None,
+            token: None,
+        }));
+
         let buffer = Rc::new(RefCell::new(None));
 
         let button = Button::builder()
@@ -77,21 +83,37 @@ impl File {
             }
         });
 
-        Self { buffer, button }
+        Self {
+            header,
+            buffer,
+            button,
+        }
     }
 
-    /* this method is less-expensive but not useful as user
-       will not able re-upload existing form on failure @TODO
+    // Getters
 
-    pub fn take_bytes(&self) -> Option<Bytes> {
-        self.buffer.borrow_mut().take()
-    } */
+    /// Get `Header` copy
+    /// * borrow, do not take to have form re-send ability
+    pub fn header(&self) -> Header {
+        self.header.borrow().clone()
+    }
 
-    pub fn to_bytes(&self) -> Option<Bytes> {
+    /// Get cloned [Bytes](https://docs.gtk.org/glib/struct.Bytes.html)
+    // * borrow, do not take to have form re-send ability
+    pub fn bytes(&self) -> Option<Bytes> {
         self.buffer.borrow().as_ref().map(|bytes| bytes.clone())
     }
 
+    /// Get size
     pub fn size(&self) -> Option<usize> {
         self.buffer.borrow().as_ref().map(|bytes| bytes.len())
+    }
+
+    // Setters
+
+    /// Replace current `Header`
+    /// * return previous object
+    pub fn set_header(&self, header: Header) -> Header {
+        self.header.replace(header)
     }
 }

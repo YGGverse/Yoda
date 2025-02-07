@@ -17,17 +17,13 @@ pub trait Titan {
 
 impl Titan for gtk::Box {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use gtk::{glib::uuid_string_random, prelude::ButtonExt, Label, TextView};
-        use std::{cell::RefCell, rc::Rc};
+        use gtk::{glib::uuid_string_random, prelude::ButtonExt, Label};
+        use std::rc::Rc;
 
         // Init components
-        let header = Rc::new(RefCell::new(Header {
-            mime: None,
-            token: None,
-        }));
-        let control = Rc::new(Control::build(&header));
+        let control = Rc::new(Control::build());
         let file = Rc::new(File::build(&control));
-        let text = TextView::text(&control);
+        let text = Rc::new(Text::build(&control));
 
         let notebook = {
             let notebook = Notebook::builder()
@@ -35,7 +31,7 @@ impl Titan for gtk::Box {
                 .show_border(false)
                 .build();
 
-            notebook.append_page(&text, Some(&Label::tab("Text")));
+            notebook.append_page(&text.text_view, Some(&Label::tab("Text")));
             notebook.append_page(&file.button, Some(&Label::tab("File")));
 
             notebook.connect_switch_page({
@@ -75,21 +71,57 @@ impl Titan for gtk::Box {
         };
 
         // Init events
-        control.upload.connect_clicked(move |this| {
-            use control::Upload;
-            this.set_uploading();
-            callback(
-                header.borrow().clone(), // keep original header to have re-send ability
-                match notebook.current_page().unwrap() {
-                    0 => text.to_bytes(),
-                    1 => file.to_bytes().unwrap(),
+        control.options.connect_clicked({
+            let text = text.clone();
+            let file = file.clone();
+            let notebook = notebook.clone();
+            move |this| {
+                use gtk::prelude::WidgetExt;
+                this.set_sensitive(false); // lock
+                let page = notebook.current_page().unwrap();
+                match page {
+                    0 => text.header(),
+                    1 => file.header(),
                     _ => panic!(),
-                },
-                Box::new({
+                }
+                .dialog(Some(this), {
                     let this = this.clone();
-                    move || this.set_resend() // re-activate button on failure
-                }),
-            )
+                    let text = text.clone();
+                    let file = file.clone();
+                    move |header| {
+                        match page {
+                            0 => text.set_header(header),
+                            1 => file.set_header(header),
+                            _ => panic!(),
+                        };
+                        this.set_sensitive(true); // unlock
+                    }
+                })
+            }
+        });
+
+        control.upload.connect_clicked({
+            move |this| {
+                use control::Upload;
+                this.set_uploading();
+                let page = notebook.current_page().unwrap();
+                callback(
+                    match page {
+                        0 => text.header(),
+                        1 => file.header(),
+                        _ => panic!(),
+                    },
+                    match page {
+                        0 => text.bytes(),
+                        1 => file.bytes().unwrap(),
+                        _ => panic!(),
+                    },
+                    Box::new({
+                        let this = this.clone();
+                        move || this.set_resend() // re-activate button on failure
+                    }),
+                )
+            }
         });
 
         g_box

@@ -1,55 +1,82 @@
 mod form;
 
-use super::Control;
+use super::{Control, Header};
 use gtk::{
     glib::{Bytes, GString},
     prelude::{TextBufferExt, TextViewExt},
-    TextView,
+    TextBuffer, TextView,
 };
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
-pub trait Text {
-    fn text(control: &Rc<Control>) -> Self;
-    fn to_bytes(&self) -> Bytes;
-    fn to_gstring(&self) -> GString;
-    fn len(&self) -> usize;
-    fn count(&self) -> i32;
+pub struct Text {
+    header: Rc<RefCell<Header>>,
+    pub text_view: TextView,
 }
 
-impl Text for TextView {
-    fn text(control: &Rc<Control>) -> Self {
+impl Text {
+    // Constructors
+
+    /// Build new `Self`
+    pub fn build(control: &Rc<Control>) -> Self {
         use form::Form;
 
+        // Init components
+        let header = Rc::new(RefCell::new(Header {
+            mime: Some("text/plain".into()), // some servers may reject request without MIME @TODO optional defaults
+            token: None,
+        }));
+
+        // Init main widget
         let text_view = TextView::form();
 
         text_view.buffer().connect_changed({
             let control = control.clone();
-            let text_view = text_view.clone();
-            move |text_buffer| control.update(Some(text_view.len()), Some(text_buffer.char_count()))
+            move |text_buffer| {
+                control.update(
+                    Some(gstring(text_buffer).len()),
+                    Some(text_buffer.char_count()),
+                )
+            }
         });
 
-        text_view
+        Self { header, text_view }
     }
 
-    fn to_bytes(&self) -> Bytes {
-        Bytes::from(self.to_gstring().as_bytes())
+    // Getters
+
+    /// Get `Header` copy
+    /// * borrow, do not take to have form re-send ability
+    pub fn header(&self) -> Header {
+        self.header.borrow().clone()
     }
 
-    fn to_gstring(&self) -> GString {
-        let buffer = self.buffer();
-        self.buffer()
-            .text(&buffer.start_iter(), &buffer.end_iter(), true)
+    pub fn bytes(&self) -> Bytes {
+        Bytes::from(self.gstring().as_bytes())
     }
 
-    fn count(&self) -> i32 {
-        self.buffer().char_count()
+    pub fn gstring(&self) -> GString {
+        gstring(&self.text_view.buffer())
     }
 
-    fn len(&self) -> usize {
-        let buffer = self.buffer();
-
-        buffer
-            .text(&buffer.start_iter(), &buffer.end_iter(), true)
-            .len()
+    pub fn count(&self) -> i32 {
+        self.text_view.buffer().char_count()
     }
+
+    pub fn len(&self) -> usize {
+        self.gstring().len()
+    }
+
+    // Setters
+
+    /// Replace current `Header`
+    /// * return previous object
+    pub fn set_header(&self, header: Header) -> Header {
+        self.header.replace(header)
+    }
+}
+
+// Tools
+
+fn gstring(text_buffer: &TextBuffer) -> GString {
+    text_buffer.text(&text_buffer.start_iter(), &text_buffer.end_iter(), true)
 }
