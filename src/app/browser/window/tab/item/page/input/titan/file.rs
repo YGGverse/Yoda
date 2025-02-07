@@ -77,6 +77,7 @@ impl File {
                                                                         file_info.content_type();
                                                                 }
                                                                 // async operations completed, unlock the form
+                                                                // * @TODO make shared function for members below?
                                                                 control.update(
                                                                     Some(bytes.len()),
                                                                     None,
