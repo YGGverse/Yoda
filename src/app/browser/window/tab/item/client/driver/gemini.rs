@@ -381,7 +381,7 @@ fn handle(
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
-                            /* @TODO can't find that in specification:
+                            /* @TODO can't find that in specification, implement manual confirmation status page:
                             // Disallow external redirection by protocol restrictions
                             } else if "gemini" != target.scheme()
                                 || uri.port() != target.port()
