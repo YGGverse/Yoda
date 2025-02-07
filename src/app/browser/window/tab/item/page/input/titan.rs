@@ -18,10 +18,10 @@ pub trait Titan {
 impl Titan for gtk::Box {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
         use gtk::{glib::uuid_string_random, prelude::ButtonExt, Label, TextView};
-        use std::{cell::Cell, rc::Rc};
+        use std::{cell::RefCell, rc::Rc};
 
         // Init components
-        let header = Rc::new(Cell::new(Header {
+        let header = Rc::new(RefCell::new(Header {
             mime: None,
             token: None,
         }));
@@ -79,7 +79,7 @@ impl Titan for gtk::Box {
             use control::Upload;
             this.set_uploading();
             callback(
-                header.take(), // @TODO copy?
+                header.borrow().clone(), // keep original header to have re-send ability
                 match notebook.current_page().unwrap() {
                     0 => text.to_bytes(),
                     1 => file.to_bytes().unwrap(),
@@ -87,7 +87,7 @@ impl Titan for gtk::Box {
                 },
                 Box::new({
                     let this = this.clone();
-                    move || this.set_resend() // on failure
+                    move || this.set_resend() // re-activate button on failure
                 }),
             )
         });

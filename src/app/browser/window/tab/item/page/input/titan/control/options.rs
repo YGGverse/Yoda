@@ -3,14 +3,14 @@ use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
-use std::{cell::Cell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 pub trait Options {
-    fn options(header: &Rc<Cell<Header>>) -> Self;
+    fn options(header: &Rc<RefCell<Header>>) -> Self;
 }
 
 impl Options for Button {
-    fn options(header: &Rc<Cell<Header>>) -> Self {
+    fn options(header: &Rc<RefCell<Header>>) -> Self {
         let button = Button::builder()
             .icon_name("emblem-system-symbolic")
             .tooltip_text("Options")

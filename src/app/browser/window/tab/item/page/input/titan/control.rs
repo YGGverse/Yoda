@@ -9,7 +9,7 @@ use gtk::{
     Align, Box, Button, Label, Orientation,
 };
 use options::Options;
-use std::{cell::Cell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 pub use upload::Upload;
 
 pub struct Control {
@@ -22,7 +22,7 @@ impl Control {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(header: &Rc<Cell<Header>>) -> Self {
+    pub fn build(header: &Rc<RefCell<Header>>) -> Self {
         // Init components
         let counter = Label::counter();
         let options = Button::options(header);
