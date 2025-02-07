@@ -10,7 +10,6 @@ pub trait File {
 impl File for Box {
     fn file() -> Self {
         use control::Control;
-        use gtk::Button;
         use std::{cell::Cell, rc::Rc};
 
         // Init components
@@ -19,7 +18,14 @@ impl File for Box {
             token: None,
         }));
         let control = Box::control(&header);
-        let form = Button::builder().label("Choose a file..").build();
+        let form = {
+            const MARGIN: i32 = 8;
+            gtk::Button::builder()
+                .label("Choose a file..")
+                .margin_bottom(MARGIN)
+                .margin_top(MARGIN)
+                .build()
+        };
 
         // Init main widget
         {
