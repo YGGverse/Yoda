@@ -38,8 +38,8 @@ impl Titan for gtk::Box {
                 let control = control.clone();
                 let file = file.clone();
                 let text = text.clone();
-                move |_, _, i| {
-                    if i == 0 {
+                move |_, _, tab_number| {
+                    if tab_number == 0 {
                         control.update(Some(text.len()), Some(text.count()))
                     } else {
                         control.update(file.size(), None)
@@ -78,8 +78,8 @@ impl Titan for gtk::Box {
             move |this| {
                 use gtk::prelude::WidgetExt;
                 this.set_sensitive(false); // lock
-                let page = notebook.current_page().unwrap();
-                match page {
+                let tab_number = notebook.current_page().unwrap();
+                match tab_number {
                     0 => text.header(),
                     1 => file.header(),
                     _ => panic!(),
@@ -89,7 +89,7 @@ impl Titan for gtk::Box {
                     let text = text.clone();
                     let file = file.clone();
                     move |header| {
-                        match page {
+                        match tab_number {
                             0 => text.set_header(header),
                             1 => file.set_header(header),
                             _ => panic!(),
@@ -104,14 +104,14 @@ impl Titan for gtk::Box {
             move |this| {
                 use control::Upload;
                 this.set_uploading();
-                let page = notebook.current_page().unwrap();
+                let tab_number = notebook.current_page().unwrap();
                 callback(
-                    match page {
+                    match tab_number {
                         0 => text.header(),
                         1 => file.header(),
                         _ => panic!(),
                     },
-                    match page {
+                    match tab_number {
                         0 => text.bytes(),
                         1 => file.bytes().unwrap(),
                         _ => panic!(),
