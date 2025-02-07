@@ -2,6 +2,7 @@ mod form;
 
 use super::Control;
 use gtk::{
+    glib::{Bytes, GString},
     prelude::{TextBufferExt, TextViewExt},
     TextView,
 };
@@ -9,6 +10,8 @@ use std::rc::Rc;
 
 pub trait Text {
     fn text(control: &Rc<Control>) -> Self;
+    fn to_bytes(&self) -> Bytes;
+    fn to_gstring(&self) -> GString;
     fn len(&self) -> usize;
     fn count(&self) -> i32;
 }
@@ -26,6 +29,16 @@ impl Text for TextView {
         });
 
         text_view
+    }
+
+    fn to_bytes(&self) -> Bytes {
+        Bytes::from(self.to_gstring().as_bytes())
+    }
+
+    fn to_gstring(&self) -> GString {
+        let buffer = self.buffer();
+        self.buffer()
+            .text(&buffer.start_iter(), &buffer.end_iter(), true)
     }
 
     fn count(&self) -> i32 {

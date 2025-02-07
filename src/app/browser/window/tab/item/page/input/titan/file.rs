@@ -80,6 +80,17 @@ impl File {
         Self { buffer, button }
     }
 
+    /* this method is less-expensive but not useful as user
+       will not able re-upload existing form on failure @TODO
+
+    pub fn take_bytes(&self) -> Option<Bytes> {
+        self.buffer.borrow_mut().take()
+    } */
+
+    pub fn to_bytes(&self) -> Option<Bytes> {
+        self.buffer.borrow().as_ref().map(|bytes| bytes.clone())
+    }
+
     pub fn size(&self) -> Option<usize> {
         self.buffer.borrow().as_ref().map(|bytes| bytes.len())
     }

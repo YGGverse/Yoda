@@ -17,7 +17,7 @@ pub trait Titan {
 
 impl Titan for gtk::Box {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use gtk::{glib::uuid_string_random, Box, Label, TextView};
+        use gtk::{glib::uuid_string_random, prelude::ButtonExt, Label, TextView};
         use std::{cell::Cell, rc::Rc};
 
         // Init components
@@ -26,9 +26,8 @@ impl Titan for gtk::Box {
             token: None,
         }));
         let control = Rc::new(Control::build(&header));
-
+        let file = Rc::new(File::build(&control));
         let text = TextView::text(&control);
-        let file = File::build(&control);
 
         let notebook = {
             let notebook = Notebook::builder()
@@ -41,6 +40,7 @@ impl Titan for gtk::Box {
 
             notebook.connect_switch_page({
                 let control = control.clone();
+                let file = file.clone();
                 let text = text.clone();
                 move |_, _, i| {
                     if i == 0 {
@@ -57,7 +57,7 @@ impl Titan for gtk::Box {
 
         // Init main widget
         let g_box = {
-            use gtk::{prelude::BoxExt, Orientation};
+            use gtk::{prelude::BoxExt, Box, Orientation};
 
             let g_box = {
                 const MARGIN: i32 = 8;
@@ -75,17 +75,22 @@ impl Titan for gtk::Box {
         };
 
         // Init events
-        /*control.upload.connect_clicked(move |this| {
+        control.upload.connect_clicked(move |this| {
+            use control::Upload;
             this.set_uploading();
             callback(
-                header.take(),
-                Bytes::from(form.text().as_bytes()),
+                header.take(), // @TODO copy?
+                match notebook.current_page().unwrap() {
+                    0 => text.to_bytes(),
+                    1 => file.to_bytes().unwrap(),
+                    _ => panic!(),
+                },
                 Box::new({
                     let this = this.clone();
                     move || this.set_resend() // on failure
                 }),
             )
-        });*/
+        });
 
         g_box
     }
