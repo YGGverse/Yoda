@@ -13,7 +13,8 @@ impl Options for Button {
     fn options(header: &Rc<Cell<Header>>) -> Self {
         let button = Button::builder()
             .icon_name("emblem-system-symbolic")
-            .sensitive(false)
+            // @TODO deactivate by default on dyn MIME type detection only
+            // .sensitive(false)
             .tooltip_text("Options")
             .build();
 
