@@ -2,16 +2,7 @@ mod control;
 mod form;
 
 use super::Header;
-use control::Control;
-use control::Upload;
-use form::Form;
 use gtk::glib::Bytes;
-use gtk::{
-    prelude::{BoxExt, ButtonExt, TextBufferExt, TextViewExt},
-    Orientation, TextView,
-};
-use std::cell::Cell;
-use std::rc::Rc;
 
 pub trait Text {
     fn text(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self;
@@ -19,6 +10,14 @@ pub trait Text {
 
 impl Text for gtk::Box {
     fn text(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
+        use control::{Control, Upload};
+        use form::Form;
+        use gtk::{
+            prelude::{BoxExt, ButtonExt, TextBufferExt, TextViewExt},
+            Orientation, TextView,
+        };
+        use std::{cell::Cell, rc::Rc};
+
         // Init components
         let header = Rc::new(Cell::new(Header {
             mime: Some("text/plain".into()), // some servers require not empty content type

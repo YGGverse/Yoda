@@ -1,31 +1,43 @@
-use gtk::{prelude::BoxExt, Align, Label, Orientation};
+mod control;
 
-const MARGIN: i32 = 8;
-const SPACING: i32 = 8;
+use super::Header;
+use gtk::Box;
 
 pub trait File {
     fn file() -> Self;
 }
 
-impl File for gtk::Box {
+impl File for Box {
     fn file() -> Self {
-        // Init widget
-        let g_box = gtk::Box::builder()
-            .halign(Align::Center)
-            .margin_bottom(MARGIN)
-            .margin_end(MARGIN)
-            .margin_start(MARGIN)
-            .orientation(Orientation::Vertical)
-            .spacing(SPACING)
-            //.margin_top(MARGIN)
-            .build();
+        use control::Control;
+        use gtk::Button;
+        use std::{cell::Cell, rc::Rc};
 
-        g_box.append(
-            &Label::builder()
-                .css_classes(["dim-label"])
-                .label("Soon..")
-                .build(),
-        ); // @TODO
-        g_box
+        // Init components
+        let header = Rc::new(Cell::new(Header {
+            mime: None,
+            token: None,
+        }));
+        let control = Box::control(&header);
+        let form = Button::builder().label("Choose a file..").build();
+
+        // Init main widget
+        {
+            use gtk::{prelude::BoxExt, Orientation};
+
+            const MARGIN: i32 = 8;
+
+            let g_box = Box::builder()
+                .margin_bottom(MARGIN)
+                .margin_end(MARGIN)
+                .margin_start(MARGIN)
+                .orientation(Orientation::Vertical)
+                .spacing(MARGIN)
+                .build();
+
+            g_box.append(&form);
+            g_box.append(&control);
+            g_box
+        }
     }
 }
