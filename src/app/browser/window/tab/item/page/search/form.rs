@@ -85,12 +85,12 @@ impl Form {
                     if !this.text().is_empty() {
                         match navigation.forward(subject) {
                             Some((mut start, _)) => {
+                                navigation.update();
                                 result.update(navigation.position(), navigation.total());
                                 scroll_to_iter(&subject.text_view, &mut start)
                             }
                             None => todo!(), // unexpected
                         }
-                        navigation.update()
                     }
                 }
                 None => todo!(),
@@ -126,19 +126,16 @@ impl Form {
             let navigation = navigation.clone();
             let result = result.clone();
             let subject = subject.clone();
-            move |_| {
-                match subject.borrow().as_ref() {
-                    Some(subject) => match navigation.back(subject) {
-                        Some((mut start, _)) => {
-                            result.update(navigation.position(), navigation.total());
-                            scroll_to_iter(&subject.text_view, &mut start)
-                        }
-                        None => todo!(), // unexpected
-                    },
-
-                    None => todo!(),
-                }
-                navigation.update()
+            move |_| match subject.borrow().as_ref() {
+                Some(subject) => match navigation.back(subject) {
+                    Some((mut start, _)) => {
+                        navigation.update();
+                        result.update(navigation.position(), navigation.total());
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
+                    None => todo!(), // unexpected
+                },
+                None => todo!(),
             }
         });
 
@@ -146,19 +143,17 @@ impl Form {
             let navigation = navigation.clone();
             let result = result.clone();
             let subject = subject.clone();
-            move |_| {
-                match subject.borrow().as_ref() {
-                    Some(subject) => match navigation.forward(subject) {
-                        Some((mut start, _)) => {
-                            result.update(navigation.position(), navigation.total());
-                            scroll_to_iter(&subject.text_view, &mut start)
-                        }
-                        None => todo!(), // unexpected
-                    },
+            move |_| match subject.borrow().as_ref() {
+                Some(subject) => match navigation.forward(subject) {
+                    Some((mut start, _)) => {
+                        navigation.update();
+                        result.update(navigation.position(), navigation.total());
+                        scroll_to_iter(&subject.text_view, &mut start)
+                    }
+                    None => todo!(), // unexpected
+                },
 
-                    None => todo!(),
-                }
-                navigation.update()
+                None => todo!(),
             }
         });
 
