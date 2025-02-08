@@ -61,50 +61,28 @@ impl File {
                                     this.set_label("Buffering, please wait.."); // @TODO progress
                                     file.load_bytes_async(Cancellable::NONE, {
                                         let file = file.clone();
-                                        move |result| {
-                                            match result {
-                                                Ok((bytes, _)) => {
-                                                    // try autocomplete content type (if None)
-                                                    if header.borrow().mime.is_none() {
-                                                        file.query_info_async(
-                                                            "standard::content-type",
-                                                            FileQueryInfoFlags::NONE,
-                                                            Priority::DEFAULT,
-                                                            Cancellable::NONE,
-                                                            move |file_info| {
-                                                                if let Ok(file_info) = file_info {
-                                                                    header.borrow_mut().mime =
-                                                                        file_info.content_type();
-                                                                }
-                                                                // async operations completed, unlock the form
-                                                                // * @TODO make shared function for members below?
-                                                                control.update(
-                                                                    Some(bytes.len()),
-                                                                    None,
-                                                                );
-                                                                buffer.replace(Some(bytes));
-                                                                this.set_css_classes(&[CLASS.2]);
-                                                                this.set_label(
-                                                                    path.to_str().unwrap(),
-                                                                );
-                                                                this.set_sensitive(true);
-                                                            },
-                                                        );
-                                                    // no async operations left, update/unlock immediately
-                                                    } else {
-                                                        control.update(Some(bytes.len()), None);
-                                                        buffer.replace(Some(bytes));
-
-                                                        this.set_css_classes(&[CLASS.2]);
-                                                        this.set_label(path.to_str().unwrap());
-                                                        this.set_sensitive(true);
-                                                    }
-                                                }
-                                                Err(e) => {
-                                                    this.set_css_classes(&[CLASS.0]);
-                                                    this.set_label(e.message());
+                                        move |result| match result {
+                                            Ok((bytes, _)) => file.query_info_async(
+                                                "standard::content-type",
+                                                FileQueryInfoFlags::NONE,
+                                                Priority::DEFAULT,
+                                                Cancellable::NONE,
+                                                move |file_info| {
+                                                    header.borrow_mut().mime = match file_info {
+                                                        Ok(file_info) => file_info.content_type(),
+                                                        Err(_) => None,
+                                                    };
+                                                    control.update(Some(bytes.len()), None);
+                                                    buffer.replace(Some(bytes));
+                                                    this.set_css_classes(&[CLASS.2]);
+                                                    this.set_label(path.to_str().unwrap());
                                                     this.set_sensitive(true);
-                                                }
+                                                },
+                                            ),
+                                            Err(e) => {
+                                                this.set_css_classes(&[CLASS.0]);
+                                                this.set_label(e.message());
+                                                this.set_sensitive(true);
                                             }
                                         }
                                     })
