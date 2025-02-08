@@ -35,7 +35,7 @@ ggemtext = "0.3.0"
 indexmap = "2.7.0"
 itertools = "0.14.0"
 libspelling = "0.3.0"
-openssl = "0.10.68"
+openssl = "0.10.70"
 plurify = "0.2.0"
 syntect = "5.2.0"
 
