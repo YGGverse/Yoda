@@ -18,7 +18,7 @@ use gtk::{
 use sourceview::prelude::InputStreamExtManual;
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
-/// [Gemini protocol](https://geminiprotocol.net/docs/protocol-specification.gmi) driver implementation
+/// [Gemini protocol](https://geminiprotocol.net/docs/protocol-specification.gmi) client driver
 pub struct Gemini {
     /// Should be initiated once
     client: Rc<Client>,
