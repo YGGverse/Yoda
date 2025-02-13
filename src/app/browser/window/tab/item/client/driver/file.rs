@@ -27,9 +27,10 @@ impl File {
         };
 
         let url = uri.to_string();
+        let file = File::for_uri(&url);
 
-        match File::for_uri(&url).query_file_type(FileQueryInfoFlags::NONE, Some(&cancellable)) {
-            FileType::Directory => File::for_uri(&url).enumerate_children_async(
+        match file.query_file_type(FileQueryInfoFlags::NONE, Some(&cancellable)) {
+            FileType::Directory => file.enumerate_children_async(
                 "standard::content-type",
                 FileQueryInfoFlags::NONE,
                 Priority::DEFAULT,
@@ -55,21 +56,36 @@ impl File {
                     Err(_) => todo!(),
                 },
             ),
-            _ => {
-                if url.ends_with(".gmi") || url.ends_with(".gemini") {
-                    if matches!(*feature, Feature::Source) {
-                        text_source(&self.page, uri, cancellable)
-                    } else {
-                        text_gemini(&self.page, uri, cancellable)
+            _ => file.clone().query_info_async(
+                "standard::content-type",
+                FileQueryInfoFlags::NONE,
+                Priority::DEFAULT,
+                Some(&cancellable.clone()),
+                {
+                    let page = self.page.clone();
+                    move |result| match result {
+                        Ok(file_info) => match file_info.content_type() {
+                            Some(content_type) => match content_type.as_str() {
+                                "text/plain" => {
+                                    if matches!(*feature, Feature::Source) {
+                                        text_source(page, file, uri, cancellable)
+                                    } else if url.ends_with(".txt") {
+                                        text_plain(page, file, uri, cancellable)
+                                    } else {
+                                        text_gemini(page, file, uri, cancellable)
+                                    }
+                                }
+                                "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                    todo!()
+                                }
+                                _ => status_failure(page, "Unsupported content type"),
+                            },
+                            None => status_failure(page, "Undetectable content type"),
+                        },
+                        Err(e) => status_failure(page, &e.to_string()),
                     }
-                } else if url.ends_with(".txt") {
-                    text_plain(&self.page, uri, cancellable)
-                } else if !url.ends_with("/") {
-                    text_gemini(&self.page, uri, cancellable)
-                } else {
-                    status_failure(&self.page, "Unsupported content type")
-                }
-            }
+                },
+            ),
         }
     }
 }
@@ -77,55 +93,35 @@ impl File {
 // Tools
 
 /// Handle as `text/source`
-fn text_source(page: &Rc<Page>, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(&uri.to_string(), cancellable, {
-        let page = page.clone();
-        let uri = uri.clone();
-        move |data| text(page, uri, Text::Source(data))
-    });
+fn text_source(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
+    load_contents_async(file, cancellable, move |result| match result {
+        Ok(data) => text(page, uri, Text::Source(data)),
+        Err(message) => status_failure(page, &message),
+    })
 }
 
 /// Handle as `text/gemini`
-fn text_gemini(page: &Rc<Page>, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(&uri.to_string(), cancellable, {
-        let page = page.clone();
-        let uri = uri.clone();
-        move |data| text(page, uri, Text::Gemini(data))
-    });
+fn text_gemini(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
+    load_contents_async(file, cancellable, move |result| match result {
+        Ok(data) => text(page, uri, Text::Gemini(data)),
+        Err(message) => status_failure(page, &message),
+    })
 }
 
 /// Handle as `text/plain`
-fn text_plain(page: &Rc<Page>, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(&uri.to_string(), cancellable, {
-        let page = page.clone();
-        let uri = uri.clone();
-        move |data| text(page, uri, Text::Plain(data))
+fn text_plain(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
+    load_contents_async(file, cancellable, move |result| match result {
+        Ok(data) => text(page, uri, Text::Plain(data)),
+        Err(message) => status_failure(page, &message),
     });
 }
 
 /// Handle as failure status page
-fn status_failure(page: &Rc<Page>, message: &str) {
+fn status_failure(page: Rc<Page>, message: &str) {
     let status = page.content.to_status_failure();
     status.set_description(Some(message));
     page.set_title(&status.title());
     page.set_progress(0.0);
-}
-
-fn load_contents_async(
-    url: &str,
-    cancellable: Cancellable,
-    on_success: impl FnOnce(String) + 'static,
-) {
-    use gtk::prelude::FileExtManual;
-    gtk::gio::File::for_uri(url).load_contents_async(Some(&cancellable), {
-        move |result| match result {
-            Ok((ref buffer, _)) => match String::from_utf8(buffer.to_vec()) {
-                Ok(data) => on_success(data),
-                Err(_) => todo!(),
-            },
-            Err(_) => todo!(),
-        }
-    })
 }
 
 enum Text {
@@ -148,6 +144,25 @@ fn text(page: Rc<Page>, uri: Uri, text: Text) {
     });
     page.set_progress(0.0);
     page.window_action.find.simple_action.set_enabled(true);
+}
+
+fn load_contents_async(
+    file: gtk::gio::File,
+    cancellable: Cancellable,
+    callback: impl FnOnce(Result<String, String>) + 'static,
+) {
+    use gtk::prelude::FileExtManual;
+    file.load_contents_async(Some(&cancellable), {
+        move |result| {
+            callback(match result {
+                Ok((ref buffer, _)) => match String::from_utf8(buffer.to_vec()) {
+                    Ok(data) => Ok(data),
+                    Err(e) => Err(e.to_string()),
+                },
+                Err(e) => Err(e.to_string()),
+            })
+        }
+    })
 }
 
 /// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
