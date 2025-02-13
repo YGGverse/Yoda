@@ -1,3 +1,4 @@
+mod image;
 mod status;
 mod text;
 
@@ -24,6 +25,7 @@ impl File {
             glib::Priority,
             prelude::{FileExt, FileExtManual},
         };
+        use image::Image;
         use status::Status;
         use text::Text;
 
@@ -98,7 +100,10 @@ impl File {
                                     }
                                 }
                                 "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                                    todo!()
+                                    match gtk::gdk::Texture::from_file(&file) {
+                                        Ok(texture) => Image::Bitmap(uri, texture).handle(page),
+                                        Err(e) => Status::Failure(e.to_string()).handle(page),
+                                    }
                                 }
                                 mime => Status::Failure(format!(
                                     "Content type `{mime}` yet not supported"
