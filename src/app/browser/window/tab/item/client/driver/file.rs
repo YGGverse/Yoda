@@ -1,9 +1,8 @@
+mod status;
+mod text;
+
 use super::{Feature, Page};
-use gtk::{
-    gio::Cancellable,
-    glib::{GString, Uri},
-};
-use sourceview::prelude::FileExt;
+use gtk::{gio::Cancellable, glib::Uri};
 use std::rc::Rc;
 
 /// Local files client driver
@@ -23,8 +22,10 @@ impl File {
         use gtk::{
             gio::{File, FileQueryInfoFlags, FileType},
             glib::Priority,
-            prelude::FileExtManual,
+            prelude::{FileExt, FileExtManual},
         };
+        use status::Status;
+        use text::Text;
 
         let url = uri.to_string();
         let file = File::for_uri(&url);
@@ -70,22 +71,28 @@ impl File {
                                     if matches!(*feature, Feature::Source) {
                                         load_contents_async(file, cancellable, move |result| {
                                             match result {
-                                                Ok(data) => text(page, uri, Text::Source(data)),
-                                                Err(message) => failure(page, &message),
+                                                Ok(data) => Text::Source(uri, data).handle(page),
+                                                Err(message) => {
+                                                    Status::Failure(message).handle(page)
+                                                }
                                             }
                                         })
                                     } else if url.ends_with(".txt") {
                                         load_contents_async(file, cancellable, move |result| {
                                             match result {
-                                                Ok(data) => text(page, uri, Text::Plain(data)),
-                                                Err(message) => failure(page, &message),
+                                                Ok(data) => Text::Plain(uri, data).handle(page),
+                                                Err(message) => {
+                                                    Status::Failure(message).handle(page)
+                                                }
                                             }
                                         });
                                     } else {
                                         load_contents_async(file, cancellable, move |result| {
                                             match result {
-                                                Ok(data) => text(page, uri, Text::Gemini(data)),
-                                                Err(message) => failure(page, &message),
+                                                Ok(data) => Text::Gemini(uri, data).handle(page),
+                                                Err(message) => {
+                                                    Status::Failure(message).handle(page)
+                                                }
                                             }
                                         })
                                     }
@@ -93,11 +100,15 @@ impl File {
                                 "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                     todo!()
                                 }
-                                _ => failure(page, "Unsupported content type"),
+                                mime => Status::Failure(format!(
+                                    "Content type `{mime}` yet not supported"
+                                ))
+                                .handle(page),
                             },
-                            None => failure(page, "Undetectable content type"),
+                            None => Status::Failure("Undetectable content type".to_string())
+                                .handle(page),
                         },
-                        Err(e) => failure(page, &e.to_string()),
+                        Err(e) => Status::Failure(e.to_string()).handle(page),
                     }
                 },
             ),
@@ -106,36 +117,6 @@ impl File {
 }
 
 // Tools
-
-/// Handle as failure status page
-fn failure(page: Rc<Page>, message: &str) {
-    let status = page.content.to_status_failure();
-    status.set_description(Some(message));
-    page.set_title(&status.title());
-    page.set_progress(0.0);
-}
-
-enum Text {
-    Gemini(String),
-    Plain(String),
-    Source(String),
-}
-
-/// Handle as text
-fn text(page: Rc<Page>, uri: Uri, text: Text) {
-    let widget = match text {
-        Text::Gemini(data) => page.content.to_text_gemini(&uri, &data),
-        Text::Plain(data) => page.content.to_text_plain(&data),
-        Text::Source(data) => page.content.to_text_source(&data),
-    };
-    page.search.set(Some(widget.text_view));
-    page.set_title(&match widget.meta.title {
-        Some(title) => title.into(), // @TODO
-        None => uri_to_title(&uri),
-    });
-    page.set_progress(0.0);
-    page.window_action.find.simple_action.set_enabled(true);
-}
 
 fn load_contents_async(
     file: gtk::gio::File,
@@ -154,19 +135,4 @@ fn load_contents_async(
             })
         }
     })
-}
-
-/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-/// * useful as common placeholder when page title could not be detected
-/// * this feature may be improved and moved outside @TODO
-fn uri_to_title(uri: &Uri) -> GString {
-    let path = uri.path();
-    if path.split('/').last().unwrap_or_default().is_empty() {
-        match uri.host() {
-            Some(host) => host,
-            None => "Untitled".into(),
-        }
-    } else {
-        path
-    }
 }
