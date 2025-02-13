@@ -65,6 +65,7 @@ impl Client {
                 match result {
                     // route by scheme
                     Ok(uri) => match uri.scheme().as_str() {
+                        "file" => driver.file.handle(uri, feature, cancellable),
                         "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
                         scheme => {
                             // no scheme match driver, complete with failure message
