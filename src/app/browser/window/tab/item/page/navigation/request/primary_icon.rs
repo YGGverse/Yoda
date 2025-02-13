@@ -3,6 +3,10 @@ pub enum PrimaryIcon<'a> {
         name: &'a str,
         tooltip: &'a str,
     },
+    File {
+        name: &'a str,
+        tooltip: &'a str,
+    },
     Gemini {
         name: &'a str,
         tooltip: (&'a str, &'a str),
@@ -28,6 +32,13 @@ pub fn from(request: &str) -> PrimaryIcon {
         return PrimaryIcon::Download {
             name: "document-save-symbolic",
             tooltip: "Download",
+        };
+    }
+
+    if prefix.starts_with("file:") {
+        return PrimaryIcon::File {
+            name: "drive-harddisk-symbolic", // `user-desktop-symbolic`
+            tooltip: ("Local browser"),
         };
     }
 

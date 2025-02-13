@@ -219,7 +219,7 @@ impl Request for Entry {
         self.first_child().unwrap().remove_css_class("success"); // @TODO handle
 
         match primary_icon::from(&self.text()) {
-            PrimaryIcon::Download { name, tooltip } => {
+            PrimaryIcon::Download { name, tooltip } | PrimaryIcon::File { name, tooltip } => {
                 self.set_primary_icon_activatable(false);
                 self.set_primary_icon_sensitive(false);
                 self.set_primary_icon_name(Some(name));
