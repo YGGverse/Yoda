@@ -1,12 +1,9 @@
-use super::Page;
-use std::rc::Rc;
-
 pub enum Status {
     Failure(String),
 }
 
 impl Status {
-    pub fn handle(&self, page: Rc<Page>) {
+    pub fn handle(&self, page: &super::Page) {
         let (message, widget) = match self {
             Self::Failure(message) => (message, page.content.to_status_failure()),
         };

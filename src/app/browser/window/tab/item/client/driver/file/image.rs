@@ -1,6 +1,4 @@
-use super::Page;
 use gtk::{gdk::Texture, glib::Uri};
-use std::rc::Rc;
 
 pub enum Image {
     Bitmap(Uri, Texture),
@@ -8,7 +6,7 @@ pub enum Image {
 }
 
 impl Image {
-    pub fn handle(&self, page: Rc<Page>) {
+    pub fn handle(&self, page: &super::Page) {
         let uri = match self {
             Self::Bitmap(uri, texture) => {
                 page.content.to_image(texture);

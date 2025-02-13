@@ -1,6 +1,4 @@
-use super::Page;
 use gtk::glib::Uri;
-use std::rc::Rc;
 
 pub enum Text {
     Gemini(Uri, String),
@@ -9,7 +7,7 @@ pub enum Text {
 }
 
 impl Text {
-    pub fn handle(&self, page: Rc<Page>) {
+    pub fn handle(&self, page: &super::Page) {
         let (uri, widget) = match self {
             Self::Gemini(uri, data) => (uri, page.content.to_text_gemini(uri, data)),
             Self::Plain(uri, data) => (uri, page.content.to_text_plain(data)),
