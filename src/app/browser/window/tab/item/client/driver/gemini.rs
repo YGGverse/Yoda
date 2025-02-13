@@ -7,7 +7,6 @@ use ggemini::{
     client::{Client, Request, Response},
     gio::{file_output_stream, memory_input_stream},
 };
-use gtk::glib::GString;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
@@ -169,7 +168,7 @@ fn handle(
                         Feature::Download => {
                             // Init download widget
                             let status = page.content.to_status_download(
-                                uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                                crate::tool::uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
                                 // format FS entities
                                 &cancellable,
                                 {
@@ -264,7 +263,7 @@ fn handle(
                                                         page.search.set(Some(widget.text_view));
                                                         page.set_title(&match widget.meta.title {
                                                             Some(title) => title.into(), // @TODO
-                                                            None => uri_to_title(&uri),
+                                                            None => crate::tool::uri_to_title(&uri),
                                                         });
                                                         page.set_progress(0.0);
                                                         page.window_action
@@ -330,7 +329,7 @@ fn handle(
                                                         move |result| {
                                                             match result {
                                                                 Ok(buffer) => {
-                                                                    page.set_title(&uri_to_title(&uri));
+                                                                    page.set_title(&crate::tool::uri_to_title(&uri));
                                                                     page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                 }
                                                                 Err(e) => {
@@ -468,19 +467,4 @@ fn handle(
             }
         },
     )
-}
-
-/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-/// * useful as common placeholder when page title could not be detected
-/// * this feature may be improved and moved outside @TODO
-fn uri_to_title(uri: &Uri) -> GString {
-    let path = uri.path();
-    if path.split('/').last().unwrap_or_default().is_empty() {
-        match uri.host() {
-            Some(host) => host,
-            None => "Untitled".into(),
-        }
-    } else {
-        path
-    }
 }

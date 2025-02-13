@@ -26,3 +26,18 @@ impl Format for usize {
         }
     }
 }
+
+/// Helper function, extract readable title from [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+/// * this feature wants to be improved @TODO
+pub fn uri_to_title(uri: &gtk::glib::Uri) -> gtk::glib::GString {
+    let path = uri.path();
+
+    if path.split('/').last().unwrap_or_default().is_empty() {
+        match uri.host() {
+            Some(host) => host,
+            None => "Untitled".into(),
+        }
+    } else {
+        path
+    }
+}
