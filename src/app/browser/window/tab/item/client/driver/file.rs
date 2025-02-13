@@ -68,21 +68,36 @@ impl File {
                             Some(content_type) => match content_type.as_str() {
                                 "text/plain" => {
                                     if matches!(*feature, Feature::Source) {
-                                        text_source(page, file, uri, cancellable)
+                                        load_contents_async(file, cancellable, move |result| {
+                                            match result {
+                                                Ok(data) => text(page, uri, Text::Source(data)),
+                                                Err(message) => failure(page, &message),
+                                            }
+                                        })
                                     } else if url.ends_with(".txt") {
-                                        text_plain(page, file, uri, cancellable)
+                                        load_contents_async(file, cancellable, move |result| {
+                                            match result {
+                                                Ok(data) => text(page, uri, Text::Plain(data)),
+                                                Err(message) => failure(page, &message),
+                                            }
+                                        });
                                     } else {
-                                        text_gemini(page, file, uri, cancellable)
+                                        load_contents_async(file, cancellable, move |result| {
+                                            match result {
+                                                Ok(data) => text(page, uri, Text::Gemini(data)),
+                                                Err(message) => failure(page, &message),
+                                            }
+                                        })
                                     }
                                 }
                                 "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
                                     todo!()
                                 }
-                                _ => status_failure(page, "Unsupported content type"),
+                                _ => failure(page, "Unsupported content type"),
                             },
-                            None => status_failure(page, "Undetectable content type"),
+                            None => failure(page, "Undetectable content type"),
                         },
-                        Err(e) => status_failure(page, &e.to_string()),
+                        Err(e) => failure(page, &e.to_string()),
                     }
                 },
             ),
@@ -92,32 +107,8 @@ impl File {
 
 // Tools
 
-/// Handle as `text/source`
-fn text_source(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(file, cancellable, move |result| match result {
-        Ok(data) => text(page, uri, Text::Source(data)),
-        Err(message) => status_failure(page, &message),
-    })
-}
-
-/// Handle as `text/gemini`
-fn text_gemini(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(file, cancellable, move |result| match result {
-        Ok(data) => text(page, uri, Text::Gemini(data)),
-        Err(message) => status_failure(page, &message),
-    })
-}
-
-/// Handle as `text/plain`
-fn text_plain(page: Rc<Page>, file: gtk::gio::File, uri: Uri, cancellable: Cancellable) {
-    load_contents_async(file, cancellable, move |result| match result {
-        Ok(data) => text(page, uri, Text::Plain(data)),
-        Err(message) => status_failure(page, &message),
-    });
-}
-
 /// Handle as failure status page
-fn status_failure(page: Rc<Page>, message: &str) {
+fn failure(page: Rc<Page>, message: &str) {
     let status = page.content.to_status_failure();
     status.set_description(Some(message));
     page.set_title(&status.title());
