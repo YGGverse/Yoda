@@ -1,5 +1,4 @@
 const DEFAULT: &str = "-";
-const WIDTH: i32 = 360;
 
 pub trait Column {
     fn icon() -> Self;
