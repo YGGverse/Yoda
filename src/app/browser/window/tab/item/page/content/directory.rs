@@ -14,9 +14,10 @@ impl Directory {
         // Init children widget
         let column_view = {
             const ATTRIBUTES: &str =
-            "standard::display-name,standard::symbolic-icon,standard::size,standard::content-type";
+            "standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
 
             let column_view = gtk::ColumnView::builder()
+                // @TODO implement profile save .reorderable(true)
                 // @TODO enable this option may cause core dumped errors
                 // .single_click_activate(true)
                 .model(
@@ -32,7 +33,13 @@ impl Directory {
                 .build();
 
             column_view.append_column(&Column::icon());
-            column_view.append_column(&Column::name());
+            let name = Column::name();
+            column_view.append_column(&name);
+            column_view.append_column(&Column::size());
+            column_view.append_column(&Column::content_type());
+            //column_view.append_column(&Column::modification_date_time());
+
+            column_view.sort_by_column(Some(&name), gtk::SortType::Ascending);
             column_view
         };
 
@@ -55,12 +62,7 @@ impl Directory {
 
         // Build main widget
         ScrolledWindow::builder()
-            .child(
-                &adw::Clamp::builder()
-                    .child(&column_view)
-                    .css_classes(["view"])
-                    .build(),
-            )
+            .child(&column_view)
             .vexpand(true)
             .build()
     }

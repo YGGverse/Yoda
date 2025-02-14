@@ -1,6 +1,11 @@
+const DEFAULT: &str = "-";
+
 pub trait Column {
     fn icon() -> Self;
     fn name() -> Self;
+    fn size() -> Self;
+    fn content_type() -> Self;
+    fn modification_date_time() -> Self;
 }
 
 impl Column for gtk::ColumnViewColumn {
@@ -80,6 +85,103 @@ impl Column for gtk::ColumnViewColumn {
                                     .to_str()
                                     .unwrap(),
                             ) this feature maybe is not really wanted */
+                            .build(),
+                    ));
+                });
+                factory
+            })
+            .build()
+    }
+
+    fn size() -> Self {
+        gtk::ColumnViewColumn::builder()
+            .expand(true)
+            .title("Size")
+            .factory(&{
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_bind(|_, this| {
+                    use crate::tool::Format;
+                    use gtk::prelude::{Cast, ListItemExt};
+                    let list_item = this.downcast_ref::<gtk::ListItem>().unwrap();
+                    let item = list_item.item().unwrap();
+                    let file_info = item.downcast_ref::<gtk::gio::FileInfo>().unwrap();
+                    list_item.set_child(Some(
+                        &gtk::Label::builder()
+                            .halign(gtk::Align::Start)
+                            .ellipsize(gtk::pango::EllipsizeMode::Middle)
+                            .label((file_info.size() as usize).bytes())
+                            .build(),
+                    ));
+                });
+                factory
+            })
+            .build()
+    }
+
+    fn content_type() -> Self {
+        gtk::ColumnViewColumn::builder()
+            .expand(true)
+            .title("Content Type")
+            .factory(&{
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_bind(|_, this| {
+                    use gtk::prelude::{Cast, ListItemExt};
+                    let list_item = this.downcast_ref::<gtk::ListItem>().unwrap();
+                    let item = list_item.item().unwrap();
+                    let file_info = item.downcast_ref::<gtk::gio::FileInfo>().unwrap();
+                    let content_type: gtk::glib::GString = match file_info.content_type() {
+                        Some(content_type) => {
+                            let display_name = file_info.display_name();
+                            if content_type == "text/plain" {
+                                if display_name.ends_with(".gmi")
+                                    || display_name.ends_with(".gemini")
+                                {
+                                    "text/gemini".into()
+                                } else {
+                                    content_type
+                                }
+                            } else {
+                                content_type
+                            }
+                        }
+                        None => DEFAULT.into(),
+                    }
+                    .into();
+                    list_item.set_child(Some(
+                        &gtk::Label::builder()
+                            .halign(gtk::Align::Start)
+                            .ellipsize(gtk::pango::EllipsizeMode::Middle)
+                            .label(content_type)
+                            .build(),
+                    ));
+                });
+                factory
+            })
+            .build()
+    }
+
+    fn modification_date_time() -> Self {
+        gtk::ColumnViewColumn::builder()
+            .expand(true)
+            .title("Modified")
+            .factory(&{
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_bind(|_, this| {
+                    use gtk::prelude::{Cast, ListItemExt};
+                    let list_item = this.downcast_ref::<gtk::ListItem>().unwrap();
+                    let item = list_item.item().unwrap();
+                    let file_info = item.downcast_ref::<gtk::gio::FileInfo>().unwrap();
+                    list_item.set_child(Some(
+                        &gtk::Label::builder()
+                            .halign(gtk::Align::Start)
+                            .ellipsize(gtk::pango::EllipsizeMode::Middle)
+                            .label(
+                                file_info
+                                    .modification_date_time()
+                                    .unwrap()
+                                    .format_iso8601()
+                                    .unwrap_or(DEFAULT.into()),
+                            )
                             .build(),
                     ));
                 });
