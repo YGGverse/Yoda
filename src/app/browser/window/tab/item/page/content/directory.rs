@@ -7,27 +7,31 @@ pub struct Directory; // @TODO save settings
 impl Directory {
     // Constructors
 
-    pub fn for_file(file: &File, callback: impl Fn(&File) + 'static) -> ScrolledWindow {
+    pub fn for_file(
+        file: &File,
+        (on_ready, on_activate): (impl Fn() + 'static, impl Fn(&File) + 'static),
+    ) -> ScrolledWindow {
         use column::Column;
         use gtk::gio::FileInfo;
 
+        // Init model
+        const ATTRIBUTES: &str =
+        "standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
+
+        let directory_list = gtk::DirectoryList::builder()
+            .file(file)
+            .attributes(ATTRIBUTES)
+            .build();
+
         // Init children widget
         let column_view = {
-            const ATTRIBUTES: &str =
-            "standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
-
             let column_view = gtk::ColumnView::builder()
                 // @TODO implement profile save .reorderable(true)
                 // @TODO enable this option may cause core dumped errors
                 // .single_click_activate(true)
                 .model(
                     &gtk::SingleSelection::builder()
-                        .model(
-                            &gtk::DirectoryList::builder()
-                                .file(file)
-                                .attributes(ATTRIBUTES)
-                                .build(),
-                        )
+                        .model(&directory_list)
                         .build(),
                 )
                 .build();
@@ -49,9 +53,15 @@ impl Directory {
         };
 
         // Connect events
+        directory_list.connect_loading_notify(move |this| {
+            if !this.is_loading() {
+                on_ready()
+            }
+        });
+
         column_view.connect_activate(move |this, i| {
             use gtk::prelude::{Cast, ListModelExt};
-            callback(
+            on_activate(
                 this.model()
                     .unwrap()
                     .item(i)

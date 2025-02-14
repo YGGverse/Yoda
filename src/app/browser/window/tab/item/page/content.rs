@@ -131,7 +131,11 @@ impl Content {
         text
     }
 
-    pub fn to_directory(&self, file: &File, callback: impl Fn(&File) + 'static) {
+    pub fn to_directory(
+        &self,
+        file: &File,
+        callback: (impl Fn() + 'static, impl Fn(&File) + 'static),
+    ) {
         self.clean();
         self.g_box.append(&Directory::for_file(file, callback))
     }
