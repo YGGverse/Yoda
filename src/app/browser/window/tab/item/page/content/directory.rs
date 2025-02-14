@@ -80,7 +80,7 @@ impl Directory {
                     .factory(&{
                         let factory = gtk::SignalListItemFactory::new();
                         factory.connect_bind(|_, this| {
-                            use gtk::prelude::{Cast, FileExt, ListItemExt};
+                            use gtk::prelude::{Cast, /*FileExt,*/ ListItemExt};
                             let list_item = this.downcast_ref::<ListItem>().unwrap();
                             let item = list_item.item().unwrap();
                             let file_info = item.downcast_ref::<FileInfo>().unwrap();
@@ -89,7 +89,7 @@ impl Directory {
                                     .halign(Align::Start)
                                     .ellipsize(gtk::pango::EllipsizeMode::Middle)
                                     .label(file_info.display_name())
-                                    .tooltip_text(
+                                    /*.tooltip_text(
                                         file_info
                                             .attribute_object("standard::file")
                                             .unwrap()
@@ -99,7 +99,7 @@ impl Directory {
                                             .unwrap()
                                             .to_str()
                                             .unwrap(),
-                                    )
+                                    ) this feature maybe is not really wanted */
                                     .build(),
                             ));
                         });
