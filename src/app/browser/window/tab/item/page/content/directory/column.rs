@@ -18,6 +18,7 @@ impl Column for gtk::ColumnViewColumn {
 
         ColumnViewColumn::builder()
             .title("Type")
+            .resizable(false)
             .factory(&{
                 let factory = SignalListItemFactory::new();
                 factory.connect_bind(|_, this| {
@@ -61,6 +62,7 @@ impl Column for gtk::ColumnViewColumn {
     fn name() -> Self {
         gtk::ColumnViewColumn::builder()
             .expand(true)
+            .resizable(true)
             .title("Name")
             .factory(&{
                 let factory = gtk::SignalListItemFactory::new();
@@ -96,6 +98,7 @@ impl Column for gtk::ColumnViewColumn {
     fn size() -> Self {
         gtk::ColumnViewColumn::builder()
             .expand(true)
+            .resizable(true)
             .title("Size")
             .factory(&{
                 let factory = gtk::SignalListItemFactory::new();
@@ -121,6 +124,7 @@ impl Column for gtk::ColumnViewColumn {
     fn content_type() -> Self {
         gtk::ColumnViewColumn::builder()
             .expand(true)
+            .resizable(true)
             .title("Content Type")
             .factory(&{
                 let factory = gtk::SignalListItemFactory::new();
@@ -163,6 +167,7 @@ impl Column for gtk::ColumnViewColumn {
     fn modification_date_time() -> Self {
         gtk::ColumnViewColumn::builder()
             .expand(true)
+            .resizable(true)
             .title("Modified")
             .factory(&{
                 let factory = gtk::SignalListItemFactory::new();
