@@ -131,9 +131,9 @@ impl Content {
         text
     }
 
-    pub fn to_directory(&self, file: &File) {
+    pub fn to_directory(&self, file: &File, callback: impl Fn(&File) + 'static) {
         self.clean();
-        self.g_box.append(&Directory::for_file(file))
+        self.g_box.append(&Directory::for_file(file, callback))
     }
 
     /// * system `source:`
