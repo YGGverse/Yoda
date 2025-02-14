@@ -26,7 +26,7 @@ impl Directory {
                             .build();
                         column_view.append_column(
                             &gtk::ColumnViewColumn::builder()
-                                .title("Icon")
+                                .title("Type")
                                 .factory(&{
                                     use gtk::prelude::{BoxExt, Cast, ListItemExt, WidgetExt};
                                     let factory = gtk::SignalListItemFactory::new();
