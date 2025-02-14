@@ -1,11 +1,12 @@
 const DEFAULT: &str = "-";
+const WIDTH: i32 = 360;
 
 pub trait Column {
     fn icon() -> Self;
-    fn name() -> Self;
-    fn size() -> Self;
-    fn content_type() -> Self;
-    fn modification_date_time() -> Self;
+    fn name(width: i32) -> Self;
+    fn size(width: i32) -> Self;
+    fn content_type(width: i32) -> Self;
+    fn modification_date_time(width: i32) -> Self;
 }
 
 impl Column for gtk::ColumnViewColumn {
@@ -18,7 +19,6 @@ impl Column for gtk::ColumnViewColumn {
 
         ColumnViewColumn::builder()
             .title("Type")
-            .resizable(false)
             .factory(&{
                 let factory = SignalListItemFactory::new();
                 factory.connect_bind(|_, this| {
@@ -59,9 +59,9 @@ impl Column for gtk::ColumnViewColumn {
             .build()
     }
 
-    fn name() -> Self {
+    fn name(width: i32) -> Self {
         gtk::ColumnViewColumn::builder()
-            .expand(true)
+            .fixed_width(width)
             .resizable(true)
             .title("Name")
             .factory(&{
@@ -95,9 +95,9 @@ impl Column for gtk::ColumnViewColumn {
             .build()
     }
 
-    fn size() -> Self {
+    fn size(width: i32) -> Self {
         gtk::ColumnViewColumn::builder()
-            .expand(true)
+            .fixed_width(width)
             .resizable(true)
             .title("Size")
             .factory(&{
@@ -121,9 +121,9 @@ impl Column for gtk::ColumnViewColumn {
             .build()
     }
 
-    fn content_type() -> Self {
+    fn content_type(width: i32) -> Self {
         gtk::ColumnViewColumn::builder()
-            .expand(true)
+            .fixed_width(width)
             .resizable(true)
             .title("Content Type")
             .factory(&{
@@ -164,9 +164,9 @@ impl Column for gtk::ColumnViewColumn {
             .build()
     }
 
-    fn modification_date_time() -> Self {
+    fn modification_date_time(width: i32) -> Self {
         gtk::ColumnViewColumn::builder()
-            .expand(true)
+            .fixed_width(width)
             .resizable(true)
             .title("Modified")
             .factory(&{

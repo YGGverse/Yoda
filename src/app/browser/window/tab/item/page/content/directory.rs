@@ -2,7 +2,7 @@ mod column;
 
 use gtk::{gio::File, ScrolledWindow};
 
-pub struct Directory;
+pub struct Directory; // @TODO save settings
 
 impl Directory {
     // Constructors
@@ -32,12 +32,17 @@ impl Directory {
                 )
                 .build();
 
-            column_view.append_column(&Column::icon());
-            let name = Column::name();
+            let icon = Column::icon();
+            let name = Column::name(360);
+            let size = Column::size(120);
+            let content_type = Column::content_type(180);
+            //let modification_date_time = Column::modification_date_time();
+
+            column_view.append_column(&icon);
             column_view.append_column(&name);
-            column_view.append_column(&Column::size());
-            column_view.append_column(&Column::content_type());
-            //column_view.append_column(&Column::modification_date_time());
+            column_view.append_column(&size);
+            column_view.append_column(&content_type);
+            //column_view.append_column(&modification_date_time);
 
             column_view.sort_by_column(Some(&name), gtk::SortType::Ascending);
             column_view
