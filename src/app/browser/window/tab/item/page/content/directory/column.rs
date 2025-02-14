@@ -1,4 +1,5 @@
 const DEFAULT: &str = "-";
+const DATE_TIME_FORMAT: &str = "%Y.%m.%d %H:%M:%S";
 
 pub trait Column {
     fn icon() -> Self;
@@ -185,7 +186,7 @@ impl Column for gtk::ColumnViewColumn {
                                 file_info
                                     .creation_date_time()
                                     .unwrap()
-                                    .format_iso8601()
+                                    .format(DATE_TIME_FORMAT) // @TODO optional
                                     .unwrap_or(DEFAULT.into()),
                             )
                             .build(),
@@ -216,7 +217,7 @@ impl Column for gtk::ColumnViewColumn {
                                 file_info
                                     .modification_date_time()
                                     .unwrap()
-                                    .format_iso8601()
+                                    .format(DATE_TIME_FORMAT) // @TODO optional
                                     .unwrap_or(DEFAULT.into()),
                             )
                             .build(),
@@ -247,7 +248,7 @@ impl Column for gtk::ColumnViewColumn {
                                 file_info
                                     .access_date_time()
                                     .unwrap()
-                                    .format_iso8601()
+                                    .format(DATE_TIME_FORMAT) // @TODO optional
                                     .unwrap_or(DEFAULT.into()),
                             )
                             .build(),
