@@ -16,7 +16,7 @@ impl Directory {
 
         // Init model
         const ATTRIBUTES: &str =
-        "standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
+        "standard::type,standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
 
         let directory_list = gtk::DirectoryList::builder()
             .file(file)
