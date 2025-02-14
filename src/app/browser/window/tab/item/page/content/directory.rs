@@ -61,7 +61,8 @@ impl Directory {
                                                 _ => None,
                                             },
                                         );
-                                        let container = gtk::Box::builder().build(); // prevents `gtk::Image` blur
+                                        let container =
+                                            gtk::Box::builder().halign(gtk::Align::Center).build(); // prevents `gtk::Image` blur
                                         container.append(&image);
                                         list_item.set_child(Some(&container));
                                     });
