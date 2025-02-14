@@ -151,8 +151,7 @@ impl Column for gtk::ColumnViewColumn {
                             }
                         }
                         None => DEFAULT.into(),
-                    }
-                    .into();
+                    };
                     list_item.set_child(Some(
                         &gtk::Label::builder()
                             .halign(gtk::Align::Start)
