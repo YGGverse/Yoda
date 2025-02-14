@@ -1,3 +1,4 @@
+mod directory;
 mod image;
 mod status;
 mod text;
@@ -20,10 +21,11 @@ impl File {
     }
 
     pub fn handle(&self, uri: Uri, feature: Rc<Feature>, cancellable: Cancellable) {
+        use directory::Directory;
         use gtk::{
             gio::{File, FileQueryInfoFlags, FileType},
             glib::Priority,
-            prelude::{FileExt, FileExtManual},
+            prelude::FileExt,
         };
         use image::Image;
         use status::Status;
@@ -34,32 +36,7 @@ impl File {
         let page = self.page.clone();
 
         match file.query_file_type(FileQueryInfoFlags::NONE, Some(&cancellable)) {
-            FileType::Directory => file.enumerate_children_async(
-                "standard::content-type",
-                FileQueryInfoFlags::NONE,
-                Priority::DEFAULT,
-                Some(&cancellable),
-                move |result| match result {
-                    Ok(file_enumerator) => {
-                        for entry in file_enumerator {
-                            match entry {
-                                Ok(file_info) => match file_info.file_type() {
-                                    FileType::Unknown => todo!(),
-                                    FileType::Regular => todo!(),
-                                    FileType::Directory => todo!(),
-                                    FileType::SymbolicLink => todo!(),
-                                    FileType::Special => todo!(),
-                                    FileType::Shortcut => todo!(),
-                                    FileType::Mountable => todo!(),
-                                    _ => todo!(),
-                                },
-                                Err(e) => Status::Failure(e.to_string()).handle(&page),
-                            }
-                        }
-                    }
-                    Err(e) => Status::Failure(e.to_string()).handle(&page),
-                },
-            ),
+            FileType::Directory => Directory { file }.handle(&page),
             _ => file.clone().query_info_async(
                 "standard::content-type",
                 FileQueryInfoFlags::NONE,

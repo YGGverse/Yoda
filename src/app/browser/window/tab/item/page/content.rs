@@ -1,7 +1,9 @@
+mod directory;
 mod image;
 mod status;
 mod text;
 
+use directory::Directory;
 use image::Image;
 use text::Text;
 
@@ -127,6 +129,11 @@ impl Content {
         let text = Text::plain(data);
         self.g_box.append(&text.scrolled_window);
         text
+    }
+
+    pub fn to_directory(&self, file: &File) {
+        self.clean();
+        self.g_box.append(&Directory::for_file(file))
     }
 
     /// * system `source:`
