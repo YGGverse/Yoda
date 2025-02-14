@@ -16,7 +16,7 @@ impl Directory {
 
         // Init model
         const ATTRIBUTES: &str =
-        "standard::type,standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,standard::modification-date-time";
+        "standard::type,standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,time::modified,time::created,time::access";
 
         let directory_list = gtk::DirectoryList::builder()
             .file(file)
@@ -40,13 +40,17 @@ impl Directory {
             let name = Column::name(360);
             let size = Column::size(120);
             let content_type = Column::content_type(180);
-            //let modification_date_time = Column::modification_date_time();
+            let creation_date_time = Column::creation_date_time(220);
+            let modification_date_time = Column::modification_date_time(220);
+            let access_date_time = Column::access_date_time(220);
 
             column_view.append_column(&icon);
             column_view.append_column(&name);
-            column_view.append_column(&size);
             column_view.append_column(&content_type);
-            //column_view.append_column(&modification_date_time);
+            column_view.append_column(&size);
+            column_view.append_column(&creation_date_time);
+            column_view.append_column(&modification_date_time);
+            column_view.append_column(&access_date_time);
 
             column_view.sort_by_column(Some(&name), gtk::SortType::Ascending);
             column_view

@@ -5,7 +5,9 @@ pub trait Column {
     fn name(width: i32) -> Self;
     fn size(width: i32) -> Self;
     fn content_type(width: i32) -> Self;
+    fn creation_date_time(width: i32) -> Self;
     fn modification_date_time(width: i32) -> Self;
+    fn access_date_time(width: i32) -> Self;
 }
 
 impl Column for gtk::ColumnViewColumn {
@@ -163,6 +165,37 @@ impl Column for gtk::ColumnViewColumn {
             .build()
     }
 
+    fn creation_date_time(width: i32) -> Self {
+        gtk::ColumnViewColumn::builder()
+            .fixed_width(width)
+            .resizable(true)
+            .title("Created")
+            .factory(&{
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_bind(|_, this| {
+                    use gtk::prelude::{Cast, ListItemExt};
+                    let list_item = this.downcast_ref::<gtk::ListItem>().unwrap();
+                    let item = list_item.item().unwrap();
+                    let file_info = item.downcast_ref::<gtk::gio::FileInfo>().unwrap();
+                    list_item.set_child(Some(
+                        &gtk::Label::builder()
+                            .halign(gtk::Align::Start)
+                            .ellipsize(gtk::pango::EllipsizeMode::Middle)
+                            .label(
+                                file_info
+                                    .creation_date_time()
+                                    .unwrap()
+                                    .format_iso8601()
+                                    .unwrap_or(DEFAULT.into()),
+                            )
+                            .build(),
+                    ));
+                });
+                factory
+            })
+            .build()
+    }
+
     fn modification_date_time(width: i32) -> Self {
         gtk::ColumnViewColumn::builder()
             .fixed_width(width)
@@ -182,6 +215,37 @@ impl Column for gtk::ColumnViewColumn {
                             .label(
                                 file_info
                                     .modification_date_time()
+                                    .unwrap()
+                                    .format_iso8601()
+                                    .unwrap_or(DEFAULT.into()),
+                            )
+                            .build(),
+                    ));
+                });
+                factory
+            })
+            .build()
+    }
+
+    fn access_date_time(width: i32) -> Self {
+        gtk::ColumnViewColumn::builder()
+            .fixed_width(width)
+            .resizable(true)
+            .title("Accessed")
+            .factory(&{
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_bind(|_, this| {
+                    use gtk::prelude::{Cast, ListItemExt};
+                    let list_item = this.downcast_ref::<gtk::ListItem>().unwrap();
+                    let item = list_item.item().unwrap();
+                    let file_info = item.downcast_ref::<gtk::gio::FileInfo>().unwrap();
+                    list_item.set_child(Some(
+                        &gtk::Label::builder()
+                            .halign(gtk::Align::Start)
+                            .ellipsize(gtk::pango::EllipsizeMode::Middle)
+                            .label(
+                                file_info
+                                    .access_date_time()
                                     .unwrap()
                                     .format_iso8601()
                                     .unwrap_or(DEFAULT.into()),
