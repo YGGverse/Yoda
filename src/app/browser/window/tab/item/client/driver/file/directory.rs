@@ -7,15 +7,14 @@ pub struct Directory {
 
 impl Directory {
     pub fn handle(&self, page: &Rc<super::Page>) {
+        page.set_progress(1.0);
         page.content.to_directory(
             &self.file,
             (
                 // on ready
                 {
                     let page = page.clone();
-                    move || {
-                        page.set_progress(0.0);
-                    }
+                    move || page.set_progress(0.0)
                 },
                 // on activate
                 {
@@ -33,7 +32,6 @@ impl Directory {
             ),
         );
         page.set_title(&self.file.parse_name());
-
         page.window_action.find.simple_action.set_enabled(false);
     }
 }
