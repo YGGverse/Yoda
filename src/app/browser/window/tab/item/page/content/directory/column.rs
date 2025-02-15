@@ -4,10 +4,7 @@ mod format;
 use display::Display;
 use format::Format;
 
-use gtk::{
-    gio::FileInfo, pango::EllipsizeMode, Align, ColumnViewColumn, Label, ListItem,
-    SignalListItemFactory,
-};
+use gtk::{gio::FileInfo, glib::GString, ColumnViewColumn, Label, ListItem, SignalListItemFactory};
 
 pub trait Column {
     fn icon() -> Self;
@@ -72,24 +69,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label(file_info.display_name())
-                            /*.tooltip_text(
-                                file_info
-                                    .attribute_object("standard::file")
-                                    .unwrap()
-                                    .downcast_ref::<File>()
-                                    .unwrap()
-                                    .path()
-                                    .unwrap()
-                                    .to_str()
-                                    .unwrap(),
-                            ) this feature maybe is not really wanted */
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label(file_info.display_name())));
                 });
                 factory
             })
@@ -109,13 +89,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label((file_info.size() as usize).bytes())
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label((file_info.size() as usize).bytes().into())));
                 });
                 factory
             })
@@ -134,13 +108,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label(file_info.format_content_type())
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label(file_info.format_content_type())));
                 });
                 factory
             })
@@ -159,13 +127,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label(file_info.format_date_time())
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label(file_info.format_date_time())));
                 });
                 factory
             })
@@ -184,13 +146,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label(file_info.format_date_time())
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label(file_info.format_date_time())));
                 });
                 factory
             })
@@ -209,16 +165,18 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(
-                        &Label::builder()
-                            .halign(Align::Start)
-                            .ellipsize(EllipsizeMode::Middle)
-                            .label(file_info.format_date_time())
-                            .build(),
-                    ));
+                    list_item.set_child(Some(&label(file_info.format_date_time())));
                 });
                 factory
             })
             .build()
     }
+}
+
+fn label(label: GString) -> Label {
+    Label::builder()
+        .halign(gtk::Align::Start)
+        .ellipsize(gtk::pango::EllipsizeMode::Middle)
+        .label(label)
+        .build()
 }
