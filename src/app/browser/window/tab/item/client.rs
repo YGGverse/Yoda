@@ -57,42 +57,34 @@ impl Client {
             snap_history(&self.page, None);
         }
 
-        // try autocomplete scheme if the request match local filename
-        if std::path::Path::new(&request).exists() {
-            self.page
-                .item_action
-                .load
-                .activate(Some(&format!("file://{request}")), is_snap_history)
-        } else {
-            // run async resolver to detect Uri, scheme-less host, or search query
-            lookup(&self.profile, request, self.cancellable(), {
-                let driver = self.driver.clone();
-                let page = self.page.clone();
-                move |feature, cancellable, result| {
-                    match result {
-                        // route by scheme
-                        Ok(uri) => match uri.scheme().as_str() {
-                            "file" => driver.file.handle(uri, feature, cancellable),
-                            "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
-                            scheme => {
-                                // no scheme match driver, complete with failure message
-                                let status = page.content.to_status_failure();
-                                status.set_description(Some(&format!(
-                                    "Scheme `{scheme}` yet not supported"
-                                )));
-                                page.set_title(&status.title());
-                                page.set_progress(0.0);
-                            }
-                        },
-                        // begin redirection to new address suggested
-                        Err(uri) => page
-                            .item_action
-                            .load
-                            .activate(Some(&uri.to_string()), false),
-                    }
+        // run async resolver to detect Uri, scheme-less host, or search query
+        lookup(&self.profile, request, self.cancellable(), {
+            let driver = self.driver.clone();
+            let page = self.page.clone();
+            move |feature, cancellable, result| {
+                match result {
+                    // route by scheme
+                    Ok(uri) => match uri.scheme().as_str() {
+                        "file" => driver.file.handle(uri, feature, cancellable),
+                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
+                        scheme => {
+                            // no scheme match driver, complete with failure message
+                            let status = page.content.to_status_failure();
+                            status.set_description(Some(&format!(
+                                "Scheme `{scheme}` yet not supported"
+                            )));
+                            page.set_title(&status.title());
+                            page.set_progress(0.0);
+                        }
+                    },
+                    // begin redirection to new address suggested
+                    Err(query) => page
+                        .item_action
+                        .load
+                        .activate(Some(&query), is_snap_history),
                 }
-            })
-        }
+            }
+        })
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
@@ -117,7 +109,7 @@ fn lookup(
     profile: &Rc<Profile>,
     query: &str,
     cancellable: Cancellable,
-    callback: impl FnOnce(Rc<Feature>, Cancellable, Result<Uri, Uri>) + 'static,
+    callback: impl FnOnce(Rc<Feature>, Cancellable, Result<Uri, String>) + 'static,
 ) {
     use gtk::{
         gio::{NetworkAddress, Resolver},
@@ -157,18 +149,33 @@ fn lookup(
                                 feature,
                                 cancellable,
                                 if resolve.is_ok() {
-                                    match Uri::parse(&suggestion, UriFlags::NONE) {
-                                        Ok(uri) => Err(uri),
-                                        Err(_) => Err(search(&profile, &query)),
+                                    Err(match Uri::parse(&suggestion, UriFlags::NONE) {
+                                        Ok(uri) => uri,
+                                        Err(_) => search(&profile, &query),
                                     }
+                                    .to_string())
                                 } else {
-                                    Err(search(&profile, &query))
+                                    const FILE_SCHEME: &str = "file://";
+                                    Err(
+                                        // try autocomplete scheme if the request match local filename
+                                        if !query.starts_with(FILE_SCHEME)
+                                            && std::path::Path::new(&query).exists()
+                                        {
+                                            format!("{FILE_SCHEME}{query}")
+                                        } else {
+                                            search(&profile, &query).to_string()
+                                        },
+                                    )
                                 },
                             )
                         }
                     },
                 ),
-                Err(_) => callback(feature, cancellable, Err(search(profile, query))),
+                Err(_) => callback(
+                    feature,
+                    cancellable,
+                    Err(search(profile, query).to_string()),
+                ),
             }
         }
     }
