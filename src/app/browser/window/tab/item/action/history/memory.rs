@@ -34,10 +34,10 @@ impl Memory {
             }
         }
 
-        // prevent duplicates at the last history position
-        // e.g. on page reload with `follow_to_index` enabled
         match index.last() {
             Some(last) => {
+                // prevent duplicates at the last history position
+                // e.g. on page reload with `follow_to_index` enabled
                 if *last != value {
                     index.push(value);
                 }
