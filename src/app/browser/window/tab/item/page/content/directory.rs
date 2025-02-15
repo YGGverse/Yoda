@@ -37,13 +37,14 @@ impl Directory {
                 )
                 .build();
 
+            // Init columns @TODO implement profile settings for width, order, etc
             let icon = Column::icon();
             let name = Column::name(360);
-            let size = Column::size(120);
-            let content_type = Column::content_type(180);
-            let creation_date_time = Column::creation_date_time(220);
-            let modification_date_time = Column::modification_date_time(220);
-            let access_date_time = Column::access_date_time(220);
+            let size = Column::size(-1);
+            let content_type = Column::content_type(-1);
+            let creation_date_time = Column::creation_date_time(-1);
+            let modification_date_time = Column::modification_date_time(-1);
+            let access_date_time = Column::access_date_time(-1);
 
             column_view.append_column(&icon);
             column_view.append_column(&name);
