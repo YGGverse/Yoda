@@ -33,5 +33,6 @@ impl Directory {
         );
         page.set_title(&self.file.parse_name());
         page.window_action.find.simple_action.set_enabled(false);
+        page.window_action.save_as.simple_action.set_enabled(false);
     }
 }

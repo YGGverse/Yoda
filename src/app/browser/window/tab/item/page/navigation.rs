@@ -166,6 +166,10 @@ impl Navigation {
     pub fn home(&self) -> Option<Uri> {
         self.request.home()
     }
+
+    pub fn is_file(&self) -> bool {
+        self.request.is_file()
+    }
 }
 
 // Tools

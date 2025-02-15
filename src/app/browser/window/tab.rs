@@ -463,6 +463,10 @@ fn update_actions(
                 .history_forward
                 .simple_action
                 .set_enabled(item.action.history.forward.is_enabled());
+            window_action
+                .save_as
+                .simple_action
+                .set_enabled(!item.page.navigation.is_file());
 
             window_action.change_state(Some(tab_view.page_position(tab_page)));
             return;

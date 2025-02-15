@@ -61,6 +61,7 @@ pub trait Request {
     fn source(&self) -> GString;
     fn uri(&self) -> Option<Uri>;
     fn home(&self) -> Option<Uri>;
+    fn is_file(&self) -> bool;
 }
 
 impl Request for Entry {
@@ -359,6 +360,10 @@ impl Request for Entry {
         } else {
             None
         }
+    }
+
+    fn is_file(&self) -> bool {
+        self.text().starts_with("file://")
     }
 }
 
