@@ -4,7 +4,11 @@ mod format;
 use display::Display;
 use format::Format;
 
-use gtk::{gio::FileInfo, glib::GString, ColumnViewColumn, Label, ListItem, SignalListItemFactory};
+use gtk::{
+    gio::{File, FileInfo, FileQueryInfoFlags},
+    glib::{GString, Priority},
+    ColumnViewColumn, Label, ListItem, SignalListItemFactory,
+};
 
 pub trait Column {
     fn icon() -> Self;
@@ -85,11 +89,48 @@ impl Column for ColumnViewColumn {
                 let factory = SignalListItemFactory::new();
                 factory.connect_bind(|_, this| {
                     use crate::tool::Format;
-                    use gtk::prelude::{Cast, ListItemExt};
+                    use gtk::{
+                        gio::FileType,
+                        prelude::{Cast, ListItemExt},
+                    };
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label((file_info.size() as usize).bytes().into())));
+
+                    if !matches!(file_info.file_type(), FileType::Directory) {
+                        list_item
+                            .set_child(Some(&label((file_info.size() as usize).bytes().into())))
+                    } else {
+                        use gtk::{gio::Cancellable, glib::gformat, prelude::FileExtManual};
+                        use plurify::Plurify;
+                        list_item.set_child(Some(&label("loading..".into())));
+                        file_info
+                            .attribute_object("standard::file")
+                            .unwrap()
+                            .downcast_ref::<File>()
+                            .unwrap()
+                            .enumerate_children_async(
+                                "standard::type",
+                                FileQueryInfoFlags::NONE,
+                                Priority::DEFAULT,
+                                Cancellable::NONE,
+                                {
+                                    let list_item = list_item.clone();
+                                    move |result| {
+                                        list_item.set_child(Some(&label(match result {
+                                            Ok(i) => {
+                                                let count = i.count();
+                                                gformat!(
+                                                    "{count} {}",
+                                                    count.plurify(&["item", "items", "items"])
+                                                )
+                                            }
+                                            Err(e) => e.to_string().into(),
+                                        })))
+                                    }
+                                },
+                            )
+                    }
                 });
                 factory
             })
