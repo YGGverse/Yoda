@@ -51,6 +51,8 @@ impl Memory {
         }
     }
 
+    /// Get previous history record
+    /// * change `cursor` position if `follow_to_index` match `true`
     pub fn back(&self, follow_to_index: bool) -> Option<GString> {
         let index = self.index.borrow();
         let len = index.len();
@@ -65,6 +67,8 @@ impl Memory {
         }
     }
 
+    /// Get next history record
+    /// * change `cursor` position if `follow_to_index` match `true`
     pub fn next(&self, follow_to_index: bool) -> Option<GString> {
         let index = self.index.borrow();
         let len = index.len();
