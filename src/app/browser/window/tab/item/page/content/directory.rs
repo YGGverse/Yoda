@@ -26,6 +26,7 @@ impl Directory {
         // Init children widget
         let column_view = {
             let column_view = gtk::ColumnView::builder()
+                .halign(gtk::Align::Center)
                 // @TODO implement profile save .reorderable(true)
                 // @TODO enable this option may cause core dumped errors
                 // .single_click_activate(true)
@@ -81,6 +82,7 @@ impl Directory {
 
         // Build main widget
         ScrolledWindow::builder()
+            .css_classes(["view"])
             .child(&column_view)
             .vexpand(true)
             .build()
