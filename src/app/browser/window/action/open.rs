@@ -54,7 +54,7 @@ impl Open {
     // Actions
 
     /// Formatted action connector for external implementation
-    pub fn on_activate(&self, callback: impl Fn(Option<i32>, String) + 'static) -> SignalHandlerId {
+    pub fn on_activate(&self, callback: impl Fn(Option<i32>, &str) + 'static) -> SignalHandlerId {
         use gtk::{prelude::FileExt, FileDialog, Window};
         use std::rc::Rc;
 
@@ -80,7 +80,7 @@ impl Open {
                                 } else {
                                     Some(state)
                                 },
-                                format!("file://{}", file.path().unwrap().to_str().unwrap()),
+                                file.path().unwrap().to_str().unwrap(),
                             )
                         }
                     }

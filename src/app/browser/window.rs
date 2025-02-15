@@ -129,7 +129,7 @@ impl Window {
         action.open.on_activate({
             let tab = tab.clone();
             move |position, request| {
-                tab.open(position, &request, true);
+                tab.open(position, request, true);
             }
         });
 

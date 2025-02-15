@@ -57,34 +57,42 @@ impl Client {
             snap_history(&self.page, None);
         }
 
-        // run async resolver to detect Uri, scheme-less host, or search query
-        lookup(&self.profile, request, self.cancellable(), {
-            let driver = self.driver.clone();
-            let page = self.page.clone();
-            move |feature, cancellable, result| {
-                match result {
-                    // route by scheme
-                    Ok(uri) => match uri.scheme().as_str() {
-                        "file" => driver.file.handle(uri, feature, cancellable),
-                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
-                        scheme => {
-                            // no scheme match driver, complete with failure message
-                            let status = page.content.to_status_failure();
-                            status.set_description(Some(&format!(
-                                "Scheme `{scheme}` yet not supported"
-                            )));
-                            page.set_title(&status.title());
-                            page.set_progress(0.0);
-                        }
-                    },
-                    // begin redirection to new address suggested
-                    Err(uri) => page
-                        .item_action
-                        .load
-                        .activate(Some(&uri.to_string()), false),
+        // try autocomplete scheme if the request match local filename
+        if std::path::Path::new(&request).exists() {
+            self.page
+                .item_action
+                .load
+                .activate(Some(&format!("file://{request}")), is_snap_history)
+        } else {
+            // run async resolver to detect Uri, scheme-less host, or search query
+            lookup(&self.profile, request, self.cancellable(), {
+                let driver = self.driver.clone();
+                let page = self.page.clone();
+                move |feature, cancellable, result| {
+                    match result {
+                        // route by scheme
+                        Ok(uri) => match uri.scheme().as_str() {
+                            "file" => driver.file.handle(uri, feature, cancellable),
+                            "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
+                            scheme => {
+                                // no scheme match driver, complete with failure message
+                                let status = page.content.to_status_failure();
+                                status.set_description(Some(&format!(
+                                    "Scheme `{scheme}` yet not supported"
+                                )));
+                                page.set_title(&status.title());
+                                page.set_progress(0.0);
+                            }
+                        },
+                        // begin redirection to new address suggested
+                        Err(uri) => page
+                            .item_action
+                            .load
+                            .activate(Some(&uri.to_string()), false),
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     /// Get new [Cancellable](https://docs.gtk.org/gio/class.Cancellable.html) by cancel previous one
