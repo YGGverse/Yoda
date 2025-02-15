@@ -53,10 +53,6 @@ impl Client {
         self.page.set_title("Loading..");
         self.page.set_progress(0.1);
 
-        if is_snap_history {
-            snap_history(&self.page, None);
-        }
-
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(&self.profile, request, self.cancellable(), {
             let driver = self.driver.clone();
@@ -65,8 +61,18 @@ impl Client {
                 match result {
                     // route by scheme
                     Ok(uri) => match uri.scheme().as_str() {
-                        "file" => driver.file.handle(uri, feature, cancellable),
-                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
+                        "file" => {
+                            if is_snap_history {
+                                snap_history(&page, Some(&uri));
+                            }
+                            driver.file.handle(uri, feature, cancellable)
+                        }
+                        "gemini" | "titan" => {
+                            if is_snap_history {
+                                snap_history(&page, Some(&uri));
+                            }
+                            driver.gemini.handle(uri, feature, cancellable)
+                        }
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
