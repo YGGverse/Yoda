@@ -34,7 +34,18 @@ impl Menu for gtk::gio::Menu {
             )),
         );
 
-        main.append(
+        let main_file = gtk::gio::Menu::new();
+
+        main_file.append(
+            Some("Open.."),
+            Some(&format!(
+                "{}.{}",
+                window_action.id,
+                window_action.open.simple_action.name()
+            )),
+        );
+
+        main_file.append(
             Some("Save as.."),
             Some(&format!(
                 "{}.{}",
@@ -42,6 +53,8 @@ impl Menu for gtk::gio::Menu {
                 window_action.save_as.simple_action.name()
             )),
         );
+
+        main.append_submenu(Some("File"), &main_file);
 
         let main_mark = gtk::gio::Menu::new();
 

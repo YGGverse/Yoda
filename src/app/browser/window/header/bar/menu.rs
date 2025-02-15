@@ -47,11 +47,22 @@ impl Menu for MenuButton {
                     window_action.find.simple_action.name()
                 )));
 
-                main_page.append(Some("Save as.."), Some(&format!(
-                    "{}.{}",
-                    window_action.id,
-                    window_action.save_as.simple_action.name()
-                )));
+                // Main > Page > File
+                let main_page_file = gio::Menu::new();
+
+                    main_page_file.append(Some("Open.."), Some(&format!(
+                        "{}.{}",
+                        window_action.id,
+                        window_action.open.simple_action.name()
+                    )));
+
+                    main_page_file.append(Some("Save as.."), Some(&format!(
+                        "{}.{}",
+                        window_action.id,
+                        window_action.save_as.simple_action.name()
+                    )));
+
+                main_page.append_submenu(Some("File"), &main_page_file);
 
                 // Main > Page > Mark
                 let main_page_mark = gio::Menu::new();

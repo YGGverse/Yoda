@@ -204,6 +204,14 @@ impl App {
                 format!(
                     "{}.{}",
                     browser.window.action.id,
+                    browser.window.action.open.simple_action.name()
+                ),
+                &["<Primary>o"],
+            ),
+            (
+                format!(
+                    "{}.{}",
+                    browser.window.action.id,
                     browser.window.action.source.simple_action.name()
                 ),
                 &["<Primary>u"],

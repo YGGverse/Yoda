@@ -7,6 +7,7 @@ mod history_back;
 mod history_forward;
 mod home;
 mod load;
+mod open;
 mod pin;
 mod reload;
 mod save_as;
@@ -21,6 +22,7 @@ use history_back::HistoryBack;
 use history_forward::HistoryForward;
 use home::Home;
 use load::Load;
+use open::Open;
 use pin::Pin;
 use reload::Reload;
 use save_as::SaveAs;
@@ -47,6 +49,7 @@ pub struct Action {
     pub history_forward: Rc<HistoryForward>,
     pub home: Rc<Home>,
     pub load: Rc<Load>,
+    pub open: Rc<Open>,
     pub pin: Rc<Pin>,
     pub reload: Rc<Reload>,
     pub save_as: Rc<SaveAs>,
@@ -77,6 +80,7 @@ impl Action {
         let history_forward = Rc::new(HistoryForward::new());
         let home = Rc::new(Home::new());
         let load = Rc::new(Load::new());
+        let open = Rc::new(Open::new());
         let pin = Rc::new(Pin::new());
         let reload = Rc::new(Reload::new());
         let save_as = Rc::new(SaveAs::new());
@@ -98,6 +102,7 @@ impl Action {
         simple_action_group.add_action(&history_forward.simple_action);
         simple_action_group.add_action(&home.simple_action);
         simple_action_group.add_action(&load.simple_action);
+        simple_action_group.add_action(&open.simple_action);
         simple_action_group.add_action(&pin.simple_action);
         simple_action_group.add_action(&reload.simple_action);
         simple_action_group.add_action(&save_as.simple_action);
@@ -113,13 +118,14 @@ impl Action {
             history_back,
             history_forward,
             home,
+            id,
             load,
+            open,
             pin,
             reload,
             save_as,
-            source,
-            id,
             simple_action_group,
+            source,
         }
     }
 
@@ -133,6 +139,7 @@ impl Action {
         self.history_back.change_state(state);
         self.history_forward.change_state(state);
         self.home.change_state(state);
+        self.open.change_state(state);
         self.pin.change_state(state);
         self.reload.change_state(state);
         self.save_as.change_state(state);
