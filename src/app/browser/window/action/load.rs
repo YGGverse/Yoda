@@ -6,18 +6,18 @@ use gtk::{
     prelude::StaticVariantType,
 };
 
-/// Open [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html)
-pub struct Open {
+/// Load [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html)
+pub struct Load {
     pub simple_action: SimpleAction,
 }
 
-impl Default for Open {
+impl Default for Load {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Open {
+impl Load {
     // Constructors
 
     /// Create new `Self`

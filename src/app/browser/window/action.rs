@@ -6,7 +6,7 @@ mod find;
 mod history_back;
 mod history_forward;
 mod home;
-mod open;
+mod load;
 mod pin;
 mod reload;
 mod save_as;
@@ -20,7 +20,7 @@ use find::Find;
 use history_back::HistoryBack;
 use history_forward::HistoryForward;
 use home::Home;
-use open::Open;
+use load::Load;
 use pin::Pin;
 use reload::Reload;
 use save_as::SaveAs;
@@ -46,7 +46,7 @@ pub struct Action {
     pub history_back: Rc<HistoryBack>,
     pub history_forward: Rc<HistoryForward>,
     pub home: Rc<Home>,
-    pub open: Rc<Open>,
+    pub load: Rc<Load>,
     pub pin: Rc<Pin>,
     pub reload: Rc<Reload>,
     pub save_as: Rc<SaveAs>,
@@ -76,7 +76,7 @@ impl Action {
         let history_back = Rc::new(HistoryBack::new());
         let history_forward = Rc::new(HistoryForward::new());
         let home = Rc::new(Home::new());
-        let open = Rc::new(Open::new());
+        let load = Rc::new(Load::new());
         let pin = Rc::new(Pin::new());
         let reload = Rc::new(Reload::new());
         let save_as = Rc::new(SaveAs::new());
@@ -97,7 +97,7 @@ impl Action {
         simple_action_group.add_action(&history_back.simple_action);
         simple_action_group.add_action(&history_forward.simple_action);
         simple_action_group.add_action(&home.simple_action);
-        simple_action_group.add_action(&open.simple_action);
+        simple_action_group.add_action(&load.simple_action);
         simple_action_group.add_action(&pin.simple_action);
         simple_action_group.add_action(&reload.simple_action);
         simple_action_group.add_action(&save_as.simple_action);
@@ -113,7 +113,7 @@ impl Action {
             history_back,
             history_forward,
             home,
-            open,
+            load,
             pin,
             reload,
             save_as,

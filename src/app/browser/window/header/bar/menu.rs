@@ -201,7 +201,7 @@ impl Menu for MenuButton {
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
-                                window_action.open.simple_action.name()
+                                window_action.load.simple_action.name()
                             )), Some(&request.to_variant()));
 
                         main_bookmarks.append_item(&menu_item);
@@ -215,7 +215,7 @@ impl Menu for MenuButton {
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
-                                window_action.open.simple_action.name()
+                                window_action.load.simple_action.name()
                             )), Some(&item_request.to_variant()));
 
                             main_history_tab.append_item(&menu_item);
@@ -293,7 +293,7 @@ fn menu_item(action: &WindowAction, uri: &Uri, is_parent: bool) -> gio::MenuItem
         Some(&format!(
             "{}.{}",
             action.id,
-            action.open.simple_action.name()
+            action.load.simple_action.name()
         )),
         Some(&uri.to_string().to_variant()),
     );

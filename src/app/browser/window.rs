@@ -119,7 +119,7 @@ impl Window {
             }
         });
 
-        action.open.on_activate({
+        action.load.on_activate({
             let tab = tab.clone();
             move |_, request| {
                 tab.append(Position::End, Some(&request), false, true, false, true);
