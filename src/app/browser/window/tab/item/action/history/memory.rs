@@ -21,19 +21,27 @@ impl Memory {
 
     // Actions
 
+    /// Create new record in the navigation memory
     pub fn add(&self, value: GString, follow_to_index: bool) {
-        let mut index = self.index.borrow_mut();
-
-        match index.last() {
-            Some(last) => {
-                if *last != value {
-                    index.push(value);
-                }
-            }
-            None => index.push(value),
-        }
-
         if follow_to_index {
+            // request index recording
+            let mut index = self.index.borrow_mut();
+            // drop forward history if the user continue navigation
+            // from the previous history position
+            if let Some(next) = self.cursor.borrow().next(index.len()) {
+                index.truncate(next);
+            }
+            // prevent duplicates at the last history position
+            // e.g. on page reload with `follow_to_index` enabled
+            match index.last() {
+                Some(last) => {
+                    if *last != value {
+                        index.push(value);
+                    }
+                }
+                None => index.push(value),
+            }
+            // set cursor on to the last record
             self.cursor.borrow_mut().go_last(index.len());
         }
     }
