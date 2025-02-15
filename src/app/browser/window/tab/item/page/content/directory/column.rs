@@ -73,7 +73,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label(file_info.display_name())));
+                    list_item.set_child(Some(&label(file_info.display_name(), &[])));
                 });
                 factory
             })
@@ -98,12 +98,14 @@ impl Column for ColumnViewColumn {
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
 
                     if !matches!(file_info.file_type(), FileType::Directory) {
-                        list_item
-                            .set_child(Some(&label((file_info.size() as usize).bytes().into())))
+                        list_item.set_child(Some(&label(
+                            (file_info.size() as usize).bytes().into(),
+                            &["dim-label"],
+                        )))
                     } else {
                         use gtk::{gio::Cancellable, glib::gformat, prelude::FileExtManual};
                         use plurify::Plurify;
-                        list_item.set_child(Some(&label("loading..".into())));
+                        list_item.set_child(Some(&label("loading..".into(), &["dim-label"])));
                         file_info
                             .attribute_object("standard::file")
                             .unwrap()
@@ -117,16 +119,19 @@ impl Column for ColumnViewColumn {
                                 {
                                     let list_item = list_item.clone();
                                     move |result| {
-                                        list_item.set_child(Some(&label(match result {
-                                            Ok(i) => {
-                                                let count = i.count();
-                                                gformat!(
-                                                    "{count} {}",
-                                                    count.plurify(&["item", "items", "items"])
-                                                )
-                                            }
-                                            Err(e) => e.to_string().into(),
-                                        })))
+                                        list_item.set_child(Some(&label(
+                                            match result {
+                                                Ok(i) => {
+                                                    let count = i.count();
+                                                    gformat!(
+                                                        "{count} {}",
+                                                        count.plurify(&["item", "items", "items"])
+                                                    )
+                                                }
+                                                Err(e) => e.to_string().into(),
+                                            },
+                                            &["dim-label"],
+                                        )))
                                     }
                                 },
                             )
@@ -149,7 +154,10 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label(file_info.format_content_type())));
+                    list_item.set_child(Some(&label(
+                        file_info.format_content_type(),
+                        &["dim-label"],
+                    )));
                 });
                 factory
             })
@@ -168,7 +176,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label(file_info.format_date_time())));
+                    list_item.set_child(Some(&label(file_info.format_date_time(), &["dim-label"])));
                 });
                 factory
             })
@@ -187,7 +195,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label(file_info.format_date_time())));
+                    list_item.set_child(Some(&label(file_info.format_date_time(), &["dim-label"])));
                 });
                 factory
             })
@@ -206,7 +214,7 @@ impl Column for ColumnViewColumn {
                     let list_item = this.downcast_ref::<ListItem>().unwrap();
                     let item = list_item.item().unwrap();
                     let file_info = item.downcast_ref::<FileInfo>().unwrap();
-                    list_item.set_child(Some(&label(file_info.format_date_time())));
+                    list_item.set_child(Some(&label(file_info.format_date_time(), &["dim-label"])));
                 });
                 factory
             })
@@ -214,8 +222,9 @@ impl Column for ColumnViewColumn {
     }
 }
 
-fn label(label: GString) -> Label {
+fn label(label: GString, css_classes: &[&str]) -> Label {
     Label::builder()
+        .css_classes(css_classes)
         .halign(gtk::Align::Start)
         .ellipsize(gtk::pango::EllipsizeMode::Middle)
         .label(label)
