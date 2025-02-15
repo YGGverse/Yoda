@@ -1,8 +1,9 @@
 use gtk::{
-    gio::SimpleAction,
-    glib::uuid_string_random,
+    gio::{Cancellable, SimpleAction},
+    glib::SignalHandlerId,
     prelude::{ActionExt, ToVariant},
 };
+use std::cell::RefCell;
 
 // Defaults
 
@@ -11,6 +12,7 @@ const DEFAULT_STATE: i32 = -1;
 
 /// [SimpleAction](https://docs.gtk.org/gio/class.SimpleAction.html) wrapper for `Open` action
 pub struct Open {
+    cancellable: RefCell<Cancellable>,
     pub simple_action: SimpleAction,
 }
 
@@ -26,8 +28,9 @@ impl Open {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
+            cancellable: RefCell::new(Cancellable::new()),
             simple_action: SimpleAction::new_stateful(
-                &uuid_string_random(),
+                &gtk::glib::uuid_string_random(),
                 None,
                 &DEFAULT_STATE.to_variant(),
             ),
@@ -48,11 +51,16 @@ impl Open {
         )
     }
 
-    // Events
+    // Actions
 
-    /// Define callback function for
-    /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
-    pub fn connect_activate(&self, callback: impl Fn(Option<i32>) + 'static) {
+    /// Formatted action connector for external implementation
+    pub fn on_activate(&self, callback: impl Fn(Option<i32>, String) + 'static) -> SignalHandlerId {
+        use gtk::{prelude::FileExt, FileDialog, Window};
+        use std::rc::Rc;
+
+        let cancellable = self.cancellable();
+        let callback = Rc::new(callback);
+
         self.simple_action.connect_activate(move |this, _| {
             let state = this
                 .state()
@@ -60,11 +68,37 @@ impl Open {
                 .get::<i32>()
                 .expect("Parameter type does not match `i32`");
 
-            callback(if state == DEFAULT_STATE {
-                None
-            } else {
-                Some(state)
-            })
-        });
+            FileDialog::builder()
+                .build()
+                .open(Window::NONE, Some(&cancellable), {
+                    let callback = callback.clone();
+                    move |result| {
+                        if let Ok(file) = result {
+                            callback(
+                                if state == DEFAULT_STATE {
+                                    None
+                                } else {
+                                    Some(state)
+                                },
+                                format!("file://{}", file.path().unwrap().to_str().unwrap()),
+                            )
+                        }
+                    }
+                });
+        })
+    }
+
+    // Tools
+
+    /// Gent new `Cancellable` by cancel previous one
+    fn cancellable(&self) -> Cancellable {
+        use gtk::prelude::CancellableExt;
+
+        let cancellable = self.cancellable.replace(Cancellable::new());
+        if !cancellable.is_cancelled() {
+            cancellable.cancel();
+        }
+
+        self.cancellable.borrow().clone()
     }
 }

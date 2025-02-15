@@ -303,6 +303,12 @@ impl Tab {
         }
     }
 
+    pub fn open(&self, page_position: Option<i32>, request: &str, is_snap_history: bool) {
+        if let Some(item) = self.item(page_position) {
+            item.action.load.activate(Some(request), is_snap_history);
+        }
+    }
+
     pub fn clean(
         &self,
         transaction: &Transaction,
