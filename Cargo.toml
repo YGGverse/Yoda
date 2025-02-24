@@ -1,6 +1,6 @@
 [package]
 name = "Yoda"
-version = "0.10.11"
+version = "0.10.12"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
