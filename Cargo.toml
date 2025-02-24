@@ -30,7 +30,7 @@ version = "0.9.1"
 
 [dependencies]
 ansi-parser = "0.9.1"
-ggemini = "0.16.0"
+ggemini = "0.17.0"
 ggemtext = "0.3.1"
 indexmap = "2.7.0"
 itertools = "0.14.0"
