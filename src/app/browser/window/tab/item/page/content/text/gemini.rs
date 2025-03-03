@@ -14,7 +14,7 @@ use tag::Tag;
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
 use ggemtext::line::{
-    code::{Inline, Multiline},
+    code::*,
     header::{Header, Level},
     link::Link,
     list::List,
@@ -103,6 +103,19 @@ impl Gemini {
         // Init gutter widget (the tooltip on URL tags hover)
         let gutter = Gutter::build(&text_view);
 
+        // Disable multiline format on at least one closing tag not found
+        let is_multiline_enabled = {
+            let mut m = Vec::new();
+            for (i, l) in gemtext.lines().enumerate() {
+                if (l.starts_with(multiline::TAG) || l.ends_with(multiline::TAG))
+                    && Inline::from(l).is_none()
+                {
+                    m.push(i);
+                }
+            }
+            m.len() % 2 == 0
+        };
+
         // Parse gemtext lines
         for line in gemtext.lines() {
             // Is inline code
@@ -144,86 +157,88 @@ impl Gemini {
             }
 
             // Is multiline code
-            match multiline {
-                None => {
-                    // Open tag found
-                    if let Some(code) = Multiline::begin_from(line) {
-                        // Begin next lines collection into the code buffer
-                        multiline = Some(code);
-
-                        // Skip other actions for this line
-                        continue;
-                    }
-                }
-                Some(ref mut this) => {
-                    match Multiline::continue_from(this, line) {
-                        Ok(()) => {
-                            // Close tag found:
-                            if this.completed {
-                                // Is alt provided
-                                let alt = match this.alt {
-                                    Some(ref alt) => {
-                                        // Insert alt value to the main buffer
-                                        buffer.insert_with_tags(
-                                            &mut buffer.end_iter(),
-                                            alt.as_str(),
-                                            &[&tag.title],
-                                        );
-
-                                        // Append new line after alt text
-                                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                                        // Return value as wanted also for syntax highlight detection
-                                        Some(alt)
-                                    }
-                                    None => None,
-                                };
-
-                                // Begin code block construction
-                                // Try auto-detect code syntax for given `value` and `alt` @TODO optional
-                                match syntax.highlight(&this.value, alt) {
-                                    Ok(highlight) => {
-                                        for (syntax_tag, entity) in highlight {
-                                            // Register new tag
-                                            if !tag.text_tag_table.add(&syntax_tag) {
-                                                todo!()
-                                            }
-                                            // Append tag to buffer
-                                            buffer.insert_with_tags(
-                                                &mut buffer.end_iter(),
-                                                &entity,
-                                                &[&syntax_tag],
-                                            );
-                                        }
-                                    }
-                                    Err(_) => {
-                                        // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                        for (syntax_tag, entity) in ansi::format(&this.value) {
-                                            // Register new tag
-                                            if !tag.text_tag_table.add(&syntax_tag) {
-                                                todo!()
-                                            }
-                                            // Append tag to buffer
-                                            buffer.insert_with_tags(
-                                                &mut buffer.end_iter(),
-                                                &entity,
-                                                &[&syntax_tag],
-                                            );
-                                        }
-                                    } // @TODO handle
-                                }
-
-                                // Reset
-                                multiline = None;
-                            }
+            if is_multiline_enabled {
+                match multiline {
+                    None => {
+                        // Open tag found
+                        if let Some(code) = Multiline::begin_from(line) {
+                            // Begin next lines collection into the code buffer
+                            multiline = Some(code);
 
                             // Skip other actions for this line
                             continue;
                         }
-                        Err(e) => return Err(Error::Gemtext(e.to_string())),
+                    }
+                    Some(ref mut this) => {
+                        match Multiline::continue_from(this, line) {
+                            Ok(()) => {
+                                // Close tag found:
+                                if this.completed {
+                                    // Is alt provided
+                                    let alt = match this.alt {
+                                        Some(ref alt) => {
+                                            // Insert alt value to the main buffer
+                                            buffer.insert_with_tags(
+                                                &mut buffer.end_iter(),
+                                                alt.as_str(),
+                                                &[&tag.title],
+                                            );
+
+                                            // Append new line after alt text
+                                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+
+                                            // Return value as wanted also for syntax highlight detection
+                                            Some(alt)
+                                        }
+                                        None => None,
+                                    };
+
+                                    // Begin code block construction
+                                    // Try auto-detect code syntax for given `value` and `alt` @TODO optional
+                                    match syntax.highlight(&this.value, alt) {
+                                        Ok(highlight) => {
+                                            for (syntax_tag, entity) in highlight {
+                                                // Register new tag
+                                                if !tag.text_tag_table.add(&syntax_tag) {
+                                                    todo!()
+                                                }
+                                                // Append tag to buffer
+                                                buffer.insert_with_tags(
+                                                    &mut buffer.end_iter(),
+                                                    &entity,
+                                                    &[&syntax_tag],
+                                                );
+                                            }
+                                        }
+                                        Err(_) => {
+                                            // Try ANSI/SGR format (terminal emulation) @TODO optional
+                                            for (syntax_tag, entity) in ansi::format(&this.value) {
+                                                // Register new tag
+                                                if !tag.text_tag_table.add(&syntax_tag) {
+                                                    todo!()
+                                                }
+                                                // Append tag to buffer
+                                                buffer.insert_with_tags(
+                                                    &mut buffer.end_iter(),
+                                                    &entity,
+                                                    &[&syntax_tag],
+                                                );
+                                            }
+                                        } // @TODO handle
+                                    }
+
+                                    // Reset
+                                    multiline = None;
+                                }
+
+                                // Skip other actions for this line
+                                continue;
+                            }
+                            Err(e) => return Err(Error::Gemtext(e.to_string())),
+                        }
                     }
                 }
-            };
+            }
 
             // Is header
             if let Some(header) = Header::from(line) {
