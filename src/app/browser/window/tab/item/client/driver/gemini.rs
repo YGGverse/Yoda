@@ -260,6 +260,9 @@ fn handle(
                                                                 _ => panic!() // unexpected
                                                             }
                                                         };
+                                                        if let Some(notice) = widget.meta.notice {
+                                                            page.notice(&notice)
+                                                        }
                                                         page.search.set(Some(widget.text_view));
                                                         page.set_title(&match widget.meta.title {
                                                             Some(title) => title.into(), // @TODO

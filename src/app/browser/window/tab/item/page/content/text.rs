@@ -12,6 +12,7 @@ use std::rc::Rc;
 
 pub struct Meta {
     pub title: Option<String>,
+    pub notice: Option<String>,
 } // @TODO move to separated mod
 
 pub struct Text {
@@ -27,7 +28,15 @@ impl Text {
         gemtext: &str,
     ) -> Self {
         // Init gemtext reader
-        let gemini = Gemini::build(actions, base, gemtext).unwrap(); // @TODO handle
+        let (gemini, notice) = match Gemini::build(actions, base, gemtext) {
+            Ok(gemini) => (gemini, None),
+            Err(e) => {
+                let notice = e.message();
+                match e {
+                    gemini::Error::Multiline(gemini) => (gemini, Some(notice)),
+                }
+            }
+        };
 
         // Init container widget
         let clamp_scrollable = ClampScrollable::builder()
@@ -42,6 +51,7 @@ impl Text {
             text_view: gemini.text_view,
             meta: Meta {
                 title: gemini.title,
+                notice,
             },
             scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
         }
@@ -60,7 +70,10 @@ impl Text {
         Self {
             scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
             text_view,
-            meta: Meta { title: None },
+            meta: Meta {
+                title: None,
+                notice: None,
+            },
         }
     }
 
@@ -69,7 +82,10 @@ impl Text {
         Self {
             scrolled_window: ScrolledWindow::builder().child(&source).build(),
             text_view: source.into_text_view(),
-            meta: Meta { title: None },
+            meta: Meta {
+                title: None,
+                notice: None,
+            },
         }
     }
 }

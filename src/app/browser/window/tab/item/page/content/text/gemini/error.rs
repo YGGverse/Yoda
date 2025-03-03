@@ -1,15 +1,12 @@
-use std::fmt::{Display, Formatter, Result};
-
-#[derive(Debug)]
 pub enum Error {
-    Gemtext(String),
+    Multiline(super::Gemini),
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter) -> Result {
+impl Error {
+    pub fn message(&self) -> String {
         match self {
-            Self::Gemtext(e) => {
-                write!(f, "Gemtext error: {e}")
+            Self::Multiline(_) => {
+                "Invalid multiline markup! Gemtext format partially ignored.".to_string()
             }
         }
     }

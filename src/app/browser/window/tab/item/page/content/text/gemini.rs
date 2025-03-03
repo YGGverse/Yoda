@@ -234,7 +234,7 @@ impl Gemini {
                                 // Skip other actions for this line
                                 continue;
                             }
-                            Err(e) => return Err(Error::Gemtext(e.to_string())),
+                            Err(_) => todo!(),
                         }
                     }
                 }
@@ -502,6 +502,10 @@ impl Gemini {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        Ok(Self { text_view, title })
+        if is_multiline_enabled {
+            Ok(Self { text_view, title })
+        } else {
+            Err(Error::Multiline(Self { text_view, title }))
+        }
     }
 }
