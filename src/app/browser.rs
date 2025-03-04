@@ -36,7 +36,7 @@ impl Browser {
 
         // Init widget
         let widget = Rc::new(Widget::new(
-            &window.g_box,
+            &window,
             &[
                 // action groups
                 (

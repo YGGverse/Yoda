@@ -1,12 +1,14 @@
 mod database;
 
+use super::Window;
 use adw::ApplicationWindow;
 use gtk::{
     gio::SimpleActionGroup,
     glib::GString,
-    prelude::{GtkWindowExt, IsA, WidgetExt},
+    prelude::{GtkWindowExt, WidgetExt},
 };
 use sqlite::Transaction;
+use std::rc::Rc;
 
 // Default options
 const DEFAULT_HEIGHT: i32 = 480;
@@ -19,13 +21,10 @@ pub struct Widget {
 
 impl Widget {
     // Construct
-    pub fn new(
-        content: &impl IsA<gtk::Widget>,
-        action_groups: &[(&GString, SimpleActionGroup)],
-    ) -> Self {
+    pub fn new(window: &Rc<Window>, action_groups: &[(&GString, SimpleActionGroup)]) -> Self {
         // Init GTK
         let application_window = ApplicationWindow::builder()
-            .content(content)
+            .content(&window.g_box)
             .default_height(DEFAULT_HEIGHT)
             .default_width(DEFAULT_WIDTH)
             .maximized(MAXIMIZED)
@@ -35,6 +34,21 @@ impl Widget {
         for (name, group) in action_groups {
             application_window.insert_action_group(name, Some(group));
         }
+
+        // Connect back/forward navigation buttons @TODO use constant
+        application_window.add_controller({
+            use gtk::prelude::GestureSingleExt;
+            let button_controller = gtk::GestureClick::builder().button(0).build();
+            button_controller.connect_pressed({
+                let window = window.clone();
+                move |this, _, _, _| match this.current_button() {
+                    8 => window.tab.history_back(None),
+                    9 => window.tab.history_forward(None),
+                    _ => {}
+                }
+            });
+            button_controller
+        });
 
         // Return new struct
         Self { application_window }
