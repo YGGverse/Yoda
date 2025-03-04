@@ -31,16 +31,6 @@ impl Window {
         // Init components
         let tab = Rc::new(Tab::build(profile, (browser_action, &action)));
 
-        // Init widget
-        let g_box = Box::builder().orientation(Orientation::Vertical).build();
-
-        g_box.append(&ToolbarView::header(
-            (browser_action, &action),
-            profile,
-            &tab.tab_view,
-        ));
-        g_box.append(&tab.tab_view);
-
         // Init events
         action.append.connect_activate({
             let tab = tab.clone();
@@ -134,7 +124,20 @@ impl Window {
         });
 
         // Init struct
-        Self { action, tab, g_box }
+        Self {
+            g_box: {
+                let g_box = Box::builder().orientation(Orientation::Vertical).build();
+                g_box.append(&ToolbarView::header(
+                    (browser_action, &action),
+                    profile,
+                    &tab.tab_view,
+                ));
+                g_box.append(&tab.tab_view);
+                g_box
+            },
+            action,
+            tab,
+        }
     }
 
     // Actions
