@@ -37,8 +37,9 @@ impl Widget {
 
         // Connect back/forward navigation buttons @TODO use constant
         application_window.add_controller({
-            use gtk::prelude::GestureSingleExt;
+            use gtk::prelude::{GestureExt, GestureSingleExt};
             let button_controller = gtk::GestureClick::builder().button(0).build();
+            button_controller.set_state(gtk::EventSequenceState::Denied); // prevent broken accounting warn
             button_controller.connect_pressed({
                 let window = window.clone();
                 move |this, _, _, _| match this.current_button() {
