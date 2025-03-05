@@ -105,7 +105,7 @@ impl Gemini {
 
         // Disable multiline format on at least one closing tag not found
         let is_multiline_enabled = {
-            let mut t = 0;
+            let mut t: usize = 0;
             for l in gemtext.lines() {
                 if (l.starts_with(multiline::TAG) || l.ends_with(multiline::TAG))
                     && Inline::from(l).is_none()
