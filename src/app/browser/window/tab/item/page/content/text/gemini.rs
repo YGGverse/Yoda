@@ -104,6 +104,7 @@ impl Gemini {
         let gutter = Gutter::build(&text_view);
 
         // Disable multiline format on at least one closing tag not found
+        // gemini://bbs.geminispace.org/s/Gemini/26031
         let is_multiline_enabled = {
             let mut t: usize = 0;
             for l in gemtext.lines() {
