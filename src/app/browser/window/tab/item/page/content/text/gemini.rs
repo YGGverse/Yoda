@@ -105,15 +105,15 @@ impl Gemini {
 
         // Disable multiline format on at least one closing tag not found
         let is_multiline_enabled = {
-            let mut m = Vec::new();
-            for (i, l) in gemtext.lines().enumerate() {
+            let mut t = 0;
+            for l in gemtext.lines() {
                 if (l.starts_with(multiline::TAG) || l.ends_with(multiline::TAG))
                     && Inline::from(l).is_none()
                 {
-                    m.push(i);
+                    t += 1;
                 }
             }
-            m.is_empty() || m.len() % 2 == 0
+            t == 0 || t % 2 == 0
         };
 
         // Parse gemtext lines
