@@ -12,7 +12,6 @@ use std::rc::Rc;
 
 pub struct Meta {
     pub title: Option<String>,
-    pub notice: Option<String>,
 } // @TODO move to separated mod
 
 pub struct Text {
@@ -26,54 +25,36 @@ impl Text {
         actions: (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
         gemtext: &str,
-    ) -> Self {
-        // Init gemtext reader
-        let (gemini, notice) = match Gemini::build(actions, base, gemtext) {
-            Ok(gemini) => (gemini, None),
-            Err(e) => {
-                let notice = e.message();
-                match e {
-                    gemini::Error::Multiline(gemini) => (gemini, Some(notice)),
-                }
-            }
-        };
-
-        // Init container widget
-        let clamp_scrollable = ClampScrollable::builder()
-            .child(&gemini.text_view)
-            .css_classes(["view"])
-            .maximum_size(800)
-            .build();
-
-        grab_focus_patch(&clamp_scrollable, &gemini.text_view);
-
-        Self {
-            text_view: gemini.text_view,
-            meta: Meta {
-                title: gemini.title,
-                notice,
+    ) -> Result<Self, (String, Option<Self>)> {
+        match Gemini::build(actions, base, gemtext) {
+            Ok(widget) => Ok(Self {
+                scrolled_window: reader(&widget.text_view),
+                text_view: widget.text_view,
+                meta: Meta {
+                    title: widget.title,
+                },
+            }),
+            Err(e) => match e {
+                gemini::Error::Markup(message, widget) => Err((
+                    message,
+                    Some(Self {
+                        scrolled_window: reader(&widget.text_view),
+                        text_view: widget.text_view,
+                        meta: Meta {
+                            title: widget.title,
+                        },
+                    }),
+                )),
             },
-            scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
         }
     }
 
     pub fn plain(data: &str) -> Self {
         let text_view = TextView::plain(data);
-        let clamp_scrollable = ClampScrollable::builder()
-            .child(&text_view)
-            .css_classes(["view"])
-            .maximum_size(800) // @TODO auto-expand
-            .build();
-
-        grab_focus_patch(&clamp_scrollable, &text_view);
-
         Self {
-            scrolled_window: ScrolledWindow::builder().child(&clamp_scrollable).build(),
+            scrolled_window: reader(&text_view),
             text_view,
-            meta: Meta {
-                title: None,
-                notice: None,
-            },
+            meta: Meta { title: None },
         }
     }
 
@@ -82,10 +63,7 @@ impl Text {
         Self {
             scrolled_window: ScrolledWindow::builder().child(&source).build(),
             text_view: source.into_text_view(),
-            meta: Meta {
-                title: None,
-                notice: None,
-            },
+            meta: Meta { title: None },
         }
     }
 }
@@ -105,4 +83,16 @@ fn grab_focus_patch(clamp_scrollable: &ClampScrollable, text_view: &TextView) {
     });
 
     clamp_scrollable.add_controller(controller);
+}
+
+fn reader(text_view: &TextView) -> ScrolledWindow {
+    let clamp_scrollable = ClampScrollable::builder()
+        .child(text_view)
+        .css_classes(["view"])
+        .maximum_size(800)
+        .build();
+
+    grab_focus_patch(&clamp_scrollable, text_view);
+
+    ScrolledWindow::builder().child(&clamp_scrollable).build()
 }

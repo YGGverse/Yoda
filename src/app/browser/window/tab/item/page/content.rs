@@ -118,9 +118,30 @@ impl Content {
     /// `text/gemini`
     pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-        let text = Text::gemini((&self.window_action, &self.item_action), base, data);
-        self.g_box.append(&text.scrolled_window);
-        text
+        match Text::gemini((&self.window_action, &self.item_action), base, data) {
+            Ok(text) => {
+                self.g_box.append(&text.scrolled_window);
+                text
+            }
+            Err((message, text)) => {
+                self.g_box.append(&{
+                    let banner = adw::Banner::builder()
+                        .title(message)
+                        .revealed(true)
+                        .button_label("Ok")
+                        .build();
+                    banner.connect_button_clicked(|this| this.set_revealed(false));
+                    banner
+                });
+                match text {
+                    Some(text) => {
+                        self.g_box.append(&text.scrolled_window);
+                        text
+                    }
+                    None => todo!(),
+                }
+            }
+        }
     }
 
     /// `text/plain`

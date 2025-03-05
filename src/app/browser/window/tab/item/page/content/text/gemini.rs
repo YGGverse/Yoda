@@ -506,7 +506,10 @@ impl Gemini {
         if is_multiline_enabled {
             Ok(Self { text_view, title })
         } else {
-            Err(Error::Multiline(Self { text_view, title }))
+            Err(Error::Markup(
+                "Invalid multiline markup! Gemtext format partially ignored.".to_string(),
+                Self { text_view, title },
+            ))
         }
     }
 }

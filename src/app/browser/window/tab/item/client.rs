@@ -49,7 +49,6 @@ impl Client {
 
         // Reset widgets
         self.page.input.unset();
-        self.page.notice.unset();
         self.page.search.unset();
         self.page.set_title("Loading..");
         self.page.set_progress(0.1);

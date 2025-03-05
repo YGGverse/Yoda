@@ -3,7 +3,6 @@ mod database;
 mod error;
 mod input;
 mod navigation;
-mod notice;
 mod search;
 
 use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
@@ -12,7 +11,6 @@ use content::Content;
 use error::Error;
 use input::Input;
 use navigation::Navigation;
-use notice::Notice;
 use search::Search;
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -27,7 +25,6 @@ pub struct Page {
     pub content: Rc<Content>,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
-    pub notice: Rc<Notice>,
     pub search: Rc<Search>,
     // System
     /// Reference to [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
@@ -59,7 +56,6 @@ impl Page {
             (window_action, tab_action, item_action),
         ));
         let input = Rc::new(Input::new());
-        let notice = Rc::new(Notice::new());
 
         // Done
         Self {
@@ -73,7 +69,6 @@ impl Page {
             content,
             input,
             navigation,
-            notice,
             search,
         }
     }
@@ -102,11 +97,6 @@ impl Page {
     /// Toggle `Find` widget
     pub fn find(&self) {
         self.search.show()
-    }
-
-    /// Toggle `Notice` widget
-    pub fn notice(&self, title: &str) {
-        self.notice.show(title)
     }
 
     /// Cleanup session for `Self`
