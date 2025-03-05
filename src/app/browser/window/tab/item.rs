@@ -63,7 +63,7 @@ impl Item {
         ));
 
         target_child.append(&page.navigation.g_box);
-        target_child.append(&page.notice);
+        target_child.append(&page.notice.banner);
         target_child.append(&page.content.g_box);
         target_child.append(&page.search.g_box);
         target_child.append(&page.input.clamp);

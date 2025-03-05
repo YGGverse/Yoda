@@ -7,7 +7,7 @@ mod notice;
 mod search;
 
 use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
-use adw::{Banner, TabPage};
+use adw::TabPage;
 use content::Content;
 use error::Error;
 use input::Input;
@@ -27,7 +27,7 @@ pub struct Page {
     pub content: Rc<Content>,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
-    pub notice: Banner,
+    pub notice: Rc<Notice>,
     pub search: Rc<Search>,
     // System
     /// Reference to [TabPage](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.TabPage.html)
@@ -59,7 +59,7 @@ impl Page {
             (window_action, tab_action, item_action),
         ));
         let input = Rc::new(Input::new());
-        let notice = Banner::notice();
+        let notice = Rc::new(Notice::new());
 
         // Done
         Self {
