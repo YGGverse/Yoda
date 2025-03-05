@@ -113,7 +113,7 @@ impl Gemini {
                     m.push(i);
                 }
             }
-            m.len() % 2 == 0
+            m.is_empty() || m.len() % 2 == 0
         };
 
         // Parse gemtext lines
