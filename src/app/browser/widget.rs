@@ -37,17 +37,21 @@ impl Widget {
 
         // Connect back/forward navigation buttons @TODO use constant
         application_window.add_controller({
-            use gtk::prelude::GestureSingleExt;
-            let button_controller = gtk::GestureClick::builder().button(0).build();
-            button_controller.connect_pressed({
+            let controller = gtk::GestureClick::builder().button(8).build();
+            controller.connect_pressed({
                 let window = window.clone();
-                move |this, _, _, _| match this.current_button() {
-                    8 => window.tab.history_back(None),
-                    9 => window.tab.history_forward(None),
-                    _ => {}
-                }
+                move |_, _, _, _| window.tab.history_back(None)
             });
-            button_controller
+            controller
+        });
+
+        application_window.add_controller({
+            let controller = gtk::GestureClick::builder().button(9).build();
+            controller.connect_pressed({
+                let window = window.clone();
+                move |_, _, _, _| window.tab.history_forward(None)
+            });
+            controller
         });
 
         // Return new struct
