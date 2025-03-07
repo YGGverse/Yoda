@@ -1,5 +1,6 @@
+use anyhow::Result;
 use gtk::glib::DateTime;
-use sqlite::{Connection, Error, Transaction};
+use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
@@ -26,14 +27,14 @@ impl Database {
     // Getters
 
     /// Get all records
-    pub fn records(&self) -> Result<Vec<Table>, Error> {
+    pub fn records(&self) -> Result<Vec<Table>> {
         let readable = self.connection.read().unwrap();
         let tx = readable.unchecked_transaction()?;
         select(&tx)
     }
 
     /// Get active profile record if exist
-    pub fn active(&self) -> Result<Option<Table>, Error> {
+    pub fn active(&self) -> Result<Option<Table>> {
         let records = self.records()?;
         Ok(records.into_iter().find(|record| record.is_active))
     }
@@ -41,36 +42,24 @@ impl Database {
     // Setters
 
     /// Create new record in `Self` database connected
-    pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64, Error> {
-        // Begin new transaction
+    pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64> {
         let mut writable = self.connection.write().unwrap();
         let tx = writable.transaction()?;
-
-        // New record has active status
         if is_active {
-            // Deactivate other records as only one profile should be active
             for record in select(&tx)? {
                 update(&tx, record.id, false, record.time, record.name)?;
             }
         }
-
-        // Create new record
-        insert(&tx, is_active, time, name)?;
-
-        // Hold insert ID for result
-        let id = last_insert_id(&tx);
-
-        // Done
+        let id = insert(&tx, is_active, time, name)?;
         tx.commit()?;
-
         Ok(id)
     }
 }
 
 // Low-level DB API
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile`
         (
             `id`        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -79,7 +68,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             `name`      VARCHAR(255)
         )",
         [],
-    )
+    )?)
 }
 
 pub fn insert(
@@ -87,7 +76,7 @@ pub fn insert(
     is_active: bool,
     time: DateTime,
     name: Option<String>,
-) -> Result<usize, Error> {
+) -> Result<i64> {
     tx.execute(
         "INSERT INTO `profile` (
             `is_active`,
@@ -95,7 +84,8 @@ pub fn insert(
             `name`
         ) VALUES (?, ?, ?)",
         (is_active, time.to_unix(), name),
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
 pub fn update(
@@ -104,14 +94,14 @@ pub fn update(
     is_active: bool,
     time: DateTime,
     name: Option<String>,
-) -> Result<usize, Error> {
-    tx.execute(
+) -> Result<usize> {
+    Ok(tx.execute(
         "UPDATE `profile` SET `is_active` = ?, `time` = ?, `name` = ? WHERE `id` = ?",
         (is_active, time.to_unix(), name, id),
-    )
+    )?)
 }
 
-pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare("SELECT `id`, `is_active`, `time`, `name` FROM `profile`")?;
     let result = stmt.query_map([], |row| {
         Ok(Table {
@@ -130,8 +120,4 @@ pub fn select(tx: &Transaction) -> Result<Vec<Table>, Error> {
     }
 
     Ok(records)
-}
-
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
 }

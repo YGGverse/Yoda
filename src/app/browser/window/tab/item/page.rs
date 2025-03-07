@@ -7,6 +7,7 @@ mod search;
 
 use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
 use adw::TabPage;
+use anyhow::Result;
 use content::Content;
 use error::Error;
 use input::Input;
@@ -104,20 +105,11 @@ impl Page {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_item_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to the item childs
-                            self.navigation.clean(transaction, &record.id)?;
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    ) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_item_id)? {
+            database::delete(transaction, record.id)?;
+            // Delegate clean action to the item childs
+            self.navigation.clean(transaction, &record.id)?;
         }
         Ok(())
     }
@@ -127,25 +119,20 @@ impl Page {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
-    ) -> Result<(), String> {
+    ) -> Result<()> {
         // Begin page restore
-        match database::select(transaction, app_browser_window_tab_item_id) {
-            Ok(records) => {
-                for record in records {
-                    // Restore `Self`
-                    if let Some(title) = record.title {
-                        self.set_title(title.as_str());
-                    }
-                    self.set_needs_attention(record.is_needs_attention);
-                    // Restore child components
-                    self.navigation.restore(transaction, &record.id)?;
-                    // Make initial page history snap using `navigation` values restored
-                    if let Some(uri) = self.navigation.uri() {
-                        self.profile.history.memory.request.set(uri);
-                    }
-                }
+        for record in database::select(transaction, app_browser_window_tab_item_id)? {
+            // Restore `Self`
+            if let Some(title) = record.title {
+                self.set_title(title.as_str());
             }
-            Err(e) => return Err(e.to_string()),
+            self.set_needs_attention(record.is_needs_attention);
+            // Restore child components
+            self.navigation.restore(transaction, &record.id)?;
+            // Make initial page history snap using `navigation` values restored
+            if let Some(uri) = self.navigation.uri() {
+                self.profile.history.memory.request.set(uri);
+            }
         }
         Ok(())
     }
@@ -155,10 +142,10 @@ impl Page {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_id: i64,
-    ) -> Result<(), String> {
+    ) -> Result<()> {
         // Keep value in memory until operation complete
         let title = self.tab_page.title();
-        match database::insert(
+        let id = database::insert(
             transaction,
             app_browser_window_tab_item_id,
             self.tab_page.needs_attention(),
@@ -166,15 +153,9 @@ impl Page {
                 true => None,
                 false => Some(title.as_str()),
             },
-        ) {
-            Ok(_) => {
-                let id = database::last_insert_id(transaction);
-
-                // Delegate save action to childs
-                self.navigation.save(transaction, &id)?;
-            }
-            Err(e) => return Err(e.to_string()),
-        }
+        )?;
+        // Delegate save action to childs
+        self.navigation.save(transaction, &id)?;
         Ok(())
     }
 
@@ -198,11 +179,9 @@ impl Page {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     navigation::migrate(tx)?;

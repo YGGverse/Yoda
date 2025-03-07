@@ -7,6 +7,7 @@ use super::{Action as TabAction, BrowserAction, WindowAction};
 use crate::Profile;
 use action::Action;
 use adw::TabPage;
+use anyhow::Result;
 use client::Client;
 use gtk::{
     prelude::{ActionExt, ActionMapExt, BoxExt},
@@ -164,26 +165,12 @@ impl Item {
         }
     }
 
-    pub fn clean(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_tab_id: i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to the item childs
-                            self.page.clean(transaction, record.id)?;
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    pub fn clean(&self, transaction: &Transaction, app_browser_window_tab_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_id)? {
+            database::delete(transaction, record.id)?;
+            // Delegate clean action to the item childs
+            self.page.clean(transaction, record.id)?;
         }
-
         Ok(())
     }
 
@@ -192,32 +179,23 @@ impl Item {
         transaction: &Transaction,
         app_browser_window_tab_id: i64,
         page_position: i32,
-    ) -> Result<(), String> {
-        match database::insert(
+    ) -> Result<()> {
+        let id = database::insert(
             transaction,
             app_browser_window_tab_id,
             page_position,
             self.tab_page.is_pinned(),
             self.tab_page.is_selected(),
-        ) {
-            Ok(_) => {
-                // Delegate save action to childs
-                let id = database::last_insert_id(transaction);
-                self.page.save(transaction, id)?;
-            }
-            Err(e) => return Err(e.to_string()),
-        }
-
+        )?;
+        self.page.save(transaction, id)?;
         Ok(())
     }
 }
 
 // Tools
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     page::migrate(tx)?;
@@ -231,9 +209,6 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 pub fn restore(
     transaction: &Transaction,
     app_browser_window_tab_id: i64,
-) -> Result<Vec<database::Table>, String> {
-    match database::select(transaction, app_browser_window_tab_id) {
-        Ok(records) => Ok(records),
-        Err(e) => Err(e.to_string()),
-    }
+) -> Result<Vec<database::Table>> {
+    database::select(transaction, app_browser_window_tab_id)
 }

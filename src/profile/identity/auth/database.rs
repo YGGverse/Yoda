@@ -1,4 +1,5 @@
-use sqlite::{Connection, Error, Transaction};
+use anyhow::Result;
+use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
@@ -25,51 +26,34 @@ impl Database {
     // Actions
 
     /// Create new record in database
-    pub fn add(&self, profile_identity_id: i64, scope: &str) -> Result<i64, Error> {
-        // Begin new transaction
+    pub fn add(&self, profile_identity_id: i64, scope: &str) -> Result<i64> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-
-        // Create new record
-        insert(&tx, profile_identity_id, scope)?;
-
-        // Hold insert ID for result
-        let id = last_insert_id(&tx);
-
-        // Done
-        match tx.commit() {
-            Ok(_) => Ok(id),
-            Err(e) => Err(e),
-        }
+        let id = insert(&tx, profile_identity_id, scope)?;
+        tx.commit()?;
+        Ok(id)
     }
 
     /// Delete record with given `id` from database
-    pub fn delete(&self, id: i64) -> Result<(), Error> {
-        // Begin new transaction
+    pub fn delete(&self, id: i64) -> Result<()> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-
-        // Create new record
         delete(&tx, id)?;
-
-        // Done
-        match tx.commit() {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        tx.commit()?;
+        Ok(())
     }
 
     // Getters
 
     /// Get records from database match current `profile_id` optionally filtered by `scope`
-    pub fn records_scope(&self, scope: Option<&str>) -> Result<Vec<Table>, Error> {
+    pub fn records_scope(&self, scope: Option<&str>) -> Result<Vec<Table>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
         select_scope(&tx, scope)
     }
 
     /// Get records from database match current `profile_id` optionally filtered by `scope`
-    pub fn records_ref(&self, profile_identity_id: i64) -> Result<Vec<Table>, Error> {
+    pub fn records_ref(&self, profile_identity_id: i64) -> Result<Vec<Table>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
         select_ref(&tx, profile_identity_id)
@@ -78,8 +62,8 @@ impl Database {
 
 // Low-level DB API
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_identity_auth`
         (
             `id`                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -90,24 +74,25 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             UNIQUE (`scope`)
         )",
         [],
-    )
+    )?)
 }
 
-pub fn insert(tx: &Transaction, profile_identity_id: i64, scope: &str) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_identity_id: i64, scope: &str) -> Result<i64> {
     tx.execute(
         "INSERT INTO `profile_identity_auth` (
             `profile_identity_id`,
             `scope`
         ) VALUES (?, ?)",
         (profile_identity_id, scope),
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute("DELETE FROM `profile_identity_auth` WHERE `id` = ?", [id])
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize> {
+    Ok(tx.execute("DELETE FROM `profile_identity_auth` WHERE `id` = ?", [id])?)
 }
 
-pub fn select_scope(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>, Error> {
+pub fn select_scope(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_id`,
@@ -135,7 +120,7 @@ pub fn select_scope(tx: &Transaction, scope: Option<&str>) -> Result<Vec<Table>,
     Ok(records)
 }
 
-pub fn select_ref(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>, Error> {
+pub fn select_ref(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_identity_id`,
@@ -161,8 +146,4 @@ pub fn select_ref(tx: &Transaction, profile_identity_id: i64) -> Result<Vec<Tabl
     }
 
     Ok(records)
-}
-
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
 }

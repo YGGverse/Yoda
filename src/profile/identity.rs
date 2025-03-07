@@ -1,18 +1,15 @@
 mod auth;
 mod certificate;
 mod database;
-mod error;
 mod item;
 mod memory;
 
+use anyhow::{bail, Result};
 use auth::Auth;
 use database::Database;
-pub use error::Error;
-use item::Item;
-
-use memory::Memory;
-
 use gtk::glib::DateTime;
+use item::Item;
+use memory::Memory;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -32,11 +29,11 @@ impl Identity {
     pub fn build(
         connection: &Rc<RwLock<Connection>>,
         profile_identity_id: &Rc<i64>,
-    ) -> Result<Self, Error> {
+    ) -> Result<Self> {
         // Init components
         let auth = match Auth::build(connection) {
             Ok(auth) => Rc::new(auth),
-            Err(e) => return Err(Error::Auth(e)),
+            Err(e) => bail!("Could not create auth: {e}"),
         };
         let database = Rc::new(Database::build(connection, profile_identity_id));
         let memory = Rc::new(Memory::new());
@@ -58,33 +55,23 @@ impl Identity {
 
     /// Add new record to database, update memory index
     /// * return new `profile_identity_id` on success
-    pub fn add(&self, pem: &str) -> Result<i64, Error> {
-        match self.database.add(pem) {
-            Ok(profile_identity_id) => {
-                self.index()?;
-                Ok(profile_identity_id)
-            }
-            Err(e) => Err(Error::Database(e)),
-        }
+    pub fn add(&self, pem: &str) -> Result<i64> {
+        let profile_identity_id = self.database.add(pem)?;
+        self.index()?;
+        Ok(profile_identity_id)
     }
 
     /// Delete record from database including children dependencies, update memory index
-    pub fn delete(&self, profile_identity_id: i64) -> Result<(), Error> {
-        match self.auth.remove_ref(profile_identity_id) {
-            Ok(_) => match self.database.delete(profile_identity_id) {
-                Ok(_) => {
-                    self.index()?;
-                    Ok(())
-                }
-                Err(e) => Err(Error::Database(e)),
-            },
-            Err(e) => Err(Error::Auth(e)),
-        }
+    pub fn delete(&self, profile_identity_id: i64) -> Result<()> {
+        self.auth.remove_ref(profile_identity_id)?;
+        self.database.delete(profile_identity_id)?;
+        self.index()?;
+        Ok(())
     }
 
     /// Generate new certificate and insert record to DB, update memory index
     /// * return new `profile_identity_id` on success
-    pub fn make(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64, Error> {
+    pub fn make(&self, time: Option<(DateTime, DateTime)>, name: &str) -> Result<i64> {
         // Generate new certificate
         match certificate::generate(
             match time {
@@ -97,29 +84,17 @@ impl Identity {
             name,
         ) {
             Ok(pem) => self.add(&pem),
-            Err(e) => Err(Error::Certificate(e)),
+            Err(e) => bail!("Could not create certificate: {e}"),
         }
     }
 
     /// Create new `Memory` index from `Database` for `Self`
-    pub fn index(&self) -> Result<(), Error> {
+    pub fn index(&self) -> Result<()> {
         // Clear previous records
-        if let Err(e) = self.memory.clear() {
-            return Err(Error::Memory(e));
+        self.memory.clear()?;
+        for record in self.database.records()? {
+            self.memory.add(record.id, record.pem)?;
         }
-
-        // Build new index
-        match self.database.records() {
-            Ok(records) => {
-                for record in records {
-                    if let Err(e) = self.memory.add(record.id, record.pem) {
-                        return Err(Error::Memory(e));
-                    }
-                }
-            }
-            Err(e) => return Err(Error::Database(e)),
-        };
-
         Ok(())
     }
 
@@ -144,11 +119,9 @@ impl Identity {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     auth::migrate(tx)?;

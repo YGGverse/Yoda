@@ -1,12 +1,10 @@
 mod database;
-mod error;
 mod memory;
 
+use anyhow::Result;
 use database::Database;
-use error::Error;
-use memory::Memory;
-
 use gtk::glib::DateTime;
+use memory::Memory;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -19,48 +17,38 @@ impl Bookmark {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
         // Init children components
         let database = Rc::new(Database::new(connection, profile_id));
         let memory = Rc::new(Memory::new());
 
         // Build initial index
-        match database.records(None) {
-            Ok(records) => {
-                for record in records {
-                    if let Err(e) = memory.add(record.request, record.id) {
-                        todo!("{}", e.to_string())
-                    }
-                }
-            }
-            Err(e) => todo!("{}", e.to_string()),
+        for record in database.records(None)? {
+            memory.add(record.request, record.id)?;
         }
 
         // Return new `Self`
-        Self { database, memory }
+        Ok(Self { database, memory })
     }
 
     // Actions
 
     /// Get record `id` by `request` from memory index
-    pub fn get(&self, request: &str) -> Result<i64, Error> {
-        match self.memory.get(request) {
-            Ok(id) => Ok(id),
-            Err(_) => Err(Error::MemoryNotFound),
-        }
+    pub fn get(&self, request: &str) -> Option<i64> {
+        self.memory.get(request)
     }
 
     /// Toggle record in `database` and `memory` index
     /// * return `true` on bookmark created, `false` on deleted
-    pub fn toggle(&self, request: &str) -> Result<bool, Error> {
+    pub fn toggle(&self, request: &str) -> Result<bool> {
         // Delete record if exists
-        if let Ok(id) = self.get(request) {
+        if let Some(id) = self.get(request) {
             match self.database.delete(id) {
                 Ok(_) => match self.memory.delete(request) {
                     Ok(_) => Ok(false),
-                    Err(_) => Err(Error::MemoryDelete),
+                    Err(_) => panic!(), // unexpected
                 },
-                Err(_) => Err(Error::DatabaseDelete),
+                Err(_) => panic!(), // unexpected
             }
         // Otherwise, create new record
         } else {
@@ -70,9 +58,9 @@ impl Bookmark {
             {
                 Ok(id) => match self.memory.add(request.into(), id) {
                     Ok(_) => Ok(true),
-                    Err(_) => Err(Error::MemoryAdd),
+                    Err(_) => panic!(), // unexpected
                 },
-                Err(_) => Err(Error::DatabaseAdd),
+                Err(_) => panic!(), // unexpected
             }
         } // @TODO return affected rows on success?
     }
@@ -80,11 +68,9 @@ impl Bookmark {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     // nothing yet..

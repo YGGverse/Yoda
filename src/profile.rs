@@ -10,6 +10,7 @@ use history::History;
 use identity::Identity;
 use search::Search;
 
+use anyhow::Result;
 use gtk::glib::{user_config_dir, DateTime};
 use sqlite::{Connection, Transaction};
 use std::{fs::create_dir_all, path::PathBuf, rc::Rc, sync::RwLock};
@@ -29,16 +30,10 @@ pub struct Profile {
     pub config_path: PathBuf,
 }
 
-impl Default for Profile {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Profile {
     // Constructors
 
-    pub fn new() -> Self {
+    pub fn new() -> Result<Self> {
         // Init profile path
         let mut config_path = user_config_dir();
 
@@ -51,44 +46,26 @@ impl Profile {
             env!("CARGO_PKG_VERSION_MINOR")
         )); // @TODO remove after auto-migrate feature implementation
 
-        if let Err(e) = create_dir_all(&config_path) {
-            panic!("{e}")
-        }
+        create_dir_all(&config_path)?;
 
         // Init database path
         let mut database_path = config_path.clone();
         database_path.push(DB_NAME);
 
         // Init database connection
-        let connection = match Connection::open(database_path.as_path()) {
-            Ok(connection) => Rc::new(RwLock::new(connection)),
-            Err(e) => panic!("{e}"),
-        };
+        let connection = Rc::new(RwLock::new(Connection::open(database_path.as_path())?));
 
         // Init profile components
         {
             // Init writable connection
-            let mut connection = match connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
+            let mut connection = connection.write().unwrap(); // @TODO handle
 
             // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
+            let transaction = connection.transaction()?;
 
             // Begin migration
-            match migrate(&transaction) {
-                Ok(_) => {
-                    // Confirm changes
-                    if let Err(e) = transaction.commit() {
-                        todo!("{e}")
-                    }
-                }
-                Err(e) => todo!("{e}"),
-            }
+            migrate(&transaction)?;
+            transaction.commit()?;
         } // unlock database
 
         // Init model
@@ -104,7 +81,7 @@ impl Profile {
         });
 
         // Init components
-        let bookmark = Rc::new(Bookmark::build(&connection, &profile_id));
+        let bookmark = Rc::new(Bookmark::build(&connection, &profile_id)?);
         let history = Rc::new(History::build(&connection, &profile_id));
         let search = Rc::new(Search::build(&connection, &profile_id).unwrap()); // @TODO handle
         let identity = Rc::new(match Identity::build(&connection, &profile_id) {
@@ -113,22 +90,20 @@ impl Profile {
         });
 
         // Result
-        Self {
+        Ok(Self {
             bookmark,
             database,
             history,
             identity,
             search,
             config_path,
-        }
+        })
     }
 }
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to children components
     bookmark::migrate(tx)?;

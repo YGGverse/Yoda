@@ -6,6 +6,7 @@ mod reload;
 mod request;
 
 use super::{ItemAction, Profile, TabAction, WindowAction};
+use anyhow::Result;
 use bookmark::Bookmark;
 use gtk::{
     glib::{GString, Uri},
@@ -72,22 +73,12 @@ impl Navigation {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_item_page_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, &record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to the item childs
-                            self.request.clean(transaction, &record.id)?;
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    ) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_item_page_id)? {
+            database::delete(transaction, &record.id)?;
+            // Delegate clean action to the item childs
+            self.request.clean(transaction, &record.id)?;
         }
-
         Ok(())
     }
 
@@ -95,17 +86,11 @@ impl Navigation {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_item_page_id) {
-            Ok(records) => {
-                for record in records {
-                    // Delegate restore action to the item childs
-                    self.request.restore(transaction, &record.id)?;
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    ) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_item_page_id)? {
+            // Delegate restore action to the item childs
+            self.request.restore(transaction, &record.id)?;
         }
-
         Ok(())
     }
 
@@ -113,17 +98,10 @@ impl Navigation {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_id: &i64,
-    ) -> Result<(), String> {
-        match database::insert(transaction, app_browser_window_tab_item_page_id) {
-            Ok(_) => {
-                let id = database::last_insert_id(transaction);
-
-                // Delegate save action to childs
-                self.request.save(transaction, &id)?;
-            }
-            Err(e) => return Err(e.to_string()),
-        }
-
+    ) -> Result<()> {
+        let id = database::insert(transaction, app_browser_window_tab_item_page_id)?;
+        // Delegate save action to childs
+        self.request.save(transaction, &id)?;
         Ok(())
     }
 
@@ -173,11 +151,9 @@ impl Navigation {
 }
 
 // Tools
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     request::migrate(tx)?;

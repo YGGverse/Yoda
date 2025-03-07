@@ -1,9 +1,8 @@
 mod database;
-mod error;
 mod memory;
 
+use anyhow::Result;
 use database::Database;
-use error::Error;
 use gtk::glib::Uri;
 use memory::Memory;
 use sqlite::{Connection, Transaction};
@@ -18,40 +17,30 @@ impl Search {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self, Error> {
-        match Database::init(connection, profile_id) {
-            Ok(database) => {
-                // Init fast search index
-                let memory = Memory::init();
-
-                // Build initial index
-                index(&database, &memory)?;
-
-                // Return new `Self`
-                Ok(Self { database, memory })
-            }
-            Err(e) => Err(Error::Database(e)),
-        }
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
+        let database = Database::init(connection, profile_id)?;
+        // Init fast search index
+        let memory = Memory::init();
+        // Build initial index
+        index(&database, &memory)?;
+        // Return new `Self`
+        Ok(Self { database, memory })
     }
 
     // Actions
 
     /// Add new search provider record
     /// * requires valid [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-    pub fn add(&self, query: &Uri, is_default: bool) -> Result<(), Error> {
-        match self.database.add(query.to_string(), is_default) {
-            Ok(_) => index(&self.database, &self.memory),
-            Err(e) => Err(Error::Database(e)),
-        }
+    pub fn add(&self, query: &Uri, is_default: bool) -> Result<()> {
+        self.database.add(query.to_string(), is_default)?;
+        Ok(())
     }
 
     /// Add new search provider record
     /// * requires valid [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-    pub fn set_default(&self, profile_search_id: i64) -> Result<(), Error> {
-        match self.database.set_default(profile_search_id) {
-            Ok(_) => index(&self.database, &self.memory),
-            Err(e) => Err(Error::Database(e)),
-        }
+    pub fn set_default(&self, profile_search_id: i64) -> Result<()> {
+        self.database.set_default(profile_search_id)?;
+        index(&self.database, &self.memory)
     }
 
     /// Get records from the memory index
@@ -60,11 +49,9 @@ impl Search {
     }
 
     /// Delete record from `database` and `memory` index
-    pub fn delete(&self, id: i64) -> Result<(), Error> {
-        match self.database.delete(id) {
-            Ok(_) => index(&self.database, &self.memory),
-            Err(e) => Err(Error::Database(e)),
-        }
+    pub fn delete(&self, id: i64) -> Result<()> {
+        self.database.delete(id)?;
+        index(&self.database, &self.memory)
     }
 
     // Getters
@@ -77,11 +64,9 @@ impl Search {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     // nothing yet..
@@ -91,15 +76,10 @@ pub fn migrate(tx: &Transaction) -> Result<(), String> {
 }
 
 /// Sync memory index with database
-fn index(database: &Database, memory: &Memory) -> Result<(), Error> {
+fn index(database: &Database, memory: &Memory) -> Result<()> {
     memory.clear();
-    match database.records() {
-        Ok(records) => {
-            for record in records {
-                memory.push(record.id, record.query, record.is_default)
-            }
-        }
-        Err(e) => return Err(Error::Database(e)),
+    for record in database.records()? {
+        memory.push(record.id, record.query, record.is_default)
     }
     Ok(())
 }

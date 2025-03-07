@@ -1,4 +1,5 @@
-use sqlite::{Error, Transaction};
+use anyhow::Result;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -7,8 +8,8 @@ pub struct Table {
     pub title: Option<String>,
 }
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `app_browser_window_tab_item_page`
         (
             `id`                             INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -19,7 +20,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             FOREIGN KEY (`app_browser_window_tab_item_id`) REFERENCES `app_browser_window_tab_item` (`id`)
         )",
         [],
-    )
+    )?)
 }
 
 pub fn insert(
@@ -27,7 +28,7 @@ pub fn insert(
     app_browser_window_tab_item_id: i64,
     is_needs_attention: bool,
     title: Option<&str>,
-) -> Result<usize, Error> {
+) -> Result<i64> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item_page` (
             `app_browser_window_tab_item_id`,
@@ -35,10 +36,11 @@ pub fn insert(
             `title`
         ) VALUES (?, ?, ?)",
         (app_browser_window_tab_item_id, is_needs_attention, title),
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
-pub fn select(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_tab_item_id`,
@@ -67,13 +69,9 @@ pub fn select(tx: &Transaction, app_browser_window_tab_item_id: i64) -> Result<V
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute(
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize> {
+    Ok(tx.execute(
         "DELETE FROM `app_browser_window_tab_item_page` WHERE `id` = ?",
         [id],
-    )
-}
-
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
+    )?)
 }

@@ -1,4 +1,5 @@
-use sqlite::{Error, Transaction};
+use anyhow::Result;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -8,8 +9,8 @@ pub struct Table {
     pub is_maximized: bool,
 }
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `app_browser_widget`
         (
             `id`             INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -21,7 +22,7 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             FOREIGN KEY (`app_browser_id`) REFERENCES `app_browser`(`id`)
         )",
         [],
-    )
+    )?)
 }
 
 pub fn insert(
@@ -30,7 +31,7 @@ pub fn insert(
     default_width: i32,
     default_height: i32,
     is_maximized: bool,
-) -> Result<usize, Error> {
+) -> Result<i64> {
     tx.execute(
         "INSERT INTO `app_browser_widget` (
             `app_browser_id`,
@@ -44,10 +45,11 @@ pub fn insert(
             default_height as i64,
             is_maximized as i64,
         ],
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
-pub fn select(tx: &Transaction, app_browser_id: i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, app_browser_id: i64) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_id`,
@@ -76,11 +78,6 @@ pub fn select(tx: &Transaction, app_browser_id: i64) -> Result<Vec<Table>, Error
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize> {
+    Ok(tx.execute("DELETE FROM `app_browser_widget` WHERE `id` = ?", [id])?)
 }
-
-/* not in use
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
-} */

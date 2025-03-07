@@ -2,6 +2,7 @@ mod database;
 
 use super::Window;
 use adw::ApplicationWindow;
+use anyhow::Result;
 use gtk::{
     gio::SimpleActionGroup,
     glib::GString,
@@ -59,74 +60,44 @@ impl Widget {
     }
 
     // Actions
-    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::select(transaction, app_browser_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to childs
-                            // nothing yet..
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_id)? {
+            database::delete(transaction, record.id)?;
         }
-
         Ok(())
     }
 
-    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::select(transaction, app_browser_id) {
-            Ok(records) => {
-                for record in records {
-                    // Restore widget
-                    self.application_window.set_maximized(record.is_maximized);
-                    self.application_window
-                        .set_default_size(record.default_width, record.default_height);
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_id)? {
+            // Restore widget
+            self.application_window.set_maximized(record.is_maximized);
+            self.application_window
+                .set_default_size(record.default_width, record.default_height);
 
-                    // Delegate restore action to childs
-                    // nothing yet..
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+            // Delegate restore action to childs
+            // nothing yet..
         }
-
         Ok(())
     }
 
-    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::insert(
+    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        database::insert(
             transaction,
             app_browser_id,
             self.application_window.default_width(),
             self.application_window.default_height(),
             self.application_window.is_maximized(),
-        ) {
-            Ok(_) => {
-                // Delegate save action to childs
-                // let id = self.database.last_insert_id(transaction);
-                // nothing yet..
-            }
-            Err(e) => return Err(e.to_string()),
-        }
-
+        )?;
         Ok(())
     }
 }
 
 // Tools
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
-
+    database::init(tx)?;
     // Delegate migration to childs
     // nothing yet..
-
     // Success
     Ok(())
 }

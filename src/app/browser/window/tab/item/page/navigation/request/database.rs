@@ -1,4 +1,5 @@
-use sqlite::{Error, Transaction};
+use anyhow::Result;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -6,8 +7,8 @@ pub struct Table {
     pub text: Option<String>, // can be stored as NULL
 }
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok( tx.execute(
         "CREATE TABLE IF NOT EXISTS `app_browser_window_tab_item_page_navigation_request`
         (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -17,27 +18,28 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             FOREIGN KEY (`app_browser_window_tab_item_page_navigation_id`) REFERENCES `app_browser_window_tab_item_page_navigation`(`id`)
         )",
         [],
-    )
+    )?)
 }
 
 pub fn insert(
     tx: &Transaction,
     app_browser_window_tab_item_page_navigation_id: &i64,
     text: Option<&str>,
-) -> Result<usize, Error> {
+) -> Result<i64> {
     tx.execute(
         "INSERT INTO `app_browser_window_tab_item_page_navigation_request` (
             `app_browser_window_tab_item_page_navigation_id`,
             `text`
         ) VALUES (?, ?)",
         (app_browser_window_tab_item_page_navigation_id, text),
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
 pub fn select(
     tx: &Transaction,
     app_browser_window_tab_item_page_navigation_id: &i64,
-) -> Result<Vec<Table>, Error> {
+) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `app_browser_window_tab_item_page_navigation_id`,
@@ -64,14 +66,9 @@ pub fn select(
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: &i64) -> Result<usize, Error> {
-    tx.execute(
+pub fn delete(tx: &Transaction, id: &i64) -> Result<usize> {
+    Ok(tx.execute(
         "DELETE FROM `app_browser_window_tab_item_page_navigation_request` WHERE `id` = ?",
         [id],
-    )
+    )?)
 }
-
-/* not in use
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
-} */

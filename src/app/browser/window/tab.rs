@@ -8,6 +8,7 @@ use super::{Action as WindowAction, BrowserAction, Position};
 use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
+use anyhow::Result;
 use error::Error;
 use gtk::{
     gio::Icon,
@@ -309,102 +310,68 @@ impl Tab {
         }
     }
 
-    pub fn clean(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_id: i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to childs
-                            for (_, item) in self.index.borrow().iter() {
-                                item.clean(transaction, record.id)?
-                            }
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
+    pub fn clean(&self, transaction: &Transaction, app_browser_window_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_id)? {
+            database::delete(transaction, record.id)?;
+            // Delegate clean action to childs
+            for (_, item) in self.index.borrow().iter() {
+                item.clean(transaction, record.id)?
             }
-            Err(e) => return Err(e.to_string()),
         }
         Ok(())
     }
 
-    pub fn restore(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_id: i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_id) {
-            Ok(tab_records) => {
-                for tab_record in tab_records {
-                    for item_record in item::restore(transaction, tab_record.id)? {
-                        // Generate new `TabPage` with blank `Widget`
-                        let (tab_page, target_child) = new_tab_page(
-                            &self.tab_view,
-                            Position::Number(item_record.page_position),
-                        );
+    pub fn restore(&self, transaction: &Transaction, app_browser_window_id: i64) -> Result<()> {
+        for tab_record in database::select(transaction, app_browser_window_id)? {
+            for item_record in item::restore(transaction, tab_record.id)? {
+                // Generate new `TabPage` with blank `Widget`
+                let (tab_page, target_child) =
+                    new_tab_page(&self.tab_view, Position::Number(item_record.page_position));
 
-                        // Init new tab item
-                        let item = Rc::new(Item::build(
-                            (&tab_page, &target_child),
-                            &self.profile,
-                            // Actions
-                            (&self.browser_action, &self.window_action, &self.action),
-                            // Options
-                            None,
-                            false,
-                        ));
+                // Init new tab item
+                let item = Rc::new(Item::build(
+                    (&tab_page, &target_child),
+                    &self.profile,
+                    // Actions
+                    (&self.browser_action, &self.window_action, &self.action),
+                    // Options
+                    None,
+                    false,
+                ));
 
-                        // Relate with GTK `TabPage` with app `Item`
-                        self.index
-                            .borrow_mut()
-                            .insert(item.tab_page.clone(), item.clone());
+                // Relate with GTK `TabPage` with app `Item`
+                self.index
+                    .borrow_mut()
+                    .insert(item.tab_page.clone(), item.clone());
 
-                        // Setup
-                        self.tab_view
-                            .set_page_pinned(&item.tab_page, item_record.is_pinned);
+                // Setup
+                self.tab_view
+                    .set_page_pinned(&item.tab_page, item_record.is_pinned);
 
-                        if item_record.is_selected {
-                            self.tab_view.set_selected_page(&item.tab_page);
-                        }
-
-                        // Forcefully update global actions on HashMap index build complete
-                        // * `selected_page_notify` runs this action also, just before Item init @TODO
-                        update_actions(
-                            &self.tab_view,
-                            self.tab_view.selected_page().as_ref(),
-                            &self.index,
-                            &self.window_action,
-                        );
-
-                        // Restore children components
-                        item.page.restore(transaction, item_record.id)?;
-                    }
+                if item_record.is_selected {
+                    self.tab_view.set_selected_page(&item.tab_page);
                 }
+
+                // Forcefully update global actions on HashMap index build complete
+                // * `selected_page_notify` runs this action also, just before Item init @TODO
+                update_actions(
+                    &self.tab_view,
+                    self.tab_view.selected_page().as_ref(),
+                    &self.index,
+                    &self.window_action,
+                );
+
+                // Restore children components
+                item.page.restore(transaction, item_record.id)?;
             }
-            Err(e) => return Err(e.to_string()),
         }
         Ok(())
     }
 
-    pub fn save(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_id: i64,
-    ) -> Result<(), String> {
-        match database::insert(transaction, app_browser_window_id) {
-            Ok(_) => {
-                // Delegate save action to childs
-                let id = database::last_insert_id(transaction);
-                for (_, item) in self.index.borrow().iter() {
-                    item.save(transaction, id, self.tab_view.page_position(&item.tab_page))?;
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    pub fn save(&self, transaction: &Transaction, app_browser_window_id: i64) -> Result<()> {
+        let id = database::insert(transaction, app_browser_window_id)?;
+        for (_, item) in self.index.borrow().iter() {
+            item.save(transaction, id, self.tab_view.page_position(&item.tab_page))?;
         }
         Ok(())
     }
@@ -430,11 +397,9 @@ impl Tab {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     item::migrate(tx)?;

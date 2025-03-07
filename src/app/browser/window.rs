@@ -3,16 +3,16 @@ mod database;
 mod header;
 pub mod tab;
 
-use action::{Action, Position};
-use adw::ToolbarView;
-use header::Header;
-use sqlite::Transaction;
-use tab::Tab;
-
 use super::Action as BrowserAction;
 use crate::Profile;
+use action::{Action, Position};
+use adw::ToolbarView;
+use anyhow::Result;
 use gtk::{prelude::BoxExt, Box, Orientation};
+use header::Header;
+use sqlite::Transaction;
 use std::rc::Rc;
+use tab::Tab;
 
 pub struct Window {
     pub action: Rc<Action>,
@@ -145,52 +145,26 @@ impl Window {
         self.tab.escape();
     }
 
-    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::select(transaction, app_browser_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to childs
-                            self.tab.clean(transaction, record.id)?;
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_id)? {
+            database::delete(transaction, record.id)?;
+            // Delegate clean action to childs
+            self.tab.clean(transaction, record.id)?;
         }
         Ok(())
     }
 
-    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::select(transaction, app_browser_id) {
-            Ok(records) => {
-                for record in records {
-                    // Delegate restore action to childs
-                    self.tab.restore(transaction, record.id)?;
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    pub fn restore(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        for record in database::select(transaction, app_browser_id)? {
+            // Delegate restore action to childs
+            self.tab.restore(transaction, record.id)?;
         }
-
         Ok(())
     }
 
-    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<(), String> {
-        match database::insert(transaction, app_browser_id) {
-            Ok(_) => {
-                // Delegate save action to childs
-                if let Err(e) = self
-                    .tab
-                    .save(transaction, database::last_insert_id(transaction))
-                {
-                    return Err(e.to_string());
-                }
-            }
-            Err(e) => return Err(e.to_string()),
-        }
-
+    pub fn save(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
+        self.tab
+            .save(transaction, database::insert(transaction, app_browser_id)?)?;
         Ok(())
     }
 
@@ -200,11 +174,9 @@ impl Window {
 }
 
 // Tools
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     tab::migrate(tx)?;

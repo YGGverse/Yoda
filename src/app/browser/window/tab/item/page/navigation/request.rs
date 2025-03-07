@@ -3,15 +3,15 @@ mod identity;
 mod primary_icon;
 mod search;
 
-use adw::{prelude::AdwDialogExt, AlertDialog};
-use primary_icon::PrimaryIcon;
-
 use super::{ItemAction, Profile};
+use adw::{prelude::AdwDialogExt, AlertDialog};
+use anyhow::Result;
 use gtk::{
     glib::{gformat, GString, Uri, UriFlags},
     prelude::{EditableExt, EntryExt, WidgetExt},
     Entry, EntryIconPosition, StateFlags,
 };
+use primary_icon::PrimaryIcon;
 use sqlite::Transaction;
 use std::{cell::Cell, rc::Rc};
 
@@ -29,19 +29,19 @@ pub trait Request {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String>;
+    ) -> Result<()>;
 
     fn restore(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String>;
+    ) -> Result<()>;
 
     fn save(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String>;
+    ) -> Result<()>;
 
     fn update_primary_icon(&self, profile: &Profile);
     fn update_secondary_icon(&self);
@@ -147,22 +147,13 @@ impl Request for Entry {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_item_page_navigation_id) {
-            Ok(records) => {
-                for record in records {
-                    match database::delete(transaction, &record.id) {
-                        Ok(_) => {
-                            // Delegate clean action to the item childs
-                            // nothing yet..
-                        }
-                        Err(e) => return Err(e.to_string()),
-                    }
-                }
-            }
-            Err(e) => return Err(e.to_string()),
+    ) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_item_page_navigation_id)?
+        {
+            database::delete(transaction, &record.id)?;
+            // Delegate clean action to the item childs
+            // nothing yet..
         }
-
         Ok(())
     }
 
@@ -170,21 +161,15 @@ impl Request for Entry {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String> {
-        match database::select(transaction, app_browser_window_tab_item_page_navigation_id) {
-            Ok(records) => {
-                for record in records {
-                    if let Some(text) = record.text {
-                        self.set_text(&text);
-                    }
-
-                    // Delegate restore action to the item childs
-                    // nothing yet..
-                }
+    ) -> Result<()> {
+        for record in database::select(transaction, app_browser_window_tab_item_page_navigation_id)?
+        {
+            if let Some(text) = record.text {
+                self.set_text(&text);
             }
-            Err(e) => return Err(e.to_string()),
+            // Delegate restore action to the item childs
+            // nothing yet..
         }
-
         Ok(())
     }
 
@@ -192,27 +177,19 @@ impl Request for Entry {
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<(), String> {
+    ) -> Result<()> {
         // Keep value in memory until operation complete
         let text = self.text();
-
-        match database::insert(
+        let _id = database::insert(
             transaction,
             app_browser_window_tab_item_page_navigation_id,
             match text.is_empty() {
                 true => None,
                 false => Some(text.as_str()),
             },
-        ) {
-            Ok(_) => {
-                // let id = database::last_insert_id(transaction);
-
-                // Delegate save action to childs
-                // nothing yet..
-            }
-            Err(e) => return Err(e.to_string()),
-        }
-
+        )?;
+        // Delegate save action to childs
+        // nothing yet..
         Ok(())
     }
 
@@ -369,11 +346,9 @@ impl Request for Entry {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     // nothing yet..

@@ -1,6 +1,4 @@
-mod error;
-use error::Error;
-
+use anyhow::Result;
 use itertools::Itertools;
 use std::{cell::RefCell, collections::HashMap};
 
@@ -29,37 +27,34 @@ impl Memory {
 
     /// Add new record with `request` as key and `id` as value
     /// * validate record with same key does not exist yet
-    pub fn add(&self, request: String, id: i64) -> Result<(), Error> {
+    pub fn add(&self, request: String, id: i64) -> Result<()> {
         // Borrow shared index access
         let mut index = self.index.borrow_mut();
 
         // Prevent existing key overwrite
         if index.contains_key(&request) {
-            return Err(Error::Overwrite(request));
+            panic!() // unexpected
         }
 
         // Slot should be free, let check it twice
         match index.insert(request, id) {
-            Some(_) => Err(Error::Unexpected),
+            Some(_) => panic!(), // unexpected
             None => Ok(()),
         }
     }
 
     /// Delete record from index by `request`
     /// * validate record key is exist
-    pub fn delete(&self, request: &str) -> Result<(), Error> {
+    pub fn delete(&self, request: &str) -> Result<()> {
         match self.index.borrow_mut().remove(request) {
             Some(_) => Ok(()),
-            None => Err(Error::Unexpected), // @TODO
+            None => panic!(), // unexpected
         }
     }
 
     /// Get `id` by `request` from memory index
-    pub fn get(&self, request: &str) -> Result<i64, Error> {
-        match self.index.borrow().get(request) {
-            Some(&value) => Ok(value),
-            None => Err(Error::Unexpected), // @TODO
-        }
+    pub fn get(&self, request: &str) -> Option<i64> {
+        self.index.borrow().get(request).copied()
     }
 
     /// Get recent requests vector sorted by `ID` DESC

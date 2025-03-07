@@ -1,13 +1,11 @@
 //! Controller for children `database` and `memory` components
 
 mod database;
-mod error;
 mod memory;
 
+use anyhow::Result;
 use database::Database;
-pub use error::Error;
 use memory::Memory;
-
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
@@ -21,7 +19,7 @@ impl Auth {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>) -> Result<Self, Error> {
+    pub fn build(connection: &Rc<RwLock<Connection>>) -> Result<Self> {
         // Init `Self`
         let this = Self {
             database: Rc::new(Database::build(connection)),
@@ -41,18 +39,14 @@ impl Auth {
     /// * deactivate active auth by remove previous records from `Self` database
     /// * reindex `Self` memory index on success
     /// * return last insert `profile_identity_auth_id` on success
-    pub fn apply(&self, profile_identity_id: i64, request: &str) -> Result<i64, Error> {
+    pub fn apply(&self, profile_identity_id: i64, request: &str) -> Result<i64> {
         // Cleanup records match `scope` (unauthorize)
         self.remove(request)?;
 
         // Create new record (auth)
-        let profile_identity_auth_id = match self
+        let profile_identity_auth_id = self
             .database
-            .add(profile_identity_id, &filter_scope(request))
-        {
-            Ok(id) => id,
-            Err(e) => return Err(Error::Database(e)),
-        };
+            .add(profile_identity_id, &filter_scope(request))?;
 
         // Reindex
         self.index()?;
@@ -62,56 +56,31 @@ impl Auth {
     }
 
     /// Remove all records match request (unauthorize)
-    pub fn remove(&self, request: &str) -> Result<(), Error> {
-        match self.database.records_scope(Some(&filter_scope(request))) {
-            Ok(records) => {
-                for record in records {
-                    if let Err(e) = self.database.delete(record.id) {
-                        return Err(Error::Database(e));
-                    }
-                }
-            }
-            Err(e) => return Err(Error::Database(e)),
+    pub fn remove(&self, request: &str) -> Result<()> {
+        for record in self.database.records_scope(Some(&filter_scope(request)))? {
+            self.database.delete(record.id)?;
         }
         self.index()?;
         Ok(())
     }
 
     /// Remove all records match `profile_identity_id` foreign reference key
-    pub fn remove_ref(&self, profile_identity_id: i64) -> Result<(), Error> {
-        match self.database.records_ref(profile_identity_id) {
-            Ok(records) => {
-                for record in records {
-                    if let Err(e) = self.database.delete(record.id) {
-                        return Err(Error::Database(e));
-                    }
-                }
-            }
-            Err(e) => return Err(Error::Database(e)),
+    pub fn remove_ref(&self, profile_identity_id: i64) -> Result<()> {
+        for record in self.database.records_ref(profile_identity_id)? {
+            self.database.delete(record.id)?;
         }
         self.index()?;
         Ok(())
     }
 
     /// Create new `Memory` index from `Database` for `Self`
-    pub fn index(&self) -> Result<(), Error> {
+    pub fn index(&self) -> Result<()> {
         // Clear previous records
-        if let Err(e) = self.memory.clear() {
-            return Err(Error::Memory(e));
-        }
-
+        self.memory.clear()?;
         // Build new index
-        match self.database.records_scope(None) {
-            Ok(records) => {
-                for record in records {
-                    if let Err(e) = self.memory.add(record.scope, record.profile_identity_id) {
-                        return Err(Error::Memory(e));
-                    }
-                }
-            }
-            Err(e) => return Err(Error::Database(e)),
+        for record in self.database.records_scope(None)? {
+            self.memory.add(record.scope, record.profile_identity_id)?;
         }
-
         Ok(())
     }
 
@@ -154,11 +123,9 @@ impl Auth {
 
 // Tools
 
-pub fn migrate(tx: &Transaction) -> Result<(), String> {
+pub fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     // nothing yet..

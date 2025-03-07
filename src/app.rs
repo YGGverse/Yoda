@@ -1,10 +1,10 @@
 pub mod browser;
 mod database;
 
-use browser::Browser;
-
 use crate::profile::Profile;
 use adw::Application;
+use anyhow::Result;
+use browser::Browser;
 use gtk::{
     glib::ExitCode,
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt},
@@ -294,11 +294,9 @@ impl App {
 }
 
 // Tools
-fn migrate(tx: &Transaction) -> Result<(), String> {
+fn migrate(tx: &Transaction) -> Result<()> {
     // Migrate self components
-    if let Err(e) = database::init(tx) {
-        return Err(e.to_string());
-    }
+    database::init(tx)?;
 
     // Delegate migration to childs
     browser::migrate(tx)?;

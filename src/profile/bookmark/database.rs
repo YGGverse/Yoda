@@ -1,5 +1,6 @@
+use anyhow::Result;
 use gtk::glib::DateTime;
-use sqlite::{Connection, Error, Transaction};
+use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Table {
@@ -28,7 +29,7 @@ impl Database {
     // Getters
 
     /// Get bookmark records from database with optional filter by `request`
-    pub fn records(&self, request: Option<&str>) -> Result<Vec<Table>, Error> {
+    pub fn records(&self, request: Option<&str>) -> Result<Vec<Table>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
         select(&tx, *self.profile_id, request)
@@ -38,45 +39,28 @@ impl Database {
 
     /// Create new bookmark record in database
     /// * return last insert ID on success
-    pub fn add(&self, time: DateTime, request: String) -> Result<i64, Error> {
-        // Begin new transaction
+    pub fn add(&self, time: DateTime, request: String) -> Result<i64> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-
-        // Create new record
-        insert(&tx, *self.profile_id, time, request)?;
-
-        // Hold insert ID for result
-        let id = last_insert_id(&tx);
-
-        // Done
-        match tx.commit() {
-            Ok(_) => Ok(id),
-            Err(e) => Err(e),
-        }
+        let id = insert(&tx, *self.profile_id, time, request)?;
+        tx.commit()?;
+        Ok(id)
     }
 
     /// Delete bookmark record from database
-    pub fn delete(&self, id: i64) -> Result<(), Error> {
-        // Begin new transaction
+    pub fn delete(&self, id: i64) -> Result<usize> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-
-        // Delete record by ID
-        match delete(&tx, id) {
-            Ok(_) => match tx.commit() {
-                Ok(_) => Ok(()),
-                Err(e) => Err(e),
-            },
-            Err(e) => Err(e),
-        }
+        let usize = delete(&tx, id)?;
+        tx.commit()?;
+        Ok(usize)
     }
 }
 
 // Low-level DB API
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_bookmark`
         (
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -87,15 +71,10 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
         )",
         [],
-    )
+    )?)
 }
 
-pub fn insert(
-    tx: &Transaction,
-    profile_id: i64,
-    time: DateTime,
-    request: String,
-) -> Result<usize, Error> {
+pub fn insert(tx: &Transaction, profile_id: i64, time: DateTime, request: String) -> Result<i64> {
     tx.execute(
         "INSERT INTO `profile_bookmark` (
             `profile_id`,
@@ -103,14 +82,11 @@ pub fn insert(
             `request`
         ) VALUES (?, ?, ?)",
         (profile_id, time.to_unix(), request),
-    )
+    )?;
+    Ok(tx.last_insert_rowid())
 }
 
-pub fn select(
-    tx: &Transaction,
-    profile_id: i64,
-    request: Option<&str>,
-) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, profile_id: i64, request: Option<&str>) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`, `profile_id`, `time`, `request`
             FROM `profile_bookmark`
@@ -136,10 +112,6 @@ pub fn select(
     Ok(records)
 }
 
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute("DELETE FROM `profile_bookmark` WHERE `id` = ?", [id])
-}
-
-pub fn last_insert_id(tx: &Transaction) -> i64 {
-    tx.last_insert_rowid()
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize> {
+    Ok(tx.execute("DELETE FROM `profile_bookmark` WHERE `id` = ?", [id])?)
 }
