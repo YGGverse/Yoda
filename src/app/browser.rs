@@ -88,7 +88,7 @@ impl Browser {
             let profile = profile.clone();
             move || {
                 FileLauncher::new(Some(&File::for_path(profile.config_path.as_path()))).launch(
-                    gtk::Window::NONE,
+                    adw::Window::NONE,
                     Cancellable::NONE,
                     |result| {
                         if let Err(error) = result {
