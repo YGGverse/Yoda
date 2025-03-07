@@ -1,3 +1,4 @@
+use anyhow::Result;
 use gtk::glib::DateTime;
 use openssl::{
     asn1::{Asn1Integer, Asn1Time},
@@ -7,7 +8,6 @@ use openssl::{
     rsa::Rsa,
     x509::{X509Builder, X509Name},
 };
-use std::error::Error;
 
 // Defaults
 
@@ -19,7 +19,7 @@ pub const BITS: u32 = 2048;
 pub fn generate(
     time: (DateTime, DateTime), // valid (from, to)
     name: &str,
-) -> Result<String, Box<dyn Error>> {
+) -> Result<String> {
     // Generate new RSA key pair
     let rsa = Rsa::generate(BITS)?;
     let key = PKey::from_rsa(rsa)?;

@@ -31,10 +31,7 @@ impl Identity {
         profile_identity_id: &Rc<i64>,
     ) -> Result<Self> {
         // Init components
-        let auth = match Auth::build(connection) {
-            Ok(auth) => Rc::new(auth),
-            Err(e) => bail!("Could not create auth: {e}"),
-        };
+        let auth = Rc::new(Auth::build(connection)?);
         let database = Rc::new(Database::build(connection, profile_identity_id));
         let memory = Rc::new(Memory::new());
 
