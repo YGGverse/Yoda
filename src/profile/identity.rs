@@ -77,8 +77,8 @@ impl Identity {
             match time {
                 Some(value) => value,
                 None => (
-                    DateTime::now_local().unwrap(),
-                    DateTime::from_local(9999, 12, 31, 23, 59, 59.9).unwrap(), // max @TODO
+                    DateTime::now_local()?,
+                    DateTime::from_local(9999, 12, 31, 23, 59, 59.9)?, // max @TODO
                 ),
             },
             name,

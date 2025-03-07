@@ -52,10 +52,7 @@ impl Bookmark {
             }
         // Otherwise, create new record
         } else {
-            match self
-                .database
-                .add(DateTime::now_local().unwrap(), request.into())
-            {
+            match self.database.add(DateTime::now_local()?, request.into()) {
                 Ok(id) => match self.memory.add(request.into(), id) {
                     Ok(_) => Ok(true),
                     Err(_) => panic!(), // unexpected

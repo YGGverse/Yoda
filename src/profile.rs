@@ -72,9 +72,9 @@ impl Profile {
         let database = Rc::new(Database::build(&connection));
 
         // Get active profile or create new one
-        let profile_id = Rc::new(match database.active().unwrap() {
+        let profile_id = Rc::new(match database.active()? {
             Some(profile) => profile.id,
-            None => match database.add(true, DateTime::now_local().unwrap(), None) {
+            None => match database.add(true, DateTime::now_local()?, None) {
                 Ok(id) => id,
                 Err(e) => todo!("{:?}", e),
             },
@@ -83,7 +83,7 @@ impl Profile {
         // Init components
         let bookmark = Rc::new(Bookmark::build(&connection, &profile_id)?);
         let history = Rc::new(History::build(&connection, &profile_id));
-        let search = Rc::new(Search::build(&connection, &profile_id).unwrap()); // @TODO handle
+        let search = Rc::new(Search::build(&connection, &profile_id)?); // @TODO handle
         let identity = Rc::new(match Identity::build(&connection, &profile_id) {
             Ok(result) => result,
             Err(e) => todo!("{:?}", e.to_string()),
