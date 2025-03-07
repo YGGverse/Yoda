@@ -10,11 +10,11 @@ use widget::Widget;
 use window::Window;
 
 use crate::Profile;
-use adw::{prelude::AdwDialogExt, AboutDialog};
+use adw::{prelude::AdwDialogExt, AboutDialog, Application};
 use gtk::{
     gio::{Cancellable, File},
-    prelude::{GtkWindowExt, IsA},
-    Application, FileLauncher,
+    prelude::GtkWindowExt,
+    FileLauncher,
 };
 use sqlite::Transaction;
 use std::rc::Rc;
@@ -168,7 +168,7 @@ impl Browser {
         Ok(())
     }
 
-    pub fn init(&self, application: Option<&impl IsA<Application>>) -> &Self {
+    pub fn init(&self, application: Option<&Application>) -> &Self {
         // Assign browser window to this application
         self.widget.application_window.set_application(application); // @TODO
 

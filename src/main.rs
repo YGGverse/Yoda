@@ -3,9 +3,8 @@ mod profile;
 mod tool;
 
 use app::App;
-use profile::Profile;
-
 use gtk::glib::ExitCode;
+use profile::Profile;
 use std::rc::Rc;
 
 fn main() -> ExitCode {
