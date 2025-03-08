@@ -1,6 +1,5 @@
 mod content;
 mod database;
-mod error;
 mod input;
 mod navigation;
 mod search;
@@ -9,7 +8,6 @@ use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowActio
 use adw::TabPage;
 use anyhow::Result;
 use content::Content;
-use error::Error;
 use input::Input;
 use navigation::Navigation;
 use search::Search;
@@ -76,18 +74,12 @@ impl Page {
 
     // Actions
 
-    /// Toggle bookmark for current `profile` by navigation request value
-    /// * return `true` on bookmark created, `false` on deleted
-    pub fn bookmark(&self) -> Result<bool, Error> {
-        let result = match self
-            .profile
+    /// Toggle bookmark for current navigation request
+    pub fn bookmark(&self) {
+        self.profile
             .bookmark
-            .toggle(self.navigation.request().as_str())
-        {
-            Ok(result) => Ok(result),
-            Err(_) => Err(Error::Bookmark), // @TODO
-        };
-        result
+            .toggle(&self.navigation.request())
+            .unwrap(); // @TODO
     }
 
     /// Request `Escape` action for all page components

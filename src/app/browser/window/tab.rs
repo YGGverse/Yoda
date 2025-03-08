@@ -1,6 +1,5 @@
 mod action;
 mod database;
-mod error;
 mod item;
 mod menu;
 
@@ -9,7 +8,6 @@ use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
 use anyhow::Result;
-use error::Error;
 use gtk::{
     gio::Icon,
     glib::{DateTime, Propagation},
@@ -257,16 +255,11 @@ impl Tab {
         }
     }
 
-    /// Toggle `Bookmark` in current `Profile` for `Page` at given `position` (current page on `None`)
-    /// * return `true` on bookmark created, `false` on deleted; `Error` otherwise.
-    pub fn bookmark(&self, page_position: Option<i32>) -> Result<bool, Error> {
+    /// Toggle `Bookmark` for `Page` at given `position` (current page on `None`)
+    pub fn bookmark(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            return match item.page.bookmark() {
-                Ok(result) => Ok(result),
-                Err(_) => Err(Error::Bookmark),
-            };
+            item.page.bookmark()
         }
-        Err(Error::PageNotFound)
     }
 
     /// Toggle pin for page at given `position`, `None` to pin selected page (if available)

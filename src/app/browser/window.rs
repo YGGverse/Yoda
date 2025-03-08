@@ -48,11 +48,7 @@ impl Window {
 
         action.bookmark.connect_activate({
             let tab = tab.clone();
-            move |position| {
-                if tab.bookmark(position).is_err() {
-                    todo!()
-                }
-            }
+            move |position| tab.bookmark(position)
         });
 
         action.pin.connect_activate({
