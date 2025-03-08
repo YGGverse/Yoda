@@ -4,7 +4,6 @@ use gtk::glib::{DateTime, GString};
 pub struct Item {
     pub id: i64,
     pub request: GString,
-    pub created: DateTime,
     pub opened: Vec<DateTime>,
     pub closed: Vec<DateTime>,
 }
@@ -16,7 +15,6 @@ impl Item {
         Self {
             id,
             request,
-            created: now(),
             opened: vec![now()],
             closed: vec![],
         }
