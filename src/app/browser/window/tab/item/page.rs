@@ -121,10 +121,8 @@ impl Page {
             self.set_needs_attention(record.is_needs_attention);
             // Restore child components
             self.navigation.restore(transaction, &record.id)?;
-            // Make initial page history snap using `navigation` values restored
-            if let Some(uri) = self.navigation.uri() {
-                self.profile.history.memory.request.set(uri);
-            }
+            // Make initial page history snap
+            self.profile.history.open(self.navigation.request());
         }
         Ok(())
     }

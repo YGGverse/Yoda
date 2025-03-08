@@ -8,12 +8,7 @@ use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
 use anyhow::Result;
-use gtk::{
-    gio::Icon,
-    glib::{DateTime, Propagation},
-    prelude::ActionExt,
-    Box, Orientation,
-};
+use gtk::{gio::Icon, glib::Propagation, prelude::ActionExt, Box, Orientation};
 pub use item::Item;
 use menu::Menu;
 use sourceview::prelude::IsA;
@@ -86,11 +81,7 @@ impl Tab {
                     // keep removed `Item` reference in the memory (to reopen from the main menu)
                     // * skip item with blank request
                     if !item.page.navigation.request().is_empty() {
-                        profile
-                            .history
-                            .memory
-                            .tab
-                            .add(item, DateTime::now_local().unwrap().to_unix());
+                        profile.history.close(&item.page.navigation.request());
                     }
                 }
                 // reassign global actions to active tab

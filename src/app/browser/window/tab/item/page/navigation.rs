@@ -137,10 +137,6 @@ impl Navigation {
         self.request.text()
     }
 
-    pub fn uri(&self) -> Option<Uri> {
-        self.request.uri()
-    }
-
     pub fn home(&self) -> Option<Uri> {
         self.request.home()
     }

@@ -1,7 +1,7 @@
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
     gio::{self},
-    glib::{GString, Uri},
+    glib::{GString, Uri, UriFlags},
     prelude::{ActionExt, ToVariant},
     Align, MenuButton,
 };
@@ -220,14 +220,13 @@ impl Menu for MenuButton {
 
                     // Recently closed history
                     main_history_tab.remove_all();
-                    for item in profile.history.memory.tab.recent() {
-                        let item_request = item.page.navigation.request(); // @TODO restore entire `Item`
-                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&item_request, LABEL_MAX_LENGTH)), None);
+                    for history in profile.history.recently_closed(None) {
+                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&history.request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
                                 window_action.load.simple_action.name()
-                            )), Some(&item_request.to_variant()));
+                            )), Some(&history.request.to_variant()));
 
                             main_history_tab.append_item(&menu_item);
                     } // @TODO `menu_item`
@@ -238,11 +237,14 @@ impl Menu for MenuButton {
                     main_history_request.remove_all();
 
                     let mut list: IndexMap<GString, Vec<Uri>> = IndexMap::new();
-                    for uri in profile.history.memory.request.recent() {
-                        list.entry(match uri.host() {
-                            Some(host) => host,
-                            None => uri.to_str(),
-                        }).or_default().push(uri);
+                    for history in profile.history.recently_opened(None) {
+                        match Uri::parse(&history.request, UriFlags::NONE) {
+                            Ok(uri) => list.entry(match uri.host() {
+                                Some(host) => host,
+                                None => uri.to_str(),
+                            }).or_default().push(uri),
+                            Err(_) => continue // @TODO
+                        }
                     }
 
                     for (group, items) in list {

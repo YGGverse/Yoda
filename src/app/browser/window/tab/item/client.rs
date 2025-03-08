@@ -63,13 +63,13 @@ impl Client {
                     Ok(uri) => match uri.scheme().as_str() {
                         "file" => {
                             if is_snap_history {
-                                snap_history(&page, Some(&uri));
+                                snap_history(&page);
                             }
                             driver.file.handle(uri, feature, cancellable)
                         }
                         "gemini" | "titan" => {
                             if is_snap_history {
-                                snap_history(&page, Some(&uri));
+                                snap_history(&page);
                             }
                             driver.gemini.handle(uri, feature, cancellable)
                         }
@@ -201,23 +201,9 @@ fn search(profile: &Profile, query: &str) -> Uri {
 }
 
 /// Make new history record in related components
-/// * optional [Uri](https://docs.gtk.org/glib/struct.Uri.html) reference wanted only for performance reasons, to not parse it twice
-fn snap_history(page: &Page, uri: Option<&Uri>) {
-    let request = page.navigation.request();
-
-    // Add new record into the global memory index (used in global menu)
-    // * if the `Uri` is `None`, try parse it from `request`
-    match uri {
-        Some(uri) => page.profile.history.memory.request.set(uri.clone()),
-        None => {
-            // this case especially useful for some routes that contain redirects
-            // maybe some parental optimization wanted @TODO
-            if let Some(uri) = page.navigation.uri() {
-                page.profile.history.memory.request.set(uri);
-            }
-        }
-    }
-
-    // Add new record into the page navigation history
-    page.item_action.history.add(request, true)
+fn snap_history(page: &Page) {
+    page.item_action
+        .history
+        .add(page.navigation.request(), true);
+    page.profile.history.open(page.navigation.request())
 }

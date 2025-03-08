@@ -36,11 +36,6 @@ impl HistoryForward {
 
     // Actions
 
-    /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
-    pub fn activate(&self) {
-        self.simple_action.activate(None);
-    }
-
     /// Change action [state](https://docs.gtk.org/gio/method.SimpleAction.set_state.html)
     /// * set `DEFAULT_STATE` on `None`
     pub fn change_state(&self, state: Option<i32>) {
