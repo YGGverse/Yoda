@@ -207,7 +207,7 @@ impl Menu for MenuButton {
                 move |_| {
                     // Bookmarks
                     main_bookmarks.remove_all();
-                    for bookmark in profile.bookmark.recent() {
+                    for bookmark in profile.bookmark.recent(None) {
                         let menu_item = gio::MenuItem::new(Some(&ellipsize(&bookmark.request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",

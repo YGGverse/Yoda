@@ -68,8 +68,8 @@ impl Bookmark {
     }
 
     /// Get recent Items vector from `memory`, sorted by `ID` DESC
-    pub fn recent(&self) -> Vec<Item> {
-        self.memory.borrow().recent()
+    pub fn recent(&self, limit: Option<usize>) -> Vec<Item> {
+        self.memory.borrow().recent(limit)
     }
 }
 

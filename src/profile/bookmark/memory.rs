@@ -40,13 +40,17 @@ impl Memory {
     }
 
     /// Get recent Items vector sorted by `ID` DESC
-    pub fn recent(&self) -> Vec<Item> {
+    pub fn recent(&self, limit: Option<usize>) -> Vec<Item> {
         let mut recent: Vec<Item> = Vec::new();
-        for item in self
+        for (i, item) in self
             .0
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.request, &a.request))
+            .enumerate()
         {
+            if limit.is_some_and(|l| i > l) {
+                break;
+            }
             recent.push(item.clone())
         }
         recent
