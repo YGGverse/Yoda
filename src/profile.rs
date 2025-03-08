@@ -33,7 +33,7 @@ pub struct Profile {
 impl Profile {
     // Constructors
 
-    pub fn new() -> Result<Self> {
+    pub fn init() -> Result<Self> {
         // Init profile path
         let mut config_path = user_config_dir();
 
