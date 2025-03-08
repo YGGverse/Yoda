@@ -50,7 +50,7 @@ impl Bookmark {
             None => {
                 self.memory.add(
                     request.into(),
-                    self.database.add(DateTime::now_local()?, request.into())?,
+                    self.database.add(DateTime::now_local()?, request)?,
                 )?;
                 true
             }

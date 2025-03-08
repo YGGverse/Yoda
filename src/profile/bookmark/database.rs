@@ -39,7 +39,7 @@ impl Database {
 
     /// Create new bookmark record in database
     /// * return last insert ID on success
-    pub fn add(&self, time: DateTime, request: String) -> Result<i64> {
+    pub fn add(&self, time: DateTime, request: &str) -> Result<i64> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
         let id = insert(&tx, *self.profile_id, time, request)?;
@@ -74,7 +74,7 @@ pub fn init(tx: &Transaction) -> Result<usize> {
     )?)
 }
 
-pub fn insert(tx: &Transaction, profile_id: i64, time: DateTime, request: String) -> Result<i64> {
+pub fn insert(tx: &Transaction, profile_id: i64, time: DateTime, request: &str) -> Result<i64> {
     tx.execute(
         "INSERT INTO `profile_bookmark` (
             `profile_id`,
