@@ -260,36 +260,17 @@ impl App {
     }
 
     // Actions
-    pub fn run(&self) -> ExitCode {
+    pub fn run(&self) -> Result<ExitCode> {
         // Begin database migration @TODO
         {
-            // Init writable connection
-            let mut connection = match self.profile.database.connection.write() {
-                Ok(connection) => connection,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Init new transaction
-            let transaction = match connection.transaction() {
-                Ok(transaction) => transaction,
-                Err(e) => todo!("{e}"),
-            };
-
-            // Begin migration
-            match migrate(&transaction) {
-                Ok(_) => {
-                    // Confirm changes
-                    match transaction.commit() {
-                        Ok(_) => {} // @TODO
-                        Err(e) => todo!("{e}"),
-                    }
-                }
-                Err(e) => todo!("{e}"),
-            }
+            let mut connection = self.profile.database.connection.write().unwrap();
+            let transaction = connection.transaction()?;
+            migrate(&transaction)?;
+            transaction.commit()?;
         } // unlock database
 
         // Start application
-        self.application.run()
+        Ok(self.application.run())
     }
 }
 
