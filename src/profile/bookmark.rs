@@ -41,17 +41,20 @@ impl Bookmark {
     /// Toggle bookmark in `database` and `memory` index
     /// * return `true` on bookmark create, `false` on delete
     pub fn toggle(&self, request: &str) -> Result<bool> {
-        if let Some(id) = self.get(request) {
-            self.database.delete(id)?;
-            self.memory.delete(request)?;
-            Ok(false)
-        } else {
-            self.memory.add(
-                request.into(),
-                self.database.add(DateTime::now_local()?, request.into())?,
-            )?;
-            Ok(true)
-        }
+        Ok(match self.get(request) {
+            Some(id) => {
+                self.database.delete(id)?;
+                self.memory.delete(request)?;
+                false
+            }
+            None => {
+                self.memory.add(
+                    request.into(),
+                    self.database.add(DateTime::now_local()?, request.into())?,
+                )?;
+                true
+            }
+        })
     }
 
     // Getters
