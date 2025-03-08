@@ -1,16 +1,18 @@
 mod database;
+mod item;
 mod memory;
 
 use anyhow::Result;
 use database::Database;
 use gtk::glib::DateTime;
+use item::Item;
 use memory::Memory;
 use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use std::{cell::RefCell, rc::Rc, sync::RwLock};
 
 pub struct Bookmark {
-    database: Database, // permanent storage
-    memory: Memory,     // fast search index
+    database: Database,      // permanent storage
+    memory: RefCell<Memory>, // fast search index
 }
 
 impl Bookmark {
@@ -20,11 +22,17 @@ impl Bookmark {
     pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
         // Init children components
         let database = Database::new(connection, profile_id);
-        let memory = Memory::new();
+        let memory = RefCell::new(Memory::new());
 
         // Build initial index
-        for record in database.records(None)? {
-            memory.add(record.request, record.id)?;
+        {
+            let mut memory = memory.borrow_mut();
+            for record in database.records(None)? {
+                memory.add(Item {
+                    id: record.id,
+                    request: record.request,
+                });
+            }
         }
 
         // Return new `Self`
@@ -33,25 +41,20 @@ impl Bookmark {
 
     // Actions
 
-    /// Get record `id` by `request` from memory index
-    pub fn get(&self, request: &str) -> Option<i64> {
-        self.memory.get(request)
-    }
-
     /// Toggle bookmark in `database` and `memory` index
     /// * return `true` on bookmark create, `false` on delete
     pub fn toggle(&self, request: &str) -> Result<bool> {
-        Ok(match self.get(request) {
-            Some(id) => {
-                self.database.delete(id)?;
-                self.memory.delete(request)?;
+        let mut memory = self.memory.borrow_mut();
+        Ok(match memory.delete_by_request(request) {
+            Some(record) => {
+                self.database.delete(record.id)?;
                 false
             }
             None => {
-                self.memory.add(
-                    request.into(),
-                    self.database.add(DateTime::now_local()?, request)?,
-                )?;
+                memory.add(Item {
+                    id: self.database.add(DateTime::now_local()?, request)?,
+                    request: request.into(),
+                });
                 true
             }
         })
@@ -59,9 +62,14 @@ impl Bookmark {
 
     // Getters
 
-    /// Get recent requests vector from `memory`, sorted by `ID` DESC
-    pub fn recent(&self) -> Vec<String> {
-        self.memory.recent()
+    /// Check `request` exists in the memory index
+    pub fn contains_request(&self, request: &str) -> bool {
+        self.memory.borrow_mut().contains_request(request)
+    }
+
+    /// Get recent Items vector from `memory`, sorted by `ID` DESC
+    pub fn recent(&self) -> Vec<Item> {
+        self.memory.borrow().recent()
     }
 }
 

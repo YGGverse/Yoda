@@ -207,13 +207,13 @@ impl Menu for MenuButton {
                 move |_| {
                     // Bookmarks
                     main_bookmarks.remove_all();
-                    for request in profile.bookmark.recent() {
-                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&request, LABEL_MAX_LENGTH)), None);
+                    for bookmark in profile.bookmark.recent() {
+                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&bookmark.request, LABEL_MAX_LENGTH)), None);
                             menu_item.set_action_and_target_value(Some(&format!(
                                 "{}.{}",
                                 window_action.id,
                                 window_action.load.simple_action.name()
-                            )), Some(&request.to_variant()));
+                            )), Some(&bookmark.request.to_variant()));
 
                         main_bookmarks.append_item(&menu_item);
                     } // @TODO `menu_item`

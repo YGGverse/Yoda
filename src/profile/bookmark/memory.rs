@@ -1,73 +1,60 @@
-use anyhow::Result;
+use super::Item;
 use itertools::Itertools;
-use std::{cell::RefCell, collections::HashMap};
 
 /// Reduce disk usage by cache Bookmarks index in memory
-pub struct Memory {
-    index: RefCell<HashMap<String, i64>>,
-}
-
-impl Default for Memory {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub struct Memory(Vec<Item>);
 
 impl Memory {
     // Constructors
 
     /// Create new `Self`
     pub fn new() -> Self {
-        Self {
-            index: RefCell::new(HashMap::new()),
-        }
+        Self(Vec::new())
     }
 
     // Actions
 
-    /// Add new record with `request` as key and `id` as value
-    /// * validate record with same key does not exist yet
-    pub fn add(&self, request: String, id: i64) -> Result<()> {
-        // Borrow shared index access
-        let mut index = self.index.borrow_mut();
-
-        // Prevent existing key overwrite
-        if index.contains_key(&request) {
-            panic!() // unexpected
-        }
-
-        // Slot should be free, let check it twice
-        match index.insert(request, id) {
-            Some(_) => panic!(), // unexpected
-            None => Ok(()),
-        }
+    /// Add new item
+    pub fn add(&mut self, item: Item) {
+        self.0.push(item)
     }
 
     /// Delete record from index by `request`
-    /// * validate record key is exist
-    pub fn delete(&self, request: &str) -> Result<()> {
-        match self.index.borrow_mut().remove(request) {
-            Some(_) => Ok(()),
-            None => panic!(), // unexpected
+    pub fn delete_by_request(&mut self, request: &str) -> Option<Item> {
+        for (i, item) in self.0.iter().enumerate() {
+            if item.request == request {
+                return Some(self.0.remove(i));
+            }
         }
+        None
     }
 
-    /// Get `id` by `request` from memory index
-    pub fn get(&self, request: &str) -> Option<i64> {
-        self.index.borrow().get(request).copied()
+    /// Check `request` exists in the memory index
+    pub fn contains_request(&self, request: &str) -> bool {
+        for item in self.0.iter() {
+            if item.request == request {
+                return true;
+            }
+        }
+        false
     }
 
-    /// Get recent requests vector sorted by `ID` DESC
-    pub fn recent(&self) -> Vec<String> {
-        let mut recent: Vec<String> = Vec::new();
-        for (request, _) in self
-            .index
-            .borrow()
+    /// Get recent Items vector sorted by `ID` DESC
+    pub fn recent(&self) -> Vec<Item> {
+        let mut recent: Vec<Item> = Vec::new();
+        for item in self
+            .0
             .iter()
-            .sorted_by(|a, b| Ord::cmp(&b.1, &a.1))
+            .sorted_by(|a, b| Ord::cmp(&b.request, &a.request))
         {
-            recent.push(request.to_string())
+            recent.push(item.clone())
         }
         recent
+    }
+}
+
+impl Default for Memory {
+    fn default() -> Self {
+        Self::new()
     }
 }

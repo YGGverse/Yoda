@@ -48,7 +48,7 @@ impl Bookmark for Button {
     }
 
     fn update(&self, profile: &Profile, request: &Entry) {
-        let has_bookmark = profile.bookmark.get(&request.text()).is_some();
+        let has_bookmark = profile.bookmark.contains_request(&request.text());
         self.set_icon_name(icon_name(has_bookmark));
         self.set_tooltip_text(Some(tooltip_text(has_bookmark)));
     }

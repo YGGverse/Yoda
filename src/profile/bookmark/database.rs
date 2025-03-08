@@ -1,14 +1,8 @@
+use super::Item;
 use anyhow::Result;
 use gtk::glib::DateTime;
 use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
-
-pub struct Table {
-    pub id: i64,
-    //pub profile_id: i64,
-    //pub time: DateTime,
-    pub request: String,
-}
 
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
@@ -29,7 +23,7 @@ impl Database {
     // Getters
 
     /// Get bookmark records from database with optional filter by `request`
-    pub fn records(&self, request: Option<&str>) -> Result<Vec<Table>> {
+    pub fn records(&self, request: Option<&str>) -> Result<Vec<Item>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
         select(&tx, *self.profile_id, request)
@@ -86,7 +80,7 @@ pub fn insert(tx: &Transaction, profile_id: i64, time: DateTime, request: &str) 
     Ok(tx.last_insert_rowid())
 }
 
-pub fn select(tx: &Transaction, profile_id: i64, request: Option<&str>) -> Result<Vec<Table>> {
+pub fn select(tx: &Transaction, profile_id: i64, request: Option<&str>) -> Result<Vec<Item>> {
     let mut stmt = tx.prepare(
         "SELECT `id`, `profile_id`, `time`, `request`
             FROM `profile_bookmark`
@@ -94,7 +88,7 @@ pub fn select(tx: &Transaction, profile_id: i64, request: Option<&str>) -> Resul
     )?;
 
     let result = stmt.query_map((profile_id, request.unwrap_or("%")), |row| {
-        Ok(Table {
+        Ok(Item {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
             //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
