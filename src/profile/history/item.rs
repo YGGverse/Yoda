@@ -5,8 +5,8 @@ pub struct Item {
     pub id: i64,
     pub request: GString,
     pub created: DateTime,
-    pub opened: DateTime,
-    pub closed: Option<DateTime>,
+    pub opened: Vec<DateTime>,
+    pub closed: Vec<DateTime>,
 }
 
 impl Item {
@@ -17,19 +17,19 @@ impl Item {
             id,
             request,
             created: now(),
-            opened: now(),
-            closed: None,
+            opened: vec![now()],
+            closed: vec![],
         }
     }
 
     // Actions
 
     pub fn open(&mut self) {
-        self.opened = now()
+        self.opened.push(now())
     }
 
     pub fn close(&mut self) {
-        self.closed = Some(now())
+        self.closed.push(now())
     }
 }
 

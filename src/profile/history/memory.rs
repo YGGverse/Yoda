@@ -42,14 +42,14 @@ impl Memory {
 
     // Getters
 
-    /// Get recent Items vector sorted by `closed` ASC
+    /// Get recent Items vector sorted by `closed` DESC
     pub fn recently_closed(&self, limit: Option<usize>) -> Vec<Item> {
         let mut recent: Vec<Item> = Vec::new();
         for (i, item) in self
             .0
             .iter()
-            .filter(|x| x.closed.is_some())
-            .sorted_by(|a, b| Ord::cmp(&a.closed, &b.closed))
+            .filter(|x| !x.closed.is_empty())
+            .sorted_by(|a, b| Ord::cmp(&b.closed.last(), &a.closed.last()))
             .enumerate()
         {
             if limit.is_some_and(|l| i > l) {
@@ -60,13 +60,13 @@ impl Memory {
         recent
     }
 
-    /// Get recent Items vector sorted by `opened` ASC
+    /// Get recent Items vector sorted by `opened` DESC
     pub fn recently_opened(&self, limit: Option<usize>) -> Vec<Item> {
         let mut recent: Vec<Item> = Vec::new();
         for (i, item) in self
             .0
             .iter()
-            .sorted_by(|a, b| Ord::cmp(&a.opened, &b.opened))
+            .sorted_by(|a, b| Ord::cmp(&b.opened.last(), &a.opened.last()))
             .enumerate()
         {
             if limit.is_some_and(|l| i > l) {
