@@ -23,14 +23,15 @@ impl App {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(profile: &Rc<Profile>) -> Self {
+    pub fn build(profile: Profile) -> Self {
         // Init GTK
         let application = Application::builder()
             .application_id(APPLICATION_ID)
             .build();
 
         // Init components
-        let browser = Rc::new(Browser::build(profile));
+        let profile = Rc::new(profile);
+        let browser = Rc::new(Browser::build(&profile));
 
         // Prevent startup warning @TODO
         application.connect_activate(|_| {});
