@@ -9,8 +9,8 @@ use sqlite::{Connection, Transaction};
 use std::{rc::Rc, sync::RwLock};
 
 pub struct Bookmark {
-    pub database: Rc<Database>, // permanent storage
-    pub memory: Rc<Memory>,     // fast search index
+    database: Database, // permanent storage
+    memory: Memory,     // fast search index
 }
 
 impl Bookmark {
@@ -19,8 +19,8 @@ impl Bookmark {
     /// Create new `Self`
     pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
         // Init children components
-        let database = Rc::new(Database::new(connection, profile_id));
-        let memory = Rc::new(Memory::new());
+        let database = Database::new(connection, profile_id);
+        let memory = Memory::new();
 
         // Build initial index
         for record in database.records(None)? {
@@ -38,28 +38,27 @@ impl Bookmark {
         self.memory.get(request)
     }
 
-    /// Toggle record in `database` and `memory` index
-    /// * return `true` on bookmark created, `false` on deleted
+    /// Toggle bookmark in `database` and `memory` index
+    /// * return `true` on bookmark create, `false` on delete
     pub fn toggle(&self, request: &str) -> Result<bool> {
-        // Delete record if exists
         if let Some(id) = self.get(request) {
-            match self.database.delete(id) {
-                Ok(_) => match self.memory.delete(request) {
-                    Ok(_) => Ok(false),
-                    Err(_) => panic!(), // unexpected
-                },
-                Err(_) => panic!(), // unexpected
-            }
-        // Otherwise, create new record
+            self.database.delete(id)?;
+            self.memory.delete(request)?;
+            Ok(false)
         } else {
-            match self.database.add(DateTime::now_local()?, request.into()) {
-                Ok(id) => match self.memory.add(request.into(), id) {
-                    Ok(_) => Ok(true),
-                    Err(_) => panic!(), // unexpected
-                },
-                Err(_) => panic!(), // unexpected
-            }
-        } // @TODO return affected rows on success?
+            self.memory.add(
+                request.into(),
+                self.database.add(DateTime::now_local()?, request.into())?,
+            )?;
+            Ok(true)
+        }
+    }
+
+    // Getters
+
+    /// Get recent requests vector from `memory`, sorted by `ID` DESC
+    pub fn recent(&self) -> Vec<String> {
+        self.memory.recent()
     }
 }
 

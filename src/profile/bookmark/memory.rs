@@ -70,9 +70,4 @@ impl Memory {
         }
         recent
     }
-
-    /// Get records total
-    pub fn total(&self) -> usize {
-        self.index.borrow().len()
-    }
 }
