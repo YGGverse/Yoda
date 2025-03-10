@@ -44,17 +44,18 @@ impl Request {
 
         entry.add_controller({
             use gtk::{gdk::Key, glib::Propagation};
+            fn is_up(k: Key) -> bool {
+                matches!(k, Key::Up | Key::KP_Up | Key::Page_Up | Key::KP_Page_Up)
+            }
+            fn is_down(k: Key) -> bool {
+                matches!(
+                    k,
+                    Key::Down | Key::KP_Down | Key::Page_Down | Key::KP_Page_Down
+                )
+            }
             let controller = gtk::EventControllerKey::builder().build();
             controller.connect_key_pressed(|_, k, _, _| {
-                if k == Key::Down
-                    || k == Key::KP_Down
-                    || k == Key::Page_Down
-                    || k == Key::KP_Page_Down
-                    || k == Key::Up
-                    || k == Key::KP_Up
-                    || k == Key::Page_Up
-                    || k == Key::KP_Page_Up
-                {
+                if is_up(k) || is_down(k) {
                     return Propagation::Stop; // @TODO
                 }
                 Propagation::Proceed
