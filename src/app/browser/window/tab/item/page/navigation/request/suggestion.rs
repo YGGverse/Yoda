@@ -1,5 +1,6 @@
 mod item;
 
+use super::Profile;
 use adw::{
     prelude::{ActionRowExt, PopoverExt, PreferencesRowExt},
     ActionRow,
@@ -9,13 +10,19 @@ use gtk::{
         prelude::{Cast, CastNone},
         ListStore,
     },
-    prelude::{EntryExt, ListItemExt, WidgetExt},
+    glib::SignalHandlerId,
+    prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
     Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
 };
 pub use item::Item;
+use sourceview::prelude::ListModelExt;
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Suggestion {
     list_store: ListStore,
+    request: Entry,
+    profile: Rc<Profile>,
+    pub signal_handler_id: Rc<RefCell<Option<SignalHandlerId>>>,
     pub popover: Popover,
 }
 
@@ -23,9 +30,12 @@ impl Suggestion {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(request: &Entry) -> Self {
+    pub fn build(profile: &Rc<Profile>, request: &Entry) -> Self {
         let list_store = ListStore::new::<Item>();
+        let signal_handler_id = Rc::new(RefCell::new(None));
         Self {
+            profile: profile.clone(),
+            request: request.clone(),
             popover: {
                 let p = Popover::builder()
                     .autohide(false)
@@ -34,8 +44,10 @@ impl Suggestion {
                     .child(
                         &gtk::ScrolledWindow::builder()
                             //.css_classes(["view"])
-                            .child(
-                                &ListView::builder()
+                            .child(&{
+                                let list_view = ListView::builder()
+                                    .show_separators(true)
+                                    .single_click_activate(true)
                                     .model(
                                         &SingleSelection::builder()
                                             .model(&list_store)
@@ -63,8 +75,37 @@ impl Suggestion {
                                         });
                                         f
                                     })
-                                    .build(),
-                            )
+                                    .build();
+                                list_view.connect_activate({
+                                    let request = request.clone();
+                                    let signal_handler_id = signal_handler_id.clone();
+                                    move |this, i| {
+                                        use gtk::prelude::ObjectExt;
+                                        if let Some(signal_handler_id) =
+                                            signal_handler_id.borrow().as_ref()
+                                        {
+                                            request.block_signal(signal_handler_id);
+                                        }
+                                        request.set_text(
+                                            &this
+                                                .model()
+                                                .unwrap()
+                                                .item(i)
+                                                .unwrap()
+                                                .downcast_ref::<Item>()
+                                                .unwrap()
+                                                .request(),
+                                        );
+                                        request.select_region(0, -1);
+                                        if let Some(signal_handler_id) =
+                                            signal_handler_id.borrow().as_ref()
+                                        {
+                                            request.unblock_signal(signal_handler_id);
+                                        }
+                                    }
+                                });
+                                list_view
+                            })
                             .max_content_height(400)
                             .hscrollbar_policy(gtk::PolicyType::Never)
                             .propagate_natural_height(true)
@@ -87,17 +128,18 @@ impl Suggestion {
                 });
                 p
             },
+            signal_handler_id,
             list_store,
         }
     }
 
-    pub fn update(&self, profile: &super::Profile, request: &Entry, limit: Option<usize>) {
+    pub fn update(&self, limit: Option<usize>) {
         use gtk::prelude::EditableExt;
         use itertools::Itertools;
-        if request.text_length() > 0 {
+        if self.request.text_length() > 0 {
             self.list_store.remove_all();
-            let query = request.text();
-            let items = profile.bookmark.contains_request(&query, limit);
+            let query = self.request.text();
+            let items = self.profile.bookmark.contains_request(&query, limit);
             if !items.is_empty() {
                 for item in items
                     .into_iter()
@@ -109,6 +151,12 @@ impl Suggestion {
                         item.request.clone(),
                     )); // @TODO
                 }
+                self.popover
+                    .child()
+                    .unwrap()
+                    .downcast_ref::<gtk::ScrolledWindow>()
+                    .unwrap()
+                    .set_height_request(-1);
                 self.popover.popup();
                 return;
             }

@@ -82,7 +82,7 @@ impl Request for Entry {
         entry.update_primary_icon(profile);
 
         // Init additional features
-        let suggestion = Suggestion::build(&entry);
+        let suggestion = Rc::new(Suggestion::build(profile, &entry));
 
         // Connect events
         entry.connect_icon_release({
@@ -102,24 +102,28 @@ impl Request for Entry {
 
         entry.connect_has_focus_notify(|this| this.update_secondary_icon());
 
-        entry.connect_changed({
-            let profile = profile.clone();
-            let item_action = item_action.clone();
-            move |this| {
-                // Update actions
-                item_action.reload.set_enabled(!this.text().is_empty());
-                item_action.home.set_enabled(this.home().is_some());
+        suggestion
+            .clone()
+            .signal_handler_id
+            .borrow_mut()
+            .replace(entry.connect_changed({
+                let profile = profile.clone();
+                let item_action = item_action.clone();
+                move |this| {
+                    // Update actions
+                    item_action.reload.set_enabled(!this.text().is_empty());
+                    item_action.home.set_enabled(this.home().is_some());
 
-                // Update icons
-                this.update_primary_icon(&profile);
-                this.update_secondary_icon();
+                    // Update icons
+                    this.update_primary_icon(&profile);
+                    this.update_secondary_icon();
 
-                // Show search suggestions
-                if this.focus_child().is_some() {
-                    suggestion.update(&profile, this, None);
+                    // Show search suggestions
+                    if this.focus_child().is_some() {
+                        suggestion.update(None);
+                    }
                 }
-            }
-        });
+            })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
 
         entry.connect_activate({
             let item_action = item_action.clone();
@@ -142,7 +146,7 @@ impl Request for Entry {
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
                     && this.selection_bounds().is_none()
                 {
-                    this.select_region(0, this.text_length().into());
+                    this.select_region(0, -1);
                 }
                 // Update last focus state
                 has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
