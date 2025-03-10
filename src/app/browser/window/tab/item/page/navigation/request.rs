@@ -103,12 +103,12 @@ impl Request for Entry {
         entry.connect_has_focus_notify(|this| this.update_secondary_icon());
 
         suggestion
-            .clone()
             .signal_handler_id
             .borrow_mut()
             .replace(entry.connect_changed({
                 let profile = profile.clone();
                 let item_action = item_action.clone();
+                let suggestion = suggestion.clone();
                 move |this| {
                     // Update actions
                     item_action.reload.set_enabled(!this.text().is_empty());
@@ -127,8 +127,11 @@ impl Request for Entry {
 
         entry.connect_activate({
             let item_action = item_action.clone();
-            move |this| {
-                item_action.load.activate(Some(&this.text()), true);
+            let suggestion = suggestion.clone();
+            move |_| {
+                use gtk::prelude::ActionExt;
+                item_action.reload.activate(None);
+                suggestion.hide();
             }
         });
 

@@ -22,8 +22,8 @@ pub struct Suggestion {
     list_store: ListStore,
     request: Entry,
     profile: Rc<Profile>,
+    popover: Popover,
     pub signal_handler_id: Rc<RefCell<Option<SignalHandlerId>>>,
-    pub popover: Popover,
 }
 
 impl Suggestion {
@@ -133,6 +133,8 @@ impl Suggestion {
         }
     }
 
+    // Actions
+
     pub fn update(&self, limit: Option<usize>) {
         use gtk::prelude::EditableExt;
         use itertools::Itertools;
@@ -155,12 +157,15 @@ impl Suggestion {
                     .child()
                     .unwrap()
                     .downcast_ref::<gtk::ScrolledWindow>()
-                    .unwrap()
-                    .set_height_request(-1);
+                    .unwrap();
                 self.popover.popup();
                 return;
             }
         }
-        self.popover.popdown();
+        self.hide();
+    }
+
+    pub fn hide(&self) {
+        self.popover.popdown()
     }
 }
