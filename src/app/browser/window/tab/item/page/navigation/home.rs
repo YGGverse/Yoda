@@ -3,12 +3,15 @@ use crate::app::browser::window::action::Position;
 use gtk::{
     gdk::BUTTON_MIDDLE,
     prelude::{ActionExt, WidgetExt},
-    Button, Entry, GestureClick,
+    Button, GestureClick,
 };
 use std::rc::Rc;
 
 pub trait Home {
-    fn home(action: (&Rc<WindowAction>, &Rc<TabAction>, &Rc<ItemAction>), request: &Entry) -> Self;
+    fn home(
+        action: (&Rc<WindowAction>, &Rc<TabAction>, &Rc<ItemAction>),
+        request: &Rc<Request>,
+    ) -> Self;
 }
 
 impl Home for Button {
@@ -18,7 +21,7 @@ impl Home for Button {
             &Rc<TabAction>,
             &Rc<ItemAction>,
         ),
-        request: &Entry,
+        request: &Rc<Request>,
     ) -> Self {
         let button = Button::builder()
             .action_name(format!("{}.{}", tab_action.id, item_action.home.name()))

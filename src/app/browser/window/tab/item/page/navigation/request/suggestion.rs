@@ -15,7 +15,6 @@ use gtk::{
     Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
 };
 pub use item::Item;
-use sourceview::prelude::ListModelExt;
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Suggestion {
@@ -47,13 +46,39 @@ impl Suggestion {
                             .child(&{
                                 let list_view = ListView::builder()
                                     .show_separators(true)
-                                    .single_click_activate(true)
-                                    .model(
-                                        &SingleSelection::builder()
+                                    .model(&{
+                                        let s = SingleSelection::builder()
                                             .model(&list_store)
                                             .autoselect(false)
-                                            .build(),
-                                    )
+                                            .build();
+                                        s.connect_selected_notify({
+                                            let request = request.clone();
+                                            let signal_handler_id = signal_handler_id.clone();
+                                            move |this| {
+                                                use gtk::prelude::ObjectExt;
+                                                if let Some(signal_handler_id) =
+                                                    signal_handler_id.borrow().as_ref()
+                                                {
+                                                    request.block_signal(signal_handler_id);
+                                                }
+                                                request.set_text(
+                                                    &this
+                                                        .selected_item()
+                                                        .unwrap()
+                                                        .downcast_ref::<Item>()
+                                                        .unwrap()
+                                                        .request(),
+                                                );
+                                                request.select_region(0, -1);
+                                                if let Some(signal_handler_id) =
+                                                    signal_handler_id.borrow().as_ref()
+                                                {
+                                                    request.unblock_signal(signal_handler_id);
+                                                }
+                                            }
+                                        });
+                                        s
+                                    })
                                     .factory(&{
                                         let f = SignalListItemFactory::new();
                                         f.connect_setup(|_, this| {
@@ -78,31 +103,7 @@ impl Suggestion {
                                     .build();
                                 list_view.connect_activate({
                                     let request = request.clone();
-                                    let signal_handler_id = signal_handler_id.clone();
-                                    move |this, i| {
-                                        use gtk::prelude::ObjectExt;
-                                        if let Some(signal_handler_id) =
-                                            signal_handler_id.borrow().as_ref()
-                                        {
-                                            request.block_signal(signal_handler_id);
-                                        }
-                                        request.set_text(
-                                            &this
-                                                .model()
-                                                .unwrap()
-                                                .item(i)
-                                                .unwrap()
-                                                .downcast_ref::<Item>()
-                                                .unwrap()
-                                                .request(),
-                                        );
-                                        request.select_region(0, -1);
-                                        if let Some(signal_handler_id) =
-                                            signal_handler_id.borrow().as_ref()
-                                        {
-                                            request.unblock_signal(signal_handler_id);
-                                        }
-                                    }
+                                    move |_, _| request.emit_activate()
                                 });
                                 list_view
                             })

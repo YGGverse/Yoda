@@ -84,7 +84,8 @@ impl Page {
 
     /// Request `Escape` action for all page components
     pub fn escape(&self) {
-        self.search.hide()
+        self.search.hide();
+        self.navigation.escape();
     }
 
     /// Toggle `Find` widget

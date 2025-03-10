@@ -11,7 +11,7 @@ use bookmark::Bookmark;
 use gtk::{
     glib::{GString, Uri},
     prelude::{BoxExt, EditableExt, EntryExt, WidgetExt},
-    Box, Button, Entry, Orientation,
+    Box, Button, Orientation,
 };
 use history::History;
 use home::Home;
@@ -24,8 +24,7 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Navigation {
-    profile: Rc<Profile>,
-    request: Entry,
+    request: Rc<Request>,
     pub g_box: Box,
 }
 
@@ -40,10 +39,10 @@ impl Navigation {
     ) -> Self {
         // Init children components
         let history = Box::history((window_action, tab_action, item_action));
-        let request = Entry::request(item_action, profile);
+        let request = Rc::new(Request::build(item_action, profile));
         let reload = Button::reload((window_action, tab_action, item_action), &request);
         let home = Button::home((window_action, tab_action, item_action), &request);
-        let bookmark = Button::bookmark(window_action, profile, &request);
+        let bookmark = Button::bookmark(window_action, profile, &request.entry);
 
         // Init main widget
         let g_box = Box::builder()
@@ -57,17 +56,17 @@ impl Navigation {
         g_box.append(&home);
         g_box.append(&history);
         g_box.append(&reload);
-        g_box.append(&request);
+        g_box.append(&request.entry);
         g_box.append(&bookmark);
 
-        Self {
-            profile: profile.clone(),
-            request,
-            g_box,
-        }
+        Self { request, g_box }
     }
 
     // Actions
+
+    pub fn escape(&self) {
+        self.request.escape();
+    }
 
     pub fn clean(
         &self,
@@ -106,21 +105,21 @@ impl Navigation {
     }
 
     pub fn grab_focus(&self) -> bool {
-        self.request.grab_focus()
+        self.request.entry.grab_focus()
     }
 
     pub fn show_identity_dialog(&self) {
-        self.request.show_identity_dialog(&self.profile)
+        self.request.show_identity_dialog()
     }
 
     // Setters
 
     pub fn set_request(&self, value: &str) {
-        self.request.set_text(value);
+        self.request.entry.set_text(value);
     }
 
     pub fn set_progress_fraction(&self, value: f64) {
-        self.request.set_progress_fraction(value);
+        self.request.entry.set_progress_fraction(value);
     }
 
     pub fn to_download(&self) {
@@ -134,7 +133,7 @@ impl Navigation {
     // Getters
 
     pub fn request(&self) -> GString {
-        self.request.text()
+        self.request.entry.text()
     }
 
     pub fn home(&self) -> Option<Uri> {

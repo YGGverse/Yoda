@@ -20,57 +20,17 @@ use suggestion::Suggestion;
 const PREFIX_DOWNLOAD: &str = "download:";
 const PREFIX_SOURCE: &str = "source:";
 
-pub trait Request {
-    // Constructors
-
-    fn request(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self;
-
-    // Actions
-
-    fn clean(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<()>;
-
-    fn restore(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<()>;
-
-    fn save(
-        &self,
-        transaction: &Transaction,
-        app_browser_window_tab_item_page_navigation_id: &i64,
-    ) -> Result<()>;
-
-    fn update_primary_icon(&self, profile: &Profile);
-    fn update_secondary_icon(&self);
-
-    fn show_identity_dialog(&self, profile: &Rc<Profile>);
-    fn show_search_dialog(&self, profile: &Rc<Profile>);
-
-    // Setters
-
-    fn to_download(&self);
-    fn to_source(&self);
-
-    // Getters
-
-    fn prefix_less(&self) -> GString;
-    fn download(&self) -> GString;
-    fn source(&self) -> GString;
-    fn uri(&self) -> Option<Uri>;
-    fn home(&self) -> Option<Uri>;
-    fn is_file(&self) -> bool;
+pub struct Request {
+    pub entry: Entry,
+    suggestion: Rc<Suggestion>,
+    profile: Rc<Profile>,
 }
 
-impl Request for Entry {
+impl Request {
     // Constructors
 
     /// Build new `Self`
-    fn request(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
+    pub fn build(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text("URL or search term...")
@@ -79,7 +39,7 @@ impl Request for Entry {
             .build();
 
         // Detect primary icon on construct
-        entry.update_primary_icon(profile);
+        update_primary_icon(&entry, profile);
 
         // Init additional features
         let suggestion = Rc::new(Suggestion::build(profile, &entry));
@@ -90,9 +50,9 @@ impl Request for Entry {
             move |this, position| match position {
                 EntryIconPosition::Primary => {
                     if matches!(primary_icon::from(&this.text()), PrimaryIcon::Search { .. }) {
-                        this.show_search_dialog(&profile)
+                        show_search_dialog(this, &profile)
                     } else {
-                        this.show_identity_dialog(&profile)
+                        show_identity_dialog(this, &profile)
                     }
                 }
                 EntryIconPosition::Secondary => this.emit_activate(),
@@ -100,7 +60,7 @@ impl Request for Entry {
             }
         });
 
-        entry.connect_has_focus_notify(|this| this.update_secondary_icon());
+        entry.connect_has_focus_notify(update_secondary_icon);
 
         suggestion
             .signal_handler_id
@@ -112,11 +72,11 @@ impl Request for Entry {
                 move |this| {
                     // Update actions
                     item_action.reload.set_enabled(!this.text().is_empty());
-                    item_action.home.set_enabled(this.home().is_some());
+                    item_action.home.set_enabled(home(this).is_some());
 
                     // Update icons
-                    this.update_primary_icon(&profile);
-                    this.update_secondary_icon();
+                    update_primary_icon(this, &profile);
+                    update_secondary_icon(this);
 
                     // Show search suggestions
                     if this.focus_child().is_some() {
@@ -156,11 +116,35 @@ impl Request for Entry {
             }
         });
 
-        entry
+        Self {
+            entry,
+            suggestion,
+            profile: profile.clone(),
+        }
     }
 
     // Actions
-    fn clean(
+    pub fn escape(&self) {
+        self.suggestion.hide()
+    }
+
+    /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
+    /// * return `None` if current request already match home or Uri not parsable
+    pub fn home(&self) -> Option<Uri> {
+        home(&self.entry)
+    }
+
+    /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+    /// * `strip_prefix` on parse
+    pub fn uri(&self) -> Option<Uri> {
+        uri(&self.entry)
+    }
+
+    pub fn show_identity_dialog(&self) {
+        show_identity_dialog(&self.entry, &self.profile)
+    }
+
+    pub fn clean(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
@@ -174,7 +158,7 @@ impl Request for Entry {
         Ok(())
     }
 
-    fn restore(
+    pub fn restore(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
@@ -182,7 +166,7 @@ impl Request for Entry {
         for record in database::select(transaction, app_browser_window_tab_item_page_navigation_id)?
         {
             if let Some(text) = record.text {
-                self.set_text(&text);
+                self.entry.set_text(&text);
             }
             // Delegate restore action to the item childs
             // nothing yet..
@@ -190,13 +174,13 @@ impl Request for Entry {
         Ok(())
     }
 
-    fn save(
+    pub fn save(
         &self,
         transaction: &Transaction,
         app_browser_window_tab_item_page_navigation_id: &i64,
     ) -> Result<()> {
         // Keep value in memory until operation complete
-        let text = self.text();
+        let text = self.entry.text();
         let _id = database::insert(
             transaction,
             app_browser_window_tab_item_page_navigation_id,
@@ -210,154 +194,32 @@ impl Request for Entry {
         Ok(())
     }
 
-    fn update_primary_icon(&self, profile: &Profile) {
-        self.first_child().unwrap().remove_css_class("success"); // @TODO handle
-
-        match primary_icon::from(&self.text()) {
-            PrimaryIcon::Download { name, tooltip } | PrimaryIcon::File { name, tooltip } => {
-                self.set_primary_icon_activatable(false);
-                self.set_primary_icon_sensitive(false);
-                self.set_primary_icon_name(Some(name));
-                self.set_primary_icon_tooltip_text(Some(tooltip));
-            }
-            PrimaryIcon::Gemini { name, tooltip } | PrimaryIcon::Titan { name, tooltip } => {
-                self.set_primary_icon_activatable(true);
-                self.set_primary_icon_sensitive(true);
-                self.set_primary_icon_name(Some(name));
-                if profile.identity.get(&self.prefix_less()).is_some() {
-                    self.first_child().unwrap().add_css_class("success"); // @TODO handle
-                    self.set_primary_icon_tooltip_text(Some(tooltip.1));
-                } else {
-                    self.set_primary_icon_tooltip_text(Some(tooltip.0));
-                }
-            }
-            PrimaryIcon::Search { name, tooltip } => {
-                self.set_primary_icon_activatable(true);
-                self.set_primary_icon_sensitive(true);
-                self.set_primary_icon_name(Some(name));
-                self.set_primary_icon_tooltip_text(Some(tooltip));
-            }
-            PrimaryIcon::Source { name, tooltip } => {
-                self.set_primary_icon_activatable(false);
-                self.set_primary_icon_sensitive(false);
-                self.set_primary_icon_name(Some(name));
-                self.set_primary_icon_tooltip_text(Some(tooltip));
-            }
-        }
-    }
-
-    fn update_secondary_icon(&self) {
-        if !self.text().is_empty() && self.focus_child().is_some_and(|text| text.has_focus()) {
-            self.set_secondary_icon_name(Some("pan-end-symbolic"));
-        } else {
-            self.set_secondary_icon_name(None);
-            self.select_region(0, 0);
-        }
-    }
-
-    /// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-    fn show_identity_dialog(&self, profile: &Rc<Profile>) {
-        // connect identity traits
-        use identity::{Common, Unsupported};
-        if let Some(uri) = self.uri() {
-            if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
-                return AlertDialog::common(
-                    profile,
-                    &uri,
-                    &Rc::new({
-                        let profile = profile.clone();
-                        let this = self.clone();
-                        move |is_reload| {
-                            this.update_primary_icon(&profile);
-                            if is_reload {
-                                this.emit_activate();
-                            }
-                        }
-                    }),
-                )
-                .present(Some(self));
-            }
-        }
-        AlertDialog::unsupported().present(Some(self));
-    }
-
-    /// Present Search providers [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-    fn show_search_dialog(&self, profile: &Rc<Profile>) {
-        use search::Search;
-        AlertDialog::search(profile).present(Some(self))
-    }
-
     // Setters
 
-    fn to_download(&self) {
-        self.set_text(&self.download());
+    pub fn to_download(&self) {
+        self.entry.set_text(&self.download());
     }
 
-    fn to_source(&self) {
-        self.set_text(&self.source());
+    pub fn to_source(&self) {
+        self.entry.set_text(&self.source());
     }
 
     // Getters
 
-    /// Get current request value without system prefix
-    /// * the `prefix` is not `scheme`
-    fn prefix_less(&self) -> GString {
-        let mut request = self.text();
-
-        if let Some(postfix) = request.strip_prefix(PREFIX_SOURCE) {
-            request = postfix.into()
-        }
-        if let Some(postfix) = request.strip_prefix(PREFIX_DOWNLOAD) {
-            request = postfix.into()
-        }
-        request
+    pub fn is_file(&self) -> bool {
+        self.entry.text().starts_with("file://")
     }
+
+    // Tools
 
     /// Get request value with formatted `download` prefix
     fn download(&self) -> GString {
-        gformat!("{PREFIX_DOWNLOAD}{}", self.prefix_less())
+        gformat!("{PREFIX_DOWNLOAD}{}", prefix_less(&self.entry))
     }
 
     /// Get request value with formatted `source` prefix
     fn source(&self) -> GString {
-        gformat!("{PREFIX_SOURCE}{}", self.prefix_less())
-    }
-
-    /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-    /// * `strip_prefix` on parse
-    fn uri(&self) -> Option<Uri> {
-        match Uri::parse(&self.prefix_less(), UriFlags::NONE) {
-            Ok(uri) => Some(uri),
-            _ => None,
-        }
-    }
-
-    /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
-    /// * return `None` if current request already match home or Uri not parsable
-    fn home(&self) -> Option<Uri> {
-        let uri = self.uri()?;
-        if uri.path().len() > 1 || uri.query().is_some() || uri.fragment().is_some() {
-            Some(Uri::build(
-                UriFlags::NONE,
-                &if uri.scheme() == "titan" {
-                    GString::from("gemini")
-                } else {
-                    uri.scheme()
-                },
-                uri.userinfo().as_deref(),
-                uri.host().as_deref(),
-                uri.port(),
-                "/",
-                None,
-                None,
-            ))
-        } else {
-            None
-        }
-    }
-
-    fn is_file(&self) -> bool {
-        self.text().starts_with("file://")
+        gformat!("{PREFIX_SOURCE}{}", prefix_less(&self.entry))
     }
 }
 
@@ -372,4 +234,128 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
 
     // Success
     Ok(())
+}
+
+fn update_primary_icon(entry: &Entry, profile: &Profile) {
+    entry.first_child().unwrap().remove_css_class("success"); // @TODO handle
+
+    match primary_icon::from(&entry.text()) {
+        PrimaryIcon::Download { name, tooltip } | PrimaryIcon::File { name, tooltip } => {
+            entry.set_primary_icon_activatable(false);
+            entry.set_primary_icon_sensitive(false);
+            entry.set_primary_icon_name(Some(name));
+            entry.set_primary_icon_tooltip_text(Some(tooltip));
+        }
+        PrimaryIcon::Gemini { name, tooltip } | PrimaryIcon::Titan { name, tooltip } => {
+            entry.set_primary_icon_activatable(true);
+            entry.set_primary_icon_sensitive(true);
+            entry.set_primary_icon_name(Some(name));
+            if profile.identity.get(&prefix_less(entry)).is_some() {
+                entry.first_child().unwrap().add_css_class("success"); // @TODO handle
+                entry.set_primary_icon_tooltip_text(Some(tooltip.1));
+            } else {
+                entry.set_primary_icon_tooltip_text(Some(tooltip.0));
+            }
+        }
+        PrimaryIcon::Search { name, tooltip } => {
+            entry.set_primary_icon_activatable(true);
+            entry.set_primary_icon_sensitive(true);
+            entry.set_primary_icon_name(Some(name));
+            entry.set_primary_icon_tooltip_text(Some(tooltip));
+        }
+        PrimaryIcon::Source { name, tooltip } => {
+            entry.set_primary_icon_activatable(false);
+            entry.set_primary_icon_sensitive(false);
+            entry.set_primary_icon_name(Some(name));
+            entry.set_primary_icon_tooltip_text(Some(tooltip));
+        }
+    }
+}
+
+fn update_secondary_icon(entry: &Entry) {
+    if !entry.text().is_empty() && entry.focus_child().is_some_and(|text| text.has_focus()) {
+        entry.set_secondary_icon_name(Some("pan-end-symbolic"));
+    } else {
+        entry.set_secondary_icon_name(None);
+        entry.select_region(0, 0);
+    }
+}
+
+/// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
+fn show_identity_dialog(entry: &Entry, profile: &Rc<Profile>) {
+    // connect identity traits
+    use identity::{Common, Unsupported};
+    if let Some(uri) = uri(entry) {
+        if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
+            return AlertDialog::common(
+                profile,
+                &uri,
+                &Rc::new({
+                    let profile = profile.clone();
+                    let entry = entry.clone();
+                    move |is_reload| {
+                        update_primary_icon(&entry, &profile);
+                        if is_reload {
+                            entry.emit_activate();
+                        }
+                    }
+                }),
+            )
+            .present(Some(entry));
+        }
+    }
+    AlertDialog::unsupported().present(Some(entry));
+}
+
+/// Present Search providers [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
+fn show_search_dialog(entry: &Entry, profile: &Rc<Profile>) {
+    use search::Search;
+    AlertDialog::search(profile).present(Some(entry))
+}
+
+/// Get current request value without system prefix
+/// * the `prefix` is not `scheme`
+fn prefix_less(entry: &Entry) -> GString {
+    let mut request = entry.text();
+
+    if let Some(postfix) = request.strip_prefix(PREFIX_SOURCE) {
+        request = postfix.into()
+    }
+    if let Some(postfix) = request.strip_prefix(PREFIX_DOWNLOAD) {
+        request = postfix.into()
+    }
+    request
+}
+
+/// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+/// * `strip_prefix` on parse
+fn uri(entry: &Entry) -> Option<Uri> {
+    match Uri::parse(&prefix_less(entry), UriFlags::NONE) {
+        Ok(uri) => Some(uri),
+        _ => None,
+    }
+}
+
+/// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
+/// * return `None` if current request already match home or Uri not parsable
+fn home(entry: &Entry) -> Option<Uri> {
+    let uri = uri(entry)?;
+    if uri.path().len() > 1 || uri.query().is_some() || uri.fragment().is_some() {
+        Some(Uri::build(
+            UriFlags::NONE,
+            &if uri.scheme() == "titan" {
+                GString::from("gemini")
+            } else {
+                uri.scheme()
+            },
+            uri.userinfo().as_deref(),
+            uri.host().as_deref(),
+            uri.port(),
+            "/",
+            None,
+            None,
+        ))
+    } else {
+        None
+    }
 }
