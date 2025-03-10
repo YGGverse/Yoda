@@ -38,13 +38,30 @@ impl Request {
             .hexpand(true)
             .build();
 
-        // Detect primary icon on construct
         update_primary_icon(&entry, profile);
 
-        // Init additional features
         let suggestion = Rc::new(Suggestion::build(profile, &entry));
 
-        // Connect events
+        entry.add_controller({
+            use gtk::{gdk::Key, glib::Propagation};
+            let controller = gtk::EventControllerKey::builder().build();
+            controller.connect_key_pressed(|_, k, _, _| {
+                if k == Key::Down
+                    || k == Key::KP_Down
+                    || k == Key::Page_Down
+                    || k == Key::KP_Page_Down
+                    || k == Key::Up
+                    || k == Key::KP_Up
+                    || k == Key::Page_Up
+                    || k == Key::KP_Page_Up
+                {
+                    return Propagation::Stop; // @TODO
+                }
+                Propagation::Proceed
+            });
+            controller
+        });
+
         entry.connect_icon_release({
             let profile = profile.clone();
             move |this, position| match position {
