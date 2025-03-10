@@ -43,24 +43,42 @@ impl Request {
         let suggestion = Rc::new(Suggestion::build(profile, &entry));
 
         entry.add_controller({
-            use gtk::{gdk::Key, glib::Propagation};
-            fn is_up(k: Key) -> bool {
-                matches!(k, Key::Up | Key::KP_Up | Key::Page_Up | Key::KP_Page_Up)
-            }
-            fn is_down(k: Key) -> bool {
-                matches!(
-                    k,
-                    Key::Down | Key::KP_Down | Key::Page_Down | Key::KP_Page_Down
-                )
-            }
-            let controller = gtk::EventControllerKey::builder().build();
-            controller.connect_key_pressed(|_, k, _, _| {
-                if is_up(k) || is_down(k) {
-                    return Propagation::Stop; // @TODO
+            use gtk::{
+                gdk::{Key, ModifierType},
+                glib::Propagation,
+            };
+            let c = gtk::EventControllerKey::builder().build();
+            c.connect_key_pressed({
+                let entry = entry.clone();
+                let suggestion = suggestion.clone();
+                move |_, k, _, m| {
+                    if suggestion.is_visible()
+                        && !matches!(
+                            m,
+                            ModifierType::SHIFT_MASK
+                                | ModifierType::ALT_MASK
+                                | ModifierType::CONTROL_MASK
+                        )
+                    {
+                        if matches!(k, Key::Up | Key::KP_Up | Key::Page_Up | Key::KP_Page_Up) {
+                            if !suggestion.to_back() {
+                                entry.error_bell()
+                            }
+                            return Propagation::Stop;
+                        } else if matches!(
+                            k,
+                            Key::Down | Key::KP_Down | Key::Page_Down | Key::KP_Page_Down
+                        ) {
+                            if !suggestion.to_next() {
+                                entry.error_bell()
+                            }
+                            return Propagation::Stop;
+                        }
+                    }
+                    Propagation::Proceed
                 }
-                Propagation::Proceed
             });
-            controller
+            c
         });
 
         entry.connect_icon_release({

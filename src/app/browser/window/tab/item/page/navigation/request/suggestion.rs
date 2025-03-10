@@ -169,4 +169,21 @@ impl Suggestion {
     pub fn hide(&self) {
         self.popover.popdown()
     }
+
+    pub fn to_back(&self) -> bool {
+        false // @TODO
+    }
+    pub fn to_next(&self) -> bool {
+        false // @TODO
+    }
+
+    // Getters
+
+    pub fn is_visible(&self) -> bool {
+        self.popover.is_visible()
+    }
+
+    /*pub fn total(&self) -> u32 {
+        self.list_store.n_items()
+    }*/
 }
