@@ -55,26 +55,26 @@ impl Suggestion {
                                             let request = request.clone();
                                             let signal_handler_id = signal_handler_id.clone();
                                             move |this| {
-                                                use gtk::prelude::ObjectExt;
-                                                if let Some(signal_handler_id) =
-                                                    signal_handler_id.borrow().as_ref()
-                                                {
-                                                    request.block_signal(signal_handler_id);
-                                                }
-                                                request.set_text(
-                                                    &this
-                                                        .selected_item()
-                                                        .unwrap()
-                                                        .downcast_ref::<Item>()
-                                                        .unwrap()
-                                                        .request(),
-                                                );
-                                                request.select_region(0, -1);
-                                                if let Some(signal_handler_id) =
-                                                    signal_handler_id.borrow().as_ref()
-                                                {
-                                                    request.unblock_signal(signal_handler_id);
-                                                }
+                                                if let Some(selected_item) = this.selected_item() {
+                                                    use gtk::prelude::ObjectExt;
+                                                    if let Some(signal_handler_id) =
+                                                        signal_handler_id.borrow().as_ref()
+                                                    {
+                                                        request.block_signal(signal_handler_id);
+                                                    }
+                                                    request.set_text(
+                                                        &selected_item
+                                                            .downcast_ref::<Item>()
+                                                            .unwrap()
+                                                            .request(),
+                                                    );
+                                                    request.select_region(0, -1);
+                                                    if let Some(signal_handler_id) =
+                                                        signal_handler_id.borrow().as_ref()
+                                                    {
+                                                        request.unblock_signal(signal_handler_id);
+                                                    }
+                                                } // @TODO find signal to handle selected item only
                                             }
                                         });
                                         s
