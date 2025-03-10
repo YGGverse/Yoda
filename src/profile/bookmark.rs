@@ -63,8 +63,13 @@ impl Bookmark {
     // Getters
 
     /// Check `request` exists in the memory index
-    pub fn contains_request(&self, request: &str) -> bool {
-        self.memory.borrow_mut().contains_request(request)
+    pub fn is_match_request(&self, request: &str) -> bool {
+        self.memory.borrow_mut().is_match_request(request)
+    }
+
+    /// Find Items match `request`
+    pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
+        self.memory.borrow_mut().contains_request(request, limit)
     }
 
     /// Get recent Items vector from `memory`, sorted by `ID` DESC

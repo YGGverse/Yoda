@@ -30,13 +30,27 @@ impl Memory {
     }
 
     /// Check `request` exists in the memory index
-    pub fn contains_request(&self, request: &str) -> bool {
+    pub fn is_match_request(&self, request: &str) -> bool {
         for item in self.0.iter() {
             if item.request == request {
                 return true;
             }
         }
         false
+    }
+
+    /// Get Items match `request`
+    pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
+        let mut items: Vec<Item> = Vec::new();
+        for (i, item) in self.0.iter().enumerate() {
+            if limit.is_some_and(|l| i > l) {
+                break;
+            }
+            if item.request.contains(request) {
+                items.push(item.clone())
+            }
+        }
+        items
     }
 
     /// Get recent Items vector sorted by `ID` DESC

@@ -2,6 +2,7 @@ mod database;
 mod identity;
 mod primary_icon;
 mod search;
+mod suggestion;
 
 use super::{ItemAction, Profile};
 use adw::{prelude::AdwDialogExt, AlertDialog};
@@ -14,6 +15,7 @@ use gtk::{
 use primary_icon::PrimaryIcon;
 use sqlite::Transaction;
 use std::{cell::Cell, rc::Rc};
+use suggestion::Suggestion;
 
 const PREFIX_DOWNLOAD: &str = "download:";
 const PREFIX_SOURCE: &str = "source:";
@@ -79,6 +81,9 @@ impl Request for Entry {
         // Detect primary icon on construct
         entry.update_primary_icon(profile);
 
+        // Init additional features
+        let suggestion = Suggestion::build(&entry);
+
         // Connect events
         entry.connect_icon_release({
             let profile = profile.clone();
@@ -108,6 +113,11 @@ impl Request for Entry {
                 // Update icons
                 this.update_primary_icon(&profile);
                 this.update_secondary_icon();
+
+                // Show search suggestions
+                if this.focus_child().is_some() {
+                    suggestion.update(&profile, this, None);
+                }
             }
         });
 
