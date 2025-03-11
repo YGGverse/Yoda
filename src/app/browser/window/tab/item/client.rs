@@ -205,5 +205,7 @@ fn snap_history(page: &Page) {
     page.item_action
         .history
         .add(page.navigation.request(), true);
-    page.profile.history.open(page.navigation.request())
+    page.profile
+        .history
+        .open(page.navigation.request(), Some(page.title()))
 }

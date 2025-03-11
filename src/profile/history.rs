@@ -27,10 +27,10 @@ impl History {
     // Actions
 
     /// Create new history record
-    pub fn open(&self, request: GString) {
+    pub fn open(&self, request: GString, title: Option<GString>) {
         let mut memory = self.memory.borrow_mut();
         if !memory.open(&request) {
-            memory.add(Item::create(0, request)) // @TODO
+            memory.add(Item::create(0, request, title)) // @TODO
         }
     }
 
@@ -49,5 +49,10 @@ impl History {
     /// Get recently `closed` Items vector from the memory index, sorted by ASC
     pub fn recently_closed(&self, limit: Option<usize>) -> Vec<Item> {
         self.memory.borrow().recently_closed(limit)
+    }
+
+    /// Get unordered Items vector contains `request`
+    pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
+        self.memory.borrow().contains_request(request, limit)
     }
 }

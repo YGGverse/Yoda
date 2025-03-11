@@ -80,6 +80,15 @@ impl Suggestion {
                         let r = l.child().and_downcast::<ActionRow>().unwrap();
                         r.set_title(&i.title());
                         r.set_subtitle(&i.subtitle());
+                        if i.has_bookmark() {
+                            r.add_suffix(
+                                &gtk::Image::builder()
+                                    .icon_name("starred-symbolic")
+                                    .margin_end(4)
+                                    .pixel_size(11)
+                                    .build(),
+                            );
+                        }
                     });
                     f
                 })
@@ -134,22 +143,31 @@ impl Suggestion {
     // Actions
 
     pub fn update(&self, limit: Option<usize>) {
-        use gtk::prelude::EditableExt;
+        use gtk::{glib::GString, prelude::EditableExt};
         use itertools::Itertools;
         if self.request.text_length() > 0 {
             self.list_store.remove_all();
             let query = self.request.text();
-            let items = self.profile.bookmark.contains_request(&query, limit);
+            let items = self.profile.history.contains_request(&query, limit);
             if !items.is_empty() {
                 for item in items
                     .into_iter()
-                    .sorted_by(|a, b| Ord::cmp(&b.request, &a.request))
+                    .sorted_by(|a, b| Ord::cmp(&b.opened.len(), &a.opened.len()))
                 {
+                    let subtitle =
+                        GString::from(item.request.replace(&*query, &format!("<b>{query}</b>")));
+
+                    let title = match item.title {
+                        Some(title) => title.replace(&*query, &format!("<b>{query}</b>")).into(),
+                        None => subtitle.clone(),
+                    };
+
                     self.list_store.append(&Item::build(
-                        item.request.replace(&*query, &format!("<b>{query}</b>")),
-                        item.request.clone(),
-                        item.request.clone(),
-                    )); // @TODO
+                        title,
+                        subtitle,
+                        self.profile.bookmark.is_match_request(&item.request),
+                        item.request,
+                    ));
                 }
                 self.popover.popup();
                 return;

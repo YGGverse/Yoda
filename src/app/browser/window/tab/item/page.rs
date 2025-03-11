@@ -123,7 +123,9 @@ impl Page {
             // Restore child components
             self.navigation.restore(transaction, &record.id)?;
             // Make initial page history snap
-            self.profile.history.open(self.navigation.request());
+            self.profile
+                .history
+                .open(self.navigation.request(), Some(self.title()));
         }
         Ok(())
     }
@@ -165,6 +167,12 @@ impl Page {
     pub fn set_progress(&self, progress_fraction: f64) {
         self.navigation.set_progress_fraction(progress_fraction);
         self.tab_page.set_loading(progress_fraction > 0.0)
+    }
+
+    // Getters
+
+    pub fn title(&self) -> gtk::glib::GString {
+        self.tab_page.title()
     }
 }
 
