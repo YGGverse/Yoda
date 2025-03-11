@@ -234,7 +234,28 @@ fn list_view_css_patch(list_view: &ListView) {
     let name = list_view.widget_name();
     let provider = gtk::CssProvider::new();
 
-    provider.load_from_string(&format!("#{name} row {{padding:0;}}"));
+    provider.load_from_string(&format!(
+        "
+            #{name} > row {{
+                padding: 0;
+            }}
+            #{name} > row:hover {{
+                background-color: alpha(currentColor, .04);
+            }}
+            #{name} > row:active {{
+                background-color: alpha(currentColor, .08);
+            }}
+            #{name} > row:selected {{
+                background-color: alpha(currentColor, .12);
+            }}
+            #{name} > row:selected:hover {{
+                background-color: alpha(currentColor, .16);
+            }}
+            #{name} > row:selected:active {{
+                background-color: alpha(currentColor, .2);
+            }}
+        "
+    ));
 
     gtk::style_context_add_provider_for_display(
         &list_view.display(),
