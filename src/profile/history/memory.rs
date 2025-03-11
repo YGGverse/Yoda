@@ -84,7 +84,9 @@ impl Memory {
             if limit.is_some_and(|l| i > l) {
                 break;
             }
-            if item.request.contains(request) {
+            if item.request.contains(request)
+                || item.title.as_ref().is_some_and(|t| t.contains(request))
+            {
                 items.push(item.clone())
             }
         }
