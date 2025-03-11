@@ -62,7 +62,7 @@ impl Suggestion {
         };
         let list_view = {
             let lv = ListView::builder()
-                .show_separators(true)
+                .name(format!("s{}", gtk::glib::uuid_string_random()))
                 .valign(Align::Start)
                 .model(&single_selection)
                 .factory(&{
@@ -104,6 +104,7 @@ impl Suggestion {
                 let request = request.clone();
                 move |_, _| request.emit_activate()
             });
+            list_view_css_patch(&lv);
             lv
         };
         Self {
@@ -113,6 +114,7 @@ impl Suggestion {
                 let p = Popover::builder()
                     .autohide(false)
                     .can_focus(false)
+                    .css_classes(["menu"])
                     .halign(Align::Start)
                     .valign(Align::Start)
                     .child(
@@ -136,7 +138,7 @@ impl Suggestion {
                 );
                 p.connect_realize({
                     let request = request.clone();
-                    move |this| this.set_width_request(request.width())
+                    move |this| this.set_width_request(request.width() + 18)
                 });
                 p
             },
@@ -224,4 +226,19 @@ impl Suggestion {
 
 fn highlight(subject: &str, key: &str) -> GString {
     subject.replace(key, &format!("<b>{key}</b>")).into()
+}
+
+fn list_view_css_patch(list_view: &ListView) {
+    use gtk::prelude::WidgetExt;
+
+    let name = list_view.widget_name();
+    let provider = gtk::CssProvider::new();
+
+    provider.load_from_string(&format!("#{name} row {{padding:0;}}"));
+
+    gtk::style_context_add_provider_for_display(
+        &list_view.display(),
+        &provider,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
 }
