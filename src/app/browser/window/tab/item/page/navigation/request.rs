@@ -131,6 +131,15 @@ impl Request {
             }
         });
 
+        entry.connect_has_focus_notify({
+            let suggestion = suggestion.clone();
+            move |_| {
+                if suggestion.is_visible() {
+                    suggestion.hide()
+                }
+            }
+        });
+
         entry.connect_state_flags_changed({
             // Define last focus state container
             let has_focus = Cell::new(false);
