@@ -12,7 +12,7 @@ use gtk::{
     },
     glib::{GString, SignalHandlerId},
     prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
-    Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
+    Align, Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
     INVALID_LIST_POSITION,
 };
 pub use item::Item;
@@ -63,6 +63,7 @@ impl Suggestion {
         let list_view = {
             let lv = ListView::builder()
                 .show_separators(true)
+                .valign(Align::Start)
                 .model(&single_selection)
                 .factory(&{
                     let f = SignalListItemFactory::new();
@@ -112,10 +113,10 @@ impl Suggestion {
                 let p = Popover::builder()
                     .autohide(false)
                     .can_focus(false)
-                    .halign(gtk::Align::Start)
+                    .halign(Align::Start)
+                    .valign(Align::Start)
                     .child(
                         &gtk::ScrolledWindow::builder()
-                            //.css_classes(["view"])
                             .child(&list_view)
                             .max_content_height(400)
                             .hscrollbar_policy(gtk::PolicyType::Never)
