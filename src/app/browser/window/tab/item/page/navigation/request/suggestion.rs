@@ -10,7 +10,7 @@ use gtk::{
         prelude::{Cast, CastNone},
         ListStore,
     },
-    glib::SignalHandlerId,
+    glib::{GString, SignalHandlerId},
     prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
     Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
     INVALID_LIST_POSITION,
@@ -149,7 +149,7 @@ impl Suggestion {
     // Actions
 
     pub fn update(&self, limit: Option<usize>) {
-        use gtk::{glib::GString, prelude::EditableExt};
+        use gtk::prelude::EditableExt;
         use itertools::Itertools;
         if self.request.text_length() > 0 {
             self.list_store.remove_all();
@@ -160,14 +160,11 @@ impl Suggestion {
                     .into_iter()
                     .sorted_by(|a, b| Ord::cmp(&b.opened.len(), &a.opened.len()))
                 {
-                    let subtitle =
-                        GString::from(item.request.replace(&*query, &format!("<b>{query}</b>")));
-
+                    let subtitle = highlight(&item.request, &query);
                     let title = match item.title {
-                        Some(title) => title.replace(&*query, &format!("<b>{query}</b>")).into(),
+                        Some(title) => highlight(&title, &query),
                         None => subtitle.clone(),
                     };
-
                     self.list_store.append(&Item::build(
                         title,
                         subtitle,
@@ -220,4 +217,10 @@ impl Suggestion {
             .scroll_to(position, gtk::ListScrollFlags::NONE, None);
         true
     }
+}
+
+// Tools
+
+fn highlight(subject: &str, key: &str) -> GString {
+    subject.replace(key, &format!("<b>{key}</b>")).into()
 }
