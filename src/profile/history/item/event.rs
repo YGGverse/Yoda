@@ -12,7 +12,7 @@ impl Event {
     pub fn new() -> Self {
         Self {
             time: now(),
-            count: 0,
+            count: 1,
         }
     }
 

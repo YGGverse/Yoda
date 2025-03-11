@@ -42,11 +42,7 @@ impl Item {
     pub fn close(&mut self) {
         match self.closed {
             Some(ref mut closed) => closed.pulse(),
-            None => {
-                let mut event = Event::new();
-                event.pulse();
-                self.closed = Some(event)
-            }
+            None => self.closed = Some(Event::new()),
         }
     }
 }
