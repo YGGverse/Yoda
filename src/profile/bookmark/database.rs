@@ -23,20 +23,20 @@ impl Database {
     // Getters
 
     /// Get bookmark records from database with optional filter by `request`
-    pub fn records(&self, request: Option<&str>) -> Result<Vec<Item>> {
+    pub fn records(&self, request: Option<&str>, title: Option<&str>) -> Result<Vec<Item>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, *self.profile_id, request)
+        select(&tx, *self.profile_id, request, title)
     }
 
     // Setters
 
     /// Create new bookmark record in database
     /// * return last insert ID on success
-    pub fn add(&self, time: DateTime, request: &str) -> Result<i64> {
+    pub fn add(&self, time: DateTime, request: &str, title: Option<&str>) -> Result<i64> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-        let id = insert(&tx, *self.profile_id, time, request)?;
+        let id = insert(&tx, *self.profile_id, time, request, title)?;
         tx.commit()?;
         Ok(id)
     }
@@ -61,40 +61,57 @@ pub fn init(tx: &Transaction) -> Result<usize> {
             `profile_id` INTEGER NOT NULL,
             `time`       INTEGER NOT NULL,
             `request`    TEXT NOT NULL,
+            `title`      TEXT NULL,
 
-            FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
+            FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
         )",
         [],
     )?)
 }
 
-pub fn insert(tx: &Transaction, profile_id: i64, time: DateTime, request: &str) -> Result<i64> {
+pub fn insert(
+    tx: &Transaction,
+    profile_id: i64,
+    time: DateTime,
+    request: &str,
+    title: Option<&str>,
+) -> Result<i64> {
     tx.execute(
         "INSERT INTO `profile_bookmark` (
             `profile_id`,
             `time`,
-            `request`
-        ) VALUES (?, ?, ?)",
-        (profile_id, time.to_unix(), request),
+            `request`,
+            `title`
+        ) VALUES (?, ?, ?, ?)",
+        (profile_id, time.to_unix(), request, title),
     )?;
     Ok(tx.last_insert_rowid())
 }
 
-pub fn select(tx: &Transaction, profile_id: i64, request: Option<&str>) -> Result<Vec<Item>> {
+pub fn select(
+    tx: &Transaction,
+    profile_id: i64,
+    request: Option<&str>,
+    title: Option<&str>,
+) -> Result<Vec<Item>> {
     let mut stmt = tx.prepare(
-        "SELECT `id`, `profile_id`, `time`, `request`
+        "SELECT `id`, `profile_id`, `time`, `request`, `title`
             FROM `profile_bookmark`
-            WHERE `profile_id` = ? AND `request` LIKE ?",
+            WHERE `profile_id` = ? AND (`request` LIKE ? OR `title` LIKE ?)",
     )?;
 
-    let result = stmt.query_map((profile_id, request.unwrap_or("%")), |row| {
-        Ok(Item {
-            id: row.get(0)?,
-            //profile_id: row.get(1)?,
-            //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
-            request: row.get(3)?,
-        })
-    })?;
+    let result = stmt.query_map(
+        (profile_id, request.unwrap_or("%"), title.unwrap_or("%")),
+        |row| {
+            Ok(Item {
+                id: row.get(0)?,
+                //profile_id: row.get(1)?,
+                //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+                request: row.get(3)?,
+                title: row.get(4)?,
+            })
+        },
+    )?;
 
     let mut records = Vec::new();
 

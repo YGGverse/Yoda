@@ -78,7 +78,7 @@ impl Page {
     pub fn bookmark(&self) {
         self.profile
             .bookmark
-            .toggle(&self.navigation.request())
+            .toggle(&self.navigation.request(), Some(&self.title()))
             .unwrap(); // @TODO
     }
 

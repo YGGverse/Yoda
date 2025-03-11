@@ -27,11 +27,8 @@ impl Bookmark {
         // Build initial index
         {
             let mut memory = memory.borrow_mut();
-            for record in database.records(None)? {
-                memory.add(Item {
-                    id: record.id,
-                    request: record.request,
-                });
+            for item in database.records(None, None)? {
+                memory.add(item);
             }
         }
 
@@ -43,17 +40,18 @@ impl Bookmark {
 
     /// Toggle bookmark in `database` and `memory` index
     /// * return `true` on bookmark create, `false` on delete
-    pub fn toggle(&self, request: &str) -> Result<bool> {
+    pub fn toggle(&self, request: &str, title: Option<&str>) -> Result<bool> {
         let mut memory = self.memory.borrow_mut();
         Ok(match memory.delete_by_request(request) {
-            Some(record) => {
-                self.database.delete(record.id)?;
+            Some(item) => {
+                self.database.delete(item.id)?;
                 false
             }
             None => {
                 memory.add(Item {
-                    id: self.database.add(DateTime::now_local()?, request)?,
+                    id: self.database.add(DateTime::now_local()?, request, title)?,
                     request: request.into(),
+                    title: title.map(|t| t.to_string()),
                 });
                 true
             }
