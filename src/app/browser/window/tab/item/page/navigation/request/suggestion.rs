@@ -151,11 +151,6 @@ impl Suggestion {
                         item.request.clone(),
                     )); // @TODO
                 }
-                self.popover
-                    .child()
-                    .unwrap()
-                    .downcast_ref::<gtk::ScrolledWindow>()
-                    .unwrap();
                 self.popover.popup();
                 return;
             }
