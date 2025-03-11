@@ -67,28 +67,34 @@ impl Suggestion {
                 .factory(&{
                     let f = SignalListItemFactory::new();
                     f.connect_setup(|_, this| {
-                        this.downcast_ref::<ListItem>().unwrap().set_child(Some(
-                            &ActionRow::builder()
-                                .use_markup(true)
-                                .use_underline(true)
+                        let r = ActionRow::builder()
+                            .use_markup(true)
+                            .use_underline(true)
+                            .build();
+                        r.add_suffix(
+                            &gtk::Image::builder()
+                                .icon_name("starred-symbolic")
+                                .margin_end(4)
+                                .pixel_size(11)
+                                .visible(false)
                                 .build(),
-                        ))
+                        );
+                        this.downcast_ref::<ListItem>().unwrap().set_child(Some(&r))
                     });
                     f.connect_bind(|_, this| {
+                        use gtk::prelude::ListBoxRowExt;
                         let l = this.downcast_ref::<ListItem>().unwrap();
                         let i = l.item().and_downcast::<Item>().unwrap();
                         let r = l.child().and_downcast::<ActionRow>().unwrap();
                         r.set_title(&i.title());
                         r.set_subtitle(&i.subtitle());
-                        if i.has_bookmark() {
-                            r.add_suffix(
-                                &gtk::Image::builder()
-                                    .icon_name("starred-symbolic")
-                                    .margin_end(4)
-                                    .pixel_size(11)
-                                    .build(),
-                            );
-                        }
+                        r.child()
+                            .unwrap()
+                            .last_child()
+                            .unwrap()
+                            .last_child()
+                            .unwrap()
+                            .set_visible(i.has_bookmark());
                     });
                     f
                 })
