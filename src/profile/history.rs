@@ -30,7 +30,7 @@ impl History {
     pub fn open(&self, request: GString, title: Option<GString>) {
         let mut memory = self.memory.borrow_mut();
         if !memory.open(&request) {
-            memory.add(Item::create(0, request, title)) // @TODO
+            memory.add(Item::init(request, title))
         }
     }
 
