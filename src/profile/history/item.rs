@@ -1,4 +1,7 @@
-use gtk::glib::{DateTime, GString};
+mod event;
+
+use event::Event;
+use gtk::glib::GString;
 
 #[derive(Clone)]
 pub struct Item {
@@ -9,12 +12,12 @@ pub struct Item {
     /// Some history items may contain title (e.g. gemtext documents and system tabs)
     /// * used as the additional criteria for search in the navbar suggestions widget
     pub title: Option<GString>,
-    /// Collect opened count with event time
-    /// * used for sort order search results in the navbar suggestions widget
-    pub opened: Vec<DateTime>,
-    /// Collect tab closed count with event time
-    /// * used in recently closed pages menu
-    pub closed: Vec<DateTime>,
+    /// Collect `Item` open events
+    /// * used for sort order search results in the navbar suggestions widget and history page
+    pub opened: Event,
+    /// Collect `Item` close events
+    /// * used in recently closed pages menu and history page
+    pub closed: Option<Event>,
 }
 
 impl Item {
@@ -25,24 +28,21 @@ impl Item {
             id: None,
             request,
             title,
-            opened: vec![now()],
-            closed: vec![],
+            opened: Event::new(),
+            closed: None,
         }
     }
 
     // Actions
 
     pub fn open(&mut self) {
-        self.opened.push(now())
+        self.opened.pulse()
     }
 
     pub fn close(&mut self) {
-        self.closed.push(now())
+        match self.closed {
+            Some(ref mut closed) => closed.pulse(),
+            None => self.closed = Some(Event::new()),
+        }
     }
-}
-
-// Tools
-
-fn now() -> DateTime {
-    DateTime::now_local().unwrap()
 }

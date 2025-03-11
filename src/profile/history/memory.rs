@@ -48,8 +48,13 @@ impl Memory {
         for (i, item) in self
             .0
             .iter()
-            .filter(|x| !x.closed.is_empty())
-            .sorted_by(|a, b| Ord::cmp(&b.closed.last(), &a.closed.last()))
+            .filter(|x| x.closed.is_some())
+            .sorted_by(|a, b| {
+                Ord::cmp(
+                    &b.closed.as_ref().unwrap().time,
+                    &a.closed.as_ref().unwrap().time,
+                )
+            })
             .enumerate()
         {
             if limit.is_some_and(|l| i > l) {
@@ -66,7 +71,7 @@ impl Memory {
         for (i, item) in self
             .0
             .iter()
-            .sorted_by(|a, b| Ord::cmp(&b.opened.last(), &a.opened.last()))
+            .sorted_by(|a, b| Ord::cmp(&b.opened.time, &a.opened.time))
             .enumerate()
         {
             if limit.is_some_and(|l| i > l) {

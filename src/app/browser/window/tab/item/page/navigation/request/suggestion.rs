@@ -161,7 +161,7 @@ impl Suggestion {
             if !items.is_empty() {
                 for item in items
                     .into_iter()
-                    .sorted_by(|a, b| Ord::cmp(&b.opened.len(), &a.opened.len()))
+                    .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count))
                 {
                     let subtitle = highlight(&item.request, &query);
                     let title = match item.title {
