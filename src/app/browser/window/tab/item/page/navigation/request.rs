@@ -61,7 +61,7 @@ impl Request {
                         )
                     {
                         if matches!(k, Key::Up | Key::KP_Up | Key::Page_Up | Key::KP_Page_Up) {
-                            if !suggestion.to_back() {
+                            if !suggestion.back() {
                                 entry.error_bell()
                             }
                             return Propagation::Stop;
@@ -69,7 +69,7 @@ impl Request {
                             k,
                             Key::Down | Key::KP_Down | Key::Page_Down | Key::KP_Page_Down
                         ) {
-                            if !suggestion.to_next() {
+                            if !suggestion.next() {
                                 entry.error_bell()
                             }
                             return Propagation::Stop;

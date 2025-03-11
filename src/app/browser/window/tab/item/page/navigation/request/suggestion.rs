@@ -13,12 +13,16 @@ use gtk::{
     glib::SignalHandlerId,
     prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
     Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
+    INVALID_LIST_POSITION,
 };
 pub use item::Item;
+use sourceview::prelude::ListModelExt;
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Suggestion {
     list_store: ListStore,
+    list_view: ListView,
+    single_selection: SingleSelection,
     request: Entry,
     profile: Rc<Profile>,
     popover: Popover,
@@ -30,8 +34,62 @@ impl Suggestion {
 
     /// Create new `Self`
     pub fn build(profile: &Rc<Profile>, request: &Entry) -> Self {
-        let list_store = ListStore::new::<Item>();
         let signal_handler_id = Rc::new(RefCell::new(None));
+        let list_store = ListStore::new::<Item>();
+        let single_selection = {
+            let ss = SingleSelection::builder()
+                .model(&list_store)
+                .autoselect(false)
+                .build();
+            ss.connect_selected_notify({
+                let request = request.clone();
+                let signal_handler_id = signal_handler_id.clone();
+                move |this| {
+                    if let Some(selected_item) = this.selected_item() {
+                        use gtk::prelude::ObjectExt;
+                        if let Some(signal_handler_id) = signal_handler_id.borrow().as_ref() {
+                            request.block_signal(signal_handler_id);
+                        }
+                        request.set_text(&selected_item.downcast_ref::<Item>().unwrap().request());
+                        request.select_region(0, -1);
+                        if let Some(signal_handler_id) = signal_handler_id.borrow().as_ref() {
+                            request.unblock_signal(signal_handler_id);
+                        }
+                    } // @TODO find signal to handle selected item only
+                }
+            });
+            ss
+        };
+        let list_view = {
+            let lv = ListView::builder()
+                .show_separators(true)
+                .model(&single_selection)
+                .factory(&{
+                    let f = SignalListItemFactory::new();
+                    f.connect_setup(|_, this| {
+                        this.downcast_ref::<ListItem>().unwrap().set_child(Some(
+                            &ActionRow::builder()
+                                .use_markup(true)
+                                .use_underline(true)
+                                .build(),
+                        ))
+                    });
+                    f.connect_bind(|_, this| {
+                        let l = this.downcast_ref::<ListItem>().unwrap();
+                        let i = l.item().and_downcast::<Item>().unwrap();
+                        let r = l.child().and_downcast::<ActionRow>().unwrap();
+                        r.set_title(&i.title());
+                        r.set_subtitle(&i.subtitle());
+                    });
+                    f
+                })
+                .build();
+            lv.connect_activate({
+                let request = request.clone();
+                move |_, _| request.emit_activate()
+            });
+            lv
+        };
         Self {
             profile: profile.clone(),
             request: request.clone(),
@@ -43,70 +101,7 @@ impl Suggestion {
                     .child(
                         &gtk::ScrolledWindow::builder()
                             //.css_classes(["view"])
-                            .child(&{
-                                let list_view = ListView::builder()
-                                    .show_separators(true)
-                                    .model(&{
-                                        let s = SingleSelection::builder()
-                                            .model(&list_store)
-                                            .autoselect(false)
-                                            .build();
-                                        s.connect_selected_notify({
-                                            let request = request.clone();
-                                            let signal_handler_id = signal_handler_id.clone();
-                                            move |this| {
-                                                if let Some(selected_item) = this.selected_item() {
-                                                    use gtk::prelude::ObjectExt;
-                                                    if let Some(signal_handler_id) =
-                                                        signal_handler_id.borrow().as_ref()
-                                                    {
-                                                        request.block_signal(signal_handler_id);
-                                                    }
-                                                    request.set_text(
-                                                        &selected_item
-                                                            .downcast_ref::<Item>()
-                                                            .unwrap()
-                                                            .request(),
-                                                    );
-                                                    request.select_region(0, -1);
-                                                    if let Some(signal_handler_id) =
-                                                        signal_handler_id.borrow().as_ref()
-                                                    {
-                                                        request.unblock_signal(signal_handler_id);
-                                                    }
-                                                } // @TODO find signal to handle selected item only
-                                            }
-                                        });
-                                        s
-                                    })
-                                    .factory(&{
-                                        let f = SignalListItemFactory::new();
-                                        f.connect_setup(|_, this| {
-                                            this.downcast_ref::<ListItem>().unwrap().set_child(
-                                                Some(
-                                                    &ActionRow::builder()
-                                                        .use_markup(true)
-                                                        .use_underline(true)
-                                                        .build(),
-                                                ),
-                                            )
-                                        });
-                                        f.connect_bind(|_, this| {
-                                            let l = this.downcast_ref::<ListItem>().unwrap();
-                                            let i = l.item().and_downcast::<Item>().unwrap();
-                                            let r = l.child().and_downcast::<ActionRow>().unwrap();
-                                            r.set_title(&i.title());
-                                            r.set_subtitle(&i.subtitle());
-                                        });
-                                        f
-                                    })
-                                    .build();
-                                list_view.connect_activate({
-                                    let request = request.clone();
-                                    move |_, _| request.emit_activate()
-                                });
-                                list_view
-                            })
+                            .child(&list_view)
                             .max_content_height(400)
                             .hscrollbar_policy(gtk::PolicyType::Never)
                             .propagate_natural_height(true)
@@ -130,7 +125,9 @@ impl Suggestion {
                 p
             },
             signal_handler_id,
+            single_selection,
             list_store,
+            list_view,
         }
     }
 
@@ -170,11 +167,20 @@ impl Suggestion {
         self.popover.popdown()
     }
 
-    pub fn to_back(&self) -> bool {
-        false // @TODO
+    pub fn back(&self) -> bool {
+        let position = self.single_selection.selected();
+        if position == 0 {
+            return false; // prevent unsigned value decrement
+        }
+        self.select(position - 1)
     }
-    pub fn to_next(&self) -> bool {
-        false // @TODO
+
+    pub fn next(&self) -> bool {
+        let position = self.single_selection.selected();
+        if position == INVALID_LIST_POSITION {
+            return self.select(0);
+        }
+        self.select(position + 1)
     }
 
     // Getters
@@ -183,7 +189,16 @@ impl Suggestion {
         self.popover.is_visible()
     }
 
-    /*pub fn total(&self) -> u32 {
-        self.list_store.n_items()
-    }*/
+    // Tools
+
+    fn select(&self, position: u32) -> bool {
+        let total = self.list_store.n_items();
+        if position == INVALID_LIST_POSITION || position >= total || total == 0 {
+            return false;
+        }
+        self.single_selection.set_selected(position);
+        self.list_view
+            .scroll_to(position, gtk::ListScrollFlags::NONE, None);
+        true
+    }
 }
