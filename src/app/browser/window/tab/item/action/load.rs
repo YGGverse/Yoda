@@ -23,7 +23,7 @@ impl Load {
         Self {
             simple_action: SimpleAction::new(
                 &uuid_string_random(),
-                Some(&<(String, bool)>::static_variant_type()),
+                Some(&<String>::static_variant_type()),
             ),
         }
     }
