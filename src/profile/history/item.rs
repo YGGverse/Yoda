@@ -1,6 +1,6 @@
-mod event;
+pub mod event;
+pub use event::Event;
 
-use event::Event;
 use gtk::glib::GString;
 
 #[derive(Clone)]
@@ -18,25 +18,17 @@ pub struct Item {
     /// Collect `Item` close events
     /// * used in recently closed pages menu and history page
     pub closed: Option<Event>,
+    /// Mark in-memory `Item` as saved
+    /// * used for database update (e.g. on app close)
+    pub is_saved: bool,
 }
 
 impl Item {
-    // Constructors
 
-    pub fn init(request: GString, title: Option<GString>) -> Self {
-        Self {
-            id: None,
-            request,
-            title,
-            opened: Event::new(),
-            closed: None,
-        }
-    }
-
-    // Actions
 
     pub fn open(&mut self) {
-        self.opened.pulse()
+        self.opened.pulse();
+        self.is_saved = false
     }
 
     pub fn close(&mut self) {
@@ -44,5 +36,6 @@ impl Item {
             Some(ref mut closed) => closed.pulse(),
             None => self.closed = Some(Event::new()),
         }
+        self.is_saved = false
     }
 }

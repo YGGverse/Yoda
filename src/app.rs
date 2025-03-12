@@ -23,7 +23,7 @@ impl App {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(profile: Profile) -> Self {
+    pub fn build(profile: Profile) -> Result<Self> {
         // Init GTK
         let application = Application::builder()
             .application_id(APPLICATION_ID)
@@ -76,54 +76,56 @@ impl App {
             let browser = browser.clone();
             let profile = profile.clone();
             move |_| {
-                // Init writable connection
-                match profile.database.connection.write() {
-                    Ok(mut connection) => {
-                        // Create transaction
-                        match connection.transaction() {
-                            Ok(transaction) => {
-                                match database::select(&transaction) {
-                                    Ok(records) => {
-                                        // Cleanup previous session records
-                                        for record in records {
-                                            match database::delete(&transaction, record.id) {
+                match profile.save() {
+                    Ok(_) => match profile.database.connection.write() {
+                        Ok(mut connection) => {
+                            // Create transaction
+                            match connection.transaction() {
+                                Ok(transaction) => {
+                                    match database::select(&transaction) {
+                                        Ok(records) => {
+                                            // Cleanup previous session records
+                                            for record in records {
+                                                match database::delete(&transaction, record.id) {
+                                                    Ok(_) => {
+                                                        // Delegate clean action to childs
+                                                        if let Err(e) =
+                                                            browser.clean(&transaction, record.id)
+                                                        {
+                                                            todo!("{e}")
+                                                        }
+                                                    }
+                                                    Err(e) => todo!("{e}"),
+                                                }
+                                            }
+
+                                            // Save current session to DB
+                                            match database::insert(&transaction) {
                                                 Ok(_) => {
-                                                    // Delegate clean action to childs
-                                                    if let Err(e) =
-                                                        browser.clean(&transaction, record.id)
-                                                    {
+                                                    // Delegate save action to childs
+                                                    if let Err(e) = browser.save(
+                                                        &transaction,
+                                                        database::last_insert_id(&transaction),
+                                                    ) {
                                                         todo!("{e}")
                                                     }
                                                 }
                                                 Err(e) => todo!("{e}"),
                                             }
                                         }
-
-                                        // Save current session to DB
-                                        match database::insert(&transaction) {
-                                            Ok(_) => {
-                                                // Delegate save action to childs
-                                                if let Err(e) = browser.save(
-                                                    &transaction,
-                                                    database::last_insert_id(&transaction),
-                                                ) {
-                                                    todo!("{e}")
-                                                }
-                                            }
-                                            Err(e) => todo!("{e}"),
-                                        }
+                                        Err(e) => todo!("{e}"),
                                     }
-                                    Err(e) => todo!("{e}"),
-                                }
 
-                                // Confirm changes
-                                if let Err(e) = transaction.commit() {
-                                    todo!("{e}")
+                                    // Confirm changes
+                                    if let Err(e) = transaction.commit() {
+                                        todo!("{e}")
+                                    }
                                 }
+                                Err(e) => todo!("{e}"),
                             }
-                            Err(e) => todo!("{e}"),
                         }
-                    }
+                        Err(e) => todo!("{e}"),
+                    },
                     Err(e) => todo!("{e}"),
                 }
             }
@@ -254,10 +256,10 @@ impl App {
         }
 
         // Return activated App struct
-        Self {
+        Ok(Self {
             profile: profile.clone(),
             application,
-        }
+        })
     }
 
     // Actions

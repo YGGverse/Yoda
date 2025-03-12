@@ -79,7 +79,7 @@ impl Profile {
 
         // Init components
         let bookmark = Rc::new(Bookmark::build(&connection, &profile_id)?);
-        let history = Rc::new(History::build(&connection, &profile_id));
+        let history = Rc::new(History::build(&connection, &profile_id)?);
         let search = Rc::new(Search::build(&connection, &profile_id)?);
         let identity = Rc::new(Identity::build(&connection, &profile_id)?);
 
@@ -93,6 +93,12 @@ impl Profile {
             config_path,
         })
     }
+
+    // Actions
+
+    pub fn save(&self) -> Result<()> {
+        self.history.save()
+    }
 }
 
 pub fn migrate(tx: &Transaction) -> Result<()> {
@@ -103,8 +109,7 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
     bookmark::migrate(tx)?;
     identity::migrate(tx)?;
     search::migrate(tx)?;
-    // @TODO not in use yet
-    // history::migrate(tx)?;
+    history::migrate(tx)?;
 
     // Success
     Ok(())

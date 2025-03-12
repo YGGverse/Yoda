@@ -1,14 +1,17 @@
-// mod database;
+mod database;
 mod item;
 mod memory;
 
+use anyhow::Result;
+use database::Database;
 use gtk::glib::GString;
-use item::Item;
+use item::{Event, Item};
 use memory::Memory;
-use sqlite::Connection;
+use sqlite::{Connection, Transaction};
 use std::{cell::RefCell, rc::Rc, sync::RwLock};
 
 pub struct History {
+    database: Database,      // permanent storage
     memory: RefCell<Memory>, // fast search index
 }
 
@@ -16,12 +19,35 @@ impl History {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(_connection: &Rc<RwLock<Connection>>, _profile_id: &Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
         // Init children components
+        let database = Database::build(connection, profile_id);
         let memory = RefCell::new(Memory::new());
 
+        for item in database.records(None, None)? {
+            memory.borrow_mut().add(item)
+        }
+
         // Return new `Self`
-        Self { memory }
+        Ok(Self { database, memory })
+    }
+
+    // Actions
+
+    pub fn save(&self) -> Result<()> {
+        for item in self.memory.borrow().items() {
+            if !item.is_saved {
+                match item.id {
+                    Some(_) => {
+                        self.database.update(item)?;
+                    }
+                    None => {
+                        self.database.add(item)?;
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     // Actions
@@ -30,7 +56,14 @@ impl History {
     pub fn open(&self, request: GString, title: Option<GString>) {
         let mut memory = self.memory.borrow_mut();
         if !memory.open(&request) {
-            memory.add(Item::init(request, title))
+            memory.add(Item {
+                id: None,
+                request,
+                title,
+                opened: Event::new(),
+                closed: None,
+                is_saved: false,
+            })
         }
     }
 
@@ -55,4 +88,17 @@ impl History {
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
         self.memory.borrow().contains_request(request, limit)
     }
+}
+
+// Tools
+
+pub fn migrate(tx: &Transaction) -> Result<()> {
+    // Migrate self components
+    database::init(tx)?;
+
+    // Delegate migration to childs
+    // nothing yet..
+
+    // Success
+    Ok(())
 }

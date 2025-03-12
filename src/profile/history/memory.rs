@@ -21,9 +21,9 @@ impl Memory {
     /// Update `opened` time for given `request`
     /// * return `false` if the `request` not found in memory index
     pub fn open(&mut self, request: &str) -> bool {
-        for record in &mut self.0 {
-            if record.request == request {
-                record.open();
+        for item in &mut self.0 {
+            if item.request == request {
+                item.open();
                 return true;
             }
         }
@@ -32,9 +32,9 @@ impl Memory {
 
     /// Update `closed` time for given `request`
     pub fn close(&mut self, request: &str) {
-        for record in &mut self.0 {
-            if record.request == request {
-                record.close();
+        for item in &mut self.0 {
+            if item.request == request {
+                item.close();
                 return;
             }
         }
@@ -101,6 +101,10 @@ impl Memory {
             }
         }
         items
+    }
+
+    pub fn items(&self) -> &Vec<Item> {
+        &self.0
     }
 }
 

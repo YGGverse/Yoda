@@ -14,9 +14,12 @@ fn main() -> ExitCode {
     }
 
     match Profile::init() {
-        Ok(profile) => match App::build(profile).run() {
-            Ok(app) => return app,
-            Err(e) => eprintln!("Failed to initialize application: {e}"),
+        Ok(profile) => match App::build(profile) {
+            Ok(app) => match app.run() {
+                Ok(run) => return run,
+                Err(e) => eprintln!("Failed to run application: {e}"),
+            },
+            Err(e) => eprintln!("Failed to build application: {e}"),
         },
         Err(e) => eprintln!("Failed to initialize profile: {e}"),
     }

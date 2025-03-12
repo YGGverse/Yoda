@@ -63,7 +63,8 @@ pub fn init(tx: &Transaction) -> Result<usize> {
             `request`    TEXT NOT NULL,
             `title`      TEXT NULL,
 
-            FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
+            FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`),
+            UNIQUE (`profile_id`, `request`)
         )",
         [],
     )?)
