@@ -40,7 +40,7 @@ impl Action {
 
         let history = Rc::new(History::build({
             let load = load.clone();
-            move |request| load.activate(Some(&request))
+            move |request| load.activate(Some(&request), false)
         }));
 
         Self {

@@ -20,7 +20,13 @@ impl File {
         Self { page: page.clone() } // @TODO
     }
 
-    pub fn handle(&self, uri: Uri, feature: Rc<Feature>, cancellable: Cancellable) {
+    pub fn handle(
+        &self,
+        uri: Uri,
+        feature: Rc<Feature>,
+        cancellable: Cancellable,
+        is_snap_history: bool,
+    ) {
         use directory::Directory;
         use gtk::{
             gio::{File, FileQueryInfoFlags, FileType},
@@ -36,7 +42,7 @@ impl File {
         let page = self.page.clone();
 
         match file.query_file_type(FileQueryInfoFlags::NONE, Some(&cancellable)) {
-            FileType::Directory => Directory { file }.handle(&page),
+            FileType::Directory => Directory { file }.handle(&page, is_snap_history),
             _ => file.clone().query_info_async(
                 "standard::content-type",
                 FileQueryInfoFlags::NONE,

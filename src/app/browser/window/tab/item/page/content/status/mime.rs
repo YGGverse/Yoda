@@ -24,7 +24,9 @@ pub fn build(mime: &str, download: Option<(&Rc<ItemAction>, &Uri)>) -> StatusPag
             let action = action.clone();
             let request = request.clone();
             move |_| {
-                action.load.activate(Some(&format!("download:{}", request)));
+                action
+                    .load
+                    .activate(Some(&format!("download:{}", request)), true)
             }
         });
 

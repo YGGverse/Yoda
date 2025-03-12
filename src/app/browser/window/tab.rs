@@ -284,13 +284,13 @@ impl Tab {
     /// Reload page at `i32` position or selected page on `None` given
     pub fn reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.client.handle(&item.page.navigation.request());
+            item.client.handle(&item.page.navigation.request(), true);
         }
     }
 
     pub fn open(&self, page_position: Option<i32>, request: &str) {
         if let Some(item) = self.item(page_position) {
-            item.action.load.activate(Some(request));
+            item.action.load.activate(Some(request), true);
         }
     }
 

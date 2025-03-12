@@ -65,18 +65,27 @@ impl Gemini {
 
     // Actions
 
-    pub fn handle(&self, uri: Uri, feature: Rc<Feature>, cancellable: Cancellable) {
+    pub fn handle(
+        &self,
+        uri: Uri,
+        feature: Rc<Feature>,
+        cancellable: Cancellable,
+        is_snap_history: bool,
+    ) {
         use ggemini::client::connection::Request;
 
         match uri.scheme().as_str() {
             "gemini" => handle(
                 Request::Gemini { uri },
-                self.client.clone(),
-                self.page.clone(),
-                self.redirects.clone(),
-                feature,
+                (
+                    self.client.clone(),
+                    self.page.clone(),
+                    self.redirects.clone(),
+                    feature,
+                ),
                 cancellable,
                 None,
+                is_snap_history,
             ),
             "titan" => {
                 self.page.input.set_new_titan({
@@ -91,12 +100,15 @@ impl Gemini {
                                 mime: header.mime.map(|mime| mime.into()),
                                 token: header.token.map(|token| token.into()),
                             },
-                            client.clone(),
-                            page.clone(),
-                            redirects.clone(),
-                            feature.clone(),
+                            (
+                                client.clone(),
+                                page.clone(),
+                                redirects.clone(),
+                                feature.clone(),
+                            ),
                             cancellable.clone(),
                             Some(on_failure),
+                            is_snap_history,
                         )
                     }
                 });
@@ -111,12 +123,10 @@ impl Gemini {
 
 fn handle(
     request: Request,
-    client: Rc<Client>,
-    page: Rc<Page>,
-    redirects: Rc<Cell<usize>>,
-    feature: Rc<Feature>,
+    (client, page, redirects, feature): (Rc<Client>, Rc<Page>, Rc<Cell<usize>>, Rc<Feature>),
     cancellable: Cancellable,
     on_failure: Option<Box<dyn Fn()>>,
+    is_snap_history: bool,
 ) {
     let uri = request.uri().clone();
     client.request_async(
@@ -146,7 +156,9 @@ fn handle(
                         let title = input.to_string();
                         page.set_progress(0.0);
                         page.set_title(&title);
-                        page.snap_history();
+                        if is_snap_history {
+                            page.snap_history();
+                        }
                         redirects.replace(0); // reset
                         match input {
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
@@ -230,7 +242,9 @@ fn handle(
                             );
                             page.set_progress(0.0);
                             page.set_title(&status.title());
-                            page.snap_history();
+                            if is_snap_history {
+                                page.snap_history();
+                            }
                             redirects.replace(0); // reset
                         },
                         _ => match success.mime() {
@@ -271,7 +285,9 @@ fn handle(
                                                             .find
                                                             .simple_action
                                                             .set_enabled(true);
-                                                        page.snap_history();
+                                                        if is_snap_history {
+                                                            page.snap_history();
+                                                        }
                                                         redirects.replace(0); // reset
                                                     },
                                                     Err(e) => {
@@ -279,7 +295,9 @@ fn handle(
                                                         status.set_description(Some(&e.to_string()));
                                                         page.set_progress(0.0);
                                                         page.set_title(&status.title());
-                                                        page.snap_history();
+                                                        if is_snap_history {
+                                                            page.snap_history();
+                                                        }
                                                         redirects.replace(0); // reset
                                                     },
                                                 },
@@ -288,7 +306,9 @@ fn handle(
                                                     status.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
                                                     page.set_title(&status.title());
-                                                    page.snap_history();
+                                                    if is_snap_history {
+                                                        page.snap_history();
+                                                    }
                                                     redirects.replace(0); // reset
                                                 }
                                             }
@@ -298,7 +318,9 @@ fn handle(
                                             status.set_description(Some(&e.to_string()));
                                             page.set_progress(0.0);
                                             page.set_title(&status.title());
-                                            page.snap_history();
+                                            if is_snap_history {
+                                                page.snap_history();
+                                            }
                                             redirects.replace(0); // reset
                                         },
                                     }
@@ -343,7 +365,9 @@ fn handle(
                                                                 }
                                                             }
                                                             page.set_progress(0.0);
-                                                            page.snap_history();
+                                                            if is_snap_history {
+                                                                page.snap_history();
+                                                            }
                                                             redirects.replace(0); // reset
                                                         },
                                                     )
@@ -353,7 +377,9 @@ fn handle(
                                                     status.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
                                                     page.set_title(&status.title());
-                                                    page.snap_history();
+                                                    if is_snap_history {
+                                                        page.snap_history();
+                                                    }
                                                     redirects.replace(0); // reset
                                                 }
                                             }
@@ -368,7 +394,9 @@ fn handle(
                                 status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
-                                page.snap_history();
+                                if is_snap_history {
+                                    page.snap_history();
+                                }
                                 redirects.replace(0); // reset
                             },
                         }
@@ -404,7 +432,7 @@ fn handle(
                                     page.navigation.set_request(&target.to_string());
                                 }
                                 redirects.replace(total);
-                                page.item_action.load.activate(Some(&target.to_string()));
+                                page.item_action.load.activate(Some(&target.to_string()), false);
                             }
                         }
                         Err(e) => {
@@ -426,7 +454,9 @@ fn handle(
                             status.set_description(Some(message.as_ref().unwrap_or(&certificate.to_string())));
                             page.set_progress(0.0);
                             page.set_title(&status.title());
-                            page.snap_history();
+                            if is_snap_history {
+                                page.snap_history();
+                            }
                             redirects.replace(0); // reset
                         }
                     }
@@ -441,7 +471,9 @@ fn handle(
                                 status.set_description(Some(message.as_ref().unwrap_or(&temporary.to_string())));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
-                                page.snap_history();
+                                if is_snap_history {
+                                    page.snap_history();
+                                }
                                 redirects.replace(0); // reset
                                 if let Some(callback) = on_failure {
                                     callback()
@@ -458,7 +490,9 @@ fn handle(
                                 status.set_description(Some(message.as_ref().unwrap_or(&permanent.to_string())));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
-                                page.snap_history();
+                                if is_snap_history {
+                                    page.snap_history();
+                                }
                                 redirects.replace(0); // reset
                                 if let Some(callback) = on_failure {
                                     callback()
@@ -472,7 +506,9 @@ fn handle(
                     status.set_description(Some(&e.to_string()));
                     page.set_progress(0.0);
                     page.set_title(&status.title());
-                    page.snap_history();
+                    if is_snap_history {
+                        page.snap_history();
+                    }
                     redirects.replace(0); // reset
                 }
             }

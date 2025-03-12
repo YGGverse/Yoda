@@ -36,7 +36,7 @@ impl Client {
 
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
-    pub fn handle(&self, request: &str) {
+    pub fn handle(&self, request: &str, is_snap_history: bool) {
         // Move focus out from navigation entry @TODO
         self.page.browser_action.escape.activate(None);
 
@@ -61,8 +61,14 @@ impl Client {
                 match result {
                     // route by scheme
                     Ok(uri) => match uri.scheme().as_str() {
-                        "file" => driver.file.handle(uri, feature, cancellable),
-                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
+                        "file" => driver
+                            .file
+                            .handle(uri, feature, cancellable, is_snap_history),
+                        "gemini" | "titan" => {
+                            driver
+                                .gemini
+                                .handle(uri, feature, cancellable, is_snap_history)
+                        }
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
@@ -74,7 +80,10 @@ impl Client {
                         }
                     },
                     // begin redirection to new address suggested
-                    Err(query) => page.item_action.load.activate(Some(&query)),
+                    Err(query) => page
+                        .item_action
+                        .load
+                        .activate(Some(&query), is_snap_history),
                 }
             }
         })

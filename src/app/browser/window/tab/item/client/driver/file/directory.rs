@@ -6,7 +6,7 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn handle(&self, page: &Rc<super::Page>) {
+    pub fn handle(&self, page: &Rc<super::Page>, is_snap_history: bool) {
         page.set_progress(1.0);
         page.content.to_directory(
             &self.file,
@@ -20,16 +20,21 @@ impl Directory {
                 {
                     let page = page.clone();
                     move |file| {
-                        page.item_action.load.activate(Some(&format!(
-                            "file://{}",
-                            file.path().unwrap().to_str().unwrap()
-                        )))
+                        page.item_action.load.activate(
+                            Some(&format!(
+                                "file://{}",
+                                file.path().unwrap().to_str().unwrap()
+                            )),
+                            is_snap_history,
+                        )
                     }
                 },
             ),
         );
         page.set_title(&self.file.parse_name());
-        page.snap_history();
+        if is_snap_history {
+            page.snap_history();
+        }
         page.window_action.find.simple_action.set_enabled(false);
         page.window_action.save_as.simple_action.set_enabled(false);
     }

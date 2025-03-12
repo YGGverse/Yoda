@@ -23,7 +23,7 @@ impl Load {
         Self {
             simple_action: SimpleAction::new(
                 &uuid_string_random(),
-                Some(&<String>::static_variant_type()),
+                Some(&<(String, bool)>::static_variant_type()),
             ),
         }
     }
@@ -32,25 +32,30 @@ impl Load {
 
     /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     /// with formatted for this action [Variant](https://docs.gtk.org/glib/struct.Variant.html) value
-    pub fn activate(&self, request: Option<&str>) {
-        self.simple_action
-            .activate(Some(&(request.unwrap_or_default()).to_variant()));
+    pub fn activate(&self, request: Option<&str>, is_history: bool) {
+        self.simple_action.activate(Some(
+            &(request.unwrap_or_default(), is_history).to_variant(),
+        ));
     }
 
     // Events
 
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
-    pub fn connect_activate(&self, callback: impl Fn(Option<GString>) + 'static) {
+    pub fn connect_activate(&self, callback: impl Fn(Option<GString>, bool) + 'static) {
         self.simple_action.connect_activate(move |_, this| {
-            let request = this
-                .expect("Expected `request` variant")
-                .get::<String>()
-                .expect("Parameter type does not match `String`");
-            callback(match request.is_empty() {
-                true => None,
-                false => Some(request.into()),
-            })
+            let (request, is_history) = this
+                .expect("Expected (`request`,`is_history`) variant")
+                .get::<(String, bool)>()
+                .expect("Parameter type does not match (`String`,`bool`) tuple");
+
+            callback(
+                match request.is_empty() {
+                    true => None,
+                    false => Some(request.into()),
+                },
+                is_history,
+            )
         });
     }
 }
