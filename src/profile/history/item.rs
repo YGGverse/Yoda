@@ -24,8 +24,6 @@ pub struct Item {
 }
 
 impl Item {
-
-
     pub fn open(&mut self) {
         self.opened.pulse();
         self.is_saved = false
