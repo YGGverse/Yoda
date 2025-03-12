@@ -63,6 +63,7 @@ impl Suggestion {
         let list_view = {
             let lv = ListView::builder()
                 .name(format!("s{}", gtk::glib::uuid_string_random()))
+                .single_click_activate(true)
                 .valign(Align::Start)
                 .model(&single_selection)
                 .factory(&{
