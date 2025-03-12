@@ -19,6 +19,7 @@ impl Text {
             None => crate::tool::uri_to_title(uri),
         });
         page.set_progress(0.0);
+        page.snap_history();
         page.window_action.find.simple_action.set_enabled(true);
     }
 }

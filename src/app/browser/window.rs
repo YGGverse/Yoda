@@ -93,16 +93,12 @@ impl Window {
 
         action.history_back.connect_activate({
             let tab = tab.clone();
-            move |position| {
-                tab.history_back(position);
-            }
+            move |position| tab.history_back(position)
         });
 
         action.history_forward.connect_activate({
             let tab = tab.clone();
-            move |position| {
-                tab.history_forward(position);
-            }
+            move |position| tab.history_forward(position)
         });
 
         action.load.on_activate({
@@ -114,9 +110,7 @@ impl Window {
 
         action.open.on_activate({
             let tab = tab.clone();
-            move |position, request| {
-                tab.open(position, request, true);
-            }
+            move |position, request| tab.open(position, request)
         });
 
         // Init struct

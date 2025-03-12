@@ -10,6 +10,7 @@ impl Status {
         widget.set_description(Some(message));
         page.set_title(&widget.title());
         page.set_progress(0.0);
+        page.snap_history();
         page.window_action.find.simple_action.set_enabled(false);
     }
 }

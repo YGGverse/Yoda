@@ -20,18 +20,16 @@ impl Directory {
                 {
                     let page = page.clone();
                     move |file| {
-                        page.item_action.load.activate(
-                            Some(&format!(
-                                "file://{}",
-                                file.path().unwrap().to_str().unwrap()
-                            )),
-                            true,
-                        )
+                        page.item_action.load.activate(Some(&format!(
+                            "file://{}",
+                            file.path().unwrap().to_str().unwrap()
+                        )))
                     }
                 },
             ),
         );
         page.set_title(&self.file.parse_name());
+        page.snap_history();
         page.window_action.find.simple_action.set_enabled(false);
         page.window_action.save_as.simple_action.set_enabled(false);
     }

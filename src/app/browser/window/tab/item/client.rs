@@ -36,7 +36,7 @@ impl Client {
 
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
-    pub fn handle(&self, request: &str, is_snap_history: bool) {
+    pub fn handle(&self, request: &str) {
         // Move focus out from navigation entry @TODO
         self.page.browser_action.escape.activate(None);
 
@@ -61,18 +61,8 @@ impl Client {
                 match result {
                     // route by scheme
                     Ok(uri) => match uri.scheme().as_str() {
-                        "file" => {
-                            if is_snap_history {
-                                snap_history(&page);
-                            }
-                            driver.file.handle(uri, feature, cancellable)
-                        }
-                        "gemini" | "titan" => {
-                            if is_snap_history {
-                                snap_history(&page);
-                            }
-                            driver.gemini.handle(uri, feature, cancellable)
-                        }
+                        "file" => driver.file.handle(uri, feature, cancellable),
+                        "gemini" | "titan" => driver.gemini.handle(uri, feature, cancellable),
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
@@ -84,10 +74,7 @@ impl Client {
                         }
                     },
                     // begin redirection to new address suggested
-                    Err(query) => page
-                        .item_action
-                        .load
-                        .activate(Some(&query), is_snap_history),
+                    Err(query) => page.item_action.load.activate(Some(&query)),
                 }
             }
         })
@@ -198,14 +185,4 @@ fn search(profile: &Profile, query: &str) -> Uri {
         UriFlags::NONE,
     )
     .unwrap() // @TODO handle or skip extra URI parse by String return
-}
-
-/// Make new history record in related components
-fn snap_history(page: &Page) {
-    page.item_action
-        .history
-        .add(page.navigation.request(), true);
-    page.profile
-        .history
-        .open(page.navigation.request(), Some(page.title()))
 }

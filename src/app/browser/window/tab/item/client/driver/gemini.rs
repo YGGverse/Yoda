@@ -102,6 +102,7 @@ impl Gemini {
                 });
                 self.page.set_title("Titan input");
                 self.page.set_progress(0.0);
+                //self.page.snap_history();
             }
             _ => panic!(), // unexpected
         }
@@ -145,6 +146,7 @@ fn handle(
                         let title = input.to_string();
                         page.set_progress(0.0);
                         page.set_title(&title);
+                        page.snap_history();
                         redirects.replace(0); // reset
                         match input {
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
@@ -174,62 +176,61 @@ fn handle(
                                 {
                                     let cancellable = cancellable.clone();
                                     let stream = connection.stream();
-                                    move |file, action| {
-                                        match file.replace(
-                                            None,
-                                            false,
-                                            gtk::gio::FileCreateFlags::NONE,
-                                            Some(&cancellable),
-                                        ) {
-                                            Ok(file_output_stream) => {
-                                                use crate::tool::Format;
-                                                // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                                // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                                // show bytes count in loading widget, validate max size for incoming data
-                                                // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                                file_output_stream::from_stream_async(
-                                                    stream.clone(),
-                                                    file_output_stream,
-                                                    cancellable.clone(),
-                                                    Priority::DEFAULT,
-                                                    (
-                                                        0x100000, // 1M bytes per chunk
-                                                        None,     // unlimited
-                                                        0,        // initial totals
-                                                    ),
-                                                    (
-                                                        // on chunk
-                                                        {
-                                                            let action = action.clone();
-                                                            move |_, total| action.update.activate(&format!(
-                                                                "Received {}...",
-                                                                total.bytes()
-                                                            ))
-                                                        },
-                                                        // on complete
-                                                        {
-                                                            let action = action.clone();
-                                                            move |result| match result {
-                                                                Ok((_, total)) => {
-                                                                    action.complete.activate(&format!(
-                                                                        "Saved to {} ({} total)",
-                                                                        file.parse_name(),
-                                                                        total.bytes()
-                                                                    ))
-                                                                }
-                                                                Err(e) => action.cancel.activate(&e.to_string())
+                                    move |file, action| match file.replace(
+                                        None,
+                                        false,
+                                        gtk::gio::FileCreateFlags::NONE,
+                                        Some(&cancellable),
+                                    ) {
+                                        Ok(file_output_stream) => {
+                                            use crate::tool::Format;
+                                            // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                            // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                            // show bytes count in loading widget, validate max size for incoming data
+                                            // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                            file_output_stream::from_stream_async(
+                                                stream.clone(),
+                                                file_output_stream,
+                                                cancellable.clone(),
+                                                Priority::DEFAULT,
+                                                (
+                                                    0x100000, // 1M bytes per chunk
+                                                    None,     // unlimited
+                                                    0,        // initial totals
+                                                ),
+                                                (
+                                                    // on chunk
+                                                    {
+                                                        let action = action.clone();
+                                                        move |_, total| action.update.activate(&format!(
+                                                            "Received {}...",
+                                                            total.bytes()
+                                                        ))
+                                                    },
+                                                    // on complete
+                                                    {
+                                                        let action = action.clone();
+                                                        move |result| match result {
+                                                            Ok((_, total)) => {
+                                                                action.complete.activate(&format!(
+                                                                    "Saved to {} ({} total)",
+                                                                    file.parse_name(),
+                                                                    total.bytes()
+                                                                ))
                                                             }
-                                                        },
-                                                    ),
-                                                )
-                                            }
-                                            Err(e) => action.cancel.activate(&e.to_string()),
+                                                            Err(e) => action.cancel.activate(&e.to_string())
+                                                        }
+                                                    },
+                                                ),
+                                            )
                                         }
+                                        Err(e) => action.cancel.activate(&e.to_string()),
                                     }
                                 },
                             );
                             page.set_progress(0.0);
                             page.set_title(&status.title());
+                            page.snap_history();
                             redirects.replace(0); // reset
                         },
                         _ => match success.mime() {
@@ -270,6 +271,7 @@ fn handle(
                                                             .find
                                                             .simple_action
                                                             .set_enabled(true);
+                                                        page.snap_history();
                                                         redirects.replace(0); // reset
                                                     },
                                                     Err(e) => {
@@ -277,6 +279,7 @@ fn handle(
                                                         status.set_description(Some(&e.to_string()));
                                                         page.set_progress(0.0);
                                                         page.set_title(&status.title());
+                                                        page.snap_history();
                                                         redirects.replace(0); // reset
                                                     },
                                                 },
@@ -285,6 +288,7 @@ fn handle(
                                                     status.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
                                                     page.set_title(&status.title());
+                                                    page.snap_history();
                                                     redirects.replace(0); // reset
                                                 }
                                             }
@@ -294,6 +298,7 @@ fn handle(
                                             status.set_description(Some(&e.to_string()));
                                             page.set_progress(0.0);
                                             page.set_title(&status.title());
+                                            page.snap_history();
                                             redirects.replace(0); // reset
                                         },
                                     }
@@ -320,7 +325,6 @@ fn handle(
                                     (
                                         move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
                                         {
-                                            //let page = page.clone();
                                             move | result | match result {
                                                 Ok((memory_input_stream, _)) => {
                                                     Pixbuf::from_stream_async(
@@ -339,6 +343,7 @@ fn handle(
                                                                 }
                                                             }
                                                             page.set_progress(0.0);
+                                                            page.snap_history();
                                                             redirects.replace(0); // reset
                                                         },
                                                     )
@@ -348,6 +353,7 @@ fn handle(
                                                     status.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
                                                     page.set_title(&status.title());
+                                                    page.snap_history();
                                                     redirects.replace(0); // reset
                                                 }
                                             }
@@ -362,6 +368,7 @@ fn handle(
                                 status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
+                                page.snap_history();
                                 redirects.replace(0); // reset
                             },
                         }
@@ -397,7 +404,7 @@ fn handle(
                                     page.navigation.set_request(&target.to_string());
                                 }
                                 redirects.replace(total);
-                                page.item_action.load.activate(Some(&target.to_string()), false);
+                                page.item_action.load.activate(Some(&target.to_string()));
                             }
                         }
                         Err(e) => {
@@ -419,6 +426,7 @@ fn handle(
                             status.set_description(Some(message.as_ref().unwrap_or(&certificate.to_string())));
                             page.set_progress(0.0);
                             page.set_title(&status.title());
+                            page.snap_history();
                             redirects.replace(0); // reset
                         }
                     }
@@ -433,6 +441,7 @@ fn handle(
                                 status.set_description(Some(message.as_ref().unwrap_or(&temporary.to_string())));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
+                                page.snap_history();
                                 redirects.replace(0); // reset
                                 if let Some(callback) = on_failure {
                                     callback()
@@ -449,6 +458,7 @@ fn handle(
                                 status.set_description(Some(message.as_ref().unwrap_or(&permanent.to_string())));
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
+                                page.snap_history();
                                 redirects.replace(0); // reset
                                 if let Some(callback) = on_failure {
                                     callback()
@@ -462,6 +472,7 @@ fn handle(
                     status.set_description(Some(&e.to_string()));
                     page.set_progress(0.0);
                     page.set_title(&status.title());
+                    page.snap_history();
                     redirects.replace(0); // reset
                 }
             }

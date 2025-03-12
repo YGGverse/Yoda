@@ -90,7 +90,7 @@ impl Item {
                 if let Some(uri) = page.navigation.home() {
                     let request = uri.to_string();
                     page.navigation.set_request(&request);
-                    client.handle(&request, true);
+                    client.handle(&request);
                 }
             }
         });
@@ -98,10 +98,10 @@ impl Item {
         action.load.connect_activate({
             let page = page.clone();
             let client = client.clone();
-            move |request, is_history| {
-                if let Some(text) = request {
-                    page.navigation.set_request(&text);
-                    client.handle(&text, is_history);
+            move |request| {
+                if let Some(request) = request {
+                    page.navigation.set_request(&request);
+                    client.handle(&request);
                 }
             }
         });
@@ -114,9 +114,7 @@ impl Item {
         action.reload.connect_activate({
             let page = page.clone();
             let client = client.clone();
-            move |_, _| {
-                client.handle(&page.navigation.request(), true);
-            }
+            move |_, _| client.handle(&page.navigation.request())
         });
 
         action.reload.connect_enabled_notify({
@@ -150,10 +148,10 @@ impl Item {
         });
 
         // Handle immediately on request
-        if let Some(text) = request {
-            page.navigation.set_request(text);
+        if let Some(request) = request {
+            page.navigation.set_request(request);
             if is_load {
-                client.handle(text, true);
+                client.handle(request)
             }
         }
 

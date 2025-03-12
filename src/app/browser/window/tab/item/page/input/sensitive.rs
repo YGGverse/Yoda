@@ -59,14 +59,11 @@ impl Sensitive for Box {
         action_send.connect_activate({
             let form = form.clone();
             move |_, _| {
-                item_action.load.activate(
-                    Some(&format!(
-                        "{}?{}",
-                        base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(&form.password_entry_row.text(), None, false),
-                    )),
-                    false, // prevent re-send on history navigation
-                );
+                item_action.load.activate(Some(&format!(
+                    "{}?{}",
+                    base.to_string_partial(UriHideFlags::QUERY),
+                    Uri::escape_string(&form.password_entry_row.text(), None, false),
+                )))
             }
         });
 

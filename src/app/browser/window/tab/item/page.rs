@@ -93,6 +93,16 @@ impl Page {
         self.search.show()
     }
 
+    /// Make new history record in related components
+    pub fn snap_history(&self) {
+        self.item_action
+            .history
+            .add(self.navigation.request(), true);
+        self.profile
+            .history
+            .open(self.navigation.request(), Some(self.title()))
+    }
+
     /// Cleanup session for `Self`
     pub fn clean(
         &self,
