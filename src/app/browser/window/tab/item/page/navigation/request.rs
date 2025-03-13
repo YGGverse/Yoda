@@ -116,7 +116,7 @@ impl Request {
 
                     // Show search suggestions
                     if this.focus_child().is_some() {
-                        suggestion.update(None);
+                        suggestion.update(Some(100)); // @TODO optional
                     }
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
