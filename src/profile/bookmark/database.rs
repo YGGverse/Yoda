@@ -6,17 +6,17 @@ use std::{rc::Rc, sync::RwLock};
 
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
-    profile_id: Rc<i64>, // multi-profile relationship
+    profile_id: i64,
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
+    pub fn new(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Self {
         Self {
             connection: connection.clone(),
-            profile_id: profile_id.clone(),
+            profile_id,
         }
     }
 
@@ -26,7 +26,7 @@ impl Database {
     pub fn records(&self, request: Option<&str>, title: Option<&str>) -> Result<Vec<Item>> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, *self.profile_id, request, title)
+        select(&tx, self.profile_id, request, title)
     }
 
     // Setters
@@ -36,7 +36,7 @@ impl Database {
     pub fn add(&self, time: DateTime, request: &str, title: Option<&str>) -> Result<i64> {
         let mut writable = self.connection.write().unwrap(); // @TODO
         let tx = writable.transaction()?;
-        let id = insert(&tx, *self.profile_id, time, request, title)?;
+        let id = insert(&tx, self.profile_id, time, request, title)?;
         tx.commit()?;
         Ok(id)
     }

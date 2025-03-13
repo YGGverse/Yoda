@@ -22,11 +22,11 @@ const BRANCH: &str = "master";
 const DB_NAME: &str = "database.sqlite3";
 
 pub struct Profile {
-    pub bookmark: Rc<Bookmark>,
-    pub database: Rc<Database>,
-    pub history: Rc<History>,
-    pub identity: Rc<Identity>,
-    pub search: Rc<Search>,
+    pub bookmark: Bookmark,
+    pub database: Database,
+    pub history: History,
+    pub identity: Identity,
+    pub search: Search,
     pub config_path: PathBuf,
 }
 
@@ -69,19 +69,19 @@ impl Profile {
         } // unlock database
 
         // Init model
-        let database = Rc::new(Database::build(&connection));
+        let database = Database::build(&connection);
 
         // Get active profile or create new one
-        let profile_id = Rc::new(match database.active()? {
+        let profile_id = match database.active()? {
             Some(profile) => profile.id,
             None => database.add(true, DateTime::now_local()?, None)?,
-        });
+        };
 
         // Init components
-        let bookmark = Rc::new(Bookmark::build(&connection, &profile_id)?);
-        let history = Rc::new(History::build(&connection, &profile_id)?);
-        let search = Rc::new(Search::build(&connection, &profile_id)?);
-        let identity = Rc::new(Identity::build(&connection, &profile_id)?);
+        let bookmark = Bookmark::build(&connection, profile_id)?;
+        let history = History::build(&connection, profile_id)?;
+        let search = Search::build(&connection, profile_id)?;
+        let identity = Identity::build(&connection, profile_id)?;
 
         // Result
         Ok(Self {

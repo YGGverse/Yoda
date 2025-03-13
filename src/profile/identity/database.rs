@@ -10,17 +10,17 @@ pub struct Table {
 /// Storage for Gemini auth certificates
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
-    profile_id: Rc<i64>, // multi-profile relationship
+    profile_id: i64,
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Self {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Self {
         Self {
             connection: connection.clone(),
-            profile_id: profile_id.clone(),
+            profile_id,
         }
     }
 
@@ -33,7 +33,7 @@ impl Database {
         let tx = writable.transaction()?;
 
         // Create new record
-        insert(&tx, *self.profile_id, pem)?;
+        insert(&tx, self.profile_id, pem)?;
 
         // Hold insert ID for result
         let id = last_insert_id(&tx);
@@ -65,7 +65,7 @@ impl Database {
     pub fn record(&self, id: i64) -> Result<Option<Table>, Error> {
         let readable = self.connection.read().unwrap();
         let tx = readable.unchecked_transaction()?;
-        let records = select(&tx, *self.profile_id)?; // @TODO single record query
+        let records = select(&tx, self.profile_id)?; // @TODO single record query
 
         for record in records {
             if record.id == id {
@@ -80,7 +80,7 @@ impl Database {
     pub fn records(&self) -> Result<Vec<Table>, Error> {
         let readable = self.connection.read().unwrap(); // @TODO
         let tx = readable.unchecked_transaction()?;
-        select(&tx, *self.profile_id)
+        select(&tx, self.profile_id)
     }
 }
 

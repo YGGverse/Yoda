@@ -12,27 +12,27 @@ pub struct Row {
 
 pub struct Database {
     connection: Rc<RwLock<Connection>>,
-    profile_id: Rc<i64>, // multi-profile relationship
+    profile_id: i64,
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
+    pub fn init(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
         let mut writable = connection.write().unwrap(); // @TODO handle
         let tx = writable.transaction()?;
 
-        let records = select(&tx, **profile_id)?;
+        let records = select(&tx, profile_id)?;
 
         if records.is_empty() {
-            add_defaults(&tx, **profile_id)?;
+            add_defaults(&tx, profile_id)?;
             tx.commit()?;
         }
 
         Ok(Self {
             connection: connection.clone(),
-            profile_id: profile_id.clone(),
+            profile_id,
         })
     }
 
@@ -42,7 +42,7 @@ impl Database {
     pub fn records(&self) -> Result<Vec<Row>> {
         let readable = self.connection.read().unwrap(); // @TODO handle
         let tx = readable.unchecked_transaction()?;
-        select(&tx, *self.profile_id)
+        select(&tx, self.profile_id)
     }
 
     // Setters
@@ -53,9 +53,9 @@ impl Database {
         let mut writable = self.connection.write().unwrap(); // @TODO handle
         let tx = writable.transaction()?;
         if is_default {
-            reset(&tx, *self.profile_id, !is_default)?;
+            reset(&tx, self.profile_id, !is_default)?;
         }
-        let id = insert(&tx, *self.profile_id, query, is_default)?;
+        let id = insert(&tx, self.profile_id, query, is_default)?;
         tx.commit()?;
         Ok(id)
     }
@@ -69,11 +69,11 @@ impl Database {
         // Delete record by ID
         delete(&tx, id)?;
 
-        let records = select(&tx, *self.profile_id)?;
+        let records = select(&tx, self.profile_id)?;
 
         // Restore defaults if DB becomes empty
         if records.is_empty() {
-            add_defaults(&tx, *self.profile_id)?;
+            add_defaults(&tx, self.profile_id)?;
         } else {
             // At least one provider should be selected as default
             let mut has_default = false;
@@ -85,7 +85,7 @@ impl Database {
             }
             // Select first
             if !has_default {
-                set_default(&tx, *self.profile_id, records[0].id, true)?;
+                set_default(&tx, self.profile_id, records[0].id, true)?;
             }
         }
 
@@ -101,10 +101,10 @@ impl Database {
         let tx = writable.transaction()?;
 
         // Make sure only one default provider in set
-        reset(&tx, *self.profile_id, false)?;
+        reset(&tx, self.profile_id, false)?;
 
         // Delete record by ID
-        set_default(&tx, *self.profile_id, id, true)?;
+        set_default(&tx, self.profile_id, id, true)?;
         tx.commit()?;
         Ok(())
     }

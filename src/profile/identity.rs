@@ -17,23 +17,20 @@ use std::{rc::Rc, sync::RwLock};
 ///
 /// https://geminiprotocol.net/docs/protocol-specification.gmi#client-certificates
 pub struct Identity {
-    pub auth: Rc<Auth>,
-    pub database: Rc<Database>,
-    pub memory: Rc<Memory>,
-}
+    pub auth: Auth,
+    pub database: Database,
+    pub memory: Memory,
+} // @TODO remove pub access
 
 impl Identity {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(
-        connection: &Rc<RwLock<Connection>>,
-        profile_identity_id: &Rc<i64>,
-    ) -> Result<Self> {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_identity_id: i64) -> Result<Self> {
         // Init components
-        let auth = Rc::new(Auth::build(connection)?);
-        let database = Rc::new(Database::build(connection, profile_identity_id));
-        let memory = Rc::new(Memory::new());
+        let auth = Auth::build(connection)?;
+        let database = Database::build(connection, profile_identity_id);
+        let memory = Memory::new();
 
         // Init `Self`
         let this = Self {

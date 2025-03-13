@@ -17,7 +17,7 @@ impl Search {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
         let database = Database::init(connection, profile_id)?;
         // Init fast search index
         let memory = Memory::init();

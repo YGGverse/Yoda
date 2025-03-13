@@ -19,7 +19,7 @@ impl History {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: &Rc<i64>) -> Result<Self> {
+    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
         // Init children components
         let database = Database::build(connection, profile_id);
         let memory = RefCell::new(Memory::new());
