@@ -57,7 +57,7 @@ impl Memory {
             })
             .enumerate()
         {
-            if limit.is_some_and(|l| i > l) {
+            if limit.is_some_and(|l| i >= l) {
                 break;
             }
             recent.push(item.clone())
@@ -74,7 +74,7 @@ impl Memory {
             .sorted_by(|a, b| Ord::cmp(&b.opened.time, &a.opened.time))
             .enumerate()
         {
-            if limit.is_some_and(|l| i > l) {
+            if limit.is_some_and(|l| i >= l) {
                 break;
             }
             recent.push(item.clone())
@@ -87,7 +87,7 @@ impl Memory {
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
         let mut items: Vec<Item> = Vec::new();
         for (i, item) in self.0.iter().enumerate() {
-            if limit.is_some_and(|l| i > l) {
+            if limit.is_some_and(|l| i >= l) {
                 break;
             }
             let p = request.to_lowercase();
