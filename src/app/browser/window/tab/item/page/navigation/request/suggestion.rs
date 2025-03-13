@@ -155,32 +155,51 @@ impl Suggestion {
     pub fn update(&self, limit: Option<usize>) {
         use gtk::prelude::EditableExt;
         use itertools::Itertools;
+        self.popover.popdown();
         if self.request.text_length() > 0 {
             self.list_store.remove_all();
+
             let query = self.request.text();
-            let items = self.profile.history.contains_request(&query, limit);
-            if !items.is_empty() {
-                for item in items
-                    .into_iter()
-                    .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count))
-                {
-                    let subtitle = highlight(&item.request, &query);
-                    let title = match item.title {
-                        Some(title) => highlight(&title, &query),
-                        None => subtitle.clone(),
-                    };
-                    self.list_store.append(&Item::build(
-                        title,
-                        subtitle,
-                        self.profile.bookmark.is_match_request(&item.request),
-                        item.request,
-                    ));
+            let popover = self.popover.clone();
+            let list_store = self.list_store.clone();
+
+            let history = self.profile.history.memory.clone(); // @TODO
+            let bookmark = self.profile.bookmark.memory.clone(); // @TODO
+
+            gtk::glib::spawn_future_local(async move {
+                let list_items = gtk::gio::spawn_blocking(move || {
+                    let result = history
+                        .read()
+                        .unwrap()
+                        .contains_request(&query, limit)
+                        .into_iter()
+                        .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count));
+                    let mut list_items = Vec::with_capacity(result.len());
+                    for item in result {
+                        let subtitle = highlight(&item.request, &query);
+                        let title = match item.title {
+                            Some(title) => highlight(&title, &query),
+                            None => subtitle.clone(),
+                        };
+                        list_items.push((
+                            title,
+                            subtitle,
+                            bookmark.read().unwrap().is_match_request(&item.request),
+                            item.request,
+                        ))
+                    }
+                    list_items
+                })
+                .await
+                .unwrap();
+                if !list_items.is_empty() {
+                    for (title, subtitle, has_bookmark, request) in list_items {
+                        list_store.append(&Item::build(title, subtitle, has_bookmark, request));
+                    } // @TODO take a while
+                    popover.popup()
                 }
-                self.popover.popup();
-                return;
-            }
+            });
         }
-        self.hide();
     }
 
     pub fn hide(&self) {

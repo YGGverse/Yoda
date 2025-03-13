@@ -8,12 +8,15 @@ use gtk::glib::GString;
 use item::{Event, Item};
 use memory::Memory;
 use sqlite::{Connection, Transaction};
-use std::{cell::RefCell, rc::Rc, sync::RwLock};
+use std::{
+    rc::Rc,
+    sync::{Arc, RwLock},
+};
 
 pub struct History {
-    database: Database,      // permanent storage
-    memory: RefCell<Memory>, // fast search index
-}
+    database: Database,              // permanent storage
+    pub memory: Arc<RwLock<Memory>>, // fast search index
+} // @TODO close memory member, Arc entire profile instead
 
 impl History {
     // Constructors
@@ -22,10 +25,10 @@ impl History {
     pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
         // Init children components
         let database = Database::build(connection, profile_id);
-        let memory = RefCell::new(Memory::new());
+        let memory = Arc::new(RwLock::new(Memory::new()));
 
         for item in database.records(None, None)? {
-            memory.borrow_mut().add(item)
+            memory.write().unwrap().add(item)
         }
 
         // Return new `Self`
@@ -35,7 +38,7 @@ impl History {
     // Actions
 
     pub fn save(&self) -> Result<()> {
-        for item in self.memory.borrow().items() {
+        for item in self.memory.read().unwrap().items() {
             if !item.is_saved {
                 match item.id {
                     Some(_) => {
@@ -54,7 +57,7 @@ impl History {
 
     /// Create new history record
     pub fn open(&self, request: GString, title: Option<GString>) {
-        let mut memory = self.memory.borrow_mut();
+        let mut memory = self.memory.write().unwrap();
         if !memory.open(&request) {
             memory.add(Item {
                 id: None,
@@ -69,25 +72,25 @@ impl History {
 
     /// Close existing history record
     pub fn close(&self, request: &str) {
-        self.memory.borrow_mut().close(request)
+        self.memory.write().unwrap().close(request)
     }
 
     // Getters
 
     /// Get recently `opened` Items vector from the memory index, sorted by ASC
     pub fn recently_opened(&self, limit: Option<usize>) -> Vec<Item> {
-        self.memory.borrow().recently_opened(limit)
+        self.memory.read().unwrap().recently_opened(limit)
     }
 
     /// Get recently `closed` Items vector from the memory index, sorted by ASC
     pub fn recently_closed(&self, limit: Option<usize>) -> Vec<Item> {
-        self.memory.borrow().recently_closed(limit)
+        self.memory.read().unwrap().recently_closed(limit)
     }
 
-    /// Get unordered Items vector contains `request`
+    /// Get unordered Items vector that contains given `request`
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
-        self.memory.borrow().contains_request(request, limit)
-    }
+        self.memory.read().unwrap().contains_request(request, limit)
+    } // @TODO close memory member
 }
 
 // Tools

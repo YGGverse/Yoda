@@ -8,12 +8,15 @@ use gtk::glib::DateTime;
 use item::Item;
 use memory::Memory;
 use sqlite::{Connection, Transaction};
-use std::{cell::RefCell, rc::Rc, sync::RwLock};
+use std::{
+    rc::Rc,
+    sync::{Arc, RwLock},
+};
 
 pub struct Bookmark {
-    database: Database,      // permanent storage
-    memory: RefCell<Memory>, // fast search index
-}
+    database: Database,              // permanent storage
+    pub memory: Arc<RwLock<Memory>>, // fast search index
+} // @TODO close memory member, Arc entire profile instead
 
 impl Bookmark {
     // Constructors
@@ -22,11 +25,11 @@ impl Bookmark {
     pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
         // Init children components
         let database = Database::new(connection, profile_id);
-        let memory = RefCell::new(Memory::new());
+        let memory = Arc::new(RwLock::new(Memory::new()));
 
         // Build initial index
         {
-            let mut memory = memory.borrow_mut();
+            let mut memory = memory.write().unwrap();
             for item in database.records(None, None)? {
                 memory.add(item);
             }
@@ -41,7 +44,7 @@ impl Bookmark {
     /// Toggle bookmark in `database` and `memory` index
     /// * return `true` on bookmark create, `false` on delete
     pub fn toggle(&self, request: &str, title: Option<&str>) -> Result<bool> {
-        let mut memory = self.memory.borrow_mut();
+        let mut memory = self.memory.write().unwrap();
         Ok(match memory.delete_by_request(request) {
             Some(item) => {
                 self.database.delete(item.id)?;
@@ -62,17 +65,20 @@ impl Bookmark {
 
     /// Check `request` exists in the memory index
     pub fn is_match_request(&self, request: &str) -> bool {
-        self.memory.borrow_mut().is_match_request(request)
+        self.memory.write().unwrap().is_match_request(request)
     }
 
     /// Find Items match `request`
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
-        self.memory.borrow_mut().contains_request(request, limit)
+        self.memory
+            .write()
+            .unwrap()
+            .contains_request(request, limit)
     }
 
     /// Get recent Items vector from `memory`, sorted by `ID` DESC
     pub fn recent(&self, limit: Option<usize>) -> Vec<Item> {
-        self.memory.borrow().recent(limit)
+        self.memory.read().unwrap().recent(limit)
     }
 }
 
