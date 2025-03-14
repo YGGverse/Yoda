@@ -10,7 +10,7 @@ const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
 pub trait Bookmark {
     fn bookmark(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self;
-    fn update(&self, profile: &Profile, request: &Entry);
+    fn update(&self, profile: &Arc<Profile>, request: &Entry);
 }
 
 impl Bookmark for Button {
@@ -47,10 +47,20 @@ impl Bookmark for Button {
         button
     }
 
-    fn update(&self, profile: &Profile, request: &Entry) {
-        let has_bookmark = profile.bookmark.is_match_request(&request.text());
-        self.set_icon_name(icon_name(has_bookmark));
-        self.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+    fn update(&self, profile: &Arc<Profile>, request: &Entry) {
+        self.set_sensitive(false); // lock
+        let this = self.clone();
+        let profile = profile.clone();
+        let query = request.text();
+        gtk::glib::spawn_future_local(async move {
+            let has_bookmark =
+                gtk::gio::spawn_blocking(move || profile.bookmark.is_match_request(&query))
+                    .await
+                    .unwrap();
+            this.set_icon_name(icon_name(has_bookmark));
+            this.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+            this.set_sensitive(true);
+        }); // may take a while
     }
 }
 
