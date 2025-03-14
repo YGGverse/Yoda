@@ -4,12 +4,12 @@ use super::{Action as WindowAction, BrowserAction, Profile};
 use adw::{TabView, ToolbarView};
 use bar::Bar;
 use gtk::Box;
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 pub trait Header {
     fn header(
         action: (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         tab_view: &TabView,
     ) -> Self;
 }
@@ -20,7 +20,7 @@ impl Header for ToolbarView {
     /// Build new `Self`
     fn header(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         tab_view: &TabView,
     ) -> Self {
         let toolbar_view = ToolbarView::builder().build();

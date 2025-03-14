@@ -3,18 +3,18 @@ use gtk::{
     prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
     Button, Entry,
 };
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 const ICON_NAME: (&str, &str) = ("non-starred-symbolic", "starred-symbolic");
 const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
 pub trait Bookmark {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self;
+    fn bookmark(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self;
     fn update(&self, profile: &Profile, request: &Entry);
 }
 
 impl Bookmark for Button {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self {
+    fn bookmark(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self {
         let button = Button::builder()
             .action_name(format!(
                 "{}.{}",

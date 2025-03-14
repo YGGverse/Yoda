@@ -1,5 +1,5 @@
 pub mod item;
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 use item::Item;
 
@@ -25,7 +25,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
+    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Arc<Profile>, request: &Uri) -> Self {
         // Init dropdown items
         let guest_session = Item::new_guest_session();
         let generate_pem = Item::new_generate_pem();

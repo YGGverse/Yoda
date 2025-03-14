@@ -10,6 +10,7 @@ use form::{list::item::Value, list::Item, Form, Query};
 use gtk::prelude::{EditableExt, WidgetExt};
 use sourceview::prelude::CastNone;
 use std::rc::Rc;
+use std::sync::Arc;
 
 // Response variants
 const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");
@@ -17,14 +18,14 @@ const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 // const RESPONSE_MANAGE: (&str, &str) = ("manage", "Manage");
 
 pub trait Search {
-    fn search(profile: &Rc<Profile>) -> Self;
+    fn search(profile: &Arc<Profile>) -> Self;
 }
 
 impl Search for AlertDialog {
     // Constructors
 
     /// Create new `Self`
-    fn search(profile: &Rc<Profile>) -> Self {
+    fn search(profile: &Arc<Profile>) -> Self {
         // Init child container
         let form = Rc::new(Form::build(profile));
 

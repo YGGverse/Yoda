@@ -11,7 +11,7 @@ use anyhow::Result;
 use gtk::{prelude::BoxExt, Box, Orientation};
 use header::Header;
 use sqlite::Transaction;
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 use tab::Tab;
 
 pub struct Window {
@@ -24,7 +24,7 @@ impl Window {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(profile: &Rc<Profile>, browser_action: &Rc<BrowserAction>) -> Self {
+    pub fn build(profile: &Arc<Profile>, browser_action: &Rc<BrowserAction>) -> Self {
         // Init local actions
         let action = Rc::new(Action::new());
 

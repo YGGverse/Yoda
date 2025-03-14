@@ -9,12 +9,12 @@ use tab::Tab;
 use super::{BrowserAction, Profile, WindowAction};
 use adw::{TabBar, TabView};
 use gtk::{prelude::BoxExt, Box, MenuButton, Orientation};
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 pub trait Bar {
     fn bar(
         action: (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         view: &TabView,
     ) -> Self;
 }
@@ -25,7 +25,7 @@ impl Bar for Box {
     /// Build new `Self`
     fn bar(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         view: &TabView,
     ) -> Self {
         let g_box = Box::builder()

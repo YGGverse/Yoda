@@ -2,7 +2,7 @@ use anyhow::{bail, Result};
 
 use crate::profile::Profile;
 use gtk::{gio::TlsCertificate, prelude::TlsCertificateExt};
-use std::rc::Rc;
+use std::sync::Arc;
 
 /// Certificate details holder for export to file action
 pub struct Certificate {
@@ -14,7 +14,7 @@ impl Certificate {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: Rc<Profile>, profile_identity_id: i64) -> Result<Self> {
+    pub fn build(profile: &Arc<Profile>, profile_identity_id: i64) -> Result<Self> {
         let record = profile.identity.database.record(profile_identity_id)?;
         match record {
             Some(identity) => Ok(Self {

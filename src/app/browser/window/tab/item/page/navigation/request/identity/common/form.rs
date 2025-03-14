@@ -19,7 +19,7 @@ use gtk::{
     prelude::{BoxExt, WidgetExt},
     Box, Button, Entry, Orientation,
 };
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 pub struct Form {
     // pub action_widget: Rc<Action>,
@@ -30,14 +30,14 @@ pub struct Form {
     pub name: Entry,
     pub save: Rc<Save>,
     pub g_box: Box,
-    profile: Rc<Profile>,
+    profile: Arc<Profile>,
 }
 
 impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Rc<Profile>, request: &Uri) -> Self {
+    pub fn build(widget_action: &Rc<WidgetAction>, profile: &Arc<Profile>, request: &Uri) -> Self {
         // Init components
         let list = Rc::new(List::build(widget_action, profile, request));
         let file = Rc::new(File::build(widget_action));

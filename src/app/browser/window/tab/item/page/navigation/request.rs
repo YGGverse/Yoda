@@ -14,7 +14,7 @@ use gtk::{
 };
 use primary_icon::PrimaryIcon;
 use sqlite::Transaction;
-use std::{cell::Cell, rc::Rc};
+use std::{cell::Cell, rc::Rc, sync::Arc};
 use suggestion::Suggestion;
 
 const PREFIX_DOWNLOAD: &str = "download:";
@@ -23,14 +23,14 @@ const PREFIX_SOURCE: &str = "source:";
 pub struct Request {
     pub entry: Entry,
     suggestion: Rc<Suggestion>,
-    profile: Rc<Profile>,
+    profile: Arc<Profile>,
 }
 
 impl Request {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
+    pub fn build(item_action: &Rc<ItemAction>, profile: &Arc<Profile>) -> Self {
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text("URL or search term...")
@@ -327,7 +327,7 @@ fn update_secondary_icon(entry: &Entry) {
 }
 
 /// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-fn show_identity_dialog(entry: &Entry, profile: &Rc<Profile>) {
+fn show_identity_dialog(entry: &Entry, profile: &Arc<Profile>) {
     // connect identity traits
     use identity::{Common, Unsupported};
     if let Some(uri) = uri(entry) {
@@ -353,7 +353,7 @@ fn show_identity_dialog(entry: &Entry, profile: &Rc<Profile>) {
 }
 
 /// Present Search providers [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-fn show_search_dialog(entry: &Entry, profile: &Rc<Profile>) {
+fn show_search_dialog(entry: &Entry, profile: &Arc<Profile>) {
     use search::Search;
     AlertDialog::search(profile).present(Some(entry))
 }

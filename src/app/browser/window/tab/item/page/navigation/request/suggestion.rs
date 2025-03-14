@@ -17,14 +17,14 @@ use gtk::{
 };
 pub use item::Item;
 use sourceview::prelude::ListModelExt;
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 pub struct Suggestion {
     list_store: ListStore,
     list_view: ListView,
     single_selection: SingleSelection,
     request: Entry,
-    profile: Rc<Profile>,
+    profile: Arc<Profile>,
     popover: Popover,
     pub signal_handler_id: Rc<RefCell<Option<SignalHandlerId>>>,
 }
@@ -33,7 +33,7 @@ impl Suggestion {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>, request: &Entry) -> Self {
+    pub fn build(profile: &Arc<Profile>, request: &Entry) -> Self {
         let signal_handler_id = Rc::new(RefCell::new(None));
         let list_store = ListStore::new::<Item>();
         let single_selection = {
@@ -162,15 +162,12 @@ impl Suggestion {
             let query = self.request.text();
             let popover = self.popover.clone();
             let list_store = self.list_store.clone();
-
-            let history = self.profile.history.memory.clone(); // @TODO
-            let bookmark = self.profile.bookmark.memory.clone(); // @TODO
+            let profile = self.profile.clone();
 
             gtk::glib::spawn_future_local(async move {
                 let list_items = gtk::gio::spawn_blocking(move || {
-                    let result = history
-                        .read()
-                        .unwrap()
+                    let result = profile
+                        .history
                         .contains_request(&query, limit)
                         .into_iter()
                         .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count));
@@ -184,7 +181,7 @@ impl Suggestion {
                         list_items.push((
                             title,
                             subtitle,
-                            bookmark.read().unwrap().is_match_request(&item.request),
+                            profile.bookmark.is_match_request(&item.request),
                             item.request,
                         ))
                     }

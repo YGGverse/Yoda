@@ -10,7 +10,7 @@ use gtk::{
     Align, Box, DropDown, Label, ListItem, Orientation, SignalListItemFactory,
 };
 pub use item::Item;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct List {
     pub dropdown: DropDown,
@@ -21,7 +21,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>) -> Self {
+    pub fn build(profile: &Arc<Profile>) -> Self {
         // Init dropdown items
         let new_search_provider = Item::add();
 

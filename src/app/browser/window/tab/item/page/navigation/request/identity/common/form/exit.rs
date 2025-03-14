@@ -8,12 +8,12 @@ use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 pub trait Exit {
     fn exit(
         widget_action: &Rc<WidgetAction>,
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         list: &Rc<List>,
         request: &Uri,
     ) -> Self;
@@ -25,7 +25,7 @@ impl Exit for Button {
     /// Create new `Self`
     fn exit(
         widget_action: &Rc<WidgetAction>,
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         list: &Rc<List>,
         request: &Uri,
     ) -> Self {

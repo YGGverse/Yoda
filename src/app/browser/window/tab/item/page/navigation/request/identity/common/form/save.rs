@@ -9,7 +9,7 @@ use gtk::{
     prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
     Button, FileDialog, FileFilter, Window,
 };
-use std::{path::MAIN_SEPARATOR, rc::Rc};
+use std::{path::MAIN_SEPARATOR, rc::Rc, sync::Arc};
 
 const LABEL: &str = "Export";
 const TOOLTIP_TEXT: &str = "Export selected identity to file";
@@ -24,7 +24,7 @@ impl Save {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
+    pub fn build(profile: &Arc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)
@@ -46,7 +46,7 @@ impl Save {
                         button.set_sensitive(false);
 
                         // Create PEM file based on option ID selected
-                        match Certificate::build(profile.clone(), profile_identity_id) {
+                        match Certificate::build(&profile, profile_identity_id) {
                             Ok(certificate) => {
                                 // Init file filters related with PEM extension
                                 let filters = ListStore::new::<FileFilter>();

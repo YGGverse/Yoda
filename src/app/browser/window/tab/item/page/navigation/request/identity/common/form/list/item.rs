@@ -14,7 +14,7 @@ use gtk::{
     gio::TlsCertificate,
     glib::{self, Object},
 };
-use std::rc::Rc;
+use std::sync::Arc;
 
 glib::wrapper! {
     pub struct Item(ObjectSubclass<imp::Item>);
@@ -54,7 +54,7 @@ impl Item {
     }
 
     pub fn new_profile_identity_id(
-        profile: &Rc<Profile>,
+        profile: &Arc<Profile>,
         profile_identity_id: i64,
         auth_url: &str,
     ) -> Result<Self, Error> {
@@ -96,7 +96,7 @@ impl Item {
     // Actions
 
     /// Update properties for `Self` for given `Profile` and `auth_url`
-    pub fn update(&self, profile: &Rc<Profile>, auth_url: &str) -> Result<(), Error> {
+    pub fn update(&self, profile: &Arc<Profile>, auth_url: &str) -> Result<(), Error> {
         // Update item depending on value type
         match self.value_enum() {
             Value::ProfileIdentityId(profile_identity_id) => {

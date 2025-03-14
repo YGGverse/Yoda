@@ -9,7 +9,7 @@ use gtk::{
     prelude::{ButtonExt, WidgetExt},
     Button,
 };
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 // Defaults
 
@@ -30,7 +30,7 @@ impl Drop {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
+    pub fn build(profile: &Arc<Profile>, list: &Rc<List>) -> Self {
         // Init main widget
         let button = Button::builder()
             .label(LABEL)

@@ -10,12 +10,12 @@ use memory::Memory;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use sqlite::Transaction;
-use std::sync::{Arc, RwLock};
+use std::sync::RwLock;
 
 pub struct Bookmark {
-    database: Database,              // permanent storage
-    pub memory: Arc<RwLock<Memory>>, // fast search index
-} // @TODO close memory member, Arc entire profile instead
+    database: Database,     // permanent storage
+    memory: RwLock<Memory>, // fast search index
+}
 
 impl Bookmark {
     // Constructors
@@ -24,7 +24,7 @@ impl Bookmark {
     pub fn build(database_pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Result<Self> {
         // Init children components
         let database = Database::new(database_pool, profile_id);
-        let memory = Arc::new(RwLock::new(Memory::new()));
+        let memory = RwLock::new(Memory::new());
 
         // Build initial index
         {
