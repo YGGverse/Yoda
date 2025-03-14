@@ -46,7 +46,7 @@ impl Save {
                         button.set_sensitive(false);
 
                         // Create PEM file based on option ID selected
-                        match Certificate::new(profile.clone(), profile_identity_id) {
+                        match Certificate::build(profile.clone(), profile_identity_id) {
                             Ok(certificate) => {
                                 // Init file filters related with PEM extension
                                 let filters = ListStore::new::<FileFilter>();

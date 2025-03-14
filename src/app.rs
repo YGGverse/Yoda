@@ -42,7 +42,7 @@ impl App {
             let profile = profile.clone();
             move |this| {
                 // Init readable connection
-                match profile.database.connection.read() {
+                match profile.database.pool.get() {
                     Ok(connection) => {
                         // Create transaction
                         match connection.unchecked_transaction() {
@@ -77,7 +77,7 @@ impl App {
             let profile = profile.clone();
             move |_| {
                 match profile.save() {
-                    Ok(_) => match profile.database.connection.write() {
+                    Ok(_) => match profile.database.pool.get() {
                         Ok(mut connection) => {
                             // Create transaction
                             match connection.transaction() {
@@ -266,7 +266,7 @@ impl App {
     pub fn run(&self) -> Result<ExitCode> {
         // Begin database migration @TODO
         {
-            let mut connection = self.profile.database.connection.write().unwrap();
+            let mut connection = self.profile.database.pool.get()?;
             let transaction = connection.transaction()?;
             migrate(&transaction)?;
             transaction.commit()?;

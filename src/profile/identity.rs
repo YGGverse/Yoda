@@ -10,8 +10,9 @@ use database::Database;
 use gtk::glib::DateTime;
 use item::Item;
 use memory::Memory;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 /// Authorization wrapper for Gemini protocol
 ///
@@ -26,10 +27,13 @@ impl Identity {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_identity_id: i64) -> Result<Self> {
+    pub fn build(
+        database_pool: &Pool<SqliteConnectionManager>,
+        profile_identity_id: i64,
+    ) -> Result<Self> {
         // Init components
-        let auth = Auth::build(connection)?;
-        let database = Database::build(connection, profile_identity_id);
+        let auth = Auth::build(database_pool)?;
+        let database = Database::build(database_pool, profile_identity_id);
         let memory = Memory::new();
 
         // Init `Self`

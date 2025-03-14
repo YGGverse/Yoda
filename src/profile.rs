@@ -4,16 +4,17 @@ mod history;
 mod identity;
 mod search;
 
+use anyhow::Result;
 use bookmark::Bookmark;
 use database::Database;
+use gtk::glib::{user_config_dir, DateTime};
 use history::History;
 use identity::Identity;
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
 use search::Search;
-
-use anyhow::Result;
-use gtk::glib::{user_config_dir, DateTime};
-use sqlite::{Connection, Transaction};
-use std::{fs::create_dir_all, path::PathBuf, rc::Rc, sync::RwLock};
+use sqlite::Transaction;
+use std::{fs::create_dir_all, path::PathBuf};
 
 const VENDOR: &str = "YGGverse";
 const APP_ID: &str = "Yoda";
@@ -53,23 +54,24 @@ impl Profile {
         database_path.push(DB_NAME);
 
         // Init database connection
-        let connection = Rc::new(RwLock::new(Connection::open(database_path.as_path())?));
+        let database_pool =
+            Pool::new(SqliteConnectionManager::file(database_path.as_path())).unwrap();
 
         // Init profile components
         {
             // Init writable connection
-            let mut connection = connection.write().unwrap(); // @TODO handle
+            let mut connection = database_pool.get()?;
 
             // Init new transaction
-            let transaction = connection.transaction()?;
+            let tx = connection.transaction()?;
 
             // Begin migration
-            migrate(&transaction)?;
-            transaction.commit()?;
+            migrate(&tx)?;
+            tx.commit()?;
         } // unlock database
 
         // Init model
-        let database = Database::build(&connection);
+        let database = Database::build(&database_pool);
 
         // Get active profile or create new one
         let profile_id = match database.active()? {
@@ -78,10 +80,10 @@ impl Profile {
         };
 
         // Init components
-        let bookmark = Bookmark::build(&connection, profile_id)?;
-        let history = History::build(&connection, profile_id)?;
-        let search = Search::build(&connection, profile_id)?;
-        let identity = Identity::build(&connection, profile_id)?;
+        let bookmark = Bookmark::build(&database_pool, profile_id)?;
+        let history = History::build(&database_pool, profile_id)?;
+        let search = Search::build(&database_pool, profile_id)?;
+        let identity = Identity::build(&database_pool, profile_id)?;
 
         // Result
         Ok(Self {

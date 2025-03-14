@@ -22,7 +22,7 @@ features = ["gnome_46"]
 
 [dependencies.sqlite]
 package = "rusqlite"
-version = "0.32.1"
+version = "0.34.0"
 
 [dependencies.sourceview]
 package = "sourceview5"
@@ -38,6 +38,8 @@ itertools = "0.14.0"
 libspelling = "0.3.0"
 openssl = "0.10.70"
 plurify = "0.2.0"
+r2d2 = "0.8.10"
+r2d2_sqlite = "0.27.0"
 syntect = "5.2.0"
 
 # development

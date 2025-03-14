@@ -1,11 +1,12 @@
 use super::{item::Event, Item};
 use anyhow::Result;
 use gtk::glib::DateTime;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Database {
-    connection: Rc<RwLock<Connection>>,
+    pool: Pool<SqliteConnectionManager>,
     profile_id: i64,
 }
 
@@ -13,9 +14,9 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Self {
+    pub fn build(pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Self {
         Self {
-            connection: connection.clone(),
+            pool: pool.clone(),
             profile_id,
         }
     }
@@ -24,9 +25,12 @@ impl Database {
 
     /// Get history records from database with optional filter by `request`
     pub fn records(&self, request: Option<&str>, title: Option<&str>) -> Result<Vec<Item>> {
-        let readable = self.connection.read().unwrap(); // @TODO
-        let tx = readable.unchecked_transaction()?;
-        select(&tx, self.profile_id, request, title)
+        select(
+            &self.pool.get()?.unchecked_transaction()?,
+            self.profile_id,
+            request,
+            title,
+        )
     }
 
     // Actions
@@ -34,16 +38,16 @@ impl Database {
     /// Create new history record in database
     /// * return last insert ID on success
     pub fn add(&self, item: &Item) -> Result<i64> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         let id = insert(&tx, self.profile_id, item)?;
         tx.commit()?;
         Ok(id)
     }
 
     pub fn update(&self, item: &Item) -> Result<usize> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         let affected = update(&tx, self.profile_id, item)?;
         tx.commit()?;
         Ok(affected)

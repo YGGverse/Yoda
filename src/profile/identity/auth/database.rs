@@ -1,6 +1,7 @@
 use anyhow::Result;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -10,25 +11,23 @@ pub struct Table {
 
 /// Storage for `profile_identity_id` + `scope` auth pairs
 pub struct Database {
-    connection: Rc<RwLock<Connection>>,
+    pool: Pool<SqliteConnectionManager>,
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>) -> Self {
-        Self {
-            connection: connection.clone(),
-        }
+    pub fn build(pool: &Pool<SqliteConnectionManager>) -> Self {
+        Self { pool: pool.clone() }
     }
 
     // Actions
 
     /// Create new record in database
     pub fn add(&self, profile_identity_id: i64, scope: &str) -> Result<i64> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         let id = insert(&tx, profile_identity_id, scope)?;
         tx.commit()?;
         Ok(id)
@@ -36,8 +35,8 @@ impl Database {
 
     /// Delete record with given `id` from database
     pub fn delete(&self, id: i64) -> Result<()> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         delete(&tx, id)?;
         tx.commit()?;
         Ok(())
@@ -47,16 +46,15 @@ impl Database {
 
     /// Get records from database match current `profile_id` optionally filtered by `scope`
     pub fn records_scope(&self, scope: Option<&str>) -> Result<Vec<Table>> {
-        let readable = self.connection.read().unwrap(); // @TODO
-        let tx = readable.unchecked_transaction()?;
-        select_scope(&tx, scope)
+        select_scope(&self.pool.get()?.unchecked_transaction()?, scope)
     }
 
     /// Get records from database match current `profile_id` optionally filtered by `scope`
     pub fn records_ref(&self, profile_identity_id: i64) -> Result<Vec<Table>> {
-        let readable = self.connection.read().unwrap(); // @TODO
-        let tx = readable.unchecked_transaction()?;
-        select_ref(&tx, profile_identity_id)
+        select_ref(
+            &self.pool.get()?.unchecked_transaction()?,
+            profile_identity_id,
+        )
     }
 }
 

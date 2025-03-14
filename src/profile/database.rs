@@ -1,7 +1,8 @@
 use anyhow::Result;
 use gtk::glib::DateTime;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -11,26 +12,22 @@ pub struct Table {
 }
 
 pub struct Database {
-    pub connection: Rc<RwLock<Connection>>,
+    pub pool: Pool<SqliteConnectionManager>,
 }
 
 impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>) -> Self {
-        Self {
-            connection: connection.clone(),
-        }
+    pub fn build(pool: &Pool<SqliteConnectionManager>) -> Self {
+        Self { pool: pool.clone() }
     }
 
     // Getters
 
     /// Get all records
     pub fn records(&self) -> Result<Vec<Table>> {
-        let readable = self.connection.read().unwrap();
-        let tx = readable.unchecked_transaction()?;
-        select(&tx)
+        select(&self.pool.get()?.unchecked_transaction()?)
     }
 
     /// Get active profile record if exist
@@ -43,8 +40,8 @@ impl Database {
 
     /// Create new record in `Self` database connected
     pub fn add(&self, is_active: bool, time: DateTime, name: Option<String>) -> Result<i64> {
-        let mut writable = self.connection.write().unwrap();
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         if is_active {
             for record in select(&tx)? {
                 update(&tx, record.id, false, record.time, record.name)?;

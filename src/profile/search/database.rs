@@ -1,6 +1,7 @@
 use anyhow::Result;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 #[derive(Clone)]
 pub struct Row {
@@ -11,7 +12,7 @@ pub struct Row {
 }
 
 pub struct Database {
-    connection: Rc<RwLock<Connection>>,
+    pool: Pool<SqliteConnectionManager>,
     profile_id: i64,
 }
 
@@ -19,9 +20,9 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
-        let mut writable = connection.write().unwrap(); // @TODO handle
-        let tx = writable.transaction()?;
+    pub fn init(pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Result<Self> {
+        let mut connection = pool.get()?;
+        let tx = connection.transaction()?;
 
         let records = select(&tx, profile_id)?;
 
@@ -31,7 +32,7 @@ impl Database {
         }
 
         Ok(Self {
-            connection: connection.clone(),
+            pool: pool.clone(),
             profile_id,
         })
     }
@@ -40,9 +41,7 @@ impl Database {
 
     /// Get records from database
     pub fn records(&self) -> Result<Vec<Row>> {
-        let readable = self.connection.read().unwrap(); // @TODO handle
-        let tx = readable.unchecked_transaction()?;
-        select(&tx, self.profile_id)
+        select(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
     }
 
     // Setters
@@ -50,8 +49,8 @@ impl Database {
     /// Create new record in database
     /// * return last insert ID on success
     pub fn add(&self, query: String, is_default: bool) -> Result<i64> {
-        let mut writable = self.connection.write().unwrap(); // @TODO handle
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         if is_default {
             reset(&tx, self.profile_id, !is_default)?;
         }
@@ -63,8 +62,8 @@ impl Database {
     /// Delete record from database
     pub fn delete(&self, id: i64) -> Result<()> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
 
         // Delete record by ID
         delete(&tx, id)?;
@@ -97,8 +96,8 @@ impl Database {
     /// Delete record from database
     pub fn set_default(&self, id: i64) -> Result<()> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
 
         // Make sure only one default provider in set
         reset(&tx, self.profile_id, false)?;

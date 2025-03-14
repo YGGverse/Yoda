@@ -1,5 +1,7 @@
-use sqlite::{Connection, Error, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use anyhow::Result;
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Table {
     pub id: i64,
@@ -9,7 +11,7 @@ pub struct Table {
 
 /// Storage for Gemini auth certificates
 pub struct Database {
-    connection: Rc<RwLock<Connection>>,
+    pool: Pool<SqliteConnectionManager>,
     profile_id: i64,
 }
 
@@ -17,9 +19,9 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Self {
+    pub fn build(pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Self {
         Self {
-            connection: connection.clone(),
+            pool: pool.clone(),
             profile_id,
         }
     }
@@ -27,10 +29,10 @@ impl Database {
     // Actions
 
     /// Create new record in database
-    pub fn add(&self, pem: &str) -> Result<i64, Error> {
+    pub fn add(&self, pem: &str) -> Result<i64> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
 
         // Create new record
         insert(&tx, self.profile_id, pem)?;
@@ -39,55 +41,45 @@ impl Database {
         let id = last_insert_id(&tx);
 
         // Done
-        match tx.commit() {
-            Ok(_) => Ok(id),
-            Err(e) => Err(e),
-        }
+        tx.commit()?;
+        Ok(id)
     }
 
     /// Delete record with given `id` from database
-    pub fn delete(&self, id: i64) -> Result<(), Error> {
+    pub fn delete(&self, id: i64) -> Result<()> {
         // Begin new transaction
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
 
         // Create new record
         delete(&tx, id)?;
 
         // Done
-        match tx.commit() {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        tx.commit()?;
+        Ok(())
     }
 
     /// Get single record match `id`
-    pub fn record(&self, id: i64) -> Result<Option<Table>, Error> {
-        let readable = self.connection.read().unwrap();
-        let tx = readable.unchecked_transaction()?;
-        let records = select(&tx, self.profile_id)?; // @TODO single record query
-
+    pub fn record(&self, id: i64) -> Result<Option<Table>> {
+        let records = select(&self.pool.get()?.unchecked_transaction()?, self.profile_id)?; // @TODO single record query
         for record in records {
             if record.id == id {
                 return Ok(Some(record));
             }
         }
-
         Ok(None)
     }
 
     /// Get all records match current `profile_id`
-    pub fn records(&self) -> Result<Vec<Table>, Error> {
-        let readable = self.connection.read().unwrap(); // @TODO
-        let tx = readable.unchecked_transaction()?;
-        select(&tx, self.profile_id)
+    pub fn records(&self) -> Result<Vec<Table>> {
+        select(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
     }
 }
 
 // Low-level DB API
 
-pub fn init(tx: &Transaction) -> Result<usize, Error> {
-    tx.execute(
+pub fn init(tx: &Transaction) -> Result<usize> {
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_identity`
         (
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -97,24 +89,24 @@ pub fn init(tx: &Transaction) -> Result<usize, Error> {
             FOREIGN KEY (`profile_id`) REFERENCES `profile`(`id`)
         )",
         [],
-    )
+    )?)
 }
 
-pub fn insert(tx: &Transaction, profile_id: i64, pem: &str) -> Result<usize, Error> {
-    tx.execute(
+pub fn insert(tx: &Transaction, profile_id: i64, pem: &str) -> Result<usize> {
+    Ok(tx.execute(
         "INSERT INTO `profile_identity` (
             `profile_id`,
             `pem`
         ) VALUES (?, ?)",
         (profile_id, pem),
-    )
+    )?)
 }
 
-pub fn delete(tx: &Transaction, id: i64) -> Result<usize, Error> {
-    tx.execute("DELETE FROM `profile_identity` WHERE `id` = ?", [id])
+pub fn delete(tx: &Transaction, id: i64) -> Result<usize> {
+    Ok(tx.execute("DELETE FROM `profile_identity` WHERE `id` = ?", [id])?)
 }
 
-pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>, Error> {
+pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Table>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_id`,

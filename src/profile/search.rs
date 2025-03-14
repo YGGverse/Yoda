@@ -5,8 +5,9 @@ use anyhow::Result;
 use database::Database;
 use gtk::glib::Uri;
 use memory::Memory;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Search {
     database: Database, // permanent storage
@@ -17,8 +18,8 @@ impl Search {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
-        let database = Database::init(connection, profile_id)?;
+    pub fn build(database_pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Result<Self> {
+        let database = Database::init(database_pool, profile_id)?;
         // Init fast search index
         let memory = Memory::init();
         // Build initial index

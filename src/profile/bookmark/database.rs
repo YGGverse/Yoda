@@ -1,11 +1,12 @@
 use super::Item;
 use anyhow::Result;
 use gtk::glib::DateTime;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 pub struct Database {
-    connection: Rc<RwLock<Connection>>,
+    pool: Pool<SqliteConnectionManager>,
     profile_id: i64,
 }
 
@@ -13,9 +14,9 @@ impl Database {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Self {
+    pub fn new(pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Self {
         Self {
-            connection: connection.clone(),
+            pool: pool.clone(),
             profile_id,
         }
     }
@@ -24,9 +25,12 @@ impl Database {
 
     /// Get bookmark records from database with optional filter by `request`
     pub fn records(&self, request: Option<&str>, title: Option<&str>) -> Result<Vec<Item>> {
-        let readable = self.connection.read().unwrap(); // @TODO
-        let tx = readable.unchecked_transaction()?;
-        select(&tx, self.profile_id, request, title)
+        select(
+            &self.pool.get()?.unchecked_transaction()?,
+            self.profile_id,
+            request,
+            title,
+        )
     }
 
     // Setters
@@ -34,8 +38,8 @@ impl Database {
     /// Create new bookmark record in database
     /// * return last insert ID on success
     pub fn add(&self, time: DateTime, request: &str, title: Option<&str>) -> Result<i64> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         let id = insert(&tx, self.profile_id, time, request, title)?;
         tx.commit()?;
         Ok(id)
@@ -43,8 +47,8 @@ impl Database {
 
     /// Delete bookmark record from database
     pub fn delete(&self, id: i64) -> Result<usize> {
-        let mut writable = self.connection.write().unwrap(); // @TODO
-        let tx = writable.transaction()?;
+        let mut connection = self.pool.get()?;
+        let tx = connection.transaction()?;
         let usize = delete(&tx, id)?;
         tx.commit()?;
         Ok(usize)

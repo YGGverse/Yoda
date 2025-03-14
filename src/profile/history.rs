@@ -7,11 +7,10 @@ use database::Database;
 use gtk::glib::GString;
 use item::{Event, Item};
 use memory::Memory;
-use sqlite::{Connection, Transaction};
-use std::{
-    rc::Rc,
-    sync::{Arc, RwLock},
-};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
+use std::sync::{Arc, RwLock};
 
 pub struct History {
     database: Database,              // permanent storage
@@ -22,9 +21,9 @@ impl History {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>, profile_id: i64) -> Result<Self> {
+    pub fn build(database_pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Result<Self> {
         // Init children components
-        let database = Database::build(connection, profile_id);
+        let database = Database::build(database_pool, profile_id);
         let memory = Arc::new(RwLock::new(Memory::new()));
 
         for item in database.records(None, None)? {

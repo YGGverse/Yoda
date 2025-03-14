@@ -6,24 +6,25 @@ mod memory;
 use anyhow::Result;
 use database::Database;
 use memory::Memory;
-use sqlite::{Connection, Transaction};
-use std::{rc::Rc, sync::RwLock};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use sqlite::Transaction;
 
 /// Auth pair operations
 pub struct Auth {
-    database: Rc<Database>,
-    memory: Rc<Memory>,
+    database: Database,
+    memory: Memory,
 }
 
 impl Auth {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(connection: &Rc<RwLock<Connection>>) -> Result<Self> {
+    pub fn build(database_pool: &Pool<SqliteConnectionManager>) -> Result<Self> {
         // Init `Self`
         let this = Self {
-            database: Rc::new(Database::build(connection)),
-            memory: Rc::new(Memory::new()),
+            database: Database::build(database_pool),
+            memory: Memory::new(),
         };
 
         // Build initial index

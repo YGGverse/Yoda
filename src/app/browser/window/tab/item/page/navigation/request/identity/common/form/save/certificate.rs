@@ -1,5 +1,4 @@
-mod error;
-pub use error::Error;
+use anyhow::{bail, Result};
 
 use crate::profile::Profile;
 use gtk::{gio::TlsCertificate, prelude::TlsCertificateExt};
@@ -15,19 +14,17 @@ impl Certificate {
     // Constructors
 
     /// Create new `Self`
-    pub fn new(profile: Rc<Profile>, profile_identity_id: i64) -> Result<Self, Error> {
-        match profile.identity.database.record(profile_identity_id) {
-            Ok(record) => match record {
-                Some(identity) => match TlsCertificate::from_pem(&identity.pem) {
-                    Ok(certificate) => Ok(Self {
-                        data: identity.pem,
-                        name: certificate.subject_name().unwrap().replace("CN=", ""),
-                    }),
-                    Err(e) => Err(Error::TlsCertificate(e)),
-                },
-                None => Err(Error::NotFound(profile_identity_id)),
-            },
-            Err(e) => Err(Error::Database(e)),
+    pub fn build(profile: Rc<Profile>, profile_identity_id: i64) -> Result<Self> {
+        let record = profile.identity.database.record(profile_identity_id)?;
+        match record {
+            Some(identity) => Ok(Self {
+                name: TlsCertificate::from_pem(&identity.pem)?
+                    .subject_name()
+                    .unwrap_or_default()
+                    .replace("CN=", ""),
+                data: identity.pem,
+            }),
+            None => bail!("Identity not found!"),
         }
     }
 }
