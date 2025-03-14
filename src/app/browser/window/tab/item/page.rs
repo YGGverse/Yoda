@@ -76,10 +76,7 @@ impl Page {
 
     /// Toggle bookmark for current navigation request
     pub fn bookmark(&self) {
-        self.profile
-            .bookmark
-            .toggle(&self.navigation.request(), Some(&self.title()))
-            .unwrap(); // @TODO
+        self.navigation.bookmark(Some(&self.title()))
     }
 
     /// Request `Escape` action for all page components

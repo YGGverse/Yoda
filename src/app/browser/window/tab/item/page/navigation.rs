@@ -25,6 +25,7 @@ const SPACING: i32 = 6;
 
 pub struct Navigation {
     request: Rc<Request>,
+    bookmark: Rc<Bookmark>,
     pub g_box: Box,
 }
 
@@ -42,7 +43,7 @@ impl Navigation {
         let request = Rc::new(Request::build(item_action, profile));
         let reload = Button::reload((window_action, tab_action, item_action), &request);
         let home = Button::home((window_action, tab_action, item_action), &request);
-        let bookmark = Button::bookmark(window_action, profile, &request.entry);
+        let bookmark = Rc::new(Bookmark::build(window_action, profile, &request.entry));
 
         // Init main widget
         let g_box = Box::builder()
@@ -57,15 +58,24 @@ impl Navigation {
         g_box.append(&history);
         g_box.append(&reload);
         g_box.append(&request.entry);
-        g_box.append(&bookmark);
+        g_box.append(&bookmark.button);
 
-        Self { request, g_box }
+        Self {
+            request,
+            bookmark,
+            g_box,
+        }
     }
 
     // Actions
 
     pub fn escape(&self) {
         self.request.escape();
+    }
+
+    /// Toggle bookmark for current navigation request
+    pub fn bookmark(&self, title: Option<&str>) {
+        self.bookmark.toggle(title)
     }
 
     pub fn clean(

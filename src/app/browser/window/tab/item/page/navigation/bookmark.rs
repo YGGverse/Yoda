@@ -8,13 +8,14 @@ use std::{rc::Rc, sync::Arc};
 const ICON_NAME: (&str, &str) = ("non-starred-symbolic", "starred-symbolic");
 const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
-pub trait Bookmark {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self;
-    fn update(&self, profile: &Arc<Profile>, request: &Entry);
+pub struct Bookmark {
+    profile: Arc<Profile>,
+    request: Entry,
+    pub button: Button,
 }
 
-impl Bookmark for Button {
-    fn bookmark(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self {
+impl Bookmark {
+    pub fn build(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self {
         let button = Button::builder()
             .action_name(format!(
                 "{}.{}",
@@ -22,44 +23,34 @@ impl Bookmark for Button {
                 action.bookmark.simple_action.name()
             ))
             .build();
-        button.update(profile, request);
-
-        // Setup events
-        action.bookmark.simple_action.connect_activate({
-            let button = button.clone();
-            let profile = profile.clone();
-            let request = request.clone();
-            move |_, _| button.update(&profile, &request)
-        });
-
+        update(profile, &button, request.text());
         request.connect_changed({
             let profile = profile.clone();
             let button = button.clone();
-            move |this| button.update(&profile, this)
+            move |entry| update(&profile, &button, entry.text())
         });
-
-        button.connect_clicked({
-            let profile = profile.clone();
-            let request = request.clone();
-            move |this| this.update(&profile, &request)
-        });
-
-        button
+        Self {
+            profile: profile.clone(),
+            request: request.clone(),
+            button,
+        }
     }
 
-    fn update(&self, profile: &Arc<Profile>, request: &Entry) {
-        self.set_sensitive(false); // lock
-        let this = self.clone();
-        let profile = profile.clone();
-        let query = request.text();
+    pub fn toggle(&self, title: Option<&str>) {
+        let button = self.button.clone();
+        let profile = self.profile.clone();
+        let query = self.request.text();
+        let title = title.map(|t| t.to_string());
         gtk::glib::spawn_future_local(async move {
-            let has_bookmark =
-                gtk::gio::spawn_blocking(move || profile.bookmark.is_match_request(&query))
-                    .await
-                    .unwrap();
-            this.set_icon_name(icon_name(has_bookmark));
-            this.set_tooltip_text(Some(tooltip_text(has_bookmark)));
-            this.set_sensitive(true);
+            button.set_sensitive(false); // lock
+            let has_bookmark = gtk::gio::spawn_blocking(move || {
+                profile.bookmark.toggle(&query, title.as_deref()).unwrap()
+            })
+            .await
+            .unwrap();
+            button.set_icon_name(icon_name(has_bookmark));
+            button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+            button.set_sensitive(true);
         }); // may take a while
     }
 }
@@ -78,4 +69,19 @@ fn icon_name(has_bookmark: bool) -> &'static str {
     } else {
         ICON_NAME.0
     }
+}
+
+fn update(profile: &Arc<Profile>, button: &Button, request: gtk::glib::GString) {
+    let profile = profile.clone();
+    let button = button.clone();
+    gtk::glib::spawn_future_local(async move {
+        button.set_sensitive(false); // lock
+        let has_bookmark =
+            gtk::gio::spawn_blocking(move || profile.bookmark.is_match_request(&request))
+                .await
+                .unwrap();
+        button.set_icon_name(icon_name(has_bookmark));
+        button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+        button.set_sensitive(true);
+    }); // may take a while
 }
