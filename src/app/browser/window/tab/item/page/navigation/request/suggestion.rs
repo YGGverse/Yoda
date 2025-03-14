@@ -164,15 +164,11 @@ impl Suggestion {
     pub fn update(&self, limit: Option<usize>) {
         use gtk::prelude::EditableExt;
         use itertools::Itertools;
-        self.popover.popdown();
         if self.request.text_length() > 0 {
-            self.list_store.remove_all();
-
             let query = self.request.text();
             let popover = self.popover.clone();
             let list_store = self.list_store.clone();
             let profile = self.profile.clone();
-
             gtk::glib::spawn_future_local(async move {
                 let list_items = gtk::gio::spawn_blocking(move || {
                     let result = profile
@@ -198,13 +194,18 @@ impl Suggestion {
                 })
                 .await
                 .unwrap();
-                if !list_items.is_empty() {
+                if list_items.is_empty() {
+                    popover.popdown();
+                } else {
+                    list_store.remove_all();
                     for (title, subtitle, has_bookmark, request) in list_items {
                         list_store.append(&Item::build(title, subtitle, has_bookmark, request));
                     } // @TODO take a while
                     popover.popup()
                 }
             });
+        } else {
+            self.popover.popdown();
         }
     }
 
