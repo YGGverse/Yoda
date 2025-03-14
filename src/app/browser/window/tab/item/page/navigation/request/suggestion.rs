@@ -63,7 +63,6 @@ impl Suggestion {
         let list_view = {
             let lv = ListView::builder()
                 .name(format!("s{}", gtk::glib::uuid_string_random()))
-                .single_click_activate(true)
                 .valign(Align::Start)
                 .model(&single_selection)
                 .factory(&{
@@ -101,6 +100,16 @@ impl Suggestion {
                     f
                 })
                 .build();
+            lv.add_controller({
+                let c = gtk::GestureClick::builder()
+                    .button(gtk::gdk::BUTTON_PRIMARY)
+                    .build();
+                c.connect_released({
+                    let request = request.clone();
+                    move |_, _, _, _| request.emit_activate()
+                });
+                c
+            });
             lv.connect_activate({
                 let request = request.clone();
                 move |_, _| request.emit_activate()
