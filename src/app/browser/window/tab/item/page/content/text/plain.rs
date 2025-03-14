@@ -1,4 +1,4 @@
-use gtk::{TextBuffer, TextView};
+use gtk::TextView;
 
 pub trait Plain {
     fn plain(data: &str) -> Self;
@@ -10,13 +10,14 @@ impl Plain for TextView {
         TextView::builder()
             .bottom_margin(MARGIN)
             .cursor_visible(false)
-            .buffer(&TextBuffer::builder().text(data).build())
+            .buffer(&gtk::TextBuffer::builder().text(data).build())
             .editable(false)
             .left_margin(MARGIN)
             .monospace(true)
             .right_margin(MARGIN)
             .top_margin(MARGIN)
             .vexpand(true)
+            .wrap_mode(gtk::WrapMode::Word)
             .build()
     }
 }
