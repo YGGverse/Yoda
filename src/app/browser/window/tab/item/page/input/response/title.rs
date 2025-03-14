@@ -10,6 +10,7 @@ impl Title for Label {
             .css_classes(["heading"])
             .halign(Align::Start)
             .label(title.unwrap_or("Input expected"))
+            .selectable(true)
             .build()
     }
 }

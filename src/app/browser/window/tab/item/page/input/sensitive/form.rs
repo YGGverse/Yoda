@@ -21,6 +21,8 @@ impl Form {
 
         if let Some(value) = title {
             password_entry_row.set_title(value);
+            /* @TODO has no effect
+            password_entry_row.set_title_selectable(true); */
         }
 
         /* @TODO adw 1.6 / ubuntu 24.10+
