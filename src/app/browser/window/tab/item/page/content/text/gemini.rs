@@ -270,10 +270,8 @@ impl Gemini {
                 let mut alt = Vec::new();
 
                 // Append external indicator on exist
-                if let Some(is_external) = link.is_external {
-                    if is_external {
-                        alt.push(EXTERNAL_LINK_INDICATOR.to_string());
-                    }
+                if link.uri.scheme() != base.scheme() {
+                    alt.push(EXTERNAL_LINK_INDICATOR.to_string());
                 }
 
                 // Append date on exist
