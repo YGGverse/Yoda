@@ -420,7 +420,8 @@ fn handle(
                             } else if uri.host() != target.host() {
                                 let url = target.to_string();
                                 let status = page.content.to_status_failure();
-                                status.set_title("External redirection");
+                                let title = "External redirection";
+                                status.set_title(title);
                                 status.set_icon_name(Some("dialog-warning-symbolic"));
                                 status.set_description(Some(&url));
                                 status.set_child(Some(&{
@@ -436,7 +437,7 @@ fn handle(
                                     button
                                 }));
                                 page.set_progress(0.0);
-                                page.set_title(&status.title());
+                                page.set_title(title);
                                 redirects.replace(0); // reset
                             } else {
                                 if matches!(redirect, Redirect::Permanent { .. }) {
