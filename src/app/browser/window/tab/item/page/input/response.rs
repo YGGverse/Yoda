@@ -4,14 +4,13 @@ mod title;
 
 use control::Control;
 use form::Form;
-use sourceview::prelude::ActionExt;
 use title::Title;
 
 use super::ItemAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::{BoxExt, WidgetExt},
+    prelude::{ActionExt, BoxExt, DisplayExt, WidgetExt},
     Box, Label, Orientation, TextView,
 };
 use std::rc::Rc;
@@ -105,6 +104,8 @@ impl Response for Box {
                     .action(&gtk::CallbackAction::new(move |_, _| {
                         if control.send.is_sensitive() {
                             action_send.activate(None);
+                        } else {
+                            control.send.display().beep();
                         }
                         gtk::glib::Propagation::Stop
                     }))
