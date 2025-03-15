@@ -39,35 +39,32 @@ impl Memory {
         false
     }
 
-    /// Get Items match `request`
+    /// Get unordered Items vector where title or request match `request`
+    /// * this function is case insensitive
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
-        let mut items: Vec<Item> = Vec::new();
-        for (i, item) in self.0.iter().enumerate() {
-            if limit.is_some_and(|l| i > l) {
-                break;
-            }
-            if item.request.contains(request) {
-                items.push(item.clone())
-            }
-        }
-        items
+        self.0
+            .iter()
+            .filter(|item| {
+                let p = request.to_lowercase();
+                item.request.to_lowercase().contains(&p)
+                    || item
+                        .title
+                        .as_ref()
+                        .is_some_and(|t| t.to_lowercase().contains(&p))
+            })
+            .take(limit.unwrap_or(usize::MAX))
+            .cloned()
+            .collect()
     }
 
     /// Get recent Items vector sorted by `ID` DESC
     pub fn recent(&self, limit: Option<usize>) -> Vec<Item> {
-        let mut recent: Vec<Item> = Vec::new();
-        for (i, item) in self
-            .0
+        self.0
             .iter()
-            .sorted_by(|a, b| Ord::cmp(&b.request, &a.request))
-            .enumerate()
-        {
-            if limit.is_some_and(|l| i > l) {
-                break;
-            }
-            recent.push(item.clone())
-        }
-        recent
+            .sorted_by(|a, b| Ord::cmp(&b.id, &a.id))
+            .take(limit.unwrap_or(usize::MAX))
+            .cloned()
+            .collect()
     }
 }
 

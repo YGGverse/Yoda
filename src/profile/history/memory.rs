@@ -44,9 +44,7 @@ impl Memory {
 
     /// Get recent Items vector sorted by `closed` DESC
     pub fn recently_closed(&self, limit: Option<usize>) -> Vec<Item> {
-        let mut recent: Vec<Item> = Vec::new();
-        for (i, item) in self
-            .0
+        self.0
             .iter()
             .filter(|x| x.closed.is_some())
             .sorted_by(|a, b| {
@@ -55,52 +53,37 @@ impl Memory {
                     &a.closed.as_ref().unwrap().time,
                 )
             })
-            .enumerate()
-        {
-            if limit.is_some_and(|l| i >= l) {
-                break;
-            }
-            recent.push(item.clone())
-        }
-        recent
+            .take(limit.unwrap_or(usize::MAX))
+            .cloned()
+            .collect()
     }
 
     /// Get recent Items vector sorted by `opened` DESC
     pub fn recently_opened(&self, limit: Option<usize>) -> Vec<Item> {
-        let mut recent: Vec<Item> = Vec::new();
-        for (i, item) in self
-            .0
+        self.0
             .iter()
             .sorted_by(|a, b| Ord::cmp(&b.opened.time, &a.opened.time))
-            .enumerate()
-        {
-            if limit.is_some_and(|l| i >= l) {
-                break;
-            }
-            recent.push(item.clone())
-        }
-        recent
+            .take(limit.unwrap_or(usize::MAX))
+            .cloned()
+            .collect()
     }
 
-    /// Get unordered Items vector contains `request`
+    /// Get unordered Items vector where title or request match `request`
     /// * this function is case insensitive
     pub fn contains_request(&self, request: &str, limit: Option<usize>) -> Vec<Item> {
-        let mut items: Vec<Item> = Vec::new();
-        for (i, item) in self.0.iter().enumerate() {
-            if limit.is_some_and(|l| i >= l) {
-                break;
-            }
-            let p = request.to_lowercase();
-            if item.request.to_lowercase().contains(&p)
-                || item
-                    .title
-                    .as_ref()
-                    .is_some_and(|t| t.to_lowercase().contains(&p))
-            {
-                items.push(item.clone())
-            }
-        }
-        items
+        self.0
+            .iter()
+            .filter(|item| {
+                let p = request.to_lowercase();
+                item.request.to_lowercase().contains(&p)
+                    || item
+                        .title
+                        .as_ref()
+                        .is_some_and(|t| t.to_lowercase().contains(&p))
+            })
+            .take(limit.unwrap_or(usize::MAX))
+            .cloned()
+            .collect()
     }
 
     pub fn items(&self) -> &Vec<Item> {
