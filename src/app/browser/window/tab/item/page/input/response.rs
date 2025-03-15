@@ -4,13 +4,14 @@ mod title;
 
 use control::Control;
 use form::Form;
+use sourceview::prelude::ActionExt;
 use title::Title;
 
 use super::ItemAction;
 use gtk::{
     gio::SimpleAction,
     glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::BoxExt,
+    prelude::{BoxExt, WidgetExt},
     Box, Label, Orientation, TextView,
 };
 use std::rc::Rc;
@@ -92,7 +93,26 @@ impl Response for Box {
             }
         });
 
-        // Return activated `Self`
+        form.add_controller({
+            const SHORTCUT: &str = "<Primary>Return"; // @TODO optional
+            /*control
+                .send
+                .set_tooltip_text(Some(&format!("Shortcut: {SHORTCUT}")));*/
+            let c = gtk::ShortcutController::new();
+            c.add_shortcut(
+                gtk::Shortcut::builder()
+                    .trigger(&gtk::ShortcutTrigger::parse_string(SHORTCUT).unwrap())
+                    .action(&gtk::CallbackAction::new(move |_, _| {
+                        if control.send.is_sensitive() {
+                            action_send.activate(None);
+                        }
+                        gtk::glib::Propagation::Stop
+                    }))
+                    .build(),
+            );
+            c
+        });
+
         g_box
     }
 }
