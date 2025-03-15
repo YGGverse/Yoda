@@ -12,7 +12,7 @@ use gtk::{
     gdk_pixbuf::Pixbuf,
     gio::{Cancellable, SocketClientEvent},
     glib::{Priority, Uri},
-    prelude::{FileExt, SocketClientExt},
+    prelude::{ButtonExt, FileExt, SocketClientExt},
 };
 use sourceview::prelude::InputStreamExtManual;
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
@@ -415,18 +415,29 @@ fn handle(
                                 page.set_progress(0.0);
                                 page.set_title(&status.title());
                                 redirects.replace(0); // reset
-                            /* @TODO can't find that in specification, implement manual confirmation status page:
-                            // Disallow external redirection by protocol restrictions
-                            } else if "gemini" != target.scheme()
-                                || uri.port() != target.port()
-                                || uri.host() != target.host() {
-                                    let status = page.content.to_status_failure();
-                                    status.set_description(Some("External redirects not allowed by protocol specification"));
-                                    page.set_progress(0.0);
-                                    page.set_title(&status.title());
-                                    redirects.replace(0); // reset
-                            */
-                            // Valid
+                            // Disallow external redirection by default as potentially unsafe
+                            // even not specified, require follow confirmation @TODO optional
+                            } else if uri.host() != target.host() {
+                                let url = target.to_string();
+                                let status = page.content.to_status_failure();
+                                status.set_title("External redirection");
+                                status.set_icon_name(Some("dialog-warning-symbolic"));
+                                status.set_description(Some(&url));
+                                status.set_child(Some(&{
+                                    let button = gtk::Button::builder()
+                                        .css_classes(["suggested-action"])
+                                        .halign(gtk::Align::Center)
+                                        .label("Follow")
+                                        .build();
+                                    button.connect_clicked({
+                                        let page = page.clone();
+                                        move |_| page.item_action.load.activate(Some(&url), false)
+                                    });
+                                    button
+                                }));
+                                page.set_progress(0.0);
+                                page.set_title(&status.title());
+                                redirects.replace(0); // reset
                             } else {
                                 if matches!(redirect, Redirect::Permanent { .. }) {
                                     page.navigation.set_request(&target.to_string());
