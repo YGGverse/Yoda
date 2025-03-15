@@ -12,12 +12,12 @@ repository = "https://github.com/YGGverse/Yoda"
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.7.0"
+version = "0.7.1"
 features = ["v1_5"]
 
 [dependencies.gtk]
 package = "gtk4"
-version = "0.9.4"
+version = "0.9.5"
 features = ["gnome_46"]
 
 [dependencies.sqlite]
