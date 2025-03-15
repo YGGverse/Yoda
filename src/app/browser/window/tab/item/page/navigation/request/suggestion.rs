@@ -170,30 +170,34 @@ impl Suggestion {
             let list_store = self.list_store.clone();
             let profile = self.profile.clone();
             gtk::glib::spawn_future_local(async move {
-                let list_items = gtk::gio::spawn_blocking(move || {
-                    let result = profile
-                        .history
-                        .contains_request(&query, limit)
-                        .into_iter()
-                        .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count));
-                    let mut list_items = Vec::with_capacity(result.len());
-                    for item in result {
-                        let subtitle = highlight(&item.request, &query);
-                        let title = match item.title {
-                            Some(title) => highlight(&title, &query),
-                            None => subtitle.clone(),
-                        };
-                        list_items.push((
-                            title,
-                            subtitle,
-                            profile.bookmark.is_match_request(&item.request),
-                            item.request,
-                        ))
-                    }
-                    list_items
-                })
-                .await
-                .unwrap();
+                let list_items: Vec<(GString, GString, bool, GString)> =
+                    gtk::gio::spawn_blocking(move || {
+                        let result = profile
+                            .history
+                            .contains_request(&query, limit)
+                            .into_iter()
+                            .sorted_by(|a, b| Ord::cmp(&b.opened.count, &a.opened.count));
+                        let mut list_items = Vec::with_capacity(result.len());
+                        for item in result {
+                            let subtitle = highlight(&item.request, &query);
+                            let title = match item.title {
+                                Some(title) => highlight(&title, &query),
+                                None => subtitle.clone(),
+                            };
+                            list_items.push((
+                                title,
+                                subtitle,
+                                profile.bookmark.is_match_request(&item.request),
+                                item.request,
+                            ))
+                        }
+                        list_items
+                            .into_iter()
+                            .sorted_by(|a, b| Ord::cmp(&b.2, &a.2)) // bookmark first
+                            .collect()
+                    })
+                    .await
+                    .unwrap();
                 if list_items.is_empty() {
                     popover.popdown();
                 } else {
