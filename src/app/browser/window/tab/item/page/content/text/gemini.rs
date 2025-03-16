@@ -14,11 +14,9 @@ use tag::Tag;
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
 use ggemtext::line::{
-    code::*,
+    code::{self, *},
     header::{Header, Level},
     link::Link,
-    list::List,
-    quote::Quote,
 };
 use gtk::{
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, RGBA},
@@ -31,8 +29,6 @@ use gtk::{
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
-pub const EXTERNAL_LINK_INDICATOR: &str = "⇖";
-pub const LIST_ITEM: &str = "•";
 pub const NEW_LINE: &str = "\n";
 
 pub struct Gemini {
@@ -108,8 +104,7 @@ impl Gemini {
         let is_multiline_enabled = {
             let mut t: usize = 0;
             for l in gemtext.lines() {
-                if (l.starts_with(multiline::TAG) || l.ends_with(multiline::TAG))
-                    && Inline::from(l).is_none()
+                if (l.starts_with(code::TAG) || l.ends_with(code::TAG)) && Inline::from(l).is_none()
                 {
                     t += 1;
                 }
@@ -149,11 +144,7 @@ impl Gemini {
                         }
                     } // @TODO handle
                 }
-
-                // Append new line
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                // Skip other actions for this line
                 continue;
             }
 
@@ -242,8 +233,7 @@ impl Gemini {
             }
 
             // Is header
-            if let Some(header) = Header::from(line) {
-                // Append value to buffer
+            if let Some(header) = Header::parse(line) {
                 buffer.insert_with_tags(
                     &mut buffer.end_iter(),
                     &header.value,
@@ -255,40 +245,32 @@ impl Gemini {
                 );
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
-                // Update reader title using first gemtext header match
                 if title.is_none() {
                     title = Some(header.value.clone());
                 }
-
-                // Skip other actions for this line
                 continue;
             }
 
             // Is link
             if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
-                // Create vector for alt values
                 let mut alt = Vec::new();
 
-                // Append external indicator on exist
                 if link.uri.scheme() != base.scheme() {
-                    alt.push(EXTERNAL_LINK_INDICATOR.to_string());
+                    alt.push("⇖".to_string());
                 }
 
-                // Append date on exist
-                if let Some(timestamp) = link.timestamp {
+                if let Some(t) = link.timestamp {
                     // https://docs.gtk.org/glib/method.DateTime.format.html
-                    if let Ok(value) = timestamp.format(DATE_FORMAT) {
-                        alt.push(value.to_string())
+                    if let Ok(f) = t.format(DATE_FORMAT) {
+                        alt.push(f.to_string())
                     }
                 }
 
-                // Append alt value on exist or use URL
                 alt.push(match link.alt {
                     Some(alt) => alt.to_string(),
                     None => link.uri.to_string(),
                 });
 
-                // Create new tag for new link
                 let a = TextTag::builder()
                     .foreground_rgba(&link_color.0)
                     // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
@@ -296,56 +278,50 @@ impl Gemini {
                     .wrap_mode(WrapMode::Word)
                     .build();
 
-                // Register new tag
                 if !tag.text_tag_table.add(&a) {
                     todo!()
                 }
 
-                // Append alt vector values to buffer
                 buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
                 buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
-                // Append tag to HashMap storage
                 links.insert(a, link.uri.clone());
-
-                // Skip other actions for this line
                 continue;
             }
 
             // Is list
-            if let Some(list) = List::from(line) {
-                // Append value to buffer
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    format!("{LIST_ITEM} {}", list.value).as_str(),
-                    &[&tag.list],
-                );
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                // Skip other actions for this line
-                continue;
+            {
+                use ggemtext::line::list::Gemtext;
+                if let Some(value) = line.as_value() {
+                    buffer.insert_with_tags(
+                        &mut buffer.end_iter(),
+                        &format!("• {value}"),
+                        &[&tag.list],
+                    );
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                    continue;
+                }
             }
 
             // Is quote
-            if let Some(quote) = Quote::from(line) {
-                // Show quote indicator if last line is not quote (to prevent duplicates)
-                if !is_line_after_quote {
-                    // Show only if the icons resolved for default `Display`
-                    if let Some(ref icon) = icon {
-                        buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
-                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+            {
+                use ggemtext::line::quote::Gemtext;
+                if let Some(quote) = line.as_value() {
+                    // Show quote indicator if last line is not quote (to prevent duplicates)
+                    if !is_line_after_quote {
+                        // Show only if the icons resolved for default `Display`
+                        if let Some(ref icon) = icon {
+                            buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
+                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                        }
                     }
+                    buffer.insert_with_tags(&mut buffer.end_iter(), quote, &[&tag.quote]);
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                    is_line_after_quote = true;
+                    continue;
+                } else {
+                    is_line_after_quote = false;
                 }
-                is_line_after_quote = true;
-
-                // Append value to buffer
-                buffer.insert_with_tags(&mut buffer.end_iter(), &quote.value, &[&tag.quote]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                // Skip other actions for this line
-                continue;
-            } else {
-                is_line_after_quote = false;
             }
 
             // Nothing match custom tags above,
