@@ -132,7 +132,7 @@ impl App {
         });
 
         // Init accels
-        for (detailed_action_name, &accels) in &[
+        for (detailed_action_name, accels) in &[
             // Browser actions
             (
                 format!(
@@ -140,7 +140,7 @@ impl App {
                     browser.action.id,
                     browser.action.close.simple_action.name()
                 ),
-                &["<Primary>Escape"],
+                ["<Primary>Escape"],
             ),
             (
                 format!(
@@ -148,11 +148,11 @@ impl App {
                     browser.action.id,
                     browser.action.debug.simple_action.name()
                 ),
-                &["<Primary>i"],
+                ["<Primary>i"],
             ),
             (
                 format!("{}.{}", browser.action.id, browser.action.escape.name()),
-                &["Escape"],
+                ["Escape"],
             ),
             // Tab actions
             (
@@ -161,7 +161,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.append.simple_action.name()
                 ),
-                &["<Primary>t"],
+                ["<Primary>t"],
             ),
             (
                 format!(
@@ -169,7 +169,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.bookmark.simple_action.name()
                 ),
-                &["<Primary>b"],
+                ["<Primary>b"],
             ),
             (
                 format!(
@@ -177,7 +177,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.find.simple_action.name()
                 ),
-                &["<Primary>f"],
+                ["<Primary>f"],
             ),
             (
                 format!(
@@ -185,7 +185,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.pin.simple_action.name()
                 ),
-                &["<Primary>p"],
+                ["<Primary>p"],
             ),
             (
                 format!(
@@ -193,7 +193,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.reload.simple_action.name()
                 ),
-                &["<Primary>r"],
+                ["<Primary>r"],
             ),
             (
                 format!(
@@ -201,7 +201,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.save_as.simple_action.name()
                 ),
-                &["<Primary>s"],
+                ["<Primary>s"],
             ),
             (
                 format!(
@@ -209,7 +209,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.open.simple_action.name()
                 ),
-                &["<Primary>o"],
+                ["<Primary>o"],
             ),
             (
                 format!(
@@ -217,7 +217,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.source.simple_action.name()
                 ),
-                &["<Primary>u"],
+                ["<Primary>u"],
             ),
             (
                 format!(
@@ -225,7 +225,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.home.simple_action.name()
                 ),
-                &["<Primary>h"],
+                ["<Primary>h"],
             ),
             (
                 format!(
@@ -233,7 +233,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.history_back.simple_action.name()
                 ),
-                &["<Primary>Left"],
+                ["<Primary>Left"],
             ),
             (
                 format!(
@@ -241,7 +241,7 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.history_forward.simple_action.name()
                 ),
-                &["<Primary>Right"],
+                ["<Primary>Right"],
             ),
             (
                 format!(
@@ -249,10 +249,10 @@ impl App {
                     browser.window.action.id,
                     browser.window.action.close.simple_action.name()
                 ),
-                &["<Primary>q"],
+                ["<Primary>q"],
             ),
         ] {
-            application.set_accels_for_action(detailed_action_name, &accels);
+            application.set_accels_for_action(detailed_action_name, accels);
         }
 
         // Return activated App struct
