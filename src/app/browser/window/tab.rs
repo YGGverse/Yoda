@@ -8,7 +8,7 @@ use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
 use anyhow::Result;
-use gtk::{gio::Icon, glib::Propagation, prelude::ActionExt, Box, Orientation};
+use gtk::{Box, Orientation, gio::Icon, glib::Propagation, prelude::ActionExt};
 pub use item::Item;
 use menu::Menu;
 use sourceview::prelude::IsA;

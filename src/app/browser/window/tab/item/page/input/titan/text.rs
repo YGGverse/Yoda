@@ -2,9 +2,9 @@ mod form;
 
 use super::{Control, Header};
 use gtk::{
+    TextBuffer, TextView,
     glib::{Bytes, GString},
     prelude::{TextBufferExt, TextViewExt},
-    TextBuffer, TextView,
 };
 use std::{cell::RefCell, rc::Rc};
 

@@ -19,12 +19,12 @@ use ggemtext::line::{
     link::Link,
 };
 use gtk::{
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
+    UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, RGBA},
     gio::Cancellable,
     glib::{TimeZone, Uri},
     prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
-    UriLauncher, Window, WrapMode,
 };
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 

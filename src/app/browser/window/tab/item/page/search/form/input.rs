@@ -1,6 +1,6 @@
 use gtk::{
-    prelude::{EditableExt, EntryExt, WidgetExt},
     Align, Entry, EntryIconPosition,
+    prelude::{EditableExt, EntryExt, WidgetExt},
 };
 
 const MARGIN: i32 = 6;

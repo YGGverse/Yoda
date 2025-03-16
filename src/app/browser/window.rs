@@ -8,7 +8,7 @@ use crate::Profile;
 use action::{Action, Position};
 use adw::ToolbarView;
 use anyhow::Result;
-use gtk::{prelude::BoxExt, Box, Orientation};
+use gtk::{Box, Orientation, prelude::BoxExt};
 use header::Header;
 use sqlite::Transaction;
 use std::{rc::Rc, sync::Arc};

@@ -1,6 +1,6 @@
 use gtk::{
-    prelude::{ButtonExt, WidgetExt},
     Button,
+    prelude::{ButtonExt, WidgetExt},
 };
 
 pub trait Upload {

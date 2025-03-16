@@ -4,8 +4,8 @@ mod upload;
 
 use counter::Counter;
 use gtk::{
-    prelude::{BoxExt, WidgetExt},
     Align, Box, Button, Label, Orientation,
+    prelude::{BoxExt, WidgetExt},
 };
 use options::Options;
 pub use upload::Upload;

@@ -5,7 +5,7 @@ mod source;
 use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
-use gtk::{glib::Uri, ScrolledWindow, TextView};
+use gtk::{ScrolledWindow, TextView, glib::Uri};
 use plain::Plain;
 use source::Source;
 use std::rc::Rc;
@@ -72,7 +72,7 @@ impl Text {
 
 // Grab focus into the `TextView` on click empty `ClampScrollable` area
 fn grab_focus_patch(clamp_scrollable: &ClampScrollable, text_view: &TextView) {
-    use gtk::{prelude::WidgetExt, GestureClick};
+    use gtk::{GestureClick, prelude::WidgetExt};
     let controller = GestureClick::new();
 
     controller.connect_pressed({

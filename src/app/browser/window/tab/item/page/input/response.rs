@@ -8,10 +8,10 @@ use title::Title;
 
 use super::ItemAction;
 use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::{ActionExt, BoxExt, DisplayExt, WidgetExt},
     Box, Label, Orientation, TextView,
+    gio::SimpleAction,
+    glib::{Uri, UriHideFlags, uuid_string_random},
+    prelude::{ActionExt, BoxExt, DisplayExt, WidgetExt},
 };
 use std::rc::Rc;
 
@@ -94,9 +94,10 @@ impl Response for Box {
 
         form.add_controller({
             const SHORTCUT: &str = "<Primary>Return"; // @TODO optional
+
             /*control
-                .send
-                .set_tooltip_text(Some(&format!("Shortcut: {SHORTCUT}")));*/
+            .send
+            .set_tooltip_text(Some(&format!("Shortcut: {SHORTCUT}")));*/
             let c = gtk::ShortcutController::new();
             c.add_shortcut(
                 gtk::Shortcut::builder()

@@ -1,6 +1,6 @@
 pub mod auth;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 pub use auth::Auth;
 use std::{collections::HashMap, sync::RwLock};
 

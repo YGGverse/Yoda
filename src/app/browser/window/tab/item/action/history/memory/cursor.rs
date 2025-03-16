@@ -36,31 +36,19 @@ impl Cursor {
         let i = len2i(len)?;
         let n = self.0.unwrap_or_default();
 
-        if n < i {
-            Some(n + 1)
-        } else {
-            None
-        }
+        if n < i { Some(n + 1) } else { None }
     }
 
     pub fn back(&self, len: usize) -> Option<usize> {
         len2i(len)?;
         let n = self.0.unwrap_or_default();
 
-        if n > 0 {
-            Some(n - 1)
-        } else {
-            None
-        }
+        if n > 0 { Some(n - 1) } else { None }
     }
 }
 
 // Tools
 
 fn len2i(len: usize) -> Option<usize> {
-    if len > 0 {
-        Some(len - 1)
-    } else {
-        None
-    }
+    if len > 0 { Some(len - 1) } else { None }
 }

@@ -1,4 +1,4 @@
-use gtk::{gdk::RGBA, TextTag};
+use gtk::{TextTag, gdk::RGBA};
 
 pub fn new() -> TextTag {
     TextTag::builder()

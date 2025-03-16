@@ -1,9 +1,9 @@
 use super::{ItemAction, TabAction, WindowAction};
 use crate::app::browser::window::action::Position;
 use gtk::{
+    Button, GestureClick,
     gdk::BUTTON_MIDDLE,
     prelude::{ActionExt, WidgetExt},
-    Button, GestureClick,
 };
 use std::rc::Rc;
 

@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
 use crate::profile::Profile;
 use gtk::{gio::TlsCertificate, prelude::TlsCertificateExt};

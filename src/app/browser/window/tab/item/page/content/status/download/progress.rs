@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, Spinner}; // use adw::Spinner; @TODO adw 1.6 / ubuntu 24.10+
+use gtk::{Spinner, prelude::WidgetExt}; // use adw::Spinner; @TODO adw 1.6 / ubuntu 24.10+
 
 // Defaults
 

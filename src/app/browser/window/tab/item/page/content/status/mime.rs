@@ -1,6 +1,6 @@
 use super::ItemAction;
 use adw::StatusPage;
-use gtk::{glib::Uri, prelude::ButtonExt, Align, Button};
+use gtk::{Align, Button, glib::Uri, prelude::ButtonExt};
 use std::rc::Rc;
 
 /// Create new default `GObject` preset for mime issue

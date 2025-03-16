@@ -12,7 +12,7 @@ use profile::Profile;
 
 use gtk::{
     gio::{SimpleAction, SimpleActionGroup},
-    glib::{uuid_string_random, GString},
+    glib::{GString, uuid_string_random},
     prelude::ActionMapExt,
 };
 use std::rc::Rc;

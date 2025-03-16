@@ -1,13 +1,13 @@
 mod certificate;
 use certificate::Certificate;
 
-use super::list::{item::Value, List};
+use super::list::{List, item::Value};
 use crate::profile::Profile;
 use gtk::{
-    gio::{Cancellable, FileCreateFlags, ListStore},
-    glib::{timeout_add_seconds_local_once, Priority},
-    prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
     Button, FileDialog, FileFilter, Window,
+    gio::{Cancellable, FileCreateFlags, ListStore},
+    glib::{Priority, timeout_add_seconds_local_once},
+    prelude::{ButtonExt, FileExt, OutputStreamExtManual, WidgetExt},
 };
 use std::{path::MAIN_SEPARATOR, rc::Rc, sync::Arc};
 

@@ -8,8 +8,8 @@ use model::Model;
 
 use super::Subject;
 use gtk::{
-    prelude::{BoxExt, TextBufferExt, TextViewExt},
     Box, Orientation, TextIter,
+    prelude::{BoxExt, TextBufferExt, TextViewExt},
 };
 use std::cell::RefCell;
 

@@ -27,10 +27,10 @@ impl Common for AlertDialog {
         callback: &Rc<impl Fn(bool) + 'static>,
     ) -> Self {
         use adw::{
-            prelude::{AlertDialogExt, AlertDialogExtManual},
             ResponseAppearance,
+            prelude::{AlertDialogExt, AlertDialogExtManual},
         };
-        use form::{list::item::value::Value, Form};
+        use form::{Form, list::item::value::Value};
 
         // Response variants
         const RESPONSE_APPLY: (&str, &str) = ("apply", "Apply");

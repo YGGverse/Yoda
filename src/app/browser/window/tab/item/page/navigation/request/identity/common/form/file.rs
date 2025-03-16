@@ -1,9 +1,9 @@
 use super::WidgetAction;
 use gtk::{
-    gio::{Cancellable, ListStore, TlsCertificate},
-    glib::{gformat, GString},
-    prelude::{ButtonExt, FileExt, TlsCertificateExt, WidgetExt},
     Button, FileDialog, FileFilter, Window,
+    gio::{Cancellable, ListStore, TlsCertificate},
+    glib::{GString, gformat},
+    prelude::{ButtonExt, FileExt, TlsCertificateExt, WidgetExt},
 };
 
 use std::{cell::RefCell, rc::Rc};

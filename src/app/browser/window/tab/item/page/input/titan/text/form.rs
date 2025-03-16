@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, TextView, WrapMode};
+use gtk::{TextView, WrapMode, prelude::WidgetExt};
 use libspelling::{Checker, TextBufferAdapter};
 use sourceview::Buffer;
 

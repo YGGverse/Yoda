@@ -2,12 +2,12 @@ pub mod item;
 
 use crate::profile::Profile;
 use gtk::{
+    Align, Box, DropDown, Label, ListItem, Orientation, SignalListItemFactory,
     gio::{
-        prelude::{Cast, CastNone},
         ListStore,
+        prelude::{Cast, CastNone},
     },
     prelude::{BoxExt, ListItemExt, ObjectExt, WidgetExt},
-    Align, Box, DropDown, Label, ListItem, Orientation, SignalListItemFactory,
 };
 pub use item::Item;
 use std::sync::Arc;

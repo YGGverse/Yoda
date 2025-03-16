@@ -55,7 +55,7 @@ impl Open {
 
     /// Formatted action connector for external implementation
     pub fn on_activate(&self, callback: impl Fn(Option<i32>, &str) + 'static) -> SignalHandlerId {
-        use gtk::{prelude::FileExt, FileDialog, Window};
+        use gtk::{FileDialog, Window, prelude::FileExt};
         use std::rc::Rc;
 
         let cancellable = self.cancellable();

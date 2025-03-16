@@ -1,7 +1,7 @@
 use gtk::{
+    Button,
     gio::SimpleAction,
     prelude::{ActionExt, ButtonExt, WidgetExt},
-    Button,
 };
 
 pub trait Send {

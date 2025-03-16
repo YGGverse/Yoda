@@ -8,16 +8,16 @@ mod save;
 use drop::Drop;
 use exit::Exit;
 use file::File;
-use list::{item::value::Value, List};
+use list::{List, item::value::Value};
 use name::Name;
 use save::Save;
 
 use super::WidgetAction;
 use crate::Profile;
 use gtk::{
+    Box, Button, Entry, Orientation,
     glib::Uri,
     prelude::{BoxExt, WidgetExt},
-    Box, Button, Entry, Orientation,
 };
 use std::{rc::Rc, sync::Arc};
 

@@ -1,6 +1,6 @@
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, GString},
+    glib::{GString, uuid_string_random},
     prelude::{ActionExt, StaticVariantType, ToVariant},
 };
 

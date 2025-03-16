@@ -1,9 +1,9 @@
 use super::{BrowserAction, Profile, WindowAction};
 use gtk::{
+    Align, MenuButton,
     gio::{self},
     glib::{GString, Uri, UriFlags},
     prelude::{ActionExt, ToVariant},
-    Align, MenuButton,
 };
 use indexmap::IndexMap;
 use std::{rc::Rc, sync::Arc};

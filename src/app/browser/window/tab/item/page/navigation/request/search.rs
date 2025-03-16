@@ -3,10 +3,10 @@ mod form;
 use crate::Profile;
 use adw::AlertDialog;
 use adw::{
-    prelude::{AlertDialogExt, AlertDialogExtManual},
     ResponseAppearance,
+    prelude::{AlertDialogExt, AlertDialogExtManual},
 };
-use form::{list::item::Value, list::Item, Form, Query};
+use form::{Form, Query, list::Item, list::item::Value};
 use gtk::prelude::{EditableExt, WidgetExt};
 use sourceview::prelude::CastNone;
 use std::rc::Rc;

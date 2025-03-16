@@ -1,6 +1,6 @@
 mod form;
 
-use gtk::{glib::GString, prelude::IsA, Widget};
+use gtk::{Widget, glib::GString, prelude::IsA};
 
 #[derive(Default, Clone)]
 pub struct Header {
@@ -13,8 +13,8 @@ impl Header {
     /// * takes ownership of `Self`, return new updated copy in `callback` function
     pub fn dialog(self, widget: Option<&impl IsA<Widget>>, callback: impl Fn(Self) + 'static) {
         use adw::{
-            prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
             AlertDialog, ResponseAppearance,
+            prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
         };
         use form::Form;
 

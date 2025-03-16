@@ -1,6 +1,6 @@
 mod column;
 
-use gtk::{gio::File, ScrolledWindow};
+use gtk::{ScrolledWindow, gio::File};
 
 pub struct Directory; // @TODO save settings
 
@@ -15,8 +15,7 @@ impl Directory {
         use gtk::gio::FileInfo;
 
         // Init model
-        const ATTRIBUTES: &str =
-        "standard::type,standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,time::modified,time::created,time::access";
+        const ATTRIBUTES: &str = "standard::type,standard::display-name,standard::symbolic-icon,standard::size,standard::content-type,time::modified,time::created,time::access";
 
         let directory_list = gtk::DirectoryList::builder()
             .file(file)

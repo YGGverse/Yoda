@@ -14,9 +14,9 @@ use status::Status;
 
 use adw::StatusPage;
 use gtk::{
+    Box, FileDialog, FileLauncher, Orientation, Window,
     gio::{Cancellable, File},
     prelude::{BoxExt, CancellableExt, WidgetExt},
-    Box, FileDialog, FileLauncher, Orientation, Window,
 };
 use std::rc::Rc;
 

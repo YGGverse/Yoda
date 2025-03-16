@@ -1,13 +1,13 @@
-use super::list::{item::Value, List};
+use super::list::{List, item::Value};
 use crate::profile::Profile;
 use adw::{
-    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
     AlertDialog, ResponseAppearance,
+    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
 };
 use gtk::{
+    Button,
     glib::timeout_add_seconds_local_once,
     prelude::{ButtonExt, WidgetExt},
-    Button,
 };
 use std::{rc::Rc, sync::Arc};
 

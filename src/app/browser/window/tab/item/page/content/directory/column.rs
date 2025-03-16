@@ -5,9 +5,9 @@ use display::Display;
 use format::Format;
 
 use gtk::{
+    ColumnViewColumn, Label, ListItem, SignalListItemFactory,
     gio::{File, FileInfo, FileQueryInfoFlags},
     glib::{GString, Priority},
-    ColumnViewColumn, Label, ListItem, SignalListItemFactory,
 };
 
 pub trait Column {
@@ -23,9 +23,9 @@ pub trait Column {
 impl Column for ColumnViewColumn {
     fn icon() -> Self {
         use gtk::{
+            Align, ColumnViewColumn, ListItem, SignalListItemFactory,
             gio::FileInfo,
             prelude::{BoxExt, Cast, ListItemExt, WidgetExt},
-            Align, ColumnViewColumn, ListItem, SignalListItemFactory,
         };
 
         ColumnViewColumn::builder()

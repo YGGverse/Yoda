@@ -4,7 +4,7 @@ mod database;
 mod item;
 mod memory;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use auth::Auth;
 use database::Database;
 use gtk::glib::DateTime;

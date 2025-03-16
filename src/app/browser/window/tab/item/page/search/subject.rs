@@ -3,8 +3,8 @@ mod tag;
 use tag::Tag;
 
 use gtk::{
-    prelude::{TextBufferExt, TextViewExt},
     TextView,
+    prelude::{TextBufferExt, TextViewExt},
 };
 
 pub struct Subject {

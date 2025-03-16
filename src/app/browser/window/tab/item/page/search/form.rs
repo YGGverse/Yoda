@@ -10,11 +10,11 @@ use navigation::Navigation;
 use result::Result;
 
 use gtk::{
+    Align, Box, Orientation, TextIter, TextSearchFlags, TextView,
     prelude::{
         BoxExt, ButtonExt, CheckButtonExt, DisplayExt, EditableExt, EntryExt, TextBufferExt,
         TextViewExt, WidgetExt,
     },
-    Align, Box, Orientation, TextIter, TextSearchFlags, TextView,
 };
 use std::{cell::RefCell, rc::Rc};
 

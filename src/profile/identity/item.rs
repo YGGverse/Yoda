@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use gtk::gio::TlsCertificate;
 
 /// Gemini identity holder for cached record in application-wide struct format.

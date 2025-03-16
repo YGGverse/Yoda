@@ -5,9 +5,9 @@ use mime::Mime;
 use token::Token;
 
 use gtk::{
+    Box, Entry, Orientation,
     glib::GString,
     prelude::{BoxExt, EditableExt},
-    Box, Entry, Orientation,
 };
 
 pub struct Form {
@@ -48,9 +48,5 @@ impl Form {
 
 fn value(label: &Entry) -> Option<GString> {
     let text = label.text();
-    if !text.is_empty() {
-        Some(text)
-    } else {
-        None
-    }
+    if !text.is_empty() { Some(text) } else { None }
 }

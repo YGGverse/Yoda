@@ -1,8 +1,8 @@
 use gtk::{
-    glib::{timeout_add_local_once, Uri},
+    Align, Label, TextView, TextWindowType,
+    glib::{Uri, timeout_add_local_once},
     pango::EllipsizeMode,
     prelude::{TextViewExt, WidgetExt},
-    Align, Label, TextView, TextWindowType,
 };
 use std::{cell::Cell, rc::Rc, time::Duration};
 

@@ -5,9 +5,9 @@ mod titan;
 use super::ItemAction;
 use adw::Clamp;
 use gtk::{
+    Widget,
     glib::{Bytes, Uri},
     prelude::{IsA, WidgetExt},
-    Widget,
 };
 use response::Response;
 use sensitive::Sensitive;

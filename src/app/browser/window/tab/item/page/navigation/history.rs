@@ -5,7 +5,7 @@ pub use back::Back;
 pub use forward::Forward;
 
 use super::{ItemAction, TabAction, WindowAction};
-use gtk::{prelude::BoxExt, Box, Button, Orientation};
+use gtk::{Box, Button, Orientation, prelude::BoxExt};
 use std::rc::Rc;
 
 pub trait History {

@@ -8,7 +8,7 @@ use tab::Tab;
 
 use super::{BrowserAction, Profile, WindowAction};
 use adw::{TabBar, TabView};
-use gtk::{prelude::BoxExt, Box, MenuButton, Orientation};
+use gtk::{Box, MenuButton, Orientation, prelude::BoxExt};
 use std::{rc::Rc, sync::Arc};
 
 pub trait Bar {

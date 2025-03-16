@@ -1,7 +1,7 @@
 use super::{Feature, Page};
 use ggemini::client::connection::response::{
-    failure::{Permanent, Temporary},
     Certificate, Failure, Input, Redirect,
+    failure::{Permanent, Temporary},
 };
 use ggemini::{
     client::{Client, Request, Response},

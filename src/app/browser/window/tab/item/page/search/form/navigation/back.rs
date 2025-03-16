@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, Align, Button};
+use gtk::{Align, Button, prelude::WidgetExt};
 
 pub struct Back {
     pub button: Button,

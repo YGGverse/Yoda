@@ -8,8 +8,8 @@ use placeholder::Placeholder;
 use subject::Subject;
 
 use gtk::{
-    prelude::{BoxExt, ButtonExt, WidgetExt},
     Align, Box, Orientation, TextView,
+    prelude::{BoxExt, ButtonExt, WidgetExt},
 };
 use std::{cell::RefCell, rc::Rc};
 

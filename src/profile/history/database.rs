@@ -1,4 +1,4 @@
-use super::{item::Event, Item};
+use super::{Item, item::Event};
 use anyhow::Result;
 use gtk::glib::DateTime;
 use r2d2::Pool;

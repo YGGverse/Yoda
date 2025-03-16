@@ -1,6 +1,6 @@
 use super::{ItemAction, TabAction};
 use adw::StatusPage;
-use gtk::{prelude::ActionExt, Align, Button};
+use gtk::{Align, Button, prelude::ActionExt};
 use std::rc::Rc;
 
 // Defaults

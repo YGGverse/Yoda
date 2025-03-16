@@ -1,7 +1,7 @@
 use gtk::{
+    Entry,
     glib::{Uri, UriFlags},
     prelude::{EditableExt, EntryExt},
-    Entry,
 };
 
 const MIN_LENGTH: u16 = 1;

@@ -1,7 +1,7 @@
 use gtk::{
+    Align, Button,
     glib::SignalHandlerId,
     prelude::{ButtonExt, WidgetExt},
-    Align, Button,
 };
 
 // Defaults

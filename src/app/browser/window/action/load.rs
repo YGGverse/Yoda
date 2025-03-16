@@ -2,7 +2,7 @@
 
 use gtk::{
     gio::SimpleAction,
-    glib::{uuid_string_random, SignalHandlerId},
+    glib::{SignalHandlerId, uuid_string_random},
     prelude::StaticVariantType,
 };
 

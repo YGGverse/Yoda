@@ -1,4 +1,4 @@
-use gtk::{prelude::WidgetExt, Label};
+use gtk::{Label, prelude::WidgetExt};
 
 const MARGIN: i32 = 3;
 

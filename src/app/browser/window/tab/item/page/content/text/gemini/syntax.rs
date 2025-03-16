@@ -6,10 +6,10 @@ use tag::Tag;
 
 use adw::StyleManager;
 use gtk::{
+    TextTag,
     gdk::RGBA,
     pango::{Style, Underline},
     prelude::TextTagExt,
-    TextTag,
 };
 use syntect::{
     easy::HighlightLines,

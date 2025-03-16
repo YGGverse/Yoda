@@ -2,18 +2,18 @@ mod item;
 
 use super::Profile;
 use adw::{
-    prelude::{ActionRowExt, PopoverExt, PreferencesRowExt},
     ActionRow,
+    prelude::{ActionRowExt, PopoverExt, PreferencesRowExt},
 };
 use gtk::{
+    Align, Entry, INVALID_LIST_POSITION, ListItem, ListView, Popover, SignalListItemFactory,
+    SingleSelection,
     gio::{
-        prelude::{Cast, CastNone},
         ListStore,
+        prelude::{Cast, CastNone},
     },
     glib::{GString, SignalHandlerId},
     prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
-    Align, Entry, ListItem, ListView, Popover, SignalListItemFactory, SingleSelection,
-    INVALID_LIST_POSITION,
 };
 pub use item::Item;
 use sourceview::prelude::ListModelExt;

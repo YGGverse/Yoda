@@ -5,12 +5,12 @@ mod search;
 mod suggestion;
 
 use super::{ItemAction, Profile};
-use adw::{prelude::AdwDialogExt, AlertDialog};
+use adw::{AlertDialog, prelude::AdwDialogExt};
 use anyhow::Result;
 use gtk::{
-    glib::{gformat, GString, Uri, UriFlags},
-    prelude::{EditableExt, EntryExt, WidgetExt},
     Entry, EntryIconPosition, StateFlags,
+    glib::{GString, Uri, UriFlags, gformat},
+    prelude::{EditableExt, EntryExt, WidgetExt},
 };
 use primary_icon::PrimaryIcon;
 use sqlite::Transaction;

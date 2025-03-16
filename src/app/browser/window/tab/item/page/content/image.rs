@@ -1,7 +1,7 @@
 use gtk::{
+    ContentFit, Picture,
     gdk::Paintable,
     prelude::{IsA, WidgetExt},
-    ContentFit, Picture,
 };
 
 pub struct Image {

@@ -10,8 +10,8 @@ use adw::TabPage;
 use anyhow::Result;
 use client::Client;
 use gtk::{
-    prelude::{ActionExt, ActionMapExt, BoxExt},
     Box,
+    prelude::{ActionExt, ActionMapExt, BoxExt},
 };
 use page::Page;
 use sqlite::Transaction;

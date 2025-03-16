@@ -1,8 +1,8 @@
 use gtk::{
+    TextView, WrapMode,
     gio::SimpleAction,
     glib::GString,
     prelude::{ActionExt, TextBufferExt, TextViewExt, WidgetExt},
-    TextView, WrapMode,
 };
 use libspelling::{Checker, TextBufferAdapter};
 use sourceview::Buffer;

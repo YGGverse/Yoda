@@ -30,7 +30,7 @@ use source::Source;
 
 use gtk::{
     gio::SimpleActionGroup,
-    glib::{uuid_string_random, GString},
+    glib::{GString, uuid_string_random},
     prelude::ActionMapExt,
 };
 use std::rc::Rc;

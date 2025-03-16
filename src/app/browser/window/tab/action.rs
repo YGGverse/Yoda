@@ -1,6 +1,6 @@
 use gtk::{
     gio::SimpleActionGroup,
-    glib::{uuid_string_random, GString},
+    glib::{GString, uuid_string_random},
 };
 
 /// [SimpleActionGroup](https://docs.gtk.org/gio/class.SimpleActionGroup.html) wrapper for `Tab` actions

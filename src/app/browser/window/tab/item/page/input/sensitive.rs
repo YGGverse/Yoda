@@ -3,10 +3,10 @@ mod form;
 use super::ItemAction;
 use form::Form;
 use gtk::{
-    gio::SimpleAction,
-    glib::{uuid_string_random, Uri, UriHideFlags},
-    prelude::{BoxExt, EditableExt, WidgetExt},
     Box, Orientation,
+    gio::SimpleAction,
+    glib::{Uri, UriHideFlags, uuid_string_random},
+    prelude::{BoxExt, EditableExt, WidgetExt},
 };
 use std::rc::Rc;
 

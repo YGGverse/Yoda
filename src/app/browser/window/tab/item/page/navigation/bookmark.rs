@@ -1,7 +1,7 @@
 use super::{Profile, WindowAction};
 use gtk::{
-    prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
     Button, Entry,
+    prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
 };
 use std::{rc::Rc, sync::Arc};
 

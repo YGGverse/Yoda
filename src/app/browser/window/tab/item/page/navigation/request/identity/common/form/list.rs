@@ -6,14 +6,14 @@ use item::Item;
 use super::WidgetAction;
 use crate::profile::Profile;
 use gtk::{
+    Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
     gdk::Cursor,
     gio::{
-        prelude::{Cast, CastNone},
         ListStore,
+        prelude::{Cast, CastNone},
     },
     glib::Uri,
     prelude::{BoxExt, ListItemExt, ObjectExt, WidgetExt},
-    Align, Box, DropDown, Image, Label, ListItem, Orientation, SignalListItemFactory,
 };
 
 pub struct List {

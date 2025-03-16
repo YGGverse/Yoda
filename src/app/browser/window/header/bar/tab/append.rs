@@ -1,5 +1,5 @@
 use super::WindowAction;
-use gtk::{prelude::ButtonExt, Align, Button};
+use gtk::{Align, Button, prelude::ButtonExt};
 use std::rc::Rc;
 
 pub trait Append {

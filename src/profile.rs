@@ -7,7 +7,7 @@ mod search;
 use anyhow::Result;
 use bookmark::Bookmark;
 use database::Database;
-use gtk::glib::{user_config_dir, DateTime};
+use gtk::glib::{DateTime, user_config_dir};
 use history::History;
 use identity::Identity;
 use r2d2::Pool;

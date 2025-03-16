@@ -10,11 +10,11 @@ use text::Text;
 use super::{ItemAction, TabAction, WindowAction};
 use adw::StatusPage;
 use gtk::{
+    Box, Orientation,
     gdk::Paintable,
     gio::{Cancellable, File},
     glib::Uri,
     prelude::{BoxExt, IsA, WidgetExt},
-    Box, Orientation,
 };
 use std::{rc::Rc, time::Duration};
 

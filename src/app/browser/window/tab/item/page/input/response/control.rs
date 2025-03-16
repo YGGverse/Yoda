@@ -2,7 +2,7 @@ mod counter;
 mod send;
 
 use counter::Counter;
-use gtk::{gio::SimpleAction, prelude::BoxExt, Align, Box, Button, Label, Orientation};
+use gtk::{Align, Box, Button, Label, Orientation, gio::SimpleAction, prelude::BoxExt};
 use send::Send;
 
 const SPACING: i32 = 8;

@@ -7,9 +7,9 @@ mod text;
 use control::Control;
 use file::File;
 use gtk::{
+    Notebook,
     glib::Bytes,
     prelude::{DisplayExt, WidgetExt},
-    Notebook,
 };
 pub use header::Header;
 use tab::Tab;
@@ -21,7 +21,7 @@ pub trait Titan {
 
 impl Titan for gtk::Box {
     fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
-        use gtk::{glib::uuid_string_random, prelude::ButtonExt, Label};
+        use gtk::{Label, glib::uuid_string_random, prelude::ButtonExt};
         use std::rc::Rc;
 
         // Init components
@@ -57,7 +57,7 @@ impl Titan for gtk::Box {
 
         // Init main widget
         let g_box = {
-            use gtk::{prelude::BoxExt, Box, Orientation};
+            use gtk::{Box, Orientation, prelude::BoxExt};
 
             let g_box = {
                 const MARGIN: i32 = 8;
@@ -182,4 +182,4 @@ fn notebook_css_patch(notebook: &Notebook) {
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
 } // @TODO replace `Notebook` with `ToggleGroup` in Adw 1.7 / Ubuntu 26.04
-  // https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ToggleGroup.html
+// https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ToggleGroup.html

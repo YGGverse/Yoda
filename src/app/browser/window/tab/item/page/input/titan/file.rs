@@ -1,8 +1,8 @@
 use super::{Control, Header};
 use gtk::{
+    Button,
     gio::FileQueryInfoFlags,
     glib::{Bytes, Priority},
-    Button,
 };
 use std::{cell::RefCell, rc::Rc};
 
@@ -15,9 +15,9 @@ pub struct File {
 impl File {
     pub fn build(control: &Rc<Control>) -> Self {
         use gtk::{
+            Button, FileDialog, Window,
             gio::Cancellable,
             prelude::{ButtonExt, FileExt, WidgetExt},
-            Button, FileDialog, Window,
         };
 
         // Init components

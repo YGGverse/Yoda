@@ -1,12 +1,12 @@
 use super::{
-    list::{item::Value, List},
     WidgetAction,
+    list::{List, item::Value},
 };
 use crate::Profile;
 use gtk::{
-    glib::{timeout_add_seconds_local_once, Uri},
-    prelude::{ButtonExt, WidgetExt},
     Button,
+    glib::{Uri, timeout_add_seconds_local_once},
+    prelude::{ButtonExt, WidgetExt},
 };
 use std::{rc::Rc, sync::Arc};
 
@@ -30,8 +30,8 @@ impl Exit for Button {
         request: &Uri,
     ) -> Self {
         use adw::{
-            prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
             AlertDialog, ResponseAppearance,
+            prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
         };
 
         const LABEL: &str = "Disconnect";

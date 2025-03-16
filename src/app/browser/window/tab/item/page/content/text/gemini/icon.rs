@@ -1,4 +1,4 @@
-use gtk::{gdk::Display, IconLookupFlags, IconPaintable, IconTheme, TextDirection};
+use gtk::{IconLookupFlags, IconPaintable, IconTheme, TextDirection, gdk::Display};
 
 const SIZE: i32 = 16;
 

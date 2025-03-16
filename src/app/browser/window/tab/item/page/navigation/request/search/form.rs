@@ -4,7 +4,7 @@ pub mod query;
 
 use crate::Profile;
 use drop::Drop;
-use gtk::{prelude::BoxExt, Box, Button, Entry, Orientation};
+use gtk::{Box, Button, Entry, Orientation, prelude::BoxExt};
 use list::List;
 pub use query::Query;
 use std::{rc::Rc, sync::Arc};

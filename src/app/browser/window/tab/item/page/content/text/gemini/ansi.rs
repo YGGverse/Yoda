@@ -4,7 +4,7 @@ mod tag;
 use tag::Tag;
 
 use ansi_parser::{AnsiParser, AnsiSequence, Output};
-use gtk::{prelude::TextTagExt, TextTag};
+use gtk::{TextTag, prelude::TextTagExt};
 
 /// Apply ANSI/SGR format to new buffer
 pub fn format(source_code: &str) -> Vec<(TextTag, String)> {

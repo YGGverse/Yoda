@@ -1,7 +1,7 @@
 use super::WidgetAction;
 use gtk::{
-    prelude::{EditableExt, EntryExt, WidgetExt},
     Entry,
+    prelude::{EditableExt, EntryExt, WidgetExt},
 };
 use std::rc::Rc;
 

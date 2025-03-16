@@ -9,9 +9,9 @@ use super::{ItemAction, Profile, TabAction, WindowAction};
 use anyhow::Result;
 use bookmark::Bookmark;
 use gtk::{
+    Box, Button, Orientation,
     glib::{GString, Uri},
     prelude::{BoxExt, EditableExt, EntryExt, WidgetExt},
-    Box, Button, Orientation,
 };
 use history::History;
 use home::Home;

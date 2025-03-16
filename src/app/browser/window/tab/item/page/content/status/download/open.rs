@@ -1,4 +1,4 @@
-use gtk::{glib::SignalHandlerId, prelude::ButtonExt, Align, Button};
+use gtk::{Align, Button, glib::SignalHandlerId, prelude::ButtonExt};
 
 // Defaults
 

@@ -1,6 +1,6 @@
 use adw::{
-    prelude::{EntryRowExt, PreferencesRowExt},
     PasswordEntryRow,
+    prelude::{EntryRowExt, PreferencesRowExt},
 };
 use gtk::{
     gio::SimpleAction,
