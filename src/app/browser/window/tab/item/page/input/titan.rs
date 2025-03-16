@@ -6,7 +6,11 @@ mod text;
 
 use control::Control;
 use file::File;
-use gtk::{glib::Bytes, Notebook};
+use gtk::{
+    glib::Bytes,
+    prelude::{DisplayExt, WidgetExt},
+    Notebook,
+};
 pub use header::Header;
 use tab::Tab;
 use text::Text;
@@ -71,6 +75,28 @@ impl Titan for gtk::Box {
         };
 
         // Init events
+        text.text_view.add_controller({
+            const SHORTCUT: &str = "<Primary>Return"; // @TODO optional
+            let c = gtk::ShortcutController::new();
+            c.add_shortcut(
+                gtk::Shortcut::builder()
+                    .trigger(&gtk::ShortcutTrigger::parse_string(SHORTCUT).unwrap())
+                    .action(&gtk::CallbackAction::new({
+                        let u = control.upload.clone();
+                        move |_, _| {
+                            if u.is_sensitive() {
+                                u.emit_activate();
+                            } else {
+                                u.display().beep();
+                            }
+                            gtk::glib::Propagation::Stop
+                        }
+                    }))
+                    .build(),
+            );
+            c
+        });
+
         control.options.connect_clicked({
             let text = text.clone();
             let file = file.clone();
