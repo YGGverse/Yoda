@@ -18,12 +18,11 @@ use gtk::{
     UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, RGBA},
     gio::Cancellable,
-    glib::{TimeZone, Uri},
+    glib::Uri,
     prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
 };
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
-pub const DATE_FORMAT: &str = "%Y-%m-%d";
 pub const NEW_LINE: &str = "\n";
 
 pub struct Gemini {
@@ -259,42 +258,35 @@ impl Gemini {
             }
 
             // Is link
-            if let Some(link) =
-                ggemtext::line::Link::from(line, Some(base), Some(&TimeZone::local()))
-            {
-                let mut alt = Vec::new();
+            if let Some(link) = ggemtext::line::Link::parse(line) {
+                if let Some(uri) = link.uri(Some(base)) {
+                    let mut alt = Vec::new();
 
-                if link.uri.scheme() != base.scheme() {
-                    alt.push("⇖".to_string());
-                }
-
-                if let Some(t) = link.timestamp {
-                    // https://docs.gtk.org/glib/method.DateTime.format.html
-                    if let Ok(f) = t.format(DATE_FORMAT) {
-                        alt.push(f.to_string())
+                    if uri.scheme() != base.scheme() {
+                        alt.push("⇖".to_string());
                     }
+
+                    alt.push(match link.alt {
+                        Some(alt) => alt.to_string(),
+                        None => uri.to_string(),
+                    });
+
+                    let a = TextTag::builder()
+                        .foreground_rgba(&link_color.0)
+                        // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
+                        .sentence(true)
+                        .wrap_mode(WrapMode::Word)
+                        .build();
+
+                    if !tag.text_tag_table.add(&a) {
+                        todo!()
+                    }
+
+                    buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+
+                    links.insert(a, uri);
                 }
-
-                alt.push(match link.alt {
-                    Some(alt) => alt.to_string(),
-                    None => link.uri.to_string(),
-                });
-
-                let a = TextTag::builder()
-                    .foreground_rgba(&link_color.0)
-                    // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
-                    .sentence(true)
-                    .wrap_mode(WrapMode::Word)
-                    .build();
-
-                if !tag.text_tag_table.add(&a) {
-                    todo!()
-                }
-
-                buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                links.insert(a, link.uri.clone());
                 continue;
             }
 
