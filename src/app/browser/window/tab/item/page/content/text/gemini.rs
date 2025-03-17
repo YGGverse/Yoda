@@ -442,12 +442,10 @@ impl Gemini {
                     window_x as i32,
                     window_y as i32,
                 );
-
                 // Reset link colors to default
                 if let Some(tag) = hover.replace(None) {
                     tag.set_foreground_rgba(Some(&link_color.0));
                 }
-
                 // Apply hover effect
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
@@ -455,24 +453,18 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             // Toggle color
                             tag.set_foreground_rgba(Some(&link_color.1));
-
                             // Keep hovered tag in memory
                             hover.replace(Some(tag.clone()));
-
                             // Show tooltip
                             gutter.set_uri(Some(uri));
-
                             // Toggle cursor
                             text_view.set_cursor_from_name(Some("pointer"));
-
                             // Redraw required to apply changes immediately
                             text_view.queue_draw();
-
                             return;
                         }
                     }
                 }
-
                 // Restore defaults
                 gutter.set_uri(None);
                 text_view.set_cursor_from_name(Some("text"));
