@@ -104,7 +104,8 @@ impl Gemini {
         let is_multiline_enabled = {
             let mut t: usize = 0;
             for l in gemtext.lines() {
-                if (l.starts_with(code::TAG) || l.ends_with(code::TAG)) && Inline::from(l).is_none()
+                if (l.starts_with(code::TAG) || l.ends_with(code::TAG))
+                    && inline::Gemtext::as_value(l).is_none()
                 {
                     t += 1;
                 }
@@ -115,37 +116,43 @@ impl Gemini {
         // Parse gemtext lines
         for line in gemtext.lines() {
             // Is inline code
-            if let Some(code) = Inline::from(line) {
-                // Try auto-detect code syntax for given `value` @TODO optional
-                match syntax.highlight(&code.value, None) {
-                    Ok(highlight) => {
-                        for (syntax_tag, entity) in highlight {
-                            // Register new tag
-                            if !tag.text_tag_table.add(&syntax_tag) {
-                                todo!()
+            {
+                if let Some(code) = inline::Gemtext::as_value(line) {
+                    // Try auto-detect code syntax for given `value` @TODO optional
+                    match syntax.highlight(code, None) {
+                        Ok(highlight) => {
+                            for (syntax_tag, entity) in highlight {
+                                // Register new tag
+                                if !tag.text_tag_table.add(&syntax_tag) {
+                                    todo!()
+                                }
+                                // Append tag to buffer
+                                buffer.insert_with_tags(
+                                    &mut buffer.end_iter(),
+                                    &entity,
+                                    &[&syntax_tag],
+                                );
                             }
-                            // Append tag to buffer
-                            buffer.insert_with_tags(
-                                &mut buffer.end_iter(),
-                                &entity,
-                                &[&syntax_tag],
-                            );
                         }
+                        Err(_) => {
+                            // Try ANSI/SGR format (terminal emulation) @TODO optional
+                            for (ansi_tag, entity) in ansi::format(code) {
+                                // Register new tag
+                                if !tag.text_tag_table.add(&ansi_tag) {
+                                    todo!()
+                                }
+                                // Append tag to buffer
+                                buffer.insert_with_tags(
+                                    &mut buffer.end_iter(),
+                                    &entity,
+                                    &[&ansi_tag],
+                                );
+                            }
+                        } // @TODO handle
                     }
-                    Err(_) => {
-                        // Try ANSI/SGR format (terminal emulation) @TODO optional
-                        for (ansi_tag, entity) in ansi::format(&code.value) {
-                            // Register new tag
-                            if !tag.text_tag_table.add(&ansi_tag) {
-                                todo!()
-                            }
-                            // Append tag to buffer
-                            buffer.insert_with_tags(&mut buffer.end_iter(), &entity, &[&ansi_tag]);
-                        }
-                    } // @TODO handle
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                    continue;
                 }
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                continue;
             }
 
             // Is multiline code
