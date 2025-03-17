@@ -13,11 +13,6 @@ use tag::Tag;
 
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
-use ggemtext::line::{
-    code::{self, *},
-    header::{Header, Level},
-    link::Link,
-};
 use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
     UriLauncher, Window, WrapMode,
@@ -102,10 +97,11 @@ impl Gemini {
         // Disable multiline format on at least one closing tag not found
         // gemini://bbs.geminispace.org/s/Gemini/26031
         let is_multiline_enabled = {
+            use ggemtext::line::code::{self};
             let mut t: usize = 0;
             for l in gemtext.lines() {
                 if (l.starts_with(code::TAG) || l.ends_with(code::TAG))
-                    && inline::Gemtext::as_value(l).is_none()
+                    && code::inline::Gemtext::as_value(l).is_none()
                 {
                     t += 1;
                 }
@@ -117,7 +113,7 @@ impl Gemini {
         for line in gemtext.lines() {
             // Is inline code
             {
-                if let Some(code) = inline::Gemtext::as_value(line) {
+                if let Some(code) = ggemtext::line::code::inline::Gemtext::as_value(line) {
                     // Try auto-detect code syntax for given `value` @TODO optional
                     match syntax.highlight(code, None) {
                         Ok(highlight) => {
@@ -157,6 +153,7 @@ impl Gemini {
 
             // Is multiline code
             if is_multiline_enabled {
+                use ggemtext::line::code::Multiline;
                 match multiline {
                     None => {
                         // Open tag found
@@ -240,26 +237,31 @@ impl Gemini {
             }
 
             // Is header
-            if let Some(header) = Header::parse(line) {
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    &header.value,
-                    &[match header.level {
-                        Level::H1 => &tag.h1,
-                        Level::H2 => &tag.h2,
-                        Level::H3 => &tag.h3,
-                    }],
-                );
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+            {
+                use ggemtext::line::{Header, header::Level};
+                if let Some(header) = Header::parse(line) {
+                    buffer.insert_with_tags(
+                        &mut buffer.end_iter(),
+                        &header.value,
+                        &[match header.level {
+                            Level::H1 => &tag.h1,
+                            Level::H2 => &tag.h2,
+                            Level::H3 => &tag.h3,
+                        }],
+                    );
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
-                if title.is_none() {
-                    title = Some(header.value.clone());
+                    if title.is_none() {
+                        title = Some(header.value.clone());
+                    }
+                    continue;
                 }
-                continue;
             }
 
             // Is link
-            if let Some(link) = Link::from(line, Some(base), Some(&TimeZone::local())) {
+            if let Some(link) =
+                ggemtext::line::Link::from(line, Some(base), Some(&TimeZone::local()))
+            {
                 let mut alt = Vec::new();
 
                 if link.uri.scheme() != base.scheme() {
@@ -297,38 +299,34 @@ impl Gemini {
             }
 
             // Is list
-            {
-                use ggemtext::line::list::Gemtext;
-                if let Some(value) = line.as_value() {
-                    buffer.insert_with_tags(
-                        &mut buffer.end_iter(),
-                        &format!("• {value}"),
-                        &[&tag.list],
-                    );
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                    continue;
-                }
+
+            if let Some(value) = ggemtext::line::list::Gemtext::as_value(line) {
+                buffer.insert_with_tags(
+                    &mut buffer.end_iter(),
+                    &format!("• {value}"),
+                    &[&tag.list],
+                );
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                continue;
             }
 
             // Is quote
-            {
-                use ggemtext::line::quote::Gemtext;
-                if let Some(quote) = line.as_value() {
-                    // Show quote indicator if last line is not quote (to prevent duplicates)
-                    if !is_line_after_quote {
-                        // Show only if the icons resolved for default `Display`
-                        if let Some(ref icon) = icon {
-                            buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
-                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                        }
+
+            if let Some(quote) = ggemtext::line::quote::Gemtext::as_value(line) {
+                // Show quote indicator if last line is not quote (to prevent duplicates)
+                if !is_line_after_quote {
+                    // Show only if the icons resolved for default `Display`
+                    if let Some(ref icon) = icon {
+                        buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
+                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
                     }
-                    buffer.insert_with_tags(&mut buffer.end_iter(), quote, &[&tag.quote]);
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                    is_line_after_quote = true;
-                    continue;
-                } else {
-                    is_line_after_quote = false;
                 }
+                buffer.insert_with_tags(&mut buffer.end_iter(), quote, &[&tag.quote]);
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                is_line_after_quote = true;
+                continue;
+            } else {
+                is_line_after_quote = false;
             }
 
             // Nothing match custom tags above,
