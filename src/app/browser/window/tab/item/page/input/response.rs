@@ -9,9 +9,8 @@ use title::Title;
 use super::ItemAction;
 use gtk::{
     Box, Label, Orientation, TextView,
-    gio::SimpleAction,
-    glib::{Uri, UriHideFlags, uuid_string_random},
-    prelude::{ActionExt, BoxExt, DisplayExt, TextBufferExt, TextViewExt, WidgetExt},
+    glib::{Uri, UriHideFlags},
+    prelude::{BoxExt, ButtonExt, DisplayExt, TextBufferExt, TextViewExt, WidgetExt},
 };
 use std::rc::Rc;
 
@@ -37,11 +36,8 @@ impl Response for Box {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) -> Self {
-        // Init local actions
-        let action_send = SimpleAction::new(&uuid_string_random(), None);
-
         // Init components
-        let control = Rc::new(Control::build(action_send.clone()));
+        let control = Rc::new(Control::build());
         let text_view = TextView::form();
         let title = Label::title(title);
 
@@ -77,9 +73,11 @@ impl Response for Box {
             }
         });
 
-        action_send.connect_activate({
+        control.send.connect_clicked({
             let text_view = text_view.clone();
-            move |_, _| {
+            move |this| {
+                this.set_sensitive(false);
+                this.set_label("sending..");
                 item_action.load.activate(
                     Some(&format!(
                         "{}?{}",
@@ -93,17 +91,13 @@ impl Response for Box {
 
         text_view.add_controller({
             const SHORTCUT: &str = "<Primary>Return"; // @TODO optional
-
-            /*control
-            .send
-            .set_tooltip_text(Some(&format!("Shortcut: {SHORTCUT}")));*/
             let c = gtk::ShortcutController::new();
             c.add_shortcut(
                 gtk::Shortcut::builder()
                     .trigger(&gtk::ShortcutTrigger::parse_string(SHORTCUT).unwrap())
                     .action(&gtk::CallbackAction::new(move |_, _| {
                         if control.send.is_sensitive() {
-                            action_send.activate(None);
+                            control.send.emit_activate();
                         } else {
                             control.send.display().beep();
                         }

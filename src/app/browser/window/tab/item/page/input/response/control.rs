@@ -2,7 +2,7 @@ mod counter;
 mod send;
 
 use counter::Counter;
-use gtk::{Align, Box, Button, Label, Orientation, gio::SimpleAction, prelude::BoxExt};
+use gtk::{Align, Box, Button, Label, Orientation, prelude::BoxExt};
 use send::Send;
 
 const SPACING: i32 = 8;
@@ -17,10 +17,10 @@ impl Control {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(action_send: SimpleAction) -> Self {
+    pub fn build() -> Self {
         // Init components
         let counter = Label::counter();
-        let send = Button::send(action_send);
+        let send = Button::send();
 
         // Init main widget
         let g_box = Box::builder()
