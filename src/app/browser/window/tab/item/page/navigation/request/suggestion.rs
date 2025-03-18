@@ -13,7 +13,7 @@ use gtk::{
         prelude::{Cast, CastNone},
     },
     glib::{GString, SignalHandlerId},
-    prelude::{EditableExt, EntryExt, ListItemExt, WidgetExt},
+    prelude::{EntryExt, ListItemExt, WidgetExt},
 };
 pub use item::Item;
 use sourceview::prelude::ListModelExt;
@@ -23,7 +23,7 @@ pub struct Suggestion {
     list_store: ListStore,
     list_view: ListView,
     single_selection: SingleSelection,
-    request: Entry,
+    entry: Entry,
     profile: Arc<Profile>,
     popover: Popover,
     pub signal_handler_id: Rc<RefCell<Option<SignalHandlerId>>>,
@@ -33,7 +33,7 @@ impl Suggestion {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Arc<Profile>, request: &Entry) -> Self {
+    pub fn build(profile: &Arc<Profile>, entry: &Entry) -> Self {
         let signal_handler_id = Rc::new(RefCell::new(None));
         let list_store = ListStore::new::<Item>();
         let single_selection = {
@@ -42,18 +42,18 @@ impl Suggestion {
                 .autoselect(false)
                 .build();
             ss.connect_selected_notify({
-                let request = request.clone();
+                let e = entry.clone();
+                let p = profile.clone();
                 let signal_handler_id = signal_handler_id.clone();
                 move |this| {
                     if let Some(selected_item) = this.selected_item() {
-                        use gtk::prelude::ObjectExt;
                         if let Some(signal_handler_id) = signal_handler_id.borrow().as_ref() {
-                            request.block_signal(signal_handler_id);
-                        }
-                        request.set_text(&selected_item.downcast_ref::<Item>().unwrap().request());
-                        request.select_region(0, -1);
-                        if let Some(signal_handler_id) = signal_handler_id.borrow().as_ref() {
-                            request.unblock_signal(signal_handler_id);
+                            super::update_blocked(
+                                &p,
+                                &e,
+                                signal_handler_id,
+                                &selected_item.downcast_ref::<Item>().unwrap().request(),
+                            );
                         }
                     } // @TODO find signal to handle selected item only
                 }
@@ -105,21 +105,21 @@ impl Suggestion {
                     .button(gtk::gdk::BUTTON_PRIMARY)
                     .build();
                 c.connect_released({
-                    let request = request.clone();
-                    move |_, _, _, _| request.emit_activate()
+                    let e = entry.clone();
+                    move |_, _, _, _| e.emit_activate()
                 });
                 c
             });
             lv.connect_activate({
-                let request = request.clone();
-                move |_, _| request.emit_activate()
+                let e = entry.clone();
+                move |_, _| e.emit_activate()
             });
             list_view_css_patch(&lv);
             lv
         };
         Self {
             profile: profile.clone(),
-            request: request.clone(),
+            entry: entry.clone(),
             popover: {
                 let p = Popover::builder()
                     .autohide(false)
@@ -138,17 +138,17 @@ impl Suggestion {
                     )
                     .has_arrow(false)
                     .build();
-                p.set_parent(request);
+                p.set_parent(entry);
                 p.set_offset(
-                    request
-                        .compute_point(request, &gtk::graphene::Point::zero())
+                    entry
+                        .compute_point(entry, &gtk::graphene::Point::zero())
                         .unwrap()
                         .x() as i32,
                     6,
                 );
                 p.connect_realize({
-                    let request = request.clone();
-                    move |this| this.set_width_request(request.width() + 18)
+                    let e = entry.clone();
+                    move |this| this.set_width_request(e.width() + 18)
                 });
                 p
             },
@@ -164,8 +164,8 @@ impl Suggestion {
     pub fn update(&self, limit: Option<usize>) {
         use gtk::prelude::EditableExt;
         use itertools::Itertools;
-        if self.request.text_length() > 0 {
-            let query = self.request.text();
+        if self.entry.text_length() > 0 {
+            let query = self.entry.text();
             let popover = self.popover.clone();
             let list_store = self.list_store.clone();
             let profile = self.profile.clone();

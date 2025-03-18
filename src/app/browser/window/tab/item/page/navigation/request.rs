@@ -404,3 +404,18 @@ fn home(entry: &Entry) -> Option<Uri> {
         None
     }
 }
+
+/// Update request text with indicator icon without given signal emission
+fn update_blocked(
+    profile: &Profile,
+    entry: &Entry,
+    signal_handler_id: &gtk::glib::SignalHandlerId,
+    text: &str,
+) {
+    use gtk::prelude::ObjectExt;
+    entry.block_signal(signal_handler_id);
+    entry.set_text(text);
+    entry.select_region(0, -1);
+    update_primary_icon(entry, profile);
+    entry.unblock_signal(signal_handler_id);
+}
