@@ -52,6 +52,9 @@ impl Common for AlertDialog {
             .extra_child(&form.g_box)
             .build();
 
+        // @TODO since 4.10
+        // https://docs.gtk.org/gtk4/method.AlertDialog.set_cancel_button.html
+
         alert_dialog.add_responses(&[
             RESPONSE_CANCEL,
             // RESPONSE_MANAGE,

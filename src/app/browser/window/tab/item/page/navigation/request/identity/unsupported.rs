@@ -23,6 +23,9 @@ impl Unsupported for AlertDialog {
             .default_response(RESPONSE_QUIT.0)
             .build();
 
+        // @TODO since 4.10
+        // https://docs.gtk.org/gtk4/method.AlertDialog.set_cancel_button.html
+
         // Set response variants
         alert_dialog.add_responses(&[RESPONSE_QUIT]);
 
