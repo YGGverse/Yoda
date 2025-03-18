@@ -11,7 +11,7 @@ use gtk::{
     Box, Label, Orientation, TextView,
     gio::SimpleAction,
     glib::{Uri, UriHideFlags, uuid_string_random},
-    prelude::{ActionExt, BoxExt, DisplayExt, WidgetExt},
+    prelude::{ActionExt, BoxExt, DisplayExt, TextBufferExt, TextViewExt, WidgetExt},
 };
 use std::rc::Rc;
 
@@ -38,12 +38,11 @@ impl Response for Box {
         size_limit: Option<usize>,
     ) -> Self {
         // Init local actions
-        let action_update = SimpleAction::new(&uuid_string_random(), None);
         let action_send = SimpleAction::new(&uuid_string_random(), None);
 
         // Init components
         let control = Rc::new(Control::build(action_send.clone()));
-        let form = TextView::form(action_update.clone());
+        let text_view = TextView::form();
         let title = Label::title(title);
 
         // Init main widget
@@ -57,21 +56,21 @@ impl Response for Box {
             .build();
 
         g_box.append(&title);
-        g_box.append(&form);
+        g_box.append(&text_view);
         g_box.append(&control.g_box);
 
         // Init events
-        action_update.connect_activate({
+        text_view.buffer().connect_changed({
             let base = base.clone();
             let control = control.clone();
-            let form = form.clone();
-            move |_, _| {
+            let text_view = text_view.clone();
+            move |_| {
                 control.update(
-                    form.text().is_empty(),
+                    text_view.text().is_empty(),
                     size_limit.map(|limit| {
                         limit as isize
                             - ((base.to_string_partial(UriHideFlags::QUERY).len()
-                                + Uri::escape_string(&form.text(), None, false).len())
+                                + Uri::escape_string(&text_view.text(), None, false).len())
                                 as isize)
                     }),
                 )
@@ -79,20 +78,20 @@ impl Response for Box {
         });
 
         action_send.connect_activate({
-            let form = form.clone();
+            let text_view = text_view.clone();
             move |_, _| {
                 item_action.load.activate(
                     Some(&format!(
                         "{}?{}",
                         base.to_string_partial(UriHideFlags::QUERY),
-                        Uri::escape_string(&form.text(), None, false),
+                        Uri::escape_string(&text_view.text(), None, false),
                     )),
                     false,
                 )
             }
         });
 
-        form.add_controller({
+        text_view.add_controller({
             const SHORTCUT: &str = "<Primary>Return"; // @TODO optional
 
             /*control
