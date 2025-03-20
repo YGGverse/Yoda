@@ -153,6 +153,7 @@ fn handle(
     on_failure: Option<Box<dyn Fn()>>,
     is_snap_history: bool,
 ) {
+    const EVENT_COMPLETED: &str = "Completed";
     let uri = request.uri().clone();
     client.request_async(
         request,
@@ -185,7 +186,7 @@ fn handle(
                             page.snap_history();
                         }
                         redirects.replace(0); // reset
-                        update_page_info(&page, &uri, "Done");
+                        update_page_info(&page, &uri, EVENT_COMPLETED);
                         match input {
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
                             Input::Default { message } => page.input.set_new_response(
@@ -322,7 +323,7 @@ fn handle(
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
-                                                        i.add_event("Done".to_string());
+                                                        i.add_event(EVENT_COMPLETED.to_string());
                                                     },
                                                     Err(e) => {
                                                         let s = page.content.to_status_failure();
@@ -333,7 +334,7 @@ fn handle(
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
-                                                        update_page_info(&page, &uri, "Done");
+                                                        update_page_info(&page, &uri, EVENT_COMPLETED);
                                                     },
                                                 },
                                                 Err((_, e)) => {
@@ -345,7 +346,7 @@ fn handle(
                                                         page.snap_history();
                                                     }
                                                     redirects.replace(0); // reset
-                                                    update_page_info(&page, &uri, "Done");
+                                                    update_page_info(&page, &uri, EVENT_COMPLETED);
                                                 }
                                             }
                                         ),
@@ -358,7 +359,7 @@ fn handle(
                                                 page.snap_history();
                                             }
                                             redirects.replace(0); // reset
-                                            update_page_info(&page, &uri, "Done");
+                                            update_page_info(&page, &uri, EVENT_COMPLETED);
                                         },
                                     }
                                 )
@@ -397,7 +398,7 @@ fn handle(
                                                                     {
                                                                         let mut i = page.info.borrow_mut();
                                                                         i
-                                                                            .add_event("Done".to_string())
+                                                                            .add_event(EVENT_COMPLETED.to_string())
                                                                             .set_mime(Some(success.mime().to_string()))
                                                                             .set_request(Some(uri.to_string()))
                                                                             .set_size(Some(buffer.byte_length()));
@@ -410,7 +411,7 @@ fn handle(
                                                                     {
                                                                         let mut i = page.info.borrow_mut();
                                                                         i
-                                                                            .add_event("Done".to_string())
+                                                                            .add_event(EVENT_COMPLETED.to_string())
                                                                             .set_mime(Some(success.mime().to_string()))
                                                                             .set_request(Some(uri.to_string()))
                                                                             .set_size(None);
@@ -437,7 +438,7 @@ fn handle(
                                                     {
                                                         let mut i = page.info.borrow_mut();
                                                         i
-                                                            .add_event("Done".to_string())
+                                                            .add_event(EVENT_COMPLETED.to_string())
                                                             .set_mime(Some(success.mime().to_string()))
                                                             .set_request(Some(uri.to_string()))
                                                             .set_size(None);
@@ -462,7 +463,7 @@ fn handle(
                                 {
                                     let mut i = page.info.borrow_mut();
                                     i
-                                        .add_event("Done".to_string())
+                                        .add_event(EVENT_COMPLETED.to_string())
                                         .set_mime(Some(mime.to_string()))
                                         .set_request(Some(uri.to_string()))
                                         .set_size(None);
@@ -484,7 +485,7 @@ fn handle(
                                 page.set_progress(0.0);
                                 page.set_title(&s.title());
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, "Done");
+                                update_page_info(&page, &uri, EVENT_COMPLETED);
                             // Disallow external redirection by default as potentially unsafe
                             // even not specified, require follow confirmation @TODO optional
                             } else if uri.host() != target.host() {
@@ -509,7 +510,7 @@ fn handle(
                                 page.set_progress(0.0);
                                 page.set_title(t);
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, "Done");
+                                update_page_info(&page, &uri, EVENT_COMPLETED);
                             } else {
                                 let t = target.to_string();
                                 if matches!(redirect, Redirect::Permanent { .. }) {
@@ -519,7 +520,7 @@ fn handle(
                                 {
                                     let mut i = page.info.take();
                                     i
-                                        .add_event("Done".to_string())
+                                        .add_event(EVENT_COMPLETED.to_string())
                                         .set_mime(None)
                                         .set_request(Some(uri.to_string()))
                                         .set_size(None);
@@ -535,7 +536,7 @@ fn handle(
                             page.set_progress(0.0);
                             page.set_title(&s.title());
                             redirects.replace(0); // reset
-                            update_page_info(&page, &uri, "Done");
+                            update_page_info(&page, &uri, EVENT_COMPLETED);
                         }
                     }
                     Response::Certificate(ref certificate) => match certificate {
@@ -553,7 +554,7 @@ fn handle(
                                 page.snap_history();
                             }
                             redirects.replace(0); // reset
-                            update_page_info(&page, &uri, "Done");
+                            update_page_info(&page, &uri, EVENT_COMPLETED);
                         }
                     }
                     Response::Failure(failure) => match failure {
@@ -571,7 +572,7 @@ fn handle(
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, "Done");
+                                update_page_info(&page, &uri, EVENT_COMPLETED);
                                 if let Some(callback) = on_failure {
                                     callback()
                                 }
@@ -591,7 +592,7 @@ fn handle(
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, "Done");
+                                update_page_info(&page, &uri, EVENT_COMPLETED);
                                 if let Some(callback) = on_failure {
                                     callback()
                                 }
@@ -608,7 +609,7 @@ fn handle(
                         page.snap_history();
                     }
                     redirects.replace(0); // reset
-                    update_page_info(&page, &uri, "Done")
+                    update_page_info(&page, &uri, EVENT_COMPLETED)
                 }
             }
         },
