@@ -1,5 +1,6 @@
 mod content;
 mod database;
+mod info;
 mod input;
 mod navigation;
 mod search;
@@ -8,11 +9,12 @@ use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowActio
 use adw::TabPage;
 use anyhow::Result;
 use content::Content;
+use info::Info;
 use input::Input;
 use navigation::Navigation;
 use search::Search;
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 pub struct Page {
     pub profile: Arc<Profile>,
@@ -21,6 +23,7 @@ pub struct Page {
     pub item_action: Rc<ItemAction>,
     pub window_action: Rc<WindowAction>,
     // Components
+    pub info: Rc<RefCell<Info>>,
     pub content: Rc<Content>,
     pub input: Rc<Input>,
     pub navigation: Rc<Navigation>,
@@ -55,6 +58,7 @@ impl Page {
             (window_action, tab_action, item_action),
         ));
         let input = Rc::new(Input::new());
+        let info = Rc::new(RefCell::new(Info::new()));
 
         // Done
         Self {
@@ -65,6 +69,7 @@ impl Page {
             item_action: item_action.clone(),
             window_action: window_action.clone(),
             // Components
+            info,
             content,
             input,
             navigation,

@@ -34,7 +34,6 @@ impl Request {
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text("URL or search term...")
-            .secondary_icon_tooltip_text("Go to the location")
             .hexpand(true)
             .build();
 
@@ -317,11 +316,22 @@ fn update_primary_icon(entry: &Entry, profile: &Profile) {
     }
 }
 
+/// GTK `is_focus` / `has_focus` not an option here
+/// also, this method requires from the `Entry`` to be not empty
+fn is_focused(entry: &Entry) -> bool {
+    entry.text_length() > 0 && entry.focus_child().is_some_and(|child| child.has_focus())
+}
+
+/// Secondary icon has two modes:
+/// * navigate to the location button (on the entry is focused / has edit mode)
+/// * page info button with dialog window activation (on the entry is inactive)
 fn update_secondary_icon(entry: &Entry) {
-    if !entry.text().is_empty() && entry.focus_child().is_some_and(|text| text.has_focus()) {
+    if is_focused(entry) {
         entry.set_secondary_icon_name(Some("pan-end-symbolic"));
+        entry.set_secondary_icon_tooltip_text(Some("Go to the location"))
     } else {
-        entry.set_secondary_icon_name(None);
+        entry.set_secondary_icon_name(Some("help-about-symbolic"));
+        entry.set_secondary_icon_tooltip_text(Some("Page info"));
         entry.select_region(0, 0);
     }
 }
@@ -336,12 +346,12 @@ fn show_identity_dialog(entry: &Entry, profile: &Arc<Profile>) {
                 profile,
                 &uri,
                 &Rc::new({
-                    let profile = profile.clone();
-                    let entry = entry.clone();
+                    let p = profile.clone();
+                    let e = entry.clone();
                     move |is_reload| {
-                        update_primary_icon(&entry, &profile);
+                        update_primary_icon(&e, &p);
                         if is_reload {
-                            entry.emit_activate();
+                            e.emit_activate();
                         }
                     }
                 }),

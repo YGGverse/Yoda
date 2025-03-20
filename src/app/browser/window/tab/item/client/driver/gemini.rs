@@ -34,28 +34,54 @@ impl Gemini {
     pub fn init(page: &Rc<Page>) -> Self {
         // Init supported protocol libraries
         let client = Rc::new(ggemini::Client::new());
-
         // Listen for [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html) updates
         client.socket.connect_event({
-            let page = page.clone();
+            let p = page.clone();
             move |_, event, _, _| {
-                page.set_progress(match event {
+                let mut i = p.info.borrow_mut();
+                p.set_progress(match event {
                     // 0.1 reserved for handle begin
-                    SocketClientEvent::Resolving => 0.2,
-                    SocketClientEvent::Resolved => 0.3,
-                    SocketClientEvent::Connecting => 0.4,
-                    SocketClientEvent::Connected => 0.5,
-                    SocketClientEvent::ProxyNegotiating => 0.6,
-                    SocketClientEvent::ProxyNegotiated => 0.7,
+                    SocketClientEvent::Resolving => {
+                        i.add_event("Resolving".to_string());
+                        0.2
+                    }
+                    SocketClientEvent::Resolved => {
+                        i.add_event("Resolved".to_string());
+                        0.3
+                    }
+                    SocketClientEvent::Connecting => {
+                        i.add_event("Connecting".to_string());
+                        0.4
+                    }
+                    SocketClientEvent::Connected => {
+                        i.add_event("Connected".to_string());
+                        0.5
+                    }
+                    SocketClientEvent::ProxyNegotiating => {
+                        i.add_event("Proxy negotiating".to_string());
+                        0.6
+                    }
+                    SocketClientEvent::ProxyNegotiated => {
+                        i.add_event("Proxy negotiated".to_string());
+                        0.7
+                    }
                     // * `TlsHandshaking` | `TlsHandshaked` has effect only for guest connections!
-                    SocketClientEvent::TlsHandshaking => 0.8,
-                    SocketClientEvent::TlsHandshaked => 0.9,
-                    SocketClientEvent::Complete => 1.0,
-                    _ => todo!(), // alert on API change
+                    SocketClientEvent::TlsHandshaking => {
+                        i.add_event("TLS handshaking".to_string());
+                        0.8
+                    }
+                    SocketClientEvent::TlsHandshaked => {
+                        i.add_event("TLS handshaked".to_string());
+                        0.9
+                    }
+                    SocketClientEvent::Complete => {
+                        i.add_event("Complete".to_string());
+                        1.0
+                    }
+                    _ => panic!(), // alert on API change
                 })
             }
         });
-
         Self {
             client,
             redirects: Rc::new(Cell::new(0)),
@@ -73,7 +99,6 @@ impl Gemini {
         is_snap_history: bool,
     ) {
         use ggemini::client::connection::Request;
-
         match uri.scheme().as_str() {
             "gemini" => handle(
                 Request::Gemini { uri },
@@ -153,26 +178,27 @@ fn handle(
                 Ok((response, connection)) => match response {
                     // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
                     Response::Input(input) => {
-                        let title = input.to_string();
+                        let t = input.to_string();
                         page.set_progress(0.0);
-                        page.set_title(&title);
+                        page.set_title(&t);
                         if is_snap_history {
                             page.snap_history();
                         }
                         redirects.replace(0); // reset
+                        update_page_info(&page, &uri, "Done");
                         match input {
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
                             Input::Default { message } => page.input.set_new_response(
                                 page.item_action.clone(),
                                 uri,
-                                Some(message.as_ref().unwrap_or(&title)),
+                                Some(message.as_ref().unwrap_or(&t)),
                                 Some(1024),
                             ),
                             // https://geminiprotocol.net/docs/protocol-specification.gmi#status-11-sensitive-input
                             Input::Sensitive { message } => page.input.set_new_sensitive(
                                 page.item_action.clone(),
                                 uri,
-                                Some(message.as_ref().unwrap_or(&title)),
+                                Some(message.as_ref().unwrap_or(&t)),
                                 Some(1024),
                             )
                         }
@@ -181,7 +207,7 @@ fn handle(
                     Response::Success(success) => match *feature {
                         Feature::Download => {
                             // Init download widget
-                            let status = page.content.to_status_download(
+                            let s = page.content.to_status_download(
                                 crate::tool::uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
                                 // format FS entities
                                 &cancellable,
@@ -241,7 +267,7 @@ fn handle(
                                 },
                             );
                             page.set_progress(0.0);
-                            page.set_title(&status.title());
+                            page.set_title(&s.title());
                             if is_snap_history {
                                 page.snap_history();
                             }
@@ -260,13 +286,19 @@ fn handle(
                                     |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
                                     move |result| match result { // on complete
                                         Ok((memory_input_stream, total)) => memory_input_stream.read_all_async(
-                                            vec![0;total],
+                                            vec![0; total],
                                             Priority::DEFAULT,
                                             Some(&cancellable),
                                             move |result| match result {
                                                 Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
                                                     Ok(data) => {
-                                                        let widget = if matches!(*feature, Feature::Source) {
+                                                        let mut i = page.info.borrow_mut();
+                                                        i
+                                                            .add_event("Parsing".to_string())
+                                                            .set_mime(Some(success.mime().to_string()))
+                                                            .set_request(Some(uri.to_string()))
+                                                            .set_size(Some(data.len()));
+                                                        let w = if matches!(*feature, Feature::Source) {
                                                             page.content.to_text_source(data)
                                                         } else {
                                                             match success.mime() {
@@ -275,9 +307,10 @@ fn handle(
                                                                 _ => panic!() // unexpected
                                                             }
                                                         };
-                                                        page.search.set(Some(widget.text_view));
-                                                        page.set_title(&match widget.meta.title {
-                                                            Some(title) => title.into(), // @TODO
+                                                        i.add_event("Parsed".to_string());
+                                                        page.search.set(Some(w.text_view));
+                                                        page.set_title(&match w.meta.title {
+                                                            Some(t) => t.into(), // @TODO
                                                             None => crate::tool::uri_to_title(&uri),
                                                         });
                                                         page.set_progress(0.0);
@@ -289,39 +322,43 @@ fn handle(
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
+                                                        i.add_event("Done".to_string());
                                                     },
                                                     Err(e) => {
-                                                        let status = page.content.to_status_failure();
-                                                        status.set_description(Some(&e.to_string()));
+                                                        let s = page.content.to_status_failure();
+                                                        s.set_description(Some(&e.to_string()));
                                                         page.set_progress(0.0);
-                                                        page.set_title(&status.title());
+                                                        page.set_title(&s.title());
                                                         if is_snap_history {
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
+                                                        update_page_info(&page, &uri, "Done");
                                                     },
                                                 },
                                                 Err((_, e)) => {
-                                                    let status = page.content.to_status_failure();
-                                                    status.set_description(Some(&e.to_string()));
+                                                    let s = page.content.to_status_failure();
+                                                    s.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
-                                                    page.set_title(&status.title());
+                                                    page.set_title(&s.title());
                                                     if is_snap_history {
                                                         page.snap_history();
                                                     }
                                                     redirects.replace(0); // reset
+                                                    update_page_info(&page, &uri, "Done");
                                                 }
                                             }
                                         ),
                                         Err(e) => {
-                                            let status = page.content.to_status_failure();
-                                            status.set_description(Some(&e.to_string()));
+                                            let s = page.content.to_status_failure();
+                                            s.set_description(Some(&e.to_string()));
                                             page.set_progress(0.0);
-                                            page.set_title(&status.title());
+                                            page.set_title(&s.title());
                                             if is_snap_history {
                                                 page.snap_history();
                                             }
                                             redirects.replace(0); // reset
+                                            update_page_info(&page, &uri, "Done");
                                         },
                                     }
                                 )
@@ -357,11 +394,27 @@ fn handle(
                                                                 Ok(buffer) => {
                                                                     page.set_title(&crate::tool::uri_to_title(&uri));
                                                                     page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                                    {
+                                                                        let mut i = page.info.borrow_mut();
+                                                                        i
+                                                                            .add_event("Done".to_string())
+                                                                            .set_mime(Some(success.mime().to_string()))
+                                                                            .set_request(Some(uri.to_string()))
+                                                                            .set_size(Some(buffer.byte_length()));
+                                                                    }
                                                                 }
                                                                 Err(e) => {
-                                                                    let status = page.content.to_status_failure();
-                                                                    status.set_description(Some(e.message()));
-                                                                    page.set_title(&status.title());
+                                                                    let s = page.content.to_status_failure();
+                                                                    s.set_description(Some(e.message()));
+                                                                    page.set_title(&s.title());
+                                                                    {
+                                                                        let mut i = page.info.borrow_mut();
+                                                                        i
+                                                                            .add_event("Done".to_string())
+                                                                            .set_mime(Some(success.mime().to_string()))
+                                                                            .set_request(Some(uri.to_string()))
+                                                                            .set_size(None);
+                                                                    }
                                                                 }
                                                             }
                                                             page.set_progress(0.0);
@@ -373,14 +426,22 @@ fn handle(
                                                     )
                                                 }
                                                 Err(e) => {
-                                                    let status = page.content.to_status_failure();
-                                                    status.set_description(Some(&e.to_string()));
+                                                    let s = page.content.to_status_failure();
+                                                    s.set_description(Some(&e.to_string()));
                                                     page.set_progress(0.0);
-                                                    page.set_title(&status.title());
+                                                    page.set_title(&s.title());
                                                     if is_snap_history {
                                                         page.snap_history();
                                                     }
                                                     redirects.replace(0); // reset
+                                                    {
+                                                        let mut i = page.info.borrow_mut();
+                                                        i
+                                                            .add_event("Done".to_string())
+                                                            .set_mime(Some(success.mime().to_string()))
+                                                            .set_request(Some(uri.to_string()))
+                                                            .set_size(None);
+                                                    }
                                                 }
                                             }
                                         }
@@ -388,16 +449,24 @@ fn handle(
                                 )
                             }
                             mime => {
-                                let status = page
+                                let s = page
                                     .content
                                     .to_status_mime(mime, Some((&page.item_action, &uri)));
-                                status.set_description(Some(&format!("Content type `{mime}` yet not supported")));
+                                s.set_description(Some(&format!("Content type `{mime}` yet not supported")));
                                 page.set_progress(0.0);
-                                page.set_title(&status.title());
+                                page.set_title(&s.title());
                                 if is_snap_history {
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
+                                {
+                                    let mut i = page.info.borrow_mut();
+                                    i
+                                        .add_event("Done".to_string())
+                                        .set_mime(Some(mime.to_string()))
+                                        .set_request(Some(uri.to_string()))
+                                        .set_size(None);
+                                }
                             },
                         }
                     },
@@ -410,49 +479,63 @@ fn handle(
                             // > Client MUST limit the number of redirections they follow to 5 redirections
                             // > https://geminiprotocol.net/docs/protocol-specification.gmi#redirection
                             if total > 5 {
-                                let status = page.content.to_status_failure();
-                                status.set_description(Some("Redirection limit reached"));
+                                let s = page.content.to_status_failure();
+                                s.set_description(Some("Redirection limit reached"));
                                 page.set_progress(0.0);
-                                page.set_title(&status.title());
+                                page.set_title(&s.title());
                                 redirects.replace(0); // reset
+                                update_page_info(&page, &uri, "Done");
                             // Disallow external redirection by default as potentially unsafe
                             // even not specified, require follow confirmation @TODO optional
                             } else if uri.host() != target.host() {
-                                let url = target.to_string();
-                                let status = page.content.to_status_failure();
-                                let title = "External redirection";
-                                status.set_title(title);
-                                status.set_icon_name(Some("dialog-warning-symbolic"));
-                                status.set_description(Some(&url));
-                                status.set_child(Some(&{
-                                    let button = gtk::Button::builder()
+                                let u = target.to_string();
+                                let s = page.content.to_status_failure();
+                                let t = "External redirection";
+                                s.set_title(t);
+                                s.set_icon_name(Some("dialog-warning-symbolic"));
+                                s.set_description(Some(&u));
+                                s.set_child(Some(&{
+                                    let b = gtk::Button::builder()
                                         .css_classes(["suggested-action"])
                                         .halign(gtk::Align::Center)
                                         .label("Follow")
                                         .build();
-                                    button.connect_clicked({
-                                        let page = page.clone();
-                                        move |_| page.item_action.load.activate(Some(&url), false)
+                                    b.connect_clicked({
+                                        let p = page.clone();
+                                        move |_| p.item_action.load.activate(Some(&u), false)
                                     });
-                                    button
+                                    b
                                 }));
                                 page.set_progress(0.0);
-                                page.set_title(title);
+                                page.set_title(t);
                                 redirects.replace(0); // reset
+                                update_page_info(&page, &uri, "Done");
                             } else {
+                                let t = target.to_string();
                                 if matches!(redirect, Redirect::Permanent { .. }) {
-                                    page.navigation.set_request(&target.to_string());
+                                    page.navigation.set_request(&t);
                                 }
                                 redirects.replace(total);
-                                page.item_action.load.activate(Some(&target.to_string()), false);
+                                {
+                                    let mut i = page.info.take();
+                                    i
+                                        .add_event("Done".to_string())
+                                        .set_mime(None)
+                                        .set_request(Some(uri.to_string()))
+                                        .set_size(None);
+
+                                    page.info.replace(i.into_redirect());
+                                }
+                                page.item_action.load.activate(Some(&t), false);
                             }
                         }
                         Err(e) => {
-                            let status = page.content.to_status_failure();
-                            status.set_description(Some(&e.to_string()));
+                            let s = page.content.to_status_failure();
+                            s.set_description(Some(&e.to_string()));
                             page.set_progress(0.0);
-                            page.set_title(&status.title());
+                            page.set_title(&s.title());
                             redirects.replace(0); // reset
+                            update_page_info(&page, &uri, "Done");
                         }
                     }
                     Response::Certificate(ref certificate) => match certificate {
@@ -462,14 +545,15 @@ fn handle(
                         Certificate::NotAuthorized { message } |
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
                         Certificate::NotValid { message } => {
-                            let status = page.content.to_status_identity();
-                            status.set_description(Some(message.as_ref().unwrap_or(&certificate.to_string())));
+                            let s = page.content.to_status_identity();
+                            s.set_description(Some(message.as_ref().unwrap_or(&certificate.to_string())));
                             page.set_progress(0.0);
-                            page.set_title(&status.title());
+                            page.set_title(&s.title());
                             if is_snap_history {
                                 page.snap_history();
                             }
                             redirects.replace(0); // reset
+                            update_page_info(&page, &uri, "Done");
                         }
                     }
                     Response::Failure(failure) => match failure {
@@ -479,14 +563,15 @@ fn handle(
                             Temporary::ProxyError { message } |
                             Temporary::ServerUnavailable { message } |
                             Temporary::SlowDown { message } => {
-                                let status = page.content.to_status_failure();
-                                status.set_description(Some(message.as_ref().unwrap_or(&temporary.to_string())));
+                                let s = page.content.to_status_failure();
+                                s.set_description(Some(message.as_ref().unwrap_or(&temporary.to_string())));
                                 page.set_progress(0.0);
-                                page.set_title(&status.title());
+                                page.set_title(&s.title());
                                 if is_snap_history {
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
+                                update_page_info(&page, &uri, "Done");
                                 if let Some(callback) = on_failure {
                                     callback()
                                 }
@@ -498,14 +583,15 @@ fn handle(
                             Permanent::Gone { message } |
                             Permanent::NotFound { message } |
                             Permanent::ProxyRequestRefused { message } => {
-                                let status = page.content.to_status_failure();
-                                status.set_description(Some(message.as_ref().unwrap_or(&permanent.to_string())));
+                                let s = page.content.to_status_failure();
+                                s.set_description(Some(message.as_ref().unwrap_or(&permanent.to_string())));
                                 page.set_progress(0.0);
-                                page.set_title(&status.title());
+                                page.set_title(&s.title());
                                 if is_snap_history {
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
+                                update_page_info(&page, &uri, "Done");
                                 if let Some(callback) = on_failure {
                                     callback()
                                 }
@@ -514,16 +600,26 @@ fn handle(
                     }
                 }
                 Err(e) => {
-                    let status = page.content.to_status_failure();
-                    status.set_description(Some(&e.to_string()));
+                    let s = page.content.to_status_failure();
+                    s.set_description(Some(&e.to_string()));
                     page.set_progress(0.0);
-                    page.set_title(&status.title());
+                    page.set_title(&s.title());
                     if is_snap_history {
                         page.snap_history();
                     }
                     redirects.replace(0); // reset
+                    update_page_info(&page, &uri, "Done")
                 }
             }
         },
     )
+}
+
+/// Apply common page info pattern
+fn update_page_info(page: &Page, uri: &Uri, event_name: &str) {
+    let mut i = page.info.borrow_mut();
+    i.add_event(event_name.to_string())
+        .set_mime(None)
+        .set_request(Some(uri.to_string()))
+        .set_size(None);
 }
