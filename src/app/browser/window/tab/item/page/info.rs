@@ -13,6 +13,9 @@ use gtk::gio::NetworkAddress;
 pub struct Info {
     /// Hold page events like connection phase and parsing time
     event: Vec<Event>,
+    /// Mark holder as deprecated on handle begin
+    /// * useful on some driver does not update status properly
+    is_deprecated: bool,
     /// Page content type
     mime: Option<String>,
     /// Hold redirections chain with handled details
@@ -34,6 +37,7 @@ impl Info {
     pub fn new() -> Self {
         Self {
             event: Vec::with_capacity(50), // estimated max events quantity for all drivers
+            is_deprecated: false,
             mime: None,
             redirect: None,
             remote: None,
@@ -42,8 +46,16 @@ impl Info {
         }
     }
 
+    // Actions
+
+    /// Mark `Self` as deprecated
+    /// * tip: usually called on page handler begin
+    pub fn deprecate(&mut self) {
+        self.is_deprecated = true;
+    }
+
     // Setters
-    // useful to update `Self` as chain of values
+    // * useful to update `Self` as chain of values
 
     /// Take `Self`, convert it into the redirect member,
     /// then, return new `Self` back
@@ -56,26 +68,31 @@ impl Info {
 
     pub fn add_event(&mut self, name: String) -> &mut Self {
         self.event.push(Event::now(name));
+        self.is_deprecated = false;
         self
     }
 
     pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
         self.mime = mime;
+        self.is_deprecated = false;
         self
     }
 
     pub fn set_remote(&mut self, remote: Option<NetworkAddress>) -> &mut Self {
         self.remote = remote;
+        self.is_deprecated = false;
         self
     }
 
     pub fn set_request(&mut self, request: Option<String>) -> &mut Self {
         self.request = request;
+        self.is_deprecated = false;
         self
     }
 
     pub fn set_size(&mut self, size: Option<usize>) -> &mut Self {
         self.size = size;
+        self.is_deprecated = false;
         self
     }
 }

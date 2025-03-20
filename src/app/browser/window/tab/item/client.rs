@@ -37,6 +37,9 @@ impl Client {
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
+        // Deprecate page info but keep it data as is
+        self.page.info.borrow_mut().deprecate();
+
         // Move focus out from navigation entry @TODO
         self.page.browser_action.escape.activate(None);
 
