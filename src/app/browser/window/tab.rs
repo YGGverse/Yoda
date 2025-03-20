@@ -3,7 +3,7 @@ mod database;
 mod item;
 mod menu;
 
-use super::{Action as WindowAction, BrowserAction, Position};
+use super::{Action as WindowAction, Position};
 use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
@@ -17,7 +17,6 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
 
 // Main
 pub struct Tab {
-    browser_action: Rc<BrowserAction>,
     window_action: Rc<WindowAction>,
     profile: Arc<Profile>,
     index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
@@ -29,10 +28,7 @@ impl Tab {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(
-        profile: &Arc<Profile>,
-        (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-    ) -> Self {
+    pub fn build(profile: &Arc<Profile>, window_action: &Rc<WindowAction>) -> Self {
         let action = Rc::new(Action::new());
 
         // Init empty HashMap index
@@ -126,7 +122,6 @@ impl Tab {
         // Return activated `Self`
         Self {
             profile: profile.clone(),
-            browser_action: browser_action.clone(),
             window_action: window_action.clone(),
             index,
             tab_view,
@@ -152,7 +147,7 @@ impl Tab {
             (&tab_page, &target_child),
             &self.profile,
             // Actions
-            (&self.browser_action, &self.window_action, &self.action),
+            (&self.window_action, &self.action),
             // Options
             request,
             is_load,
@@ -213,13 +208,6 @@ impl Tab {
         while let Some(page) = self.tab_view.selected_page() {
             self.tab_view.set_page_pinned(&page, false);
             self.tab_view.close_page(&page);
-        }
-    }
-
-    // Toggle escape action for specified or current item
-    pub fn escape(&self) {
-        if let Some(item) = self.item(None) {
-            item.page.escape();
         }
     }
 
@@ -317,7 +305,7 @@ impl Tab {
                     (&tab_page, &target_child),
                     &self.profile,
                     // Actions
-                    (&self.browser_action, &self.window_action, &self.action),
+                    (&self.window_action, &self.action),
                     // Options
                     None,
                     false,

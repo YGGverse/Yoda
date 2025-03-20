@@ -1,17 +1,15 @@
 mod about;
 mod close;
 mod debug;
-mod escape;
 mod profile;
 
 use about::About;
 use close::Close;
 use debug::Debug;
-use escape::Escape;
 use profile::Profile;
 
 use gtk::{
-    gio::{SimpleAction, SimpleActionGroup},
+    gio::SimpleActionGroup,
     glib::{GString, uuid_string_random},
     prelude::ActionMapExt,
 };
@@ -23,7 +21,6 @@ pub struct Action {
     pub about: Rc<About>,
     pub close: Rc<Close>,
     pub debug: Rc<Debug>,
-    pub escape: SimpleAction,
     pub profile: Rc<Profile>,
     // Group
     pub id: GString,
@@ -45,7 +42,6 @@ impl Action {
         let about = Rc::new(About::new());
         let close = Rc::new(Close::new());
         let debug = Rc::new(Debug::new());
-        let escape = SimpleAction::escape();
         let profile = Rc::new(Profile::new());
 
         // Generate unique group ID
@@ -58,7 +54,6 @@ impl Action {
         simple_action_group.add_action(&about.simple_action);
         simple_action_group.add_action(&close.simple_action);
         simple_action_group.add_action(&debug.simple_action);
-        simple_action_group.add_action(&escape);
         simple_action_group.add_action(&profile.simple_action);
 
         // Done
@@ -66,7 +61,6 @@ impl Action {
             about,
             close,
             debug,
-            escape,
             profile,
             id,
             simple_action_group,

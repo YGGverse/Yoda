@@ -7,7 +7,7 @@ use feature::Feature;
 use gtk::{
     gio::Cancellable,
     glib::{Uri, UriFlags},
-    prelude::{ActionExt, CancellableExt},
+    prelude::CancellableExt,
 };
 use std::{cell::Cell, rc::Rc, sync::Arc};
 
@@ -37,11 +37,10 @@ impl Client {
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
     pub fn handle(&self, request: &str, is_snap_history: bool) {
+        self.page.escape();
+
         // Deprecate page info but keep it data as is
         self.page.info.borrow_mut().deprecate();
-
-        // Move focus out from navigation entry @TODO
-        self.page.browser_action.escape.activate(None);
 
         // Initially disable find action
         self.page

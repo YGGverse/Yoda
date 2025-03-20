@@ -3,7 +3,7 @@ mod client;
 mod database;
 mod page;
 
-use super::{Action as TabAction, BrowserAction, WindowAction};
+use super::{Action as TabAction, WindowAction};
 use crate::Profile;
 use action::Action;
 use adw::TabPage;
@@ -33,11 +33,7 @@ impl Item {
     pub fn build(
         (tab_page, target_child): (&TabPage, &Box),
         profile: &Arc<Profile>,
-        (browser_action, window_action, tab_action): (
-            &Rc<BrowserAction>,
-            &Rc<WindowAction>,
-            &Rc<TabAction>,
-        ),
+        (window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>),
         request: Option<&str>,
         is_load: bool,
     ) -> Self {
@@ -59,7 +55,7 @@ impl Item {
         // Create new `Page` implementation for `TabPage`
         let page = Rc::new(Page::build(
             profile,
-            (browser_action, window_action, tab_action, &action),
+            (window_action, tab_action, &action),
             tab_page,
         ));
 

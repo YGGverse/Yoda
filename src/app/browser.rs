@@ -76,15 +76,6 @@ impl Browser {
             }
         });
 
-        action.escape.connect_activate({
-            let widget = widget.clone();
-            let window = window.clone();
-            move |_, _| {
-                window.escape();
-                widget.application_window.set_focus(gtk::Window::NONE);
-            }
-        });
-
         action.profile.connect_activate({
             let profile = profile.clone();
             move || {

@@ -150,10 +150,6 @@ impl App {
                 ),
                 ["<Primary>i"],
             ),
-            (
-                format!("{}.{}", browser.action.id, browser.action.escape.name()),
-                ["Escape"],
-            ),
             // Tab actions
             (
                 format!(

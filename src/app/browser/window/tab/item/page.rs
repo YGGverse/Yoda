@@ -5,10 +5,11 @@ mod input;
 mod navigation;
 mod search;
 
-use super::{Action as ItemAction, BrowserAction, Profile, TabAction, WindowAction};
+use super::{Action as ItemAction, Profile, TabAction, WindowAction};
 use adw::TabPage;
 use anyhow::Result;
 use content::Content;
+use gtk::prelude::WidgetExt;
 use info::Info;
 use input::Input;
 use navigation::Navigation;
@@ -19,7 +20,6 @@ use std::{cell::RefCell, rc::Rc, sync::Arc};
 pub struct Page {
     pub profile: Arc<Profile>,
     // Actions
-    pub browser_action: Rc<BrowserAction>,
     pub item_action: Rc<ItemAction>,
     pub window_action: Rc<WindowAction>,
     // Components
@@ -42,8 +42,7 @@ impl Page {
 
     pub fn build(
         profile: &Arc<Profile>,
-        (browser_action, window_action, tab_action, item_action): (
-            &Rc<BrowserAction>,
+        (window_action, tab_action, item_action): (
             &Rc<WindowAction>,
             &Rc<TabAction>,
             &Rc<ItemAction>,
@@ -65,7 +64,6 @@ impl Page {
             profile: profile.clone(),
             tab_page: tab_page.clone(),
             // Actions
-            browser_action: browser_action.clone(),
             item_action: item_action.clone(),
             window_action: window_action.clone(),
             // Components
@@ -86,8 +84,14 @@ impl Page {
 
     /// Request `Escape` action for all page components
     pub fn escape(&self) {
+        use gtk::prelude::RootExt;
         self.search.hide();
         self.navigation.escape();
+        self.content
+            .g_box
+            .root()
+            .unwrap()
+            .set_focus(gtk::Window::NONE);
     }
 
     /// Toggle `Find` widget

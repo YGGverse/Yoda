@@ -49,6 +49,22 @@ impl Search {
         g_box.append(&placeholder.label);
         g_box.append(&close);
 
+        // Hide widget on `Escape` key pressed
+        g_box.add_controller({
+            use gtk::{gdk::Key, glib::Propagation};
+            let c = gtk::EventControllerKey::new();
+            c.connect_key_pressed({
+                let g_box = g_box.clone();
+                move |_, k, _, _| {
+                    if k == Key::Escape {
+                        g_box.set_visible(false)
+                    }
+                    Propagation::Stop
+                }
+            });
+            c
+        });
+
         // Connect events
         close.connect_clicked({
             let form = form.clone();

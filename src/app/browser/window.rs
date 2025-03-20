@@ -29,7 +29,7 @@ impl Window {
         let action = Rc::new(Action::new());
 
         // Init components
-        let tab = Rc::new(Tab::build(profile, (browser_action, &action)));
+        let tab = Rc::new(Tab::build(profile, &action));
 
         // Init events
         action.append.connect_activate({
@@ -131,9 +131,6 @@ impl Window {
     }
 
     // Actions
-    pub fn escape(&self) {
-        self.tab.escape();
-    }
 
     pub fn clean(&self, transaction: &Transaction, app_browser_id: i64) -> Result<()> {
         for record in database::select(transaction, app_browser_id)? {
