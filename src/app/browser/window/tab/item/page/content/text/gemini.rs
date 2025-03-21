@@ -49,8 +49,8 @@ impl Gemini {
         // * maybe less expensive than update entire HashMap by iter
         let hover: Rc<Cell<Option<TextTag>>> = Rc::new(Cell::new(None));
 
-        // Init multiline code builder features
-        let mut multiline = None;
+        // Init code features
+        let mut code = None;
 
         // Init quote icon feature
         let mut is_line_after_quote = false;
@@ -93,15 +93,13 @@ impl Gemini {
         // Init gutter widget (the tooltip on URL tags hover)
         let gutter = Gutter::build(&text_view);
 
-        // Disable multiline format on at least one closing tag not found
+        // Disable code format on at least one closing tag not found
         // gemini://bbs.geminispace.org/s/Gemini/26031
-        let is_multiline_enabled = {
+        let is_code_enabled = {
             use ggemtext::line::code::{self};
             let mut t: usize = 0;
             for l in gemtext.lines() {
-                if (l.starts_with(code::TAG) || l.ends_with(code::TAG))
-                    && code::inline::Gemtext::as_value(l).is_none()
-                {
+                if l.starts_with(code::TAG) {
                     t += 1;
                 }
             }
@@ -110,67 +108,26 @@ impl Gemini {
 
         // Parse gemtext lines
         for line in gemtext.lines() {
-            // Is inline code
-            {
-                if let Some(code) = ggemtext::line::code::inline::Gemtext::as_value(line) {
-                    // Try auto-detect code syntax for given `value` @TODO optional
-                    match syntax.highlight(code, None) {
-                        Ok(highlight) => {
-                            for (syntax_tag, entity) in highlight {
-                                // Register new tag
-                                if !tag.text_tag_table.add(&syntax_tag) {
-                                    todo!()
-                                }
-                                // Append tag to buffer
-                                buffer.insert_with_tags(
-                                    &mut buffer.end_iter(),
-                                    &entity,
-                                    &[&syntax_tag],
-                                );
-                            }
-                        }
-                        Err(_) => {
-                            // Try ANSI/SGR format (terminal emulation) @TODO optional
-                            for (ansi_tag, entity) in ansi::format(code) {
-                                // Register new tag
-                                if !tag.text_tag_table.add(&ansi_tag) {
-                                    todo!()
-                                }
-                                // Append tag to buffer
-                                buffer.insert_with_tags(
-                                    &mut buffer.end_iter(),
-                                    &entity,
-                                    &[&ansi_tag],
-                                );
-                            }
-                        } // @TODO handle
-                    }
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                    continue;
-                }
-            }
-
-            // Is multiline code
-            if is_multiline_enabled {
-                use ggemtext::line::code::Multiline;
-                match multiline {
+            if is_code_enabled {
+                use ggemtext::line::Code;
+                match code {
                     None => {
                         // Open tag found
-                        if let Some(code) = Multiline::begin_from(line) {
+                        if let Some(c) = Code::begin_from(line) {
                             // Begin next lines collection into the code buffer
-                            multiline = Some(code);
+                            code = Some(c);
 
                             // Skip other actions for this line
                             continue;
                         }
                     }
-                    Some(ref mut this) => {
-                        match Multiline::continue_from(this, line) {
+                    Some(ref mut c) => {
+                        match c.continue_from(line) {
                             Ok(()) => {
                                 // Close tag found:
-                                if this.completed {
+                                if c.is_completed {
                                     // Is alt provided
-                                    let alt = match this.alt {
+                                    let alt = match c.alt {
                                         Some(ref alt) => {
                                             // Insert alt value to the main buffer
                                             buffer.insert_with_tags(
@@ -190,7 +147,7 @@ impl Gemini {
 
                                     // Begin code block construction
                                     // Try auto-detect code syntax for given `value` and `alt` @TODO optional
-                                    match syntax.highlight(&this.value, alt) {
+                                    match syntax.highlight(&c.value, alt) {
                                         Ok(highlight) => {
                                             for (syntax_tag, entity) in highlight {
                                                 // Register new tag
@@ -207,7 +164,7 @@ impl Gemini {
                                         }
                                         Err(_) => {
                                             // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                            for (syntax_tag, entity) in ansi::format(&this.value) {
+                                            for (syntax_tag, entity) in ansi::format(&c.value) {
                                                 // Register new tag
                                                 if !tag.text_tag_table.add(&syntax_tag) {
                                                     todo!()
@@ -223,7 +180,7 @@ impl Gemini {
                                     }
 
                                     // Reset
-                                    multiline = None;
+                                    code = None;
                                 }
 
                                 // Skip other actions for this line
@@ -465,7 +422,7 @@ impl Gemini {
         }); // @TODO may be expensive for CPU, add timeout?
 
         // Result
-        if is_multiline_enabled {
+        if is_code_enabled {
             Ok(Self { text_view, title })
         } else {
             Err(Error::Markup(

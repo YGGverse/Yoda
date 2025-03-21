@@ -32,7 +32,7 @@ version = "0.9.1"
 ansi-parser = "0.9.1"
 anyhow = "1.0.97"
 ggemini = "0.17.3"
-ggemtext = "0.5.0"
+ggemtext = "0.6.0"
 indexmap = "2.7.0"
 itertools = "0.14.0"
 libspelling = "0.3.0"
@@ -45,5 +45,5 @@ syntect = "5.2.0"
 # development
 [patch.crates-io]
 ggemini = { git = "https://github.com/YGGverse/ggemini.git" }
-# ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }
+ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }
 # plurify = { git = "https://github.com/YGGverse/plurify.git" }
