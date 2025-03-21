@@ -91,60 +91,62 @@ impl Request {
         });
 
         entry.connect_icon_release({
-            let profile = profile.clone();
-            move |this, position| match position {
+            let p = profile.clone();
+            move |e, position| match position {
                 EntryIconPosition::Primary => {
-                    if matches!(primary_icon::from(&this.text()), PrimaryIcon::Search { .. }) {
-                        show_search_dialog(this, &profile)
+                    if matches!(primary_icon::from(&e.text()), PrimaryIcon::Search { .. }) {
+                        show_search_dialog(e, &p)
                     } else {
-                        show_identity_dialog(this, &profile)
+                        show_identity_dialog(e, &p)
                     }
                 }
-                EntryIconPosition::Secondary => this.emit_activate(),
+                EntryIconPosition::Secondary => e.emit_activate(),
                 _ => todo!(), // unexpected
             }
         });
 
-        entry.connect_has_focus_notify(|this| update_secondary_icon(this, false));
+        entry.connect_has_focus_notify({
+            let i = info.clone();
+            move |e| update_secondary_icon(e, &i.borrow())
+        });
 
         suggestion
             .signal_handler_id
             .borrow_mut()
             .replace(entry.connect_changed({
-                let profile = profile.clone();
-                let item_action = item_action.clone();
-                let suggestion = suggestion.clone();
-                move |this| {
+                let a = item_action.clone();
+                let i = info.clone();
+                let p = profile.clone();
+                let s = suggestion.clone();
+                move |e| {
                     // Update actions
-                    item_action.reload.set_enabled(!this.text().is_empty());
-                    item_action.home.set_enabled(home(this).is_some());
-
+                    a.reload.set_enabled(!e.text().is_empty());
+                    a.home.set_enabled(home(e).is_some());
                     // Update icons
-                    update_primary_icon(this, &profile);
-                    update_secondary_icon(this, false);
-
+                    update_primary_icon(e, &p);
+                    update_secondary_icon(e, &i.borrow());
                     // Show search suggestions
-                    if this.focus_child().is_some() {
-                        suggestion.update(Some(50)); // @TODO optional
+                    if e.focus_child().is_some() {
+                        s.update(Some(50)); // @TODO optional
                     }
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
 
         entry.connect_activate({
-            let item_action = item_action.clone();
-            let suggestion = suggestion.clone();
+            let a = item_action.clone();
+            let s = suggestion.clone();
             move |_| {
                 use gtk::prelude::ActionExt;
-                item_action.reload.activate(None);
-                suggestion.hide();
+                a.reload.activate(None);
+                s.hide();
             }
         });
 
         entry.connect_has_focus_notify({
-            let suggestion = suggestion.clone();
+            let s = suggestion.clone();
             move |_| {
-                if suggestion.is_visible() {
-                    suggestion.hide()
+                if s.is_visible() {
+                    s.hide()
                 }
             }
         });
@@ -336,12 +338,12 @@ fn is_focused(entry: &Entry) -> bool {
 /// Secondary icon has two modes:
 /// * navigate to the location button (on the entry is focused / has edit mode)
 /// * page info button with dialog window activation (on the entry is inactive)
-fn update_secondary_icon(entry: &Entry, has_info: bool) {
+fn update_secondary_icon(entry: &Entry, info: &Info) {
     if is_focused(entry) {
         entry.set_secondary_icon_name(Some("pan-end-symbolic"));
         entry.set_secondary_icon_tooltip_text(Some("Go to the location"))
     } else {
-        if has_info {
+        if !info.is_deprecated() && info.matches(&entry.text()) {
             entry.set_secondary_icon_name(Some("help-about-symbolic"));
             entry.set_secondary_icon_tooltip_text(Some("Page info"));
         } else {
