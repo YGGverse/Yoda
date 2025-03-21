@@ -95,6 +95,16 @@ impl Info {
         self.is_deprecated = false;
         self
     }
+
+    // Getters
+
+    pub fn matches(&self, request: &str) -> bool {
+        self.request.as_ref().is_some_and(|r| r == request)
+    }
+
+    pub fn is_deprecated(&self) -> bool {
+        self.is_deprecated
+    }
 }
 
 impl Default for Info {
