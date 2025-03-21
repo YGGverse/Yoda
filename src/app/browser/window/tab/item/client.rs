@@ -40,7 +40,7 @@ impl Client {
         self.page.escape();
 
         // Deprecate page info but keep it data as is
-        self.page.info.borrow_mut().deprecate();
+        self.page.navigation.request.info.borrow_mut().deprecate();
 
         // Initially disable find action
         self.page

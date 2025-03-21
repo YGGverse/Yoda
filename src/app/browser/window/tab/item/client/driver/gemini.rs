@@ -38,7 +38,7 @@ impl Gemini {
         client.socket.connect_event({
             let p = page.clone();
             move |_, event, _, _| {
-                let mut i = p.info.borrow_mut();
+                let mut i = p.navigation.request.info.borrow_mut();
                 p.set_progress(match event {
                     // 0.1 reserved for handle begin
                     SocketClientEvent::Resolving => {
@@ -293,7 +293,7 @@ fn handle(
                                             move |result| match result {
                                                 Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
                                                     Ok(data) => {
-                                                        let mut i = page.info.borrow_mut();
+                                                        let mut i = page.navigation.request.info.borrow_mut();
                                                         i
                                                             .add_event("Parsing".to_string())
                                                             .set_mime(Some(success.mime().to_string()))
@@ -396,7 +396,7 @@ fn handle(
                                                                     page.set_title(&crate::tool::uri_to_title(&uri));
                                                                     page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                     {
-                                                                        let mut i = page.info.borrow_mut();
+                                                                        let mut i = page.navigation.request.info.borrow_mut();
                                                                         i
                                                                             .add_event(EVENT_COMPLETED.to_string())
                                                                             .set_mime(Some(success.mime().to_string()))
@@ -409,7 +409,7 @@ fn handle(
                                                                     s.set_description(Some(e.message()));
                                                                     page.set_title(&s.title());
                                                                     {
-                                                                        let mut i = page.info.borrow_mut();
+                                                                        let mut i = page.navigation.request.info.borrow_mut();
                                                                         i
                                                                             .add_event(EVENT_COMPLETED.to_string())
                                                                             .set_mime(Some(success.mime().to_string()))
@@ -436,7 +436,7 @@ fn handle(
                                                     }
                                                     redirects.replace(0); // reset
                                                     {
-                                                        let mut i = page.info.borrow_mut();
+                                                        let mut i = page.navigation.request.info.borrow_mut();
                                                         i
                                                             .add_event(EVENT_COMPLETED.to_string())
                                                             .set_mime(Some(success.mime().to_string()))
@@ -461,7 +461,7 @@ fn handle(
                                 }
                                 redirects.replace(0); // reset
                                 {
-                                    let mut i = page.info.borrow_mut();
+                                    let mut i = page.navigation.request.info.borrow_mut();
                                     i
                                         .add_event(EVENT_COMPLETED.to_string())
                                         .set_mime(Some(mime.to_string()))
@@ -518,14 +518,14 @@ fn handle(
                                 }
                                 redirects.replace(total);
                                 {
-                                    let mut i = page.info.take();
+                                    let mut i = page.navigation.request.info.take();
                                     i
                                         .add_event(EVENT_COMPLETED.to_string())
                                         .set_mime(None)
                                         .set_request(Some(uri.to_string()))
                                         .set_size(None);
 
-                                    page.info.replace(i.into_redirect());
+                                    page.navigation.request.info.replace(i.into_redirect());
                                 }
                                 page.item_action.load.activate(Some(&t), false);
                             }
@@ -618,7 +618,7 @@ fn handle(
 
 /// Apply common page info pattern
 fn update_page_info(page: &Page, uri: &Uri, event_name: &str) {
-    let mut i = page.info.borrow_mut();
+    let mut i = page.navigation.request.info.borrow_mut();
     i.add_event(event_name.to_string())
         .set_mime(None)
         .set_request(Some(uri.to_string()))

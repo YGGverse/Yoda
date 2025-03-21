@@ -24,7 +24,7 @@ const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
 
 pub struct Navigation {
-    request: Rc<Request>,
+    pub request: Rc<Request>,
     bookmark: Rc<Bookmark>,
     pub g_box: Box,
 }

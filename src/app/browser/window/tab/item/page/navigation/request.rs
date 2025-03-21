@@ -1,5 +1,6 @@
 mod database;
 mod identity;
+mod info;
 mod primary_icon;
 mod search;
 mod suggestion;
@@ -12,9 +13,14 @@ use gtk::{
     glib::{GString, Uri, UriFlags, gformat},
     prelude::{EditableExt, EntryExt, WidgetExt},
 };
+use info::Info;
 use primary_icon::PrimaryIcon;
 use sqlite::Transaction;
-use std::{cell::Cell, rc::Rc, sync::Arc};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+    sync::Arc,
+};
 use suggestion::Suggestion;
 
 const PREFIX_DOWNLOAD: &str = "download:";
@@ -22,6 +28,7 @@ const PREFIX_SOURCE: &str = "source:";
 
 pub struct Request {
     pub entry: Entry,
+    pub info: Rc<RefCell<Info>>,
     suggestion: Rc<Suggestion>,
     profile: Arc<Profile>,
 }
@@ -31,6 +38,9 @@ impl Request {
 
     /// Build new `Self`
     pub fn build(item_action: &Rc<ItemAction>, profile: &Arc<Profile>) -> Self {
+        // Init components
+        let info = Rc::new(RefCell::new(Info::new()));
+
         // Init main widget
         let entry = Entry::builder()
             .placeholder_text("URL or search term...")
@@ -95,7 +105,7 @@ impl Request {
             }
         });
 
-        entry.connect_has_focus_notify(update_secondary_icon);
+        entry.connect_has_focus_notify(|this| update_secondary_icon(this, false));
 
         suggestion
             .signal_handler_id
@@ -111,7 +121,7 @@ impl Request {
 
                     // Update icons
                     update_primary_icon(this, &profile);
-                    update_secondary_icon(this);
+                    update_secondary_icon(this, false);
 
                     // Show search suggestions
                     if this.focus_child().is_some() {
@@ -162,6 +172,7 @@ impl Request {
 
         Self {
             entry,
+            info,
             suggestion,
             profile: profile.clone(),
         }
@@ -325,13 +336,18 @@ fn is_focused(entry: &Entry) -> bool {
 /// Secondary icon has two modes:
 /// * navigate to the location button (on the entry is focused / has edit mode)
 /// * page info button with dialog window activation (on the entry is inactive)
-fn update_secondary_icon(entry: &Entry) {
+fn update_secondary_icon(entry: &Entry, has_info: bool) {
     if is_focused(entry) {
         entry.set_secondary_icon_name(Some("pan-end-symbolic"));
         entry.set_secondary_icon_tooltip_text(Some("Go to the location"))
     } else {
-        entry.set_secondary_icon_name(Some("help-about-symbolic"));
-        entry.set_secondary_icon_tooltip_text(Some("Page info"));
+        if has_info {
+            entry.set_secondary_icon_name(Some("help-about-symbolic"));
+            entry.set_secondary_icon_tooltip_text(Some("Page info"));
+        } else {
+            entry.set_secondary_icon_name(None);
+            entry.set_secondary_icon_tooltip_text(None);
+        }
         entry.select_region(0, 0);
     }
 }
