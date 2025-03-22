@@ -226,7 +226,7 @@ To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-CODE
 ### Geo-location
 
 To enable geo-location features, get official IP database from [MaxMind](https://www.maxmind.com)\
-then copy following files into the app `config` folder (available from menu)
+then copy following files into the `config` folder (available from menu)
 
 * `GeoLite2-Country.mmdb`
 * `GeoLite2-City.mmdb` (not implemented yet)
