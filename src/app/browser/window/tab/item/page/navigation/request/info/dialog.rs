@@ -1,7 +1,7 @@
 use super::Info;
 use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
-    prelude::{PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
+    prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
 
 pub trait Dialog {
@@ -55,27 +55,43 @@ impl Dialog for PreferencesDialog {
         });
         if info.redirect.is_some() {
             d.add(&{
-                // collect redirections into the vector,
-                // to reverse chain before add its members to widget
-                // * capacity optimized for Gemini protocol (as default)
-                let mut v = Vec::with_capacity(5);
-
                 let g = PreferencesGroup::new();
                 let p = PreferencesPage::builder()
                     .title("Redirect")
                     .icon_name("insert-link-symbolic")
                     .build();
                 p.add(&{
-                    fn chain<'a>(v: &mut Vec<&'a Info>, i: &'a Info) {
-                        v.push(i);
+                    // Collect redirections into the buffer,
+                    // to reverse chain before add its members to widget
+                    // * capacity optimized for Gemini protocol (as default)
+                    let mut b = Vec::with_capacity(5);
+                    /// Recursively collect redirection members into the given vector
+                    fn chain<'a>(b: &mut Vec<&'a Info>, i: &'a Info) {
+                        b.push(i);
                         if let Some(ref r) = i.redirect {
-                            chain(v, r)
+                            chain(b, r)
                         }
                     }
-                    chain(&mut v, info);
-                    v.reverse();
-                    for r in v {
-                        g.add(&ActionRow::builder().title(r.request().unwrap()).build());
+                    chain(&mut b, info);
+                    b.reverse();
+                    let l = b.len(); // calculate once
+                    for (i, r) in b.iter().enumerate() {
+                        g.add(&{
+                            let a = ActionRow::builder().title(r.request().unwrap()).build();
+                            a.add_prefix(&{
+                                let c = i + 1;
+                                gtk::Button::builder()
+                                    .css_classes([
+                                        "circular",
+                                        if c == l { "success" } else { "accent" },
+                                    ])
+                                    .label(&c.to_string())
+                                    .sensitive(false)
+                                    .valign(gtk::Align::Center)
+                                    .build()
+                            });
+                            a
+                        });
                     }
                     g
                 });
