@@ -63,8 +63,10 @@ impl Dialog for PreferencesDialog {
                 .icon_name("network-transmit-receive")
                 .build();
             if let Some(ref socket) = this.socket {
-                use gtk::gio::{SocketAddress, SocketFamily};
-                use gtk::prelude::{SocketAddressExt, SocketConnectableExt};
+                use gtk::{
+                    gio::{SocketAddress, SocketFamily},
+                    prelude::{SocketAddressExt, SocketConnectableExt},
+                };
                 /// Convert socket family to string
                 fn f2s(socket_family: &SocketFamily) -> &str {
                     match socket_family {
