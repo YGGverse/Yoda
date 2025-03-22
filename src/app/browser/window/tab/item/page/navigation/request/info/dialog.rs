@@ -24,14 +24,13 @@ impl Dialog for PreferencesDialog {
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Meta").build();
                     if let Some(ref mime) = info.mime {
-                        g.add(&{
-                            let r = ActionRow::builder()
+                        g.add(
+                            &ActionRow::builder()
                                 .css_classes(["property"])
                                 .subtitle(mime)
                                 .title("Content type")
-                                .build();
-                            r
-                        })
+                                .build(),
+                        )
                     }
                     g
                 });
@@ -42,12 +41,11 @@ impl Dialog for PreferencesDialog {
                     if let Some(ref size) = info.size {
                         g.add(&{
                             use crate::tool::Format;
-                            let r = ActionRow::builder()
+                            ActionRow::builder()
                                 .css_classes(["property"])
                                 .subtitle(size.bytes())
                                 .title("Content")
-                                .build();
-                            r
+                                .build()
                         })
                     }
                     g
