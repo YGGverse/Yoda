@@ -121,7 +121,7 @@ impl Dialog for PreferencesDialog {
                     g
                 });
                 p
-            }) // @TODO clickable navigation, copy
+            }) // @TODO clickable navigation, test time values
         }
         if !info.event.is_empty() {
             d.add(&{
