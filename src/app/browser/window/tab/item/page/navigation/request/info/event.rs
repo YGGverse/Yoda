@@ -19,4 +19,14 @@ impl Event {
             time: DateTime::now_local().unwrap(),
         }
     }
+
+    // Getters
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn time(&self) -> &DateTime {
+        &self.time
+    }
 }

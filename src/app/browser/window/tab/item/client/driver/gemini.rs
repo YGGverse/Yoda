@@ -75,7 +75,7 @@ impl Gemini {
                         0.9
                     }
                     SocketClientEvent::Complete => {
-                        i.add_event("Complete".to_string());
+                        i.add_event("Receiving".to_string());
                         1.0
                     }
                     _ => panic!(), // alert on API change

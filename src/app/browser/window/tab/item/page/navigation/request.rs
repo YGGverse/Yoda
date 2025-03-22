@@ -91,6 +91,7 @@ impl Request {
         });
 
         entry.connect_icon_release({
+            let i = info.clone();
             let p = profile.clone();
             move |e, position| match position {
                 EntryIconPosition::Primary => {
@@ -100,8 +101,14 @@ impl Request {
                         show_identity_dialog(e, &p)
                     }
                 }
-                EntryIconPosition::Secondary => e.emit_activate(),
-                _ => todo!(), // unexpected
+                EntryIconPosition::Secondary => {
+                    if is_focused(e) {
+                        e.emit_activate()
+                    } else {
+                        i.borrow().dialog(Some(e));
+                    }
+                }
+                _ => panic!(),
             }
         });
 

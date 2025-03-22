@@ -1,3 +1,5 @@
+mod dialog;
+
 // Public dependencies
 
 pub mod event;
@@ -5,7 +7,8 @@ pub use event::Event;
 
 // Local dependencies
 
-use gtk::gio::NetworkAddress;
+use dialog::Dialog;
+use gtk::{gio::NetworkAddress, prelude::IsA};
 
 /// Common, shared `Page` information holder
 /// * used for the Information dialog window on request indicator activate
@@ -47,6 +50,11 @@ impl Info {
     }
 
     // Actions
+
+    pub fn dialog(&self, parent: Option<&impl IsA<gtk::Widget>>) {
+        use adw::{PreferencesDialog, prelude::AdwDialogExt};
+        PreferencesDialog::info(self).present(parent)
+    }
 
     /// Mark `Self` as deprecated
     /// * tip: usually called on page handler begin
