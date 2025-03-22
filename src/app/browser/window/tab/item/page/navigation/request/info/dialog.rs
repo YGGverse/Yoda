@@ -55,19 +55,28 @@ impl Dialog for PreferencesDialog {
         });
         if info.redirect.is_some() {
             d.add(&{
+                // collect redirections into the vector,
+                // to reverse chain before add its members to widget
+                // * capacity optimized for Gemini protocol (as default)
+                let mut v = Vec::with_capacity(5);
+
                 let g = PreferencesGroup::new();
                 let p = PreferencesPage::builder()
                     .title("Redirect")
                     .icon_name("insert-link-symbolic")
                     .build();
                 p.add(&{
-                    fn chain(g: &PreferencesGroup, i: &Info) {
-                        g.add(&ActionRow::builder().title(i.request().unwrap()).build());
+                    fn chain<'a>(v: &mut Vec<&'a Info>, i: &'a Info) {
+                        v.push(i);
                         if let Some(ref r) = i.redirect {
-                            chain(g, r)
+                            chain(v, r)
                         }
                     }
-                    chain(&g, info);
+                    chain(&mut v, info);
+                    v.reverse();
+                    for r in v {
+                        g.add(&ActionRow::builder().title(r.request().unwrap()).build());
+                    }
                     g
                 });
                 p
