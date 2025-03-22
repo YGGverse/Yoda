@@ -4,6 +4,7 @@ use adw::{
     prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
 use gtk::glib::gformat;
+use sourceview::prelude::{SocketAddressExt, SocketConnectableExt};
 
 pub trait Dialog {
     fn info(info: &Info) -> Self;
@@ -15,7 +16,6 @@ impl Dialog for PreferencesDialog {
             .search_enabled(true)
             .title("Page info")
             .build();
-
         d.add(&{
             let p = PreferencesPage::builder()
                 .title("General")
@@ -56,6 +56,48 @@ impl Dialog for PreferencesDialog {
                     g
                 });
             } // @TODO header size, total size, etc.
+            p
+        });
+        d.add(&{
+            let p = PreferencesPage::builder()
+                .title("Connection")
+                .icon_name("network-transmit-receive")
+                .build();
+            if let Some(ref socket) = info.socket {
+                use gtk::gio::SocketFamily;
+                fn f2s(socket_family: &SocketFamily) -> &str {
+                    match socket_family {
+                        SocketFamily::Invalid => "Invalid",
+                        SocketFamily::Unix => "Unix",
+                        SocketFamily::Ipv4 => "IPv4",
+                        SocketFamily::Ipv6 => "IPv6",
+                        _ => panic!(),
+                    }
+                }
+                fn r(title: &str, subtitle: &str) -> ActionRow {
+                    ActionRow::builder()
+                        .css_classes(["property"])
+                        .subtitle_selectable(true)
+                        .subtitle(subtitle)
+                        .title_selectable(true)
+                        .title(title)
+                        .build()
+                }
+                p.add(&{
+                    let g = PreferencesGroup::builder().title("Remote").build();
+                    g.add(&r("Address", &socket.remote_address.to_string()));
+                    g.add(&r("Family", f2s(&socket.remote_address.family())));
+                    g.add(&r("Location", "-")); // @TODO optional, MaxMind DB
+                    g
+                });
+                p.add(&{
+                    let g = PreferencesGroup::builder().title("Local").build();
+                    g.add(&r("Address", &socket.local_address.to_string()));
+                    g.add(&r("Family", f2s(&socket.local_address.family())));
+                    g.add(&r("Location", "-")); // @TODO optional, MaxMind DB
+                    g
+                });
+            }
             p
         });
         if info.redirect.is_some() {
