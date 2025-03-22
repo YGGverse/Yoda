@@ -3,6 +3,7 @@ use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
     prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
+use gtk::glib::gformat;
 
 pub trait Dialog {
     fn info(info: &Info) -> Self;
@@ -75,9 +76,23 @@ impl Dialog for PreferencesDialog {
                     chain(&mut b, info);
                     b.reverse();
                     let l = b.len(); // calculate once
+                    let t = b[0].event[0].time();
                     for (i, r) in b.iter().enumerate() {
                         g.add(&{
                             let a = ActionRow::builder().title(r.request().unwrap()).build();
+                            if i == 0 {
+                                a.set_subtitle(&t.format_iso8601().unwrap())
+                            } else {
+                                a.set_subtitle(&gformat!(
+                                    "{} ms",
+                                    r.event
+                                        .last()
+                                        .unwrap()
+                                        .time()
+                                        .difference(t)
+                                        .as_milliseconds()
+                                ))
+                            }
                             a.add_prefix(&{
                                 let c = i + 1;
                                 gtk::Button::builder()
@@ -118,7 +133,7 @@ impl Dialog for PreferencesDialog {
                     for e in &info.event[1..] {
                         g.add(
                             &ActionRow::builder()
-                                .subtitle(gtk::glib::gformat!(
+                                .subtitle(gformat!(
                                     "{} ms",
                                     e.time().difference(t).as_milliseconds()
                                 ))
