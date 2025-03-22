@@ -1,14 +1,11 @@
 mod dialog;
-
-// Public dependencies
-
-pub mod event;
-pub use event::Event;
-
-// Local dependencies
+mod event;
+mod socket;
 
 use dialog::Dialog;
-use gtk::{gio::NetworkAddress, prelude::IsA};
+use event::Event;
+use gtk::{gio::SocketAddress, prelude::IsA};
+use socket::Socket;
 
 /// Common, shared `Page` information holder
 /// * used for the Information dialog window on request indicator activate
@@ -24,13 +21,13 @@ pub struct Info {
     /// Hold redirections chain with handled details
     /// * the `referrer` member name is reserved for other protocols
     redirect: Option<Box<Self>>,
-    /// Optional remote host details
-    /// * useful also for geo-location feature
-    remote: Option<NetworkAddress>,
     /// Key to relate data collected with the specific request
     request: Option<String>,
     /// Hold page content size
     size: Option<usize>,
+    /// Optional socket details
+    /// * useful also for geo-location feature
+    socket: Option<Socket>,
 }
 
 impl Info {
@@ -43,9 +40,9 @@ impl Info {
             is_deprecated: false,
             mime: None,
             redirect: None,
-            remote: None,
             request: None,
             size: None,
+            socket: None,
         }
     }
 
@@ -86,8 +83,15 @@ impl Info {
         self
     }
 
-    pub fn set_remote(&mut self, remote: Option<NetworkAddress>) -> &mut Self {
-        self.remote = remote;
+    pub fn set_socket(
+        &mut self,
+        local_address: SocketAddress,
+        remote_address: SocketAddress,
+    ) -> &mut Self {
+        self.socket = Some(Socket {
+            local_address,
+            remote_address,
+        });
         self.is_deprecated = false;
         self
     }
