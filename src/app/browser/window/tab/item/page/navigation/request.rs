@@ -105,7 +105,7 @@ impl Request {
                     if is_focused(e) {
                         e.emit_activate()
                     } else {
-                        i.borrow().dialog(Some(e));
+                        i.borrow().dialog(&p, Some(e));
                     }
                 }
                 _ => panic!(),

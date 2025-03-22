@@ -1,17 +1,16 @@
-use super::Info;
+use super::{Info, Profile};
 use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
     prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
 use gtk::glib::gformat;
-use sourceview::prelude::{SocketAddressExt, SocketConnectableExt};
 
 pub trait Dialog {
-    fn info(info: &Info) -> Self;
+    fn info(this: &Info, profile: &Profile) -> Self;
 }
 
 impl Dialog for PreferencesDialog {
-    fn info(info: &Info) -> Self {
+    fn info(this: &Info, profile: &Profile) -> Self {
         let d = PreferencesDialog::builder()
             .search_enabled(true)
             .title("Page info")
@@ -21,10 +20,10 @@ impl Dialog for PreferencesDialog {
                 .title("General")
                 .icon_name("help-about-symbolic")
                 .build();
-            if info.mime.is_some() {
+            if this.mime.is_some() {
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Meta").build();
-                    if let Some(ref mime) = info.mime {
+                    if let Some(ref mime) = this.mime {
                         g.add(
                             &ActionRow::builder()
                                 .css_classes(["property"])
@@ -38,10 +37,10 @@ impl Dialog for PreferencesDialog {
                     g
                 });
             } // @TODO content language, header size, etc.
-            if info.size.is_some() {
+            if this.size.is_some() {
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Size").build();
-                    if let Some(ref size) = info.size {
+                    if let Some(ref size) = this.size {
                         g.add(&{
                             use crate::tool::Format;
                             ActionRow::builder()
@@ -63,8 +62,10 @@ impl Dialog for PreferencesDialog {
                 .title("Connection")
                 .icon_name("network-transmit-receive")
                 .build();
-            if let Some(ref socket) = info.socket {
-                use gtk::gio::SocketFamily;
+            if let Some(ref socket) = this.socket {
+                use gtk::gio::{SocketAddress, SocketFamily};
+                use gtk::prelude::{SocketAddressExt, SocketConnectableExt};
+                /// Convert socket family to string
                 fn f2s(socket_family: &SocketFamily) -> &str {
                     match socket_family {
                         SocketFamily::Invalid => "Invalid",
@@ -74,6 +75,7 @@ impl Dialog for PreferencesDialog {
                         _ => panic!(),
                     }
                 }
+                /// Build common `ActionRow` widget
                 fn r(title: &str, subtitle: &str) -> ActionRow {
                     ActionRow::builder()
                         .css_classes(["property"])
@@ -83,24 +85,67 @@ impl Dialog for PreferencesDialog {
                         .title(title)
                         .build()
                 }
+                /// Lookup [MaxMind](https://www.maxmind.com) database
+                fn l(profile: &Profile, socket_address: &SocketAddress) -> Option<String> {
+                    use maxminddb::{
+                        MaxMindDBError, Reader,
+                        geoip2::{/*City,*/ Country},
+                    };
+                    if !matches!(
+                        socket_address.family(),
+                        SocketFamily::Ipv4 | SocketFamily::Ipv6,
+                    ) {
+                        return None;
+                    }
+                    let db = {
+                        let mut c = profile.config_path.clone();
+                        c.push("GeoLite2-Country.mmdb");
+                        Reader::open_readfile(c)
+                    }
+                    .ok()?;
+                    let lookup = {
+                        let a: std::net::SocketAddr = socket_address.to_string().parse().unwrap();
+                        let lookup: std::result::Result<Country, MaxMindDBError> =
+                            db.lookup(a.ip());
+                        lookup
+                    }
+                    .ok()?;
+                    lookup.country.map(|c| {
+                        let mut b = Vec::new();
+                        if let Some(iso_code) = c.iso_code {
+                            b.push(iso_code)
+                        }
+                        if let Some(n) = c.names {
+                            if let Some(s) = n.get("en") {
+                                b.push(s)
+                            } // @TODO multi-lang
+                        }
+                        // @TODO city DB
+                        b.join(", ")
+                    })
+                }
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Remote").build();
                     g.add(&r("Address", &socket.remote_address.to_string()));
                     g.add(&r("Family", f2s(&socket.remote_address.family())));
-                    g.add(&r("Location", "-")); // @TODO optional, MaxMind DB
+                    if let Some(location) = l(profile, &socket.remote_address) {
+                        g.add(&r("Location", &location));
+                    }
                     g
                 });
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Local").build();
                     g.add(&r("Address", &socket.local_address.to_string()));
                     g.add(&r("Family", f2s(&socket.local_address.family())));
-                    g.add(&r("Location", "-")); // @TODO optional, MaxMind DB
+                    if let Some(location) = l(profile, &socket.local_address) {
+                        g.add(&r("Location", &location));
+                    }
                     g
                 });
             }
             p
         });
-        if info.redirect.is_some() {
+        if this.redirect.is_some() {
             d.add(&{
                 let g = PreferencesGroup::new();
                 let p = PreferencesPage::builder()
@@ -119,7 +164,7 @@ impl Dialog for PreferencesDialog {
                             chain(b, r)
                         }
                     }
-                    chain(&mut b, info);
+                    chain(&mut b, this);
                     b.reverse();
                     let l = b.len(); // calculate once
                     let t = b[0].event[0].time(); // first event time to count from
@@ -165,7 +210,7 @@ impl Dialog for PreferencesDialog {
                 p
             }) // @TODO clickable navigation, test time values
         }
-        if !info.event.is_empty() {
+        if !this.event.is_empty() {
             d.add(&{
                 let p = PreferencesPage::builder()
                     .title("Events")
@@ -173,7 +218,7 @@ impl Dialog for PreferencesDialog {
                     .build();
                 p.add(&{
                     let g = PreferencesGroup::new();
-                    let e = &info.event[0];
+                    let e = &this.event[0];
                     let t = e.time();
                     let n = e.name();
                     g.add(
@@ -184,7 +229,7 @@ impl Dialog for PreferencesDialog {
                             .title(n)
                             .build(),
                     );
-                    for e in &info.event[1..] {
+                    for e in &this.event[1..] {
                         g.add(
                             &ActionRow::builder()
                                 .subtitle(gformat!(

@@ -2,6 +2,7 @@ mod dialog;
 mod event;
 mod socket;
 
+use super::Profile;
 use dialog::Dialog;
 use event::Event;
 use gtk::{gio::SocketAddress, prelude::IsA};
@@ -48,9 +49,9 @@ impl Info {
 
     // Actions
 
-    pub fn dialog(&self, parent: Option<&impl IsA<gtk::Widget>>) {
+    pub fn dialog(&self, profile: &Profile, parent: Option<&impl IsA<gtk::Widget>>) {
         use adw::{PreferencesDialog, prelude::AdwDialogExt};
-        PreferencesDialog::info(self).present(parent)
+        PreferencesDialog::info(self, profile).present(parent)
     }
 
     /// Actualize `Self`
