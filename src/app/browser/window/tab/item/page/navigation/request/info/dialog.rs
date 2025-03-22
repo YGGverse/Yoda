@@ -55,14 +55,25 @@ impl Dialog for PreferencesDialog {
             } // @TODO header size, total size, etc.
             p
         });
-        if let Some(ref redirect) = info.redirect {
+        if info.redirect.is_some() {
             d.add(&{
-                PreferencesPage::builder()
+                let g = PreferencesGroup::new();
+                let p = PreferencesPage::builder()
                     .title("Redirect")
                     .icon_name("insert-link-symbolic")
-                    .build()
-            });
-            // @TODO recursive lookup
+                    .build();
+                p.add(&{
+                    fn chain(g: &PreferencesGroup, i: &Info) {
+                        g.add(&ActionRow::builder().title(i.request().unwrap()).build());
+                        if let Some(ref r) = i.redirect {
+                            chain(g, r)
+                        }
+                    }
+                    chain(&g, info);
+                    g
+                });
+                p
+            }) // @TODO reverse, time total
         }
         if !info.event.is_empty() {
             d.add(&{
@@ -75,24 +86,22 @@ impl Dialog for PreferencesDialog {
                     let e = &info.event[0];
                     let t = e.time();
                     let n = e.name();
-                    g.add(&{
-                        let r = ActionRow::builder()
+                    g.add(
+                        &ActionRow::builder()
                             .subtitle(t.format_iso8601().unwrap())
                             .title(n)
-                            .build();
-                        r
-                    });
+                            .build(),
+                    );
                     for e in &info.event[1..] {
-                        g.add(&{
-                            let r = ActionRow::builder()
+                        g.add(
+                            &ActionRow::builder()
                                 .subtitle(gtk::glib::gformat!(
                                     "{} ms",
                                     e.time().difference(t).as_milliseconds()
                                 ))
                                 .title(e.name())
-                                .build();
-                            r
-                        })
+                                .build(),
+                        )
                     }
                     g
                 });

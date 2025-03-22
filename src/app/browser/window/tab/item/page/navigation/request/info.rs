@@ -106,6 +106,10 @@ impl Info {
 
     // Getters
 
+    pub fn request(&self) -> Option<&str> {
+        self.request.as_deref()
+    }
+
     pub fn matches(&self, request: &str) -> bool {
         self.request.as_ref().is_some_and(|r| r == request)
     }
