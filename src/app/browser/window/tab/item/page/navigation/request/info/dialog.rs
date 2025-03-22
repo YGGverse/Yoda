@@ -28,7 +28,9 @@ impl Dialog for PreferencesDialog {
                         g.add(
                             &ActionRow::builder()
                                 .css_classes(["property"])
+                                .subtitle_selectable(true)
                                 .subtitle(mime)
+                                .title_selectable(true)
                                 .title("Content type")
                                 .build(),
                         )
@@ -44,7 +46,9 @@ impl Dialog for PreferencesDialog {
                             use crate::tool::Format;
                             ActionRow::builder()
                                 .css_classes(["property"])
+                                .subtitle_selectable(true)
                                 .subtitle(size.bytes())
+                                .title_selectable(true)
                                 .title("Content")
                                 .build()
                         })
@@ -76,23 +80,15 @@ impl Dialog for PreferencesDialog {
                     chain(&mut b, info);
                     b.reverse();
                     let l = b.len(); // calculate once
-                    let t = b[0].event[0].time();
+                    let t = b[0].event[0].time(); // first event time to count from
                     for (i, r) in b.iter().enumerate() {
                         g.add(&{
-                            let a = ActionRow::builder().title(r.request().unwrap()).build();
-                            if i == 0 {
-                                a.set_subtitle(&t.format_iso8601().unwrap())
-                            } else {
-                                a.set_subtitle(&gformat!(
-                                    "{} ms",
-                                    r.event
-                                        .last()
-                                        .unwrap()
-                                        .time()
-                                        .difference(t)
-                                        .as_milliseconds()
-                                ))
-                            }
+                            let a = ActionRow::builder()
+                                .subtitle_selectable(true)
+                                .title_selectable(true)
+                                .title(r.request().unwrap())
+                                .build();
+                            // show redirections counter
                             a.add_prefix(&{
                                 let c = i + 1;
                                 gtk::Button::builder()
@@ -100,10 +96,24 @@ impl Dialog for PreferencesDialog {
                                         "circular",
                                         if c == l { "success" } else { "accent" },
                                     ])
-                                    .label(&c.to_string())
+                                    .label(c.to_string())
                                     .sensitive(false)
                                     .valign(gtk::Align::Center)
                                     .build()
+                            });
+                            // show total redirection time in ms
+                            a.set_subtitle(&if i == 0 {
+                                t.format_iso8601().unwrap()
+                            } else {
+                                gformat!(
+                                    "{} ms",
+                                    r.event
+                                        .last()
+                                        .unwrap()
+                                        .time()
+                                        .difference(t)
+                                        .as_milliseconds()
+                                )
                             });
                             a
                         });
@@ -111,7 +121,7 @@ impl Dialog for PreferencesDialog {
                     g
                 });
                 p
-            }) // @TODO reverse, time total
+            }) // @TODO clickable navigation, copy
         }
         if !info.event.is_empty() {
             d.add(&{
@@ -126,7 +136,9 @@ impl Dialog for PreferencesDialog {
                     let n = e.name();
                     g.add(
                         &ActionRow::builder()
+                            .subtitle_selectable(true)
                             .subtitle(t.format_iso8601().unwrap())
+                            .title_selectable(true)
                             .title(n)
                             .build(),
                     );
@@ -137,6 +149,8 @@ impl Dialog for PreferencesDialog {
                                     "{} ms",
                                     e.time().difference(t).as_milliseconds()
                                 ))
+                                .subtitle_selectable(true)
+                                .title_selectable(true)
                                 .title(e.name())
                                 .build(),
                         )
