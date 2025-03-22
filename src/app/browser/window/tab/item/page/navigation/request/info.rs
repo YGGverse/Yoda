@@ -53,6 +53,11 @@ impl Info {
         PreferencesDialog::info(self).present(parent)
     }
 
+    /// Actualize `Self`
+    pub fn commit(&mut self) {
+        self.is_deprecated = false;
+    }
+
     /// Mark `Self` as deprecated
     /// * tip: usually called on page handler begin
     pub fn deprecate(&mut self) {
@@ -73,13 +78,11 @@ impl Info {
 
     pub fn add_event(&mut self, name: String) -> &mut Self {
         self.event.push(Event::now(name));
-        self.is_deprecated = false;
         self
     }
 
     pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
         self.mime = mime;
-        self.is_deprecated = false;
         self
     }
 
@@ -92,19 +95,16 @@ impl Info {
             local_address,
             remote_address,
         });
-        self.is_deprecated = false;
         self
     }
 
     pub fn set_request(&mut self, request: Option<String>) -> &mut Self {
         self.request = request;
-        self.is_deprecated = false;
         self
     }
 
     pub fn set_size(&mut self, size: Option<usize>) -> &mut Self {
         self.size = size;
-        self.is_deprecated = false;
         self
     }
 

@@ -177,16 +177,28 @@ fn handle(
             let redirects = redirects.clone();
             move |result| match result {
                 Ok((response, connection)) => {
+                    /// Common page info pattern for some cases in the current scope
+                    /// * includes commit action!
+                    fn update_page_info(page: &Page, event_name: &str) {
+                        let mut i = page.navigation.request.info.borrow_mut();
+                        i.add_event(event_name.to_string())
+                            .set_mime(None)
+                            .set_size(None)
+                            .commit()
+                    }
                     // Update socket info at the point, where the connection is active yet
+                    // * also, actualize `request` as same everywhere below
                     {
                         use gtk::prelude::SocketConnectionExt;
                         let mut i = page.navigation.request.info.borrow_mut();
-                        i.set_socket(
-                            connection.socket_connection.local_address().unwrap(),
-                            connection.socket_connection.remote_address().unwrap()
-                        );
-                        // * unwrap fails only on `connection.socket_connection.is_closed()`
-                        //   drop the panic as unexpected.
+                        i
+                            .set_request(Some(uri.to_string()))
+                            .set_socket(
+                                connection.socket_connection.local_address().unwrap(),
+                                connection.socket_connection.remote_address().unwrap()
+                            );
+                            // * unwrap fails only on `connection.socket_connection.is_closed()`
+                            //   drop the panic as unexpected.
                     }
                     // Handle response
                     match response {
@@ -199,7 +211,7 @@ fn handle(
                                 page.snap_history();
                             }
                             redirects.replace(0); // reset
-                            update_page_info(&page, &uri, EVENT_COMPLETED);
+                            update_page_info(&page, EVENT_COMPLETED);
                             match input {
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
                                 Input::Default { message } => page.input.set_new_response(
@@ -310,7 +322,6 @@ fn handle(
                                                             i
                                                                 .add_event("Parsing".to_string())
                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                .set_request(Some(uri.to_string()))
                                                                 .set_size(Some(data.len()));
                                                             let w = if matches!(*feature, Feature::Source) {
                                                                 page.content.to_text_source(data)
@@ -336,7 +347,9 @@ fn handle(
                                                                 page.snap_history();
                                                             }
                                                             redirects.replace(0); // reset
-                                                            i.add_event(EVENT_COMPLETED.to_string());
+                                                            i
+                                                                .add_event(EVENT_COMPLETED.to_string())
+                                                                .commit();
                                                         },
                                                         Err(e) => {
                                                             let s = page.content.to_status_failure();
@@ -347,7 +360,7 @@ fn handle(
                                                                 page.snap_history();
                                                             }
                                                             redirects.replace(0); // reset
-                                                            update_page_info(&page, &uri, EVENT_COMPLETED);
+                                                            update_page_info(&page, EVENT_COMPLETED);
                                                         },
                                                     },
                                                     Err((_, e)) => {
@@ -359,7 +372,7 @@ fn handle(
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
-                                                        update_page_info(&page, &uri, EVENT_COMPLETED);
+                                                        update_page_info(&page, EVENT_COMPLETED);
                                                     }
                                                 }
                                             ),
@@ -372,7 +385,7 @@ fn handle(
                                                     page.snap_history();
                                                 }
                                                 redirects.replace(0); // reset
-                                                update_page_info(&page, &uri, EVENT_COMPLETED);
+                                                update_page_info(&page, EVENT_COMPLETED);
                                             },
                                         }
                                     )
@@ -413,8 +426,8 @@ fn handle(
                                                                             i
                                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                                .set_request(Some(uri.to_string()))
-                                                                                .set_size(Some(buffer.byte_length()));
+                                                                                .set_size(Some(buffer.byte_length()))
+                                                                                .commit();
                                                                         }
                                                                     }
                                                                     Err(e) => {
@@ -426,8 +439,8 @@ fn handle(
                                                                             i
                                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                                .set_request(Some(uri.to_string()))
-                                                                                .set_size(None);
+                                                                                .set_size(None)
+                                                                                .commit();
                                                                         }
                                                                     }
                                                                 }
@@ -453,8 +466,8 @@ fn handle(
                                                             i
                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                .set_request(Some(uri.to_string()))
-                                                                .set_size(None);
+                                                                .set_size(None)
+                                                                .commit();
                                                         }
                                                     }
                                                 }
@@ -478,8 +491,8 @@ fn handle(
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_mime(Some(mime.to_string()))
-                                            .set_request(Some(uri.to_string()))
-                                            .set_size(None);
+                                            .set_size(None)
+                                            .commit();
                                     }
                                 },
                             }
@@ -498,7 +511,7 @@ fn handle(
                                     page.set_progress(0.0);
                                     page.set_title(&s.title());
                                     redirects.replace(0); // reset
-                                    update_page_info(&page, &uri, EVENT_COMPLETED);
+                                    update_page_info(&page, EVENT_COMPLETED);
                                 // Disallow external redirection by default as potentially unsafe
                                 // even not specified, require follow confirmation @TODO optional
                                 } else if uri.host() != target.host() {
@@ -523,7 +536,7 @@ fn handle(
                                     page.set_progress(0.0);
                                     page.set_title(t);
                                     redirects.replace(0); // reset
-                                    update_page_info(&page, &uri, EVENT_COMPLETED);
+                                    update_page_info(&page, EVENT_COMPLETED);
                                 } else {
                                     let t = target.to_string();
                                     if matches!(redirect, Redirect::Permanent { .. }) {
@@ -535,8 +548,8 @@ fn handle(
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_mime(None)
-                                            .set_request(Some(uri.to_string()))
-                                            .set_size(None);
+                                            .set_size(None)
+                                            .commit();
 
                                         page.navigation.request.info.replace(i.into_redirect());
                                     }
@@ -549,7 +562,7 @@ fn handle(
                                 page.set_progress(0.0);
                                 page.set_title(&s.title());
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, EVENT_COMPLETED);
+                                update_page_info(&page, EVENT_COMPLETED);
                             }
                         }
                         Response::Certificate(ref certificate) => match certificate {
@@ -567,7 +580,7 @@ fn handle(
                                     page.snap_history();
                                 }
                                 redirects.replace(0); // reset
-                                update_page_info(&page, &uri, EVENT_COMPLETED);
+                                update_page_info(&page, EVENT_COMPLETED);
                             }
                         }
                         Response::Failure(failure) => match failure {
@@ -585,7 +598,7 @@ fn handle(
                                         page.snap_history();
                                     }
                                     redirects.replace(0); // reset
-                                    update_page_info(&page, &uri, EVENT_COMPLETED);
+                                    update_page_info(&page, EVENT_COMPLETED);
                                     if let Some(callback) = on_failure {
                                         callback()
                                     }
@@ -605,7 +618,7 @@ fn handle(
                                         page.snap_history();
                                     }
                                     redirects.replace(0); // reset
-                                    update_page_info(&page, &uri, EVENT_COMPLETED);
+                                    update_page_info(&page, EVENT_COMPLETED);
                                     if let Some(callback) = on_failure {
                                         callback()
                                     }
@@ -623,18 +636,16 @@ fn handle(
                         page.snap_history();
                     }
                     redirects.replace(0); // reset
-                    update_page_info(&page, &uri, EVENT_COMPLETED)
+                    {
+                        let mut i = page.navigation.request.info.borrow_mut();
+                        i.add_event(EVENT_COMPLETED.to_string())
+                            .set_request(Some(uri.to_string()))
+                            .set_mime(None)
+                            .set_size(None)
+                            .commit()
+                    }
                 }
             }
         },
     )
-}
-
-/// Apply common page info pattern
-fn update_page_info(page: &Page, uri: &Uri, event_name: &str) {
-    let mut i = page.navigation.request.info.borrow_mut();
-    i.add_event(event_name.to_string())
-        .set_mime(None)
-        .set_request(Some(uri.to_string()))
-        .set_size(None);
 }
