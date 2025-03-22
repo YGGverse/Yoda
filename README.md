@@ -223,6 +223,14 @@ UI localization planed as Crowdin repository, but it is not implemented yet.
 To install new spell dictionaries in Fedora, use `sudo dnf install hunspell-CODE`
 * just replace `CODE` with the locale code you want
 
+### Geo-location
+
+To enable geo-location features, get official IP database from [MaxMind](https://www.maxmind.com)\
+then copy following files into the app `config` folder (available from menu)
+
+* `GeoLite2-City.mmdb`
+* `GeoLite2-Country.mmdb`
+
 ### Releases
 
 * Package version in repository increase after [crates.io](https://crates.io/crates/yoda) release
