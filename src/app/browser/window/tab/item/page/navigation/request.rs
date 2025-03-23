@@ -188,20 +188,9 @@ impl Request {
     }
 
     // Actions
+
     pub fn escape(&self) {
         self.suggestion.hide()
-    }
-
-    /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
-    /// * return `None` if current request already match home or Uri not parsable
-    pub fn home(&self) -> Option<Uri> {
-        home(&self.entry)
-    }
-
-    /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-    /// * `strip_prefix` on parse
-    pub fn uri(&self) -> Option<Uri> {
-        uri(&self.entry)
     }
 
     pub fn show_identity_dialog(&self) {
@@ -258,6 +247,10 @@ impl Request {
         Ok(())
     }
 
+    pub fn update_secondary_icon(&self, info: &Info) {
+        update_secondary_icon(&self.entry, info);
+    }
+
     // Setters
 
     pub fn to_download(&self) {
@@ -269,6 +262,18 @@ impl Request {
     }
 
     // Getters
+
+    /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`
+    /// * return `None` if current request already match home or Uri not parsable
+    pub fn home(&self) -> Option<Uri> {
+        home(&self.entry)
+    }
+
+    /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
+    /// * `strip_prefix` on parse
+    pub fn uri(&self) -> Option<Uri> {
+        uri(&self.entry)
+    }
 
     pub fn is_file(&self) -> bool {
         self.entry.text().starts_with("file://")

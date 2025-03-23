@@ -180,10 +180,13 @@ fn handle(
                     /// * includes commit action!
                     fn update_page_info(page: &Page, event_name: &str) {
                         let mut i = page.navigation.request.info.borrow_mut();
-                        i.add_event(event_name.to_string())
+                        i
+                            .add_event(event_name.to_string())
                             .unset_mime()
                             .unset_size()
-                            .commit()
+                            .commit();
+
+                        page.navigation.request.update_secondary_icon(&i)
                     }
                     // Update socket info at the point, where the connection is active yet
                     // * also, actualize `request` as same everywhere below
@@ -349,6 +352,7 @@ fn handle(
                                                             i
                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                 .commit();
+                                                            page.navigation.request.update_secondary_icon(&i)
                                                         },
                                                         Err(e) => {
                                                             let s = page.content.to_status_failure();
@@ -420,27 +424,19 @@ fn handle(
                                                                     Ok(buffer) => {
                                                                         page.set_title(&crate::tool::uri_to_title(&uri));
                                                                         page.content.to_image(&Texture::for_pixbuf(&buffer));
-                                                                        {
-                                                                            let mut i = page.navigation.request.info.borrow_mut();
-                                                                            i
-                                                                                .add_event(EVENT_COMPLETED.to_string())
-                                                                                .set_mime(Some(success.mime().to_string()))
-                                                                                .set_size(None, Some(buffer.byte_length()))
-                                                                                .commit();
-                                                                        }
+                                                                        let mut i = page.navigation.request.info.borrow_mut();
+                                                                        i
+                                                                            .add_event(EVENT_COMPLETED.to_string())
+                                                                            .set_mime(Some(success.mime().to_string()))
+                                                                            .set_size(None, Some(buffer.byte_length()))
+                                                                            .commit();
+                                                                        page.navigation.request.update_secondary_icon(&i)
                                                                     }
                                                                     Err(e) => {
                                                                         let s = page.content.to_status_failure();
                                                                         s.set_description(Some(e.message()));
                                                                         page.set_title(&s.title());
-                                                                        {
-                                                                            let mut i = page.navigation.request.info.borrow_mut();
-                                                                            i
-                                                                                .add_event(EVENT_COMPLETED.to_string())
-                                                                                .set_mime(Some(success.mime().to_string()))
-                                                                                .unset_size()
-                                                                                .commit();
-                                                                        }
+                                                                        update_page_info(&page, EVENT_COMPLETED);
                                                                     }
                                                                 }
                                                                 page.set_progress(0.0);
@@ -460,14 +456,7 @@ fn handle(
                                                             page.snap_history();
                                                         }
                                                         redirects.replace(0); // reset
-                                                        {
-                                                            let mut i = page.navigation.request.info.borrow_mut();
-                                                            i
-                                                                .add_event(EVENT_COMPLETED.to_string())
-                                                                .set_mime(Some(success.mime().to_string()))
-                                                                .unset_size()
-                                                                .commit();
-                                                        }
+                                                        update_page_info(&page, EVENT_COMPLETED);
                                                     }
                                                 }
                                             }
@@ -485,14 +474,13 @@ fn handle(
                                         page.snap_history();
                                     }
                                     redirects.replace(0); // reset
-                                    {
-                                        let mut i = page.navigation.request.info.borrow_mut();
-                                        i
-                                            .add_event(EVENT_COMPLETED.to_string())
-                                            .set_mime(Some(mime.to_string()))
-                                            .unset_size()
-                                            .commit();
-                                    }
+                                    let mut i = page.navigation.request.info.borrow_mut();
+                                    i
+                                        .add_event(EVENT_COMPLETED.to_string())
+                                        .set_mime(Some(mime.to_string()))
+                                        .unset_size()
+                                        .commit();
+                                    page.navigation.request.update_secondary_icon(&i)
                                 },
                             }
                         },
@@ -635,14 +623,13 @@ fn handle(
                         page.snap_history();
                     }
                     redirects.replace(0); // reset
-                    {
-                        let mut i = page.navigation.request.info.borrow_mut();
-                        i.add_event(EVENT_COMPLETED.to_string())
-                            .set_request(Some(uri.to_string()))
-                            .unset_mime()
-                            .unset_size()
-                            .commit()
-                    }
+                    let mut i = page.navigation.request.info.borrow_mut();
+                    i.add_event(EVENT_COMPLETED.to_string())
+                        .set_request(Some(uri.to_string()))
+                        .unset_mime()
+                        .unset_size()
+                        .commit();
+                    page.navigation.request.update_secondary_icon(&i)
                 }
             }
         },
