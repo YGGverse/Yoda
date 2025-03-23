@@ -6,11 +6,11 @@ use adw::{
 use gtk::glib::gformat;
 
 pub trait Dialog {
-    fn info(this: &Info, profile: &Profile) -> Self;
+    fn info(profile: &Profile, info: &Info) -> Self;
 }
 
 impl Dialog for PreferencesDialog {
-    fn info(this: &Info, profile: &Profile) -> Self {
+    fn info(profile: &Profile, info: &Info) -> Self {
         let d = PreferencesDialog::builder()
             .search_enabled(true)
             .title("Page info")
@@ -20,10 +20,10 @@ impl Dialog for PreferencesDialog {
                 .title("General")
                 .icon_name("help-about-symbolic")
                 .build();
-            if this.mime.is_some() {
+            if info.mime.is_some() {
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Meta").build();
-                    if let Some(ref mime) = this.mime {
+                    if let Some(ref mime) = info.mime {
                         g.add(
                             &ActionRow::builder()
                                 .css_classes(["property"])
@@ -37,7 +37,7 @@ impl Dialog for PreferencesDialog {
                     g
                 });
             } // @TODO content language, header size, etc.
-            if this.size.header.is_some() || this.size.content.is_some() {
+            if info.size.header.is_some() || info.size.content.is_some() {
                 p.add(&{
                     use crate::tool::Format;
                     /// Common `ActionRow` widget pattern
@@ -53,12 +53,12 @@ impl Dialog for PreferencesDialog {
                     let g = PreferencesGroup::builder().title("Size").build();
                     let mut i = 0; // count group members
                     let mut t = 0; // count total size
-                    if let Some(ref c) = this.size.header {
+                    if let Some(ref c) = info.size.header {
                         i += 1;
                         t += c;
                         g.add(&r("Header", &c.bytes()))
                     }
-                    if let Some(ref c) = this.size.content {
+                    if let Some(ref c) = info.size.content {
                         i += 1;
                         t += c;
                         g.add(&r("Content", &c.bytes()))
@@ -76,7 +76,7 @@ impl Dialog for PreferencesDialog {
                 .title("Connection")
                 .icon_name("network-transmit-receive")
                 .build();
-            if let Some(ref socket) = this.socket {
+            if let Some(ref socket) = info.socket {
                 use gtk::{
                     gio::{SocketAddress, SocketFamily},
                     prelude::{SocketAddressExt, SocketConnectableExt},
@@ -161,7 +161,7 @@ impl Dialog for PreferencesDialog {
             }
             p
         });
-        if this.redirect.is_some() {
+        if info.redirect.is_some() {
             d.add(&{
                 let g = PreferencesGroup::new();
                 let p = PreferencesPage::builder()
@@ -180,7 +180,7 @@ impl Dialog for PreferencesDialog {
                             chain(b, r)
                         }
                     }
-                    chain(&mut b, this);
+                    chain(&mut b, info);
                     b.reverse();
                     let l = b.len(); // calculate once
                     let t = b[0].event[0].time(); // first event time to count from
@@ -226,7 +226,7 @@ impl Dialog for PreferencesDialog {
                 p
             }) // @TODO clickable navigation, test time values
         }
-        if !this.event.is_empty() {
+        if !info.event.is_empty() {
             d.add(&{
                 let p = PreferencesPage::builder()
                     .title("Events")
@@ -234,7 +234,7 @@ impl Dialog for PreferencesDialog {
                     .build();
                 p.add(&{
                     let g = PreferencesGroup::new();
-                    let e = &this.event[0];
+                    let e = &info.event[0];
                     let t = e.time();
                     let n = e.name();
                     g.add(
@@ -245,7 +245,7 @@ impl Dialog for PreferencesDialog {
                             .title(n)
                             .build(),
                     );
-                    for e in &this.event[1..] {
+                    for e in &info.event[1..] {
                         g.add(
                             &ActionRow::builder()
                                 .subtitle(gformat!(

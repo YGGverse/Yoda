@@ -51,9 +51,9 @@ impl Info {
 
     // Actions
 
-    pub fn dialog(&self, profile: &Profile, parent: Option<&impl IsA<gtk::Widget>>) {
+    pub fn dialog(&self, parent: &impl IsA<gtk::Widget>, profile: &Profile) {
         use adw::{PreferencesDialog, prelude::AdwDialogExt};
-        PreferencesDialog::info(self, profile).present(parent)
+        PreferencesDialog::info(profile, self).present(Some(parent))
     }
 
     /// Actualize `Self`
