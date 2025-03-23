@@ -37,20 +37,34 @@ impl Dialog for PreferencesDialog {
                     g
                 });
             } // @TODO content language, header size, etc.
-            if this.size.is_some() {
+            if this.size.header.is_some() || this.size.content.is_some() {
                 p.add(&{
+                    use crate::tool::Format;
+                    /// Common `ActionRow` widget pattern
+                    fn r(title: &str, subtitle: &str) -> ActionRow {
+                        ActionRow::builder()
+                            .css_classes(["property"])
+                            .subtitle_selectable(true)
+                            .subtitle(subtitle)
+                            .title_selectable(true)
+                            .title(title)
+                            .build()
+                    }
                     let g = PreferencesGroup::builder().title("Size").build();
-                    if let Some(ref size) = this.size {
-                        g.add(&{
-                            use crate::tool::Format;
-                            ActionRow::builder()
-                                .css_classes(["property"])
-                                .subtitle_selectable(true)
-                                .subtitle(size.bytes())
-                                .title_selectable(true)
-                                .title("Content")
-                                .build()
-                        })
+                    let mut i = 0; // count group members
+                    let mut t = 0; // count total size
+                    if let Some(ref c) = this.size.header {
+                        i += 1;
+                        t += c;
+                        g.add(&r("Header", &c.bytes()))
+                    }
+                    if let Some(ref c) = this.size.content {
+                        i += 1;
+                        t += c;
+                        g.add(&r("Content", &c.bytes()))
+                    }
+                    if i > 1 && t > 0 {
+                        g.add(&r("Total", &t.bytes()))
                     }
                     g
                 });
@@ -77,7 +91,7 @@ impl Dialog for PreferencesDialog {
                         _ => panic!(),
                     }
                 }
-                /// Build common `ActionRow` widget
+                /// Common `ActionRow` widget pattern
                 fn r(title: &str, subtitle: &str) -> ActionRow {
                     ActionRow::builder()
                         .css_classes(["property"])

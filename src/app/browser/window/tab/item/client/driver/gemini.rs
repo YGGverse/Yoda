@@ -182,8 +182,8 @@ fn handle(
                     fn update_page_info(page: &Page, event_name: &str) {
                         let mut i = page.navigation.request.info.borrow_mut();
                         i.add_event(event_name.to_string())
-                            .set_mime(None)
-                            .set_size(None)
+                            .unset_mime()
+                            .unset_size()
                             .commit()
                     }
                     // Update socket info at the point, where the connection is active yet
@@ -322,7 +322,7 @@ fn handle(
                                                             i
                                                                 .add_event("Parsing".to_string())
                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                .set_size(Some(data.len()));
+                                                                .set_size(None, Some(data.len()));
                                                             let w = if matches!(*feature, Feature::Source) {
                                                                 page.content.to_text_source(data)
                                                             } else {
@@ -426,7 +426,7 @@ fn handle(
                                                                             i
                                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                                .set_size(Some(buffer.byte_length()))
+                                                                                .set_size(None, Some(buffer.byte_length()))
                                                                                 .commit();
                                                                         }
                                                                     }
@@ -439,7 +439,7 @@ fn handle(
                                                                             i
                                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                                .set_size(None)
+                                                                                .unset_size()
                                                                                 .commit();
                                                                         }
                                                                     }
@@ -466,7 +466,7 @@ fn handle(
                                                             i
                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                 .set_mime(Some(success.mime().to_string()))
-                                                                .set_size(None)
+                                                                .unset_size()
                                                                 .commit();
                                                         }
                                                     }
@@ -491,7 +491,7 @@ fn handle(
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_mime(Some(mime.to_string()))
-                                            .set_size(None)
+                                            .unset_size()
                                             .commit();
                                     }
                                 },
@@ -547,8 +547,8 @@ fn handle(
                                         let mut i = page.navigation.request.info.take();
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
-                                            .set_mime(None)
-                                            .set_size(None)
+                                            .unset_mime()
+                                            .unset_size()
                                             .commit();
 
                                         page.navigation.request.info.replace(i.into_redirect());
@@ -640,8 +640,8 @@ fn handle(
                         let mut i = page.navigation.request.info.borrow_mut();
                         i.add_event(EVENT_COMPLETED.to_string())
                             .set_request(Some(uri.to_string()))
-                            .set_mime(None)
-                            .set_size(None)
+                            .unset_mime()
+                            .unset_size()
                             .commit()
                     }
                 }

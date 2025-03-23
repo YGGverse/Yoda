@@ -1,11 +1,13 @@
 mod dialog;
 mod event;
+mod size;
 mod socket;
 
 use super::Profile;
 use dialog::Dialog;
 use event::Event;
 use gtk::{gio::SocketAddress, prelude::IsA};
+use size::Size;
 use socket::Socket;
 
 /// Common, shared `Page` information holder
@@ -24,8 +26,8 @@ pub struct Info {
     redirect: Option<Box<Self>>,
     /// Key to relate data collected with the specific request
     request: Option<String>,
-    /// Hold page content size
-    size: Option<usize>,
+    /// Hold size info
+    size: Size,
     /// Optional socket details
     /// * useful also for geo-location feature
     socket: Option<Socket>,
@@ -42,7 +44,7 @@ impl Info {
             mime: None,
             redirect: None,
             request: None,
-            size: None,
+            size: Size::default(),
             socket: None,
         }
     }
@@ -87,6 +89,11 @@ impl Info {
         self
     }
 
+    pub fn unset_mime(&mut self) -> &mut Self {
+        self.mime = None;
+        self
+    }
+
     pub fn set_socket(
         &mut self,
         local_address: SocketAddress,
@@ -104,8 +111,13 @@ impl Info {
         self
     }
 
-    pub fn set_size(&mut self, size: Option<usize>) -> &mut Self {
-        self.size = size;
+    pub fn set_size(&mut self, header: Option<usize>, content: Option<usize>) -> &mut Self {
+        self.size = Size { content, header };
+        self
+    }
+
+    pub fn unset_size(&mut self) -> &mut Self {
+        self.size = Size::default();
         self
     }
 
