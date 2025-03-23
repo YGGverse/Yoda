@@ -42,7 +42,7 @@ impl Gemini {
                 p.set_progress(match event {
                     // 0.1 reserved for handle begin
                     SocketClientEvent::Resolving => {
-                        i.add_event("Resolving".to_string());
+                        i.clear_events().add_event("Resolving".to_string());
                         0.2
                     }
                     SocketClientEvent::Resolved => {
@@ -139,7 +139,6 @@ impl Gemini {
                 });
                 self.page.set_title("Titan input");
                 self.page.set_progress(0.0);
-                //self.page.snap_history();
             }
             _ => panic!(), // unexpected
         }

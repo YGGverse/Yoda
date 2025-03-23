@@ -84,6 +84,11 @@ impl Info {
         self
     }
 
+    pub fn clear_events(&mut self) -> &mut Self {
+        self.event.clear();
+        self
+    }
+
     pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
         self.mime = mime;
         self
