@@ -53,10 +53,10 @@ impl Dialog for PreferencesDialog {
                     let g = PreferencesGroup::builder().title("Size").build();
                     let mut i = 0; // count group members
                     let mut t = 0; // count total size
-                    if let Some(ref c) = info.size.header {
+                    if let Some(ref h) = info.size.header {
                         i += 1;
-                        t += c;
-                        g.add(&r("Header", &c.bytes()))
+                        t += h;
+                        g.add(&r("Header", &h.bytes()))
                     }
                     if let Some(ref c) = info.size.content {
                         i += 1;
