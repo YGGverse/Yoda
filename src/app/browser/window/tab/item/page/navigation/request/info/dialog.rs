@@ -238,7 +238,7 @@ impl Dialog for PreferencesDialog {
                     .build();
                 p.add(&{
                     use gtk::{Align, Button};
-                    /// Common event number badge pattern
+                    /// Common event badge pattern
                     fn b() -> Button {
                         Button::builder()
                             .css_classes(["flat"])
@@ -250,18 +250,18 @@ impl Dialog for PreferencesDialog {
                     }
                     /// Left (prefix) widget
                     fn l(b: Button, v: Option<(i64, i64)>) -> Button {
-                        if let Some((c, t)) = v {
-                            b.add_css_class(if c == 0 {
+                        if let Some((d, t)) = v {
+                            b.add_css_class(if d == 0 {
                                 "success"
-                            } else if c > t {
+                            } else if d > t {
                                 "danger"
                             } else {
                                 "warning"
                             });
-                            b.set_label(&if c > 0 {
-                                format!("+{c}")
+                            b.set_label(&if d > 0 {
+                                format!("+{d}")
                             } else {
-                                c.to_string()
+                                d.to_string()
                             });
                         } else {
                             b.add_css_class("success");
