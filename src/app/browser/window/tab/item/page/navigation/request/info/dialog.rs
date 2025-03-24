@@ -245,7 +245,7 @@ impl Dialog for PreferencesDialog {
                             .sensitive(false)
                             .valign(Align::Center)
                             .halign(Align::Center)
-                            .width_request(76)
+                            .width_request(64)
                             .build()
                     }
                     /// Left (prefix) widget
