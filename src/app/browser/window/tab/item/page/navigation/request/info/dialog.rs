@@ -202,6 +202,7 @@ impl Dialog for PreferencesDialog {
                                     .label(c.to_string())
                                     .sensitive(false)
                                     .valign(gtk::Align::Center)
+                                    .halign(gtk::Align::Center)
                                     .build()
                             });
                             // show total redirection time in ms
@@ -233,32 +234,46 @@ impl Dialog for PreferencesDialog {
                     .icon_name("system-run-symbolic")
                     .build();
                 p.add(&{
+                    // Common event number badge pattern
+                    fn b(i: usize) -> gtk::Button {
+                        gtk::Button::builder()
+                            .css_classes(["flat"])
+                            .label(i.to_string())
+                            .sensitive(false)
+                            .valign(gtk::Align::Center)
+                            .halign(gtk::Align::Center)
+                            .build()
+                    }
                     let g = PreferencesGroup::new();
                     let e = &info.event[0];
                     let t = e.time();
                     let n = e.name();
-                    g.add(
-                        &ActionRow::builder()
+                    g.add(&{
+                        let a = ActionRow::builder()
                             .subtitle_selectable(true)
                             .subtitle(t.format_iso8601().unwrap())
                             .title_selectable(true)
                             .title(n)
-                            .build(),
-                    );
+                            .build();
+                        a.add_suffix(&b(1));
+                        a
+                    });
                     for (i, e) in info.event[1..].iter().enumerate() {
-                        g.add(
-                            &ActionRow::builder()
+                        g.add(&{
+                            let a = ActionRow::builder()
                                 .use_markup(true)
                                 .subtitle(gformat!(
                                     "{} <sup>+{}</sup> ms",
-                                    e.time().difference(t).as_milliseconds(),
-                                    e.time().difference(info.event[i].time()).as_milliseconds(),
+                                    e.time().difference(t).as_milliseconds(), // total time
+                                    e.time().difference(info.event[i].time()).as_milliseconds(), // last event diff
                                 ))
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
                                 .title(e.name())
-                                .build(),
-                        )
+                                .build();
+                            a.add_suffix(&b(i + 2));
+                            a
+                        })
                     }
                     g
                 });
