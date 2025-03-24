@@ -584,23 +584,41 @@ fn handle(
                                 update_page_info(&page, EVENT_COMPLETED);
                             }
                         }
-                        Response::Certificate(ref certificate) => match certificate {
-                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                            Certificate::Required { message } |
-                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                            Certificate::NotAuthorized { message } |
-                            // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                            Certificate::NotValid { message } => {
-                                let s = page.content.to_status_identity();
-                                s.set_description(Some(message.as_ref().unwrap_or(&certificate.to_string())));
-                                page.set_progress(0.0);
-                                page.set_title(&s.title());
-                                if is_snap_history {
-                                    page.snap_history();
-                                }
-                                redirects.replace(0); // reset
-                                update_page_info(&page, EVENT_COMPLETED);
+                        Response::Certificate(ref certificate) => {
+                            let (header_size, message) = match certificate {
+                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
+                                Certificate::Required(required) => (
+                                    required.as_bytes().len(),
+                                    required.message().unwrap_or("Certificate required")
+                                ),
+                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
+                                Certificate::NotAuthorized(not_authorized) => (
+                                    not_authorized.as_bytes().len(),
+                                    not_authorized.message().unwrap_or("Certificate not authorized")
+                                ),
+                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
+                                Certificate::NotValid(not_valid) => (
+                                    not_valid.as_bytes().len(),
+                                    not_valid.message().unwrap_or("Certificate not valid")
+                                ),
+                            };
+                            {
+                                let mut i = page.navigation.request.info.borrow_mut();
+                                i
+                                    .add_event(EVENT_COMPLETED.to_string())
+                                    .set_size(Some(header_size), None)
+                                    .unset_mime()
+                                    .commit();
+                                page.navigation.request.update_secondary_icon(&i)
                             }
+                            let s = page.content.to_status_identity();
+                            s.set_description(Some(message));
+                            page.set_progress(0.0);
+                            page.set_title(&s.title());
+                            if is_snap_history {
+                                page.snap_history();
+                            }
+                            redirects.replace(0); // reset
                         }
                         Response::Failure(failure) => match failure {
                             Failure::Temporary(ref temporary) => match temporary {
