@@ -103,7 +103,7 @@ impl Gemini {
             "gemini" => handle(
                 Request::Gemini {
                     uri,
-                    mode: Mode::Header,
+                    mode: Mode::HeaderOnly,
                 },
                 (
                     self.client.clone(),
@@ -127,7 +127,7 @@ impl Gemini {
                                 data: bytes,
                                 mime: header.mime.map(|mime| mime.into()),
                                 token: header.token.map(|token| token.into()),
-                                mode: Mode::Header,
+                                mode: Mode::HeaderOnly,
                             },
                             (
                                 client.clone(),
@@ -210,9 +210,8 @@ fn handle(
                     match response {
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#input-expected
                         Response::Input(input) => {
-                            let t = input.to_string();
                             page.set_progress(0.0);
-                            page.set_title(&t);
+                            page.set_title("Input expected");
                             if is_snap_history {
                                 page.snap_history();
                             }
@@ -220,17 +219,17 @@ fn handle(
                             update_page_info(&page, EVENT_COMPLETED);
                             match input {
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
-                                Input::Default { message } => page.input.set_new_response(
+                                Input::Default(default) => page.input.set_new_response(
                                     page.item_action.clone(),
                                     uri,
-                                    Some(message.as_ref().unwrap_or(&t)),
+                                    Some(default.message().unwrap_or("Input expected")),
                                     Some(1024),
                                 ),
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-11-sensitive-input
-                                Input::Sensitive { message } => page.input.set_new_sensitive(
+                                Input::Sensitive(sensitive) => page.input.set_new_sensitive(
                                     page.item_action.clone(),
                                     uri,
-                                    Some(message.as_ref().unwrap_or(&t)),
+                                    Some(sensitive.message().unwrap_or("Sensitive input expected")),
                                     Some(1024),
                                 )
                             }
