@@ -3,7 +3,10 @@ use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
     prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
-use gtk::glib::gformat;
+use gtk::{
+    glib::gformat,
+    prelude::{ButtonExt, WidgetExt},
+};
 
 pub trait Dialog {
     fn info(profile: &Profile, info: &Info) -> Self;
@@ -234,15 +237,37 @@ impl Dialog for PreferencesDialog {
                     .icon_name("system-run-symbolic")
                     .build();
                 p.add(&{
-                    // Common event number badge pattern
-                    fn b(i: usize) -> gtk::Button {
-                        gtk::Button::builder()
+                    use gtk::{Align, Button};
+                    /// Common event number badge pattern
+                    fn b() -> Button {
+                        Button::builder()
                             .css_classes(["flat"])
-                            .label(i.to_string())
                             .sensitive(false)
-                            .valign(gtk::Align::Center)
-                            .halign(gtk::Align::Center)
+                            .valign(Align::Center)
+                            .halign(Align::Center)
+                            .width_request(76)
                             .build()
+                    }
+                    /// Left (prefix) widget
+                    fn l(b: Button, v: Option<(i64, i64)>) -> Button {
+                        if let Some((c, t)) = v {
+                            b.add_css_class(if c == 0 {
+                                "success"
+                            } else if c > t {
+                                "danger"
+                            } else {
+                                "warning"
+                            });
+                            b.set_label(&if c > 0 {
+                                format!("+{c}")
+                            } else {
+                                c.to_string()
+                            });
+                        } else {
+                            b.add_css_class("success");
+                            b.set_icon_name("media-record-symbolic");
+                        }
+                        b
                     }
                     let g = PreferencesGroup::new();
                     let e = &info.event[0];
@@ -255,23 +280,26 @@ impl Dialog for PreferencesDialog {
                             .title_selectable(true)
                             .title(n)
                             .build();
-                        a.add_suffix(&b(1));
+                        a.add_prefix(&l(b(), None));
                         a
                     });
                     for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(&{
+                            let total = e.time().difference(t).as_milliseconds();
                             let a = ActionRow::builder()
                                 .use_markup(true)
-                                .subtitle(gformat!(
-                                    "{} <sup>+{}</sup> ms",
-                                    e.time().difference(t).as_milliseconds(), // total time
-                                    e.time().difference(info.event[i].time()).as_milliseconds(), // last event diff
-                                ))
+                                .subtitle(gformat!("{total} ms"))
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
                                 .title(e.name())
                                 .build();
-                            a.add_suffix(&b(i + 2));
+                            a.add_prefix(&l(
+                                b(),
+                                Some((
+                                    e.time().difference(info.event[i].time()).as_milliseconds(),
+                                    total,
+                                )),
+                            ));
                             a
                         })
                     }
