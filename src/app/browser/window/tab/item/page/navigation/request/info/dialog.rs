@@ -245,12 +245,14 @@ impl Dialog for PreferencesDialog {
                             .title(n)
                             .build(),
                     );
-                    for e in &info.event[1..] {
+                    for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(
                             &ActionRow::builder()
+                                .use_markup(true)
                                 .subtitle(gformat!(
-                                    "{} ms",
-                                    e.time().difference(t).as_milliseconds()
+                                    "{} <sup>+{}</sup> ms",
+                                    e.time().difference(t).as_milliseconds(),
+                                    e.time().difference(info.event[i].time()).as_milliseconds(),
                                 ))
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
