@@ -216,22 +216,43 @@ fn handle(
                                 page.snap_history();
                             }
                             redirects.replace(0); // reset
-                            update_page_info(&page, EVENT_COMPLETED);
                             match input {
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
-                                Input::Default(default) => page.input.set_new_response(
-                                    page.item_action.clone(),
-                                    uri,
-                                    Some(default.message().unwrap_or("Input expected")),
-                                    Some(1024),
-                                ),
+                                Input::Default(default) => {
+                                    {
+                                        let mut i = page.navigation.request.info.borrow_mut();
+                                        i
+                                            .add_event(EVENT_COMPLETED.to_string())
+                                            .set_size(Some(default.as_bytes().len()), None)
+                                            .unset_mime()
+                                            .commit();
+                                        page.navigation.request.update_secondary_icon(&i)
+                                    }
+                                    page.input.set_new_response(
+                                        page.item_action.clone(),
+                                        uri,
+                                        Some(default.message().unwrap_or("Input expected")),
+                                        Some(1024),
+                                    )
+                                },
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-11-sensitive-input
-                                Input::Sensitive(sensitive) => page.input.set_new_sensitive(
-                                    page.item_action.clone(),
-                                    uri,
-                                    Some(sensitive.message().unwrap_or("Sensitive input expected")),
-                                    Some(1024),
-                                )
+                                Input::Sensitive(sensitive) => {
+                                    {
+                                        let mut i = page.navigation.request.info.borrow_mut();
+                                        i
+                                            .add_event(EVENT_COMPLETED.to_string())
+                                            .set_size(Some(sensitive.as_bytes().len()), None)
+                                            .unset_mime()
+                                            .commit();
+                                        page.navigation.request.update_secondary_icon(&i)
+                                    }
+                                    page.input.set_new_sensitive(
+                                        page.item_action.clone(),
+                                        uri,
+                                        Some(sensitive.message().unwrap_or("Sensitive input expected")),
+                                        Some(1024),
+                                    )
+                                }
                             }
                         }
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
