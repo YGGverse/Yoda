@@ -584,33 +584,26 @@ fn handle(
                                 update_page_info(&page, EVENT_COMPLETED);
                             }
                         }
-                        Response::Certificate(ref certificate) => {
-                            let header = certificate.as_bytes();
-                            let message = match certificate {
-                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-60
-                                Certificate::Required(required) => required.message().unwrap_or("Certificate required"),
-                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-61-certificate-not-authorized
-                                Certificate::NotAuthorized(not_authorized) => not_authorized.message().unwrap_or("Certificate not authorized"),
-                                // https://geminiprotocol.net/docs/protocol-specification.gmi#status-62-certificate-not-valid
-                                Certificate::NotValid(not_valid) => not_valid.message().unwrap_or("Certificate not valid"),
-                            };
-                            {
-                                let mut i = page.navigation.request.info.borrow_mut();
-                                i
-                                    .add_event(EVENT_COMPLETED.to_string())
-                                    .set_size(Some(header.len()), None)
-                                    .unset_mime()
-                                    .commit();
-                                page.navigation.request.update_secondary_icon(&i)
-                            }
+                        Response::Certificate(c) => {
+                            // update page information
+                            let mut i = page.navigation.request.info.borrow_mut();
+                            i
+                                .add_event(EVENT_COMPLETED.to_string())
+                                .set_size(Some(c.as_bytes().len()), None)
+                                .unset_mime()
+                                .commit();
+                            page.navigation.request.update_secondary_icon(&i);
+                            // update page content widget
                             let s = page.content.to_status_identity();
-                            s.set_description(Some(message));
+                            s.set_description(Some(c.message_or_default()));
+                            // update other page members
                             page.set_progress(0.0);
-                            page.set_title(message);
+                            page.set_title(c.message_or_default());
                             if is_snap_history {
                                 page.snap_history();
                             }
-                            redirects.replace(0); // reset
+                            // reset previous redirections
+                            redirects.replace(0);
                         }
                         Response::Failure(failure) => match failure {
                             Failure::Temporary(ref temporary) => match temporary {
