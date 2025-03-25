@@ -1,8 +1,5 @@
 use super::{Feature, Page};
-use ggemini::client::connection::response::{
-    Failure, Input, Redirect, Success,
-    failure::{Permanent, Temporary},
-};
+use ggemini::client::connection::response::{Input, Redirect, Success};
 use ggemini::{
     client::{Client, Request, Response},
     gio::{file_output_stream, memory_input_stream},
@@ -503,7 +500,7 @@ fn handle(
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        Response::Redirect(r) => match r.uri(&uri) {
+                        Response::Redirect(redirect) => match redirect.uri(&uri) {
                             Ok(target) => {
                                 // Increase client redirection counter
                                 let total = redirects.take() + 1;
@@ -543,7 +540,7 @@ fn handle(
                                     update_page_info(&page, EVENT_COMPLETED);
                                 } else {
                                     let t = target.to_string();
-                                    if matches!(r, Redirect::Permanent { .. }) {
+                                    if matches!(redirect, Redirect::Permanent { .. }) {
                                         page.navigation.set_request(&t);
                                     }
                                     redirects.replace(total);
@@ -569,67 +566,39 @@ fn handle(
                                 update_page_info(&page, EVENT_COMPLETED);
                             }
                         }
-                        Response::Certificate(c) => {
+                        Response::Certificate(certificate) => {
                             // update page information
                             let mut i = page.navigation.request.info.borrow_mut();
                             i
                                 .add_event(EVENT_COMPLETED.to_string())
-                                .set_size(Some(c.as_bytes().len()), None)
+                                .set_size(Some(certificate.as_bytes().len()), None)
                                 .unset_mime()
                                 .commit();
                             page.navigation.request.update_secondary_icon(&i);
                             // update page content widget
                             let s = page.content.to_status_identity();
-                            s.set_description(Some(c.message_or_default()));
+                            s.set_description(Some(certificate.message_or_default()));
                             // update other page members
                             page.set_progress(0.0);
-                            page.set_title(c.message_or_default());
+                            page.set_title(certificate.message_or_default());
                             if is_snap_history {
                                 page.snap_history();
                             }
                             // reset previous redirections
                             redirects.replace(0);
                         }
-                        Response::Failure(failure) => match failure {
-                            Failure::Temporary(ref temporary) => match temporary {
-                                Temporary::CgiError { message } |
-                                Temporary::Default { message } |
-                                Temporary::ProxyError { message } |
-                                Temporary::ServerUnavailable { message } |
-                                Temporary::SlowDown { message } => {
-                                    let s = page.content.to_status_failure();
-                                    s.set_description(Some(message.as_ref().unwrap_or(&temporary.to_string())));
-                                    page.set_progress(0.0);
-                                    page.set_title(&s.title());
-                                    if is_snap_history {
-                                        page.snap_history();
-                                    }
-                                    redirects.replace(0); // reset
-                                    update_page_info(&page, EVENT_COMPLETED);
-                                    if let Some(callback) = on_failure {
-                                        callback()
-                                    }
-                                }
+                        Response::Failure(failure) => {
+                            let s = page.content.to_status_failure();
+                            s.set_description(Some(failure.message_or_default()));
+                            page.set_progress(0.0);
+                            page.set_title(&s.title());
+                            if is_snap_history {
+                                page.snap_history();
                             }
-                            Failure::Permanent(ref permanent) => match permanent {
-                                Permanent::BadRequest { message } |
-                                Permanent::Default { message } |
-                                Permanent::Gone { message } |
-                                Permanent::NotFound { message } |
-                                Permanent::ProxyRequestRefused { message } => {
-                                    let s = page.content.to_status_failure();
-                                    s.set_description(Some(message.as_ref().unwrap_or(&permanent.to_string())));
-                                    page.set_progress(0.0);
-                                    page.set_title(&s.title());
-                                    if is_snap_history {
-                                        page.snap_history();
-                                    }
-                                    redirects.replace(0); // reset
-                                    update_page_info(&page, EVENT_COMPLETED);
-                                    if let Some(callback) = on_failure {
-                                        callback()
-                                    }
-                                }
+                            redirects.replace(0); // reset
+                            update_page_info(&page, EVENT_COMPLETED);
+                            if let Some(callback) = on_failure {
+                                callback()
                             }
                         }
                     }
