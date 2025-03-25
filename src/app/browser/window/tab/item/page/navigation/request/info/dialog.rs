@@ -3,10 +3,7 @@ use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
     prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
-use gtk::{
-    glib::gformat,
-    prelude::{ButtonExt, WidgetExt},
-};
+use gtk::glib::gformat;
 
 pub trait Dialog {
     fn info(profile: &Profile, info: &Info) -> Self;
@@ -237,69 +234,49 @@ impl Dialog for PreferencesDialog {
                     .icon_name("system-run-symbolic")
                     .build();
                 p.add(&{
-                    use gtk::{Align, Button};
-                    /// Common event badge pattern
-                    fn b() -> Button {
-                        Button::builder()
-                            .css_classes(["flat"])
+                    use gtk::{Align, Label};
+                    /// Right (prefix) widget
+                    fn r(c: i64) -> Label {
+                        Label::builder()
+                            .css_classes(["flat", if c == 0 { "success" } else { "warning" }])
+                            .halign(Align::End)
+                            .label(if c > 0 {
+                                format!("+{c} ms")
+                            } else {
+                                c.to_string()
+                            })
                             .sensitive(false)
                             .valign(Align::Center)
-                            .halign(Align::Center)
-                            .width_request(64)
                             .build()
-                    }
-                    /// Left (prefix) widget
-                    fn l(b: Button, v: Option<(i64, i64)>) -> Button {
-                        if let Some((d, t)) = v {
-                            b.add_css_class(if d == 0 {
-                                "success"
-                            } else if d > t {
-                                "danger"
-                            } else {
-                                "warning"
-                            });
-                            b.set_label(&if d > 0 {
-                                format!("+{d}")
-                            } else {
-                                d.to_string()
-                            });
-                        } else {
-                            b.add_css_class("success");
-                            b.set_icon_name("media-record-symbolic");
-                        }
-                        b
                     }
                     let g = PreferencesGroup::new();
                     let e = &info.event[0];
                     let t = e.time();
                     let n = e.name();
-                    g.add(&{
-                        let a = ActionRow::builder()
+                    g.add(
+                        &ActionRow::builder()
                             .subtitle_selectable(true)
                             .subtitle(t.format_iso8601().unwrap())
                             .title_selectable(true)
                             .title(n)
-                            .build();
-                        a.add_prefix(&l(b(), None));
-                        a
-                    });
+                            .build(),
+                    );
                     for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(&{
-                            let total = e.time().difference(t).as_milliseconds();
                             let a = ActionRow::builder()
                                 .use_markup(true)
-                                .subtitle(gformat!("{total} ms"))
+                                .subtitle(gformat!(
+                                    "{} ms",
+                                    e.time().difference(t).as_milliseconds()
+                                ))
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
                                 .title(e.name())
                                 .build();
-                            a.add_prefix(&l(
-                                b(),
-                                Some((
-                                    e.time().difference(info.event[i].time()).as_milliseconds(),
-                                    total,
-                                )),
-                            ));
+                            a.add_suffix(&r(e
+                                .time()
+                                .difference(info.event[i].time())
+                                .as_milliseconds()));
                             a
                         })
                     }
