@@ -1,7 +1,9 @@
 use super::{Info, Profile};
 use adw::{
     ActionRow, PreferencesDialog, PreferencesGroup, PreferencesPage,
-    prelude::{ActionRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
+    prelude::{
+        ActionRowExt, ExpanderRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt,
+    },
 };
 use gtk::glib::gformat;
 
@@ -37,11 +39,11 @@ impl Dialog for PreferencesDialog {
                     g
                 });
             } // @TODO content language, header size, etc.
-            if info.size.header.is_some() || info.size.content.is_some() {
+            if info.size.is_some() || info.header.is_some() {
                 p.add(&{
                     use crate::tool::Format;
                     /// Common `ActionRow` widget pattern
-                    fn r(title: &str, subtitle: &str) -> ActionRow {
+                    fn r(title: &str, subtitle: String) -> ActionRow {
                         ActionRow::builder()
                             .css_classes(["property"])
                             .subtitle_selectable(true)
@@ -53,18 +55,45 @@ impl Dialog for PreferencesDialog {
                     let g = PreferencesGroup::builder().title("Size").build();
                     let mut i = 0; // count group members
                     let mut t = 0; // count total size
-                    if let Some(ref h) = info.size.header {
+                    if let Some(ref h) = info.header {
+                        let l = h.len();
                         i += 1;
-                        t += h;
-                        g.add(&r("Header", &h.bytes()))
+                        t += l;
+                        g.add(&{
+                            let e = adw::ExpanderRow::builder()
+                                /* @TODO this class does not work with `ExpanderRow`
+                                .css_classes(["property"]) */
+                                .enable_expansion(true)
+                                .expanded(false)
+                                .subtitle(l.bytes())
+                                .title_selectable(true)
+                                .title("Header")
+                                .build();
+                            e.add_row(
+                                &gtk::Label::builder()
+                                    .css_classes(["dim-label", "caption"])
+                                    .ellipsize(gtk::pango::EllipsizeMode::None)
+                                    .halign(gtk::Align::Start)
+                                    .label(h)
+                                    .margin_bottom(2)
+                                    .margin_end(12)
+                                    .margin_start(12)
+                                    .margin_top(14)
+                                    .selectable(true)
+                                    .valign(gtk::Align::Center)
+                                    .wrap(false)
+                                    .build(), // @TODO replace with `ActionRow` after fix empty subtitle issue
+                            );
+                            e
+                        })
                     }
-                    if let Some(ref c) = info.size.content {
+                    if let Some(ref c) = info.size {
                         i += 1;
                         t += c;
-                        g.add(&r("Content", &c.bytes()))
+                        g.add(&r("Content", c.bytes()))
                     }
                     if i > 1 && t > 0 {
-                        g.add(&r("Total", &t.bytes()))
+                        g.add(&r("Total", t.bytes()))
                     }
                     g
                 });

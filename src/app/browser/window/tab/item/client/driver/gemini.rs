@@ -183,8 +183,9 @@ fn handle(
                         let mut i = page.navigation.request.info.borrow_mut();
                         i
                             .add_event(event_name.to_string())
-                            .unset_mime()
-                            .unset_size()
+                            .set_header(None)
+                            .set_mime(None)
+                            .set_size(None)
                             .commit();
 
                         page.navigation.request.update_secondary_icon(&i)
@@ -216,8 +217,9 @@ fn handle(
                             let mut i = page.navigation.request.info.borrow_mut();
                             i
                                 .add_event(EVENT_COMPLETED.to_string())
-                                .set_size(Some(input.as_bytes().len()), None)
-                                .unset_mime()
+                                .set_header(Some(input.as_str().to_string()))
+                                .set_size(Some(input.as_bytes().len()))
+                                .set_mime(None)
                                 .commit();
                             page.navigation.request.update_secondary_icon(&i);
                             match input {
@@ -332,8 +334,9 @@ fn handle(
                                                                     let mut i = page.navigation.request.info.borrow_mut();
                                                                     i
                                                                         .add_event("Parsing".to_string())
-                                                                        .set_mime(Some(mime))
-                                                                        .set_size(Some(success.as_header_bytes().len()), Some(data.len()));
+                                                                        .set_header(Some(success.as_header_str().to_string()))
+                                                                        .set_size(Some(buffer.len()))
+                                                                        .set_mime(Some(mime));
                                                                     let w = if matches!(*feature, Feature::Source) {
                                                                         page.content.to_text_source(data)
                                                                     } else {
@@ -437,8 +440,9 @@ fn handle(
                                                                             let mut i = page.navigation.request.info.borrow_mut();
                                                                             i
                                                                                 .add_event(EVENT_COMPLETED.to_string())
+                                                                                .set_header(Some(success.as_header_str().to_string()))
                                                                                 .set_mime(Some(mime))
-                                                                                .set_size(None, Some(buffer.byte_length()))
+                                                                                .set_size(Some(buffer.byte_length()))
                                                                                 .commit();
                                                                             page.navigation.request.update_secondary_icon(&i)
                                                                         }
@@ -487,8 +491,9 @@ fn handle(
                                         let mut i = page.navigation.request.info.borrow_mut();
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
+                                            .set_header(Some(success.as_header_str().to_string()))
                                             .set_mime(Some(mime.to_string()))
-                                            .unset_size()
+                                            .set_size(None)
                                             .commit();
                                         page.navigation.request.update_secondary_icon(&i)
                                     },
@@ -556,8 +561,9 @@ fn handle(
                                         let mut i = page.navigation.request.info.take();
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
-                                            .unset_mime()
-                                            .unset_size()
+                                            .set_header(Some(redirect.as_str().to_string()))
+                                            .set_mime(None)
+                                            .set_size(None)
                                             .commit();
 
                                         page.navigation.request.info.replace(i.into_redirect());
@@ -579,8 +585,9 @@ fn handle(
                             let mut i = page.navigation.request.info.borrow_mut();
                             i
                                 .add_event(EVENT_COMPLETED.to_string())
-                                .set_size(Some(certificate.as_bytes().len()), None)
-                                .unset_mime()
+                                .set_header(Some(certificate.as_str().to_string()))
+                                .set_size(Some(certificate.as_bytes().len()))
+                                .set_mime(None)
                                 .commit();
                             page.navigation.request.update_secondary_icon(&i);
                             // update page content widget
@@ -623,8 +630,9 @@ fn handle(
                     let mut i = page.navigation.request.info.borrow_mut();
                     i.add_event(EVENT_COMPLETED.to_string())
                         .set_request(Some(uri.to_string()))
-                        .unset_mime()
-                        .unset_size()
+                        .set_header(None)
+                        .set_size(None)
+                        .set_mime(None)
                         .commit();
                     page.navigation.request.update_secondary_icon(&i)
                 }

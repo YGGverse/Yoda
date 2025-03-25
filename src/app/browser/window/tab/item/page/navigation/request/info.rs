@@ -1,13 +1,11 @@
 mod dialog;
 mod event;
-mod size;
 mod socket;
 
 use super::Profile;
 use dialog::Dialog;
 use event::Event;
 use gtk::{gio::SocketAddress, prelude::IsA};
-use size::Size;
 use socket::Socket;
 
 /// Common, shared `Page` information holder
@@ -16,6 +14,9 @@ use socket::Socket;
 pub struct Info {
     /// Hold page events like connection phase and parsing time
     event: Vec<Event>,
+    /// Hold optional header string to dump it in the info dialog
+    /// and calculate total size
+    header: Option<String>,
     /// Mark holder as deprecated on handle begin
     /// * useful on some driver does not update status properly
     is_deprecated: bool,
@@ -27,7 +28,7 @@ pub struct Info {
     /// Key to relate data collected with the specific request
     request: Option<String>,
     /// Hold size info
-    size: Size,
+    size: Option<usize>,
     /// Optional socket details
     /// * useful also for geo-location feature
     socket: Option<Socket>,
@@ -40,11 +41,12 @@ impl Info {
     pub fn new() -> Self {
         Self {
             event: Vec::with_capacity(50), // estimated max events quantity for all drivers
+            header: None,
             is_deprecated: false,
             mime: None,
             redirect: None,
             request: None,
-            size: Size::default(),
+            size: None,
             socket: None,
         }
     }
@@ -89,13 +91,13 @@ impl Info {
         self
     }
 
-    pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
-        self.mime = mime;
+    pub fn set_header(&mut self, header: Option<String>) -> &mut Self {
+        self.header = header;
         self
     }
 
-    pub fn unset_mime(&mut self) -> &mut Self {
-        self.mime = None;
+    pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
+        self.mime = mime;
         self
     }
 
@@ -116,13 +118,8 @@ impl Info {
         self
     }
 
-    pub fn set_size(&mut self, header: Option<usize>, content: Option<usize>) -> &mut Self {
-        self.size = Size { content, header };
-        self
-    }
-
-    pub fn unset_size(&mut self) -> &mut Self {
-        self.size = Size::default();
+    pub fn set_size(&mut self, size: Option<usize>) -> &mut Self {
+        self.size = size;
         self
     }
 
