@@ -1,5 +1,5 @@
 use super::{Feature, Page};
-use ggemini::client::connection::response::{Input, Redirect, Success};
+use ggemini::client::connection::response::{Input, Redirect};
 use ggemini::{
     client::{Client, Request, Response},
     gio::{file_output_stream, memory_input_stream},
@@ -307,76 +307,63 @@ fn handle(
                                 }
                                 redirects.replace(0); // reset
                             },
-                            _ => match success {
-                                Success::Default(default) => match default.header.mime() {
-                                    Ok(mime) => match mime.as_str() {
-                                        "text/gemini" | "text/plain" => memory_input_stream::from_stream_async(
-                                            connection.stream(),
-                                            Priority::DEFAULT,
-                                            cancellable.clone(),
-                                            (
-                                                0x400,   // 1024 chunk
-                                                0xfffff, // 1M limit
-                                            ),
-                                            (
-                                                |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
-                                                move |result| match result { // on complete
-                                                    Ok((memory_input_stream, total)) => memory_input_stream.read_all_async(
-                                                        vec![0; total],
-                                                        Priority::DEFAULT,
-                                                        Some(&cancellable),
-                                                        {
-                                                            let m = mime.clone();
-                                                            move |result| match result {
-                                                                Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
-                                                                    Ok(data) => {
-                                                                        let mut i = page.navigation.request.info.borrow_mut();
-                                                                        i
-                                                                            .add_event("Parsing".to_string())
-                                                                            .set_mime(Some(mime))
-                                                                            .set_size(Some(default.header.len()), Some(data.len()));
-                                                                        let w = if matches!(*feature, Feature::Source) {
-                                                                            page.content.to_text_source(data)
-                                                                        } else {
-                                                                            match m.as_str() {
-                                                                                "text/gemini" => page.content.to_text_gemini(&uri, data),
-                                                                                "text/plain" => page.content.to_text_plain(data),
-                                                                                _ => panic!() // unexpected
-                                                                            }
-                                                                        };
-                                                                        i.add_event("Parsed".to_string());
-                                                                        page.search.set(Some(w.text_view));
-                                                                        page.set_title(&match w.meta.title {
-                                                                            Some(t) => t.into(), // @TODO
-                                                                            None => crate::tool::uri_to_title(&uri),
-                                                                        });
-                                                                        page.set_progress(0.0);
-                                                                        page.window_action
-                                                                            .find
-                                                                            .simple_action
-                                                                            .set_enabled(true);
-                                                                        if is_snap_history {
-                                                                            page.snap_history();
+                            _ => match success.mime() {
+                                Ok(mime) => match mime.as_str() {
+                                    "text/gemini" | "text/plain" => memory_input_stream::from_stream_async(
+                                        connection.stream(),
+                                        Priority::DEFAULT,
+                                        cancellable.clone(),
+                                        (
+                                            0x400,   // 1024 chunk
+                                            0xfffff, // 1M limit
+                                        ),
+                                        (
+                                            |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
+                                            move |result| match result { // on complete
+                                                Ok((memory_input_stream, total)) => memory_input_stream.read_all_async(
+                                                    vec![0; total],
+                                                    Priority::DEFAULT,
+                                                    Some(&cancellable),
+                                                    {
+                                                        let m = mime.clone();
+                                                        move |result| match result {
+                                                            Ok((buffer, _ ,_)) => match std::str::from_utf8(&buffer) {
+                                                                Ok(data) => {
+                                                                    let mut i = page.navigation.request.info.borrow_mut();
+                                                                    i
+                                                                        .add_event("Parsing".to_string())
+                                                                        .set_mime(Some(mime))
+                                                                        .set_size(Some(success.as_header_bytes().len()), Some(data.len()));
+                                                                    let w = if matches!(*feature, Feature::Source) {
+                                                                        page.content.to_text_source(data)
+                                                                    } else {
+                                                                        match m.as_str() {
+                                                                            "text/gemini" => page.content.to_text_gemini(&uri, data),
+                                                                            "text/plain" => page.content.to_text_plain(data),
+                                                                            _ => panic!() // unexpected
                                                                         }
-                                                                        redirects.replace(0); // reset
-                                                                        i
-                                                                            .add_event(EVENT_COMPLETED.to_string())
-                                                                            .commit();
-                                                                        page.navigation.request.update_secondary_icon(&i)
-                                                                    },
-                                                                    Err(e) => {
-                                                                        let s = page.content.to_status_failure();
-                                                                        s.set_description(Some(&e.to_string()));
-                                                                        page.set_progress(0.0);
-                                                                        page.set_title(&s.title());
-                                                                        if is_snap_history {
-                                                                            page.snap_history();
-                                                                        }
-                                                                        redirects.replace(0); // reset
-                                                                        update_page_info(&page, EVENT_COMPLETED);
-                                                                    },
+                                                                    };
+                                                                    i.add_event("Parsed".to_string());
+                                                                    page.search.set(Some(w.text_view));
+                                                                    page.set_title(&match w.meta.title {
+                                                                        Some(t) => t.into(), // @TODO
+                                                                        None => crate::tool::uri_to_title(&uri),
+                                                                    });
+                                                                    page.set_progress(0.0);
+                                                                    page.window_action
+                                                                        .find
+                                                                        .simple_action
+                                                                        .set_enabled(true);
+                                                                    if is_snap_history {
+                                                                        page.snap_history();
+                                                                    }
+                                                                    redirects.replace(0); // reset
+                                                                    i
+                                                                        .add_event(EVENT_COMPLETED.to_string())
+                                                                        .commit();
+                                                                    page.navigation.request.update_secondary_icon(&i)
                                                                 },
-                                                                Err((_, e)) => {
+                                                                Err(e) => {
                                                                     let s = page.content.to_status_failure();
                                                                     s.set_description(Some(&e.to_string()));
                                                                     page.set_progress(0.0);
@@ -386,79 +373,9 @@ fn handle(
                                                                     }
                                                                     redirects.replace(0); // reset
                                                                     update_page_info(&page, EVENT_COMPLETED);
-                                                                }
-                                                            }
-                                                        }
-                                                    ),
-                                                    Err(e) => {
-                                                        let s = page.content.to_status_failure();
-                                                        s.set_description(Some(&e.to_string()));
-                                                        page.set_progress(0.0);
-                                                        page.set_title(&s.title());
-                                                        if is_snap_history {
-                                                            page.snap_history();
-                                                        }
-                                                        redirects.replace(0); // reset
-                                                        update_page_info(&page, EVENT_COMPLETED);
-                                                    },
-                                                }
-                                            )
-                                        ),
-                                        "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                                            // Final image size unknown, show loading widget
-                                            let status = page.content.to_status_loading(
-                                                Some(Duration::from_secs(1)), // show if download time > 1 second
-                                            );
-
-                                            // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
-                                            // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
-                                            // show bytes count in loading widget, validate max size for incoming data
-                                            // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
-                                            memory_input_stream::from_stream_async(
-                                                connection.stream(),
-                                                Priority::DEFAULT,
-                                                cancellable.clone(),
-                                                (
-                                                    0x400,   // 1024 bytes per chunk, optional step for images download tracking
-                                                    0xA00000 // 10M bytes max to prevent memory overflow if server play with promises
-                                                ),
-                                                (
-                                                    move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
-                                                    {
-                                                        move | result | match result {
-                                                            Ok((memory_input_stream, _)) => {
-                                                                Pixbuf::from_stream_async(
-                                                                    &memory_input_stream,
-                                                                    Some(&cancellable),
-                                                                    move |result| {
-                                                                        match result {
-                                                                            Ok(buffer) => {
-                                                                                page.set_title(&crate::tool::uri_to_title(&uri));
-                                                                                page.content.to_image(&Texture::for_pixbuf(&buffer));
-                                                                                let mut i = page.navigation.request.info.borrow_mut();
-                                                                                i
-                                                                                    .add_event(EVENT_COMPLETED.to_string())
-                                                                                    .set_mime(Some(mime))
-                                                                                    .set_size(None, Some(buffer.byte_length()))
-                                                                                    .commit();
-                                                                                page.navigation.request.update_secondary_icon(&i)
-                                                                            }
-                                                                            Err(e) => {
-                                                                                let s = page.content.to_status_failure();
-                                                                                s.set_description(Some(e.message()));
-                                                                                page.set_title(&s.title());
-                                                                                update_page_info(&page, EVENT_COMPLETED);
-                                                                            }
-                                                                        }
-                                                                        page.set_progress(0.0);
-                                                                        if is_snap_history {
-                                                                            page.snap_history();
-                                                                        }
-                                                                        redirects.replace(0); // reset
-                                                                    },
-                                                                )
-                                                            }
-                                                            Err(e) => {
+                                                                },
+                                                            },
+                                                            Err((_, e)) => {
                                                                 let s = page.content.to_status_failure();
                                                                 s.set_description(Some(&e.to_string()));
                                                                 page.set_progress(0.0);
@@ -472,29 +389,120 @@ fn handle(
                                                         }
                                                     }
                                                 ),
-                                            )
-                                        }
-                                        mime => {
-                                            let s = page
-                                                .content
-                                                .to_status_mime(mime, Some((&page.item_action, &uri)));
-                                            s.set_description(Some(&format!("Content type `{mime}` yet not supported")));
-                                            page.set_progress(0.0);
-                                            page.set_title(&s.title());
-                                            if is_snap_history {
-                                                page.snap_history();
+                                                Err(e) => {
+                                                    let s = page.content.to_status_failure();
+                                                    s.set_description(Some(&e.to_string()));
+                                                    page.set_progress(0.0);
+                                                    page.set_title(&s.title());
+                                                    if is_snap_history {
+                                                        page.snap_history();
+                                                    }
+                                                    redirects.replace(0); // reset
+                                                    update_page_info(&page, EVENT_COMPLETED);
+                                                },
                                             }
-                                            redirects.replace(0); // reset
-                                            let mut i = page.navigation.request.info.borrow_mut();
-                                            i
-                                                .add_event(EVENT_COMPLETED.to_string())
-                                                .set_mime(Some(mime.to_string()))
-                                                .unset_size()
-                                                .commit();
-                                            page.navigation.request.update_secondary_icon(&i)
-                                        },
+                                        )
+                                    ),
+                                    "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                        // Final image size unknown, show loading widget
+                                        let status = page.content.to_status_loading(
+                                            Some(Duration::from_secs(1)), // show if download time > 1 second
+                                        );
+
+                                        // Asynchronously read [IOStream](https://docs.gtk.org/gio/class.IOStream.html)
+                                        // to local [MemoryInputStream](https://docs.gtk.org/gio/class.MemoryInputStream.html)
+                                        // show bytes count in loading widget, validate max size for incoming data
+                                        // * no dependency of Gemini library here, feel free to use any other `IOStream` processor
+                                        memory_input_stream::from_stream_async(
+                                            connection.stream(),
+                                            Priority::DEFAULT,
+                                            cancellable.clone(),
+                                            (
+                                                0x400,   // 1024 bytes per chunk, optional step for images download tracking
+                                                0xA00000 // 10M bytes max to prevent memory overflow if server play with promises
+                                            ),
+                                            (
+                                                move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
+                                                {
+                                                    move | result | match result {
+                                                        Ok((memory_input_stream, _)) => {
+                                                            Pixbuf::from_stream_async(
+                                                                &memory_input_stream,
+                                                                Some(&cancellable),
+                                                                move |result| {
+                                                                    match result {
+                                                                        Ok(buffer) => {
+                                                                            page.set_title(&crate::tool::uri_to_title(&uri));
+                                                                            page.content.to_image(&Texture::for_pixbuf(&buffer));
+                                                                            let mut i = page.navigation.request.info.borrow_mut();
+                                                                            i
+                                                                                .add_event(EVENT_COMPLETED.to_string())
+                                                                                .set_mime(Some(mime))
+                                                                                .set_size(None, Some(buffer.byte_length()))
+                                                                                .commit();
+                                                                            page.navigation.request.update_secondary_icon(&i)
+                                                                        }
+                                                                        Err(e) => {
+                                                                            let s = page.content.to_status_failure();
+                                                                            s.set_description(Some(e.message()));
+                                                                            page.set_title(&s.title());
+                                                                            update_page_info(&page, EVENT_COMPLETED);
+                                                                        }
+                                                                    }
+                                                                    page.set_progress(0.0);
+                                                                    if is_snap_history {
+                                                                        page.snap_history();
+                                                                    }
+                                                                    redirects.replace(0); // reset
+                                                                },
+                                                            )
+                                                        }
+                                                        Err(e) => {
+                                                            let s = page.content.to_status_failure();
+                                                            s.set_description(Some(&e.to_string()));
+                                                            page.set_progress(0.0);
+                                                            page.set_title(&s.title());
+                                                            if is_snap_history {
+                                                                page.snap_history();
+                                                            }
+                                                            redirects.replace(0); // reset
+                                                            update_page_info(&page, EVENT_COMPLETED);
+                                                        }
+                                                    }
+                                                }
+                                            ),
+                                        )
+                                    }
+                                    mime => {
+                                        let s = page
+                                            .content
+                                            .to_status_mime(mime, Some((&page.item_action, &uri)));
+                                        s.set_description(Some(&format!("Content type `{mime}` yet not supported")));
+                                        page.set_progress(0.0);
+                                        page.set_title(&s.title());
+                                        if is_snap_history {
+                                            page.snap_history();
+                                        }
+                                        redirects.replace(0); // reset
+                                        let mut i = page.navigation.request.info.borrow_mut();
+                                        i
+                                            .add_event(EVENT_COMPLETED.to_string())
+                                            .set_mime(Some(mime.to_string()))
+                                            .unset_size()
+                                            .commit();
+                                        page.navigation.request.update_secondary_icon(&i)
                                     },
-                                    Err(_) => todo!()
+                                },
+                                Err(e) => {
+                                    let s = page.content.to_status_failure();
+                                    s.set_description(Some(&e.to_string()));
+                                    page.set_progress(0.0);
+                                    page.set_title(&s.title());
+                                    if is_snap_history {
+                                        page.snap_history();
+                                    }
+                                    redirects.replace(0); // reset
+                                    update_page_info(&page, EVENT_COMPLETED);
                                 }
                             }
                         },
