@@ -234,21 +234,6 @@ impl Dialog for PreferencesDialog {
                     .icon_name("system-run-symbolic")
                     .build();
                 p.add(&{
-                    use gtk::{Align, Label};
-                    /// Right (prefix) widget
-                    fn r(c: i64) -> Label {
-                        Label::builder()
-                            .css_classes(["flat", if c == 0 { "success" } else { "warning" }])
-                            .halign(Align::End)
-                            .label(if c > 0 {
-                                format!("+{c} ms")
-                            } else {
-                                c.to_string()
-                            })
-                            .sensitive(false)
-                            .valign(Align::Center)
-                            .build()
-                    }
                     let g = PreferencesGroup::new();
                     let e = &info.event[0];
                     let t = e.time();
@@ -263,6 +248,8 @@ impl Dialog for PreferencesDialog {
                     );
                     for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(&{
+                            use gtk::{Align, Label};
+                            let c = e.time().difference(info.event[i].time()).as_milliseconds();
                             let a = ActionRow::builder()
                                 .use_markup(true)
                                 .subtitle(gformat!(
@@ -273,10 +260,22 @@ impl Dialog for PreferencesDialog {
                                 .title_selectable(true)
                                 .title(e.name())
                                 .build();
-                            a.add_suffix(&r(e
-                                .time()
-                                .difference(info.event[i].time())
-                                .as_milliseconds()));
+                            a.add_suffix(
+                                &Label::builder()
+                                    .css_classes([
+                                        "flat",
+                                        if c == 0 { "success" } else { "warning" },
+                                    ])
+                                    .halign(Align::End)
+                                    .label(if c > 0 {
+                                        format!("+{c} ms")
+                                    } else {
+                                        c.to_string()
+                                    })
+                                    .sensitive(false)
+                                    .valign(Align::Center)
+                                    .build(),
+                            );
                             a
                         })
                     }
