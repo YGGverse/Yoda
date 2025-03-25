@@ -1,6 +1,6 @@
 use super::{Feature, Page};
 use ggemini::client::connection::response::{
-    Certificate, Failure, Input, Redirect, Success,
+    Failure, Input, Redirect, Success,
     failure::{Permanent, Temporary},
 };
 use ggemini::{
@@ -518,7 +518,7 @@ fn handle(
                         },
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-30-temporary-redirection
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-31-permanent-redirection
-                        Response::Redirect(redirect) => match redirect.to_uri(&uri) {
+                        Response::Redirect(r) => match r.uri(&uri) {
                             Ok(target) => {
                                 // Increase client redirection counter
                                 let total = redirects.take() + 1;
@@ -558,7 +558,7 @@ fn handle(
                                     update_page_info(&page, EVENT_COMPLETED);
                                 } else {
                                     let t = target.to_string();
-                                    if matches!(redirect, Redirect::Permanent { .. }) {
+                                    if matches!(r, Redirect::Permanent { .. }) {
                                         page.navigation.set_request(&t);
                                     }
                                     redirects.replace(total);
