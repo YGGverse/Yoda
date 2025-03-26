@@ -50,7 +50,7 @@ impl Info {
     }
 
     /// Take `Self`, convert it into the new `Redirect` member,
-    /// * return new `Self` back
+    /// * return new `Self` that contain referring node
     fn into_redirect(self, method: redirect::Method) -> Self {
         let mut this = Self::new();
         this.redirect = Some(Box::new(Redirect { info: self, method }));
