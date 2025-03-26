@@ -53,6 +53,22 @@ impl Info {
         }
     }
 
+    /// Take `Self`, convert it into the new `Redirect` member,
+    /// * return new `Self` back
+    fn into_redirect(self, method: redirect::Method) -> Self {
+        let mut this = Self::new();
+        this.redirect = Some(Box::new(Redirect { info: self, method }));
+        this
+    }
+
+    pub fn into_permanent_redirect(self) -> Self {
+        self.into_redirect(redirect::Method::Permanent)
+    }
+
+    pub fn into_temporary_redirect(self) -> Self {
+        self.into_redirect(redirect::Method::Temporary)
+    }
+
     // Actions
 
     pub fn dialog(&self, parent: &impl IsA<gtk::Widget>, profile: &Profile) {
@@ -66,28 +82,24 @@ impl Info {
     }
 
     /// Mark `Self` as deprecated
-    /// * tip: usually called on page handler begin
+    /// * tip: usually called on page load begin,
+    ///   to prevent driver implementation mistakes
     pub fn deprecate(&mut self) {
         self.is_deprecated = true;
     }
 
     // Setters
-    // * useful to update `Self` as chain of values
+    // * update `Self` in chain
 
-    /// Take `Self`, convert it into the redirect member,
-    /// then, return new `Self` back
-    pub fn into_redirect(self, method: redirect::Method) -> Self {
-        let mut this = Self::new();
-        this.redirect = Some(Box::new(Redirect { info: self, method }));
-        this
-    }
-
-    pub fn into_permanent_redirect(self) -> Self {
-        self.into_redirect(redirect::Method::Permanent)
-    }
-
-    pub fn into_temporary_redirect(self) -> Self {
-        self.into_redirect(redirect::Method::Temporary)
+    /// Reset `Self` to the clean state
+    /// * this method keeps `Redirect` value!
+    pub fn reset(&mut self) -> &mut Self {
+        self.clear_events()
+            .set_header(None)
+            .set_mime(None)
+            .set_request(None)
+            .set_size(None)
+            .set_socket(None)
     }
 
     pub fn add_event(&mut self, name: String) -> &mut Self {
@@ -110,12 +122,8 @@ impl Info {
         self
     }
 
-    pub fn set_socket(
-        &mut self,
-        local_address: SocketAddress,
-        remote_address: SocketAddress,
-    ) -> &mut Self {
-        self.socket = Some(Socket {
+    pub fn set_socket(&mut self, address: Option<(SocketAddress, SocketAddress)>) -> &mut Self {
+        self.socket = address.map(|(local_address, remote_address)| Socket {
             local_address,
             remote_address,
         });

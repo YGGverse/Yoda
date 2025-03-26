@@ -39,7 +39,7 @@ impl Gemini {
                 p.set_progress(match event {
                     // 0.1 reserved for handle begin
                     SocketClientEvent::Resolving => {
-                        i.clear_events().add_event("Resolving".to_string());
+                        i.reset().add_event("Resolving".to_string());
                         0.2
                     }
                     SocketClientEvent::Resolved => {
@@ -181,13 +181,7 @@ fn handle(
                     /// * includes commit action!
                     fn update_page_info(page: &Page, event_name: &str) {
                         let mut i = page.navigation.request.info.borrow_mut();
-                        i
-                            .add_event(event_name.to_string())
-                            .set_header(None)
-                            .set_mime(None)
-                            .set_size(None)
-                            .commit();
-
+                        i.add_event(event_name.to_string()).commit();
                         page.navigation.request.update_secondary_icon(&i)
                     }
                     // Update socket info at the point, where the connection is active yet
@@ -197,10 +191,10 @@ fn handle(
                         let mut i = page.navigation.request.info.borrow_mut();
                         i
                             .set_request(Some(uri.to_string()))
-                            .set_socket(
+                            .set_socket(Some((
                                 connection.socket_connection.local_address().unwrap(),
                                 connection.socket_connection.remote_address().unwrap()
-                            );
+                            )));
                             // * unwrap fails only on `connection.socket_connection.is_closed()`
                             //   drop the panic as unexpected.
                     }
@@ -219,7 +213,6 @@ fn handle(
                                 .add_event(EVENT_COMPLETED.to_string())
                                 .set_header(Some(input.as_str().to_string()))
                                 .set_size(Some(input.as_bytes().len()))
-                                .set_mime(None)
                                 .commit();
                             page.navigation.request.update_secondary_icon(&i);
                             match input {
@@ -493,7 +486,6 @@ fn handle(
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_header(Some(success.as_header_str().to_string()))
                                             .set_mime(Some(mime.to_string()))
-                                            .set_size(None)
                                             .commit();
                                         page.navigation.request.update_secondary_icon(&i)
                                     },
@@ -562,10 +554,7 @@ fn handle(
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_header(Some(redirect.as_str().to_string()))
-                                            .set_mime(None)
-                                            .set_size(None)
                                             .commit();
-
                                         page.navigation.request.info.replace(match redirect {
                                             Redirect::Permanent { .. } => i.into_permanent_redirect(),
                                             Redirect::Temporary { .. } => i.into_temporary_redirect(),
@@ -590,7 +579,6 @@ fn handle(
                                 .add_event(EVENT_COMPLETED.to_string())
                                 .set_header(Some(certificate.as_str().to_string()))
                                 .set_size(Some(certificate.as_bytes().len()))
-                                .set_mime(None)
                                 .commit();
                             page.navigation.request.update_secondary_icon(&i);
                             // update page content widget
@@ -631,12 +619,7 @@ fn handle(
                     }
                     redirects.replace(0); // reset
                     let mut i = page.navigation.request.info.borrow_mut();
-                    i.add_event(EVENT_COMPLETED.to_string())
-                        .set_request(Some(uri.to_string()))
-                        .set_header(None)
-                        .set_size(None)
-                        .set_mime(None)
-                        .commit();
+                    i.add_event(EVENT_COMPLETED.to_string()).set_request(Some(uri.to_string())).commit();
                     page.navigation.request.update_secondary_icon(&i)
                 }
             }
