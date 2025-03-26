@@ -1,11 +1,13 @@
 mod dialog;
 mod event;
+mod redirect;
 mod socket;
 
 use super::Profile;
 use dialog::Dialog;
 use event::Event;
 use gtk::{gio::SocketAddress, prelude::IsA};
+use redirect::Redirect;
 use socket::Socket;
 
 /// Common, shared `Page` information holder
@@ -24,7 +26,7 @@ pub struct Info {
     mime: Option<String>,
     /// Hold redirections chain with handled details
     /// * the `referrer` member name is reserved for other protocols
-    redirect: Option<Box<Self>>,
+    redirect: Option<Box<Redirect>>,
     /// Key to relate data collected with the specific request
     request: Option<String>,
     /// Hold size info
@@ -74,11 +76,18 @@ impl Info {
 
     /// Take `Self`, convert it into the redirect member,
     /// then, return new `Self` back
-    /// * tip: use on driver redirection events
-    pub fn into_redirect(self) -> Self {
+    pub fn into_redirect(self, method: redirect::Method) -> Self {
         let mut this = Self::new();
-        this.redirect = Some(Box::new(self));
+        this.redirect = Some(Box::new(Redirect { info: self, method }));
         this
+    }
+
+    pub fn into_permanent_redirect(self) -> Self {
+        self.into_redirect(redirect::Method::Permanent)
+    }
+
+    pub fn into_temporary_redirect(self) -> Self {
+        self.into_redirect(redirect::Method::Temporary)
     }
 
     pub fn add_event(&mut self, name: String) -> &mut Self {

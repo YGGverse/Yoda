@@ -185,36 +185,60 @@ impl Dialog for PreferencesDialog {
                     .icon_name("insert-link-symbolic")
                     .build();
                 p.add(&{
-                    // Collect redirections into the buffer,
-                    // to reverse chain before add its members to widget
-                    // * capacity optimized for Gemini protocol (as default)
-                    let mut b = Vec::with_capacity(5);
+                    use gtk::Button;
+                    /// Common suffix widget pattern
+                    fn suffix(
+                        icon_name: impl Into<GString>,
+                        tooltip_text: impl Into<GString>,
+                    ) -> Button {
+                        Button::builder()
+                            .css_classes(["flat"])
+                            .icon_name(icon_name)
+                            .tooltip_text(tooltip_text)
+                            .sensitive(false)
+                            .valign(Align::Center)
+                            .halign(Align::Center)
+                            .build()
+                    }
                     /// Recursively collect redirection members into the given vector
                     fn chain<'a>(b: &mut Vec<&'a Info>, i: &'a Info) {
                         b.push(i);
                         if let Some(ref r) = i.redirect {
-                            chain(b, r)
+                            chain(b, &r.info)
                         }
                     }
+                    // Collect redirections into the buffer,
+                    // to reverse chain before add its members to widget
+                    // * capacity optimized for Gemini protocol (as default)
+                    let mut b = Vec::with_capacity(5);
                     chain(&mut b, info);
                     b.reverse();
                     let l = b.len(); // calculate once
                     let t = b[0].event[0].time(); // first event time to count from
                     for (i, r) in b.iter().enumerate() {
                         g.add(&{
+                            let is_external = r
+                                .redirect
+                                .as_ref()
+                                .is_some_and(|this| this.is_external(r).is_some_and(|v| v));
                             let a = ActionRow::builder()
                                 .css_classes(["property"])
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
                                 .title(r.request().unwrap())
                                 .build();
-                            // show redirections counter
                             a.add_prefix(&{
                                 let c = i + 1;
-                                gtk::Button::builder()
+                                Button::builder()
                                     .css_classes([
                                         "circular",
-                                        if c == l { "success" } else { "accent" },
+                                        if is_external {
+                                            "warning"
+                                        } else if c == l {
+                                            "success"
+                                        } else {
+                                            "accent"
+                                        },
                                     ])
                                     .label(c.to_string())
                                     .sensitive(false)
@@ -222,6 +246,15 @@ impl Dialog for PreferencesDialog {
                                     .halign(Align::Center)
                                     .build()
                             });
+                            if let Some(ref redirect) = r.redirect {
+                                a.add_suffix(&suffix(
+                                    redirect.method.icon_name(),
+                                    redirect.method.to_string(),
+                                ))
+                            }
+                            if is_external {
+                                a.add_suffix(&suffix("application-exit-symbolic", "External")) // @TODO links contain ⇖ text label indication
+                            }
                             // show total redirection time in ms
                             a.set_subtitle(&if i == 0 {
                                 t.format_iso8601().unwrap()
@@ -237,7 +270,7 @@ impl Dialog for PreferencesDialog {
                                 )
                             });
                             a
-                        });
+                        })
                     }
                     g
                 });
@@ -266,10 +299,7 @@ impl Dialog for PreferencesDialog {
                             );
                             a.add_suffix(
                                 &Label::builder()
-                                    .css_classes([
-                                        "flat",
-                                        if c == 0 { "success" } else { "warning" },
-                                    ])
+                                    .css_classes([if c == 0 { "success" } else { "warning" }])
                                     .halign(Align::End)
                                     .label(if c > 0 {
                                         format!("+{c} ms")

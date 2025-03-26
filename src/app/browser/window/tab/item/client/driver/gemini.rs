@@ -566,7 +566,10 @@ fn handle(
                                             .set_size(None)
                                             .commit();
 
-                                        page.navigation.request.info.replace(i.into_redirect());
+                                        page.navigation.request.info.replace(match redirect {
+                                            Redirect::Permanent { .. } => i.into_permanent_redirect(),
+                                            Redirect::Temporary { .. } => i.into_temporary_redirect(),
+                                        });
                                     }
                                     page.item_action.load.activate(Some(&t), false);
                                 }
