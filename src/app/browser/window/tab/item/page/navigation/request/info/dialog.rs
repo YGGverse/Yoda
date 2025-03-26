@@ -5,7 +5,10 @@ use adw::{
         ActionRowExt, ExpanderRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt,
     },
 };
-use gtk::{Align, glib::gformat};
+use gtk::{
+    Align,
+    glib::{GString, gformat},
+};
 
 pub trait Dialog {
     fn info(profile: &Profile, info: &Info) -> Self;
@@ -13,6 +16,17 @@ pub trait Dialog {
 
 impl Dialog for PreferencesDialog {
     fn info(profile: &Profile, info: &Info) -> Self {
+        /// Common `ActionRow` widget pattern
+        fn row(title: impl Into<GString>, subtitle: impl Into<GString>) -> ActionRow {
+            ActionRow::builder()
+                .css_classes(["property"])
+                .use_markup(true)
+                .subtitle(subtitle)
+                .subtitle_selectable(true)
+                .title_selectable(true)
+                .title(title)
+                .build()
+        }
         let d = PreferencesDialog::builder()
             .search_enabled(true)
             .title("Page info")
@@ -26,15 +40,7 @@ impl Dialog for PreferencesDialog {
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Meta").build();
                     if let Some(ref mime) = info.mime {
-                        g.add(
-                            &ActionRow::builder()
-                                .css_classes(["property"])
-                                .subtitle_selectable(true)
-                                .subtitle(mime)
-                                .title_selectable(true)
-                                .title("Content type")
-                                .build(),
-                        )
+                        g.add(&row("Content type", mime))
                     }
                     g
                 });
@@ -42,16 +48,6 @@ impl Dialog for PreferencesDialog {
             if info.size.is_some() || info.header.is_some() {
                 p.add(&{
                     use crate::tool::Format;
-                    /// Common `ActionRow` widget pattern
-                    fn r(title: &str, subtitle: String) -> ActionRow {
-                        ActionRow::builder()
-                            .css_classes(["property"])
-                            .subtitle_selectable(true)
-                            .subtitle(subtitle)
-                            .title_selectable(true)
-                            .title(title)
-                            .build()
-                    }
                     let g = PreferencesGroup::builder().title("Size").build();
                     let mut i = 0; // count group members
                     let mut t = 0; // count total size
@@ -91,10 +87,10 @@ impl Dialog for PreferencesDialog {
                     if let Some(ref c) = info.size {
                         i += 1;
                         t += c;
-                        g.add(&r("Content", c.bytes()))
+                        g.add(&row("Content", c.bytes()))
                     }
                     if i > 1 && t > 0 {
-                        g.add(&r("Total", t.bytes()))
+                        g.add(&row("Total", t.bytes()))
                     }
                     g
                 });
@@ -120,16 +116,6 @@ impl Dialog for PreferencesDialog {
                         SocketFamily::Ipv6 => "IPv6",
                         _ => panic!(),
                     }
-                }
-                /// Common `ActionRow` widget pattern
-                fn r(title: &str, subtitle: &str) -> ActionRow {
-                    ActionRow::builder()
-                        .css_classes(["property"])
-                        .subtitle_selectable(true)
-                        .subtitle(subtitle)
-                        .title_selectable(true)
-                        .title(title)
-                        .build()
                 }
                 /// Lookup [MaxMind](https://www.maxmind.com) database
                 fn l(profile: &Profile, socket_address: &SocketAddress) -> Option<String> {
@@ -172,19 +158,19 @@ impl Dialog for PreferencesDialog {
                 }
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Remote").build();
-                    g.add(&r("Address", &socket.remote_address.to_string()));
-                    g.add(&r("Family", f2s(&socket.remote_address.family())));
+                    g.add(&row("Address", socket.remote_address.to_string()));
+                    g.add(&row("Family", f2s(&socket.remote_address.family())));
                     if let Some(location) = l(profile, &socket.remote_address) {
-                        g.add(&r("Location", &location));
+                        g.add(&row("Location", location))
                     }
                     g
                 });
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Local").build();
-                    g.add(&r("Address", &socket.local_address.to_string()));
-                    g.add(&r("Family", f2s(&socket.local_address.family())));
+                    g.add(&row("Address", socket.local_address.to_string()));
+                    g.add(&row("Family", f2s(&socket.local_address.family())));
                     if let Some(location) = l(profile, &socket.local_address) {
-                        g.add(&r("Location", &location));
+                        g.add(&row("Location", location));
                     }
                     g
                 });
@@ -217,6 +203,7 @@ impl Dialog for PreferencesDialog {
                     for (i, r) in b.iter().enumerate() {
                         g.add(&{
                             let a = ActionRow::builder()
+                                .css_classes(["property"])
                                 .subtitle_selectable(true)
                                 .title_selectable(true)
                                 .title(r.request().unwrap())
@@ -268,28 +255,15 @@ impl Dialog for PreferencesDialog {
                     let e = &info.event[0];
                     let t = e.time();
                     let n = e.name();
-                    g.add(
-                        &ActionRow::builder()
-                            .subtitle_selectable(true)
-                            .subtitle(t.format_iso8601().unwrap())
-                            .title_selectable(true)
-                            .title(n)
-                            .build(),
-                    );
+                    g.add(&row(n, t.format_iso8601().unwrap()));
                     for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(&{
                             use gtk::{Align, Label};
                             let c = e.time().difference(info.event[i].time()).as_milliseconds();
-                            let a = ActionRow::builder()
-                                .use_markup(true)
-                                .subtitle(gformat!(
-                                    "{} ms",
-                                    e.time().difference(t).as_milliseconds()
-                                ))
-                                .subtitle_selectable(true)
-                                .title_selectable(true)
-                                .title(e.name())
-                                .build();
+                            let a = row(
+                                e.name(),
+                                gformat!("{} ms", e.time().difference(t).as_milliseconds()),
+                            );
                             a.add_suffix(
                                 &Label::builder()
                                     .css_classes([
