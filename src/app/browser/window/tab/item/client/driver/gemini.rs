@@ -181,7 +181,7 @@ fn handle(
                     /// * includes commit action!
                     fn update_page_info(page: &Page, event_name: &str) {
                         let mut i = page.navigation.request.info.borrow_mut();
-                        i.add_event(event_name.to_string()).commit();
+                        i.add_event(event_name.to_string());
                         page.navigation.request.update_secondary_icon(&i)
                     }
                     // Update socket info at the point, where the connection is active yet
@@ -196,7 +196,7 @@ fn handle(
                                 connection.socket_connection.remote_address().unwrap()
                             )));
                             // * unwrap fails only on `connection.socket_connection.is_closed()`
-                            //   drop the panic as unexpected.
+                            //   drop the panic as unexpected here.
                     }
                     // Handle response
                     match response {
@@ -212,8 +212,7 @@ fn handle(
                             i
                                 .add_event(EVENT_COMPLETED.to_string())
                                 .set_header(Some(input.as_str().to_string()))
-                                .set_size(Some(input.as_bytes().len()))
-                                .commit();
+                                .set_size(Some(input.as_bytes().len()));
                             page.navigation.request.update_secondary_icon(&i);
                             match input {
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
@@ -354,9 +353,7 @@ fn handle(
                                                                         page.snap_history();
                                                                     }
                                                                     redirects.replace(0); // reset
-                                                                    i
-                                                                        .add_event(EVENT_COMPLETED.to_string())
-                                                                        .commit();
+                                                                    i.add_event(EVENT_COMPLETED.to_string());
                                                                     page.navigation.request.update_secondary_icon(&i)
                                                                 },
                                                                 Err(e) => {
@@ -435,8 +432,7 @@ fn handle(
                                                                                 .add_event(EVENT_COMPLETED.to_string())
                                                                                 .set_header(Some(success.as_header_str().to_string()))
                                                                                 .set_mime(Some(mime))
-                                                                                .set_size(Some(buffer.byte_length()))
-                                                                                .commit();
+                                                                                .set_size(Some(buffer.byte_length()));
                                                                             page.navigation.request.update_secondary_icon(&i)
                                                                         }
                                                                         Err(e) => {
@@ -485,8 +481,7 @@ fn handle(
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
                                             .set_header(Some(success.as_header_str().to_string()))
-                                            .set_mime(Some(mime.to_string()))
-                                            .commit();
+                                            .set_mime(Some(mime.to_string()));
                                         page.navigation.request.update_secondary_icon(&i)
                                     },
                                 },
@@ -553,8 +548,7 @@ fn handle(
                                         let mut i = page.navigation.request.info.take();
                                         i
                                             .add_event(EVENT_COMPLETED.to_string())
-                                            .set_header(Some(redirect.as_str().to_string()))
-                                            .commit();
+                                            .set_header(Some(redirect.as_str().to_string()));
                                         page.navigation.request.info.replace(match redirect {
                                             Redirect::Permanent { .. } => i.into_permanent_redirect(),
                                             Redirect::Temporary { .. } => i.into_temporary_redirect(),
@@ -578,8 +572,7 @@ fn handle(
                             i
                                 .add_event(EVENT_COMPLETED.to_string())
                                 .set_header(Some(certificate.as_str().to_string()))
-                                .set_size(Some(certificate.as_bytes().len()))
-                                .commit();
+                                .set_size(Some(certificate.as_bytes().len()));
                             page.navigation.request.update_secondary_icon(&i);
                             // update page content widget
                             let s = page.content.to_status_identity();
@@ -619,7 +612,7 @@ fn handle(
                     }
                     redirects.replace(0); // reset
                     let mut i = page.navigation.request.info.borrow_mut();
-                    i.add_event(EVENT_COMPLETED.to_string()).set_request(Some(uri.to_string())).commit();
+                    i.add_event(EVENT_COMPLETED.to_string()).set_request(Some(uri.to_string()));
                     page.navigation.request.update_secondary_icon(&i)
                 }
             }

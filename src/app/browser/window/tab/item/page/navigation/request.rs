@@ -355,7 +355,7 @@ fn update_secondary_icon(entry: &Entry, info: &Info) {
         entry.set_secondary_icon_name(Some("pan-end-symbolic"));
         entry.set_secondary_icon_tooltip_text(Some("Go to the location"))
     } else {
-        if !info.is_deprecated() && info.matches(&entry.text()) {
+        if info.matches(&entry.text()) {
             entry.set_secondary_icon_name(Some("help-about-symbolic"));
             entry.set_secondary_icon_tooltip_text(Some("Page info"));
         } else {

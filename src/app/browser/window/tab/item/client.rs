@@ -39,9 +39,6 @@ impl Client {
     pub fn handle(&self, request: &str, is_snap_history: bool) {
         self.page.escape();
 
-        // Deprecate page info but keep it data as is
-        self.page.navigation.request.info.borrow_mut().deprecate();
-
         // Initially disable find action
         self.page
             .window_action

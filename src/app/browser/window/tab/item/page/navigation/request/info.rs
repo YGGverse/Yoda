@@ -19,9 +19,6 @@ pub struct Info {
     /// Hold optional header string to dump it in the info dialog
     /// and calculate total size
     header: Option<String>,
-    /// Mark holder as deprecated on handle begin
-    /// * useful on some driver does not update status properly
-    is_deprecated: bool,
     /// Page content type
     mime: Option<String>,
     /// Hold redirections chain with handled details
@@ -44,7 +41,6 @@ impl Info {
         Self {
             event: Vec::with_capacity(50), // estimated max events quantity for all drivers
             header: None,
-            is_deprecated: false,
             mime: None,
             redirect: None,
             request: None,
@@ -74,18 +70,6 @@ impl Info {
     pub fn dialog(&self, parent: &impl IsA<gtk::Widget>, profile: &Profile) {
         use adw::{PreferencesDialog, prelude::AdwDialogExt};
         PreferencesDialog::info(profile, self).present(Some(parent))
-    }
-
-    /// Actualize `Self`
-    pub fn commit(&mut self) {
-        self.is_deprecated = false;
-    }
-
-    /// Mark `Self` as deprecated
-    /// * tip: usually called on page load begin,
-    ///   to prevent driver implementation mistakes
-    pub fn deprecate(&mut self) {
-        self.is_deprecated = true;
     }
 
     // Setters
@@ -148,10 +132,6 @@ impl Info {
 
     pub fn matches(&self, request: &str) -> bool {
         self.request.as_ref().is_some_and(|r| r == request)
-    }
-
-    pub fn is_deprecated(&self) -> bool {
-        self.is_deprecated
     }
 }
 
