@@ -5,7 +5,7 @@ use adw::{
         ActionRowExt, ExpanderRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt,
     },
 };
-use gtk::glib::gformat;
+use gtk::{Align, glib::gformat};
 
 pub trait Dialog {
     fn info(profile: &Profile, info: &Info) -> Self;
@@ -61,8 +61,6 @@ impl Dialog for PreferencesDialog {
                         t += l;
                         g.add(&{
                             let e = adw::ExpanderRow::builder()
-                                /* @TODO this class does not work with `ExpanderRow`
-                                .css_classes(["property"]) */
                                 .enable_expansion(true)
                                 .expanded(false)
                                 .subtitle(l.bytes())
@@ -70,20 +68,23 @@ impl Dialog for PreferencesDialog {
                                 .title("Header")
                                 .build();
                             e.add_row(
-                                &gtk::Label::builder()
-                                    .css_classes(["dim-label", "caption"])
-                                    .ellipsize(gtk::pango::EllipsizeMode::None)
-                                    .halign(gtk::Align::Start)
-                                    .label(h)
-                                    .margin_bottom(2)
-                                    .margin_end(12)
-                                    .margin_start(12)
-                                    .margin_top(14)
-                                    .selectable(true)
-                                    .valign(gtk::Align::Center)
-                                    .wrap(false)
-                                    .build(), // @TODO replace with `ActionRow` after fix empty subtitle issue
+                                &ActionRow::builder()
+                                    .css_classes(["property"])
+                                    .title_selectable(true)
+                                    .title(h.escape_default().to_string()) // escape \r\n
+                                    .build(),
                             );
+                            {
+                                use gtk::prelude::{ListBoxRowExt, WidgetExt};
+                                e.child().map(|c| {
+                                    c.first_child().map(|c| {
+                                        c.first_child().map_or_else(
+                                            || println!("Deprecated child order!"),
+                                            |c| c.add_css_class("property"),
+                                        )
+                                    })
+                                }); // @TODO unstable!
+                            }
                             e
                         })
                     }
@@ -230,8 +231,8 @@ impl Dialog for PreferencesDialog {
                                     ])
                                     .label(c.to_string())
                                     .sensitive(false)
-                                    .valign(gtk::Align::Center)
-                                    .halign(gtk::Align::Center)
+                                    .valign(Align::Center)
+                                    .halign(Align::Center)
                                     .build()
                             });
                             // show total redirection time in ms
