@@ -202,7 +202,7 @@ impl Dialog for PreferencesDialog {
                     fn chain<'a>(b: &mut Vec<&'a Info>, i: &'a Info) {
                         b.push(i);
                         if let Some(ref r) = i.redirect {
-                            chain(b, &r.info)
+                            chain(b, &r.referrer)
                         }
                     }
                     // Collect redirections into the buffer,

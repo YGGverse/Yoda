@@ -5,11 +5,27 @@ use super::Info;
 
 /// Unified redirection info wrapper for the application page
 pub struct Redirect {
-    pub info: Info,
+    pub referrer: Box<Info>,
     pub method: Method,
 }
 
 impl Redirect {
+    // Constructors
+
+    pub fn permanent(referrer: Info) -> Self {
+        Self {
+            referrer: Box::new(referrer),
+            method: Method::Permanent,
+        }
+    }
+
+    pub fn temporary(referrer: Info) -> Self {
+        Self {
+            referrer: Box::new(referrer),
+            method: Method::Temporary,
+        }
+    }
+
     // Getters
 
     /// Check redirection has external target
@@ -21,6 +37,6 @@ impl Redirect {
                 .ok()?
                 .host()
         }
-        Some(parse(&self.info)? != parse(cmp)?)
+        Some(parse(&self.referrer)? != parse(cmp)?)
     }
 }

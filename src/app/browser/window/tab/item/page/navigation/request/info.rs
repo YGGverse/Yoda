@@ -23,7 +23,7 @@ pub struct Info {
     mime: Option<String>,
     /// Hold redirections chain with handled details
     /// * the `referrer` member name is reserved for other protocols
-    redirect: Option<Box<Redirect>>,
+    redirect: Option<Redirect>,
     /// Key to relate data collected with the specific request
     request: Option<String>,
     /// Hold size info
@@ -49,20 +49,16 @@ impl Info {
         }
     }
 
-    /// Take `Self`, convert it into the new `Redirect` member,
-    /// * return new `Self` that contain referring node
-    fn into_redirect(self, method: redirect::Method) -> Self {
+    pub fn into_permanent_redirect(self) -> Self {
         let mut this = Self::new();
-        this.redirect = Some(Box::new(Redirect { info: self, method }));
+        this.redirect = Some(Redirect::permanent(self));
         this
     }
 
-    pub fn into_permanent_redirect(self) -> Self {
-        self.into_redirect(redirect::Method::Permanent)
-    }
-
     pub fn into_temporary_redirect(self) -> Self {
-        self.into_redirect(redirect::Method::Temporary)
+        let mut this = Self::new();
+        this.redirect = Some(Redirect::temporary(self));
+        this
     }
 
     // Actions
