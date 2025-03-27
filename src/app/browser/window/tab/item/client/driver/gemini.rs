@@ -156,17 +156,10 @@ fn handle(
         cancellable.clone(),
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
-        match this.page
+        this.page
             .profile
             .identity
-            .get(&uri.to_string())
-        {
-            Some(identity) => match identity.to_tls_certificate() {
-                Ok(certificate) => Some(certificate),
-                Err(_) => panic!(), // unexpected
-            },
-            None => None,
-        },
+            .get(&uri.to_string()).map(|identity|identity.to_tls_certificate().unwrap()),
         {
             let page = this.page.clone();
             let redirects = this.redirects.clone();
