@@ -39,7 +39,7 @@ impl Gemini {
                 p.set_progress(match event {
                     // 0.1 reserved for handle begin
                     SocketClientEvent::Resolving => {
-                        i.reset().add_event("Resolving".to_string());
+                        i.add_event("Resolving".to_string());
                         0.2
                     }
                     SocketClientEvent::Resolved => {
@@ -94,8 +94,15 @@ impl Gemini {
         feature: Rc<Feature>,
         cancellable: Cancellable,
         is_snap_history: bool,
+        is_redirect: bool,
     ) {
         use ggemini::client::connection::request::{Mode, Request};
+        self.page
+            .navigation
+            .request
+            .info
+            .borrow_mut()
+            .reset(!is_redirect);
         match uri.scheme().as_str() {
             "gemini" => handle(
                 self,
@@ -109,6 +116,8 @@ impl Gemini {
                 is_snap_history,
             ),
             "titan" => {
+                self.page.set_title("Titan input");
+                self.page.set_progress(0.0);
                 self.page.input.set_new_titan({
                     let this = Self {
                         client: self.client.clone(),
@@ -131,9 +140,7 @@ impl Gemini {
                             is_snap_history,
                         )
                     }
-                });
-                self.page.set_title("Titan input");
-                self.page.set_progress(0.0);
+                })
             }
             _ => panic!(), // unexpected
         }
@@ -520,7 +527,7 @@ fn handle(
                                             .build();
                                         b.connect_clicked({
                                             let p = page.clone();
-                                            move |_| p.item_action.load.activate(Some(&u), false)
+                                            move |_| p.item_action.load.activate(Some(&u), false, true)
                                         });
                                         b
                                     }));
@@ -544,7 +551,7 @@ fn handle(
                                             Redirect::Temporary { .. } => i.into_temporary_redirect(),
                                         });
                                     }
-                                    page.item_action.load.activate(Some(&t), false);
+                                    page.item_action.load.activate(Some(&t), false, true);
                                 }
                             }
                             Err(e) => {

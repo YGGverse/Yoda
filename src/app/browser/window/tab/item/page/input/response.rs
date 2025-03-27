@@ -85,6 +85,7 @@ impl Response for Box {
                         Uri::escape_string(&text_view.text(), None, false),
                     )),
                     false,
+                    false,
                 )
             }
         });

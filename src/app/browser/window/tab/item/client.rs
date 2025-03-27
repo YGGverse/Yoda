@@ -36,7 +36,7 @@ impl Client {
 
     /// Route tab item `request` to protocol driver
     /// * or `navigation` entry if the value not provided
-    pub fn handle(&self, request: &str, is_snap_history: bool) {
+    pub fn handle(&self, request: &str, is_snap_history: bool, is_redirect: bool) {
         self.page.escape();
 
         // Initially disable find action
@@ -63,11 +63,13 @@ impl Client {
                         "file" => driver
                             .file
                             .handle(uri, feature, cancellable, is_snap_history),
-                        "gemini" | "titan" => {
-                            driver
-                                .gemini
-                                .handle(uri, feature, cancellable, is_snap_history)
-                        }
+                        "gemini" | "titan" => driver.gemini.handle(
+                            uri,
+                            feature,
+                            cancellable,
+                            is_snap_history,
+                            is_redirect,
+                        ),
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
@@ -79,10 +81,11 @@ impl Client {
                         }
                     },
                     // begin redirection to new address suggested
-                    Err(query) => page
-                        .item_action
-                        .load
-                        .activate(Some(&query), is_snap_history),
+                    Err(query) => {
+                        page.item_action
+                            .load
+                            .activate(Some(&query), is_snap_history, true)
+                    }
                 }
             }
         })

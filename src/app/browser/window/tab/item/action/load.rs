@@ -23,7 +23,7 @@ impl Load {
         Self {
             simple_action: SimpleAction::new(
                 &uuid_string_random(),
-                Some(&<(String, bool)>::static_variant_type()),
+                Some(&<(String, bool, bool)>::static_variant_type()),
             ),
         }
     }
@@ -32,9 +32,9 @@ impl Load {
 
     /// Emit [activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
     /// with formatted for this action [Variant](https://docs.gtk.org/glib/struct.Variant.html) value
-    pub fn activate(&self, request: Option<&str>, is_history: bool) {
+    pub fn activate(&self, request: Option<&str>, is_snap_history: bool, is_redirect: bool) {
         self.simple_action.activate(Some(
-            &(request.unwrap_or_default(), is_history).to_variant(),
+            &(request.unwrap_or_default(), is_snap_history, is_redirect).to_variant(),
         ));
     }
 
@@ -42,19 +42,20 @@ impl Load {
 
     /// Define callback function for
     /// [SimpleAction::activate](https://docs.gtk.org/gio/signal.SimpleAction.activate.html) signal
-    pub fn connect_activate(&self, callback: impl Fn(Option<GString>, bool) + 'static) {
+    pub fn connect_activate(&self, callback: impl Fn(Option<GString>, bool, bool) + 'static) {
         self.simple_action.connect_activate(move |_, this| {
-            let (request, is_history) = this
-                .expect("Expected (`request`,`is_history`) variant")
-                .get::<(String, bool)>()
-                .expect("Parameter type does not match (`String`,`bool`) tuple");
+            let (request, is_snap_history, is_redirect) = this
+                .expect("Expected (`request`,`is_snap_history`) variant")
+                .get::<(String, bool, bool)>()
+                .expect("Parameter type does not match (`String`,`bool`,`bool`) tuple");
 
             callback(
                 match request.is_empty() {
                     true => None,
                     false => Some(request.into()),
                 },
-                is_history,
+                is_snap_history,
+                is_redirect,
             )
         });
     }

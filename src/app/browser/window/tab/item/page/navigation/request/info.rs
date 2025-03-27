@@ -73,7 +73,10 @@ impl Info {
 
     /// Reset `Self` to the clean state
     /// * this method keeps `Redirect` value!
-    pub fn reset(&mut self) -> &mut Self {
+    pub fn reset(&mut self, is_unset_redirect: bool) -> &mut Self {
+        if is_unset_redirect {
+            self.set_redirect(None);
+        }
         self.clear_events()
             .set_header(None)
             .set_mime(None)
@@ -99,6 +102,11 @@ impl Info {
 
     pub fn set_mime(&mut self, mime: Option<String>) -> &mut Self {
         self.mime = mime;
+        self
+    }
+
+    pub fn set_redirect(&mut self, redirect: Option<Redirect>) -> &mut Self {
+        self.redirect = redirect;
         self
     }
 

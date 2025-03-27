@@ -26,6 +26,7 @@ impl Directory {
                                 file.path().unwrap().to_str().unwrap()
                             )),
                             is_snap_history,
+                            false,
                         )
                     }
                 },

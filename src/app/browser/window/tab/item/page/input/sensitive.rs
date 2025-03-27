@@ -66,6 +66,7 @@ impl Sensitive for Box {
                         Uri::escape_string(&form.password_entry_row.text(), None, false),
                     )),
                     false,
+                    false,
                 )
             }
         });

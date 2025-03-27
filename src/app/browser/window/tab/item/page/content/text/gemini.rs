@@ -316,7 +316,7 @@ impl Gemini {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
                                 "gemini" | "titan" => {
-                                    item_action.load.activate(Some(&uri.to_str()), true)
+                                    item_action.load.activate(Some(&uri.to_str()), true, false)
                                 }
                                 // Scheme not supported, delegate
                                 _ => UriLauncher::new(&uri.to_str()).launch(
