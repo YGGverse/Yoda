@@ -94,15 +94,8 @@ impl Gemini {
         feature: Rc<Feature>,
         cancellable: Cancellable,
         is_snap_history: bool,
-        is_redirect: bool,
     ) {
         use ggemini::client::connection::request::{Mode, Request};
-        self.page
-            .navigation
-            .request
-            .info
-            .borrow_mut()
-            .reset(!is_redirect);
         match uri.scheme().as_str() {
             "gemini" => handle(
                 self,

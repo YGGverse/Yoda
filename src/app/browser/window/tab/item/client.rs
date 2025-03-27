@@ -51,6 +51,12 @@ impl Client {
         self.page.search.unset();
         self.page.set_title("Loading..");
         self.page.set_progress(0.1);
+        self.page
+            .navigation
+            .request
+            .info
+            .borrow_mut()
+            .reset(!is_redirect);
 
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(&self.profile, request, self.cancellable(), {
@@ -63,13 +69,11 @@ impl Client {
                         "file" => driver
                             .file
                             .handle(uri, feature, cancellable, is_snap_history),
-                        "gemini" | "titan" => driver.gemini.handle(
-                            uri,
-                            feature,
-                            cancellable,
-                            is_snap_history,
-                            is_redirect,
-                        ),
+                        "gemini" | "titan" => {
+                            driver
+                                .gemini
+                                .handle(uri, feature, cancellable, is_snap_history)
+                        }
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
