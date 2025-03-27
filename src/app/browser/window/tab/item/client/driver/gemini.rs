@@ -247,11 +247,11 @@ fn handle(
                                                     file_output_stream,
                                                     cancellable.clone(),
                                                     Priority::DEFAULT,
-                                                    (
-                                                        0x100000, // 1M bytes per chunk
-                                                        None,     // unlimited
-                                                        0,        // initial totals
-                                                    ),
+                                                    file_output_stream::Size {
+                                                        chunk: 0x100000, // 1M bytes per chunk
+                                                        limit: None,     // unlimited
+                                                        total: 0,        // initial totals
+                                                    },
                                                     (
                                                         // on chunk
                                                         {
