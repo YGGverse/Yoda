@@ -295,10 +295,11 @@ fn handle(
                                         connection.stream(),
                                         Priority::DEFAULT,
                                         cancellable.clone(),
-                                        (
-                                            0x400,   // 1024 chunk
-                                            0xfffff, // 1M limit
-                                        ),
+                                        memory_input_stream::Size {
+                                            chunk: 0x400,   // 1024 bytes chunk
+                                            limit: 0xfffff, // 1M limit
+                                            total: 0,       // initial totals
+                                        },
                                         (
                                             |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
                                             move |result| match result { // on complete
@@ -398,10 +399,11 @@ fn handle(
                                             connection.stream(),
                                             Priority::DEFAULT,
                                             cancellable.clone(),
-                                            (
-                                                0x400,   // 1024 bytes per chunk, optional step for images download tracking
-                                                0xA00000 // 10M bytes max to prevent memory overflow if server play with promises
-                                            ),
+                                            memory_input_stream::Size {
+                                                chunk: 0x400,    // 1024 bytes chunk
+                                                limit: 0xA00000, // 10M limit
+                                                total: 0,        // initial totals
+                                            },
                                             (
                                                 move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
                                                 {
