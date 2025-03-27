@@ -223,41 +223,14 @@ impl Dialog for PreferencesDialog {
                                 .build();
                             a.add_prefix(&{
                                 let c = i + 1;
-                                let (css_class, tooltip_text) = if r
-                                    .redirect
-                                    .as_ref()
-                                    .is_some_and(|this| this.is_external(r).is_some_and(|v| v))
-                                {
-                                    if c == l {
-                                        ("warning", "Current (External)")
-                                    } else {
-                                        (
-                                            "warning",
-                                            if i == 0 {
-                                                "Initial request"
-                                            } else {
-                                                "External redirect"
-                                            },
-                                        )
-                                    }
-                                } else if c == l {
-                                    ("success", "Current")
-                                } else {
-                                    (
-                                        "accent",
-                                        if i == 0 {
-                                            "Initial request"
-                                        } else {
-                                            "Internal redirect"
-                                        },
-                                    )
-                                };
                                 Button::builder()
-                                    .css_classes(["circular", css_class])
+                                    .css_classes([
+                                        "circular",
+                                        if c == l { "success" } else { "accent" },
+                                    ])
                                     .halign(Align::Center)
                                     .label(c.to_string())
                                     .sensitive(false)
-                                    .tooltip_text(tooltip_text)
                                     .valign(Align::Center)
                                     .build()
                             });
@@ -266,6 +239,12 @@ impl Dialog for PreferencesDialog {
                                     redirect.method.icon_name(),
                                     redirect.method.to_string(),
                                 ))
+                            }
+                            if r.redirect
+                                .as_ref()
+                                .is_some_and(|this| this.is_external(r).is_some_and(|v| v))
+                            {
+                                a.add_suffix(&suffix("application-exit", "External redirect"))
                             }
                             // calculate total redirections time in ms
                             let c = r.event.last().unwrap().time();
