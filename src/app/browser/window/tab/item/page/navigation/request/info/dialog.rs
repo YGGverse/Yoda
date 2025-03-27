@@ -215,10 +215,6 @@ impl Dialog for PreferencesDialog {
                     let t = b[0].event[0].time(); // first event time to count from
                     for (i, r) in b.iter().enumerate() {
                         g.add(&{
-                            let is_external = r
-                                .redirect
-                                .as_ref()
-                                .is_some_and(|this| this.is_external(r).is_some_and(|v| v));
                             let a = ActionRow::builder()
                                 .css_classes(["property"])
                                 .subtitle_selectable(true)
@@ -227,21 +223,42 @@ impl Dialog for PreferencesDialog {
                                 .build();
                             a.add_prefix(&{
                                 let c = i + 1;
-                                Button::builder()
-                                    .css_classes([
-                                        "circular",
-                                        if is_external {
-                                            "warning"
-                                        } else if c == l {
-                                            "success"
+                                let (css_class, tooltip_text) = if r
+                                    .redirect
+                                    .as_ref()
+                                    .is_some_and(|this| this.is_external(r).is_some_and(|v| v))
+                                {
+                                    if c == l {
+                                        ("warning", "Current (External)")
+                                    } else {
+                                        (
+                                            "warning",
+                                            if i == 0 {
+                                                "Initial request"
+                                            } else {
+                                                "External redirect"
+                                            },
+                                        )
+                                    }
+                                } else if c == l {
+                                    ("success", "Current")
+                                } else {
+                                    (
+                                        "accent",
+                                        if i == 0 {
+                                            "Initial request"
                                         } else {
-                                            "accent"
+                                            "Internal redirect"
                                         },
-                                    ])
+                                    )
+                                };
+                                Button::builder()
+                                    .css_classes(["circular", css_class])
+                                    .halign(Align::Center)
                                     .label(c.to_string())
                                     .sensitive(false)
+                                    .tooltip_text(tooltip_text)
                                     .valign(Align::Center)
-                                    .halign(Align::Center)
                                     .build()
                             });
                             if let Some(ref redirect) = r.redirect {
@@ -249,9 +266,6 @@ impl Dialog for PreferencesDialog {
                                     redirect.method.icon_name(),
                                     redirect.method.to_string(),
                                 ))
-                            }
-                            if is_external {
-                                a.add_suffix(&suffix("application-exit-symbolic", "External")) // @TODO links contain ⇖ text label indication
                             }
                             // calculate total redirections time in ms
                             let c = r.event.last().unwrap().time();
