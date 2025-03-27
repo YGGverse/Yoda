@@ -98,27 +98,26 @@ impl Gemini {
         use ggemini::client::connection::request::{Mode, Request};
         match uri.scheme().as_str() {
             "gemini" => handle(
+                self,
                 Request::Gemini {
                     uri,
                     mode: Mode::HeaderOnly,
                 },
-                (
-                    self.client.clone(),
-                    self.page.clone(),
-                    self.redirects.clone(),
-                    feature,
-                ),
+                feature,
                 cancellable,
                 None,
                 is_snap_history,
             ),
             "titan" => {
                 self.page.input.set_new_titan({
-                    let client = self.client.clone();
-                    let page = self.page.clone();
-                    let redirects = self.redirects.clone();
+                    let this = Self {
+                        client: self.client.clone(),
+                        page: self.page.clone(),
+                        redirects: self.redirects.clone(),
+                    };
                     move |header, bytes, on_failure| {
                         handle(
+                            &this,
                             Request::Titan {
                                 uri: uri.clone(),
                                 data: bytes,
@@ -126,12 +125,7 @@ impl Gemini {
                                 token: header.token.map(|token| token.into()),
                                 mode: Mode::HeaderOnly,
                             },
-                            (
-                                client.clone(),
-                                page.clone(),
-                                redirects.clone(),
-                                feature.clone(),
-                            ),
+                            feature.clone(),
                             cancellable.clone(),
                             Some(on_failure),
                             is_snap_history,
@@ -147,21 +141,22 @@ impl Gemini {
 }
 
 fn handle(
+    this: &Gemini,
     request: Request,
-    (client, page, redirects, feature): (Rc<Client>, Rc<Page>, Rc<Cell<usize>>, Rc<Feature>),
+    feature: Rc<Feature>,
     cancellable: Cancellable,
     on_failure: Option<Box<dyn Fn()>>,
     is_snap_history: bool,
 ) {
     const EVENT_COMPLETED: &str = "Completed";
     let uri = request.uri().clone();
-    client.request_async(
+    this.client.request_async(
         request,
         Priority::DEFAULT,
         cancellable.clone(),
         // Search for user certificate match request
         // * @TODO this feature does not support multi-protocol yet
-        match page
+        match this.page
             .profile
             .identity
             .get(&uri.to_string())
@@ -173,8 +168,8 @@ fn handle(
             None => None,
         },
         {
-            let page = page.clone();
-            let redirects = redirects.clone();
+            let page = this.page.clone();
+            let redirects = this.redirects.clone();
             move |result| match result {
                 Ok((response, connection)) => {
                     /// Common page info pattern for some cases in the current scope
