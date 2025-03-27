@@ -5,10 +5,7 @@ use adw::{
         ActionRowExt, ExpanderRowExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt,
     },
 };
-use gtk::{
-    Align,
-    glib::{GString, gformat},
-};
+use gtk::{Align, glib::GString};
 
 pub trait Dialog {
     fn info(profile: &Profile, info: &Info) -> Self;
@@ -20,11 +17,12 @@ impl Dialog for PreferencesDialog {
         fn row(title: impl Into<GString>, subtitle: impl Into<GString>) -> ActionRow {
             ActionRow::builder()
                 .css_classes(["property"])
-                .use_markup(true)
-                .subtitle(subtitle)
                 .subtitle_selectable(true)
+                .subtitle(subtitle)
                 .title_selectable(true)
                 .title(title)
+                .use_markup(true)
+                .use_markup(true)
                 .build()
         }
         let d = PreferencesDialog::builder()
@@ -255,18 +253,16 @@ impl Dialog for PreferencesDialog {
                             if is_external {
                                 a.add_suffix(&suffix("application-exit-symbolic", "External")) // @TODO links contain ⇖ text label indication
                             }
-                            // show total redirection time in ms
+                            // calculate total redirections time in ms
+                            let c = r.event.last().unwrap().time();
                             a.set_subtitle(&if i == 0 {
-                                t.format_iso8601().unwrap()
+                                format!("{} ms", c.difference(t).as_milliseconds())
                             } else {
-                                gformat!(
-                                    "{} ms",
-                                    r.event
-                                        .last()
-                                        .unwrap()
-                                        .time()
-                                        .difference(t)
-                                        .as_milliseconds()
+                                format!(
+                                    "+{} / {} ms",
+                                    c.difference(b[i - 1].event.last().unwrap().time())
+                                        .as_milliseconds(),
+                                    c.difference(t).as_milliseconds()
                                 )
                             });
                             a
@@ -291,24 +287,15 @@ impl Dialog for PreferencesDialog {
                     g.add(&row(n, t.format_iso8601().unwrap()));
                     for (i, e) in info.event[1..].iter().enumerate() {
                         g.add(&{
-                            use gtk::{Align, Label};
-                            let c = e.time().difference(info.event[i].time()).as_milliseconds();
+                            let c = e.time().difference(info.event[i].time()).as_milliseconds(); // current
+                            let s = e.time().difference(t).as_milliseconds(); // sum
                             let a = row(
                                 e.name(),
-                                gformat!("{} ms", e.time().difference(t).as_milliseconds()),
-                            );
-                            a.add_suffix(
-                                &Label::builder()
-                                    .css_classes([if c == 0 { "success" } else { "warning" }])
-                                    .halign(Align::End)
-                                    .label(if c > 0 {
-                                        format!("+{c} ms")
-                                    } else {
-                                        c.to_string()
-                                    })
-                                    .sensitive(false)
-                                    .valign(Align::Center)
-                                    .build(),
+                                if c == s {
+                                    format!("+{c} ms")
+                                } else {
+                                    format!("+{c} / {s} ms")
+                                },
                             );
                             a
                         })
