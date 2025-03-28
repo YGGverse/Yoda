@@ -37,6 +37,12 @@ impl File {
         use status::Status;
         use text::Text;
 
+        {
+            let mut i = self.page.navigation.request.info.borrow_mut();
+            i.set_request(Some(uri.to_string()));
+            self.page.navigation.request.update_secondary_icon(&i)
+        }
+
         let url = uri.to_string();
         let file = File::for_uri(&url);
         let page = self.page.clone();
@@ -44,52 +50,81 @@ impl File {
         match file.query_file_type(FileQueryInfoFlags::NONE, Some(&cancellable)) {
             FileType::Directory => Directory { file }.handle(&page, is_snap_history),
             _ => file.clone().query_info_async(
-                "standard::content-type",
+                "standard::content-type,standard::size",
                 FileQueryInfoFlags::NONE,
                 Priority::DEFAULT,
                 Some(&cancellable.clone()),
                 move |result| match result {
-                    Ok(file_info) => match file_info.content_type() {
-                        Some(content_type) => match content_type.as_str() {
-                            "text/plain" => {
-                                if matches!(*feature, Feature::Source) {
-                                    load_contents_async(file, cancellable, move |result| {
-                                        match result {
-                                            Ok(data) => Text::Source(uri, data).handle(&page),
-                                            Err(message) => Status::Failure(message).handle(&page),
+                    Ok(file_info) => {
+                        page.navigation
+                            .request
+                            .info
+                            .borrow_mut()
+                            .set_size(Some(file_info.size() as usize));
+                        match file_info.content_type() {
+                            Some(content_type) => {
+                                {
+                                    page.navigation
+                                        .request
+                                        .info
+                                        .borrow_mut()
+                                        .set_mime(Some(content_type.to_string()));
+                                }
+                                match content_type.as_str() {
+                                    "text/plain" => {
+                                        if matches!(*feature, Feature::Source) {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Source(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
+                                        } else if url.ends_with(".txt") {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Plain(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Gemini(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
                                         }
-                                    })
-                                } else if url.ends_with(".txt") {
-                                    load_contents_async(file, cancellable, move |result| {
-                                        match result {
-                                            Ok(data) => Text::Plain(uri, data).handle(&page),
-                                            Err(message) => Status::Failure(message).handle(&page),
+                                    }
+                                    "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
+                                        match gtk::gdk::Texture::from_file(&file) {
+                                            Ok(texture) => {
+                                                Image::Bitmap(uri, texture).handle(&page)
+                                            }
+                                            Err(e) => Status::Failure(e.to_string()).handle(&page),
                                         }
-                                    });
-                                } else {
-                                    load_contents_async(file, cancellable, move |result| {
-                                        match result {
-                                            Ok(data) => Text::Gemini(uri, data).handle(&page),
-                                            Err(message) => Status::Failure(message).handle(&page),
-                                        }
-                                    })
+                                    }
+                                    mime => Status::Failure(format!(
+                                        "Content type `{mime}` yet not supported"
+                                    ))
+                                    .handle(&page),
                                 }
                             }
-                            "image/png" | "image/gif" | "image/jpeg" | "image/webp" => {
-                                match gtk::gdk::Texture::from_file(&file) {
-                                    Ok(texture) => Image::Bitmap(uri, texture).handle(&page),
-                                    Err(e) => Status::Failure(e.to_string()).handle(&page),
-                                }
-                            }
-                            mime => {
-                                Status::Failure(format!("Content type `{mime}` yet not supported"))
-                                    .handle(&page)
-                            }
-                        },
-                        None => {
-                            Status::Failure("Undetectable content type".to_string()).handle(&page)
+                            None => Status::Failure("Undetectable content type".to_string())
+                                .handle(&page),
                         }
-                    },
+                    }
                     Err(e) => Status::Failure(e.to_string()).handle(&page),
                 },
             ),

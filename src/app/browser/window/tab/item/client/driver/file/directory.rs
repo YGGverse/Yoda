@@ -14,7 +14,14 @@ impl Directory {
                 // on ready
                 {
                     let page = page.clone();
-                    move || page.set_progress(0.0)
+                    move || {
+                        page.navigation
+                            .request
+                            .info
+                            .borrow_mut()
+                            .add_event("Build directory tree".to_string());
+                        page.set_progress(0.0)
+                    }
                 },
                 // on activate
                 {

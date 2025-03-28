@@ -7,6 +7,11 @@ pub enum Image {
 
 impl Image {
     pub fn handle(&self, page: &super::Page) {
+        page.navigation
+            .request
+            .info
+            .borrow_mut()
+            .add_event("Rendering".to_string());
         let uri = match self {
             Self::Bitmap(uri, texture) => {
                 page.content.to_image(texture);
@@ -17,5 +22,10 @@ impl Image {
         page.set_progress(0.0);
         page.snap_history();
         page.window_action.find.simple_action.set_enabled(false);
+        page.navigation
+            .request
+            .info
+            .borrow_mut()
+            .add_event("Rendered".to_string());
     }
 }
