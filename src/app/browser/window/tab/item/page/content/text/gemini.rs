@@ -315,7 +315,7 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" | "titan" => {
+                                "gemini" | "titan" | "file" => {
                                     item_action.load.activate(Some(&uri.to_str()), true, false)
                                 }
                                 // Scheme not supported, delegate
