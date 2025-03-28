@@ -56,7 +56,8 @@ impl Client {
             .request
             .info
             .borrow_mut()
-            .reset(!is_redirect);
+            .reset(!is_redirect)
+            .add_event("New request".to_string());
 
         // run async resolver to detect Uri, scheme-less host, or search query
         lookup(&self.profile, request, self.cancellable(), {
