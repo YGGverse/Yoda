@@ -204,17 +204,17 @@ fn handle(
                             page.navigation.request.update_secondary_icon(&i);
                             match input {
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-10
-                                Input::Default(d) => page.input.set_new_response(
+                                Input::Default(default) => page.input.set_new_response(
                                     page.item_action.clone(),
                                     uri,
-                                    Some(d.message_or_default()),
+                                    Some(default.message_or_default()),
                                     Some(1024),
                                 ),
                                 // https://geminiprotocol.net/docs/protocol-specification.gmi#status-11-sensitive-input
-                                Input::Sensitive(s) => page.input.set_new_sensitive(
+                                Input::Sensitive(sensitive) => page.input.set_new_sensitive(
                                     page.item_action.clone(),
                                     uri,
-                                    Some(s.message_or_default()),
+                                    Some(sensitive.message_or_default()),
                                     Some(1024),
                                 )
                             }
@@ -222,6 +222,15 @@ fn handle(
                         // https://geminiprotocol.net/docs/protocol-specification.gmi#status-20
                         Response::Success(success) => match *feature {
                             Feature::Download => {
+                                // Update page info
+                                {
+                                    let mut i = page.navigation.request.info.borrow_mut();
+                                    i
+                                        .add_event("Header preload".to_string())
+                                        .set_header(Some(success.as_header_str().to_string()))
+                                        .set_mime(success.mime().ok());
+                                    page.navigation.request.update_secondary_icon(&i)
+                                }
                                 // Init download widget
                                 let s = page.content.to_status_download(
                                     crate::tool::uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
@@ -229,6 +238,7 @@ fn handle(
                                     &cancellable,
                                     {
                                         let cancellable = cancellable.clone();
+                                        let page = page.clone();
                                         let stream = connection.stream();
                                         move |file, action| match file.replace(
                                             None,
@@ -256,16 +266,21 @@ fn handle(
                                                         // on chunk
                                                         {
                                                             let action = action.clone();
-                                                            move |_, total| action.update.activate(&format!(
-                                                                "Received {}...",
-                                                                total.bytes()
-                                                            ))
+                                                            let page = page.clone();
+                                                            move |_, total| {
+                                                                let mut i = page.navigation.request.info.borrow_mut();
+                                                                i.set_size(Some(total));
+                                                                action.update.activate(&format!("Received {}...", total.bytes()))
+                                                            }
                                                         },
                                                         // on complete
                                                         {
                                                             let action = action.clone();
+                                                            let page = page.clone();
                                                             move |result| match result {
                                                                 Ok((_, total)) => {
+                                                                    let mut i = page.navigation.request.info.borrow_mut();
+                                                                    i.set_size(Some(total));
                                                                     action.complete.activate(&format!(
                                                                         "Saved to {} ({} total)",
                                                                         file.parse_name(),

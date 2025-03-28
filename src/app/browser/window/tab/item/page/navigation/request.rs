@@ -341,12 +341,6 @@ fn update_primary_icon(entry: &Entry, profile: &Profile) {
     }
 }
 
-/// GTK `is_focus` / `has_focus` not an option here
-/// also, this method requires from the `Entry`` to be not empty
-fn is_focused(entry: &Entry) -> bool {
-    entry.text_length() > 0 && entry.focus_child().is_some_and(|child| child.has_focus())
-}
-
 /// Secondary icon has two modes:
 /// * navigate to the location button (on the entry is focused / has edit mode)
 /// * page info button with dialog window activation (on the entry is inactive)
@@ -355,7 +349,7 @@ fn update_secondary_icon(entry: &Entry, info: &Info) {
         entry.set_secondary_icon_name(Some("pan-end-symbolic"));
         entry.set_secondary_icon_tooltip_text(Some("Go to the location"))
     } else {
-        if info.matches(&entry.text()) {
+        if info.matches(&prefix_less(&entry)) {
             entry.set_secondary_icon_name(Some("help-about-symbolic"));
             entry.set_secondary_icon_tooltip_text(Some("Page info"));
         } else {
@@ -364,6 +358,12 @@ fn update_secondary_icon(entry: &Entry, info: &Info) {
         }
         entry.select_region(0, 0);
     }
+}
+
+/// GTK `is_focus` / `has_focus` not an option here
+/// also, this method requires from the `Entry`` to be not empty
+fn is_focused(entry: &Entry) -> bool {
+    entry.text_length() > 0 && entry.focus_child().is_some_and(|child| child.has_focus())
 }
 
 /// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
