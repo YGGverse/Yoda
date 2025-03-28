@@ -352,7 +352,7 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" | "titan" => {
+                                "gemini" | "titan" | "file" => {
                                     // Open new page in browser
                                     window_action.append.activate_stateful_once(
                                         Position::After,
