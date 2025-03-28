@@ -29,72 +29,74 @@ impl Dialog for PreferencesDialog {
             .search_enabled(true)
             .title("Page info")
             .build();
-        d.add(&{
-            let p = PreferencesPage::builder()
-                .title("General")
-                .icon_name("help-about-symbolic")
-                .build();
-            if info.mime.is_some() {
-                p.add(&{
-                    let g = PreferencesGroup::builder().title("Meta").build();
-                    if let Some(ref mime) = info.mime {
-                        g.add(&row("Content type", mime))
-                    }
-                    g
-                });
-            } // @TODO content language, header size, etc.
-            if info.size.is_some() || info.header.is_some() {
-                p.add(&{
-                    use crate::tool::Format;
-                    let g = PreferencesGroup::builder().title("Size").build();
-                    let mut i = 0; // count group members
-                    let mut t = 0; // count total size
-                    if let Some(ref h) = info.header {
-                        let l = h.len();
-                        i += 1;
-                        t += l;
-                        g.add(&{
-                            let e = adw::ExpanderRow::builder()
-                                .enable_expansion(true)
-                                .expanded(false)
-                                .subtitle(l.bytes())
-                                .title_selectable(true)
-                                .title("Header")
-                                .build();
-                            e.add_row(
-                                &ActionRow::builder()
-                                    .css_classes(["property"])
+        if info.mime.is_some() || info.size.is_some() || info.header.is_some() {
+            d.add(&{
+                let p = PreferencesPage::builder()
+                    .title("General")
+                    .icon_name("help-about-symbolic")
+                    .build();
+                if info.mime.is_some() {
+                    p.add(&{
+                        let g = PreferencesGroup::builder().title("Meta").build();
+                        if let Some(ref mime) = info.mime {
+                            g.add(&row("Content type", mime))
+                        }
+                        g
+                    });
+                } // @TODO content language, header size, etc.
+                if info.size.is_some() || info.header.is_some() {
+                    p.add(&{
+                        use crate::tool::Format;
+                        let g = PreferencesGroup::builder().title("Size").build();
+                        let mut i = 0; // count group members
+                        let mut t = 0; // count total size
+                        if let Some(ref h) = info.header {
+                            let l = h.len();
+                            i += 1;
+                            t += l;
+                            g.add(&{
+                                let e = adw::ExpanderRow::builder()
+                                    .enable_expansion(true)
+                                    .expanded(false)
+                                    .subtitle(l.bytes())
                                     .title_selectable(true)
-                                    .title(h.escape_default().to_string()) // escape \r\n
-                                    .build(),
-                            );
-                            {
-                                use gtk::prelude::{ListBoxRowExt, WidgetExt};
-                                e.child().map(|c| {
-                                    c.first_child().map(|c| {
-                                        c.first_child().map_or_else(
-                                            || println!("Deprecated child order!"),
-                                            |c| c.add_css_class("property"),
-                                        )
-                                    })
-                                }); // @TODO unstable!
-                            }
-                            e
-                        })
-                    }
-                    if let Some(ref c) = info.size {
-                        i += 1;
-                        t += c;
-                        g.add(&row("Content", c.bytes()))
-                    }
-                    if i > 1 && t > 0 {
-                        g.add(&row("Total", t.bytes()))
-                    }
-                    g
-                });
-            } // @TODO header size, total size, etc.
-            p
-        });
+                                    .title("Header")
+                                    .build();
+                                e.add_row(
+                                    &ActionRow::builder()
+                                        .css_classes(["property"])
+                                        .title_selectable(true)
+                                        .title(h.escape_default().to_string()) // escape \r\n
+                                        .build(),
+                                );
+                                {
+                                    use gtk::prelude::{ListBoxRowExt, WidgetExt};
+                                    e.child().map(|c| {
+                                        c.first_child().map(|c| {
+                                            c.first_child().map_or_else(
+                                                || println!("Deprecated child order!"),
+                                                |c| c.add_css_class("property"),
+                                            )
+                                        })
+                                    }); // @TODO unstable!
+                                }
+                                e
+                            })
+                        }
+                        if let Some(ref c) = info.size {
+                            i += 1;
+                            t += c;
+                            g.add(&row("Content", c.bytes()))
+                        }
+                        if i > 1 && t > 0 {
+                            g.add(&row("Total", t.bytes()))
+                        }
+                        g
+                    });
+                } // @TODO header size, total size, etc.
+                p
+            });
+        }
         if let Some(ref socket) = info.socket {
             d.add(&{
                 let p = PreferencesPage::builder()
