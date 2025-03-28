@@ -95,12 +95,13 @@ impl Dialog for PreferencesDialog {
             } // @TODO header size, total size, etc.
             p
         });
-        d.add(&{
-            let p = PreferencesPage::builder()
-                .title("Connection")
-                .icon_name("network-transmit-receive")
-                .build();
-            if let Some(ref socket) = info.socket {
+        if let Some(ref socket) = info.socket {
+            d.add(&{
+                let p = PreferencesPage::builder()
+                    .title("Connection")
+                    .icon_name("network-transmit-receive")
+                    .build();
+
                 use gtk::{
                     gio::{SocketAddress, SocketFamily},
                     prelude::{SocketAddressExt, SocketConnectableExt},
@@ -172,9 +173,9 @@ impl Dialog for PreferencesDialog {
                     }
                     g
                 });
-            }
-            p
-        });
+                p
+            });
+        }
         if info.redirect.is_some() {
             d.add(&{
                 let g = PreferencesGroup::new();
