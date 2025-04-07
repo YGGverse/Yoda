@@ -121,7 +121,7 @@ impl Dialog for PreferencesDialog {
                 /// Lookup [MaxMind](https://www.maxmind.com) database
                 fn l(profile: &Profile, socket_address: &SocketAddress) -> Option<String> {
                     use maxminddb::{
-                        MaxMindDBError, Reader,
+                        MaxMindDbError, Reader,
                         geoip2::{/*City,*/ Country},
                     };
                     if !matches!(
@@ -138,11 +138,11 @@ impl Dialog for PreferencesDialog {
                     .ok()?;
                     let lookup = {
                         let a: std::net::SocketAddr = socket_address.to_string().parse().unwrap();
-                        let lookup: std::result::Result<Country, MaxMindDBError> =
+                        let lookup: std::result::Result<Option<Country>, MaxMindDbError> =
                             db.lookup(a.ip());
                         lookup
                     }
-                    .ok()?;
+                    .ok()??;
                     lookup.country.map(|c| {
                         let mut b = Vec::new();
                         if let Some(iso_code) = c.iso_code {
