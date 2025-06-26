@@ -210,7 +210,12 @@ fn render(
             }
             Err(e) => failure(&p, &e.to_string()),
         })
-    } else {
+    } else if q.ends_with(".txt")
+        || q.ends_with(".gmi")
+        || q.ends_with(".gemini")
+        || q.ends_with("/")
+        || !u.path().contains(".")
+    {
         p.window_action.find.simple_action.set_enabled(true);
         match *f {
             Feature::Default | Feature::Source => {
@@ -240,6 +245,10 @@ fn render(
             }
             Feature::Download => panic!(), // unexpected
         }
+    } else {
+        p.content
+            .to_status_mime(&u.path(), Some((&p.item_action, &u)));
+        p.set_progress(0.0)
     }
 }
 
