@@ -12,7 +12,7 @@ use gtk::{
     glib::{Priority, Uri},
 };
 use sourceview::prelude::FileExt;
-use std::{rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Nex {
     page: Rc<Page>,
@@ -104,18 +104,21 @@ impl Nex {
                         Some(&cancellable.clone()),
                         move |r| match r {
                             Ok(_) => {
-                                // Is download feature request
+                                // Is download feature request,
+                                // delegate this task to the separated handler function.
                                 if matches!(*feature, Feature::Download) {
                                     return download(c.upcast::<IOStream>(), (p, uri), cancellable);
                                 }
 
-                                // Handle renderable types..
-                                // Show loading status if handle time > 1 second
-                                let status =
-                                    p.content.to_status_loading(Some(Duration::from_secs(1)));
+                                // Is renderable types..
+
+                                // Show loading status page if awaiting time > 1 second
+                                // * the RefCell is just to not init the loading widget before timeout and prevent bg blinks
+                                let loading: RefCell<Option<adw::StatusPage>> = RefCell::new(None);
 
                                 // Nex is the header-less protocol, final content size is never known,
-                                // borrow ggemini::gio wrapper api to preload it safely by chunks
+                                // borrow ggemini::gio wrapper api to preload the buffer swap-safely,
+                                // by using the chunks controller.
                                 ggemini::gio::memory_input_stream::from_stream_async(
                                     c.upcast::<IOStream>(),
                                     Priority::DEFAULT,
@@ -126,10 +129,21 @@ impl Nex {
                                         total: 0,        // initial totals
                                     },
                                     (
-                                        move |_, t| {
-                                            status.set_description(Some(&format!(
-                                                "Preload: {t} bytes"
-                                            )))
+                                        {
+                                            let p = p.clone();
+                                            move |_, t| {
+                                                let mut l = loading.borrow_mut();
+                                                match *l {
+                                                    Some(ref this) => this.set_description(Some(
+                                                        &format!("Preload: {t} bytes"),
+                                                    )),
+                                                    None => {
+                                                        l.replace(p.content.to_status_loading(
+                                                            Some(std::time::Duration::from_secs(1)),
+                                                        ));
+                                                    }
+                                                }
+                                            }
                                         },
                                         move |r| match r {
                                             Ok((m, s)) => {
