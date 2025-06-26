@@ -37,7 +37,9 @@ pub fn build(
     on_choose: impl Fn(File, Rc<Action>) + 'static,
 ) -> StatusPage {
     // Init components
-    let dialog = FileDialog::builder().initial_name(initial_filename).build();
+    let dialog = FileDialog::builder()
+        .initial_name(initial_filename.replace(std::path::MAIN_SEPARATOR, "-"))
+        .build();
     let file_launcher = FileLauncher::new(File::NONE);
 
     let action = Rc::new(Action::new()); // public callback API
