@@ -22,7 +22,7 @@ features = ["gnome_46"]
 
 [dependencies.sqlite]
 package = "rusqlite"
-version = "0.34.0"
+version = "0.36.0"
 
 [dependencies.sourceview]
 package = "sourceview5"
@@ -40,7 +40,7 @@ maxminddb = "0.26.0"
 openssl = "0.10.72"
 plurify = "0.2.0"
 r2d2 = "0.8.10"
-r2d2_sqlite = "0.27.0"
+r2d2_sqlite = "0.30.0"
 syntect = "5.2.0"
 
 # development
