@@ -32,7 +32,7 @@ impl Format for usize {
 pub fn uri_to_title(uri: &gtk::glib::Uri) -> gtk::glib::GString {
     let path = uri.path();
 
-    if path.split('/').last().unwrap_or_default().is_empty() {
+    if path.split('/').next_back().unwrap_or_default().is_empty() {
         match uri.host() {
             Some(host) => host,
             None => "Untitled".into(),

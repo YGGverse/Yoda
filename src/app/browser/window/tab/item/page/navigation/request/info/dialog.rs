@@ -285,15 +285,14 @@ impl Dialog for PreferencesDialog {
                         g.add(&{
                             let c = e.time().difference(info.event[i].time()).as_milliseconds(); // current
                             let s = e.time().difference(t).as_milliseconds(); // sum
-                            let a = row(
+                            row(
                                 e.name(),
                                 if c == s {
                                     format!("+{c} ms")
                                 } else {
                                     format!("+{c} / {s} ms")
                                 },
-                            );
-                            a
+                            )
                         })
                     }
                     g
