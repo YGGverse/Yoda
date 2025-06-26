@@ -23,6 +23,10 @@ pub enum PrimaryIcon<'a> {
         name: &'a str,
         tooltip: (&'a str, &'a str),
     },
+    Nex {
+        name: &'a str,
+        tooltip: &'a str,
+    },
 }
 
 pub fn from(request: &str) -> PrimaryIcon {
@@ -49,17 +53,24 @@ pub fn from(request: &str) -> PrimaryIcon {
         };
     }
 
-    if prefix.starts_with("gemini:") {
+    if prefix.starts_with("gemini://") {
         return PrimaryIcon::Gemini {
             name: "channel-secure-symbolic",
             tooltip: ("Guest session", "User session"),
         };
     }
 
-    if prefix.starts_with("titan:") {
+    if prefix.starts_with("titan://") {
         return PrimaryIcon::Titan {
             name: "document-send-symbolic",
             tooltip: ("Guest titan input", "User titan input"),
+        };
+    }
+
+    if prefix.starts_with("nex://") {
+        return PrimaryIcon::Nex {
+            name: "network-server-symbolic",
+            tooltip: "Nex protocol connection",
         };
     }
 

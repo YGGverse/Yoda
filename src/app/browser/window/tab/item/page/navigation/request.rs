@@ -309,7 +309,10 @@ fn update_primary_icon(entry: &Entry, profile: &Profile) {
     entry.first_child().unwrap().remove_css_class("success"); // @TODO handle
 
     match primary_icon::from(&entry.text()) {
-        PrimaryIcon::Download { name, tooltip } | PrimaryIcon::File { name, tooltip } => {
+        PrimaryIcon::Download { name, tooltip }
+        | PrimaryIcon::File { name, tooltip }
+        | PrimaryIcon::Source { name, tooltip }
+        | PrimaryIcon::Nex { name, tooltip } => {
             entry.set_primary_icon_activatable(false);
             entry.set_primary_icon_sensitive(false);
             entry.set_primary_icon_name(Some(name));
@@ -329,12 +332,6 @@ fn update_primary_icon(entry: &Entry, profile: &Profile) {
         PrimaryIcon::Search { name, tooltip } => {
             entry.set_primary_icon_activatable(true);
             entry.set_primary_icon_sensitive(true);
-            entry.set_primary_icon_name(Some(name));
-            entry.set_primary_icon_tooltip_text(Some(tooltip));
-        }
-        PrimaryIcon::Source { name, tooltip } => {
-            entry.set_primary_icon_activatable(false);
-            entry.set_primary_icon_sensitive(false);
             entry.set_primary_icon_name(Some(name));
             entry.set_primary_icon_tooltip_text(Some(tooltip));
         }
@@ -415,10 +412,7 @@ fn prefix_less(entry: &Entry) -> GString {
 /// Try get current request value as [Uri](https://docs.gtk.org/glib/struct.Uri.html)
 /// * `strip_prefix` on parse
 fn uri(entry: &Entry) -> Option<Uri> {
-    match Uri::parse(&prefix_less(entry), UriFlags::NONE) {
-        Ok(uri) => Some(uri),
-        _ => None,
-    }
+    Uri::parse(&prefix_less(entry), UriFlags::NONE).ok()
 }
 
 /// Try build home [Uri](https://docs.gtk.org/glib/struct.Uri.html) for `Self`

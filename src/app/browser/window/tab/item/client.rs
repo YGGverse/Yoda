@@ -75,6 +75,9 @@ impl Client {
                                 .gemini
                                 .handle(uri, feature, cancellable, is_snap_history)
                         }
+                        "nex" => driver
+                            .nex
+                            .handle(uri, feature, cancellable, is_snap_history),
                         scheme => {
                             // no scheme match driver, complete with failure message
                             let status = page.content.to_status_failure();
