@@ -98,6 +98,16 @@ impl Nex {
             let p = self.page.clone();
             move |result| match result {
                 Ok(c) => {
+                    {
+                        use gtk::prelude::SocketConnectionExt;
+                        let mut i = p.navigation.request.info.borrow_mut();
+                        i.set_socket(Some((
+                            c.local_address().unwrap(),
+                            c.remote_address().unwrap(),
+                        )));
+                        // * unwrap fails only on `connection.socket_connection.is_closed()`
+                        //   panic as unexpected.
+                    }
                     c.output_stream().write_all_async(
                         format!("{}\r\n", uri.path()),
                         Priority::DEFAULT,
