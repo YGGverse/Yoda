@@ -29,8 +29,8 @@ impl Nex for TextView {
         let tags = TextTagTable::new();
 
         // Define default tag once
-        let plain_text_tag = TextTag::builder().wrap_mode(WrapMode::Word).build();
-        tags.add(&plain_text_tag);
+        let p = TextTag::builder().wrap_mode(WrapMode::Word).build();
+        tags.add(&p);
 
         // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
@@ -54,17 +54,6 @@ impl Nex for TextView {
             // just borrow ggemtext parser as compatible API
             if let Some(link) = ggemtext::line::Link::parse(line) {
                 if let Some(uri) = link.uri(Some(base)) {
-                    let mut alt = Vec::new();
-
-                    if uri.scheme() != base.scheme() {
-                        alt.push("⇖".to_string());
-                    }
-
-                    alt.push(match link.alt {
-                        Some(alt) => alt,
-                        None => uri.to_string(),
-                    });
-
                     let a = TextTag::builder()
                         .foreground_rgba(&link_color.0)
                         // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
@@ -76,7 +65,22 @@ impl Nex for TextView {
                         panic!()
                     }
 
-                    buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
+                    buffer.insert_with_tags(
+                        &mut buffer.end_iter(),
+                        &format!(
+                            "{} {}",
+                            if uri.scheme() == base.scheme() {
+                                "=>"
+                            } else {
+                                "<="
+                            },
+                            link.url
+                        ),
+                        &[&a],
+                    );
+                    if let Some(alt) = link.alt {
+                        buffer.insert_with_tags(&mut buffer.end_iter(), &format!(" {alt}"), &[&p]);
+                    }
                     buffer.insert(&mut buffer.end_iter(), NEW_LINE);
 
                     links.insert(a, uri);
@@ -86,7 +90,7 @@ impl Nex for TextView {
             }
             // Nothing match custom tags above,
             // just append plain text covered in empty tag (to handle controller events properly)
-            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&plain_text_tag]);
+            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&p]);
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 
