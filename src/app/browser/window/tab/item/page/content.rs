@@ -152,6 +152,14 @@ impl Content {
         text
     }
 
+    /// [text/nex](https://nightfall.city/nex/info/specification.txt)
+    pub fn to_text_nex(&self, base: &Uri, data: &str) -> Text {
+        self.clean();
+        let text = Text::nex((&self.window_action, &self.item_action), base, data);
+        self.g_box.append(&text.scrolled_window);
+        text
+    }
+
     pub fn to_directory(
         &self,
         file: &File,

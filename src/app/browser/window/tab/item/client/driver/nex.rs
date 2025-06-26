@@ -198,7 +198,7 @@ fn render(
                             } else if q.ends_with(".gmi") || q.ends_with(".gemini") {
                                 p.content.to_text_gemini(&u, d)
                             } else {
-                                p.content.to_text_plain(d)
+                                p.content.to_text_nex(&u, d)
                             };
                             event(&p, "Parsed", Some(s));
                             p.search.set(Some(t.text_view));

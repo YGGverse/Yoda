@@ -1,4 +1,5 @@
 mod gemini;
+mod nex;
 mod plain;
 mod source;
 
@@ -6,6 +7,7 @@ use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
 use gtk::{ScrolledWindow, TextView, glib::Uri};
+use nex::Nex;
 use plain::Plain;
 use source::Source;
 use std::rc::Rc;
@@ -51,6 +53,15 @@ impl Text {
 
     pub fn plain(data: &str) -> Self {
         let text_view = TextView::plain(data);
+        Self {
+            scrolled_window: reader(&text_view),
+            text_view,
+            meta: Meta { title: None },
+        }
+    }
+
+    pub fn nex(actions: (&Rc<WindowAction>, &Rc<ItemAction>), base: &Uri, data: &str) -> Self {
+        let text_view = TextView::nex(actions, base, data);
         Self {
             scrolled_window: reader(&text_view),
             text_view,

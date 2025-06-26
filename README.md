@@ -130,7 +130,7 @@ GTK 4 / Libadwaita client written in Rust
 #### Text
   * [x] `text/gemini`
   * [x] `text/plain`
-  * [ ] `text/nex`
+  * [x] `text/nex`
 
 #### Images
   * [x] `image/gif`

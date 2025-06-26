@@ -224,7 +224,7 @@ impl Gemini {
                     }
 
                     alt.push(match link.alt {
-                        Some(alt) => alt.to_string(),
+                        Some(alt) => alt,
                         None => uri.to_string(),
                     });
 
@@ -236,7 +236,7 @@ impl Gemini {
                         .build();
 
                     if !tag.text_tag_table.add(&a) {
-                        todo!()
+                        panic!()
                     }
 
                     buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
@@ -315,7 +315,7 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" | "titan" | "file" => {
+                                "gemini" | "titan" | "nex" | "file" => {
                                     item_action.load.activate(Some(&uri.to_str()), true, false)
                                 }
                                 // Scheme not supported, delegate
@@ -352,7 +352,7 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             // Select link handler by scheme
                             return match uri.scheme().as_str() {
-                                "gemini" | "titan" | "file" => {
+                                "gemini" | "titan" | "nex" | "file" => {
                                     // Open new page in browser
                                     window_action.append.activate_stateful_once(
                                         Position::After,
