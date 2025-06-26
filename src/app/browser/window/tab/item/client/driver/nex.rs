@@ -30,10 +30,6 @@ impl Nex {
         cancellable: Cancellable,
         is_snap_history: bool,
     ) {
-        if is_snap_history {
-            self.page.snap_history();
-        }
-
         {
             self.page
                 .navigation
@@ -41,6 +37,27 @@ impl Nex {
                 .info
                 .borrow_mut()
                 .set_request(Some(uri.to_string()));
+        }
+
+        let path = uri.path(); // copy once
+
+        if path.is_empty() {
+            let r = format!("{uri}/"); // auto-append missed trailing slash to the root locations
+            {
+                let mut i = self.page.navigation.request.info.take();
+                i.set_header(Some(r.clone()));
+                self.page
+                    .navigation
+                    .request
+                    .info
+                    .replace(i.into_permanent_redirect());
+            }
+            self.page.navigation.set_request(&r);
+            self.page.item_action.load.activate(Some(&r), false, true);
+        }
+
+        if is_snap_history {
+            self.page.snap_history();
         }
 
         let socket = SocketClient::new();
@@ -109,7 +126,7 @@ impl Nex {
                         //   panic as unexpected.
                     }
                     c.output_stream().write_all_async(
-                        format!("{}\r\n", uri.path()),
+                        format!("{path}\r\n"),
                         Priority::DEFAULT,
                         Some(&cancellable.clone()),
                         move |r| match r {
