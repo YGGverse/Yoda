@@ -42,16 +42,17 @@ impl Nex {
         let path = uri.path(); // copy once
 
         if path.is_empty() {
+            // auto-append trailing slash to the root locations
             let mut r = uri.to_string();
-            r.push('/'); // auto-append trailing slash to the root locations
-            self.page.navigation.request.info.replace(
-                self.page
-                    .navigation
-                    .request
-                    .info
-                    .take()
-                    .into_permanent_redirect(),
-            );
+            r.push('/');
+            // apply the permanent redirection
+            let mut i = self.page.navigation.request.info.take();
+            i.add_event("Canonicalize root request".to_string());
+            self.page
+                .navigation
+                .request
+                .info
+                .replace(i.into_permanent_redirect());
             self.page.navigation.set_request(&r);
             self.page.item_action.load.activate(Some(&r), false, true);
         }
