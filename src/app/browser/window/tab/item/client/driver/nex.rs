@@ -42,7 +42,8 @@ impl Nex {
         let path = uri.path(); // copy once
 
         if path.is_empty() {
-            let r = format!("{uri}/"); // auto-append trailing slash to the root locations
+            let mut r = uri.to_string();
+            r.push('/'); // auto-append trailing slash to the root locations
             self.page.navigation.request.info.replace(
                 self.page
                     .navigation
