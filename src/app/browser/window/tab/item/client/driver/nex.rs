@@ -227,6 +227,7 @@ fn render(
             Err(e) => failure(&p, &e.to_string()),
         })
     } else if q.ends_with(".txt")
+        || q.ends_with(".log")
         || q.ends_with(".gmi")
         || q.ends_with(".gemini")
         || q.ends_with("/")
@@ -242,6 +243,8 @@ fn render(
                                 p.content.to_text_source(d)
                             } else if q.ends_with(".gmi") || q.ends_with(".gemini") {
                                 p.content.to_text_gemini(&u, d)
+                            } else if q.ends_with(".log") {
+                                p.content.to_text_plain(d)
                             } else {
                                 p.content.to_text_nex(&u, d)
                             };
