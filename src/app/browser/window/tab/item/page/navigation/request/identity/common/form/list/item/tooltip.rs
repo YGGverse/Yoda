@@ -29,7 +29,7 @@ pub fn new_for_profile_identity_id(certificate: &TlsCertificate, scope: &[String
         tooltip.push_str("\n\n<b>Scope</b>\n");
 
         for path in scope {
-            tooltip.push_str(&format!("\n<small>{}</small>", path));
+            tooltip.push_str(&format!("\n<small>{path}</small>"));
         }
     }
 

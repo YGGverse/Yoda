@@ -26,7 +26,7 @@ pub fn build(mime: &str, download: Option<(&Rc<ItemAction>, &Uri)>) -> StatusPag
             move |_| {
                 action
                     .load
-                    .activate(Some(&format!("download:{}", request)), true, false)
+                    .activate(Some(&format!("download:{request}")), true, false)
             }
         });
 
