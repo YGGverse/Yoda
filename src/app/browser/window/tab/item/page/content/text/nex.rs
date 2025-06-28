@@ -14,7 +14,12 @@ use gutter::Gutter;
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 pub trait Nex {
-    fn nex(actions: (&Rc<WindowAction>, &Rc<ItemAction>), base: &Uri, data: &str) -> Self;
+    fn nex(
+        actions: (&Rc<WindowAction>, &Rc<ItemAction>),
+        base: &Uri,
+        data: &str,
+        title: &mut Option<String>,
+    ) -> Self;
 }
 
 impl Nex for TextView {
@@ -22,6 +27,7 @@ impl Nex for TextView {
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
         data: &str,
+        title: &mut Option<String>,
     ) -> Self {
         pub const NEW_LINE: &str = "\n";
 
@@ -50,7 +56,14 @@ impl Nex for TextView {
         let buffer = TextBuffer::new(Some(&tags));
 
         // Collect links
-        for line in data.lines() {
+        for (i, line) in data.lines().enumerate() {
+            // Generate document title based on first line
+            if i == 0 {
+                let l = line.trim();
+                if !l.starts_with("=>") {
+                    *title = Some(l.into())
+                }
+            }
             // * skip links processing when the current location does not contain trailing slash
             //   it may be confusing: gemini://bbs.geminispace.org/s/nex/29641
             if base.to_string().ends_with("/") {

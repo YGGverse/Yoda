@@ -61,11 +61,12 @@ impl Text {
     }
 
     pub fn nex(actions: (&Rc<WindowAction>, &Rc<ItemAction>), base: &Uri, data: &str) -> Self {
-        let text_view = TextView::nex(actions, base, data);
+        let mut title = None;
+        let text_view = TextView::nex(actions, base, data, &mut title);
         Self {
             scrolled_window: reader(&text_view),
             text_view,
-            meta: Meta { title: None },
+            meta: Meta { title },
         }
     }
 
