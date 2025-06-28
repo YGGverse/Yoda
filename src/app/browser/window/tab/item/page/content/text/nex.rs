@@ -55,15 +55,16 @@ impl Nex for TextView {
         // Init new text buffer
         let buffer = TextBuffer::new(Some(&tags));
 
-        // Collect links
-        for (i, line) in data.lines().enumerate() {
-            // Generate document title based on first line
-            if i == 0 {
+        // Collect markup tags
+        for line in data.lines() {
+            // Generate document title, based on the first non-empty line
+            if title.is_none() {
                 let l = line.trim();
-                if !l.starts_with("=>") {
+                if !l.is_empty() && !l.starts_with("=>") {
                     *title = Some(l.into())
                 }
             }
+            // Collect links
             // * skip links processing when the current location does not contain trailing slash
             //   it may be confusing: gemini://bbs.geminispace.org/s/nex/29641
             if base.to_string().ends_with("/") {
