@@ -165,7 +165,7 @@ impl Nex {
                                         {
                                             let p = p.clone();
                                             move |_, t| {
-                                                if loading_total.replace(t) > 1024 {
+                                                if loading_total.replace(t) > 102400 {
                                                     let mut l = loading.borrow_mut();
                                                     match *l {
                                                         Some(ref this) => this.set_description(
