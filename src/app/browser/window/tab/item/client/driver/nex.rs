@@ -12,7 +12,10 @@ use gtk::{
     glib::{Priority, Uri},
 };
 use sourceview::prelude::FileExt;
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 pub struct Nex {
     page: Rc<Page>,
@@ -144,6 +147,7 @@ impl Nex {
                                 // Show loading status page if awaiting time > 1 second
                                 // * the RefCell is just to not init the loading widget before timeout and prevent bg blinks
                                 let loading: RefCell<Option<adw::StatusPage>> = RefCell::new(None);
+                                let loading_total: Cell<usize> = Cell::new(0);
 
                                 // Nex is the header-less protocol, final content size is never known,
                                 // borrow ggemini::gio wrapper api to preload the buffer swap-safely,
@@ -161,15 +165,17 @@ impl Nex {
                                         {
                                             let p = p.clone();
                                             move |_, t| {
-                                                let mut l = loading.borrow_mut();
-                                                match *l {
-                                                    Some(ref this) => this.set_description(Some(
-                                                        &format!("Preload: {t} bytes"),
-                                                    )),
-                                                    None => {
-                                                        l.replace(p.content.to_status_loading(
-                                                            Some(std::time::Duration::from_secs(1)),
-                                                        ));
+                                                if loading_total.replace(t) > 1024 {
+                                                    let mut l = loading.borrow_mut();
+                                                    match *l {
+                                                        Some(ref this) => this.set_description(
+                                                            Some(&format!("Preload: {t} bytes")),
+                                                        ),
+                                                        None => {
+                                                            l.replace(
+                                                                p.content.to_status_loading(None),
+                                                            );
+                                                        }
                                                     }
                                                 }
                                             }
