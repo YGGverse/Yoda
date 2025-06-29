@@ -258,7 +258,7 @@ fn render(
     c: Cancellable,
 ) {
     use crate::tool::uri_to_title;
-    let q = u.to_string();
+    let q = u.path();
     if is_image(&q) {
         p.window_action.find.simple_action.set_enabled(false);
         Pixbuf::from_stream_async(&m, Some(&c), move |r| match r {
