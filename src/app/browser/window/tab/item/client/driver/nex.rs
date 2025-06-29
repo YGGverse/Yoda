@@ -142,6 +142,14 @@ impl Nex {
                                     return download(c.upcast::<IOStream>(), (p, uri), cancellable);
                                 }
 
+                                // Navigate to the download gateway on content type is not supported
+                                if !is_renderable(&path) {
+                                    p.content
+                                        .to_status_mime(&path, Some((&p.item_action, &uri)));
+                                    p.set_progress(0.0);
+                                    return;
+                                }
+
                                 // Is renderable types..
 
                                 // Show loading status page if awaiting time > 1 second
@@ -219,12 +227,7 @@ fn render(
 ) {
     use crate::tool::uri_to_title;
     let q = u.to_string();
-    if q.ends_with(".gif")
-        || q.ends_with(".jpeg")
-        || q.ends_with(".jpg")
-        || q.ends_with(".png")
-        || q.ends_with(".webp")
-    {
+    if is_image(&q) {
         p.window_action.find.simple_action.set_enabled(false);
         Pixbuf::from_stream_async(&m, Some(&c), move |r| match r {
             Ok(b) => {
@@ -235,13 +238,7 @@ fn render(
             }
             Err(e) => failure(&p, &e.to_string()),
         })
-    } else if q.ends_with(".txt")
-        || q.ends_with(".log")
-        || q.ends_with(".gmi")
-        || q.ends_with(".gemini")
-        || q.ends_with("/")
-        || !u.path().contains(".")
-    {
+    } else if is_text(&q) {
         p.window_action.find.simple_action.set_enabled(true);
         match *f {
             Feature::Default | Feature::Source => {
@@ -274,9 +271,7 @@ fn render(
             Feature::Download => panic!(), // unexpected
         }
     } else {
-        p.content
-            .to_status_mime(&u.path(), Some((&p.item_action, &u)));
-        p.set_progress(0.0)
+        panic!() // unexpected
     }
 }
 
@@ -341,4 +336,25 @@ fn download(s: IOStream, (p, u): (Rc<Page>, Uri), c: Cancellable) {
             Err(e) => a.cancel.activate(&e.to_string()),
         }
     });
+}
+
+fn is_image(q: &str) -> bool {
+    q.ends_with(".gif")
+        || q.ends_with(".jpeg")
+        || q.ends_with(".jpg")
+        || q.ends_with(".png")
+        || q.ends_with(".webp")
+}
+
+fn is_text(q: &str) -> bool {
+    q.ends_with(".txt")
+        || q.ends_with(".log")
+        || q.ends_with(".gmi")
+        || q.ends_with(".gemini")
+        || q.ends_with("/")
+        || !q.contains(".")
+}
+
+fn is_renderable(q: &str) -> bool {
+    is_text(q) || is_image(q)
 }
