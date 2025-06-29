@@ -152,7 +152,7 @@ impl Nex {
                                         move |r| {
                                             event(
                                                 &p,
-                                                &match r {
+                                                match r {
                                                     Ok(()) => "Disconnected".to_string(),
                                                     Err(e) => e.to_string(),
                                                 },
@@ -211,7 +211,7 @@ impl Nex {
                                                         move |r| {
                                                             event(
                                                                 &p,
-                                                                &match r {
+                                                                match r {
                                                                     Ok(()) => {
                                                                         "Disconnected".to_string()
                                                                     }
@@ -239,9 +239,9 @@ impl Nex {
     }
 }
 
-fn event(p: &Page, e: &str, s: Option<usize>) {
+fn event(p: &Page, e: String, s: Option<usize>) {
     let mut i = p.navigation.request.info.borrow_mut();
-    i.add_event(e.to_string()).set_size(s);
+    i.add_event(e).set_size(s);
     p.navigation.request.update_secondary_icon(&i)
 }
 
@@ -266,7 +266,7 @@ fn render(
                 p.set_title(&uri_to_title(&u));
                 p.content.to_image(&Texture::for_pixbuf(&b));
                 p.set_progress(0.0);
-                event(&p, "Completed", Some(s))
+                event(&p, "Completed".to_string(), Some(s))
             }
             Err(e) => failure(&p, &e.to_string()),
         })
@@ -286,14 +286,14 @@ fn render(
                             } else {
                                 p.content.to_text_nex(&u, d)
                             };
-                            event(&p, "Parsed", Some(s));
+                            event(&p, "Parsed".to_string(), Some(s));
                             p.search.set(Some(t.text_view));
                             p.set_title(&match t.meta.title {
                                 Some(t) => t.into(), // @TODO
                                 None => uri_to_title(&u),
                             });
                             p.set_progress(0.0);
-                            event(&p, "Completed", Some(s))
+                            event(&p, "Completed".to_string(), Some(s))
                         }
                         Err(e) => failure(&p, &e.to_string()),
                     },
@@ -310,7 +310,7 @@ fn render(
 fn download(s: SocketConnection, (p, u): (Rc<Page>, Uri), c: Cancellable) {
     use crate::tool::Format;
     use ggemini::gio::file_output_stream;
-    event(&p, "Download begin", None);
+    event(&p, "Download begin".to_string(), None);
     let t = crate::tool::uri_to_title(&u)
         .trim_matches(std::path::MAIN_SEPARATOR)
         .to_string();
@@ -338,7 +338,7 @@ fn download(s: SocketConnection, (p, u): (Rc<Page>, Uri), c: Cancellable) {
                             move |_, total| {
                                 const T: &str = "Received";
                                 let t = format!("{T} {}...", total.bytes());
-                                event(&p, T, Some(total));
+                                event(&p, T.to_string(), Some(total));
                                 p.set_title(&t);
                                 a.update.activate(&t)
                             }
@@ -364,7 +364,7 @@ fn download(s: SocketConnection, (p, u): (Rc<Page>, Uri), c: Cancellable) {
                                         move |r| {
                                             event(
                                                 &p,
-                                                &match r {
+                                                match r {
                                                     Ok(()) => "Disconnected".to_string(),
                                                     Err(e) => e.to_string(),
                                                 },
