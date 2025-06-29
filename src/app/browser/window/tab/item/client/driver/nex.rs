@@ -1,7 +1,7 @@
 //! https://nightfall.city/nex/info/specification.txt
 
 use super::{Feature, Page};
-use gtk::gio::MemoryInputStream;
+use gtk::gio::{MemoryInputStream, SocketConnection};
 use gtk::prelude::{
     Cast, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
 };
@@ -135,11 +135,11 @@ impl Nex {
                         Priority::DEFAULT,
                         Some(&cancellable.clone()),
                         move |r| match r {
-                            Ok(_) => {
+                            Ok((_, size, _)) => {
                                 // Is download feature request,
                                 // delegate this task to the separated handler function.
                                 if matches!(*feature, Feature::Download) {
-                                    return download(c.upcast::<IOStream>(), (p, uri), cancellable);
+                                    return download(c, (p, uri), cancellable);
                                 }
 
                                 // Navigate to the download gateway on content type is not supported
@@ -147,6 +147,19 @@ impl Nex {
                                     p.content
                                         .to_status_mime(&path, Some((&p.item_action, &uri)));
                                     p.set_progress(0.0);
+                                    c.close_async(Priority::DEFAULT, Some(&cancellable), {
+                                        let p = p.clone();
+                                        move |r| {
+                                            event(
+                                                &p,
+                                                &match r {
+                                                    Ok(()) => "Disconnected".to_string(),
+                                                    Err(e) => e.to_string(),
+                                                },
+                                                Some(size),
+                                            )
+                                        }
+                                    });
                                     return;
                                 }
 
@@ -161,7 +174,7 @@ impl Nex {
                                 // borrow ggemini::gio wrapper api to preload the buffer swap-safely,
                                 // by using the chunks controller.
                                 ggemini::gio::memory_input_stream::from_stream_async(
-                                    c.upcast::<IOStream>(),
+                                    c.clone().upcast::<IOStream>(),
                                     Priority::DEFAULT,
                                     cancellable.clone(),
                                     ggemini::gio::memory_input_stream::Size {
@@ -190,7 +203,26 @@ impl Nex {
                                         },
                                         move |r| match r {
                                             Ok((m, s)) => {
-                                                render((m, s), (p, feature, uri), cancellable)
+                                                c.close_async(
+                                                    Priority::DEFAULT,
+                                                    Some(&cancellable),
+                                                    {
+                                                        let p = p.clone();
+                                                        move |r| {
+                                                            event(
+                                                                &p,
+                                                                &match r {
+                                                                    Ok(()) => {
+                                                                        "Disconnected".to_string()
+                                                                    }
+                                                                    Err(e) => e.to_string(),
+                                                                },
+                                                                Some(s),
+                                                            )
+                                                        }
+                                                    },
+                                                );
+                                                render((m, s), (p, feature, uri), cancellable);
                                             }
                                             Err(e) => failure(&p, &e.to_string()),
                                         },
@@ -275,7 +307,7 @@ fn render(
     }
 }
 
-fn download(s: IOStream, (p, u): (Rc<Page>, Uri), c: Cancellable) {
+fn download(s: SocketConnection, (p, u): (Rc<Page>, Uri), c: Cancellable) {
     use crate::tool::Format;
     use ggemini::gio::file_output_stream;
     event(&p, "Download begin", None);
@@ -289,7 +321,7 @@ fn download(s: IOStream, (p, u): (Rc<Page>, Uri), c: Cancellable) {
         move |f, a| match f.replace(None, false, gtk::gio::FileCreateFlags::NONE, Some(&c)) {
             Ok(file_output_stream) => {
                 file_output_stream::from_stream_async(
-                    s.clone(),
+                    s.clone().upcast::<IOStream>(),
                     file_output_stream,
                     c.clone(),
                     Priority::DEFAULT,
@@ -316,6 +348,8 @@ fn download(s: IOStream, (p, u): (Rc<Page>, Uri), c: Cancellable) {
                             let a = a.clone();
                             let p = p.clone();
                             let t = t.clone();
+                            let c = c.clone();
+                            let s = s.clone();
                             move |result| match result {
                                 Ok((_, total)) => {
                                     a.complete.activate(&format!(
@@ -325,7 +359,19 @@ fn download(s: IOStream, (p, u): (Rc<Page>, Uri), c: Cancellable) {
                                     ));
                                     p.set_progress(0.0);
                                     p.set_title(&t);
-                                    event(&p, "Completed", Some(total))
+                                    s.close_async(Priority::DEFAULT, Some(&c), {
+                                        let p = p.clone();
+                                        move |r| {
+                                            event(
+                                                &p,
+                                                &match r {
+                                                    Ok(()) => "Disconnected".to_string(),
+                                                    Err(e) => e.to_string(),
+                                                },
+                                                Some(total),
+                                            )
+                                        }
+                                    })
                                 }
                                 Err(e) => a.cancel.activate(&e.to_string()),
                             }
