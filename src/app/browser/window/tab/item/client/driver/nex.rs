@@ -270,7 +270,7 @@ fn render(
             }
             Err(e) => failure(&p, &e.to_string()),
         })
-    } else if is_text(&q) {
+    } else if is_document(&q) {
         p.window_action.find.simple_action.set_enabled(true);
         match *f {
             Feature::Default | Feature::Source => {
@@ -279,12 +279,12 @@ fn render(
                         Ok(d) => {
                             let t = if matches!(*f, Feature::Source) {
                                 p.content.to_text_source(d)
+                            } else if q.ends_with("/") {
+                                p.content.to_text_nex(&u, d)
                             } else if q.ends_with(".gmi") || q.ends_with(".gemini") {
                                 p.content.to_text_gemini(&u, d)
-                            } else if q.ends_with(".log") {
-                                p.content.to_text_plain(d)
                             } else {
-                                p.content.to_text_nex(&u, d)
+                                p.content.to_text_plain(d)
                             };
                             event(&p, "Parsed".to_string(), Some(s));
                             p.search.set(Some(t.text_view));
@@ -392,7 +392,7 @@ fn is_image(q: &str) -> bool {
         || q.ends_with(".webp")
 }
 
-fn is_text(q: &str) -> bool {
+fn is_document(q: &str) -> bool {
     q.ends_with(".txt")
         || q.ends_with(".log")
         || q.ends_with(".gmi")
@@ -402,5 +402,5 @@ fn is_text(q: &str) -> bool {
 }
 
 fn is_renderable(q: &str) -> bool {
-    is_text(q) || is_image(q)
+    is_document(q) || is_image(q)
 }
