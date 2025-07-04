@@ -1,6 +1,7 @@
 //! https://nightfall.city/nex/info/specification.txt
 
 use super::{Feature, Page};
+use crate::tool::{Format, uri_to_title};
 use gtk::gio::{MemoryInputStream, SocketConnection};
 use gtk::prelude::{
     Cast, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
@@ -189,9 +190,12 @@ impl Nex {
                                                 if loading_total.replace(t) > 102400 {
                                                     let mut l = loading.borrow_mut();
                                                     match *l {
-                                                        Some(ref this) => this.set_description(
-                                                            Some(&format!("Preload: {t} bytes")),
-                                                        ),
+                                                        Some(ref this) => {
+                                                            this.set_description(Some(&format!(
+                                                                "Preload: {}",
+                                                                t.bytes()
+                                                            )))
+                                                        }
                                                         None => {
                                                             l.replace(
                                                                 p.content.to_status_loading(None),
@@ -257,7 +261,6 @@ fn render(
     (p, f, u): (Rc<Page>, Rc<Feature>, Uri),
     c: Cancellable,
 ) {
-    use crate::tool::uri_to_title;
     let q = u.path();
     if is_image(&q) {
         p.window_action.find.simple_action.set_enabled(false);
