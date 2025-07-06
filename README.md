@@ -113,7 +113,7 @@ GTK 4 / Libadwaita client written in Rust
     * [x] Header options
       * [x] MIME
       * [x] Token
-* [x] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io))
+* [x] [NEX](https://nightfall.city/nex/info/specification.txt) - useful for networks with build-in encryption (e.g. [Yggdrasil](https://yggdrasil-network.github.io) or [Mycelium](https://github.com/threefoldtech/mycelium))
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [x] System
   * [x] `file://` - local files browser
