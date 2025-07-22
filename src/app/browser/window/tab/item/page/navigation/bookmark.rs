@@ -41,17 +41,11 @@ impl Bookmark {
         let profile = self.profile.clone();
         let query = self.request.text();
         let title = title.map(|t| t.to_string());
-        gtk::glib::spawn_future_local(async move {
-            button.set_sensitive(false); // lock
-            let has_bookmark = gtk::gio::spawn_blocking(move || {
-                profile.bookmark.toggle(&query, title.as_deref()).unwrap()
-            })
-            .await
-            .unwrap();
-            button.set_icon_name(icon_name(has_bookmark));
-            button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
-            button.set_sensitive(true);
-        }); // may take a while
+        button.set_sensitive(false); // lock
+        let has_bookmark = profile.bookmark.toggle(&query, title.as_deref()).unwrap();
+        button.set_icon_name(icon_name(has_bookmark));
+        button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+        button.set_sensitive(true);
     }
 }
 
@@ -76,10 +70,7 @@ fn update(profile: &Arc<Profile>, button: &Button, request: gtk::glib::GString) 
     let button = button.clone();
     gtk::glib::spawn_future_local(async move {
         button.set_sensitive(false); // lock
-        let has_bookmark =
-            gtk::gio::spawn_blocking(move || profile.bookmark.is_match_request(&request))
-                .await
-                .unwrap();
+        let has_bookmark = profile.bookmark.is_match_request(&request);
         button.set_icon_name(icon_name(has_bookmark));
         button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
         button.set_sensitive(true);
