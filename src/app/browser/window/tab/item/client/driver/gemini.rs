@@ -11,7 +11,7 @@ use gtk::{
     glib::{Priority, Uri},
     prelude::{ButtonExt, FileExt, SocketClientExt},
 };
-use sourceview::prelude::InputStreamExtManual;
+use sourceview::prelude::{ActionExt, InputStreamExtManual, TlsConnectionExt};
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
 /// [Gemini protocol](https://geminiprotocol.net/docs/protocol-specification.gmi) client driver
@@ -150,6 +150,8 @@ fn handle(
 ) {
     const EVENT_COMPLETED: &str = "Completed";
     let uri = request.uri().clone();
+    let server_certificates = this.page.profile.tofu.server_certificates(&uri);
+    let has_server_certificates = server_certificates.is_some();
     this.client.request_async(
         request,
         Priority::DEFAULT,
@@ -160,6 +162,7 @@ fn handle(
             .profile
             .identity
             .get(&uri.to_string()).map(|identity|identity.to_tls_certificate().unwrap()),
+        server_certificates,
         {
             let page = this.page.clone();
             let redirects = this.redirects.clone();
@@ -185,6 +188,12 @@ fn handle(
                             )));
                             // * unwrap fails only on `connection.socket_connection.is_closed()`
                             //   drop the panic as unexpected here.
+                    }
+                    // Register new peer certificate if the TOFU index is empty
+                    if !has_server_certificates {
+                        page.profile.tofu.add(
+                            connection.tls_client_connection.peer_certificate().unwrap()
+                        ).unwrap() // expect new record
                     }
                     // Handle response
                     match response {
@@ -608,8 +617,38 @@ fn handle(
                     }
                 }
                 Err(e) => {
-                    let s = page.content.to_status_failure();
-                    s.set_description(Some(&e.to_string()));
+                    let s = match e {
+                        ggemini::client::Error::Request(connection, e) => match e {
+                            ggemini::client::connection::Error::Request(_, e) => {
+                                use gtk::gio::TlsError;
+                                if e.kind::<TlsError>().is_some_and(|e| matches!(e, TlsError::BadCertificate)) {
+                                    page.content.to_status_tofu({
+                                        let p = page.clone();
+                                        move || {
+                                            p.profile.tofu.add(
+                                                connection.tls_client_connection.peer_certificate().unwrap()
+                                            ).unwrap(); // expect new record
+                                            p.item_action.reload.activate(None)
+                                        }
+                                    })
+                                } else {
+                                    let s = page.content.to_status_failure();
+                                        s.set_description(Some(&e.to_string()));
+                                        s
+                                }
+                            },
+                            _ => {
+                                let s = page.content.to_status_failure();
+                                s.set_description(Some(&e.to_string()));
+                                s
+                            }
+                        },
+                        _ => {
+                            let s = page.content.to_status_failure();
+                                s.set_description(Some(&e.to_string()));
+                                s
+                        }
+                    };
                     page.set_progress(0.0);
                     page.set_title(&s.title());
                     if is_snap_history {

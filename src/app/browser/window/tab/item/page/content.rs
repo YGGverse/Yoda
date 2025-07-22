@@ -51,9 +51,9 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_image(&self, paintable: &impl IsA<Paintable>) -> Image {
         self.clean();
-        let image = Image::new_from_paintable(paintable);
-        self.g_box.append(&image.picture);
-        image
+        let i = Image::new_from_paintable(paintable);
+        self.g_box.append(&i.picture);
+        i
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Download` preset
@@ -66,9 +66,9 @@ impl Content {
         on_choose: impl Fn(File, Rc<status::download::Action>) + 'static,
     ) -> StatusPage {
         self.clean();
-        let status = status::download::build(initial_filename, cancellable, on_choose);
-        self.g_box.append(&status);
-        status
+        let s = status::download::build(initial_filename, cancellable, on_choose);
+        self.g_box.append(&s);
+        s
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Failure` preset
@@ -76,9 +76,19 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_failure(&self) -> StatusPage {
         self.clean();
-        let status = status::failure::new();
-        self.g_box.append(&status);
-        status
+        let s = status::failure::new();
+        self.g_box.append(&s);
+        s
+    }
+
+    /// Set new `content::Status` component for `Self` with new `status::Tofu` preset
+    ///
+    /// * action removes previous children component from `Self`
+    pub fn to_status_tofu(&self, on_accept: impl Fn() + 'static) -> StatusPage {
+        self.clean();
+        let s = status::tofu::build(on_accept);
+        self.g_box.append(&s);
+        s
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Mime` issue preset
@@ -90,9 +100,9 @@ impl Content {
         download: Option<(&Rc<ItemAction>, &Uri)>,
     ) -> StatusPage {
         self.clean();
-        let status = status::mime::build(mime, download);
-        self.g_box.append(&status);
-        status
+        let s = status::mime::build(mime, download);
+        self.g_box.append(&s);
+        s
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Identity` preset
@@ -100,9 +110,9 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_identity(&self) -> StatusPage {
         self.clean();
-        let status = status::identity::build((&self.tab_action, &self.item_action));
-        self.g_box.append(&status);
-        status
+        let s = status::identity::build((&self.tab_action, &self.item_action));
+        self.g_box.append(&s);
+        s
     }
 
     /// Set new `content::Status` component for `Self` with new `status::Loading` preset
@@ -110,9 +120,9 @@ impl Content {
     /// * action removes previous children component from `Self`
     pub fn to_status_loading(&self, show_with_delay: Option<Duration>) -> StatusPage {
         self.clean();
-        let status = status::loading::build(show_with_delay);
-        self.g_box.append(&status);
-        status
+        let s = status::loading::build(show_with_delay);
+        self.g_box.append(&s);
+        s
     }
 
     /// `text/gemini`
@@ -147,17 +157,17 @@ impl Content {
     /// `text/plain`
     pub fn to_text_plain(&self, data: &str) -> Text {
         self.clean();
-        let text = Text::plain(data);
-        self.g_box.append(&text.scrolled_window);
-        text
+        let t = Text::plain(data);
+        self.g_box.append(&t.scrolled_window);
+        t
     }
 
     /// [text/nex](https://nightfall.city/nex/info/specification.txt)
     pub fn to_text_nex(&self, base: &Uri, data: &str) -> Text {
         self.clean();
-        let text = Text::nex((&self.window_action, &self.item_action), base, data);
-        self.g_box.append(&text.scrolled_window);
-        text
+        let t = Text::nex((&self.window_action, &self.item_action), base, data);
+        self.g_box.append(&t.scrolled_window);
+        t
     }
 
     pub fn to_directory(
@@ -172,9 +182,9 @@ impl Content {
     /// * system `source:`
     pub fn to_text_source(&self, data: &str) -> Text {
         self.clean();
-        let text = Text::source(data);
-        self.g_box.append(&text.scrolled_window);
-        text
+        let t = Text::source(data);
+        self.g_box.append(&t.scrolled_window);
+        t
     }
 
     /// Remove all children components from `Self`

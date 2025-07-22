@@ -21,11 +21,14 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [Audio](#audio)
   * [ ] [Video](#video)
 * [x] Certificates
-  * [x] Generate new identity
-  * [x] Select for path
-  * [x] Export to PEM
-  * [x] Import from PEM
-  * [x] Delete
+  * [x] Server
+    * [x] [TOFU](https://en.wikipedia.org/wiki/Trust_on_first_use)
+  * [x] Client
+    * [x] Generate new identity
+    * [x] Select for path
+    * [x] Export to PEM
+    * [x] Import from PEM
+    * [x] Delete
 * [x] Custom search providers
 * [ ] Downloads
   * [ ] Browser window

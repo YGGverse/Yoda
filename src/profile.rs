@@ -3,6 +3,7 @@ mod database;
 mod history;
 mod identity;
 mod search;
+mod tofu;
 
 use anyhow::Result;
 use bookmark::Bookmark;
@@ -15,6 +16,7 @@ use r2d2_sqlite::SqliteConnectionManager;
 use search::Search;
 use sqlite::Transaction;
 use std::{fs::create_dir_all, path::PathBuf};
+use tofu::Tofu;
 
 const VENDOR: &str = "YGGverse";
 const APP_ID: &str = "Yoda";
@@ -24,11 +26,12 @@ const DB_NAME: &str = "database.sqlite3";
 
 pub struct Profile {
     pub bookmark: Bookmark,
+    pub config_path: PathBuf,
     pub database: Database,
     pub history: History,
     pub identity: Identity,
     pub search: Search,
-    pub config_path: PathBuf,
+    pub tofu: Tofu,
 }
 
 impl Profile {
@@ -82,24 +85,28 @@ impl Profile {
         // Init components
         let bookmark = Bookmark::build(&database_pool, profile_id)?;
         let history = History::build(&database_pool, profile_id)?;
-        let search = Search::build(&database_pool, profile_id)?;
         let identity = Identity::build(&database_pool, profile_id)?;
+        let search = Search::build(&database_pool, profile_id)?;
+        let tofu = Tofu::init(&database_pool, profile_id)?;
 
         // Result
         Ok(Self {
             bookmark,
+            config_path,
             database,
             history,
             identity,
             search,
-            config_path,
+            tofu,
         })
     }
 
     // Actions
 
     pub fn save(&self) -> Result<()> {
-        self.history.save()
+        self.history.save()?;
+        self.tofu.save()?;
+        Ok(())
     }
 }
 
@@ -109,9 +116,10 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
 
     // Delegate migration to children components
     bookmark::migrate(tx)?;
+    history::migrate(tx)?;
     identity::migrate(tx)?;
     search::migrate(tx)?;
-    history::migrate(tx)?;
+    tofu::migrate(tx)?;
 
     // Success
     Ok(())
