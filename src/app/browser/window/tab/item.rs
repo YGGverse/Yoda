@@ -15,7 +15,7 @@ use gtk::{
 };
 use page::Page;
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub struct Item {
     // Multi-protocol handler
@@ -32,7 +32,7 @@ impl Item {
     /// Build new `Self`
     pub fn build(
         (tab_page, target_child): (&TabPage, &Box),
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         (window_action, tab_action): (&Rc<WindowAction>, &Rc<TabAction>),
         request: Option<&str>,
         is_load: bool,

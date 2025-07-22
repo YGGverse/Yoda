@@ -13,10 +13,10 @@ use input::Input;
 use navigation::Navigation;
 use search::Search;
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub struct Page {
-    pub profile: Arc<Profile>,
+    pub profile: Rc<Profile>,
     // Actions
     pub item_action: Rc<ItemAction>,
     pub window_action: Rc<WindowAction>,
@@ -38,7 +38,7 @@ impl Page {
     // Constructors
 
     pub fn build(
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         (window_action, tab_action, item_action): (
             &Rc<WindowAction>,
             &Rc<TabAction>,

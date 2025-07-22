@@ -10,7 +10,7 @@ use gtk::{
     prelude::{BoxExt, ListItemExt, ObjectExt, WidgetExt},
 };
 pub use item::Item;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct List {
     pub dropdown: DropDown,
@@ -21,7 +21,7 @@ impl List {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Arc<Profile>) -> Self {
+    pub fn build(profile: &Rc<Profile>) -> Self {
         // Init dropdown items
         let new_search_provider = Item::add();
 

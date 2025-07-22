@@ -3,19 +3,19 @@ use gtk::{
     Button, Entry,
     prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
 };
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 const ICON_NAME: (&str, &str) = ("non-starred-symbolic", "starred-symbolic");
 const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
 pub struct Bookmark {
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
     request: Entry,
     pub button: Button,
 }
 
 impl Bookmark {
-    pub fn build(action: &Rc<WindowAction>, profile: &Arc<Profile>, request: &Entry) -> Self {
+    pub fn build(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self {
         let button = Button::builder()
             .action_name(format!(
                 "{}.{}",
@@ -65,7 +65,7 @@ fn icon_name(has_bookmark: bool) -> &'static str {
     }
 }
 
-fn update(profile: &Arc<Profile>, button: &Button, request: gtk::glib::GString) {
+fn update(profile: &Rc<Profile>, button: &Button, request: gtk::glib::GString) {
     let profile = profile.clone();
     let button = button.clone();
     gtk::glib::spawn_future_local(async move {

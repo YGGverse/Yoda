@@ -19,7 +19,6 @@ use sqlite::Transaction;
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
-    sync::Arc,
 };
 use suggestion::Suggestion;
 
@@ -30,14 +29,14 @@ pub struct Request {
     pub entry: Entry,
     pub info: Rc<RefCell<Info>>,
     suggestion: Rc<Suggestion>,
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
 }
 
 impl Request {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(item_action: &Rc<ItemAction>, profile: &Arc<Profile>) -> Self {
+    pub fn build(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
         // Init components
         let info = Rc::new(RefCell::new(Info::new()));
 
@@ -364,7 +363,7 @@ fn is_focused(entry: &Entry) -> bool {
 }
 
 /// Present Identity [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-fn show_identity_dialog(entry: &Entry, profile: &Arc<Profile>) {
+fn show_identity_dialog(entry: &Entry, profile: &Rc<Profile>) {
     // connect identity traits
     use identity::{Common, Unsupported};
     if let Some(uri) = uri(entry) {
@@ -390,7 +389,7 @@ fn show_identity_dialog(entry: &Entry, profile: &Arc<Profile>) {
 }
 
 /// Present Search providers [AlertDialog](https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AlertDialog.html) for `Self`
-fn show_search_dialog(entry: &Entry, profile: &Arc<Profile>) {
+fn show_search_dialog(entry: &Entry, profile: &Rc<Profile>) {
     use search::Search;
     AlertDialog::search(profile).present(Some(entry))
 }

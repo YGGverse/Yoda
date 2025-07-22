@@ -7,7 +7,7 @@ use drop::Drop;
 use gtk::{Box, Button, Entry, Orientation, prelude::BoxExt};
 use list::List;
 pub use query::Query;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub struct Form {
     pub drop: Button,
@@ -20,7 +20,7 @@ impl Form {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Arc<Profile>) -> Self {
+    pub fn build(profile: &Rc<Profile>) -> Self {
         // Init components
         let list = Rc::new(List::build(profile));
         let query = Entry::query();

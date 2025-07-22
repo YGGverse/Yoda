@@ -1,8 +1,8 @@
 use crate::profile::Profile;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub fn new_for_profile_identity_id(
-    profile: &Arc<Profile>,
+    profile: &Rc<Profile>,
     profile_identity_id: i64,
     auth_url: &str,
 ) -> bool {

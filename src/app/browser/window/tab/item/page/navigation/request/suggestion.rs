@@ -17,14 +17,14 @@ use gtk::{
 };
 pub use item::Item;
 use sourceview::prelude::ListModelExt;
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Suggestion {
     list_store: ListStore,
     list_view: ListView,
     single_selection: SingleSelection,
     entry: Entry,
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
     popover: Popover,
     pub signal_handler_id: Rc<RefCell<Option<SignalHandlerId>>>,
 }
@@ -33,7 +33,7 @@ impl Suggestion {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Arc<Profile>, entry: &Entry) -> Self {
+    pub fn build(profile: &Rc<Profile>, entry: &Entry) -> Self {
         let signal_handler_id = Rc::new(RefCell::new(None));
         let list_store = ListStore::new::<Item>();
         let single_selection = {

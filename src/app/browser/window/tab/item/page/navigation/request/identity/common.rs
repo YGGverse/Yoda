@@ -5,16 +5,13 @@ use crate::Profile;
 use action::Action as WidgetAction;
 use adw::AlertDialog;
 use gtk::{glib::Uri, prelude::EditableExt};
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 // Select options
 
 pub trait Common {
-    fn common(
-        profile: &Arc<Profile>,
-        request: &Uri,
-        callback: &Rc<impl Fn(bool) + 'static>,
-    ) -> Self;
+    fn common(profile: &Rc<Profile>, request: &Uri, callback: &Rc<impl Fn(bool) + 'static>)
+    -> Self;
 }
 
 impl Common for AlertDialog {
@@ -22,7 +19,7 @@ impl Common for AlertDialog {
 
     /// Create new `Self`
     fn common(
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         request: &Uri,
         callback: &Rc<impl Fn(bool) + 'static>,
     ) -> Self {

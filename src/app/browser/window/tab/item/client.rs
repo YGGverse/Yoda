@@ -9,21 +9,21 @@ use gtk::{
     glib::{Uri, UriFlags},
     prelude::CancellableExt,
 };
-use std::{cell::Cell, rc::Rc, sync::Arc};
+use std::{cell::Cell, rc::Rc};
 
 /// Multi-protocol client API for tab `Item`
 pub struct Client {
     cancellable: Cell<Cancellable>,
     driver: Rc<Driver>,
     page: Rc<Page>,
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
 }
 
 impl Client {
     // Constructors
 
     /// Create new `Self`
-    pub fn init(profile: &Arc<Profile>, page: &Rc<Page>) -> Self {
+    pub fn init(profile: &Rc<Profile>, page: &Rc<Page>) -> Self {
         Self {
             cancellable: Cell::new(Cancellable::new()),
             driver: Rc::new(Driver::build(page)),
@@ -118,7 +118,7 @@ impl Client {
 /// Create request using async DNS resolver (slow method)
 /// * return suggestion [Uri](https://docs.gtk.org/glib/struct.Uri.html) on failure (to handle as redirect)
 fn lookup(
-    profile: &Arc<Profile>,
+    profile: &Rc<Profile>,
     query: &str,
     cancellable: Cancellable,
     callback: impl FnOnce(Rc<Feature>, Cancellable, Result<Uri, String>) + 'static,

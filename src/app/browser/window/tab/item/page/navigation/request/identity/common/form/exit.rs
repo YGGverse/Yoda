@@ -8,12 +8,12 @@ use gtk::{
     glib::{Uri, timeout_add_seconds_local_once},
     prelude::{ButtonExt, WidgetExt},
 };
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub trait Exit {
     fn exit(
         widget_action: &Rc<WidgetAction>,
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         list: &Rc<List>,
         request: &Uri,
     ) -> Self;
@@ -25,7 +25,7 @@ impl Exit for Button {
     /// Create new `Self`
     fn exit(
         widget_action: &Rc<WidgetAction>,
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         list: &Rc<List>,
         request: &Uri,
     ) -> Self {

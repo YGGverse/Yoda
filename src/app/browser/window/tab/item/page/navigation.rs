@@ -18,7 +18,7 @@ use home::Home;
 use reload::Reload;
 use request::Request;
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 const MARGIN: i32 = 6;
 const SPACING: i32 = 6;
@@ -31,7 +31,7 @@ pub struct Navigation {
 
 impl Navigation {
     pub fn build(
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
         (window_action, tab_action, item_action): (
             &Rc<WindowAction>,
             &Rc<TabAction>,

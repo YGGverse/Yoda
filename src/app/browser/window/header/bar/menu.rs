@@ -6,13 +6,13 @@ use gtk::{
     prelude::{ActionExt, ToVariant},
 };
 use indexmap::IndexMap;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 // Config options
 
 const LABEL_MAX_LENGTH: usize = 28;
 pub trait Menu {
-    fn menu(action: (&Rc<BrowserAction>, &Rc<WindowAction>), profile: &Arc<Profile>) -> Self;
+    fn menu(action: (&Rc<BrowserAction>, &Rc<WindowAction>), profile: &Rc<Profile>) -> Self;
 }
 
 #[rustfmt::skip] // @TODO template builder?
@@ -22,7 +22,7 @@ impl Menu for MenuButton {
     /// Build new `Self`
      fn menu(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Arc<Profile>,
+        profile: &Rc<Profile>,
     ) -> Self {
         // Main
         let main = gio::Menu::new();

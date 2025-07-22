@@ -10,12 +10,12 @@ use gtk::{
     prelude::{ActionExt, ApplicationExt, ApplicationExtManual, GtkApplicationExt},
 };
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 const APPLICATION_ID: &str = "io.github.yggverse.Yoda";
 
 pub struct App {
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
     application: Application,
 }
 
@@ -30,7 +30,7 @@ impl App {
             .build();
 
         // Init components
-        let profile = Arc::new(profile);
+        let profile = Rc::new(profile);
         let browser = Rc::new(Browser::build(&profile));
 
         // Prevent startup warning @TODO

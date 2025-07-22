@@ -13,12 +13,12 @@ pub use item::Item;
 use menu::Menu;
 use sourceview::prelude::IsA;
 use sqlite::Transaction;
-use std::{cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 // Main
 pub struct Tab {
     window_action: Rc<WindowAction>,
-    profile: Arc<Profile>,
+    profile: Rc<Profile>,
     index: Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     pub action: Rc<Action>,
     pub tab_view: TabView,
@@ -28,7 +28,7 @@ impl Tab {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(profile: &Arc<Profile>, window_action: &Rc<WindowAction>) -> Self {
+    pub fn build(profile: &Rc<Profile>, window_action: &Rc<WindowAction>) -> Self {
         let action = Rc::new(Action::new());
 
         // Init empty HashMap index

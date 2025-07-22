@@ -9,17 +9,17 @@ use gtk::{
     glib::timeout_add_seconds_local_once,
     prelude::{ButtonExt, WidgetExt},
 };
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub trait Drop {
-    fn drop(profile: &Arc<Profile>, list: &Rc<List>) -> Self;
+    fn drop(profile: &Rc<Profile>, list: &Rc<List>) -> Self;
 }
 
 impl Drop for Button {
     // Constructors
 
     /// Create new `Self`
-    fn drop(profile: &Arc<Profile>, list: &Rc<List>) -> Self {
+    fn drop(profile: &Rc<Profile>, list: &Rc<List>) -> Self {
         // Defaults
 
         const LABEL: &str = "Delete";

@@ -2,11 +2,11 @@ pub mod auth;
 
 use anyhow::{Result, bail};
 pub use auth::Auth;
-use std::{collections::HashMap, sync::RwLock};
+use std::{cell::RefCell, collections::HashMap};
 
 /// Reduce disk usage by cache Auth index in memory
 pub struct Memory {
-    index: RwLock<HashMap<String, i64>>,
+    index: RefCell<HashMap<String, i64>>,
 }
 
 impl Default for Memory {
@@ -21,7 +21,7 @@ impl Memory {
     /// Create new `Self`
     pub fn new() -> Self {
         Self {
-            index: RwLock::new(HashMap::new()),
+            index: RefCell::new(HashMap::new()),
         }
     }
 
@@ -31,7 +31,7 @@ impl Memory {
     /// * validate record with same key does not exist yet
     pub fn add(&self, scope: String, profile_identity_id: i64) -> Result<()> {
         // Borrow shared index access
-        let mut index = self.index.write().unwrap();
+        let mut index = self.index.borrow_mut();
 
         // Prevent existing key overwrite
         if index.contains_key(&scope) {
@@ -47,7 +47,7 @@ impl Memory {
 
     /// Cleanup index
     pub fn clear(&self) -> Result<()> {
-        let mut index = self.index.write().unwrap();
+        let mut index = self.index.borrow_mut();
         index.clear();
         if index.is_empty() {
             Ok(())
@@ -62,7 +62,7 @@ impl Memory {
     pub fn match_scope(&self, scope: &str) -> Option<Auth> {
         let mut result = Vec::new();
 
-        for (value, &profile_identity_id) in self.index.read().unwrap().iter() {
+        for (value, &profile_identity_id) in self.index.borrow().iter() {
             if scope.starts_with(value) {
                 result.push(Auth {
                     profile_identity_id,
@@ -83,7 +83,7 @@ impl Memory {
     /// * see also parent `is_match_request`
     pub fn total(&self, profile_identity_id: i64) -> usize {
         let mut total = 0;
-        for (_, _profile_identity_id) in self.index.read().unwrap().iter() {
+        for (_, _profile_identity_id) in self.index.borrow().iter() {
             if *_profile_identity_id == profile_identity_id {
                 total += 1
             }

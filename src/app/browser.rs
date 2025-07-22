@@ -18,7 +18,7 @@ use gtk::{
     prelude::GtkWindowExt,
 };
 use sqlite::Transaction;
-use std::{rc::Rc, sync::Arc};
+use std::rc::Rc;
 
 pub struct Browser {
     pub action: Rc<Action>,
@@ -30,7 +30,7 @@ impl Browser {
     // Constructors
 
     /// Build new `Self`
-    pub fn build(profile: &Arc<Profile>) -> Browser {
+    pub fn build(profile: &Rc<Profile>) -> Browser {
         // Init components
         let action = Rc::new(Action::new());
         let window = Rc::new(Window::build(profile, &action));
