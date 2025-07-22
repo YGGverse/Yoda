@@ -22,7 +22,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [Video](#video)
 * [x] Certificates
   * [x] Server
-    * [x] [TOFU](https://en.wikipedia.org/wiki/Trust_on_first_use)
+    * [x] The [TOFU](https://en.wikipedia.org/wiki/Trust_on_first_use) validation
   * [x] Client
     * [x] Generate new identity
     * [x] Select for path
