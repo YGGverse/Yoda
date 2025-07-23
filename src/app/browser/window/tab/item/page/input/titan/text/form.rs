@@ -1,5 +1,5 @@
 use gtk::{TextView, WrapMode, prelude::WidgetExt};
-use libspelling::{Checker, TextBufferAdapter};
+//use libspelling::{Checker, TextBufferAdapter};
 use sourceview::Buffer;
 
 pub trait Form {
@@ -15,9 +15,9 @@ impl Form for TextView {
         let buffer = Buffer::builder().build();
 
         // Init [libspelling](https://gitlab.gnome.org/GNOME/libspelling)
-        let checker = Checker::default();
+        /*let checker = Checker::default();
         let adapter = TextBufferAdapter::new(&buffer, &checker);
-        adapter.set_enabled(true);
+        adapter.set_enabled(true);*/
 
         // Init main widget
 
@@ -27,7 +27,7 @@ impl Form for TextView {
                 .bottom_margin(MARGIN)
                 .buffer(&buffer)
                 .css_classes(["frame", "view"])
-                .extra_menu(&adapter.menu_model())
+                //.extra_menu(&adapter.menu_model())
                 .left_margin(MARGIN)
                 .right_margin(MARGIN)
                 .top_margin(MARGIN)
@@ -35,7 +35,7 @@ impl Form for TextView {
                 .build()
         };
 
-        text_view.insert_action_group("spelling", Some(&adapter));
+        //text_view.insert_action_group("spelling", Some(&adapter));
         text_view.set_size_request(-1, 38); // @TODO [#635](https://gitlab.gnome.org/GNOME/pygobject/-/issues/635)
 
         // Init events
