@@ -12,17 +12,17 @@ repository = "https://github.com/YGGverse/Yoda"
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.7.1"
+version = "0.7.2"
 features = ["v1_5"]
 
 [dependencies.gtk]
 package = "gtk4"
-version = "0.9.5"
+version = "0.9.7"
 features = ["gnome_46"]
 
 [dependencies.sqlite]
 package = "rusqlite"
-version = "0.36.0"
+version = "0.37.0"
 
 [dependencies.sourceview]
 package = "sourceview5"
@@ -36,12 +36,12 @@ ggemini = "0.19.0"
 ggemtext = "0.6.0"
 indexmap = "2.7.0"
 itertools = "0.14.0"
-libspelling = "0.3.0"
+libspelling = "0.4.0"
 maxminddb = "0.26.0"
 openssl = "0.10.72"
 plurify = "0.2.0"
 r2d2 = "0.8.10"
-r2d2_sqlite = "0.30.0"
+r2d2_sqlite = "0.31.0"
 syntect = "5.2.0"
 
 # development
