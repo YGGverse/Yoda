@@ -7,16 +7,15 @@ use database::Database;
 use gtk::{gio::TlsCertificate, glib::Uri};
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
-use sourceview::prelude::TlsCertificateExt;
 use sqlite::Transaction;
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::HashMap};
 
 /// TOFU wrapper for the Gemini protocol
 ///
 /// https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
 pub struct Tofu {
     database: Database,
-    memory: RefCell<Vec<Certificate>>,
+    memory: RefCell<HashMap<String, Certificate>>,
 }
 
 impl Tofu {
@@ -26,13 +25,17 @@ impl Tofu {
         let database = Database::init(database_pool, profile_id);
 
         let records = database.records()?;
-        let memory = RefCell::new(Vec::with_capacity(records.len()));
+        let memory = RefCell::new(HashMap::with_capacity(records.len()));
 
         {
             // build in-memory index...
             let mut m = memory.borrow_mut();
             for r in records {
-                m.push(Certificate::from_db(Some(r.id), &r.pem, r.time)?)
+                if m.insert(r.address, Certificate::from_db(Some(r.id), &r.pem, r.time)?)
+                    .is_some()
+                {
+                    panic!() // expect unique address
+                }
             }
         }
 
@@ -41,47 +44,37 @@ impl Tofu {
 
     // Actions
 
-    pub fn add(&self, tls_certificate: TlsCertificate) -> Result<()> {
-        self.memory
-            .borrow_mut()
-            .push(Certificate::from_tls_certificate(tls_certificate)?);
-        Ok(())
+    pub fn add(
+        &self,
+        uri: &Uri,
+        default_port: i32,
+        tls_certificate: TlsCertificate,
+    ) -> Result<bool> {
+        match address(uri, default_port) {
+            Some(k) => Ok(self
+                .memory
+                .borrow_mut()
+                .insert(k, Certificate::from_tls_certificate(tls_certificate)?)
+                .is_none()),
+            None => Ok(false),
+        }
     }
 
-    pub fn server_certificates(&self, uri: &Uri) -> Option<Vec<TlsCertificate>> {
-        fn f(subject_name: &str) -> String {
-            subject_name
-                .trim_start_matches("CN=")
-                .trim_start_matches('*')
-                .trim_matches('.')
-                .to_lowercase()
-        }
-        if let Some(h) = uri.host() {
-            let k = f(&h);
-            let m = self.memory.borrow();
-            let b: Vec<TlsCertificate> = m
-                .iter()
-                .filter_map(|certificate| {
-                    let tls_certificate = certificate.tls_certificate();
-                    if k.ends_with(&f(&tls_certificate.subject_name().unwrap())) {
-                        Some(tls_certificate.clone())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            if !b.is_empty() {
-                return Some(b);
-            }
-        }
-        None
+    pub fn server_certificate(&self, uri: &Uri, default_port: i32) -> Option<TlsCertificate> {
+        address(uri, default_port).and_then(|k| {
+            self.memory
+                .borrow()
+                .get(&k)
+                .map(|c| c.tls_certificate().clone())
+        })
     }
 
     /// Save in-memory index to the permanent database (on app close)
     pub fn save(&self) -> Result<()> {
-        for c in self.memory.borrow().iter() {
-            if c.id().is_none() {
-                self.database.add(c.time(), &c.pem())?;
+        for (address, certificate) in self.memory.borrow_mut().drain() {
+            if certificate.id().is_none() {
+                self.database
+                    .add(address, certificate.time(), &certificate.pem())?;
             }
         }
         Ok(())
@@ -99,4 +92,19 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
 
     // Success
     Ok(())
+}
+
+fn address(uri: &Uri, default_port: i32) -> Option<String> {
+    uri.host().map(|host| {
+        let port = uri.port();
+        format!(
+            "{}:{}",
+            host,
+            if port.is_positive() {
+                port
+            } else {
+                default_port
+            }
+        )
+    })
 }

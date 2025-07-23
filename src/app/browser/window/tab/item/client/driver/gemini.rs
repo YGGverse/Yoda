@@ -14,6 +14,8 @@ use gtk::{
 use sourceview::prelude::{ActionExt, InputStreamExtManual, TlsConnectionExt};
 use std::{cell::Cell, path::MAIN_SEPARATOR, rc::Rc, time::Duration};
 
+const DEFAULT_PORT: i32 = 1965;
+
 /// [Gemini protocol](https://geminiprotocol.net/docs/protocol-specification.gmi) client driver
 pub struct Gemini {
     /// Should be initiated once
@@ -150,8 +152,12 @@ fn handle(
 ) {
     const EVENT_COMPLETED: &str = "Completed";
     let uri = request.uri().clone();
-    let server_certificates = this.page.profile.tofu.server_certificates(&uri);
-    let has_server_certificates = server_certificates.is_some();
+    let server_certificate = this
+        .page
+        .profile
+        .tofu
+        .server_certificate(&uri, DEFAULT_PORT);
+    let has_server_certificate = server_certificate.is_some();
     this.client.request_async(
         request,
         Priority::DEFAULT,
@@ -162,7 +168,7 @@ fn handle(
             .profile
             .identity
             .get(&uri.to_string()).map(|identity|identity.to_tls_certificate().unwrap()),
-        server_certificates,
+        server_certificate.map(|c|vec![c]),
         {
             let page = this.page.clone();
             let redirects = this.redirects.clone();
@@ -190,10 +196,12 @@ fn handle(
                             //   drop the panic as unexpected here.
                     }
                     // Register new peer certificate if the TOFU index is empty
-                    if !has_server_certificates {
+                    if !has_server_certificate {
                         page.profile.tofu.add(
+                            &uri,
+                            DEFAULT_PORT,
                             connection.tls_client_connection.peer_certificate().unwrap()
-                        ).unwrap() // expect new record
+                        ).unwrap();
                     }
                     // Handle response
                     match response {
@@ -624,10 +632,12 @@ fn handle(
                                 if e.kind::<TlsError>().is_some_and(|e| matches!(e, TlsError::BadCertificate)) {
                                     page.content.to_status_tofu({
                                         let p = page.clone();
+                                        let u = uri.clone();
                                         move || {
                                             p.profile.tofu.add(
+                                                &u, DEFAULT_PORT,
                                                 connection.tls_client_connection.peer_certificate().unwrap()
-                                            ).unwrap(); // expect new record
+                                            ).unwrap();
                                             p.item_action.reload.activate(None)
                                         }
                                     })
