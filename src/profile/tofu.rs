@@ -4,7 +4,10 @@ mod database;
 use anyhow::Result;
 use certificate::Certificate;
 use database::Database;
-use gtk::{gio::TlsCertificate, glib::Uri};
+use gtk::{
+    gio::TlsCertificate,
+    glib::{GString, Uri},
+};
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use sqlite::Transaction;
@@ -15,7 +18,7 @@ use std::{cell::RefCell, collections::HashMap};
 /// https://geminiprotocol.net/docs/protocol-specification.gmi#tls-server-certificate-validation
 pub struct Tofu {
     database: Database,
-    memory: RefCell<HashMap<String, Certificate>>,
+    memory: RefCell<HashMap<(GString, i32), Certificate>>,
 }
 
 impl Tofu {
@@ -31,8 +34,11 @@ impl Tofu {
             // build in-memory index...
             let mut m = memory.borrow_mut();
             for r in records {
-                if m.insert(r.address, Certificate::from_db(Some(r.id), &r.pem, r.time)?)
-                    .is_some()
+                if m.insert(
+                    (r.host.into(), r.port),
+                    Certificate::from_db(Some(r.id), &r.pem, r.time)?,
+                )
+                .is_some()
                 {
                     panic!() // expect unique address
                 }
@@ -50,31 +56,34 @@ impl Tofu {
         default_port: i32,
         tls_certificate: TlsCertificate,
     ) -> Result<bool> {
-        match address(uri, default_port) {
-            Some(k) => Ok(self
+        match uri.host() {
+            Some(host) => Ok(self
                 .memory
                 .borrow_mut()
-                .insert(k, Certificate::from_tls_certificate(tls_certificate)?)
+                .insert(
+                    (host, port(uri.port(), default_port)),
+                    Certificate::from_tls_certificate(tls_certificate)?,
+                )
                 .is_none()),
             None => Ok(false),
         }
     }
 
     pub fn server_certificate(&self, uri: &Uri, default_port: i32) -> Option<TlsCertificate> {
-        address(uri, default_port).and_then(|k| {
+        uri.host().and_then(|host| {
             self.memory
                 .borrow()
-                .get(&k)
+                .get(&(host, port(uri.port(), default_port)))
                 .map(|c| c.tls_certificate().clone())
         })
     }
 
     /// Save in-memory index to the permanent database (on app close)
     pub fn save(&self) -> Result<()> {
-        for (address, certificate) in self.memory.borrow_mut().drain() {
+        for ((host, port), certificate) in self.memory.borrow_mut().drain() {
             if certificate.id().is_none() {
                 self.database
-                    .add(address, certificate.time(), &certificate.pem())?;
+                    .add(host.into(), port, certificate.time(), &certificate.pem())?;
             }
         }
         Ok(())
@@ -94,17 +103,10 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
     Ok(())
 }
 
-fn address(uri: &Uri, default_port: i32) -> Option<String> {
-    uri.host().map(|host| {
-        let port = uri.port();
-        format!(
-            "{}:{}",
-            host,
-            if port.is_positive() {
-                port
-            } else {
-                default_port
-            }
-        )
-    })
+fn port(port: i32, default_port: i32) -> i32 {
+    if port.is_positive() {
+        port
+    } else {
+        default_port
+    }
 }

@@ -34,10 +34,10 @@ impl Database {
 
     /// Create new record in database
     /// * return last insert ID on success
-    pub fn add(&self, address: String, time: &DateTime, pem: &str) -> Result<i64> {
+    pub fn add(&self, host: String, port: i32, time: &DateTime, pem: &str) -> Result<i64> {
         let mut connection = self.pool.get()?;
         let tx = connection.transaction()?;
-        let id = insert(&tx, self.profile_id, address, time, pem)?;
+        let id = insert(&tx, self.profile_id, host, port, time, pem)?;
         tx.commit()?;
         Ok(id)
     }
@@ -52,11 +52,12 @@ pub fn init(tx: &Transaction) -> Result<usize> {
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `profile_id` INTEGER NOT NULL,
             `time`       INTEGER NOT NULL,
-            `address`    VARCHAR(255) NOT NULL,
+            `port`       INTEGER NOT NULL,
+            `host`       VARCHAR(1024) NOT NULL,
             `pem`        TEXT NOT NULL,
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`),
-            UNIQUE (`address`)
+            UNIQUE (`host`, `port`)
         )",
         [],
     )?)
@@ -65,7 +66,8 @@ pub fn init(tx: &Transaction) -> Result<usize> {
 pub fn insert(
     tx: &Transaction,
     profile_id: i64,
-    address: String,
+    host: String,
+    port: i32,
     time: &DateTime,
     pem: &str,
 ) -> Result<i64> {
@@ -73,28 +75,35 @@ pub fn insert(
         "INSERT INTO `profile_tofu` (
             `profile_id`,
             `time`,
-            `address`,
+            `host`,
+            `port`,
             `pem`
-        ) VALUES (?, ?, ?, ?) ON CONFLICT (`address`)
-                              DO UPDATE SET `time` = `excluded`.`time`,
-                                            `pem`  = `excluded`.`pem`",
-        (profile_id, time.to_unix(), address, pem),
+        ) VALUES (?, ?, ?, ?, ?) ON CONFLICT (`host`, `port`)
+                                 DO UPDATE SET `time` = `excluded`.`time`,
+                                               `pem`  = `excluded`.`pem`",
+        (profile_id, time.to_unix(), host, port, pem),
     )?;
     Ok(tx.last_insert_rowid())
 }
 
 pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
     let mut stmt = tx.prepare(
-        "SELECT `id`, `profile_id`, `address`, `time`, `pem` FROM `profile_tofu` WHERE `profile_id` = ?",
+        "SELECT `id`,
+                `profile_id`,
+                `host`,
+                `port`,
+                `time`,
+                `pem` FROM `profile_tofu` WHERE `profile_id` = ?",
     )?;
 
     let result = stmt.query_map([profile_id], |row| {
         Ok(Row {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
-            address: row.get(2)?,
-            time: DateTime::from_unix_local(row.get(3)?).unwrap(),
-            pem: row.get(4)?,
+            host: row.get(2)?,
+            port: row.get(3)?,
+            time: DateTime::from_unix_local(row.get(4)?).unwrap(),
+            pem: row.get(5)?,
         })
     })?;
 
