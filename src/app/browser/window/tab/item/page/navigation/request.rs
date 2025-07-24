@@ -139,27 +139,27 @@ impl Request {
                         s.update(Some(50)); // @TODO optional
                     }
                     // Indicate proxy connections @TODO cancel previous operation on update
-                    {
-                        const C: &str = "accent";
-                        match p.proxy.matches(&t) {
-                            Some(r) => {
-                                e.set_css_classes(&[C]);
-                                r.lookup_async(&t, Cancellable::NONE, {
-                                    let e = e.clone();
-                                    move |r| {
-                                        e.set_tooltip_text(Some(&{
-                                            match r {
-                                                Ok(h) => format!("Proxy over {}", h.join(",")),
-                                                Err(e) => e.to_string(),
-                                            }
-                                        }))
+                    match p.proxy.matches(&t) {
+                        Some(r) => r.lookup_async(&t, Cancellable::NONE, {
+                            let e = e.clone();
+                            move |r| {
+                                e.set_tooltip_text(Some(&{
+                                    match r {
+                                        Ok(h) => {
+                                            e.set_css_classes(&["accent"]);
+                                            format!("Proxy over {}", h.join(","))
+                                        }
+                                        Err(i) => {
+                                            e.set_css_classes(&["error"]);
+                                            i.to_string()
+                                        }
                                     }
-                                });
+                                }))
                             }
-                            None => {
-                                e.remove_css_class(C);
-                                e.set_tooltip_text(None)
-                            }
+                        }),
+                        None => {
+                            e.set_css_classes(&[]);
+                            e.set_tooltip_text(None)
                         }
                     }
                 }
