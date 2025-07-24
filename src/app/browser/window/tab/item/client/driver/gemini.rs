@@ -98,6 +98,11 @@ impl Gemini {
         is_snap_history: bool,
     ) {
         use ggemini::client::connection::request::{Mode, Request};
+
+        self.client
+            .socket
+            .set_proxy_resolver(self.page.profile.proxy.matches(&uri).as_ref());
+
         match uri.scheme().as_str() {
             "gemini" => handle(
                 self,

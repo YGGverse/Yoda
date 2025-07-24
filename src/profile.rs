@@ -2,6 +2,7 @@ mod bookmark;
 mod database;
 mod history;
 mod identity;
+mod proxy;
 mod search;
 mod tofu;
 
@@ -11,6 +12,7 @@ use database::Database;
 use gtk::glib::{DateTime, user_config_dir};
 use history::History;
 use identity::Identity;
+use proxy::Proxy;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use search::Search;
@@ -30,6 +32,7 @@ pub struct Profile {
     pub database: Database,
     pub history: History,
     pub identity: Identity,
+    pub proxy: Proxy,
     pub search: Search,
     pub tofu: Tofu,
 }
@@ -86,6 +89,7 @@ impl Profile {
         let bookmark = Bookmark::build(&database_pool, profile_id)?;
         let history = History::build(&database_pool, profile_id)?;
         let identity = Identity::build(&database_pool, profile_id)?;
+        let proxy = Proxy::init(&database_pool, profile_id)?;
         let search = Search::build(&database_pool, profile_id)?;
         let tofu = Tofu::init(&database_pool, profile_id)?;
 
@@ -96,6 +100,7 @@ impl Profile {
             database,
             history,
             identity,
+            proxy,
             search,
             tofu,
         })
@@ -118,6 +123,7 @@ pub fn migrate(tx: &Transaction) -> Result<()> {
     bookmark::migrate(tx)?;
     history::migrate(tx)?;
     identity::migrate(tx)?;
+    proxy::migrate(tx)?;
     search::migrate(tx)?;
     tofu::migrate(tx)?;
 

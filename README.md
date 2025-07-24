@@ -39,7 +39,10 @@ GTK 4 / Libadwaita client written in Rust
   * [x] Page navigation
   * [x] Recently visited
   * [x] Recently closed
-* [ ] Proxy
+* [ ] Proxy (by [SimpleProxyResolver](https://docs.gtk.org/gio/class.SimpleProxyResolver.html))
+  * [x] Multiple regex rules by the priority
+  * [x] Custom ignored hosts
+  * [ ] UI controls (frontend)
 * [ ] Session
   * [ ] Window
     * [x] Size
