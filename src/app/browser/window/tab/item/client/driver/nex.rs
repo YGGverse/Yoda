@@ -69,7 +69,7 @@ impl Nex {
         }
 
         let socket = SocketClient::new();
-        socket.set_proxy_resolver(self.page.profile.proxy.matches(&url).as_ref());
+        socket.set_proxy_resolver(self.page.navigation.request.proxy_resolver().as_ref());
         socket.set_protocol(SocketProtocol::Tcp);
         socket.set_timeout(30); // @TODO optional
 

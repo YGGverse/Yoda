@@ -162,7 +162,7 @@ fn handle(
 
     this.client
         .socket
-        .set_proxy_resolver(this.page.profile.proxy.matches(&url).as_ref());
+        .set_proxy_resolver(this.page.navigation.request.proxy_resolver().as_ref());
 
     this.client.request_async(
         request,

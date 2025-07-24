@@ -10,7 +10,7 @@ use adw::{AlertDialog, prelude::AdwDialogExt};
 use anyhow::Result;
 use gtk::{
     Entry, EntryIconPosition, StateFlags,
-    gio::Cancellable,
+    gio::{Cancellable, ProxyResolver},
     glib::{GString, Uri, UriFlags, gformat},
     prelude::{EditableExt, EntryExt, ProxyResolverExt, WidgetExt},
 };
@@ -29,8 +29,9 @@ const PREFIX_SOURCE: &str = "source:";
 pub struct Request {
     pub entry: Entry,
     pub info: Rc<RefCell<Info>>,
-    suggestion: Rc<Suggestion>,
     profile: Rc<Profile>,
+    proxy_resolver: Rc<RefCell<Option<ProxyResolver>>>,
+    suggestion: Rc<Suggestion>,
 }
 
 impl Request {
@@ -40,6 +41,7 @@ impl Request {
     pub fn build(item_action: &Rc<ItemAction>, profile: &Rc<Profile>) -> Self {
         // Init components
         let info = Rc::new(RefCell::new(Info::new()));
+        let proxy_resolver = Rc::new(RefCell::new(None));
 
         // Init main widget
         let entry = Entry::builder()
@@ -124,6 +126,7 @@ impl Request {
                 let a = item_action.clone();
                 let i = info.clone();
                 let p = profile.clone();
+                let r = proxy_resolver.clone();
                 let s = suggestion.clone();
                 move |e| {
                     // Allocate once
@@ -140,11 +143,13 @@ impl Request {
                     }
                     // Indicate proxy connections @TODO cancel previous operation on update
                     match p.proxy.matches(&t) {
-                        Some(r) => r.lookup_async(&t, Cancellable::NONE, {
+                        Some(m) => m.clone().lookup_async(&t, Cancellable::NONE, {
                             let e = e.clone();
-                            move |r| {
+                            let r = r.clone();
+                            move |l| {
+                                r.replace(Some(m));
                                 e.set_tooltip_text(Some(&{
-                                    match r {
+                                    match l {
                                         Ok(h) => {
                                             e.set_css_classes(&["accent"]);
                                             format!("Proxy over {}", h.join(","))
@@ -208,8 +213,9 @@ impl Request {
         Self {
             entry,
             info,
-            suggestion,
             profile: profile.clone(),
+            proxy_resolver,
+            suggestion,
         }
     }
 
@@ -303,6 +309,14 @@ impl Request {
 
     pub fn is_file(&self) -> bool {
         self.entry.text().starts_with("file://")
+    }
+
+    /// Get [ProxyResolver](https://docs.gtk.org/gio/iface.ProxyResolver.html)
+    /// which is constructed for every `Request` entry change
+    /// * useful on build new [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html)
+    ///   to prevent double search / construct operations
+    pub fn proxy_resolver(&self) -> Option<ProxyResolver> {
+        self.proxy_resolver.borrow().clone()
     }
 
     // Tools
