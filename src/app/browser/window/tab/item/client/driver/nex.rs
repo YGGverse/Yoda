@@ -43,7 +43,9 @@ impl Nex {
                 .set_request(Some(uri.to_string()));
         }
 
-        let path = uri.path(); // copy once
+        // copy once
+        let path = uri.path();
+        let url = uri.to_string();
 
         if path.is_empty() {
             // auto-append trailing slash to the root locations
@@ -67,7 +69,7 @@ impl Nex {
         }
 
         let socket = SocketClient::new();
-        socket.set_proxy_resolver(self.page.profile.proxy.matches(&uri).as_ref());
+        socket.set_proxy_resolver(self.page.profile.proxy.matches(&url).as_ref());
         socket.set_protocol(SocketProtocol::Tcp);
         socket.set_timeout(30); // @TODO optional
 
@@ -118,7 +120,7 @@ impl Nex {
             }
         });
 
-        socket.connect_to_uri_async(&uri.to_string(), 1900, Some(&cancellable.clone()), {
+        socket.connect_to_uri_async(&url, 1900, Some(&cancellable.clone()), {
             let p = self.page.clone();
             move |result| match result {
                 Ok(c) => {

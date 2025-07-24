@@ -4,10 +4,7 @@ mod rule;
 
 use anyhow::Result;
 use database::Database;
-use gtk::{
-    gio::{ProxyResolver, SimpleProxyResolver},
-    glib::Uri,
-};
+use gtk::gio::{ProxyResolver, SimpleProxyResolver};
 use ignore::Ignore;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -59,11 +56,11 @@ impl Proxy {
 
     // Actions
 
-    pub fn matches(&self, request: &Uri) -> Option<ProxyResolver> {
+    pub fn matches(&self, request: &str) -> Option<ProxyResolver> {
         for rule in self.rule.borrow().iter().filter(|r| r.is_enabled) {
             if gtk::glib::Regex::match_simple(
                 &rule.request,
-                request.to_str(),
+                request,
                 gtk::glib::RegexCompileFlags::DEFAULT,
                 gtk::glib::RegexMatchFlags::DEFAULT,
             ) {

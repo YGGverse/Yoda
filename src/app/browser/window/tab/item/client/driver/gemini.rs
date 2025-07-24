@@ -152,6 +152,7 @@ fn handle(
 ) {
     const EVENT_COMPLETED: &str = "Completed";
     let uri = request.uri().clone();
+    let url = uri.to_string();
     let server_certificate = this
         .page
         .profile
@@ -161,7 +162,7 @@ fn handle(
 
     this.client
         .socket
-        .set_proxy_resolver(this.page.profile.proxy.matches(&uri).as_ref());
+        .set_proxy_resolver(this.page.profile.proxy.matches(&url).as_ref());
 
     this.client.request_async(
         request,
@@ -172,7 +173,7 @@ fn handle(
         this.page
             .profile
             .identity
-            .get(&uri.to_string()).map(|identity|identity.to_tls_certificate().unwrap()),
+            .get(&url).map(|identity|identity.to_tls_certificate().unwrap()),
         server_certificate.map(|c|vec![c]),
         {
             let page = this.page.clone();
@@ -192,7 +193,7 @@ fn handle(
                         use gtk::prelude::SocketConnectionExt;
                         let mut i = page.navigation.request.info.borrow_mut();
                         i
-                            .set_request(Some(uri.to_string()))
+                            .set_request(Some(url))
                             .set_socket(Some((
                                 connection.socket_connection.local_address().unwrap(),
                                 connection.socket_connection.remote_address().unwrap()

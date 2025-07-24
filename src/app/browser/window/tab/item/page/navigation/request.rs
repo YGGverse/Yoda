@@ -138,7 +138,7 @@ impl Request {
                     // Indicate proxy connections
                     {
                         const C: &str = "accent";
-                        if uri(e).is_some_and(|u| p.proxy.matches(&u).is_some()) {
+                        if p.proxy.matches(&e.text()).is_some() {
                             e.set_css_classes(&[C])
                         } else {
                             e.remove_css_class(C)
