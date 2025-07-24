@@ -98,11 +98,6 @@ impl Gemini {
         is_snap_history: bool,
     ) {
         use ggemini::client::connection::request::{Mode, Request};
-
-        self.client
-            .socket
-            .set_proxy_resolver(self.page.profile.proxy.matches(&uri).as_ref());
-
         match uri.scheme().as_str() {
             "gemini" => handle(
                 self,
@@ -163,6 +158,11 @@ fn handle(
         .tofu
         .server_certificate(&uri, DEFAULT_PORT);
     let has_server_certificate = server_certificate.is_some();
+
+    this.client
+        .socket
+        .set_proxy_resolver(this.page.profile.proxy.matches(&uri).as_ref());
+
     this.client.request_async(
         request,
         Priority::DEFAULT,
