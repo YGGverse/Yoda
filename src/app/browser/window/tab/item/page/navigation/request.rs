@@ -156,7 +156,10 @@ impl Request {
                                     }
                                 });
                             }
-                            None => e.remove_css_class(C),
+                            None => {
+                                e.remove_css_class(C);
+                                e.set_tooltip_text(None)
+                            }
                         }
                     }
                 }
