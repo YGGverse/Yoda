@@ -10,8 +10,9 @@ use adw::{AlertDialog, prelude::AdwDialogExt};
 use anyhow::Result;
 use gtk::{
     Entry, EntryIconPosition, StateFlags,
+    gio::Cancellable,
     glib::{GString, Uri, UriFlags, gformat},
-    prelude::{EditableExt, EntryExt, WidgetExt},
+    prelude::{EditableExt, EntryExt, ProxyResolverExt, WidgetExt},
 };
 use info::Info;
 use primary_icon::PrimaryIcon;
@@ -125,8 +126,10 @@ impl Request {
                 let p = profile.clone();
                 let s = suggestion.clone();
                 move |e| {
+                    // Allocate once
+                    let t = e.text();
                     // Update actions
-                    a.reload.set_enabled(!e.text().is_empty());
+                    a.reload.set_enabled(!t.is_empty());
                     a.home.set_enabled(home(e).is_some());
                     // Update icons
                     update_primary_icon(e, &p);
@@ -135,13 +138,25 @@ impl Request {
                     if e.focus_child().is_some() {
                         s.update(Some(50)); // @TODO optional
                     }
-                    // Indicate proxy connections
+                    // Indicate proxy connections @TODO cancel previous operation on update
                     {
                         const C: &str = "accent";
-                        if p.proxy.matches(&e.text()).is_some() {
-                            e.set_css_classes(&[C])
-                        } else {
-                            e.remove_css_class(C)
+                        match p.proxy.matches(&t) {
+                            Some(r) => {
+                                e.set_css_classes(&[C]);
+                                r.lookup_async(&t, Cancellable::NONE, {
+                                    let e = e.clone();
+                                    move |r| {
+                                        e.set_tooltip_text(Some(&{
+                                            match r {
+                                                Ok(h) => format!("Proxy over {}", h.join(",")),
+                                                Err(e) => e.to_string(),
+                                            }
+                                        }))
+                                    }
+                                });
+                            }
+                            None => e.remove_css_class(C),
                         }
                     }
                 }
