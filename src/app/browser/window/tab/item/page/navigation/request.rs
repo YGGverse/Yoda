@@ -135,6 +135,15 @@ impl Request {
                     if e.focus_child().is_some() {
                         s.update(Some(50)); // @TODO optional
                     }
+                    // Indicate proxy connections
+                    {
+                        const C: &str = "accent";
+                        if uri(e).is_some_and(|u| p.proxy.matches(&u).is_some()) {
+                            e.set_css_classes(&[C])
+                        } else {
+                            e.remove_css_class(C)
+                        }
+                    }
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
 
