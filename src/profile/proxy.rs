@@ -48,7 +48,7 @@ impl Proxy {
             for r in rules {
                 b.push(Rule {
                     is_enabled: r.is_enabled,
-                    regex: r.regex,
+                    request: r.request,
                     url: r.url,
                 });
             }
@@ -62,7 +62,7 @@ impl Proxy {
     pub fn matches(&self, request: &Uri) -> Option<ProxyResolver> {
         for rule in self.rule.borrow().iter().filter(|r| r.is_enabled) {
             if gtk::glib::Regex::match_simple(
-                &rule.regex,
+                &rule.request,
                 request.to_str(),
                 gtk::glib::RegexCompileFlags::DEFAULT,
                 gtk::glib::RegexMatchFlags::DEFAULT,

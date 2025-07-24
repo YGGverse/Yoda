@@ -64,11 +64,11 @@ pub fn init(tx: &Transaction) -> Result<usize> {
             `time`       INTEGER NOT NULL,
             `is_enabled` INTEGER NOT NULL,
             `priority`   INTEGER NOT NULL,
-            `regex`      VARCHAR(255) NOT NULL,
+            `request`    VARCHAR(1024) NOT NULL,
             `url`        VARCHAR(255) NOT NULL,
 
             FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`),
-            UNIQUE (`regex`)
+            UNIQUE (`request`)
         )",
         [],
     )?;
@@ -115,7 +115,7 @@ pub fn rules(tx: &Transaction, profile_id: i64) -> Result<Vec<Rule>> {
                 `time`,
                 `is_enabled`,
                 `priority`,
-                `regex`,
+                `request`,
                 `url`
 
                 FROM `profile_proxy_rule`
@@ -130,7 +130,7 @@ pub fn rules(tx: &Transaction, profile_id: i64) -> Result<Vec<Rule>> {
             //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
             is_enabled: row.get(3)?,
             //priority: row.get(4)?,
-            regex: row.get(5)?,
+            request: row.get(5)?,
             url: row.get(6)?,
         })
     })?;

@@ -1,5 +1,5 @@
 pub struct Rule {
     pub is_enabled: bool,
-    pub regex: String,
+    pub request: String,
     pub url: String,
 }
