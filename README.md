@@ -13,9 +13,7 @@ GTK 4 / Libadwaita client written in Rust
 ### Interface
 * [x] Multi-tab
 * [x] Hotkeys
-* [ ] Bookmarks
-  * [ ] Browser window
-  * [x] Recent bookmarks list
+* [x] Bookmarks
 * [ ] Build-in multimedia support
   * [x] [Images](#images)
   * [ ] [Audio](#audio)
@@ -35,10 +33,8 @@ GTK 4 / Libadwaita client written in Rust
   * [x] Save page as file
   * [x] Unsupported content type downloads
 * [ ] History
-  * [ ] Browser window
-  * [x] Page navigation
   * [x] Recently visited
-  * [x] Recently closed
+  * [ ] Recently closed
 * [ ] Proxy (by [SimpleProxyResolver](https://docs.gtk.org/gio/class.SimpleProxyResolver.html))
   * [x] Multiple regex rules by the priority
   * [x] Custom ignored hosts
@@ -123,11 +119,7 @@ GTK 4 / Libadwaita client written in Rust
   * [ ] [NPS](https://nightfall.city/nps/info/specification.txt)
 * [x] System
   * [x] `file://` - local files browser
-* [ ] Request prefix
-  * [ ] `about:`
-    * [ ] `config` - low-level key/value settings editor
-  * [ ] `bookmarks:` - bookmarks browser
-  * [ ] `history:` - history browser
+* [x] Request prefix
   * [x] `download:` - save location to file
   * [x] `source:` - source viewer (by [sourceview5](https://crates.io/crates/sourceview5))
 
