@@ -110,6 +110,7 @@ impl Profile {
 
     pub fn save(&self) -> Result<()> {
         self.history.save()?;
+        self.proxy.save()?;
         self.tofu.save()?;
         Ok(())
     }

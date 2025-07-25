@@ -160,6 +160,13 @@ impl Menu for MenuButton {
 
                 main.append_submenu(Some("History"), &main_history);
 
+            // Main > Proxy
+            main.append(Some("Proxy settings"), Some(&format!(
+                "{}.{}",
+                browser_action.id,
+                browser_action.proxy.simple_action.name()
+            ))); // @TODO make the Settings submenu
+
             // Main > Tool
             let main_tool = gio::Menu::new();
 
@@ -170,7 +177,7 @@ impl Menu for MenuButton {
                     browser_action.debug.simple_action.name()
                 )));
 
-                main_tool.append(Some("Profile"), Some(&format!(
+                main_tool.append(Some("Open profile directory"), Some(&format!(
                     "{}.{}",
                     browser_action.id,
                     browser_action.profile.simple_action.name()
@@ -200,7 +207,7 @@ impl Menu for MenuButton {
                 .build();
 
             // Generate dynamical menu items
-            menu_button.set_create_popup_func({
+             menu_button.set_create_popup_func({
                 let profile = profile.clone();
                 let main_bookmarks = main_bookmarks.clone();
                 let window_action = window_action.clone();

@@ -1,16 +1,18 @@
 mod about;
 mod action;
 mod database;
+mod proxy;
 mod widget;
 pub mod window;
 
 use about::About;
 use action::Action;
+use proxy::Proxy;
 use widget::Widget;
 use window::Window;
 
 use crate::Profile;
-use adw::{AboutDialog, Application, prelude::AdwDialogExt};
+use adw::{AboutDialog, Application, PreferencesDialog, prelude::AdwDialogExt};
 use anyhow::Result;
 use gtk::{
     FileLauncher,
@@ -89,6 +91,12 @@ impl Browser {
                     },
                 ); // @TODO move out?
             }
+        });
+
+        action.proxy.connect_activate({
+            let profile = profile.clone();
+            let window = window.clone();
+            move || PreferencesDialog::proxy(&profile).present(Some(&window.g_box))
         });
 
         // Return new activated `Self`
