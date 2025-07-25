@@ -10,7 +10,8 @@ use adw::{
     },
 };
 use gtk::glib::{DateTime, GString, Uri, UriFlags};
-use std::{collections::HashMap, rc::Rc};
+use indexmap::IndexMap;
+use std::rc::Rc;
 
 struct Record {
     time: DateTime,
@@ -24,7 +25,7 @@ pub trait Bookmarks {
 
 impl Bookmarks for adw::PreferencesDialog {
     fn bookmarks(window_action: &Rc<WindowAction>, profile: &Rc<Profile>) -> Self {
-        let mut index: HashMap<GString, Vec<Record>> = HashMap::new();
+        let mut index: IndexMap<GString, Vec<Record>> = IndexMap::new();
         for bookmark in profile.bookmark.recent(None) {
             match Uri::parse(&bookmark.request, UriFlags::NONE) {
                 Ok(uri) => index

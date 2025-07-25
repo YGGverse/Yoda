@@ -10,7 +10,8 @@ use adw::{
     },
 };
 use gtk::glib::{DateTime, GString, Uri, UriFlags, gformat};
-use std::{collections::HashMap, rc::Rc};
+use indexmap::IndexMap;
+use std::rc::Rc;
 
 pub struct Event {
     pub time: DateTime,
@@ -29,7 +30,7 @@ pub trait History {
 
 impl History for adw::PreferencesDialog {
     fn history(window_action: &Rc<WindowAction>, profile: &Rc<Profile>) -> Self {
-        let mut visited: HashMap<GString, Vec<Record>> = HashMap::new();
+        let mut visited: IndexMap<GString, Vec<Record>> = IndexMap::new();
         // @TODO recently closed
 
         for history in profile.history.recently_opened(None) {
