@@ -1,18 +1,15 @@
-use super::{BrowserAction, Profile, WindowAction};
+use super::{BrowserAction, WindowAction};
 use gtk::{
     Align, MenuButton,
     gio::{self},
-    glib::{GString, Uri, UriFlags},
-    prelude::{ActionExt, ToVariant},
+    prelude::ActionExt,
 };
-use indexmap::IndexMap;
 use std::rc::Rc;
 
 // Config options
 
-const LABEL_MAX_LENGTH: usize = 28;
 pub trait Menu {
-    fn menu(action: (&Rc<BrowserAction>, &Rc<WindowAction>), profile: &Rc<Profile>) -> Self;
+    fn menu(actions: (&Rc<BrowserAction>, &Rc<WindowAction>)) -> Self;
 }
 
 #[rustfmt::skip] // @TODO template builder?
@@ -22,7 +19,6 @@ impl Menu for MenuButton {
     /// Build new `Self`
      fn menu(
         (browser_action, window_action): (&Rc<BrowserAction>, &Rc<WindowAction>),
-        profile: &Rc<Profile>,
     ) -> Self {
         // Main
         let main = gio::Menu::new();
@@ -116,7 +112,7 @@ impl Menu for MenuButton {
                             window_action.history_forward.simple_action.name()
                         )));
 
-                    main_page_navigation.append_submenu(Some("Navigation history"), &main_page_navigation_history);
+                    main_page_navigation.append_submenu(Some("Navigation"), &main_page_navigation_history);
 
                 main_page.append_section(None, &main_page_navigation);
 
@@ -139,29 +135,22 @@ impl Menu for MenuButton {
 
                 main.append_submenu(Some("Page"), &main_page);
 
-            // Main > Bookmark
-            // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
-            let main_bookmarks = gio::Menu::new();
-
-                main.append_submenu(Some("Bookmarks"), &main_bookmarks);
+            // Main > Bookmarks
+            main.append(Some("Bookmarks"), Some(&format!(
+                "{}.{}",
+                browser_action.id,
+                browser_action.bookmarks.simple_action.name()
+            )));
 
             // Main > History
-            let main_history = gio::Menu::new();
-
-                // Main > History > Recently closed
-                // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
-                let main_history_tab = gio::Menu::new();
-                    main_history.append_submenu(Some("Recently closed"), &main_history_tab);
-
-                // Main > History > Recent requests
-                // * menu items dynamically generated using profile memory pool and `set_create_popup_func`
-                let main_history_request = gio::Menu::new();
-                    main_history.append_section(None, &main_history_request);
-
-                main.append_submenu(Some("History"), &main_history);
+            main.append(Some("History"), Some(&format!(
+                "{}.{}",
+                browser_action.id,
+                browser_action.history.simple_action.name()
+            )));
 
             // Main > Proxy
-            main.append(Some("Proxy settings"), Some(&format!(
+            main.append(Some("Proxy"), Some(&format!(
                 "{}.{}",
                 browser_action.id,
                 browser_action.proxy.simple_action.name()
@@ -198,124 +187,12 @@ impl Menu for MenuButton {
         )));
 
         // Init main widget
-        let menu_button = MenuButton::builder()
-                .css_classes(["flat"])
-                .icon_name("open-menu-symbolic")
-                .menu_model(&main)
-                .tooltip_text("Menu")
-                .valign(Align::Center)
-                .build();
-
-            // Generate dynamical menu items
-             menu_button.set_create_popup_func({
-                let profile = profile.clone();
-                let main_bookmarks = main_bookmarks.clone();
-                let window_action = window_action.clone();
-                move |_| {
-                    // Bookmarks
-                    main_bookmarks.remove_all();
-                    for bookmark in profile.bookmark.recent(None) {
-                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&bookmark.request, LABEL_MAX_LENGTH)), None);
-                            menu_item.set_action_and_target_value(Some(&format!(
-                                "{}.{}",
-                                window_action.id,
-                                window_action.load.simple_action.name()
-                            )), Some(&bookmark.request.to_variant()));
-
-                        main_bookmarks.append_item(&menu_item);
-                    } // @TODO `menu_item`
-
-                    // Recently closed history
-                    main_history_tab.remove_all();
-                    for history in profile.history.recently_closed(None) {
-                        let menu_item = gio::MenuItem::new(Some(&ellipsize(&history.request, LABEL_MAX_LENGTH)), None);
-                            menu_item.set_action_and_target_value(Some(&format!(
-                                "{}.{}",
-                                window_action.id,
-                                window_action.load.simple_action.name()
-                            )), Some(&history.request.to_variant()));
-
-                            main_history_tab.append_item(&menu_item);
-                    } // @TODO `menu_item`
-
-                    // Recently visited history
-                    // * in first iteration, group records by it hostname
-                    // * in second iteration, collect uri path as the menu sub-item label
-                    main_history_request.remove_all();
-
-                    let mut list: IndexMap<GString, Vec<Uri>> = IndexMap::new();
-                    for history in profile.history.recently_opened(None) {
-                        match Uri::parse(&history.request, UriFlags::NONE) {
-                            Ok(uri) => list.entry(match uri.host() {
-                                Some(host) => host,
-                                None => uri.to_str(),
-                            }).or_default().push(uri),
-                            Err(_) => continue // @TODO
-                        }
-                    }
-
-                    for (group, items) in list {
-                        let list = gio::Menu::new();
-
-                        // Show first menu item only without children menu
-                        if items.len() == 1 {
-                            main_history_request.append_item(&menu_item(&window_action, &items[0], true));
-
-                        // Create children menu items related to parental host item
-                        } else {
-                            for uri in items {
-                                list.append_item(&menu_item(&window_action, &uri, false));
-                            }
-                            main_history_request.append_submenu(Some(&group), &list);
-                        }
-                    }
-                }
-            });
-
-        menu_button
+        MenuButton::builder()
+            .css_classes(["flat"])
+            .icon_name("open-menu-symbolic")
+            .menu_model(&main)
+            .tooltip_text("Menu")
+            .valign(Align::Center)
+            .build()
     }
-}
-
-/// Format dynamically generated strings for menu item label
-/// * crop resulting string at the middle position on new `value` longer than `limit`
-fn ellipsize(value: &str, limit: usize) -> String {
-    if value.len() <= limit {
-        return value.to_string();
-    }
-
-    let length = (limit - 2) / 2;
-
-    format!("{}..{}", &value[..length], &value[value.len() - length..])
-}
-
-/// Format [Uri](https://docs.gtk.org/glib/struct.Uri.html)
-/// as [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html) label
-fn uri_to_label(uri: &Uri, is_parent: bool) -> GString {
-    let path = uri.path();
-    if path == "/" || path.is_empty() {
-        if is_parent {
-            uri.host().unwrap_or(uri.to_str())
-        } else {
-            gtk::glib::gformat!("{}{path}", uri.host().unwrap_or(uri.to_str()))
-        }
-    } else {
-        path
-    }
-}
-
-/// Shared helper to create new [MenuItem](https://docs.gtk.org/gio/class.MenuItem.html)
-fn menu_item(action: &WindowAction, uri: &Uri, is_parent: bool) -> gio::MenuItem {
-    let item = gio::MenuItem::new(
-        Some(&ellipsize(&uri_to_label(uri, is_parent), LABEL_MAX_LENGTH)),
-        None,
-    );
-    item.set_action_and_target_value(
-        Some(&format!(
-            "{}.{}",
-            action.id,
-            action.load.simple_action.name()
-        )),
-        Some(&uri.to_string().to_variant()),
-    );
-    item
 }

@@ -1,4 +1,4 @@
-mod action;
+pub mod action;
 mod database;
 mod header;
 pub mod tab;
@@ -119,7 +119,6 @@ impl Window {
                 let g_box = Box::builder().orientation(Orientation::Vertical).build();
                 g_box.append(&ToolbarView::header(
                     (browser_action, &action),
-                    profile,
                     &tab.tab_view,
                 ));
                 g_box.append(&tab.tab_view);

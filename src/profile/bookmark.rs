@@ -50,9 +50,11 @@ impl Bookmark {
                 false
             }
             None => {
+                let time = DateTime::now_local()?;
                 memory.add(Item {
-                    id: self.database.add(DateTime::now_local()?, request, title)?,
+                    id: self.database.add(time.clone(), request, title)?,
                     request: request.into(),
+                    time,
                     title: title.map(|t| t.to_string()),
                 });
                 true

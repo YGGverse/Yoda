@@ -111,7 +111,7 @@ pub fn select(
             Ok(Item {
                 id: row.get(0)?,
                 //profile_id: row.get(1)?,
-                //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+                time: DateTime::from_unix_local(row.get(2)?).unwrap(),
                 request: row.get(3)?,
                 title: row.get(4)?,
             })

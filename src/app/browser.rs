@@ -1,12 +1,16 @@
 mod about;
 mod action;
+mod bookmarks;
 mod database;
+mod history;
 mod proxy;
 mod widget;
 pub mod window;
 
 use about::About;
 use action::Action;
+use bookmarks::Bookmarks;
+use history::History;
 use proxy::Proxy;
 use widget::Widget;
 use window::Window;
@@ -90,6 +94,22 @@ impl Browser {
                         }
                     },
                 ); // @TODO move out?
+            }
+        });
+
+        action.history.connect_activate({
+            let profile = profile.clone();
+            let window = window.clone();
+            move || {
+                PreferencesDialog::history(&window.action, &profile).present(Some(&window.g_box))
+            }
+        });
+
+        action.bookmarks.connect_activate({
+            let profile = profile.clone();
+            let window = window.clone();
+            move || {
+                PreferencesDialog::bookmarks(&window.action, &profile).present(Some(&window.g_box))
             }
         });
 
