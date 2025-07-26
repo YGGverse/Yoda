@@ -62,11 +62,7 @@ impl Proxy for adw::PreferencesDialog {
                 .title("Interface")
                 .icon_name("preferences-desktop-display-symbolic")
                 .build();
-            p.add(&{
-                let g = PreferencesGroup::new();
-                g.add(&misc.widget);
-                g
-            });
+            p.add(&misc.widget);
             p
         });
 

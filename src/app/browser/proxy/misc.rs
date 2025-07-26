@@ -1,12 +1,11 @@
 use std::rc::Rc;
 
 use super::Profile;
-use adw::SwitchRow;
-use gtk::{Box, prelude::BoxExt};
+use adw::{PreferencesGroup, SwitchRow, prelude::PreferencesGroupExt};
 
 pub struct Misc {
     highlight_request_entry: SwitchRow,
-    pub widget: Box,
+    pub widget: PreferencesGroup,
 }
 
 impl Misc {
@@ -19,19 +18,16 @@ impl Misc {
             .active(profile.proxy.misc.is_highlight_request_entry())
             .hexpand(true)
             .subtitle_selectable(true)
-            .subtitle("Indicate proxy connections with accent colors")
+            .subtitle("Indicate proxy connections with the accent colors")
             .title_selectable(true)
             .title("Highlight the Request entry")
             .build();
 
         // Init widget
 
-        let widget = Box::builder()
-            .orientation(gtk::Orientation::Horizontal)
-            .spacing(8)
-            .build();
+        let widget = PreferencesGroup::new();
 
-        widget.append(&highlight_request_entry);
+        widget.add(&highlight_request_entry);
 
         Self {
             highlight_request_entry,
