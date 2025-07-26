@@ -149,8 +149,8 @@ impl Menu for MenuButton {
                 browser_action.history.simple_action.name()
             )));
 
-            // Main > Proxy
-            main.append(Some("Proxy"), Some(&format!(
+            // Main > Proxy connection
+            main.append(Some("Proxy connection"), Some(&format!(
                 "{}.{}",
                 browser_action.id,
                 browser_action.proxy.simple_action.name()
