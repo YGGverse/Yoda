@@ -486,7 +486,6 @@ fn refresh_proxy_resolver(
             let p = profile.clone();
             let r = resolver.clone();
             move |l| {
-                r.replace(Some(m));
                 e.set_tooltip_text(Some(&{
                     match l {
                         Ok(h) => {
@@ -502,12 +501,14 @@ fn refresh_proxy_resolver(
                             i.to_string()
                         }
                     }
-                }))
+                }));
+                r.replace(Some(m));
             }
         }),
         None => {
             entry.set_css_classes(&[]);
-            entry.set_tooltip_text(None)
+            entry.set_tooltip_text(None);
+            resolver.replace(None);
         }
     }
 }
