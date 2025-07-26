@@ -19,7 +19,7 @@ impl Misc {
             .active(profile.proxy.misc.is_highlight_request_entry())
             .hexpand(true)
             .subtitle_selectable(true)
-            .subtitle("Use accent color for proxy connections")
+            .subtitle("Indicate proxy connections with accent colors")
             .title_selectable(true)
             .title("Highlight the Request entry")
             .build();
