@@ -1,9 +1,11 @@
 mod ignore;
+mod misc;
 mod rule;
 
 use anyhow::Result;
 use gtk::gio::{ProxyResolver, SimpleProxyResolver};
 use ignore::Ignore;
+use misc::Misc;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rule::Rule;
@@ -11,6 +13,7 @@ use rule::Rule;
 pub struct Proxy {
     pub ignore: Ignore,
     pub rule: Rule,
+    pub misc: Misc,
 }
 
 impl Proxy {
@@ -19,6 +22,7 @@ impl Proxy {
     pub fn init(database_pool: &Pool<SqliteConnectionManager>, profile_id: i64) -> Result<Self> {
         Ok(Self {
             ignore: Ignore::init(database_pool, profile_id)?,
+            misc: Misc::init(database_pool, profile_id)?,
             rule: Rule::init(database_pool, profile_id)?,
         })
     }
@@ -26,8 +30,9 @@ impl Proxy {
     // Actions
 
     pub fn save(&self) -> Result<()> {
-        self.rule.save()?;
         self.ignore.save()?;
+        self.misc.save()?;
+        self.rule.save()?;
         Ok(())
     }
 
@@ -63,6 +68,7 @@ pub fn migrate(tx: &sqlite::Transaction) -> Result<()> {
 
     // Delegate migration to childs
     ignore::migrate(tx)?;
+    misc::migrate(tx)?;
     rule::migrate(tx)?;
 
     Ok(())
