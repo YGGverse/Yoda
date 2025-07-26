@@ -149,12 +149,17 @@ impl Menu for MenuButton {
                 browser_action.history.simple_action.name()
             )));
 
-            // Main > Proxy connection
-            main.append(Some("Proxy connection"), Some(&format!(
-                "{}.{}",
-                browser_action.id,
-                browser_action.proxy.simple_action.name()
-            ))); // @TODO make the Settings submenu
+            // Main > Settings
+            let main_settings = gio::Menu::new();
+
+                // Main > Settings > Proxy connection
+                main_settings.append(Some("Proxy connection"), Some(&format!(
+                    "{}.{}",
+                    browser_action.id,
+                    browser_action.proxy.simple_action.name()
+                )));
+
+            main.append_submenu(Some("Settings"), &main_settings);
 
             // Main > Tool
             let main_tool = gio::Menu::new();
