@@ -6,7 +6,7 @@ use certificate::Certificate;
 use database::Database;
 use gtk::{
     gio::TlsCertificate,
-    glib::{GString, Uri},
+    glib::{DateTime, GString, Uri},
 };
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -36,7 +36,7 @@ impl Tofu {
             for r in records {
                 if m.insert(
                     (r.host.into(), r.port),
-                    Certificate::from_db(Some(r.id), &r.pem, r.time)?,
+                    Certificate::from_db(Some(r.id), &r.pem, DateTime::from_unix_local(r.time)?)?,
                 )
                 .is_some()
                 {
@@ -82,8 +82,12 @@ impl Tofu {
     pub fn save(&self) -> Result<()> {
         for ((host, port), certificate) in self.memory.borrow_mut().drain() {
             if certificate.id().is_none() {
-                self.database
-                    .add(host.into(), port, certificate.time(), &certificate.pem())?;
+                self.database.add(
+                    host.into(),
+                    port,
+                    certificate.time().to_unix(),
+                    &certificate.pem(),
+                )?;
             }
         }
         Ok(())

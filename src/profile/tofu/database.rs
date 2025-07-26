@@ -1,7 +1,6 @@
 mod row;
 
 use anyhow::Result;
-use gtk::glib::DateTime;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use row::Row;
@@ -34,7 +33,7 @@ impl Database {
 
     /// Create new record in database
     /// * return last insert ID on success
-    pub fn add(&self, host: String, port: i32, time: &DateTime, pem: &str) -> Result<i64> {
+    pub fn add(&self, host: String, port: i32, time: i64, pem: &str) -> Result<i64> {
         let mut connection = self.pool.get()?;
         let tx = connection.transaction()?;
         let id = insert(&tx, self.profile_id, host, port, time, pem)?;
@@ -68,7 +67,7 @@ pub fn insert(
     profile_id: i64,
     host: String,
     port: i32,
-    time: &DateTime,
+    time: i64,
     pem: &str,
 ) -> Result<i64> {
     tx.execute(
@@ -81,7 +80,7 @@ pub fn insert(
         ) VALUES (?, ?, ?, ?, ?) ON CONFLICT (`host`, `port`)
                                  DO UPDATE SET `time` = `excluded`.`time`,
                                                `pem`  = `excluded`.`pem`",
-        (profile_id, time.to_unix(), host, port, pem),
+        (profile_id, time, host, port, pem),
     )?;
     Ok(tx.last_insert_rowid())
 }
@@ -102,7 +101,7 @@ pub fn select(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
             //profile_id: row.get(1)?,
             host: row.get(2)?,
             port: row.get(3)?,
-            time: DateTime::from_unix_local(row.get(4)?).unwrap(),
+            time: row.get(4)?,
             pem: row.get(5)?,
         })
     })?;
