@@ -479,34 +479,31 @@ fn refresh_proxy_resolver(
     profile: &Rc<Profile>,
     resolver: &Rc<RefCell<Option<ProxyResolver>>>,
 ) {
-    let t = entry.text();
+    const NONE: &[&str] = &[];
+
+    let t = entry.text(); // allocate once
+
     match profile.proxy.matches(&t) {
         Some(m) => m.clone().lookup_async(&t, Cancellable::NONE, {
             let e = entry.clone();
             let p = profile.clone();
             let r = resolver.clone();
             move |l| {
-                e.set_tooltip_text(Some(&{
-                    match l {
-                        Ok(h) => {
-                            if p.proxy.misc.is_highlight_request_entry() {
-                                e.set_css_classes(&["accent"])
-                            }
-                            format!("Proxy over {}", h.join(","))
-                        }
-                        Err(i) => {
-                            if p.proxy.misc.is_highlight_request_entry() {
-                                e.set_css_classes(&["error"]);
-                            }
-                            i.to_string()
-                        }
-                    }
-                }));
+                let (css_classes, tooltip_text) = match l {
+                    Ok(h) => (&["accent"], format!("Proxy over {}", h.join(","))),
+                    Err(i) => (&["error"], i.to_string()),
+                };
+                e.set_css_classes(if p.proxy.misc.is_highlight_request_entry() {
+                    css_classes
+                } else {
+                    NONE
+                });
+                e.set_tooltip_text(Some(&tooltip_text));
                 r.replace(Some(m));
             }
         }),
         None => {
-            entry.set_css_classes(&[]);
+            entry.set_css_classes(NONE);
             entry.set_tooltip_text(None);
             resolver.replace(None);
         }
