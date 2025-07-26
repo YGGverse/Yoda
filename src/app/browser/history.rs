@@ -9,7 +9,11 @@ use adw::{
         PreferencesPageExt,
     },
 };
-use gtk::glib::{DateTime, GString, Uri, UriFlags, gformat};
+use gtk::{
+    Align, Button,
+    glib::{DateTime, GString, Uri, UriFlags, gformat},
+    prelude::ButtonExt,
+};
 use indexmap::IndexMap;
 use std::rc::Rc;
 
@@ -81,16 +85,14 @@ impl History for adw::PreferencesDialog {
                                     .format_iso8601()
                                     .unwrap(),
                             )
-                            .title_selectable(true)
                             .title(group)
                             .build();
 
                         for record in records {
                             e.add_row(&{
                                 let a = ActionRow::builder()
-                                    .activatable(true)
-                                    // @TODO use button widget to open the links on click
-                                    //.title_selectable(true)
+                                    .activatable(false)
+                                    .title_selectable(true)
                                     .title(match record.title {
                                         Some(title) => title,
                                         None => gformat!(
@@ -99,24 +101,41 @@ impl History for adw::PreferencesDialog {
                                             record.event.count
                                         ),
                                     })
-                                    .subtitle_selectable(true)
                                     .subtitle(&*record.request)
+                                    .subtitle_selectable(true)
                                     .build();
 
-                                a.connect_activated({
-                                    let a = window_action.clone();
-                                    let d = d.clone();
-                                    move |_| {
-                                        a.append.activate_stateful_once(
-                                            Position::After,
-                                            Some(record.request.to_string()),
-                                            false,
-                                            true,
-                                            true,
-                                            true,
-                                        );
-                                        d.close();
-                                    }
+                                a.add_prefix(
+                                    &Button::builder()
+                                        .css_classes(["circular", "caption-heading"])
+                                        .label(record.event.count.to_string())
+                                        .tooltip_text("Visit count")
+                                        .valign(Align::Center)
+                                        .build(),
+                                );
+                                a.add_suffix(&{
+                                    let b = Button::builder()
+                                        .css_classes(["accent", "circular", "flat"])
+                                        .icon_name("mail-forward-symbolic")
+                                        .tooltip_text("Open in the new tab")
+                                        .valign(Align::Center)
+                                        .build();
+                                    b.connect_clicked({
+                                        let a = window_action.clone();
+                                        let d = d.clone();
+                                        move |_| {
+                                            a.append.activate_stateful_once(
+                                                Position::After,
+                                                Some(record.request.to_string()),
+                                                false,
+                                                true,
+                                                true,
+                                                true,
+                                            );
+                                            d.close();
+                                        }
+                                    });
+                                    b
                                 });
                                 a
                             })

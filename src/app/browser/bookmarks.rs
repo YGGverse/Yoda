@@ -9,7 +9,10 @@ use adw::{
         PreferencesPageExt,
     },
 };
-use gtk::glib::{DateTime, GString, Uri, UriFlags};
+use gtk::{
+    glib::{DateTime, GString, Uri, UriFlags},
+    prelude::ButtonExt,
+};
 use indexmap::IndexMap;
 use std::rc::Rc;
 
@@ -51,7 +54,7 @@ impl Bookmarks for adw::PreferencesDialog {
         d.add(&{
             let p = PreferencesPage::builder()
                 .icon_name("document-open-recent-symbolic")
-                .title("All")
+                //.title("All")
                 .build();
 
             for (group, records) in index {
@@ -70,16 +73,14 @@ impl Bookmarks for adw::PreferencesDialog {
                                     .format_iso8601()
                                     .unwrap(),
                             )
-                            .title_selectable(true)
                             .title(group)
                             .build();
 
                         for record in records {
                             e.add_row(&{
                                 let a = ActionRow::builder()
-                                    .activatable(true)
-                                    // @TODO use button widget to open the links on click
-                                    //.title_selectable(true)
+                                    .activatable(false)
+                                    .title_selectable(true)
                                     .title(match record.title {
                                         Some(title) => title,
                                         None => record.time.format_iso8601().unwrap().to_string(),
@@ -88,20 +89,29 @@ impl Bookmarks for adw::PreferencesDialog {
                                     .subtitle(&record.request)
                                     .build();
 
-                                a.connect_activated({
-                                    let a = window_action.clone();
-                                    let d = d.clone();
-                                    move |_| {
-                                        a.append.activate_stateful_once(
-                                            Position::After,
-                                            Some(record.request.clone()),
-                                            false,
-                                            true,
-                                            true,
-                                            true,
-                                        );
-                                        d.close();
-                                    }
+                                a.add_suffix(&{
+                                    let b = gtk::Button::builder()
+                                        .css_classes(["accent", "circular", "flat"])
+                                        .icon_name("mail-forward-symbolic")
+                                        .tooltip_text("Open in the new tab")
+                                        .valign(gtk::Align::Center)
+                                        .build();
+                                    b.connect_clicked({
+                                        let a = window_action.clone();
+                                        let d = d.clone();
+                                        move |_| {
+                                            a.append.activate_stateful_once(
+                                                Position::After,
+                                                Some(record.request.clone()),
+                                                false,
+                                                true,
+                                                true,
+                                                true,
+                                            );
+                                            d.close();
+                                        }
+                                    });
+                                    b
                                 });
                                 a
                             })
