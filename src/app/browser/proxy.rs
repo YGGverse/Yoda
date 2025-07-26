@@ -1,6 +1,7 @@
 //! Proxy settings dialog
 
 mod ignore;
+mod misc;
 mod rule;
 
 use super::Profile;
@@ -9,6 +10,7 @@ use adw::{
     prelude::{AdwDialogExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
 use ignore::Ignore;
+use misc::Misc;
 use rule::Rule;
 use std::rc::Rc;
 
@@ -20,6 +22,7 @@ impl Proxy for adw::PreferencesDialog {
     fn proxy(profile: &Rc<Profile>) -> Self {
         // Init components
         let ignore = Ignore::build(profile);
+        let misc = Misc::build(profile);
         let rule = Rule::build(profile);
 
         // Init widget
@@ -54,12 +57,18 @@ impl Proxy for adw::PreferencesDialog {
             p
         });
 
-        d.add(
-            &PreferencesPage::builder()
+        d.add(&{
+            let p = PreferencesPage::builder()
                 .title("Interface")
                 .icon_name("preferences-desktop-display-symbolic")
-                .build(),
-        );
+                .build();
+            p.add(&{
+                let g = PreferencesGroup::new();
+                g.add(&misc.widget);
+                g
+            });
+            p
+        });
 
         d.connect_closed({
             let profile = profile.clone();
@@ -77,6 +86,7 @@ impl Proxy for adw::PreferencesDialog {
                         )
                     }
                 }
+
                 profile.proxy.ignore.clear();
                 for i in ignore.take() {
                     if i.validate() {
@@ -86,6 +96,11 @@ impl Proxy for adw::PreferencesDialog {
                             .add(i.id, i.is_enabled(), i.host().to_string(), i.time)
                     }
                 }
+
+                profile
+                    .proxy
+                    .misc
+                    .set_highlight_request_entry(misc.is_highlight_request_entry());
             }
         });
         d
