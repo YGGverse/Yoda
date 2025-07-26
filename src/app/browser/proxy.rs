@@ -28,7 +28,7 @@ impl Proxy for adw::PreferencesDialog {
         // Init widget
         let d = adw::PreferencesDialog::builder()
             .follows_content_size(true)
-            .search_enabled(true)
+            .search_enabled(false)
             .title("Proxy")
             .build();
 
