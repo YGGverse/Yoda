@@ -142,8 +142,10 @@ impl Request {
                         s.update(Some(50)); // @TODO optional
                     }
                     // Indicate proxy connections @TODO cancel previous operation on update
-                    match p.proxy.matches(&t) {
-                        Some(m) => m.clone().lookup_async(&t, Cancellable::NONE, {
+                    if p.proxy.misc.is_highlight_request_entry()
+                        && let Some(m) = p.proxy.matches(&t)
+                    {
+                        m.clone().lookup_async(&t, Cancellable::NONE, {
                             let e = e.clone();
                             let r = r.clone();
                             move |l| {
@@ -161,11 +163,10 @@ impl Request {
                                     }
                                 }))
                             }
-                        }),
-                        None => {
-                            e.set_css_classes(&[]);
-                            e.set_tooltip_text(None)
-                        }
+                        })
+                    } else {
+                        e.set_css_classes(&[]);
+                        e.set_tooltip_text(None)
                     }
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
