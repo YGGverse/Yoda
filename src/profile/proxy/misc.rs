@@ -30,7 +30,7 @@ impl Misc {
 
             // update values from the DB (if exists)
             for row in rows {
-                assert!(!m.insert(Memory::from_db_row(&row.key, row.value).unwrap()))
+                m.insert(Memory::from_db_row(&row.key, row.value).unwrap());
                 // * panics if the DB was malformed or changed unexpectedly
             }
         }
@@ -47,12 +47,10 @@ impl Misc {
         Ok(())
     }
 
-    pub fn set_highlight_request_entry(&self, value: bool) {
-        assert!(
-            self.memory
-                .borrow_mut()
-                .insert(Memory::highlight_request_entry(value)),
-        )
+    pub fn set_highlight_request_entry(&self, value: bool) -> bool {
+        self.memory
+            .borrow_mut()
+            .insert(Memory::highlight_request_entry(value))
     }
 
     // Getters
