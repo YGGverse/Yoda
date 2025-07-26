@@ -18,10 +18,10 @@ impl Misc {
         let highlight_request_entry = SwitchRow::builder()
             .active(profile.proxy.misc.is_highlight_request_entry())
             .hexpand(true)
+            .subtitle_selectable(true)
             .subtitle("Use accent color for proxy connections")
+            .title_selectable(true)
             .title("Highlight the Request entry")
-            //.subtitle_selectable(true)
-            //.title_selectable(true)
             .build();
 
         // Init widget
