@@ -1,7 +1,7 @@
 const TRUE: &str = "1";
 const FALSE: &str = "0";
 
-#[derive(Eq, Hash, PartialEq, Default)]
+#[derive(Default)]
 pub enum Bool {
     True,
     #[default]

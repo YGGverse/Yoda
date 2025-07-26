@@ -5,7 +5,6 @@ use bool::Bool;
 
 const HIGHLIGHT_REQUEST_ENTRY: &str = "highlight_request_entry";
 
-#[derive(Eq, Hash, PartialEq)]
 pub enum Memory {
     HighlightRequestEntry(Bool),
 }
@@ -32,6 +31,14 @@ impl Memory {
             Self::HighlightRequestEntry(value) => {
                 (HIGHLIGHT_REQUEST_ENTRY.to_string(), value.into_db_value())
             }
+        }
+    }
+
+    // Getters
+
+    pub fn key(&self) -> &str {
+        match self {
+            Self::HighlightRequestEntry(..) => HIGHLIGHT_REQUEST_ENTRY,
         }
     }
 }
