@@ -183,7 +183,7 @@ pub fn new(on_add: impl Fn() + 'static) -> Box {
             .css_classes(["success"])
             .hexpand(true)
             .icon_name("list-add-symbolic")
-            .tooltip_text("Add proxy")
+            .tooltip_text("Add proxy rule")
             .build();
 
         add.connect_clicked(move |_| on_add());
