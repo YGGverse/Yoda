@@ -73,7 +73,7 @@ impl Bookmarks for adw::PreferencesDialog {
                                     .format_iso8601()
                                     .unwrap(),
                             )
-                            .title(group)
+                            .title(escape(&group))
                             .build();
 
                         for record in records {
@@ -86,7 +86,7 @@ impl Bookmarks for adw::PreferencesDialog {
                                         None => record.time.format_iso8601().unwrap().to_string(),
                                     })
                                     .subtitle_selectable(true)
-                                    .subtitle(&record.request)
+                                    .subtitle(escape(&record.request))
                                     .build();
 
                                 a.add_suffix(&{
@@ -125,4 +125,9 @@ impl Bookmarks for adw::PreferencesDialog {
         });
         d
     }
+}
+
+/// Prevents GTK warnings (`use_markup` has no effect @TODO)
+fn escape(value: &str) -> String {
+    value.replace("&amp;", "&").replace("&", "&amp;")
 }

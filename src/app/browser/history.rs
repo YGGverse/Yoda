@@ -11,7 +11,7 @@ use adw::{
 };
 use gtk::{
     Align, Button,
-    glib::{DateTime, GString, Uri, UriFlags, gformat},
+    glib::{DateTime, GString, Uri, UriFlags},
     prelude::ButtonExt,
 };
 use indexmap::IndexMap;
@@ -85,7 +85,7 @@ impl History for adw::PreferencesDialog {
                                     .format_iso8601()
                                     .unwrap(),
                             )
-                            .title(group)
+                            .title(escape(&group))
                             .build();
 
                         for record in records {
@@ -94,14 +94,14 @@ impl History for adw::PreferencesDialog {
                                     .activatable(false)
                                     .title_selectable(true)
                                     .title(match record.title {
-                                        Some(title) => title,
-                                        None => gformat!(
+                                        Some(title) => escape(&title),
+                                        None => format!(
                                             "{} ({})",
                                             record.event.time.format_iso8601().unwrap(),
                                             record.event.count
                                         ),
                                     })
-                                    .subtitle(&*record.request)
+                                    .subtitle(escape(&record.request))
                                     .subtitle_selectable(true)
                                     .build();
 
@@ -149,4 +149,9 @@ impl History for adw::PreferencesDialog {
         });
         d
     }
+}
+
+/// Prevents GTK warnings (`use_markup` has no effect @TODO)
+fn escape(value: &str) -> String {
+    value.replace("&amp;", "&").replace("&", "&amp;")
 }
