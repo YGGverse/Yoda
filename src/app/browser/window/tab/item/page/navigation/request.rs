@@ -477,34 +477,38 @@ fn update_blocked(
 /// Indicate proxy connections @TODO cancel previous operation on update
 fn refresh_proxy_resolver(
     entry: &Entry,
-    profile: &Profile,
+    profile: &Rc<Profile>,
     resolver: &Rc<RefCell<Option<ProxyResolver>>>,
 ) {
     let t = entry.text();
-    if profile.proxy.misc.is_highlight_request_entry()
-        && let Some(m) = profile.proxy.matches(&t)
-    {
-        m.clone().lookup_async(&t, Cancellable::NONE, {
+    match profile.proxy.matches(&t) {
+        Some(m) => m.clone().lookup_async(&t, Cancellable::NONE, {
             let e = entry.clone();
+            let p = profile.clone();
             let r = resolver.clone();
             move |l| {
                 r.replace(Some(m));
                 e.set_tooltip_text(Some(&{
                     match l {
                         Ok(h) => {
-                            e.set_css_classes(&["accent"]);
+                            if p.proxy.misc.is_highlight_request_entry() {
+                                e.set_css_classes(&["accent"])
+                            }
                             format!("Proxy over {}", h.join(","))
                         }
                         Err(i) => {
-                            e.set_css_classes(&["error"]);
+                            if p.proxy.misc.is_highlight_request_entry() {
+                                e.set_css_classes(&["error"]);
+                            }
                             i.to_string()
                         }
                     }
                 }))
             }
-        })
-    } else {
-        entry.set_css_classes(&[]);
-        entry.set_tooltip_text(None)
+        }),
+        None => {
+            entry.set_css_classes(&[]);
+            entry.set_tooltip_text(None)
+        }
     }
 }
