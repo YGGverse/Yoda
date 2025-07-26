@@ -141,7 +141,6 @@ impl Request {
                     if e.focus_child().is_some() {
                         s.update(Some(50)); // @TODO optional
                     }
-
                     refresh_proxy_resolver(e, &p, &r)
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
