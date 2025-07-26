@@ -13,7 +13,7 @@ pub enum Memory {
 impl Memory {
     // Constructors
 
-    pub fn from_db_row(key: &str, value: Option<&str>) -> Option<Self> {
+    pub fn from_db_row(key: &str, value: Option<String>) -> Option<Self> {
         if key == HIGHLIGHT_REQUEST_ENTRY {
             Some(Self::HighlightRequestEntry(Bool::from_db_value(value)))
         } else {

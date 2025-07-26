@@ -13,7 +13,7 @@ impl Bool {
         if value { Self::True } else { Self::False }
     }
 
-    pub fn from_db_value(key: Option<&str>) -> Self {
+    pub fn from_db_value(key: Option<String>) -> Self {
         if key.is_some_and(|k| k == TRUE) {
             Self::True
         } else {

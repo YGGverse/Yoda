@@ -30,7 +30,7 @@ impl Misc {
 
             // update values from the DB (if exists)
             for row in rows {
-                assert!(!m.insert(Memory::from_db_row(&row.key, row.value.as_deref()).unwrap()))
+                assert!(!m.insert(Memory::from_db_row(&row.key, row.value).unwrap()))
                 // * panics if the DB was malformed or changed unexpectedly
             }
         }
