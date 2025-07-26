@@ -358,6 +358,10 @@ impl Tab {
         // @TODO other/child features..
     }
 
+    pub fn items(&self) -> Vec<Rc<Item>> {
+        self.index.borrow().values().cloned().collect()
+    }
+
     /// Find `Item` by `TabPage` position in HashMap `index`
     fn item(&self, page_position: Option<i32>) -> Option<Rc<Item>> {
         match page_position {

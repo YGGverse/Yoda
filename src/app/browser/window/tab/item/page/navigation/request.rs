@@ -141,33 +141,8 @@ impl Request {
                     if e.focus_child().is_some() {
                         s.update(Some(50)); // @TODO optional
                     }
-                    // Indicate proxy connections @TODO cancel previous operation on update
-                    if p.proxy.misc.is_highlight_request_entry()
-                        && let Some(m) = p.proxy.matches(&t)
-                    {
-                        m.clone().lookup_async(&t, Cancellable::NONE, {
-                            let e = e.clone();
-                            let r = r.clone();
-                            move |l| {
-                                r.replace(Some(m));
-                                e.set_tooltip_text(Some(&{
-                                    match l {
-                                        Ok(h) => {
-                                            e.set_css_classes(&["accent"]);
-                                            format!("Proxy over {}", h.join(","))
-                                        }
-                                        Err(i) => {
-                                            e.set_css_classes(&["error"]);
-                                            i.to_string()
-                                        }
-                                    }
-                                }))
-                            }
-                        })
-                    } else {
-                        e.set_css_classes(&[]);
-                        e.set_tooltip_text(None)
-                    }
+
+                    refresh_proxy_resolver(e, &p, &r)
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
 
@@ -278,6 +253,10 @@ impl Request {
         // Delegate save action to childs
         // nothing yet..
         Ok(())
+    }
+
+    pub fn refresh(&self) {
+        refresh_proxy_resolver(&self.entry, &self.profile, &self.proxy_resolver)
     }
 
     pub fn update_secondary_icon(&self, info: &Info) {
@@ -493,4 +472,39 @@ fn update_blocked(
     entry.select_region(0, -1);
     update_primary_icon(entry, profile);
     entry.unblock_signal(signal_handler_id);
+}
+
+/// Indicate proxy connections @TODO cancel previous operation on update
+fn refresh_proxy_resolver(
+    entry: &Entry,
+    profile: &Profile,
+    resolver: &Rc<RefCell<Option<ProxyResolver>>>,
+) {
+    let t = entry.text();
+    if profile.proxy.misc.is_highlight_request_entry()
+        && let Some(m) = profile.proxy.matches(&t)
+    {
+        m.clone().lookup_async(&t, Cancellable::NONE, {
+            let e = entry.clone();
+            let r = resolver.clone();
+            move |l| {
+                r.replace(Some(m));
+                e.set_tooltip_text(Some(&{
+                    match l {
+                        Ok(h) => {
+                            e.set_css_classes(&["accent"]);
+                            format!("Proxy over {}", h.join(","))
+                        }
+                        Err(i) => {
+                            e.set_css_classes(&["error"]);
+                            i.to_string()
+                        }
+                    }
+                }))
+            }
+        })
+    } else {
+        entry.set_css_classes(&[]);
+        entry.set_tooltip_text(None)
+    }
 }

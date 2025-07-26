@@ -15,11 +15,11 @@ use rule::Rule;
 use std::rc::Rc;
 
 pub trait Proxy {
-    fn proxy(profile: &Rc<Profile>) -> Self;
+    fn proxy(profile: &Rc<Profile>, on_close: impl Fn() + 'static) -> Self;
 }
 
 impl Proxy for adw::PreferencesDialog {
-    fn proxy(profile: &Rc<Profile>) -> Self {
+    fn proxy(profile: &Rc<Profile>, on_close: impl Fn() + 'static) -> Self {
         // Init components
         let ignore = Ignore::build(profile);
         let misc = Misc::build(profile);
@@ -98,6 +98,8 @@ impl Proxy for adw::PreferencesDialog {
                     .proxy
                     .misc
                     .set_highlight_request_entry(misc.is_highlight_request_entry());
+
+                on_close()
             }
         });
         d

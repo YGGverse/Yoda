@@ -66,31 +66,31 @@ impl Browser {
 
         // Connect events
         action.about.connect_activate({
-            let window = window.clone();
-            move || AboutDialog::about().present(Some(&window.g_box))
+            let w = window.clone();
+            move || AboutDialog::about().present(Some(&w.g_box))
         });
 
         action.close.connect_activate({
-            let widget = widget.clone();
-            move || widget.application_window.close()
+            let w = widget.clone();
+            move || w.application_window.close()
         });
 
         action.debug.connect_activate({
-            let widget = widget.clone();
+            let w = widget.clone();
             move || {
-                widget.application_window.emit_enable_debugging(true);
+                w.application_window.emit_enable_debugging(true);
             }
         });
 
         action.profile.connect_activate({
-            let profile = profile.clone();
+            let p = profile.clone();
             move || {
-                FileLauncher::new(Some(&File::for_path(profile.config_path.as_path()))).launch(
+                FileLauncher::new(Some(&File::for_path(p.config_path.as_path()))).launch(
                     adw::Window::NONE,
                     Cancellable::NONE,
-                    |result| {
-                        if let Err(error) = result {
-                            println!("{error}")
+                    |r| {
+                        if let Err(e) = r {
+                            println!("{e}")
                         }
                     },
                 ); // @TODO move out?
@@ -98,25 +98,32 @@ impl Browser {
         });
 
         action.history.connect_activate({
-            let profile = profile.clone();
-            let window = window.clone();
-            move || {
-                PreferencesDialog::history(&window.action, &profile).present(Some(&window.g_box))
-            }
+            let p = profile.clone();
+            let w = window.clone();
+            move || PreferencesDialog::history(&w.action, &p).present(Some(&w.g_box))
         });
 
         action.bookmarks.connect_activate({
-            let profile = profile.clone();
-            let window = window.clone();
-            move || {
-                PreferencesDialog::bookmarks(&window.action, &profile).present(Some(&window.g_box))
-            }
+            let p = profile.clone();
+            let w = window.clone();
+            move || PreferencesDialog::bookmarks(&w.action, &p).present(Some(&w.g_box))
         });
 
         action.proxy.connect_activate({
-            let profile = profile.clone();
-            let window = window.clone();
-            move || PreferencesDialog::proxy(&profile).present(Some(&window.g_box))
+            let p = profile.clone();
+            let w = window.clone();
+            move || {
+                PreferencesDialog::proxy(&p, {
+                    let w = w.clone();
+                    move || {
+                        w.tab
+                            .items()
+                            .into_iter()
+                            .for_each(|i| i.page.navigation.request.refresh())
+                    }
+                })
+                .present(Some(&w.g_box))
+            }
         });
 
         // Return new activated `Self`
@@ -130,11 +137,11 @@ impl Browser {
     // Actions
 
     pub fn clean(&self, transaction: &Transaction, app_id: i64) -> Result<()> {
-        for record in database::select(transaction, app_id)? {
-            database::delete(transaction, record.id)?;
+        for r in database::select(transaction, app_id)? {
+            database::delete(transaction, r.id)?;
             // Delegate clean action to childs
-            self.window.clean(transaction, record.id)?;
-            self.widget.clean(transaction, record.id)?;
+            self.window.clean(transaction, r.id)?;
+            self.widget.clean(transaction, r.id)?;
             /* @TODO
             self.header.clean(transaction, &record.id)?; */
         }
@@ -142,12 +149,12 @@ impl Browser {
     }
 
     pub fn restore(&self, transaction: &Transaction, app_id: i64) -> Result<()> {
-        for record in database::select(transaction, app_id)? {
+        for r in database::select(transaction, app_id)? {
             // Delegate restore action to childs
-            self.widget.restore(transaction, record.id)?;
-            self.window.restore(transaction, record.id)?;
+            self.widget.restore(transaction, r.id)?;
+            self.window.restore(transaction, r.id)?;
             /* @TODO
-            self.header.restore(transaction, &record.id)?; */
+            self.header.restore(transaction, &r.id)?; */
         }
         Ok(())
     }
