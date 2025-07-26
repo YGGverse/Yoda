@@ -60,10 +60,10 @@ impl Proxy for adw::PreferencesDialog {
         d.connect_closed({
             let profile = profile.clone();
             move |_| {
-                profile.proxy.clear();
+                profile.proxy.rule.clear();
                 for rule in rules.take() {
                     if rule.validate() {
-                        profile.proxy.add_rule(
+                        profile.proxy.rule.add(
                             rule.id,
                             rule.is_enabled(),
                             rule.priority(),

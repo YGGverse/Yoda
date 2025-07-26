@@ -17,7 +17,7 @@ pub struct Rules {
 
 impl Rules {
     pub fn build(profile: &Rc<Profile>) -> Self {
-        let config = profile.proxy.rules();
+        let config = profile.proxy.rule.all();
 
         let rules: Rc<RefCell<HashMap<GString, Rule>>> =
             Rc::new(RefCell::new(HashMap::with_capacity(config.len())));

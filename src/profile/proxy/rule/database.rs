@@ -1,12 +1,10 @@
-mod ignore;
-mod rule;
+mod row;
 
 use anyhow::Result;
 use gtk::glib::DateTime;
-use ignore::Ignore;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
-use rule::Rule;
+use row::Row;
 use sqlite::Transaction;
 
 pub struct Database {
@@ -26,25 +24,21 @@ impl Database {
 
     // Getters
 
-    pub fn rules(&self) -> Result<Vec<Rule>> {
-        rules(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
-    }
-
-    pub fn ignores(&self) -> Result<Vec<Ignore>> {
-        ignores(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
+    pub fn rows(&self) -> Result<Vec<Row>> {
+        rows(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
     }
 
     // Setters
 
-    pub fn clean_rules(&self, keep_id: Vec<i64>) -> Result<()> {
+    pub fn clean(&self, keep_id: Vec<i64>) -> Result<()> {
         let mut c = self.pool.get()?;
         let tx = c.transaction()?;
-        clean_rules(&tx, keep_id)?;
+        clean(&tx, keep_id)?;
         tx.commit()?;
         Ok(())
     }
 
-    pub fn persist_rule(
+    pub fn persist(
         &self,
         id: Option<i64>,
         time: DateTime,
@@ -57,10 +51,10 @@ impl Database {
         let tx = c.transaction()?;
         let id = match id {
             Some(id) => {
-                update_rule(&tx, id, time, is_enabled, priority, request, url)?;
+                update(&tx, id, time, is_enabled, priority, request, url)?;
                 id
             }
-            None => insert_rule(
+            None => insert(
                 &tx,
                 self.profile_id,
                 time,
@@ -78,23 +72,7 @@ impl Database {
 // Low-level DB API
 
 pub fn init(tx: &Transaction) -> Result<usize> {
-    let mut s = 0;
-
-    s += tx.execute(
-        "CREATE TABLE IF NOT EXISTS `profile_proxy_ignore`
-        (
-            `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            `profile_id` INTEGER NOT NULL,
-            `time`       INTEGER NOT NULL,
-            `is_enabled` INTEGER NOT NULL,
-            `host`       VARCHAR(255) NOT NULL,
-
-            FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
-        )",
-        [],
-    )?;
-
-    s += tx.execute(
+    Ok(tx.execute(
         "CREATE TABLE IF NOT EXISTS `profile_proxy_rule`
         (
             `id`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -108,12 +86,10 @@ pub fn init(tx: &Transaction) -> Result<usize> {
             FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
         )",
         [],
-    )?;
-
-    Ok(s)
+    )?)
 }
 
-pub fn clean_rules(tx: &Transaction, keep_id: Vec<i64>) -> Result<usize> {
+fn clean(tx: &Transaction, keep_id: Vec<i64>) -> Result<usize> {
     if keep_id.is_empty() {
         return Ok(0);
     }
@@ -130,7 +106,7 @@ pub fn clean_rules(tx: &Transaction, keep_id: Vec<i64>) -> Result<usize> {
     )?)
 }
 
-pub fn insert_rule(
+fn insert(
     tx: &Transaction,
     profile_id: i64,
     time: DateTime,
@@ -160,7 +136,7 @@ pub fn insert_rule(
     Ok(tx.last_insert_rowid())
 }
 
-pub fn update_rule(
+fn update(
     tx: &Transaction,
     id: i64,
     time: DateTime,
@@ -182,39 +158,7 @@ pub fn update_rule(
     )?)
 }
 
-pub fn ignores(tx: &Transaction, profile_id: i64) -> Result<Vec<Ignore>> {
-    let mut stmt = tx.prepare(
-        "SELECT `id`,
-                `profile_id`,
-                `time`,
-                `host`,
-                `is_enabled`
-
-                FROM `profile_proxy_ignore`
-                WHERE `profile_id` = ?",
-    )?;
-
-    let result = stmt.query_map([profile_id], |row| {
-        Ok(Ignore {
-            //id: row.get(0)?,
-            //profile_id: row.get(1)?,
-            //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
-            host: row.get(3)?,
-            is_enabled: row.get(4)?,
-        })
-    })?;
-
-    let mut records = Vec::new();
-
-    for record in result {
-        let table = record?;
-        records.push(table);
-    }
-
-    Ok(records)
-}
-
-pub fn rules(tx: &Transaction, profile_id: i64) -> Result<Vec<Rule>> {
+fn rows(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
                 `profile_id`,
@@ -230,7 +174,7 @@ pub fn rules(tx: &Transaction, profile_id: i64) -> Result<Vec<Rule>> {
     )?;
 
     let result = stmt.query_map([profile_id], |row| {
-        Ok(Rule {
+        Ok(Row {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
             time: DateTime::from_unix_local(row.get(2)?).unwrap(),
@@ -241,12 +185,11 @@ pub fn rules(tx: &Transaction, profile_id: i64) -> Result<Vec<Rule>> {
         })
     })?;
 
-    let mut records = Vec::new();
+    let mut rows = Vec::new();
 
-    for record in result {
-        let table = record?;
-        records.push(table);
+    for r in result {
+        rows.push(r?);
     }
 
-    Ok(records)
+    Ok(rows)
 }

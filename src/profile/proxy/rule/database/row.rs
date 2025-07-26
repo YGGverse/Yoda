@@ -1,4 +1,4 @@
-pub struct Rule {
+pub struct Row {
     pub id: i64,
     pub is_enabled: bool,
     pub priority: i32,
