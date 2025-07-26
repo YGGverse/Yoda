@@ -3,6 +3,6 @@ pub struct Row {
     pub is_enabled: bool,
     pub priority: i32,
     pub request: String,
-    pub time: gtk::glib::DateTime,
+    pub time: i64,
     pub url: String,
 }

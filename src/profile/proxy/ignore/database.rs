@@ -26,6 +26,36 @@ impl Database {
     pub fn rows(&self) -> Result<Vec<Row>> {
         rows(&self.pool.get()?.unchecked_transaction()?, self.profile_id)
     }
+
+    // Setters
+
+    pub fn clean(&self, keep_id: Vec<i64>) -> Result<()> {
+        let mut c = self.pool.get()?;
+        let tx = c.transaction()?;
+        clean(&tx, keep_id)?;
+        tx.commit()?;
+        Ok(())
+    }
+
+    pub fn persist(
+        &self,
+        id: Option<i64>,
+        time: i64,
+        is_enabled: bool,
+        host: String,
+    ) -> Result<i64> {
+        let mut c = self.pool.get()?;
+        let tx = c.transaction()?;
+        let id = match id {
+            Some(id) => {
+                update(&tx, id, time, is_enabled, host)?;
+                id
+            }
+            None => insert(&tx, self.profile_id, time, is_enabled, host)?,
+        };
+        tx.commit()?;
+        Ok(id)
+    }
 }
 
 // Low-level DB API
@@ -46,6 +76,54 @@ pub fn init(tx: &Transaction) -> Result<usize> {
     )?)
 }
 
+fn clean(tx: &Transaction, keep_id: Vec<i64>) -> Result<usize> {
+    if keep_id.is_empty() {
+        return Ok(0);
+    }
+    Ok(tx.execute(
+        &format!(
+            "DELETE FROM `profile_proxy_ignore` WHERE `id` NOT IN ({})",
+            keep_id
+                .into_iter()
+                .map(|id| id.to_string())
+                .collect::<Vec<String>>()
+                .join(",")
+        ),
+        [],
+    )?)
+}
+
+fn insert(
+    tx: &Transaction,
+    profile_id: i64,
+    time: i64,
+    is_enabled: bool,
+    host: String,
+) -> Result<i64> {
+    tx.execute(
+        "INSERT INTO `profile_proxy_ignore` (
+            `profile_id`,
+            `time`,
+            `is_enabled`,
+            `host`
+        ) VALUES (?, ?, ?, ?)",
+        (profile_id, time, is_enabled, host),
+    )?;
+    Ok(tx.last_insert_rowid())
+}
+
+fn update(tx: &Transaction, id: i64, time: i64, is_enabled: bool, host: String) -> Result<usize> {
+    Ok(tx.execute(
+        "UPDATE `profile_proxy_ignore`
+            SET `time` = ?,
+                `is_enabled` = ?,
+                `host` = ?
+
+            WHERE `id` = ?",
+        (time, is_enabled, host, id),
+    )?)
+}
+
 fn rows(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
     let mut stmt = tx.prepare(
         "SELECT `id`,
@@ -60,9 +138,9 @@ fn rows(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
 
     let result = stmt.query_map([profile_id], |row| {
         Ok(Row {
-            //id: row.get(0)?,
+            id: row.get(0)?,
             //profile_id: row.get(1)?,
-            //time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+            time: row.get(2)?,
             host: row.get(3)?,
             is_enabled: row.get(4)?,
         })

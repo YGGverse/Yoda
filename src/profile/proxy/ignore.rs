@@ -3,6 +3,7 @@ mod memory;
 
 use anyhow::Result;
 use database::Database;
+use gtk::glib::DateTime;
 use memory::Memory;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -25,10 +26,12 @@ impl Ignore {
         {
             // build in-memory index...
             let mut m = memory.borrow_mut();
-            for i in rows {
+            for row in rows {
                 m.push(Memory {
-                    is_enabled: i.is_enabled,
-                    host: i.host,
+                    id: Some(row.id),
+                    host: row.host,
+                    is_enabled: row.is_enabled,
+                    time: DateTime::from_unix_local(row.time)?,
                 });
             }
         }
@@ -36,7 +39,35 @@ impl Ignore {
         Ok(Self { database, memory })
     }
 
-    // Actions
+    // Setters
+
+    pub fn add(&self, id: Option<i64>, is_enabled: bool, host: String, time: DateTime) {
+        self.memory.borrow_mut().push(Memory {
+            id,
+            host,
+            is_enabled,
+            time,
+        }) // @TODO validate?
+    }
+
+    pub fn clear(&self) {
+        self.memory.borrow_mut().clear();
+    }
+
+    pub fn save(&self) -> Result<()> {
+        let rules = self.memory.take();
+        let mut keep_id = Vec::with_capacity(rules.len());
+        for rule in rules {
+            keep_id.push(self.database.persist(
+                rule.id,
+                rule.time.to_unix(),
+                rule.is_enabled,
+                rule.host,
+            )?);
+        }
+        self.database.clean(keep_id)?;
+        Ok(())
+    }
 
     // Getters
 

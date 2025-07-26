@@ -1,7 +1,6 @@
 mod row;
 
 use anyhow::Result;
-use gtk::glib::DateTime;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use row::Row;
@@ -41,7 +40,7 @@ impl Database {
     pub fn persist(
         &self,
         id: Option<i64>,
-        time: DateTime,
+        time: i64,
         is_enabled: bool,
         priority: i32,
         request: String,
@@ -109,7 +108,7 @@ fn clean(tx: &Transaction, keep_id: Vec<i64>) -> Result<usize> {
 fn insert(
     tx: &Transaction,
     profile_id: i64,
-    time: DateTime,
+    time: i64,
     is_enabled: bool,
     priority: i32,
     request: String,
@@ -124,14 +123,7 @@ fn insert(
             `request`,
             `url`
         ) VALUES (?, ?, ?, ?, ?, ?)",
-        (
-            profile_id,
-            time.to_unix(),
-            is_enabled,
-            priority,
-            request,
-            url,
-        ),
+        (profile_id, time, is_enabled, priority, request, url),
     )?;
     Ok(tx.last_insert_rowid())
 }
@@ -139,7 +131,7 @@ fn insert(
 fn update(
     tx: &Transaction,
     id: i64,
-    time: DateTime,
+    time: i64,
     is_enabled: bool,
     priority: i32,
     request: String,
@@ -154,7 +146,7 @@ fn update(
                 `url` = ?
 
             WHERE `id` = ?",
-        (time.to_unix(), is_enabled, priority, request, url, id),
+        (time, is_enabled, priority, request, url, id),
     )?)
 }
 
@@ -177,7 +169,7 @@ fn rows(tx: &Transaction, profile_id: i64) -> Result<Vec<Row>> {
         Ok(Row {
             id: row.get(0)?,
             //profile_id: row.get(1)?,
-            time: DateTime::from_unix_local(row.get(2)?).unwrap(),
+            time: row.get(2)?,
             is_enabled: row.get(3)?,
             priority: row.get(4)?,
             request: row.get(5)?,

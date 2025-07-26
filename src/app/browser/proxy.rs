@@ -1,13 +1,15 @@
 //! Proxy settings dialog
 
-mod rules;
+mod ignore;
+mod rule;
 
 use super::Profile;
 use adw::{
     PreferencesGroup, PreferencesPage,
     prelude::{AdwDialogExt, PreferencesDialogExt, PreferencesGroupExt, PreferencesPageExt},
 };
-use rules::Rules;
+use ignore::Ignore;
+use rule::Rule;
 use std::rc::Rc;
 
 pub trait Proxy {
@@ -17,7 +19,8 @@ pub trait Proxy {
 impl Proxy for adw::PreferencesDialog {
     fn proxy(profile: &Rc<Profile>) -> Self {
         // Init components
-        let rules = Rules::build(profile);
+        let ignore = Ignore::build(profile);
+        let rule = Rule::build(profile);
 
         // Init widget
         let d = adw::PreferencesDialog::builder()
@@ -32,23 +35,24 @@ impl Proxy for adw::PreferencesDialog {
                 .build();
             p.add(&{
                 let g = PreferencesGroup::new();
-                g.add(&rules.widget);
+                g.add(&rule.widget);
                 g
             });
-            /* @TODO URL entry p.add(&{
-                let g = PreferencesGroup::builder().title("Test").build();
-                //g.add(&Box::rules(profile));
-                g
-            });*/
             p
         });
 
-        d.add(
-            &PreferencesPage::builder()
+        d.add(&{
+            let p = PreferencesPage::builder()
                 .title("Exceptions")
                 .icon_name("action-unavailable-symbolic")
-                .build(),
-        );
+                .build();
+            p.add(&{
+                let g = PreferencesGroup::new();
+                g.add(&ignore.widget);
+                g
+            });
+            p
+        });
 
         d.add(
             &PreferencesPage::builder()
@@ -61,16 +65,25 @@ impl Proxy for adw::PreferencesDialog {
             let profile = profile.clone();
             move |_| {
                 profile.proxy.rule.clear();
-                for rule in rules.take() {
-                    if rule.validate() {
+                for r in rule.take() {
+                    if r.validate() {
                         profile.proxy.rule.add(
-                            rule.id,
-                            rule.is_enabled(),
-                            rule.priority(),
-                            rule.request().to_string(),
-                            rule.url().to_string(),
-                            rule.time,
+                            r.id,
+                            r.is_enabled(),
+                            r.priority(),
+                            r.request().to_string(),
+                            r.url().to_string(),
+                            r.time,
                         )
+                    }
+                }
+                profile.proxy.ignore.clear();
+                for i in ignore.take() {
+                    if i.validate() {
+                        profile
+                            .proxy
+                            .ignore
+                            .add(i.id, i.is_enabled(), i.host().to_string(), i.time)
                     }
                 }
             }

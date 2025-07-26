@@ -29,10 +29,10 @@ impl Rule {
             for row in rows {
                 m.push(Memory {
                     id: Some(row.id),
-                    time: row.time,
                     is_enabled: row.is_enabled,
                     priority: row.priority,
                     request: row.request,
+                    time: DateTime::from_unix_local(row.time)?,
                     url: row.url,
                 });
             }
@@ -52,8 +52,7 @@ impl Rule {
         url: String,
         time: DateTime,
     ) {
-        let mut rules = self.memory.borrow_mut();
-        rules.push(Memory {
+        self.memory.borrow_mut().push(Memory {
             id,
             time,
             is_enabled,
@@ -73,7 +72,7 @@ impl Rule {
         for rule in rules {
             keep_id.push(self.database.persist(
                 rule.id,
-                rule.time,
+                rule.time.to_unix(),
                 rule.is_enabled,
                 rule.priority,
                 rule.request,

@@ -4,25 +4,21 @@ use gtk::{
     prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt},
 };
 
-pub struct Rule {
+pub struct Row {
     pub id: Option<i64>,
-    priority: Entry,
-    request: Entry,
+    host: Entry,
     status: Switch,
-    url: Entry,
     pub time: DateTime,
     pub widget: Box,
 }
 
-impl Rule {
+impl Row {
     // Constructors
 
     pub fn build(
         id: Option<i64>,
         time: Option<&DateTime>,
-        request: Option<&str>,
-        url: Option<&str>,
-        priority: Option<i32>,
+        host: Option<&str>,
         is_enabled: bool,
         on_delete: impl Fn() + 'static,
     ) -> Self {
@@ -33,25 +29,10 @@ impl Rule {
             .valign(Align::Center)
             .build();
 
-        let request = Entry::builder()
-            .max_width_chars(12)
-            .placeholder_text("Request")
-            .tooltip_text("Supports regex expressions")
-            .text(request.unwrap_or(".*"))
-            .build();
-
-        let url = Entry::builder()
+        let host = Entry::builder()
             .hexpand(true)
-            .placeholder_text("Proxy URL")
-            .text(url.unwrap_or_default())
-            .tooltip_text("e.g. socks5://127.0.0.1:1080")
-            .build();
-
-        let priority = Entry::builder()
-            .max_width_chars(1)
-            .placeholder_text("Priority")
-            .text(priority.unwrap_or(0).to_string())
-            .tooltip_text("Apply in priority")
+            .placeholder_text("Host")
+            .text(host.unwrap_or_default())
             .build();
 
         let delete = Button::builder()
@@ -68,9 +49,7 @@ impl Rule {
             .build();
 
         widget.append(&status);
-        widget.append(&request);
-        widget.append(&url);
-        widget.append(&priority);
+        widget.append(&host);
         widget.append(&delete);
 
         // Activate
@@ -87,7 +66,7 @@ impl Rule {
                 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 
                 let dialog = AlertDialog::builder()
-                    .heading("Delete this rule?")
+                    .heading("Delete this host?")
                     .close_response(RESPONSE_CANCEL.0)
                     .default_response(RESPONSE_CONFIRM.0)
                     .build();
@@ -107,30 +86,16 @@ impl Rule {
             }
         });
 
-        priority.connect_changed({
-            let url = url.clone();
-            move |this| {
-                validate(this, &url);
-            }
-        });
-
-        url.connect_changed({
-            let priority = priority.clone();
-            move |this| {
-                validate(&priority, this);
-            }
+        host.connect_changed(move |this| {
+            validate(this);
         });
 
         status.connect_state_set({
-            let priority = priority.clone();
-            let request = request.clone();
-            let url = url.clone();
+            let host = host.clone();
             move |_, state| {
-                validate(&priority, &url);
+                validate(&host);
 
-                priority.set_sensitive(state);
-                request.set_sensitive(state);
-                url.set_sensitive(state);
+                host.set_sensitive(state);
 
                 gtk::glib::Propagation::Proceed
             }
@@ -138,11 +103,9 @@ impl Rule {
 
         Self {
             id,
-            priority,
-            request,
             status,
             time: time.cloned().unwrap_or(DateTime::now_local().unwrap()),
-            url,
+            host,
             widget,
         }
     }
@@ -150,21 +113,13 @@ impl Rule {
     // Actions
 
     pub fn validate(&self) -> bool {
-        validate(&self.priority, &self.url)
+        validate(&self.host)
     }
 
     // Getters
 
-    pub fn priority(&self) -> i32 {
-        self.priority.text().parse::<i32>().unwrap_or_default()
-    }
-
-    pub fn request(&self) -> GString {
-        self.request.text()
-    }
-
-    pub fn url(&self) -> GString {
-        self.url.text()
+    pub fn host(&self) -> GString {
+        self.host.text()
     }
 
     pub fn is_enabled(&self) -> bool {
@@ -192,7 +147,7 @@ pub fn new(on_add: impl Fn() + 'static) -> Box {
     b
 }
 
-fn validate(priority: &Entry, url: &Entry) -> bool {
+fn validate(host: &Entry) -> bool {
     fn highlight(entry: &Entry, error: Result<(), String>) {
         const E: &str = "error";
         match error {
@@ -207,44 +162,22 @@ fn validate(priority: &Entry, url: &Entry) -> bool {
         }
     }
 
-    fn validate_priority(value: &str) -> Result<(), String> {
-        if value.parse::<i32>().is_err() {
-            Err("Priority value is not valid integer".to_string())
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_url(value: &str) -> Result<(), String> {
-        match gtk::glib::Uri::parse(value, gtk::glib::UriFlags::NONE) {
-            Ok(uri) => {
-                if uri.scheme().is_empty() {
-                    Err("Scheme is empty".to_string())
-                } else if uri.host().is_none() {
-                    Err("Host is required".to_string())
-                } else if uri.port() == -1 {
-                    Err("Port is required".to_string())
-                } else if !uri.path().is_empty() {
-                    Err("URL should not contain the path part".to_string())
-                } else if uri.query().is_some() {
-                    Err("URL should not contain the query part".to_string())
-                } else if uri.fragment().is_some() {
-                    Err("URL should not contain the fragment (anchor) part".to_string())
+    fn validate_host(value: &str) -> Result<(), String> {
+        match gtk::gio::InetAddress::from_string(value) {
+            Some(address) => {
+                if address.to_string() != value {
+                    Err("Host could not be parsed properly".to_string())
                 } else {
                     Ok(())
                 }
             }
-            Err(e) => Err(e.to_string()),
+            None => Err("Valid host is required".to_string()),
         }
     }
 
-    let v = validate_priority(&priority.text());
-    let is_valid_priority = v.is_ok();
-    highlight(priority, v);
+    let v = validate_host(&host.text());
+    let is_valid_host = v.is_ok();
+    highlight(host, v);
 
-    let v = validate_url(&url.text());
-    let is_valid_url = v.is_ok();
-    highlight(url, v);
-
-    is_valid_priority && is_valid_url
+    is_valid_host
 }

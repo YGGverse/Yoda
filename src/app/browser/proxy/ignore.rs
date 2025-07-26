@@ -1,4 +1,4 @@
-mod rule;
+mod row;
 
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -8,18 +8,18 @@ use gtk::{
     glib::{GString, uuid_string_random},
     prelude::BoxExt,
 };
-use rule::Rule;
+use row::Row;
 
-pub struct Rules {
+pub struct Ignore {
     pub widget: Box,
-    rules: Rc<RefCell<HashMap<GString, Rule>>>,
+    rows: Rc<RefCell<HashMap<GString, Row>>>,
 }
 
-impl Rules {
+impl Ignore {
     pub fn build(profile: &Rc<Profile>) -> Self {
-        let config = profile.proxy.rule.all();
+        let config = profile.proxy.ignore.all();
 
-        let rules: Rc<RefCell<HashMap<GString, Rule>>> =
+        let rows: Rc<RefCell<HashMap<GString, Row>>> =
             Rc::new(RefCell::new(HashMap::with_capacity(config.len())));
 
         let form = Box::builder()
@@ -28,27 +28,25 @@ impl Rules {
             .build();
 
         {
-            let mut r = rules.borrow_mut();
+            let mut r = rows.borrow_mut();
 
             for proxy in config {
                 let key = uuid_string_random();
-                let rule = Rule::build(
+                let row = Row::build(
                     proxy.id,
                     Some(&proxy.time),
-                    Some(&proxy.request),
-                    Some(&proxy.url),
-                    Some(proxy.priority),
+                    Some(&proxy.host),
                     proxy.is_enabled,
                     {
-                        let rules = rules.clone();
-                        let key = key.clone();
                         let form = form.clone();
-                        move || form.remove(&rules.borrow_mut().remove(&key).unwrap().widget)
+                        let key = key.clone();
+                        let rows = rows.clone();
+                        move || form.remove(&rows.borrow_mut().remove(&key).unwrap().widget)
                     },
                 );
-                rule.validate();
-                form.append(&rule.widget);
-                assert!(r.insert(key, rule).is_none())
+                row.validate();
+                form.append(&row.widget);
+                assert!(r.insert(key, row).is_none())
             }
         }
 
@@ -58,19 +56,19 @@ impl Rules {
                 .spacing(8)
                 .build();
 
-            b.append(&rule::new({
-                let rules = rules.clone();
+            b.append(&row::new({
                 let form = form.clone();
+                let rows = rows.clone();
                 move || {
                     let key = uuid_string_random();
-                    let rule = Rule::build(None, None, None, None, None, false, {
-                        let rules = rules.clone();
+                    let row = Row::build(None, None, None, false, {
+                        let rows = rows.clone();
                         let key = key.clone();
                         let form = form.clone();
-                        move || form.remove(&rules.borrow_mut().remove(&key).unwrap().widget)
+                        move || form.remove(&rows.borrow_mut().remove(&key).unwrap().widget)
                     });
-                    form.append(&rule.widget);
-                    assert!(rules.borrow_mut().insert(key, rule).is_none())
+                    form.append(&row.widget);
+                    assert!(rows.borrow_mut().insert(key, row).is_none())
                 }
             }));
             b
@@ -84,10 +82,10 @@ impl Rules {
         widget.append(&form);
         widget.append(&add);
 
-        Self { rules, widget }
+        Self { rows, widget }
     }
 
-    pub fn take(&self) -> Vec<Rule> {
-        self.rules.take().into_values().collect()
+    pub fn take(&self) -> Vec<Row> {
+        self.rows.take().into_values().collect()
     }
 }

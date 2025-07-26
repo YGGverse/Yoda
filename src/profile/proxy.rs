@@ -27,7 +27,7 @@ impl Proxy {
 
     pub fn save(&self) -> Result<()> {
         self.rule.save()?;
-        //self.ignore.save()?;
+        self.ignore.save()?;
         Ok(())
     }
 
