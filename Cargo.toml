@@ -47,7 +47,7 @@ syntect = "5.2.0"
 # development
 [patch.crates-io]
 
-# @TODO pending for the official gtk-rs 0.10 dependencies update
+# @TODO pending for the official gtk-rs 0.10 dependencies update (issue #3)
 libspelling = { git = "https://github.com/YGGverse/libspelling-rs.git", branch = "yoda-0.12"}
 
 # ggemini = { git = "https://github.com/YGGverse/ggemini.git" }
