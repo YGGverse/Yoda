@@ -169,7 +169,9 @@ fn validate(host: &Entry) -> bool {
             0,
         ) {
             Ok(_) => Ok(()),
-            Err(e) => Err(format!("Valid hostname or IP address is required: `{e}`")),
+            Err(e) => Err(format!(
+                "Required valid hostname, *pattern or IP address: `{e}`"
+            )),
         }
     }
 
