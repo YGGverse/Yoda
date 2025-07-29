@@ -66,7 +66,7 @@ impl Row {
                 const RESPONSE_CANCEL: (&str, &str) = ("cancel", "Cancel");
 
                 let dialog = AlertDialog::builder()
-                    .heading("Delete this host?")
+                    .heading("Delete this exception?")
                     .close_response(RESPONSE_CANCEL.0)
                     .default_response(RESPONSE_CONFIRM.0)
                     .build();
