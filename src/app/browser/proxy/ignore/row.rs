@@ -31,7 +31,7 @@ impl Row {
 
         let host = Entry::builder()
             .hexpand(true)
-            .placeholder_text("Host")
+            .placeholder_text("Hostname, *pattern or IP address")
             .text(host.unwrap_or_default())
             .build();
 
