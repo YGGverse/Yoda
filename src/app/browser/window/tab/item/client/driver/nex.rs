@@ -4,7 +4,7 @@ use super::{Feature, Page};
 use crate::tool::{Format, uri_to_title};
 use gtk::gio::{MemoryInputStream, SocketConnection};
 use gtk::prelude::{
-    Cast, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
+    Cast, EditableExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
 };
 use gtk::{
     gdk::Texture,
@@ -59,7 +59,7 @@ impl Nex {
                 .request
                 .info
                 .replace(i.into_permanent_redirect());
-            self.page.navigation.request.set_text(&r);
+            self.page.navigation.request.entry.set_text(&r);
             self.page.item_action.load.activate(Some(&r), false, true);
             return; // prevents operation cancelled message on redirect
         }

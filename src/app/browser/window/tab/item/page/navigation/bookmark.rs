@@ -1,7 +1,7 @@
 use super::{Profile, Request, WindowAction};
 use gtk::{
     Button,
-    prelude::{ActionExt, ButtonExt, WidgetExt},
+    prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
 };
 use std::rc::Rc;
 
@@ -23,12 +23,11 @@ impl Bookmark {
                 action.bookmark.simple_action.name()
             ))
             .build();
-        update(profile, &button, &request.text());
-        request.on_change({
+        update(profile, &button, &request.entry.text());
+        request.entry.connect_changed({
             let b = button.clone();
             let p = profile.clone();
-            let r = request.clone();
-            move || update(&p, &b, &r.text())
+            move |e| update(&p, &b, &e.text())
         });
         Self {
             profile: profile.clone(),
@@ -40,7 +39,7 @@ impl Bookmark {
     pub fn toggle(&self, title: Option<&str>) {
         let button = self.button.clone();
         let profile = self.profile.clone();
-        let query = self.request.text();
+        let query = self.request.entry.text();
         let title = title.map(|t| t.to_string());
         button.set_sensitive(false); // lock
         let has_bookmark = profile.bookmark.toggle(&query, title.as_deref()).unwrap();

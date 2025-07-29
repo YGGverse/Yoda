@@ -8,7 +8,12 @@ use crate::Profile;
 use action::Action;
 use adw::{TabPage, TabView};
 use anyhow::Result;
-use gtk::{Box, Orientation, gio::Icon, glib::Propagation, prelude::ActionExt};
+use gtk::{
+    Box, Orientation,
+    gio::Icon,
+    glib::Propagation,
+    prelude::{ActionExt, EditableExt, EntryExt, WidgetExt},
+};
 pub use item::Item;
 use menu::Menu;
 use sourceview::prelude::IsA;
@@ -76,8 +81,10 @@ impl Tab {
                 if let Some(item) = index.borrow_mut().remove(tab_page) {
                     // keep removed `Item` reference in the memory (to reopen from the main menu)
                     // * skip item with blank request
-                    if !item.page.navigation.request.is_empty() {
-                        profile.history.close(&item.page.navigation.request.text());
+                    if !item.page.navigation.request.entry.text_length() > 0 {
+                        profile
+                            .history
+                            .close(&item.page.navigation.request.entry.text());
                     }
                 }
                 // reassign global actions to active tab
@@ -160,7 +167,7 @@ impl Tab {
         // Expect user input on tab appended has empty request entry
         // * this action initiated here because should be applied on tab appending event only
         if request.is_none() || request.is_some_and(|value| value.is_empty()) {
-            item.page.navigation.request.grab_focus();
+            item.page.navigation.request.entry.grab_focus();
         }
 
         // Relate with GTK `TabPage` with app `Item`
@@ -273,7 +280,7 @@ impl Tab {
     pub fn reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.client
-                .handle(&item.page.navigation.request.text(), true, false);
+                .handle(&item.page.navigation.request.entry.text(), true, false);
         }
     }
 

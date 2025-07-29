@@ -8,7 +8,7 @@ use super::{Action as ItemAction, Profile, TabAction, WindowAction};
 use adw::TabPage;
 use anyhow::Result;
 use content::Content;
-use gtk::prelude::WidgetExt;
+use gtk::prelude::{EditableExt, EntryExt, WidgetExt};
 use input::Input;
 use navigation::Navigation;
 use search::Search;
@@ -98,10 +98,10 @@ impl Page {
     pub fn snap_history(&self) {
         self.item_action
             .history
-            .add(self.navigation.request.text(), true);
+            .add(self.navigation.request.entry.text(), true);
         self.profile
             .history
-            .open(self.navigation.request.text(), Some(self.title()))
+            .open(self.navigation.request.entry.text(), Some(self.title()))
     }
 
     /// Cleanup session for `Self`
@@ -136,7 +136,7 @@ impl Page {
             // Make initial page history snap
             self.profile
                 .history
-                .open(self.navigation.request.text(), Some(self.title()));
+                .open(self.navigation.request.entry.text(), Some(self.title()));
         }
         Ok(())
     }
@@ -178,6 +178,7 @@ impl Page {
     pub fn set_progress(&self, progress_fraction: f64) {
         self.navigation
             .request
+            .entry
             .set_progress_fraction(progress_fraction);
         self.tab_page.set_loading(progress_fraction > 0.0)
     }

@@ -27,8 +27,7 @@ const PREFIX_DOWNLOAD: &str = "download:";
 const PREFIX_SOURCE: &str = "source:";
 
 pub struct Request {
-    /// * keep it private to properly update some local dependencies on change (e.g. proxy resolver)
-    entry: Entry,
+    pub entry: Entry,
     pub info: Rc<RefCell<Info>>,
     profile: Rc<Profile>,
     proxy_resolver: Rc<RefCell<Option<ProxyResolver>>>,
@@ -179,7 +178,7 @@ impl Request {
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
                     && this.selection_bounds().is_none()
                 {
-                    this.select_region(0, -1);
+                    this.select_region(0, -1)
                 }
                 // Update last focus state
                 has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
@@ -291,42 +290,12 @@ impl Request {
         self.entry.text().starts_with("file://")
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.entry.text_length() > 0
-    }
-
-    pub fn grab_focus(&self) -> bool {
-        self.entry.grab_focus()
-    }
-
-    pub fn set_progress_fraction(&self, value: f64) {
-        self.entry.set_progress_fraction(value);
-    }
-
-    pub fn set_text(&self, value: &str) {
-        self.entry.set_text(value);
-        self.refresh()
-    }
-
-    pub fn text(&self) -> GString {
-        self.entry.text()
-    }
-
     /// Get [ProxyResolver](https://docs.gtk.org/gio/iface.ProxyResolver.html)
     /// which is constructed for every `Request` entry change
     /// * useful on build new [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html)
     ///   to prevent double search / construct operations
     pub fn proxy_resolver(&self) -> Option<ProxyResolver> {
         self.proxy_resolver.borrow().clone()
-    }
-
-    pub fn append_to(&self, parent: &gtk::Box) {
-        use gtk::prelude::BoxExt;
-        parent.append(&self.entry)
-    }
-
-    pub fn on_change(&self, callback: impl Fn() + 'static) {
-        self.entry.connect_changed(move |_| callback());
     }
 
     // Tools

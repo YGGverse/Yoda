@@ -53,7 +53,7 @@ impl Navigation {
         g_box.append(&home);
         g_box.append(&history);
         g_box.append(&reload);
-        request.append_to(&g_box); // private member
+        g_box.append(&request.entry);
         g_box.append(&bookmark.button);
 
         Self {

@@ -4,6 +4,7 @@ use ggemini::{
     client::{Client, Request, Response},
     gio::{file_output_stream, memory_input_stream},
 };
+use gtk::prelude::EditableExt;
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
@@ -569,7 +570,7 @@ fn handle(
                                 } else {
                                     let t = target.to_string();
                                     if matches!(redirect, Redirect::Permanent { .. }) {
-                                        page.navigation.request.set_text(&t);
+                                        page.navigation.request.entry.set_text(&t);
                                     }
                                     redirects.replace(total);
                                     {
