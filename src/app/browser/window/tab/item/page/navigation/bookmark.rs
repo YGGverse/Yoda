@@ -23,11 +23,11 @@ impl Bookmark {
                 action.bookmark.simple_action.name()
             ))
             .build();
-        update(profile, &button, &request.entry.text());
+        update(profile, &button, request.entry.text());
         request.entry.connect_changed({
             let b = button.clone();
             let p = profile.clone();
-            move |e| update(&p, &b, &e.text())
+            move |e| update(&p, &b, e.text())
         });
         Self {
             profile: profile.clone(),
@@ -37,15 +37,17 @@ impl Bookmark {
     }
 
     pub fn toggle(&self, title: Option<&str>) {
-        let button = self.button.clone();
-        let profile = self.profile.clone();
-        let query = self.request.entry.text();
-        let title = title.map(|t| t.to_string());
-        button.set_sensitive(false); // lock
-        let has_bookmark = profile.bookmark.toggle(&query, title.as_deref()).unwrap();
-        button.set_icon_name(icon_name(has_bookmark));
-        button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
-        button.set_sensitive(true);
+        let t = title.map(|t| t.to_string());
+        let p = self.profile.clone();
+        let b = self.button.clone();
+        let e = self.request.entry.clone();
+        gtk::glib::spawn_future_local(async move {
+            b.set_sensitive(false); // lock
+            let has_bookmark = p.bookmark.toggle(&e.text(), t.as_deref()).unwrap();
+            b.set_icon_name(icon_name(has_bookmark));
+            b.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+            b.set_sensitive(true)
+        }); // may take a while
     }
 }
 
@@ -65,10 +67,14 @@ fn icon_name(has_bookmark: bool) -> &'static str {
     }
 }
 
-fn update(profile: &Profile, button: &Button, request: &str) {
-    button.set_sensitive(false); // lock
-    let has_bookmark = profile.bookmark.is_match_request(request);
-    button.set_icon_name(icon_name(has_bookmark));
-    button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
-    button.set_sensitive(true);
+fn update(profile: &Rc<Profile>, button: &Button, request: gtk::glib::GString) {
+    let p = profile.clone();
+    let b = button.clone();
+    gtk::glib::spawn_future_local(async move {
+        b.set_sensitive(false); // lock
+        let has_bookmark = p.bookmark.is_match_request(&request);
+        b.set_icon_name(icon_name(has_bookmark));
+        b.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+        b.set_sensitive(true);
+    }); // may take a while
 }
