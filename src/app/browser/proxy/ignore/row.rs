@@ -138,7 +138,7 @@ pub fn new(on_add: impl Fn() + 'static) -> Box {
             .css_classes(["success"])
             .hexpand(true)
             .icon_name("list-add-symbolic")
-            .tooltip_text("Add hostname or IP exception")
+            .tooltip_text("Add hostname or IP address exception")
             .build();
 
         add.connect_clicked(move |_| on_add());
@@ -167,12 +167,12 @@ fn validate(host: &Entry) -> bool {
             Ok(address) => {
                 use gtk::prelude::NetworkAddressExt;
                 if address.hostname() != value {
-                    Err("Hostname or IP could not be parsed properly".to_string())
+                    Err("Hostname or IP address could not be parsed properly".to_string())
                 } else {
                     Ok(())
                 }
             }
-            Err(e) => Err(format!("Valid hostname or IP is required: `{e}`")),
+            Err(e) => Err(format!("Valid hostname or IP address is required: `{e}`")),
         }
     }
 
