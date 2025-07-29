@@ -14,6 +14,7 @@ pub struct Ignore {
     memory: RefCell<Vec<Memory>>,
 }
 
+/// https://docs.gtk.org/gio/property.SimpleProxyResolver.ignore-hosts.html
 impl Ignore {
     // Constructors
 
