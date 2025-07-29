@@ -163,15 +163,12 @@ fn validate(host: &Entry) -> bool {
     }
 
     fn validate_host(value: &str) -> Result<(), String> {
-        match gtk::gio::NetworkAddress::parse(value, 0) {
-            Ok(address) => {
-                use gtk::prelude::NetworkAddressExt;
-                if address.hostname() != value {
-                    Err("Hostname or IP address could not be parsed properly".to_string())
-                } else {
-                    Ok(())
-                }
-            }
+        // https://docs.gtk.org/gio/property.SimpleProxyResolver.ignore-hosts.html
+        match gtk::gio::NetworkAddress::parse(
+            value.trim_start_matches('.').trim_start_matches('*'),
+            0,
+        ) {
+            Ok(_) => Ok(()),
             Err(e) => Err(format!("Valid hostname or IP address is required: `{e}`")),
         }
     }
