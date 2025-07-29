@@ -76,8 +76,8 @@ impl Tab {
                 if let Some(item) = index.borrow_mut().remove(tab_page) {
                     // keep removed `Item` reference in the memory (to reopen from the main menu)
                     // * skip item with blank request
-                    if !item.page.navigation.request().is_empty() {
-                        profile.history.close(&item.page.navigation.request());
+                    if !item.page.navigation.request.is_empty() {
+                        profile.history.close(&item.page.navigation.request.text());
                     }
                 }
                 // reassign global actions to active tab
@@ -160,7 +160,7 @@ impl Tab {
         // Expect user input on tab appended has empty request entry
         // * this action initiated here because should be applied on tab appending event only
         if request.is_none() || request.is_some_and(|value| value.is_empty()) {
-            item.page.navigation.grab_focus();
+            item.page.navigation.request.grab_focus();
         }
 
         // Relate with GTK `TabPage` with app `Item`
@@ -221,7 +221,7 @@ impl Tab {
     // Save page at given `position`, `None` to save selected page (if available)
     pub fn save_as(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.to_download();
+            item.page.navigation.request.to_download();
             self.window_action.reload.activate();
         }
     }
@@ -229,7 +229,7 @@ impl Tab {
     // View source for page at given `position`, `None` to use selected page (if available)
     pub fn source(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
-            item.page.navigation.to_source();
+            item.page.navigation.request.to_source();
             self.window_action.reload.activate();
         }
     }
@@ -273,7 +273,7 @@ impl Tab {
     pub fn reload(&self, page_position: Option<i32>) {
         if let Some(item) = self.item(page_position) {
             item.client
-                .handle(&item.page.navigation.request(), true, false);
+                .handle(&item.page.navigation.request.text(), true, false);
         }
     }
 
@@ -414,7 +414,7 @@ fn update_actions(
             window_action
                 .save_as
                 .simple_action
-                .set_enabled(!item.page.navigation.is_file());
+                .set_enabled(!item.page.navigation.request.is_file());
 
             window_action.change_state(Some(tab_view.page_position(tab_page)));
             return;

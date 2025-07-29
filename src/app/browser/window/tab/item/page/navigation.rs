@@ -8,11 +8,7 @@ mod request;
 use super::{ItemAction, Profile, TabAction, WindowAction};
 use anyhow::Result;
 use bookmark::Bookmark;
-use gtk::{
-    Box, Button, Orientation,
-    glib::{GString, Uri},
-    prelude::{BoxExt, EditableExt, EntryExt, WidgetExt},
-};
+use gtk::{Box, Button, Orientation, prelude::BoxExt};
 use history::History;
 use home::Home;
 use reload::Reload;
@@ -43,7 +39,7 @@ impl Navigation {
         let request = Rc::new(Request::build(item_action, profile));
         let reload = Button::reload((window_action, tab_action, item_action), &request);
         let home = Button::home((window_action, tab_action, item_action), &request);
-        let bookmark = Rc::new(Bookmark::build(window_action, profile, &request.entry));
+        let bookmark = Rc::new(Bookmark::build(window_action, profile, &request));
 
         // Init main widget
         let g_box = Box::builder()
@@ -57,7 +53,7 @@ impl Navigation {
         g_box.append(&home);
         g_box.append(&history);
         g_box.append(&reload);
-        g_box.append(&request.entry);
+        request.append_to(&g_box); // private member
         g_box.append(&bookmark.button);
 
         Self {
@@ -114,44 +110,8 @@ impl Navigation {
         Ok(())
     }
 
-    pub fn grab_focus(&self) -> bool {
-        self.request.entry.grab_focus()
-    }
-
     pub fn show_identity_dialog(&self) {
         self.request.show_identity_dialog()
-    }
-
-    // Setters
-
-    pub fn set_request(&self, value: &str) {
-        self.request.entry.set_text(value);
-    }
-
-    pub fn set_progress_fraction(&self, value: f64) {
-        self.request.entry.set_progress_fraction(value);
-    }
-
-    pub fn to_download(&self) {
-        self.request.to_download();
-    }
-
-    pub fn to_source(&self) {
-        self.request.to_source();
-    }
-
-    // Getters
-
-    pub fn request(&self) -> GString {
-        self.request.entry.text()
-    }
-
-    pub fn home(&self) -> Option<Uri> {
-        self.request.home()
-    }
-
-    pub fn is_file(&self) -> bool {
-        self.request.is_file()
     }
 }
 

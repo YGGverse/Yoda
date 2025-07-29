@@ -83,9 +83,9 @@ impl Item {
             let page = page.clone();
             move |this, _| {
                 this.set_enabled(false);
-                if let Some(uri) = page.navigation.home() {
+                if let Some(uri) = page.navigation.request.home() {
                     let request = uri.to_string();
-                    page.navigation.set_request(&request);
+                    page.navigation.request.set_text(&request);
                     client.handle(&request, true, false);
                 }
             }
@@ -96,7 +96,7 @@ impl Item {
             let client = client.clone();
             move |request, is_snap_history, is_redirect| {
                 if let Some(request) = request {
-                    page.navigation.set_request(&request);
+                    page.navigation.request.set_text(&request);
                     client.handle(&request, is_snap_history, is_redirect);
                 }
             }
@@ -110,7 +110,7 @@ impl Item {
         action.reload.connect_activate({
             let page = page.clone();
             let client = client.clone();
-            move |_, _| client.handle(&page.navigation.request(), true, false)
+            move |_, _| client.handle(&page.navigation.request.text(), true, false)
         });
 
         action.reload.connect_enabled_notify({
@@ -145,7 +145,7 @@ impl Item {
 
         // Handle immediately on request
         if let Some(request) = request {
-            page.navigation.set_request(request);
+            page.navigation.request.set_text(request);
             if is_load {
                 client.handle(request, true, false)
             }

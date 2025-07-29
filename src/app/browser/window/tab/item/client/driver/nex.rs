@@ -59,7 +59,7 @@ impl Nex {
                 .request
                 .info
                 .replace(i.into_permanent_redirect());
-            self.page.navigation.set_request(&r);
+            self.page.navigation.request.set_text(&r);
             self.page.item_action.load.activate(Some(&r), false, true);
             return; // prevents operation cancelled message on redirect
         }

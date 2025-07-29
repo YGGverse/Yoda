@@ -1,7 +1,7 @@
-use super::{Profile, WindowAction};
+use super::{Profile, Request, WindowAction};
 use gtk::{
-    Button, Entry,
-    prelude::{ActionExt, ButtonExt, EditableExt, WidgetExt},
+    Button,
+    prelude::{ActionExt, ButtonExt, WidgetExt},
 };
 use std::rc::Rc;
 
@@ -10,12 +10,12 @@ const TOOLTIP_TEXT: (&str, &str) = ("Add Bookmark", "Remove Bookmark");
 
 pub struct Bookmark {
     profile: Rc<Profile>,
-    request: Entry,
+    request: Rc<Request>,
     pub button: Button,
 }
 
 impl Bookmark {
-    pub fn build(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Entry) -> Self {
+    pub fn build(action: &Rc<WindowAction>, profile: &Rc<Profile>, request: &Rc<Request>) -> Self {
         let button = Button::builder()
             .action_name(format!(
                 "{}.{}",
@@ -23,11 +23,12 @@ impl Bookmark {
                 action.bookmark.simple_action.name()
             ))
             .build();
-        update(profile, &button, request.text());
-        request.connect_changed({
-            let profile = profile.clone();
-            let button = button.clone();
-            move |entry| update(&profile, &button, entry.text())
+        update(profile, &button, &request.text());
+        request.on_change({
+            let b = button.clone();
+            let p = profile.clone();
+            let r = request.clone();
+            move || update(&p, &b, &r.text())
         });
         Self {
             profile: profile.clone(),
@@ -65,14 +66,10 @@ fn icon_name(has_bookmark: bool) -> &'static str {
     }
 }
 
-fn update(profile: &Rc<Profile>, button: &Button, request: gtk::glib::GString) {
-    let profile = profile.clone();
-    let button = button.clone();
-    gtk::glib::spawn_future_local(async move {
-        button.set_sensitive(false); // lock
-        let has_bookmark = profile.bookmark.is_match_request(&request);
-        button.set_icon_name(icon_name(has_bookmark));
-        button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
-        button.set_sensitive(true);
-    }); // may take a while
+fn update(profile: &Profile, button: &Button, request: &str) {
+    button.set_sensitive(false); // lock
+    let has_bookmark = profile.bookmark.is_match_request(request);
+    button.set_icon_name(icon_name(has_bookmark));
+    button.set_tooltip_text(Some(tooltip_text(has_bookmark)));
+    button.set_sensitive(true);
 }

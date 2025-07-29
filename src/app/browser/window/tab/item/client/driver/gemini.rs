@@ -569,7 +569,7 @@ fn handle(
                                 } else {
                                     let t = target.to_string();
                                     if matches!(redirect, Redirect::Permanent { .. }) {
-                                        page.navigation.set_request(&t);
+                                        page.navigation.request.set_text(&t);
                                     }
                                     redirects.replace(total);
                                     {

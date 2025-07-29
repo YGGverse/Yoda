@@ -27,7 +27,8 @@ const PREFIX_DOWNLOAD: &str = "download:";
 const PREFIX_SOURCE: &str = "source:";
 
 pub struct Request {
-    pub entry: Entry,
+    /// * keep it private to properly update some local dependencies on change (e.g. proxy resolver)
+    entry: Entry,
     pub info: Rc<RefCell<Info>>,
     profile: Rc<Profile>,
     proxy_resolver: Rc<RefCell<Option<ProxyResolver>>>,
@@ -290,12 +291,42 @@ impl Request {
         self.entry.text().starts_with("file://")
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.entry.text_length() > 0
+    }
+
+    pub fn grab_focus(&self) -> bool {
+        self.entry.grab_focus()
+    }
+
+    pub fn set_progress_fraction(&self, value: f64) {
+        self.entry.set_progress_fraction(value);
+    }
+
+    pub fn set_text(&self, value: &str) {
+        self.entry.set_text(value);
+        self.refresh()
+    }
+
+    pub fn text(&self) -> GString {
+        self.entry.text()
+    }
+
     /// Get [ProxyResolver](https://docs.gtk.org/gio/iface.ProxyResolver.html)
     /// which is constructed for every `Request` entry change
     /// * useful on build new [SocketClient](https://docs.gtk.org/gio/class.SocketClient.html)
     ///   to prevent double search / construct operations
     pub fn proxy_resolver(&self) -> Option<ProxyResolver> {
         self.proxy_resolver.borrow().clone()
+    }
+
+    pub fn append_to(&self, parent: &gtk::Box) {
+        use gtk::prelude::BoxExt;
+        parent.append(&self.entry)
+    }
+
+    pub fn on_change(&self, callback: impl Fn() + 'static) {
+        self.entry.connect_changed(move |_| callback());
     }
 
     // Tools
@@ -474,34 +505,30 @@ fn update_blocked(
 }
 
 /// Indicate proxy connections @TODO cancel previous operation on update
+/// * note: it's important to use sync lookup method by the current impl
 fn refresh_proxy_resolver(
     entry: &Entry,
-    profile: &Rc<Profile>,
-    resolver: &Rc<RefCell<Option<ProxyResolver>>>,
+    profile: &Profile,
+    resolver: &RefCell<Option<ProxyResolver>>,
 ) {
     const NONE: &[&str] = &[];
 
     let t = entry.text(); // allocate once
 
     match profile.proxy.matches(&t) {
-        Some(m) => m.clone().lookup_async(&t, Cancellable::NONE, {
-            let e = entry.clone();
-            let p = profile.clone();
-            let r = resolver.clone();
-            move |l| {
-                let (css_classes, tooltip_text) = match l {
-                    Ok(h) => (&["accent"], format!("Proxy over {}", h.join(","))),
-                    Err(i) => (&["error"], i.to_string()),
-                };
-                e.set_css_classes(if p.proxy.misc.is_highlight_request_entry() {
-                    css_classes
-                } else {
-                    NONE
-                });
-                e.set_tooltip_text(Some(&tooltip_text));
-                r.replace(Some(m));
-            }
-        }),
+        Some(m) => {
+            let (css_classes, tooltip_text) = match m.lookup(&t, Cancellable::NONE) {
+                Ok(h) => (&["accent"], format!("Proxy over {}", h.join(","))),
+                Err(i) => (&["error"], i.to_string()),
+            };
+            entry.set_css_classes(if profile.proxy.misc.is_highlight_request_entry() {
+                css_classes
+            } else {
+                NONE
+            });
+            entry.set_tooltip_text(Some(&tooltip_text));
+            resolver.replace(Some(m));
+        }
         None => {
             entry.set_css_classes(NONE);
             entry.set_tooltip_text(None);
