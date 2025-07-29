@@ -119,7 +119,7 @@ impl Browser {
                         w.tab
                             .items()
                             .into_iter()
-                            .for_each(|i| i.page.navigation.request.refresh())
+                            .for_each(|i| i.page.navigation.request.refresh_proxy_resolver())
                     }
                 })
                 .present(Some(&w.g_box))

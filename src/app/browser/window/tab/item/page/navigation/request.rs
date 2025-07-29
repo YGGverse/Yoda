@@ -254,7 +254,7 @@ impl Request {
         Ok(())
     }
 
-    pub fn refresh(&self) {
+    pub fn refresh_proxy_resolver(&self) {
         refresh_proxy_resolver(&self.entry, &self.profile, &self.proxy_resolver)
     }
 
