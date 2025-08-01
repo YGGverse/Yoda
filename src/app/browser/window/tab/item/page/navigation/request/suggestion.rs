@@ -33,7 +33,11 @@ impl Suggestion {
     // Constructors
 
     /// Create new `Self`
-    pub fn build(profile: &Rc<Profile>, entry: &Entry) -> Self {
+    pub fn build(
+        entry: &Entry,
+        profile: &Rc<Profile>,
+        resolver: &Rc<RefCell<Option<gtk::gio::ProxyResolver>>>,
+    ) -> Self {
         let signal_handler_id = Rc::new(RefCell::new(None));
         let list_store = ListStore::new::<Item>();
         let single_selection = {
@@ -44,6 +48,7 @@ impl Suggestion {
             ss.connect_selected_notify({
                 let e = entry.clone();
                 let p = profile.clone();
+                let r = resolver.clone();
                 let signal_handler_id = signal_handler_id.clone();
                 move |this| {
                     if let Some(selected_item) = this.selected_item() {
@@ -53,6 +58,7 @@ impl Suggestion {
                                 &e,
                                 signal_handler_id,
                                 &selected_item.downcast_ref::<Item>().unwrap().request(),
+                                &r,
                             );
                         }
                     } // @TODO find signal to handle selected item only

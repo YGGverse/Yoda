@@ -51,7 +51,7 @@ impl Request {
 
         update_primary_icon(&entry, profile);
 
-        let suggestion = Rc::new(Suggestion::build(profile, &entry));
+        let suggestion = Rc::new(Suggestion::build(&entry, profile, &proxy_resolver));
 
         entry.add_controller({
             use gtk::{
@@ -464,12 +464,14 @@ fn update_blocked(
     entry: &Entry,
     signal_handler_id: &gtk::glib::SignalHandlerId,
     text: &str,
+    resolver: &RefCell<Option<ProxyResolver>>,
 ) {
     use gtk::prelude::ObjectExt;
     entry.block_signal(signal_handler_id);
     entry.set_text(text);
     entry.select_region(0, -1);
     update_primary_icon(entry, profile);
+    refresh_proxy_resolver(entry, profile, resolver);
     entry.unblock_signal(signal_handler_id);
 }
 
