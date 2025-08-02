@@ -34,10 +34,10 @@ impl Row {
             .build();
 
         let request = Entry::builder()
-            .max_width_chars(12)
+            .hexpand(true)
             .placeholder_text("Request")
-            .tooltip_text("Supports regex expressions")
             .text(request.unwrap_or(".*"))
+            .tooltip_text("Supports regex expressions")
             .build();
 
         let url = Entry::builder()
