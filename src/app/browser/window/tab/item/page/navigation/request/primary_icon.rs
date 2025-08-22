@@ -29,7 +29,7 @@ pub enum PrimaryIcon<'a> {
     },
 }
 
-pub fn from(request: &str) -> PrimaryIcon {
+pub fn from(request: &str) -> PrimaryIcon<'_> {
     let prefix = request.to_lowercase();
 
     if prefix.starts_with("download:") {

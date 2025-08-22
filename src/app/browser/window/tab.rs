@@ -400,33 +400,34 @@ fn update_actions(
     index: &Rc<RefCell<HashMap<TabPage, Rc<Item>>>>,
     window_action: &Rc<WindowAction>,
 ) {
-    if let Some(tab_page) = tab_page {
-        if let Some(item) = index.borrow().get(tab_page) {
-            window_action
-                .home
-                .simple_action
-                .set_enabled(item.action.home.is_enabled());
-            window_action
-                .reload
-                .simple_action
-                .set_enabled(item.action.reload.is_enabled());
-            window_action
-                .history_back
-                .simple_action
-                .set_enabled(item.action.history.back.is_enabled());
-            window_action
-                .history_forward
-                .simple_action
-                .set_enabled(item.action.history.forward.is_enabled());
-            window_action
-                .save_as
-                .simple_action
-                .set_enabled(!item.page.navigation.request.is_file());
+    if let Some(tab_page) = tab_page
+        && let Some(item) = index.borrow().get(tab_page)
+    {
+        window_action
+            .home
+            .simple_action
+            .set_enabled(item.action.home.is_enabled());
+        window_action
+            .reload
+            .simple_action
+            .set_enabled(item.action.reload.is_enabled());
+        window_action
+            .history_back
+            .simple_action
+            .set_enabled(item.action.history.back.is_enabled());
+        window_action
+            .history_forward
+            .simple_action
+            .set_enabled(item.action.history.forward.is_enabled());
+        window_action
+            .save_as
+            .simple_action
+            .set_enabled(!item.page.navigation.request.is_file());
 
-            window_action.change_state(Some(tab_view.page_position(tab_page)));
-            return;
-        } // @TODO `connect_selected_page_notify` panics on unwrap
-    }
+        window_action.change_state(Some(tab_view.page_position(tab_page)));
+        return;
+    } // @TODO `connect_selected_page_notify` panics on unwrap
+
     // Reset to defaults
     window_action.home.simple_action.set_enabled(false);
     window_action.reload.simple_action.set_enabled(false);

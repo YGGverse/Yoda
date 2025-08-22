@@ -148,11 +148,11 @@ impl Dialog for PreferencesDialog {
                         if let Some(iso_code) = c.iso_code {
                             b.push(iso_code)
                         }
-                        if let Some(n) = c.names {
-                            if let Some(s) = n.get("en") {
-                                b.push(s)
-                            } // @TODO multi-lang
-                        }
+                        if let Some(n) = c.names
+                            && let Some(s) = n.get("en")
+                        {
+                            b.push(s)
+                        } // @TODO multi-lang
                         // @TODO city DB
                         b.join(", ")
                     })

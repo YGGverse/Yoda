@@ -386,24 +386,24 @@ fn is_focused(entry: &Entry) -> bool {
 fn show_identity_dialog(entry: &Entry, profile: &Rc<Profile>) {
     // connect identity traits
     use identity::{Common, Unsupported};
-    if let Some(uri) = uri(entry) {
-        if ["gemini", "titan"].contains(&uri.scheme().as_str()) {
-            return AlertDialog::common(
-                profile,
-                &uri,
-                &Rc::new({
-                    let p = profile.clone();
-                    let e = entry.clone();
-                    move |is_reload| {
-                        update_primary_icon(&e, &p);
-                        if is_reload {
-                            e.emit_activate();
-                        }
+    if let Some(uri) = uri(entry)
+        && ["gemini", "titan"].contains(&uri.scheme().as_str())
+    {
+        return AlertDialog::common(
+            profile,
+            &uri,
+            &Rc::new({
+                let p = profile.clone();
+                let e = entry.clone();
+                move |is_reload| {
+                    update_primary_icon(&e, &p);
+                    if is_reload {
+                        e.emit_activate();
                     }
-                }),
-            )
-            .present(Some(entry));
-        }
+                }
+            }),
+        )
+        .present(Some(entry));
     }
     AlertDialog::unsupported().present(Some(entry));
 }

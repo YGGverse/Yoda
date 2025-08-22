@@ -69,45 +69,41 @@ impl Nex for TextView {
             //   it may be confusing: gemini://bbs.geminispace.org/s/nex/29641
             if base.to_string().ends_with("/") {
                 // just borrow ggemtext parser as compatible API
-                if let Some(link) = ggemtext::line::Link::parse(line) {
-                    if let Some(uri) = link.uri(Some(base)) {
-                        let a = TextTag::builder()
-                            .foreground_rgba(&link_color.0)
-                            // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
-                            .sentence(true)
-                            .wrap_mode(WrapMode::Word)
-                            .build();
+                if let Some(link) = ggemtext::line::Link::parse(line)
+                    && let Some(uri) = link.uri(Some(base))
+                {
+                    let a = TextTag::builder()
+                        .foreground_rgba(&link_color.0)
+                        // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
+                        .sentence(true)
+                        .wrap_mode(WrapMode::Word)
+                        .build();
 
-                        if !tags.add(&a) {
-                            panic!()
-                        }
-
-                        buffer.insert_with_tags(
-                            &mut buffer.end_iter(),
-                            &format!(
-                                "{} {}",
-                                if uri.scheme() == base.scheme() {
-                                    "=>"
-                                } else {
-                                    "<="
-                                },
-                                link.url
-                            ),
-                            &[&a],
-                        );
-                        if let Some(alt) = link.alt {
-                            buffer.insert_with_tags(
-                                &mut buffer.end_iter(),
-                                &format!(" {alt}"),
-                                &[&p],
-                            );
-                        }
-                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                        links.insert(a, uri);
-
-                        continue;
+                    if !tags.add(&a) {
+                        panic!()
                     }
+
+                    buffer.insert_with_tags(
+                        &mut buffer.end_iter(),
+                        &format!(
+                            "{} {}",
+                            if uri.scheme() == base.scheme() {
+                                "=>"
+                            } else {
+                                "<="
+                            },
+                            link.url
+                        ),
+                        &[&a],
+                    );
+                    if let Some(alt) = link.alt {
+                        buffer.insert_with_tags(&mut buffer.end_iter(), &format!(" {alt}"), &[&p]);
+                    }
+                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+
+                    links.insert(a, uri);
+
+                    continue;
                 }
             }
             // Nothing match custom tags above,

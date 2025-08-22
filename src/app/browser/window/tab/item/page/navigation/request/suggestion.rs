@@ -51,16 +51,16 @@ impl Suggestion {
                 let r = resolver.clone();
                 let signal_handler_id = signal_handler_id.clone();
                 move |this| {
-                    if let Some(selected_item) = this.selected_item() {
-                        if let Some(signal_handler_id) = signal_handler_id.borrow().as_ref() {
-                            super::update_blocked(
-                                &p,
-                                &e,
-                                signal_handler_id,
-                                &selected_item.downcast_ref::<Item>().unwrap().request(),
-                                &r,
-                            );
-                        }
+                    if let Some(selected_item) = this.selected_item()
+                        && let Some(signal_handler_id) = signal_handler_id.borrow().as_ref()
+                    {
+                        super::update_blocked(
+                            &p,
+                            &e,
+                            signal_handler_id,
+                            &selected_item.downcast_ref::<Item>().unwrap().request(),
+                            &r,
+                        );
                     } // @TODO find signal to handle selected item only
                 }
             });

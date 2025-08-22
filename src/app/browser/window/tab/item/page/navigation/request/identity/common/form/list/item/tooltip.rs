@@ -11,18 +11,18 @@ pub fn new_for_profile_identity_id(certificate: &TlsCertificate, scope: &[String
         tooltip.push_str(&format!("\n<small><b>issuer</b>\n{issuer_name}</small>"));
     }
 
-    if let Some(not_valid_before) = certificate.not_valid_before() {
-        if let Ok(timestamp) = not_valid_before.format_iso8601() {
-            tooltip.push_str(&format!("\n<small><b>valid after</b>\n{timestamp}</small>"));
-        }
+    if let Some(not_valid_before) = certificate.not_valid_before()
+        && let Ok(timestamp) = not_valid_before.format_iso8601()
+    {
+        tooltip.push_str(&format!("\n<small><b>valid after</b>\n{timestamp}</small>"));
     }
 
-    if let Some(not_valid_after) = certificate.not_valid_after() {
-        if let Ok(timestamp) = not_valid_after.format_iso8601() {
-            tooltip.push_str(&format!(
-                "\n<small><b>valid before</b>\n{timestamp}</small>"
-            ));
-        }
+    if let Some(not_valid_after) = certificate.not_valid_after()
+        && let Ok(timestamp) = not_valid_after.format_iso8601()
+    {
+        tooltip.push_str(&format!(
+            "\n<small><b>valid before</b>\n{timestamp}</small>"
+        ));
     }
 
     if !scope.is_empty() {
