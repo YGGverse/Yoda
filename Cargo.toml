@@ -35,7 +35,7 @@ ggemini = "0.19.0"
 ggemtext = "0.7.0"
 indexmap = "2.10.0"
 itertools = "0.14.0"
-libspelling = "0.4.0"
+libspelling = "0.4.1"
 maxminddb = "0.26.0"
 openssl = "0.10.72"
 plurify = "0.2.0"
@@ -44,11 +44,8 @@ r2d2_sqlite = "0.31.0"
 syntect = "5.2.0"
 
 # development
-[patch.crates-io]
-
-# @TODO pending for the official gtk-rs 0.10 dependencies update (issue #3)
-libspelling = { git = "https://github.com/YGGverse/libspelling-rs.git", branch = "yoda-0.12"}
-
+# [patch.crates-io]
 # ggemini = { git = "https://github.com/YGGverse/ggemini.git" }
 # ggemtext = { git = "https://github.com/YGGverse/ggemtext.git" }
 # plurify = { git = "https://github.com/YGGverse/plurify.git" }
+# libspelling = { git = "https://github.com/YGGverse/libspelling-rs.git", branch = "yoda-0.12"}
