@@ -1,2 +1,5 @@
+*flatpak*
+build
 Cargo.lock
+repo
 target

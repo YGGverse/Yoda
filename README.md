@@ -198,9 +198,22 @@ cargo install Yoda
 ``` bash
 git clone https://github.com/YGGverse/Yoda.git
 cd Yoda
-cargo build
+cargo build --release
 ```
-* `cargo run`
+* run `target/release/Yoda`
+
+#### Flatpak
+
+``` bash
+git clone https://github.com/YGGverse/Yoda.git
+cd Yoda
+flatpak-builder --force-clean build\
+                --install-deps-from=flathub\
+                --install --repo=repo --user\
+                io.github.yggverse.Yoda.yaml
+```
+* launch: `flatpak run io.github.yggverse.Yoda`
+* bundle: `flatpak build-bundle repo Yoda.flatpak io.github.yggverse.Yoda`
 
 ## Development
 

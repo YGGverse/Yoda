@@ -1,0 +1,49 @@
+id: "io.github.yggverse.Yoda"
+runtime: "org.gnome.Platform"
+runtime-version: "48"
+sdk: "org.gnome.Sdk"
+
+sdk-extensions:
+  - "org.freedesktop.Sdk.Extension.rust-stable"
+
+command: "Yoda"
+
+finish-args:
+  - "--device=dri"
+  - "--share=ipc"
+  - "--share=network"
+  - "--socket=fallback-x11"
+# - "--socket=pulseaudio"
+  - "--socket=wayland"
+
+build-options:
+  append-path: "/usr/lib/sdk/rust-stable/bin"
+  build-args:
+    - "--share=network"
+  env:
+    CARGO_HOME: "/run/build/Yoda/cargo"
+
+modules:
+  - name: "libspelling"
+    buildsystem: "meson"
+    config-opts:
+      - "--prefix=/app"
+    cleanup:
+      - "/include"
+      - "/lib/pkgconfig"
+    sources:
+      - type: "archive"
+        url: "https://gitlab.gnome.org/GNOME/libspelling/-/archive/0.4.9/libspelling-0.4.9.tar.gz"
+        sha256: "7fa6185d9fc621b890ef01b2bb7943951dc2ad94d31cbf6e16bc468589571e17"
+
+  - name: "Yoda"
+    buildsystem: "simple"
+    build-commands:
+      - "cargo build --release"
+    post-install:
+      - "install -Dm755 ./target/release/Yoda -t /app/bin"
+      - "install -Dm644 ./data/${FLATPAK_ID}.desktop -t /app/share/applications"
+#     - "install -Dm644 ./data/${FLATPAK_ID}.svg -t /app/share/icons/hicolor/symbolic/apps"
+    sources:
+      - type: "dir"
+        path: "."
