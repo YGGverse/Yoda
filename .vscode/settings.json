@@ -1,0 +1,7 @@
+{
+    "files.watcherExclude": {
+        "**/.flatpak-builder/**": true,
+        "**/build/**": true,
+        "**/repo/**": true
+    }
+}
