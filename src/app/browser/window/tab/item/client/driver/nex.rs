@@ -2,15 +2,18 @@
 
 use super::{Feature, Page};
 use crate::tool::{Format, uri_to_title};
-use gtk::gio::{MemoryInputStream, SocketConnection};
-use gtk::prelude::{
-    Cast, EditableExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual, SocketClientExt,
-};
 use gtk::{
     gdk::Texture,
     gdk_pixbuf::Pixbuf,
-    gio::{Cancellable, IOStream, SocketClient, SocketClientEvent, SocketProtocol},
+    gio::{
+        Cancellable, IOStream, MemoryInputStream, SocketClient, SocketClientEvent,
+        SocketConnection, SocketProtocol,
+    },
     glib::{Priority, Uri},
+    prelude::{
+        Cast, EditableExt, IOStreamExt, InputStreamExtManual, OutputStreamExtManual,
+        SocketClientExt,
+    },
 };
 use sourceview::prelude::FileExt;
 use std::{
@@ -43,11 +46,19 @@ impl Nex {
                 .set_request(Some(uri.to_string()));
         }
 
-        // copy once
-        let path = uri.path();
+        let request = format!(
+            "{}{}{}",
+            uri.path(),
+            // @TODO
+            // unspecified request part implementation:
+            // gemini://bbs.geminispace.org/s/nex/32478
+            uri.query().map(|q| format!("?{q}")).unwrap_or_default(),
+            uri.fragment().map(|f| format!("#{f}")).unwrap_or_default()
+        );
+
         let url = uri.to_string();
 
-        if path.is_empty() {
+        if request.is_empty() {
             // auto-append trailing slash to the root locations
             let mut r = uri.to_string();
             r.push('/');
@@ -135,7 +146,7 @@ impl Nex {
                         //   panic as unexpected.
                     }
                     c.output_stream().write_all_async(
-                        format!("{path}\r\n"),
+                        format!("{request}\r\n"),
                         Priority::DEFAULT,
                         Some(&cancellable.clone()),
                         move |r| match r {
@@ -147,9 +158,9 @@ impl Nex {
                                 }
 
                                 // Navigate to the download gateway on content type is not supported
-                                if !is_renderable(&path) {
+                                if !is_renderable(&request) {
                                     p.content
-                                        .to_status_mime(&path, Some((&p.item_action, &uri)));
+                                        .to_status_mime(&request, Some((&p.item_action, &uri)));
                                     p.set_progress(0.0);
                                     c.close_async(Priority::DEFAULT, Some(&cancellable), {
                                         let p = p.clone();
