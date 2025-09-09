@@ -3,5 +3,10 @@
         "**/.flatpak-builder/**": true,
         "**/build/**": true,
         "**/repo/**": true
-    }
+    },
+    "rust-analyzer.files.excludeDirs": [
+        ".flatpak-builder",
+        "build",
+        "repo",
+    ]
 }
