@@ -49,8 +49,8 @@ impl Nex {
         let request = format!(
             "{}{}{}",
             uri.path(),
-            // @TODO
-            // unspecified request part implementation:
+            // @TODO unspecified request part implementation,
+            // allows access to files whose filenames contain `?` or `#` characters:
             // gemini://bbs.geminispace.org/s/nex/32478
             uri.query().map(|q| format!("?{q}")).unwrap_or_default(),
             uri.fragment().map(|f| format!("#{f}")).unwrap_or_default()
