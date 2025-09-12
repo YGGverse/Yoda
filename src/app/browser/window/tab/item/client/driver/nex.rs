@@ -201,6 +201,7 @@ impl Nex {
                                         {
                                             let p = p.clone();
                                             move |_, t| {
+                                                // do not change widget until n bytes
                                                 if loading_total.replace(t) > 102400 {
                                                     let mut l = loading.borrow_mut();
                                                     match *l {
