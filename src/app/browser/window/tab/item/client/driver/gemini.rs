@@ -1,4 +1,5 @@
 use super::{Feature, Page};
+use crate::tool::Format;
 use ggemini::client::connection::response::{Input, Redirect};
 use ggemini::{
     client::{Client, Request, Response},
@@ -444,7 +445,7 @@ fn handle(
                                                 total: 0,        // initial totals
                                             },
                                             (
-                                                move |_, total| status.set_description(Some(&format!("Download: {total} bytes"))),
+                                                move |_, total| status.set_description(Some(&format!("Download: {}", total.bytes()))),
                                                 {
                                                     move | result | match result {
                                                         Ok((memory_input_stream, _)) => {
