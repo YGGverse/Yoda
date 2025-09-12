@@ -1,5 +1,5 @@
 use super::{Feature, Page};
-use crate::tool::Format;
+use crate::tool::{Format, uri_to_title};
 use ggemini::client::connection::response::{Input, Redirect};
 use ggemini::{
     client::{Client, Request, Response},
@@ -258,7 +258,7 @@ fn handle(
                                 }
                                 // Init download widget
                                 let s = page.content.to_status_download(
-                                    crate::tool::uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
+                                    uri_to_title(&uri).trim_matches(MAIN_SEPARATOR), // grab default filename from base URI,
                                     // format FS entities
                                     &cancellable,
                                     {
@@ -371,7 +371,7 @@ fn handle(
                                                                     page.search.set(Some(w.text_view));
                                                                     page.set_title(&match w.meta.title {
                                                                         Some(t) => t.into(), // @TODO
-                                                                        None => crate::tool::uri_to_title(&uri),
+                                                                        None => uri_to_title(&uri),
                                                                     });
                                                                     page.set_progress(0.0);
                                                                     page.window_action
@@ -455,7 +455,7 @@ fn handle(
                                                                 move |result| {
                                                                     match result {
                                                                         Ok(buffer) => {
-                                                                            page.set_title(&crate::tool::uri_to_title(&uri));
+                                                                            page.set_title(&uri_to_title(&uri));
                                                                             page.content.to_image(&Texture::for_pixbuf(&buffer));
                                                                             let mut i = page.navigation.request.info.borrow_mut();
                                                                             i
