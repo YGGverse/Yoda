@@ -18,10 +18,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Run rustfmt
-      run: cargo fmt --all -- --check
     - name: Update packages index
       run: sudo apt update
+      run: rustup update
+      run: cargo update
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
     - name: Install system packages
       run: sudo apt install -y libgtk-4-dev libgtksourceview-5-dev libadwaita-1-dev libspelling-1-dev libsqlite3-dev
     - name: Run clippy
