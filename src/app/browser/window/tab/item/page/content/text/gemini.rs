@@ -103,7 +103,7 @@ impl Gemini {
                     t += 1;
                 }
             }
-            t == 0 || t % 2 == 0
+            t == 0 || t.is_multiple_of(2)
         };
 
         // Parse gemtext lines
