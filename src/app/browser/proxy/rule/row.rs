@@ -1,7 +1,7 @@
 use gtk::{
+    Align, Box, Button, Entry, Switch,
     glib::{DateTime, GString},
     prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt},
-    Align, Box, Button, Entry, Switch,
 };
 
 pub struct Row {
@@ -79,8 +79,8 @@ impl Row {
             let c = std::rc::Rc::new(on_delete);
             move |this| {
                 use adw::{
-                    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
                     AlertDialog, ResponseAppearance,
+                    prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
                 };
 
                 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");
