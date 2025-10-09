@@ -1,7 +1,7 @@
 use gtk::{
-    Align, Box, Button, Entry, Switch,
     glib::{DateTime, GString},
     prelude::{BoxExt, ButtonExt, EditableExt, WidgetExt},
+    Align, Box, Button, Entry, Switch,
 };
 
 pub struct Row {
@@ -35,7 +35,7 @@ impl Row {
 
         let request = Entry::builder()
             .hexpand(true)
-            .placeholder_text("Request")
+            .placeholder_text("Host")
             .text(request.unwrap_or(".*"))
             .tooltip_text("Supports regex expressions")
             .build();
@@ -79,8 +79,8 @@ impl Row {
             let c = std::rc::Rc::new(on_delete);
             move |this| {
                 use adw::{
-                    AlertDialog, ResponseAppearance,
                     prelude::{AdwDialogExt, AlertDialogExt, AlertDialogExtManual},
+                    AlertDialog, ResponseAppearance,
                 };
 
                 const RESPONSE_CONFIRM: (&str, &str) = ("confirm", "Confirm");

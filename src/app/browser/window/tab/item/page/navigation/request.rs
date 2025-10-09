@@ -484,26 +484,27 @@ fn refresh_proxy_resolver(
 ) {
     const NONE: &[&str] = &[];
 
-    let t = entry.text(); // allocate once
-
-    match profile.proxy.matches(&t) {
-        Some(m) => {
-            let (css_classes, tooltip_text) = match m.lookup(&t, Cancellable::NONE) {
-                Ok(h) => (&["accent"], format!("Proxy over {}", h.join(","))),
-                Err(i) => (&["error"], i.to_string()),
-            };
-            entry.set_css_classes(if profile.proxy.misc.is_highlight_request_entry() {
-                css_classes
-            } else {
-                NONE
-            });
-            entry.set_tooltip_text(Some(&tooltip_text));
-            resolver.replace(Some(m));
-        }
-        None => {
-            entry.set_css_classes(NONE);
-            entry.set_tooltip_text(None);
-            resolver.replace(None);
-        }
+    // apply condition only to valid host found in the request entry
+    // * in other case, the raw request string may include just user input
+    //   which may contain another 'host' in the request substring after '?'
+    if let Some(u) = uri(entry)
+        && let Some(h) = u.host()
+        && let Some(m) = profile.proxy.matches(&h)
+    {
+        let (css_classes, tooltip_text) = match m.lookup(&entry.text(), Cancellable::NONE) {
+            Ok(r) => (&["accent"], format!("Proxy over {}", r.join(","))),
+            Err(i) => (&["error"], i.to_string()),
+        };
+        entry.set_css_classes(if profile.proxy.misc.is_highlight_request_entry() {
+            css_classes
+        } else {
+            NONE
+        });
+        entry.set_tooltip_text(Some(&tooltip_text));
+        resolver.replace(Some(m));
+    } else {
+        entry.set_css_classes(NONE);
+        entry.set_tooltip_text(None);
+        resolver.replace(None);
     }
 }
