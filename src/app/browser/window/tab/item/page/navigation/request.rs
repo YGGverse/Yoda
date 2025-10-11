@@ -169,14 +169,12 @@ impl Request {
                 // Note:
                 // * Custom GestureClick is not an option here, as GTK Entry has default controller
                 // * This is experimental feature does not follow native GTK behavior @TODO make optional
-                if !has_focus.take()
+                if !has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN))
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
                     && this.selection_bounds().is_none()
                 {
                     this.select_region(0, -1)
                 }
-                // Update last focus state
-                has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN));
             }
         });
 
