@@ -60,10 +60,10 @@ impl Request {
             };
             let c = gtk::EventControllerKey::builder().build();
             c.connect_key_pressed({
-                let entry = entry.clone();
-                let suggestion = suggestion.clone();
+                let e = entry.clone();
+                let s = suggestion.clone();
                 move |_, k, _, m| {
-                    if suggestion.is_visible()
+                    if s.is_visible()
                         && !matches!(
                             m,
                             ModifierType::SHIFT_MASK
@@ -72,20 +72,21 @@ impl Request {
                         )
                     {
                         if matches!(k, Key::Up | Key::KP_Up | Key::Page_Up | Key::KP_Page_Up) {
-                            if !suggestion.back() {
-                                entry.error_bell()
+                            if !s.back() {
+                                e.error_bell()
                             }
                             return Propagation::Stop;
                         } else if matches!(
                             k,
                             Key::Down | Key::KP_Down | Key::Page_Down | Key::KP_Page_Down
                         ) {
-                            if !suggestion.next() {
-                                entry.error_bell()
+                            if !s.next() {
+                                e.error_bell()
                             }
                             return Propagation::Stop;
                         }
                     }
+                    s.hide();
                     Propagation::Proceed
                 }
             });
@@ -116,7 +117,15 @@ impl Request {
 
         entry.connect_has_focus_notify({
             let i = info.clone();
-            move |e| update_secondary_icon(e, &i.borrow())
+            let s = suggestion.clone();
+            move |this| {
+                // toggle 'go to' button
+                update_secondary_icon(this, &i.borrow());
+                // hide suggestions on focus left this entry
+                if this.focus_child().is_none_or(|child| !child.has_focus()) {
+                    s.hide()
+                }
+            }
         });
 
         suggestion
@@ -128,20 +137,20 @@ impl Request {
                 let p = profile.clone();
                 let r = proxy_resolver.clone();
                 let s = suggestion.clone();
-                move |e| {
+                move |this| {
                     // Allocate once
-                    let t = e.text();
+                    let t = this.text();
                     // Update actions
                     a.reload.set_enabled(!t.is_empty());
-                    a.home.set_enabled(home(e).is_some());
+                    a.home.set_enabled(home(this).is_some());
                     // Update icons
-                    update_primary_icon(e, &p);
-                    update_secondary_icon(e, &i.borrow());
+                    update_primary_icon(this, &p);
+                    update_secondary_icon(this, &i.borrow());
+                    refresh_proxy_resolver(this, &p, &r);
                     // Show search suggestions
-                    if e.focus_child().is_some() {
-                        s.update(Some(50)); // @TODO optional
+                    if this.focus_child().is_some() {
+                        s.update(Some(50)) // @TODO optional
                     }
-                    refresh_proxy_resolver(e, &p, &r)
                 }
             })); // `suggestion` wants `signal_handler_id` to block this event on autocomplete navigation
 
@@ -154,22 +163,16 @@ impl Request {
             }
         });
 
-        entry.connect_has_focus_notify({
-            let s = suggestion.clone();
-            move |_| s.hide()
-        });
-
+        // Select entire text on first click (release)
+        // this behavior implemented in most web-browsers,
+        // to simply overwrite current request with new value
+        // Note:
+        // * Custom GestureClick is not an option here, as GTK Entry has default controller
+        // * This is experimental feature does not follow native GTK behavior @TODO make optional
         entry.connect_state_flags_changed({
-            // Define last focus state container
-            let has_focus = Cell::new(false);
+            let had_focus = Cell::new(false);
             move |this, state| {
-                // Select entire text on first click (release)
-                // this behavior implemented in most web-browsers,
-                // to simply overwrite current request with new value
-                // Note:
-                // * Custom GestureClick is not an option here, as GTK Entry has default controller
-                // * This is experimental feature does not follow native GTK behavior @TODO make optional
-                if !has_focus.replace(state.contains(StateFlags::FOCUS_WITHIN))
+                if !had_focus.replace(state.contains(StateFlags::FOCUS_WITHIN))
                     && state.contains(StateFlags::ACTIVE | StateFlags::FOCUS_WITHIN)
                     && this.selection_bounds().is_none()
                 {

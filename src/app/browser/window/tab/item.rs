@@ -83,21 +83,35 @@ impl Item {
             let page = page.clone();
             move |this, _| {
                 this.set_enabled(false);
-                if let Some(uri) = page.navigation.request.home() {
-                    let request = uri.to_string();
-                    page.navigation.request.entry.set_text(&request);
-                    client.handle(&request, true, false);
+                match page.navigation.request.home() {
+                    Some(uri) => {
+                        let request = uri.to_string();
+                        // prevent `changed` event extra emission
+                        // but make sure the entry is always up-to-date
+                        if page.navigation.request.entry.text() != request {
+                            page.navigation.request.entry.set_text(&request)
+                        }
+                        client.handle(&request, true, false)
+                    }
+                    None => panic!(), // unexpected
                 }
             }
         });
 
         action.load.connect_activate({
-            let page = page.clone();
-            let client = client.clone();
+            let c = client.clone();
+            let e = page.navigation.request.entry.clone();
             move |request, is_snap_history, is_redirect| {
-                if let Some(request) = request {
-                    page.navigation.request.entry.set_text(&request);
-                    client.handle(&request, is_snap_history, is_redirect);
+                match request {
+                    Some(request) => {
+                        // prevent `changed` event extra emission
+                        // but make sure the entry is always up-to-date
+                        if e.text() != request {
+                            e.set_text(&request)
+                        }
+                        c.handle(&request, is_snap_history, is_redirect)
+                    }
+                    None => panic!(), // unexpected
                 }
             }
         });
@@ -144,11 +158,13 @@ impl Item {
         });
 
         // Handle immediately on request
-        if let Some(request) = request {
-            page.navigation.request.entry.set_text(request);
-            if is_load {
-                client.handle(request, true, false)
+        if is_load && let Some(request) = request {
+            // prevent `changed` event extra emission
+            // but make sure the entry is always up-to-date
+            if page.navigation.request.entry.text() != request {
+                page.navigation.request.entry.set_text(request)
             }
+            client.handle(request, true, false)
         }
 
         Self {
