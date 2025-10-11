@@ -148,20 +148,15 @@ impl Request {
         entry.connect_activate({
             let a = item_action.clone();
             let s = suggestion.clone();
-            move |_| {
-                use gtk::prelude::ActionExt;
-                a.reload.activate(None);
+            move |this| {
                 s.hide();
+                a.load.activate(Some(&this.text()), true, false)
             }
         });
 
         entry.connect_has_focus_notify({
             let s = suggestion.clone();
-            move |_| {
-                if s.is_visible() {
-                    s.hide()
-                }
-            }
+            move |_| s.hide()
         });
 
         entry.connect_state_flags_changed({

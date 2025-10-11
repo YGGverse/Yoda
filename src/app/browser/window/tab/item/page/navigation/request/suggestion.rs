@@ -207,7 +207,7 @@ impl Suggestion {
                 }
             });
         } else {
-            self.popover.popdown();
+            self.popover.popdown()
         }
     }
 
