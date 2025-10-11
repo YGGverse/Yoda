@@ -560,7 +560,7 @@ fn handle(
                                             .build();
                                         b.connect_clicked({
                                             let p = page.clone();
-                                            move |_| p.item_action.load.activate(Some(&u), false, true)
+                                            move |_| p.item_action.load.activate(Some(&u), true, true)
                                         });
                                         b
                                     }));
@@ -584,7 +584,7 @@ fn handle(
                                             Redirect::Temporary { .. } => i.into_temporary_redirect(),
                                         });
                                     }
-                                    page.item_action.load.activate(Some(&t), false, true);
+                                    page.item_action.load.activate(Some(&t), true, true);
                                 }
                             }
                             Err(e) => {
