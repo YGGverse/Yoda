@@ -1,5 +1,4 @@
 *flatpak*
-!flatpak.yml
 build
 Cargo.lock
 repo
