@@ -1,0 +1,29 @@
+name: Publish Flatpak on Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Flatpak
+        run: |
+          sudo apt install flatpak
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+      - name: Build Flatpak Bundle
+        run: |
+          flatpak-builder --force-clean build --install-deps-from=flathub --repo=repo --user io.github.yggverse.Yoda.yaml
+          flatpak build-bundle repo Yoda.flatpak io.github.yggverse.Yoda
+
+      - name: Upload Flatpak Bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: Yoda.flatpak
+          path: Yoda.flatpak
