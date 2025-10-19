@@ -282,11 +282,7 @@ fn handle(
                                                     file_output_stream,
                                                     cancellable.clone(),
                                                     Priority::DEFAULT,
-                                                    file_output_stream::Size {
-                                                        chunk: 0x100000, // 1M bytes per chunk
-                                                        limit: None,     // unlimited
-                                                        total: 0,        // initial totals
-                                                    },
+                                                    file_output_stream::Size::default(),
                                                     (
                                                         // on chunk
                                                         {
@@ -336,9 +332,8 @@ fn handle(
                                         Priority::DEFAULT,
                                         cancellable.clone(),
                                         memory_input_stream::Size {
-                                            chunk: 0x400,   // 1024 bytes chunk
                                             limit: 0xfffff, // 1M limit
-                                            total: 0,       // initial totals
+                                            ..memory_input_stream::Size::default()
                                         },
                                         (
                                             |_, _| {},                   // on chunk (maybe nothing to count yet @TODO)
@@ -440,9 +435,8 @@ fn handle(
                                             Priority::DEFAULT,
                                             cancellable.clone(),
                                             memory_input_stream::Size {
-                                                chunk: 0x400,    // 1024 bytes chunk
                                                 limit: 0xA00000, // 10M limit
-                                                total: 0,        // initial totals
+                                                ..memory_input_stream::Size::default()
                                             },
                                             (
                                                 move |_, total| status.set_description(Some(&format!("Download: {}", total.bytes()))),

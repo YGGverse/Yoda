@@ -193,9 +193,8 @@ impl Nex {
                                     Priority::DEFAULT,
                                     cancellable.clone(),
                                     ggemini::gio::memory_input_stream::Size {
-                                        chunk: 0x400,    // 1024 bytes chunk
                                         limit: 0xA00000, // 10M limit
-                                        total: 0,        // initial totals
+                                        ..ggemini::gio::memory_input_stream::Size::default()
                                     },
                                     (
                                         {
@@ -343,11 +342,7 @@ fn download(s: SocketConnection, (p, u): (Rc<Page>, Uri), c: Cancellable) {
                     file_output_stream,
                     c.clone(),
                     Priority::DEFAULT,
-                    file_output_stream::Size {
-                        chunk: 0x100000, // 1M bytes per chunk
-                        limit: None,     // unlimited
-                        total: 0,        // initial totals
-                    },
+                    file_output_stream::Size::default(),
                     (
                         // on chunk
                         {
