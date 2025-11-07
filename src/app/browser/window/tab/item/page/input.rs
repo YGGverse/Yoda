@@ -61,7 +61,13 @@ impl Input {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.update(Some(&gtk::Box::response(action, base, title, size_limit)));
+        self.update(Some(&gtk::Box::response(
+            action,
+            base,
+            title,
+            size_limit,
+            MAX_CONTENT_HEIGHT,
+        )));
     }
 
     pub fn set_new_sensitive(
@@ -75,6 +81,9 @@ impl Input {
     }
 
     pub fn set_new_titan(&self, on_send: impl Fn(titan::Header, Bytes, Box<dyn Fn()>) + 'static) {
-        self.update(Some(&gtk::Box::titan(on_send)));
+        self.update(Some(&gtk::Box::titan(MAX_CONTENT_HEIGHT, on_send)));
     }
 }
+
+/// @TODO optional, maybe relative to the current window height in %
+const MAX_CONTENT_HEIGHT: i32 = 280;

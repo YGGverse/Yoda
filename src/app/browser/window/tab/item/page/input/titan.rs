@@ -16,11 +16,17 @@ use tab::Tab;
 use text::Text;
 
 pub trait Titan {
-    fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self;
+    fn titan(
+        max_content_height: i32,
+        callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static,
+    ) -> Self;
 }
 
 impl Titan for gtk::Box {
-    fn titan(callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static) -> Self {
+    fn titan(
+        max_content_height: i32,
+        callback: impl Fn(Header, Bytes, Box<dyn Fn()>) + 'static,
+    ) -> Self {
         use gtk::{Label, glib::uuid_string_random, prelude::ButtonExt};
         use std::rc::Rc;
 
@@ -38,7 +44,7 @@ impl Titan for gtk::Box {
             notebook.append_page(
                 &gtk::ScrolledWindow::builder()
                     .child(&text.text_view)
-                    .max_content_height(320)
+                    .max_content_height(max_content_height)
                     .propagate_natural_height(true)
                     .build(),
                 Some(&Label::tab("Text")),
