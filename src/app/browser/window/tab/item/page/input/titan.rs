@@ -35,7 +35,15 @@ impl Titan for gtk::Box {
                 .show_border(false)
                 .build();
 
-            notebook.append_page(&text.text_view, Some(&Label::tab("Text")));
+            notebook.append_page(
+                &gtk::ScrolledWindow::builder()
+                    .child(&text.text_view)
+                    .max_content_height(320)
+                    .propagate_natural_height(true)
+                    .build(),
+                Some(&Label::tab("Text")),
+            );
+
             notebook.append_page(&file.button, Some(&Label::tab("File")));
 
             notebook.connect_switch_page({
