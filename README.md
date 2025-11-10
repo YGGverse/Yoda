@@ -1,6 +1,6 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
-<img src="https://raw.githubusercontent.com/YGGverse/Yoda/refs/heads/master/data/io.github.yggverse.Yoda.svg" alt="Yoda browser logo" width="160">
+![Yoda browser logo](https://raw.githubusercontent.com/YGGverse/Yoda/refs/heads/master/data/io.github.yggverse.Yoda.svg)
 
 Privacy-oriented GTK 4 / Libadwaita client written in Rust.
 
