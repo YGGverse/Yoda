@@ -1,5 +1,7 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
+<img src="https://raw.githubusercontent.com/YGGverse/Yoda/refs/heads/master/data/io.github.yggverse.Yoda.svg" alt="Yoda browser logo" width="160">
+
 Privacy-oriented GTK 4 / Libadwaita client written in Rust.
 
 The term _Privacy-oriented_ means that Yoda complies to the [Gemini protocol specification](https://geminiprotocol.net/docs/protocol-specification.gmi) and excludes third-party connections, that making it safe to use in combination with I2P. It also includes useful tools, such as connection details, optional DNS/Geo-IP features, flexible proxy configuration for use with modern IPv6 mesh networks like Yggdrasil, Mycelium, CJDNS, and others.
