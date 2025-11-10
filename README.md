@@ -4,7 +4,7 @@ Privacy-oriented GTK 4 / Libadwaita client written in Rust.
 
 The term _Privacy-oriented_ means that Yoda complies to the [Gemini protocol specification](https://geminiprotocol.net/docs/protocol-specification.gmi) and excludes third-party connections, that making it safe to use in combination with I2P. The Yoda browser also includes useful tools, such as flexible proxy configuration, out of the box for use with mesh networks like Yggdrasil, Mycelium, CJDNS, and others. Additionally, it prevents auto-follow external redirection by default and requires manual confirmation, which is currently not clearly specified.
 
-Yoda browser is primarily designed by and for experienced network users who care about their fingerprints and prefer to control every action manually. It does not preload tab content on app opening, does not run any background connections, does not incorporate web-like media preloading without user initiation (unlike some other clients), and does not automatically check for updates, even from 'official' servers.
+Yoda browser is primarily designed by and for experienced network users who care about their fingerprints and prefer to control every action manually. It does not preload tab content on app opening, does not run any background connections, does not incorporate web-like media preloading without user initiation, and does not automatically check for updates, even from 'official' servers.
 
 The Gemini protocol was designed as a simple, private alternative to the Web, and Yoda follows this philosophy by providing a graphical user interface (GUI) for seamless navigation in Geminispace, partially inspired by the Firefox UI.
 
