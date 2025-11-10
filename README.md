@@ -1,6 +1,8 @@
 # Yoda - Browser for [Gemini protocol](https://geminiprotocol.net)
 
-GTK 4 / Libadwaita client written in Rust
+Privacy-oriented GTK 4 / Libadwaita client written in Rust.
+
+The term _Privacy-oriented_ means that Yoda complies to the [Gemini protocol specification](https://geminiprotocol.net/docs/protocol-specification.gmi) and excludes third-party connections, that making it safe to use in combination with I2P. The Yoda browser also includes useful tools, such as flexible proxy configuration, out of the box for use with mesh networks like Yggdrasil, Mycelium, CJDNS, and others. Additionally, it prevents auto-follow redirection to external resources by default, which is not clearly specified at this time.
 
 > [!IMPORTANT]
 > Project in development, for stable version use [release](https://github.com/YGGverse/Yoda/releases)!
@@ -152,13 +154,13 @@ GTK 4 / Libadwaita client written in Rust
 
 ### Requirements
 
-* Cairo `1.18`
-* GdkPixBuf `2.42`
-* Glib `2.80`
-* Gtk `4.14`
-* GtkSourceView `5.14`
-* libadwaita `1.5` (Ubuntu 24.04+)
-* libspelling `0.1`
+* Cairo `1.18+`
+* GdkPixBuf `2.42+`
+* Glib `2.80+`
+* Gtk `4.14+`
+* GtkSourceView `5.14+`
+* libadwaita `1.5+` (Ubuntu 24.04+)
+* libspelling `0.1+`
 
 #### Debian
 
