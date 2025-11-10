@@ -43,7 +43,7 @@ modules:
     post-install:
       - "install -Dm755 ./target/release/Yoda -t /app/bin"
       - "install -Dm644 ./data/${FLATPAK_ID}.desktop -t /app/share/applications"
-#     - "install -Dm644 ./data/${FLATPAK_ID}.svg -t /app/share/icons/hicolor/symbolic/apps"
+      - "install -Dm644 ./data/${FLATPAK_ID}.svg -t /app/share/icons/hicolor/symbolic/apps"
     sources:
       - type: "dir"
         path: "."
