@@ -6,7 +6,7 @@ The term _Privacy-oriented_ means that Yoda complies to the [Gemini protocol spe
 
 Yoda browser is primarily designed by and for experienced network users who care about their fingerprints and prefer to control every action manually. It does not preload tab content on app opening, does not run any background connections, does not incorporate web-like media preloading without user initiation, and does not automatically check for updates, even from 'official' servers.
 
-The Gemini protocol was designed as a simple, private alternative to the Web, and Yoda follows this philosophy by providing a graphical user interface (GUI) for seamless navigation in Geminispace, partially inspired by the Firefox UI.
+The Gemini protocol was designed as a simple, private alternative to the Web, and Yoda follows this philosophy by providing a straightforward graphical user interface (GUI), partially inspired by the Firefox UI.
 
 > [!IMPORTANT]
 > Project in development, for stable version use checkpoint [releases](https://github.com/YGGverse/Yoda/releases)!
