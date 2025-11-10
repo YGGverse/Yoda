@@ -48,7 +48,7 @@
        fy="128.50734"
        r="95.479652"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-236.64674,-20.367943)" />
+       gradientTransform="translate(-236.64674,-15.819246)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#swatch27"
@@ -58,7 +58,7 @@
        x2="121.12355"
        y2="177.4632"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-14.289374,-32.738466)" />
+       gradientTransform="translate(-9.7406772,-32.738466)" />
   </defs>
   <g
      inkscape:label="nodes"
@@ -69,28 +69,28 @@
        style="fill:#1a1a1a;stroke:url(#radialGradient17);stroke-width:20;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path2"
        cx="-128.50734"
-       cy="108.1394"
+       cy="112.6881"
        r="85.479652"
        inkscape:label="node-m"
        transform="rotate(-90)" />
     <circle
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path6"
-       cx="85.671722"
+       cx="90.220421"
        cy="76.736633"
        r="4.7303405"
        inkscape:label="node-l" />
     <circle
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path7"
-       cx="135.0775"
+       cx="139.62619"
        cy="88.825287"
        r="6.3071208"
        inkscape:label="node-k" />
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path8"
-       cx="48.61739"
+       cx="53.166088"
        cy="134.02632"
        rx="4.4675441"
        ry="4.2047472"
@@ -98,7 +98,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path9"
-       cx="80.152992"
+       cx="84.701691"
        cy="169.76668"
        rx="7.095511"
        ry="6.8327141"
@@ -106,7 +106,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path10"
-       cx="172.65744"
+       cx="177.20613"
        cy="126.66801"
        rx="3.9419506"
        ry="4.2047472"
@@ -114,7 +114,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path11"
-       cx="152.15929"
+       cx="156.70798"
        cy="147.16617"
        rx="6.5699177"
        ry="6.3071208"
@@ -122,7 +122,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path12"
-       cx="143.487"
+       cx="148.03569"
        cy="177.91336"
        rx="4.7303405"
        ry="4.4675441"
@@ -130,7 +130,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path13"
-       cx="72.794685"
+       cx="77.343384"
        cy="130.87276"
        rx="3.416357"
        ry="3.6791537"
@@ -138,7 +138,7 @@
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path14"
-       cx="114.57936"
+       cx="119.12806"
        cy="63.8596"
        rx="3.6791537"
        ry="3.416357"
@@ -146,14 +146,14 @@
     <circle
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path15"
-       cx="105.90707"
+       cx="110.45576"
        cy="100.65114"
        r="2.8907638"
        inkscape:label="node-b" />
     <ellipse
        style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="path16"
-       cx="105.38148"
+       cx="109.93018"
        cy="77.787819"
        rx="1.3139836"
        ry="1.5767802"
@@ -161,44 +161,44 @@
   </g>
   <path
      style="fill:#ffffff;stroke:url(#linearGradient27);stroke-width:18;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-     d="m 96.834176,101.42742 v 86.5946"
+     d="m 101.38288,101.42742 v 86.5946"
      id="path4"
      inkscape:label="path-bottom" />
   <path
      style="fill:#ffffff;stroke:#008000;stroke-width:18;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-     d="M 101.61407,104.21734 24.514094,49.844687"
+     d="M 106.16277,104.21734 29.062791,49.844687"
      id="path1"
      inkscape:label="path-top-left" />
   <path
      style="fill:#ffffff;stroke:#008000;stroke-width:18;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-     d="M 95.052826,103.03129 161.40267,53.970647"
+     d="M 99.601523,103.03129 165.95137,53.970647"
      id="path3"
      inkscape:label="path-top-right" />
   <circle
      style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
      id="path5-9"
-     cx="95.927475"
+     cx="100.47617"
      cy="98.450752"
      r="18"
      inkscape:label="node-center" />
   <circle
      style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
      id="path5-1"
-     cx="96.860725"
+     cx="101.40943"
      cy="178.6124"
      r="18"
      inkscape:label="node-bottom" />
   <circle
      style="fill:#ffffff;stroke:#008000;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
      id="path5-0"
-     cx="26.641003"
+     cx="31.189701"
      cy="50.907196"
      r="18"
      inkscape:label="node-top-left" />
   <circle
      style="fill:#ffffff;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
      id="path5"
-     cx="165.64395"
+     cx="170.19264"
      cy="51.417984"
      r="18"
      inkscape:label="node-top-right" />
