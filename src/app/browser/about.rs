@@ -28,6 +28,7 @@ impl About for adw::AboutDialog {
         ];
 
         adw::AboutDialog::builder()
+            .application_icon("io.github.yggverse.Yoda")
             .application_name(env!("CARGO_PKG_NAME"))
             .debug_info(debug.join("\n"))
             .developer_name(env!("CARGO_PKG_DESCRIPTION"))
