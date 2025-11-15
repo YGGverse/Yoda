@@ -34,6 +34,7 @@ impl Form for TextView {
                 .left_margin(MARGIN)
                 .right_margin(MARGIN)
                 .top_margin(MARGIN)
+                .valign(gtk::Align::BaselineCenter)
                 .wrap_mode(WrapMode::Word)
                 .build()
         };
