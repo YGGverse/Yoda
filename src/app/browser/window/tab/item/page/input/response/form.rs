@@ -40,7 +40,6 @@ impl Form for TextView {
             .build();
 
         text_view.insert_action_group("spelling", Some(&adapter));
-        text_view.set_size_request(-1, 38); // @TODO [#635](https://gitlab.gnome.org/GNOME/pygobject/-/issues/635)
 
         // Init events
         text_view.connect_realize(|this| {
