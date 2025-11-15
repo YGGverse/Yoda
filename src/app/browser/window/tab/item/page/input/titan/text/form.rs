@@ -16,8 +16,11 @@ impl Form for TextView {
 
         // Init [libspelling](https://gitlab.gnome.org/GNOME/libspelling)
         let checker = Checker::default();
-        let adapter = TextBufferAdapter::new(&buffer, &checker);
-        adapter.set_enabled(true);
+        let adapter = TextBufferAdapter::builder()
+            .buffer(&buffer)
+            .checker(&checker)
+            .enabled(true)
+            .build();
 
         // Init main widget
 
