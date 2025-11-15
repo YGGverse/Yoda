@@ -23,7 +23,6 @@ pub trait Response {
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
-        max_content_height: i32,
     ) -> Self;
 }
 
@@ -36,7 +35,6 @@ impl Response for Box {
         base: Uri,
         title: Option<&str>,
         size_limit: Option<usize>,
-        max_content_height: i32,
     ) -> Self {
         // Init components
         let control = Rc::new(Control::build());
@@ -49,18 +47,12 @@ impl Response for Box {
             .margin_end(MARGIN)
             .margin_start(MARGIN)
             .margin_top(MARGIN)
-            .spacing(SPACING)
             .orientation(Orientation::Vertical)
+            .spacing(SPACING)
             .build();
 
         g_box.append(&title);
-        g_box.append(
-            &gtk::ScrolledWindow::builder()
-                .child(&text_view)
-                .max_content_height(max_content_height)
-                .propagate_natural_height(true)
-                .build(),
-        );
+        g_box.append(&text_view);
         g_box.append(&control.g_box);
 
         // Init events

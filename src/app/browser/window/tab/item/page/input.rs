@@ -61,13 +61,7 @@ impl Input {
         title: Option<&str>,
         size_limit: Option<usize>,
     ) {
-        self.update(Some(&gtk::Box::response(
-            action,
-            base,
-            title,
-            size_limit,
-            MAX_CONTENT_HEIGHT,
-        )));
+        self.update(Some(&gtk::Box::response(action, base, title, size_limit)));
     }
 
     pub fn set_new_sensitive(

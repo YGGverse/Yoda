@@ -36,6 +36,7 @@ impl Form for TextView {
             .css_classes(["frame", "view"])
             .extra_menu(&adapter.menu_model())
             .left_margin(MARGIN)
+            .margin_bottom(MARGIN / 4)
             .right_margin(MARGIN)
             .top_margin(MARGIN)
             .valign(gtk::Align::BaselineCenter)
@@ -43,6 +44,7 @@ impl Form for TextView {
             .build();
 
         text_view.insert_action_group("spelling", Some(&adapter));
+        text_view.set_size_request(-1, 36); // @TODO [#635](https://gitlab.gnome.org/GNOME/pygobject/-/issues/635)
 
         // Init events
         text_view.connect_realize(|this| {
