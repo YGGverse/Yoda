@@ -10,7 +10,6 @@ use adw::{TabPage, TabView};
 use anyhow::Result;
 use gtk::{
     Box, Orientation,
-    gio::Icon,
     glib::Propagation,
     prelude::{ActionExt, EditableExt, EntryExt, WidgetExt},
 };
@@ -43,13 +42,6 @@ impl Tab {
         let tab_view = TabView::builder()
             .menu_model(&gtk::gio::Menu::menu(window_action))
             .build();
-
-        // Change default icon (if available in the system icon set)
-        // * visible for pinned tabs only
-        // * @TODO not default GTK behavior, make this feature optional
-        if let Ok(default_icon) = Icon::for_string("view-pin-symbolic") {
-            tab_view.set_default_icon(&default_icon);
-        }
 
         // Init events
         tab_view.connect_setup_menu({
