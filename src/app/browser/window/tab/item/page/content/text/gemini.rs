@@ -5,23 +5,23 @@ mod icon;
 mod syntax;
 mod tag;
 
-pub use error::Error;
-use gutter::Gutter;
-use icon::Icon;
-use syntax::Syntax;
-use tag::Tag;
-
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
+pub use error::Error;
 use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
     UriLauncher, Window, WrapMode,
-    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, RGBA},
-    gio::Cancellable,
-    glib::Uri,
-    prelude::{TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
+    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
+    gio::{Cancellable, SimpleAction, SimpleActionGroup},
+    glib::{Uri, uuid_string_random},
+    prelude::{PopoverExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
 };
+use gutter::Gutter;
+use icon::Icon;
+use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
+use syntax::Syntax;
+use tag::Tag;
 
 pub const NEW_LINE: &str = "\n";
 
@@ -284,14 +284,113 @@ impl Gemini {
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
 
+        // Context menu
+        let action_link_tab =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_tab.connect_activate({
+            let window_action = window_action.clone();
+            move |this, _| {
+                open_link_in_new_tab(
+                    &this.state().unwrap().get::<String>().unwrap(),
+                    &window_action,
+                )
+            }
+        });
+        let action_link_copy =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_copy.connect_activate(|this, _| {
+            gtk::gdk::Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_link_download =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_download.connect_activate({
+            let window_action = window_action.clone();
+            move |this, _| {
+                open_link_in_new_tab(
+                    &link_prefix(
+                        this.state().unwrap().get::<String>().unwrap(),
+                        LINK_PREFIX_DOWNLOAD,
+                    ),
+                    &window_action,
+                )
+            }
+        });
+        let action_link_source =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_source.connect_activate({
+            let window_action = window_action.clone();
+            move |this, _| {
+                open_link_in_new_tab(
+                    &link_prefix(
+                        this.state().unwrap().get::<String>().unwrap(),
+                        LINK_PREFIX_SOURCE,
+                    ),
+                    &window_action,
+                )
+            }
+        });
+        let link_context_group_id = uuid_string_random();
+        text_view.insert_action_group(
+            &link_context_group_id,
+            Some(&{
+                let g = SimpleActionGroup::new();
+                g.add_action(&action_link_tab);
+                g.add_action(&action_link_copy);
+                g.add_action(&action_link_download);
+                g.add_action(&action_link_source);
+                g
+            }),
+        );
+        let link_context = gtk::PopoverMenu::from_model(Some(&{
+            let m = gtk::gio::Menu::new();
+            m.append(
+                Some("Open Link in New Tab"),
+                Some(&format!(
+                    "{link_context_group_id}.{}",
+                    action_link_tab.name()
+                )),
+            );
+            m.append(
+                Some("Copy Link"),
+                Some(&format!(
+                    "{link_context_group_id}.{}",
+                    action_link_copy.name()
+                )),
+            );
+            m.append(
+                Some("Download Link"),
+                Some(&format!(
+                    "{link_context_group_id}.{}",
+                    action_link_download.name()
+                )),
+            );
+            m.append(
+                Some("View Link as Source"),
+                Some(&format!(
+                    "{link_context_group_id}.{}",
+                    action_link_source.name()
+                )),
+            );
+            m
+        }));
+        link_context.set_parent(&text_view);
+
         // Init additional controllers
-        let primary_button_controller = GestureClick::builder().button(BUTTON_PRIMARY).build();
         let middle_button_controller = GestureClick::builder().button(BUTTON_MIDDLE).build();
+        let primary_button_controller = GestureClick::builder().button(BUTTON_PRIMARY).build();
+        let secondary_button_controller = GestureClick::builder()
+            .button(BUTTON_SECONDARY)
+            .propagation_phase(gtk::PropagationPhase::Capture)
+            .build();
         let motion_controller = EventControllerMotion::new();
 
-        text_view.add_controller(primary_button_controller.clone());
         text_view.add_controller(middle_button_controller.clone());
         text_view.add_controller(motion_controller.clone());
+        text_view.add_controller(primary_button_controller.clone());
+        text_view.add_controller(secondary_button_controller.clone());
 
         // Init shared reference container for HashTable collected
         let links = Rc::new(links);
@@ -308,27 +407,46 @@ impl Gemini {
                     window_x as i32,
                     window_y as i32,
                 );
-
                 if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = links.get(&tag) {
-                            // Select link handler by scheme
-                            return match uri.scheme().as_str() {
-                                "gemini" | "titan" | "nex" | "file" => {
-                                    item_action.load.activate(Some(&uri.to_str()), true, false)
-                                }
-                                // Scheme not supported, delegate
-                                _ => UriLauncher::new(&uri.to_str()).launch(
-                                    Window::NONE,
-                                    Cancellable::NONE,
-                                    |result| {
-                                        if let Err(e) = result {
-                                            println!("{e}")
-                                        }
-                                    },
-                                ),
-                            }; // @TODO common handler?
+                            return open_link_in_current_tab(&uri.to_string(), &item_action);
+                        }
+                    }
+                }
+            }
+        });
+
+        secondary_button_controller.connect_pressed({
+            let links = links.clone();
+            let text_view = text_view.clone();
+            let link_context = link_context.clone();
+            move |_, _, window_x, window_y| {
+                let x = window_x as i32;
+                let y = window_y as i32;
+                // Detect tag match current coords hovered
+                let (buffer_x, buffer_y) =
+                    text_view.window_to_buffer_coords(TextWindowType::Widget, x, y);
+                if let Some(iter) = text_view.iter_at_location(buffer_x, buffer_y) {
+                    for tag in iter.tags() {
+                        // Tag is link
+                        if let Some(uri) = links.get(&tag) {
+                            let request_str = uri.to_str();
+                            let request_var = request_str.to_variant();
+
+                            action_link_tab.set_state(&request_var);
+                            action_link_copy.set_state(&request_var);
+
+                            action_link_download.set_state(&request_var);
+                            action_link_download.set_enabled(is_prefixable_link(&request_str));
+
+                            action_link_source.set_state(&request_var);
+                            action_link_source.set_enabled(is_prefixable_link(&request_str));
+
+                            link_context
+                                .set_pointing_to(Some(&gtk::gdk::Rectangle::new(x, y, 1, 1)));
+                            link_context.popup();
                         }
                     }
                 }
@@ -350,30 +468,7 @@ impl Gemini {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = links.get(&tag) {
-                            // Select link handler by scheme
-                            return match uri.scheme().as_str() {
-                                "gemini" | "titan" | "nex" | "file" => {
-                                    // Open new page in browser
-                                    window_action.append.activate_stateful_once(
-                                        Position::After,
-                                        Some(uri.to_string()),
-                                        false,
-                                        false,
-                                        true,
-                                        true,
-                                    );
-                                }
-                                // Scheme not supported, delegate
-                                _ => UriLauncher::new(&uri.to_str()).launch(
-                                    Window::NONE,
-                                    Cancellable::NONE,
-                                    |result| {
-                                        if let Err(e) = result {
-                                            println!("{e}")
-                                        }
-                                    },
-                                ),
-                            }; // @TODO common handler?
+                            return open_link_in_new_tab(&uri.to_string(), &window_action);
                         }
                     }
                 }
@@ -432,3 +527,58 @@ impl Gemini {
         }
     }
 }
+
+fn is_internal_link(request: &str) -> bool {
+    // schemes
+    request.starts_with("gemini://")
+        || request.starts_with("titan://")
+        || request.starts_with("nex://")
+        || request.starts_with("file://")
+        // prefix
+        || request.starts_with("download:")
+        || request.starts_with("source:")
+}
+
+fn is_prefixable_link(request: &str) -> bool {
+    request.starts_with("gemini://")
+        || request.starts_with("nex://")
+        || request.starts_with("file://")
+}
+
+fn open_link_in_external_app(request: &str) {
+    UriLauncher::new(request).launch(Window::NONE, Cancellable::NONE, |r| {
+        if let Err(e) = r {
+            println!("{e}") // @TODO use warn macro
+        }
+    })
+}
+
+fn open_link_in_current_tab(request: &str, item_action: &ItemAction) {
+    if is_internal_link(request) {
+        item_action.load.activate(Some(request), true, false)
+    } else {
+        open_link_in_external_app(request)
+    }
+}
+
+fn open_link_in_new_tab(request: &str, window_action: &WindowAction) {
+    if is_internal_link(request) {
+        window_action.append.activate_stateful_once(
+            Position::After,
+            Some(request.into()),
+            false,
+            false,
+            true,
+            true,
+        );
+    } else {
+        open_link_in_external_app(request)
+    }
+}
+
+fn link_prefix(request: String, prefix: &str) -> String {
+    format!("{prefix}{}", request.trim_start_matches(prefix))
+}
+
+const LINK_PREFIX_DOWNLOAD: &str = "download:";
+const LINK_PREFIX_SOURCE: &str = "source:";
