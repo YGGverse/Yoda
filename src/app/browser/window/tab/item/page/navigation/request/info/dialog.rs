@@ -121,7 +121,7 @@ impl Dialog for PreferencesDialog {
                 /// Lookup [MaxMind](https://www.maxmind.com) database
                 fn l(profile: &Profile, socket_address: &SocketAddress) -> Option<String> {
                     use maxminddb::{
-                        MaxMindDbError, Reader,
+                        Reader,
                         geoip2::{/*City,*/ Country},
                     };
                     if !matches!(
@@ -136,26 +136,16 @@ impl Dialog for PreferencesDialog {
                         Reader::open_readfile(c)
                     }
                     .ok()?;
-                    let lookup = {
-                        let a: std::net::SocketAddr = socket_address.to_string().parse().unwrap();
-                        let lookup: std::result::Result<Option<Country>, MaxMindDbError> =
-                            db.lookup(a.ip());
-                        lookup
+                    let a: std::net::SocketAddr = socket_address.to_string().parse().unwrap();
+                    let c: Country = db.lookup(a.ip()).ok()?.decode().ok()??;
+                    let mut b = Vec::new();
+                    if let Some(iso_code) = c.country.iso_code {
+                        b.push(iso_code);
                     }
-                    .ok()??;
-                    lookup.country.map(|c| {
-                        let mut b = Vec::new();
-                        if let Some(iso_code) = c.iso_code {
-                            b.push(iso_code)
-                        }
-                        if let Some(n) = c.names
-                            && let Some(s) = n.get("en")
-                        {
-                            b.push(s)
-                        } // @TODO multi-lang
-                        // @TODO city DB
-                        b.join(", ")
-                    })
+                    if let Some(name_en) = c.country.names.english {
+                        b.push(name_en);
+                    }
+                    b.join(", ").into()
                 }
                 p.add(&{
                     let g = PreferencesGroup::builder().title("Remote").build();

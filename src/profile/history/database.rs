@@ -151,7 +151,7 @@ pub fn select(
                 //profile_id: row.get(1)?,
                 opened: Event {
                     time: DateTime::from_unix_local(row.get(2)?).unwrap(),
-                    count: row.get(3)?,
+                    count: row.get::<_, i64>(3)? as usize,
                 },
                 closed: closed(row.get(4)?, row.get(5)?),
                 request: row.get::<_, String>(6)?.into(),
