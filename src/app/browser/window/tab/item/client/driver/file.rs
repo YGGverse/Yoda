@@ -71,6 +71,31 @@ impl File {
                                         .set_mime(Some(content_type.to_string()));
                                 }
                                 match content_type.as_str() {
+                                    "text/gemini" => {
+                                        if matches!(*feature, Feature::Source) {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Source(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
+                                        } else {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Gemini(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    }
                                     "text/plain" => {
                                         if matches!(*feature, Feature::Source) {
                                             load_contents_async(file, cancellable, move |result| {
@@ -111,6 +136,31 @@ impl File {
                                                 match result {
                                                     Ok(data) => {
                                                         Text::Gemini(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    }
+                                    "text/markdown" => {
+                                        if matches!(*feature, Feature::Source) {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Source(uri, data).handle(&page)
+                                                    }
+                                                    Err(message) => {
+                                                        Status::Failure(message).handle(&page)
+                                                    }
+                                                }
+                                            })
+                                        } else {
+                                            load_contents_async(file, cancellable, move |result| {
+                                                match result {
+                                                    Ok(data) => {
+                                                        Text::Markdown(uri, data).handle(&page)
                                                     }
                                                     Err(message) => {
                                                         Status::Failure(message).handle(&page)
