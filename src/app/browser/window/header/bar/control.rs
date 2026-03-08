@@ -8,17 +8,24 @@ pub struct Control {
 
 impl Default for Control {
     fn default() -> Self {
-        Self::new()
+        Self::right()
     }
 }
 
 impl Control {
-    // Construct
-    pub fn new() -> Self {
+    pub fn right() -> Self {
         Self {
             window_controls: WindowControls::builder()
                 .margin_end(MARGIN)
                 .side(PackType::End)
+                .build(),
+        }
+    }
+    pub fn left() -> Self {
+        Self {
+            window_controls: WindowControls::builder()
+                .margin_end(MARGIN)
+                .side(PackType::Start)
                 .build(),
         }
     }
