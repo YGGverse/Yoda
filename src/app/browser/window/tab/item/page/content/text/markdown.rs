@@ -37,8 +37,22 @@ impl Markdown {
     pub fn build(
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
-        gemtext: &str,
+        markdown: &str,
     ) -> Result<Self, Error> {
+        /// Header tag
+        fn header(buffer: &TextBuffer, tag: &TextTag, line: &str, pattern: &str) -> Option<String> {
+            if let Some(h) = line.trim_start().strip_prefix(pattern)
+                && !h.starts_with(pattern)
+            {
+                let header = h.trim();
+                buffer.insert_with_tags(&mut buffer.end_iter(), header, &[tag]);
+                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+                Some(header.into())
+            } else {
+                None
+            }
+        }
+
         // Init default values
         let mut title = None;
 
@@ -98,7 +112,7 @@ impl Markdown {
         let is_code_enabled = {
             use ggemtext::line::code::{self};
             let mut t: usize = 0;
-            for l in gemtext.lines() {
+            for l in markdown.lines() {
                 if l.starts_with(code::TAG) {
                     t += 1;
                 }
@@ -106,8 +120,8 @@ impl Markdown {
             t == 0 || t.is_multiple_of(2)
         };
 
-        // Parse gemtext lines
-        for line in gemtext.lines() {
+        // Parse markdown lines
+        'l: for line in markdown.lines() {
             if is_code_enabled {
                 use ggemtext::line::Code;
                 match code {
@@ -192,25 +206,27 @@ impl Markdown {
                 }
             }
 
-            // Is header
-            {
-                use ggemtext::line::{Header, header::Level};
-                if let Some(header) = Header::parse(line) {
-                    buffer.insert_with_tags(
-                        &mut buffer.end_iter(),
-                        &header.value,
-                        &[match header.level {
-                            Level::H1 => &tag.h1,
-                            Level::H2 => &tag.h2,
-                            Level::H3 => &tag.h3,
-                        }],
-                    );
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
+            // Is 1-6 level header
+            for level in 1..=6 {
+                if let Some(t) = header(
+                    &buffer,
+                    match level {
+                        1 => &tag.h1,
+                        2 => &tag.h2,
+                        3 => &tag.h3,
+                        4 => &tag.h4,
+                        5 => &tag.h5,
+                        6 => &tag.h6,
+                        _ => unreachable!(),
+                    },
+                    line,
+                    &H.repeat(level),
+                ) {
+                    // Update document title by tag, if not set before
                     if title.is_none() {
-                        title = Some(header.value.clone());
+                        title = Some(t);
                     }
-                    continue;
+                    continue 'l;
                 }
             }
 
@@ -521,7 +537,7 @@ impl Markdown {
             Ok(Self { text_view, title })
         } else {
             Err(Error::Markup(
-                "Invalid multiline markup! Gemtext format partially ignored.".to_string(),
+                "Invalid multiline markup! Markdown format partially ignored.".to_string(),
                 Self { text_view, title },
             ))
         }
@@ -582,3 +598,5 @@ fn link_prefix(request: String, prefix: &str) -> String {
 
 const LINK_PREFIX_DOWNLOAD: &str = "download:";
 const LINK_PREFIX_SOURCE: &str = "source:";
+
+const H: &str = "#";

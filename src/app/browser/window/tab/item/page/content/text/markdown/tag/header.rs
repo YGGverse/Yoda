@@ -4,6 +4,9 @@ pub trait Header {
     fn h1() -> Self;
     fn h2() -> Self;
     fn h3() -> Self;
+    fn h4() -> Self;
+    fn h5() -> Self;
+    fn h6() -> Self;
 }
 
 impl Header for TextTag {
@@ -31,6 +34,33 @@ impl Header for TextTag {
             .scale(1.2)
             .sentence(true)
             .weight(400)
+            .wrap_mode(WrapMode::Word)
+            .build()
+    }
+    fn h4() -> Self {
+        TextTag::builder()
+            .foreground("#c88800") // @TODO optional
+            .scale(1.1)
+            .sentence(true)
+            .weight(400)
+            .wrap_mode(WrapMode::Word)
+            .build()
+    }
+    fn h5() -> Self {
+        TextTag::builder()
+            .foreground("#c88800") // @TODO optional
+            .scale(1.0)
+            .sentence(true)
+            .weight(400)
+            .wrap_mode(WrapMode::Word)
+            .build()
+    }
+    fn h6() -> Self {
+        TextTag::builder()
+            .foreground("#c88800") // @TODO optional
+            .scale(1.0)
+            .sentence(true)
+            .weight(300)
             .wrap_mode(WrapMode::Word)
             .build()
     }

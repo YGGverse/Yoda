@@ -17,6 +17,9 @@ pub struct Tag {
     pub h1: TextTag,
     pub h2: TextTag,
     pub h3: TextTag,
+    pub h4: TextTag,
+    pub h5: TextTag,
+    pub h6: TextTag,
     pub list: TextTag,
     pub quote: TextTag,
     pub title: TextTag,
@@ -36,6 +39,9 @@ impl Tag {
         let h1 = TextTag::h1();
         let h2 = TextTag::h2();
         let h3 = TextTag::h3();
+        let h4 = TextTag::h4();
+        let h5 = TextTag::h5();
+        let h6 = TextTag::h6();
         let list = TextTag::list();
         let quote = TextTag::quote();
         let title = TextTag::title();
@@ -47,6 +53,9 @@ impl Tag {
         text_tag_table.add(&h1);
         text_tag_table.add(&h2);
         text_tag_table.add(&h3);
+        text_tag_table.add(&h4);
+        text_tag_table.add(&h5);
+        text_tag_table.add(&h6);
         text_tag_table.add(&title);
         text_tag_table.add(&list);
         text_tag_table.add(&quote);
@@ -58,6 +67,9 @@ impl Tag {
             h1,
             h2,
             h3,
+            h4,
+            h5,
+            h6,
             list,
             quote,
             title,
