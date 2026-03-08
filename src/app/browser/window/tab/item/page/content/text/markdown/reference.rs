@@ -1,8 +1,16 @@
-use gtk::glib::{Uri, UriFlags};
+use super::Tag;
+use gtk::{
+    TextBuffer, TextIter, TextTag, WrapMode,
+    gdk::RGBA,
+    glib::{Uri, UriFlags},
+    prelude::{TextBufferExt, TextBufferExtManual},
+};
+use regex::Regex;
+use std::collections::HashMap;
 
-pub const REGEX_LINK: &str = r"\[(?P<text>[^\]]+)\]\((?P<url>[^\)]+)\)";
-
-pub const REGEX_IMAGE_LINK: &str =
+const REGEX_LINK: &str = r"\[(?P<text>[^\]]+)\]\((?P<url>[^\)]+)\)";
+const REGEX_IMAGE: &str = r"!\[(?P<alt>[^\]]+)\]\((?P<url>[^\)]+)\)";
+const REGEX_IMAGE_LINK: &str =
     r"\[(?P<is_img>!)\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
 
 pub struct Reference {
@@ -11,7 +19,7 @@ pub struct Reference {
 }
 
 impl Reference {
-    pub fn parse(address: &str, alt: Option<&str>, base: &Uri) -> Option<Self> {
+    fn parse(address: &str, alt: Option<&str>, base: &Uri) -> Option<Self> {
         // Convert address to the valid URI,
         // resolve to absolute URL format if the target is relative
         match Uri::resolve_relative(
@@ -55,16 +63,15 @@ impl Reference {
             Err(_) => None,
         }
     }
-    pub fn into_buffer(
+    fn into_buffer(
         self,
-        buffer: &gtk::TextBuffer,
-        position: &mut gtk::TextIter,
-        link_color: &gtk::gdk::RGBA,
+        buffer: &TextBuffer,
+        position: &mut TextIter,
+        link_color: &RGBA,
         tag: &super::Tag,
         is_annotation: bool,
-        links: &mut std::collections::HashMap<gtk::TextTag, Uri>,
+        links: &mut HashMap<TextTag, Uri>,
     ) {
-        use gtk::{TextTag, WrapMode, prelude::TextBufferExtManual};
         let a = if is_annotation {
             buffer.insert_with_tags(position, " ", &[]);
             TextTag::builder()
@@ -94,25 +101,151 @@ impl Reference {
     }
 }
 
+/// Image links `[![]()]()`
+pub fn image_link(
+    buffer: &TextBuffer,
+    tag: &Tag,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let (start, end) = buffer.bounds();
+    let full_content = buffer.text(&start, &end, true).to_string();
+
+    let matches: Vec<_> = Regex::new(REGEX_IMAGE_LINK)
+        .unwrap()
+        .captures_iter(&full_content)
+        .collect();
+
+    for cap in matches.into_iter().rev() {
+        let full_match = cap.get(0).unwrap();
+
+        let start_char_offset = full_content[..full_match.start()].chars().count() as i32;
+        let end_char_offset = full_content[..full_match.end()].chars().count() as i32;
+
+        let mut start_iter = buffer.iter_at_offset(start_char_offset);
+        let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        buffer.delete(&mut start_iter, &mut end_iter);
+
+        if let Some(reference) = Reference::parse(
+            &cap["img_url"],
+            if cap["alt"].is_empty() {
+                None
+            } else {
+                Some(&cap["alt"])
+            },
+            base,
+        ) {
+            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+        }
+        if let Some(reference) = Reference::parse(&cap["link_url"], Some("1"), base) {
+            reference.into_buffer(buffer, &mut start_iter, link_color, tag, true, links)
+        }
+    }
+}
+/// Image tags `![]()`
+pub fn image(
+    buffer: &TextBuffer,
+    tag: &Tag,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let (start, end) = buffer.bounds();
+    let full_content = buffer.text(&start, &end, true).to_string();
+
+    let matches: Vec<_> = Regex::new(REGEX_IMAGE)
+        .unwrap()
+        .captures_iter(&full_content)
+        .collect();
+
+    for cap in matches.into_iter().rev() {
+        let full_match = cap.get(0).unwrap();
+
+        let start_char_offset = full_content[..full_match.start()].chars().count() as i32;
+        let end_char_offset = full_content[..full_match.end()].chars().count() as i32;
+
+        let mut start_iter = buffer.iter_at_offset(start_char_offset);
+        let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        buffer.delete(&mut start_iter, &mut end_iter);
+
+        if let Some(reference) = Reference::parse(
+            &cap["url"],
+            if cap["alt"].is_empty() {
+                None
+            } else {
+                Some(&cap["alt"])
+            },
+            base,
+        ) {
+            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+        }
+    }
+}
+/// Links `[]()`
+pub fn link(
+    buffer: &TextBuffer,
+    tag: &Tag,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let (start, end) = buffer.bounds();
+    let full_content = buffer.text(&start, &end, true).to_string();
+
+    let matches: Vec<_> = Regex::new(REGEX_LINK)
+        .unwrap()
+        .captures_iter(&full_content)
+        .collect();
+
+    for cap in matches.into_iter().rev() {
+        let full_match = cap.get(0).unwrap();
+
+        let start_char_offset = full_content[..full_match.start()].chars().count() as i32;
+        let end_char_offset = full_content[..full_match.end()].chars().count() as i32;
+
+        let mut start_iter = buffer.iter_at_offset(start_char_offset);
+        let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        buffer.delete(&mut start_iter, &mut end_iter);
+
+        if let Some(reference) = Reference::parse(
+            &cap["url"],
+            if cap["text"].is_empty() {
+                None
+            } else {
+                Some(&cap["text"])
+            },
+            base,
+        ) {
+            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+        }
+    }
+}
+
 #[test]
 fn test_regex_link() {
-    let cap: Vec<_> = regex::Regex::new(REGEX_LINK)
+    let cap: Vec<_> = Regex::new(REGEX_LINK)
         .unwrap()
         .captures_iter(r#"[link1](https://link1.com) [link2](https://link2.com)"#)
         .collect();
 
     let first = cap.get(0).unwrap();
+    assert_eq!(&first[0], "[link1](https://link1.com)");
     assert_eq!(&first["text"], "link1");
     assert_eq!(&first["url"], "https://link1.com");
 
     let second = cap.get(1).unwrap();
+    assert_eq!(&second[0], "[link2](https://link2.com)");
     assert_eq!(&second["text"], "link2");
     assert_eq!(&second["url"], "https://link2.com");
 }
 
 #[test]
 fn test_regex_image_link() {
-    let cap: Vec<_> = regex::Regex::new(
+    let cap: Vec<_> = Regex::new(
         REGEX_IMAGE_LINK,
     )
     .unwrap().captures_iter(
@@ -120,12 +253,38 @@ fn test_regex_image_link() {
     ).collect();
 
     let first = cap.get(0).unwrap();
+    assert_eq!(
+        &first[0],
+        "[![image1](https://image1.com)](https://image2.com)"
+    );
     assert_eq!(&first["alt"], "image1");
     assert_eq!(&first["img_url"], "https://image1.com");
     assert_eq!(&first["link_url"], "https://image2.com");
 
     let second = cap.get(1).unwrap();
+    assert_eq!(
+        &second[0],
+        "[![image3](https://image3.com)](https://image4.com)"
+    );
     assert_eq!(&second["alt"], "image3");
     assert_eq!(&second["img_url"], "https://image3.com");
     assert_eq!(&second["link_url"], "https://image4.com");
+}
+
+#[test]
+fn test_regex_image() {
+    let cap: Vec<_> = Regex::new(REGEX_IMAGE)
+        .unwrap()
+        .captures_iter(r#"![image1](https://image1.com) ![image2](https://image2.com)"#)
+        .collect();
+
+    let first = cap.get(0).unwrap();
+    assert_eq!(&first[0], "![image1](https://image1.com)");
+    assert_eq!(&first["alt"], "image1");
+    assert_eq!(&first["url"], "https://image1.com");
+
+    let second = cap.get(1).unwrap();
+    assert_eq!(&second[0], "![image2](https://image2.com)");
+    assert_eq!(&second["alt"], "image2");
+    assert_eq!(&second["url"], "https://image2.com");
 }

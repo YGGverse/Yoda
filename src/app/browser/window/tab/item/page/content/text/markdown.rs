@@ -19,8 +19,6 @@ use gtk::{
 };
 use gutter::Gutter;
 use icon::Icon;
-use reference::Reference;
-use regex::Regex;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 use syntax::Syntax;
@@ -53,7 +51,7 @@ impl Markdown {
         let hover: Rc<Cell<Option<TextTag>>> = Rc::new(Cell::new(None));
 
         // Init code features
-        let mut code = None;
+        //let mut code = None;
 
         // Init quote icon feature
         let mut is_line_after_quote = false;
@@ -76,6 +74,7 @@ impl Markdown {
 
         // Init new text buffer
         let buffer = TextBuffer::new(Some(&tag.text_tag_table));
+        buffer.set_text(markdown);
 
         // Init main widget
         let text_view = {
@@ -109,8 +108,15 @@ impl Markdown {
             t == 0 || t.is_multiple_of(2)
         };
 
+        // Parse in-line markdown tags
+        // * keep order!
+
+        reference::image_link(&buffer, &tag, base, &link_color.0, &mut links);
+        reference::image(&buffer, &tag, base, &link_color.0, &mut links);
+        reference::link(&buffer, &tag, base, &link_color.0, &mut links);
+
         // Parse single-line markdown tags
-        'l: for line in markdown.lines() {
+        /*'l: for line in markdown.lines() {
             if is_code_enabled {
                 use ggemtext::line::Code;
                 match code {
@@ -254,12 +260,7 @@ impl Markdown {
             // just append plain text covered in empty tag (to handle controller events properly)
             buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain]);
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-        }
-
-        // Parse in-line markdown tags
-
-        image_link(&buffer, &tag, base, &link_color.0, &mut links);
-        link(&buffer, &tag, base, &link_color.0, &mut links);
+        }*/
 
         // Context menu
         let action_link_tab =
@@ -555,91 +556,6 @@ fn open_link_in_new_tab(request: &str, window_action: &WindowAction) {
 
 fn link_prefix(request: String, prefix: &str) -> String {
     format!("{prefix}{}", request.trim_start_matches(prefix))
-}
-
-/// Link
-fn image_link(
-    buffer: &TextBuffer,
-    tag: &Tag,
-    base: &Uri,
-    link_color: &RGBA,
-    links: &mut HashMap<TextTag, Uri>,
-) {
-    let start_iter = buffer.start_iter();
-    let end_iter = buffer.end_iter();
-    let full_content = buffer.text(&start_iter, &end_iter, true).to_string();
-
-    buffer.set_text("");
-
-    let mut last_pos = 0;
-    for cap in Regex::new(r"(?P<full_match>\[(?P<is_img>!|)?\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\))")
-        .unwrap()
-        .captures_iter(&full_content)
-    {
-        let full_match = cap.get(0).unwrap();
-        let before = &full_content[last_pos..full_match.start()];
-        if !before.is_empty() {
-            buffer.insert(&mut buffer.end_iter(), before);
-        }
-        if let Some(link) = Reference::parse(
-            &cap["link_url"],
-            None,
-            base,
-        ) {
-                link.into_buffer(buffer,
-                    link_color,
-                    tag,
-                    links)
-            }
-        last_pos = full_match.end();
-    }
-    let after = &full_content[last_pos..];
-    if !after.is_empty() {
-        buffer.insert(&mut buffer.end_iter(), after);
-    }
-}
-
-/// Link
-fn link(
-    buffer: &TextBuffer,
-    tag: &Tag,
-    base: &Uri,
-    link_color: &RGBA,
-    links: &mut HashMap<TextTag, Uri>,
-) {
-    let start_iter = buffer.start_iter();
-    let end_iter = buffer.end_iter();
-    let full_content = buffer.text(&start_iter, &end_iter, true).to_string();
-
-    buffer.set_text("");
-
-    let mut last_pos = 0;
-    for cap in Regex::new(r"(?P<is_img>!)\[(?P<text>[^\]]+)\]\((?P<url>[^\)]+)\)")
-        .unwrap()
-        .captures_iter(&full_content)
-    {
-        let full_match = cap.get(0).unwrap();
-        let before = &full_content[last_pos..full_match.start()];
-        if !before.is_empty() {
-            buffer.insert(&mut buffer.end_iter(), before);
-        }
-        if let Some(link) = Reference::parse(
-            &cap["url"],
-            if cap["text"].is_empty() {
-                None
-            } else {
-                Some(&cap["text"])
-            },
-            base,
-        ) {
-            link.into_buffer(buffer, link_color, tag, links)
-        }
-        last_pos = full_match.end();
-    }
-    let after = &full_content[last_pos..];
-    if !after.is_empty() {
-        buffer.insert(&mut buffer.end_iter(), after);
-    }
 }
 
 /// Header tag
