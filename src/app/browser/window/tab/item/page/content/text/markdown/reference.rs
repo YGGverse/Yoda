@@ -26,7 +26,7 @@ impl Reference {
                         }
                     )
                 }
-                None => String::new(),
+                None => address.into(),
             },
             UriFlags::NONE,
         ) {
