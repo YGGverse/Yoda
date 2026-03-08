@@ -13,11 +13,12 @@ use gtk::{
     UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
     gio::{Cancellable, SimpleAction, SimpleActionGroup},
-    glib::{Uri, uuid_string_random},
+    glib::{Uri, UriFlags, uuid_string_random},
     prelude::{PopoverExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
 use icon::Icon;
+use regex::Regex;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 use syntax::Syntax;
@@ -39,20 +40,6 @@ impl Markdown {
         base: &Uri,
         markdown: &str,
     ) -> Result<Self, Error> {
-        /// Header tag
-        fn header(buffer: &TextBuffer, tag: &TextTag, line: &str, pattern: &str) -> Option<String> {
-            if let Some(h) = line.trim_start().strip_prefix(pattern)
-                && !h.starts_with(pattern)
-            {
-                let header = h.trim();
-                buffer.insert_with_tags(&mut buffer.end_iter(), header, &[tag]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                Some(header.into())
-            } else {
-                None
-            }
-        }
-
         // Init default values
         let mut title = None;
 
@@ -120,7 +107,7 @@ impl Markdown {
             t == 0 || t.is_multiple_of(2)
         };
 
-        // Parse markdown lines
+        // Parse single-line markdown tags
         'l: for line in markdown.lines() {
             if is_code_enabled {
                 use ggemtext::line::Code;
@@ -230,39 +217,6 @@ impl Markdown {
                 }
             }
 
-            // Is link
-            if let Some(link) = ggemtext::line::Link::parse(line) {
-                if let Some(uri) = link.uri(Some(base)) {
-                    let mut alt = Vec::new();
-
-                    if uri.scheme() != base.scheme() {
-                        alt.push("⇖".to_string());
-                    }
-
-                    alt.push(match link.alt {
-                        Some(alt) => alt,
-                        None => uri.to_string(),
-                    });
-
-                    let a = TextTag::builder()
-                        .foreground_rgba(&link_color.0)
-                        // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
-                        .sentence(true)
-                        .wrap_mode(WrapMode::Word)
-                        .build();
-
-                    if !tag.text_tag_table.add(&a) {
-                        panic!()
-                    }
-
-                    buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                    links.insert(a, uri);
-                }
-                continue;
-            }
-
             // Is list
 
             if let Some(value) = ggemtext::line::list::Gemtext::as_value(line) {
@@ -299,6 +253,10 @@ impl Markdown {
             buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain]);
             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }
+
+        // Parse in-line markdown tags
+
+        link(&buffer, &tag, base, &link_color.0, &mut links);
 
         // Context menu
         let action_link_tab =
@@ -594,6 +552,106 @@ fn open_link_in_new_tab(request: &str, window_action: &WindowAction) {
 
 fn link_prefix(request: String, prefix: &str) -> String {
     format!("{prefix}{}", request.trim_start_matches(prefix))
+}
+
+/// Link
+fn link(
+    buffer: &TextBuffer,
+    tag: &Tag,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let start_iter = buffer.start_iter();
+    let end_iter = buffer.end_iter();
+    let full_content = buffer.text(&start_iter, &end_iter, true).to_string();
+
+    buffer.set_text("");
+
+    let mut last_pos = 0;
+    for cap in Regex::new(r"(?P<is_img>!?)\[(?P<text>[^\]]+)\]\((?P<url>[^\)]+)\)")
+        .unwrap()
+        .captures_iter(&full_content)
+    {
+        let full_match = cap.get(0).unwrap();
+        let before = &full_content[last_pos..full_match.start()];
+        if !before.is_empty() {
+            buffer.insert(&mut buffer.end_iter(), before);
+        }
+        // Relative scheme patch
+        // https://datatracker.ietf.org/doc/html/rfc3986#section-4.2
+        let unresolved_url = match cap["url"].strip_prefix("//") {
+            Some(p) => {
+                let s = p.trim_start_matches(":");
+                &format!(
+                    "{}://{}",
+                    base.scheme(),
+                    if s.is_empty() {
+                        format!("{}/", base.host().unwrap_or_default())
+                    } else {
+                        s.into()
+                    }
+                )
+            }
+            None => &cap["url"],
+        };
+        // Convert address to the valid URI,
+        // resolve to absolute URL format if the target is relative
+        match Uri::resolve_relative(Some(&base.to_string()), unresolved_url, UriFlags::NONE) {
+            Ok(url) => match Uri::parse(&url, UriFlags::NONE) {
+                Ok(uri) => {
+                    let alt = {
+                        let mut a: Vec<&str> = Vec::with_capacity(2);
+                        if uri.scheme() != base.scheme() {
+                            a.push("⇖");
+                        }
+                        if cap["text"].is_empty() {
+                            a.push(&cap["url"]);
+                        } else {
+                            a.push(&cap["text"]);
+                        }
+                        a.join(" ")
+                    };
+
+                    let a = TextTag::builder()
+                        .foreground_rgba(link_color)
+                        // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba())
+                        // @TODO adw 1.6 / ubuntu 24.10+
+                        .sentence(true)
+                        .wrap_mode(WrapMode::Word)
+                        .build();
+
+                    if !tag.text_tag_table.add(&a) {
+                        panic!()
+                    }
+
+                    buffer.insert_with_tags(&mut buffer.end_iter(), &alt, &[&a]);
+                    links.insert(a, uri);
+                }
+                Err(_) => todo!(),
+            },
+            Err(_) => continue,
+        }
+        last_pos = full_match.end();
+    }
+    let after = &full_content[last_pos..];
+    if !after.is_empty() {
+        buffer.insert(&mut buffer.end_iter(), after);
+    }
+}
+
+/// Header tag
+fn header(buffer: &TextBuffer, tag: &TextTag, line: &str, pattern: &str) -> Option<String> {
+    if let Some(h) = line.trim_start().strip_prefix(pattern)
+        && !h.starts_with(pattern)
+    {
+        let header = h.trim();
+        buffer.insert_with_tags(&mut buffer.end_iter(), header, &[tag]);
+        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
+        Some(header.into())
+    } else {
+        None
+    }
 }
 
 const LINK_PREFIX_DOWNLOAD: &str = "download:";

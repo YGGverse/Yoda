@@ -41,6 +41,7 @@ openssl = "0.10.72"
 plurify = "0.2.0"
 r2d2 = "0.8.10"
 r2d2_sqlite = "0.32.0"
+regex = "1.12.3"
 syntect = "5.2.0"
 
 # development
