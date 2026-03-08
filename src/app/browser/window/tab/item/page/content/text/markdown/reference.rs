@@ -50,4 +50,25 @@ impl Reference {
             Err(_) => None,
         }
     }
+    pub fn into_buffer(
+        self,
+        buffer: &gtk::TextBuffer,
+        link_color: &gtk::gdk::RGBA,
+        tag: &super::Tag,
+        links: &mut std::collections::HashMap<gtk::TextTag, Uri>,
+    ) {
+        use gtk::prelude::{TextBufferExt, TextBufferExtManual};
+        let a = gtk::TextTag::builder()
+            .foreground_rgba(link_color)
+            // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba())
+            // @TODO adw 1.6 / ubuntu 24.10+
+            .sentence(true)
+            .wrap_mode(gtk::WrapMode::Word)
+            .build();
+        if !tag.text_tag_table.add(&a) {
+            panic!()
+        }
+        buffer.insert_with_tags(&mut buffer.end_iter(), &self.alt, &[&a]);
+        links.insert(a, self.uri);
+    }
 }

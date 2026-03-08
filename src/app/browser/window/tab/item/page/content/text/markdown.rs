@@ -258,6 +258,7 @@ impl Markdown {
 
         // Parse in-line markdown tags
 
+        image_link(&buffer, &tag, base, &link_color.0, &mut links);
         link(&buffer, &tag, base, &link_color.0, &mut links);
 
         // Context menu
@@ -557,6 +558,48 @@ fn link_prefix(request: String, prefix: &str) -> String {
 }
 
 /// Link
+fn image_link(
+    buffer: &TextBuffer,
+    tag: &Tag,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let start_iter = buffer.start_iter();
+    let end_iter = buffer.end_iter();
+    let full_content = buffer.text(&start_iter, &end_iter, true).to_string();
+
+    buffer.set_text("");
+
+    let mut last_pos = 0;
+    for cap in Regex::new(r"(?P<full_match>\[(?P<is_img>!|)?\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\))")
+        .unwrap()
+        .captures_iter(&full_content)
+    {
+        let full_match = cap.get(0).unwrap();
+        let before = &full_content[last_pos..full_match.start()];
+        if !before.is_empty() {
+            buffer.insert(&mut buffer.end_iter(), before);
+        }
+        if let Some(link) = Reference::parse(
+            &cap["link_url"],
+            None,
+            base,
+        ) {
+                link.into_buffer(buffer,
+                    link_color,
+                    tag,
+                    links)
+            }
+        last_pos = full_match.end();
+    }
+    let after = &full_content[last_pos..];
+    if !after.is_empty() {
+        buffer.insert(&mut buffer.end_iter(), after);
+    }
+}
+
+/// Link
 fn link(
     buffer: &TextBuffer,
     tag: &Tag,
@@ -580,7 +623,7 @@ fn link(
         if !before.is_empty() {
             buffer.insert(&mut buffer.end_iter(), before);
         }
-        match Reference::parse(
+        if let Some(link) = Reference::parse(
             &cap["url"],
             if cap["text"].is_empty() {
                 None
@@ -589,21 +632,7 @@ fn link(
             },
             base,
         ) {
-            Some(link) => {
-                let a = TextTag::builder()
-                    .foreground_rgba(link_color)
-                    // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba())
-                    // @TODO adw 1.6 / ubuntu 24.10+
-                    .sentence(true)
-                    .wrap_mode(WrapMode::Word)
-                    .build();
-                if !tag.text_tag_table.add(&a) {
-                    panic!()
-                }
-                buffer.insert_with_tags(&mut buffer.end_iter(), &link.alt, &[&a]);
-                links.insert(a, link.uri);
-            }
-            None => continue,
+            link.into_buffer(buffer, link_color, tag, links)
         }
         last_pos = full_match.end();
     }
