@@ -68,7 +68,7 @@ impl Reference {
         buffer: &TextBuffer,
         position: &mut TextIter,
         link_color: &RGBA,
-        tag: &super::Tag,
+        tag: &Tag,
         is_annotation: bool,
         links: &mut HashMap<TextTag, Uri>,
     ) {
