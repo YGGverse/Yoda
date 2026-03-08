@@ -1,4 +1,5 @@
 mod gemini;
+mod markdown;
 mod nex;
 mod plain;
 mod source;
@@ -7,6 +8,7 @@ use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
 use gtk::{ScrolledWindow, TextView, glib::Uri};
+use markdown::Markdown;
 use nex::Nex;
 use plain::Plain;
 use source::Source;
@@ -38,6 +40,34 @@ impl Text {
             }),
             Err(e) => match e {
                 gemini::Error::Markup(message, widget) => Err((
+                    message,
+                    Some(Self {
+                        scrolled_window: reader(&widget.text_view),
+                        text_view: widget.text_view,
+                        meta: Meta {
+                            title: widget.title,
+                        },
+                    }),
+                )),
+            },
+        }
+    }
+
+    pub fn markdown(
+        actions: (&Rc<WindowAction>, &Rc<ItemAction>),
+        base: &Uri,
+        gemtext: &str,
+    ) -> Result<Self, (String, Option<Self>)> {
+        match Markdown::build(actions, base, gemtext) {
+            Ok(widget) => Ok(Self {
+                scrolled_window: reader(&widget.text_view),
+                text_view: widget.text_view,
+                meta: Meta {
+                    title: widget.title,
+                },
+            }),
+            Err(e) => match e {
+                markdown::Error::Markup(message, widget) => Err((
                     message,
                     Some(Self {
                         scrolled_window: reader(&widget.text_view),

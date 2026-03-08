@@ -154,6 +154,35 @@ impl Content {
         }
     }
 
+    /// `text/markdown`
+    pub fn to_text_markdown(&self, base: &Uri, data: &str) -> Text {
+        self.clean();
+        match Text::markdown((&self.window_action, &self.item_action), base, data) {
+            Ok(text) => {
+                self.g_box.append(&text.scrolled_window);
+                text
+            }
+            Err((message, text)) => {
+                self.g_box.append(&{
+                    let banner = adw::Banner::builder()
+                        .title(message)
+                        .revealed(true)
+                        .button_label("Ok")
+                        .build();
+                    banner.connect_button_clicked(|this| this.set_revealed(false));
+                    banner
+                });
+                match text {
+                    Some(text) => {
+                        self.g_box.append(&text.scrolled_window);
+                        text
+                    }
+                    None => todo!(),
+                }
+            }
+        }
+    }
+
     /// `text/plain`
     pub fn to_text_plain(&self, data: &str) -> Text {
         self.clean();

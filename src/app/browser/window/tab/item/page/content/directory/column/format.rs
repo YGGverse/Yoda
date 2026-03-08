@@ -15,6 +15,8 @@ impl Format for FileInfo {
                 if content_type == "text/plain" {
                     if display_name.ends_with(".gmi") || display_name.ends_with(".gemini") {
                         "text/gemini".into()
+                    } else if display_name.ends_with(".md") || display_name.ends_with(".markdown") {
+                        "text/markdown".into()
                     } else {
                         content_type
                     }
