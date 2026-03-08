@@ -217,7 +217,7 @@ impl Gemini {
             // Is link
             if let Some(link) = ggemtext::line::Link::parse(line) {
                 if let Some(uri) = link.uri(Some(base)) {
-                    let mut alt = Vec::new();
+                    let mut alt = Vec::with_capacity(2);
 
                     if uri.scheme() != base.scheme() {
                         alt.push("⇖".to_string());
