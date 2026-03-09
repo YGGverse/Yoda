@@ -10,19 +10,19 @@ use regex::Regex;
 use std::collections::HashMap;
 use syntax::Syntax;
 
-const REGEX_PRE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
+const REGEX_CODE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
 
 struct Entry {
     alt: Option<String>,
     data: String,
 }
 
-pub struct Pre {
+pub struct Code {
     index: HashMap<GString, Entry>,
     alt: TextTag,
 }
 
-impl Pre {
+impl Code {
     pub fn new() -> Self {
         Self {
             index: HashMap::new(),
@@ -35,12 +35,12 @@ impl Pre {
         }
     }
 
-    /// Collect all preformatted blocks into `Self.index` (to prevent formatting)
+    /// Collect all code blocks into `Self.index` (to prevent formatting)
     pub fn collect(&mut self, buffer: &TextBuffer) {
         let (start, end) = buffer.bounds();
         let full_content = buffer.text(&start, &end, true).to_string();
 
-        let matches: Vec<_> = Regex::new(REGEX_PRE)
+        let matches: Vec<_> = Regex::new(REGEX_CODE)
             .unwrap()
             .captures_iter(&full_content)
             .collect();
@@ -73,7 +73,7 @@ impl Pre {
         }
     }
 
-    /// Apply preformatted `Tag` to given `TextBuffer` using `Self.index`
+    /// Apply code `Tag` to given `TextBuffer` using `Self.index`
     pub fn render(&mut self, buffer: &TextBuffer) {
         let syntax = Syntax::new();
         assert!(buffer.tag_table().add(&self.alt));
@@ -113,7 +113,7 @@ fn alt(value: Option<&str>) -> Option<&str> {
 
 #[test]
 fn test_regex() {
-    let cap: Vec<_> = Regex::new(REGEX_PRE)
+    let cap: Vec<_> = Regex::new(REGEX_CODE)
         .unwrap()
         .captures_iter("Some ``` alt text\ncode line 1\ncode line 2``` and ```\ncode line 3\ncode line 4``` with ![img](https://link.com)")
         .collect();
