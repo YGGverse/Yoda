@@ -2,9 +2,8 @@ mod ansi;
 pub mod error;
 mod gutter;
 mod icon;
-mod reference;
 mod syntax;
-mod tag;
+mod tags;
 
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
@@ -22,7 +21,7 @@ use icon::Icon;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 use syntax::Syntax;
-use tag::Tag;
+use tags::Tags;
 
 pub const NEW_LINE: &str = "\n";
 
@@ -70,10 +69,10 @@ impl Markdown {
         let icon = Icon::new();
 
         // Init tags
-        let tag = Tag::new();
+        let tags = Tags::new();
 
         // Init new text buffer
-        let buffer = TextBuffer::new(Some(&tag.text_tag_table));
+        let buffer = TextBuffer::new(Some(&tags.text_tag_table));
         buffer.set_text(markdown);
 
         // Init main widget
@@ -111,12 +110,7 @@ impl Markdown {
         // Render markdown tags
         // * keep in order!
 
-        tag::header(&buffer, &tag);
-        tag::quote(&buffer, &tag);
-
-        reference::image_link(&buffer, &tag, base, &link_color.0, &mut links);
-        reference::image(&buffer, &tag, base, &link_color.0, &mut links);
-        reference::link(&buffer, &tag, base, &link_color.0, &mut links);
+        tags.render(&buffer, &base, &link_color.0, &mut links);
 
         // Parse single-line markdown tags
         /*'l: for line in markdown.lines() {

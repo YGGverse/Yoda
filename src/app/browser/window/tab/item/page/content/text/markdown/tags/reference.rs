@@ -1,4 +1,3 @@
-use super::Tag;
 use gtk::{
     TextBuffer, TextIter, TextTag, WrapMode,
     gdk::RGBA,
@@ -14,11 +13,12 @@ const REGEX_IMAGE_LINK: &str =
     r"\[(?P<is_img>!)\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
 
 pub struct Reference {
-    pub uri: Uri,
-    pub alt: String,
+    uri: Uri,
+    alt: String,
 }
 
 impl Reference {
+    /// Try construct new `Self` with given options
     fn parse(address: &str, alt: Option<&str>, base: &Uri) -> Option<Self> {
         // Convert address to the valid URI,
         // resolve to absolute URL format if the target is relative
@@ -63,12 +63,13 @@ impl Reference {
             Err(_) => None,
         }
     }
+
+    /// Insert `Self` into the given `TextBuffer` by registering new `TextTag` created
     fn into_buffer(
         self,
         buffer: &TextBuffer,
         position: &mut TextIter,
         link_color: &RGBA,
-        tag: &Tag,
         is_annotation: bool,
         links: &mut HashMap<TextTag, Uri>,
     ) {
@@ -93,18 +94,15 @@ impl Reference {
                 .wrap_mode(WrapMode::Word)
                 .build()
         };
-        if !tag.text_tag_table.add(&a) {
-            panic!()
-        }
+        assert!(buffer.tag_table().add(&a));
         buffer.insert_with_tags(position, &self.alt, &[&a]);
         links.insert(a, self.uri);
     }
 }
 
 /// Image links `[![]()]()`
-pub fn image_link(
+pub fn render_images_links(
     buffer: &TextBuffer,
-    tag: &Tag,
     base: &Uri,
     link_color: &RGBA,
     links: &mut HashMap<TextTag, Uri>,
@@ -128,7 +126,7 @@ pub fn image_link(
 
         buffer.delete(&mut start_iter, &mut end_iter);
 
-        if let Some(reference) = Reference::parse(
+        if let Some(this) = Reference::parse(
             &cap["img_url"],
             if cap["alt"].is_empty() {
                 None
@@ -137,17 +135,16 @@ pub fn image_link(
             },
             base,
         ) {
-            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+            this.into_buffer(buffer, &mut start_iter, link_color, false, links)
         }
-        if let Some(reference) = Reference::parse(&cap["link_url"], Some("1"), base) {
-            reference.into_buffer(buffer, &mut start_iter, link_color, tag, true, links)
+        if let Some(this) = Reference::parse(&cap["link_url"], Some("1"), base) {
+            this.into_buffer(buffer, &mut start_iter, link_color, true, links)
         }
     }
 }
 /// Image tags `![]()`
-pub fn image(
+pub fn render_images(
     buffer: &TextBuffer,
-    tag: &Tag,
     base: &Uri,
     link_color: &RGBA,
     links: &mut HashMap<TextTag, Uri>,
@@ -171,7 +168,7 @@ pub fn image(
 
         buffer.delete(&mut start_iter, &mut end_iter);
 
-        if let Some(reference) = Reference::parse(
+        if let Some(this) = Reference::parse(
             &cap["url"],
             if cap["alt"].is_empty() {
                 None
@@ -180,14 +177,13 @@ pub fn image(
             },
             base,
         ) {
-            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+            this.into_buffer(buffer, &mut start_iter, link_color, false, links)
         }
     }
 }
 /// Links `[]()`
-pub fn link(
+pub fn render_links(
     buffer: &TextBuffer,
-    tag: &Tag,
     base: &Uri,
     link_color: &RGBA,
     links: &mut HashMap<TextTag, Uri>,
@@ -211,7 +207,7 @@ pub fn link(
 
         buffer.delete(&mut start_iter, &mut end_iter);
 
-        if let Some(reference) = Reference::parse(
+        if let Some(this) = Reference::parse(
             &cap["url"],
             if cap["text"].is_empty() {
                 None
@@ -220,7 +216,7 @@ pub fn link(
             },
             base,
         ) {
-            reference.into_buffer(buffer, &mut start_iter, link_color, tag, false, links)
+            this.into_buffer(buffer, &mut start_iter, link_color, false, links)
         }
     }
 }
