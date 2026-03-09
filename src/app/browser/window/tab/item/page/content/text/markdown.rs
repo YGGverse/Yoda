@@ -1,7 +1,6 @@
 mod ansi;
 pub mod error;
 mod gutter;
-mod icon;
 mod syntax;
 mod tags;
 
@@ -9,21 +8,18 @@ use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
 pub use error::Error;
 use gtk::{
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
-    UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextTagTable, TextView,
+    TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
     gio::{Cancellable, SimpleAction, SimpleActionGroup},
     glib::{Uri, uuid_string_random},
-    prelude::{PopoverExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
+    prelude::{PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
-use icon::Icon;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 use syntax::Syntax;
 use tags::Tags;
-
-pub const NEW_LINE: &str = "\n";
 
 pub struct Markdown {
     pub title: Option<String>,
@@ -49,9 +45,6 @@ impl Markdown {
         // Init code features
         //let mut code = None;
 
-        // Init quote icon feature
-        let mut is_line_after_quote = false;
-
         // Init colors
         // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
         let link_color = (
@@ -62,14 +55,11 @@ impl Markdown {
         // Init syntect highlight features
         let syntax = Syntax::new();
 
-        // Init icons
-        let icon = Icon::new();
-
         // Init tags
         let tags = Tags::new();
 
         // Init new text buffer
-        let buffer = TextBuffer::new(Some(&tags.text_tag_table));
+        let buffer = TextBuffer::new(Some(&TextTagTable::new()));
         buffer.set_text(markdown);
 
         // Init main widget
@@ -194,42 +184,6 @@ impl Markdown {
                     }
                 }
             }
-
-            // Is list
-
-            if let Some(value) = ggemtext::line::list::Gemtext::as_value(line) {
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    &format!("• {value}"),
-                    &[&tag.list],
-                );
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                continue;
-            }
-
-            // Is quote
-
-            if let Some(quote) = ggemtext::line::quote::Gemtext::as_value(line) {
-                // Show quote indicator if last line is not quote (to prevent duplicates)
-                if !is_line_after_quote {
-                    // Show only if the icons resolved for default `Display`
-                    if let Some(ref icon) = icon {
-                        buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
-                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                    }
-                }
-                buffer.insert_with_tags(&mut buffer.end_iter(), quote, &[&tag.quote]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                is_line_after_quote = true;
-                continue;
-            } else {
-                is_line_after_quote = false;
-            }
-
-            // Nothing match custom tags above,
-            // just append plain text covered in empty tag (to handle controller events properly)
-            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain]);
-            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
         }*/
 
         // Context menu
@@ -528,21 +482,5 @@ fn link_prefix(request: String, prefix: &str) -> String {
     format!("{prefix}{}", request.trim_start_matches(prefix))
 }
 
-/// Header tag
-fn header(buffer: &TextBuffer, tag: &TextTag, line: &str, pattern: &str) -> Option<String> {
-    if let Some(h) = line.trim_start().strip_prefix(pattern)
-        && !h.starts_with(pattern)
-    {
-        let header = h.trim();
-        buffer.insert_with_tags(&mut buffer.end_iter(), header, &[tag]);
-        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-        Some(header.into())
-    } else {
-        None
-    }
-}
-
 const LINK_PREFIX_DOWNLOAD: &str = "download:";
 const LINK_PREFIX_SOURCE: &str = "source:";
-
-const H: &str = "#";

@@ -1,37 +1,24 @@
 mod bold;
 mod header;
-mod list;
 mod quote;
 mod reference;
 mod strike;
-mod title;
 mod underline;
 
 use std::collections::HashMap;
 
 use bold::Bold;
-use gtk::{
-    TextBuffer, TextTag, TextTagTable,
-    gdk::RGBA,
-    glib::Uri,
-    prelude::{TextBufferExt, TextBufferExtManual},
-};
+use gtk::{TextBuffer, TextTag, gdk::RGBA, glib::Uri};
 use header::Header;
-use list::List;
 use quote::Quote;
 use strike::Strike;
-use title::Title;
 use underline::Underline;
 
 pub struct Tags {
-    pub text_tag_table: TextTagTable,
-    // Tags
     pub bold: Bold,
     pub header: Header,
-    pub list: TextTag,
     pub quote: Quote,
     pub strike: Strike,
-    pub title: TextTag,
     pub underline: Underline,
 }
 
@@ -44,24 +31,11 @@ impl Default for Tags {
 impl Tags {
     // Construct
     pub fn new() -> Self {
-        // Init tag table
-        let text_tag_table = TextTagTable::new();
-
-        // Init shared tags members
-        let list = TextTag::list();
-        let title = TextTag::title();
-        text_tag_table.add(&title);
-        text_tag_table.add(&list);
-
         Self {
-            text_tag_table,
-            // Tags
             bold: Bold::new(),
             header: Header::new(),
-            list,
             quote: Quote::new(),
             strike: Strike::new(),
-            title,
             underline: Underline::new(),
         }
     }
