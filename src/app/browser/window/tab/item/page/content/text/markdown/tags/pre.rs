@@ -1,11 +1,14 @@
+mod ansi;
+mod syntax;
+
 use gtk::{
-    TextBuffer, TextSearchFlags, TextTag,
-    WrapMode::Word,
+    TextBuffer, TextSearchFlags, TextTag, WrapMode,
     glib::{GString, uuid_string_random},
     prelude::{TextBufferExt, TextBufferExtManual},
 };
 use regex::Regex;
 use std::collections::HashMap;
+use syntax::Syntax;
 
 const REGEX_PRE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
 
@@ -16,14 +19,19 @@ struct Entry {
 
 pub struct Pre {
     index: HashMap<GString, Entry>,
-    tag: TextTag,
+    alt: TextTag,
 }
 
 impl Pre {
     pub fn new() -> Self {
         Self {
             index: HashMap::new(),
-            tag: TextTag::builder().wrap_mode(Word).build(), // @TODO
+            alt: TextTag::builder()
+                .pixels_above_lines(4)
+                .pixels_below_lines(8)
+                .weight(500)
+                .wrap_mode(WrapMode::None)
+                .build(),
         }
     }
 
@@ -67,7 +75,8 @@ impl Pre {
 
     /// Apply preformatted `Tag` to given `TextBuffer` using `Self.index`
     pub fn render(&mut self, buffer: &TextBuffer) {
-        assert!(buffer.tag_table().add(&self.tag));
+        let syntax = Syntax::new();
+        assert!(buffer.tag_table().add(&self.alt));
         for (k, v) in self.index.iter() {
             while let Some((mut m_start, mut m_end)) =
                 buffer
@@ -75,11 +84,24 @@ impl Pre {
                     .forward_search(k, TextSearchFlags::VISIBLE_ONLY, None)
             {
                 buffer.delete(&mut m_start, &mut m_end);
-
-                let alt_text = v.alt.as_deref().unwrap_or("");
-                let display_text = format!("{} |\n {}", alt_text, v.data);
-
-                buffer.insert_with_tags(&mut m_start, &display_text, &[&self.tag]);
+                if let Some(ref alt) = v.alt {
+                    buffer.insert_with_tags(&mut m_start, &format!("{alt}\n"), &[&self.alt])
+                }
+                match syntax.highlight(&v.data, v.alt.as_ref()) {
+                    Ok(highlight) => {
+                        for (syntax_tag, entity) in highlight {
+                            assert!(buffer.tag_table().add(&syntax_tag));
+                            buffer.insert_with_tags(&mut m_start, &entity, &[&syntax_tag])
+                        }
+                    }
+                    Err(_) => {
+                        // Try ANSI/SGR format (terminal emulation) @TODO optional
+                        for (syntax_tag, entity) in ansi::format(&v.data) {
+                            assert!(buffer.tag_table().add(&syntax_tag));
+                            buffer.insert_with_tags(&mut m_start, &entity, &[&syntax_tag])
+                        }
+                    }
+                }
             }
         }
     }

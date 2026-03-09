@@ -62,9 +62,9 @@ impl Tags {
         self.strike.render(buffer);
         self.underline.render(buffer);
 
-        reference::render_images_links(&buffer, base, &link_color, links);
-        reference::render_images(&buffer, base, &link_color, links);
-        reference::render_links(&buffer, base, &link_color, links);
+        reference::render_images_links(buffer, base, link_color, links);
+        reference::render_images(buffer, base, link_color, links);
+        reference::render_links(buffer, base, link_color, links);
 
         self.pre.render(buffer);
 

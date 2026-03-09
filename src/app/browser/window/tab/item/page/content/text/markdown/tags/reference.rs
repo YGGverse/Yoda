@@ -223,11 +223,7 @@ pub fn render_links(
 
 pub fn strip_tags(value: &str) -> String {
     let mut result = String::from(value);
-    for cap in Regex::new(REGEX_LINK)
-        .unwrap()
-        .captures_iter(&value)
-        .into_iter()
-    {
+    for cap in Regex::new(REGEX_LINK).unwrap().captures_iter(value) {
         if let Some(m) = cap.get(0) {
             result = result.replace(m.as_str(), &cap["text"]);
         }
@@ -239,11 +235,7 @@ pub fn strip_tags(value: &str) -> String {
 fn test_strip_tags() {
     const VALUE: &str = r"Some text [link1](https://link1.com) [link2](https://link2.com)";
     let mut result = String::from(VALUE);
-    for cap in Regex::new(REGEX_LINK)
-        .unwrap()
-        .captures_iter(VALUE)
-        .into_iter()
-    {
+    for cap in Regex::new(REGEX_LINK).unwrap().captures_iter(VALUE) {
         if let Some(m) = cap.get(0) {
             result = result.replace(m.as_str(), &cap["text"]);
         }

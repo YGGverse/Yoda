@@ -1,7 +1,4 @@
-mod ansi;
-pub mod error;
 mod gutter;
-mod syntax;
 mod tags;
 
 use super::{ItemAction, WindowAction};
@@ -17,7 +14,6 @@ use gtk::{
 use gutter::Gutter;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
-use syntax::Syntax;
 use tags::Tags;
 
 pub struct Markdown {
@@ -51,9 +47,6 @@ impl Markdown {
             RGBA::new(0.208, 0.518, 0.894, 0.9),
         );
 
-        // Init syntect highlight features
-        let syntax = Syntax::new();
-
         // Init tags
         let mut tags = Tags::new();
 
@@ -81,94 +74,7 @@ impl Markdown {
         let gutter = Gutter::build(&text_view);
 
         // Render markdown tags
-        let title = tags.render(&buffer, &base, &link_color.0, &mut links);
-
-        // Parse single-line markdown tags
-        /*'l: for line in markdown.lines() {
-            if is_code_enabled {
-                use ggemtext::line::Code;
-                match code {
-                    None => {
-                        // Open tag found
-                        if let Some(c) = Code::begin_from(line) {
-                            // Begin next lines collection into the code buffer
-                            code = Some(c);
-
-                            // Skip other actions for this line
-                            continue;
-                        }
-                    }
-                    Some(ref mut c) => {
-                        match c.continue_from(line) {
-                            Ok(()) => {
-                                // Close tag found:
-                                if c.is_completed {
-                                    // Is alt provided
-                                    let alt = match c.alt {
-                                        Some(ref alt) => {
-                                            // Insert alt value to the main buffer
-                                            buffer.insert_with_tags(
-                                                &mut buffer.end_iter(),
-                                                alt.as_str(),
-                                                &[&tag.title],
-                                            );
-
-                                            // Append new line after alt text
-                                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                                            // Return value as wanted also for syntax highlight detection
-                                            Some(alt)
-                                        }
-                                        None => None,
-                                    };
-
-                                    // Begin code block construction
-                                    // Try auto-detect code syntax for given `value` and `alt` @TODO optional
-                                    match syntax.highlight(&c.value, alt) {
-                                        Ok(highlight) => {
-                                            for (syntax_tag, entity) in highlight {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        }
-                                        Err(_) => {
-                                            // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                            for (syntax_tag, entity) in ansi::format(&c.value) {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        } // @TODO handle
-                                    }
-
-                                    // Reset
-                                    code = None;
-                                }
-
-                                // Skip other actions for this line
-                                continue;
-                            }
-                            Err(_) => todo!(),
-                        }
-                    }
-                }
-            }
-        }*/
+        let title = tags.render(&buffer, base, &link_color.0, &mut links);
 
         // Context menu
         let action_link_tab =

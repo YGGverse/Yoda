@@ -48,11 +48,7 @@ impl Strike {
 
 pub fn strip_tags(value: &str) -> String {
     let mut result = String::from(value);
-    for cap in Regex::new(REGEX_STRIKE)
-        .unwrap()
-        .captures_iter(&value)
-        .into_iter()
-    {
+    for cap in Regex::new(REGEX_STRIKE).unwrap().captures_iter(value) {
         if let Some(m) = cap.get(0) {
             result = result.replace(m.as_str(), &cap["text"]);
         }
@@ -64,11 +60,7 @@ pub fn strip_tags(value: &str) -> String {
 fn test_strip_tags() {
     const VALUE: &str = r"Some ~~strike 1~~ and ~~strike 2~~ with ![img](https://link.com)";
     let mut result = String::from(VALUE);
-    for cap in Regex::new(REGEX_STRIKE)
-        .unwrap()
-        .captures_iter(VALUE)
-        .into_iter()
-    {
+    for cap in Regex::new(REGEX_STRIKE).unwrap().captures_iter(VALUE) {
         if let Some(m) = cap.get(0) {
             result = result.replace(m.as_str(), &cap["text"]);
         }
