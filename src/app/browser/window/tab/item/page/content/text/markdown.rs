@@ -108,8 +108,10 @@ impl Markdown {
             t == 0 || t.is_multiple_of(2)
         };
 
-        // Parse in-line markdown tags
-        // * keep order!
+        // Render markdown tags
+        // * keep in order!
+
+        tag::header(&buffer, &tag);
 
         reference::image_link(&buffer, &tag, base, &link_color.0, &mut links);
         reference::image(&buffer, &tag, base, &link_color.0, &mut links);
@@ -198,30 +200,6 @@ impl Markdown {
                             Err(_) => todo!(),
                         }
                     }
-                }
-            }
-
-            // Is 1-6 level header
-            for level in 1..=6 {
-                if let Some(t) = header(
-                    &buffer,
-                    match level {
-                        1 => &tag.h1,
-                        2 => &tag.h2,
-                        3 => &tag.h3,
-                        4 => &tag.h4,
-                        5 => &tag.h5,
-                        6 => &tag.h6,
-                        _ => unreachable!(),
-                    },
-                    line,
-                    &H.repeat(level),
-                ) {
-                    // Update document title by tag, if not set before
-                    if title.is_none() {
-                        title = Some(t);
-                    }
-                    continue 'l;
                 }
             }
 

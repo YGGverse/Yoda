@@ -4,11 +4,15 @@ mod plain;
 mod quote;
 mod title;
 
-use gtk::{TextTag, TextTagTable};
+use gtk::{
+    TextBuffer, TextTag, TextTagTable,
+    prelude::{TextBufferExt, TextBufferExtManual},
+};
 use header::Header;
 use list::List;
 use plain::Plain;
 use quote::Quote;
+use regex::Regex;
 use title::Title;
 
 pub struct Tag {
@@ -76,4 +80,54 @@ impl Tag {
             plain,
         }
     }
+}
+
+// Headers `#`, `##`, etc.
+
+const REGEX_HEADER: &str = r"(?m)^(?P<level>#{1,6})\s+(?P<title>.*)$";
+
+/// Apply header `Tag` to given `TextBuffer`
+pub fn header(buffer: &TextBuffer, tag: &Tag) {
+    let (start, end) = buffer.bounds();
+    let full_content = buffer.text(&start, &end, true).to_string();
+
+    let matches: Vec<_> = Regex::new(REGEX_HEADER)
+        .unwrap()
+        .captures_iter(&full_content)
+        .collect();
+
+    for cap in matches.into_iter().rev() {
+        let full_match = cap.get(0).unwrap();
+
+        let start_char_offset = full_content[..full_match.start()].chars().count() as i32;
+        let end_char_offset = full_content[..full_match.end()].chars().count() as i32;
+
+        let mut start_iter = buffer.iter_at_offset(start_char_offset);
+        let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        buffer.delete(&mut start_iter, &mut end_iter);
+
+        match cap["level"].chars().count() {
+            1 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h1]),
+            2 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h2]),
+            3 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h3]),
+            4 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h4]),
+            5 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h5]),
+            6 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&tag.h6]),
+            _ => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[]),
+        }
+    }
+}
+
+#[test]
+fn test_regex_header() {
+    let cap: Vec<_> = Regex::new(REGEX_HEADER)
+        .unwrap()
+        .captures_iter(r"## Title ![alt](https://link.com)")
+        .collect();
+
+    let first = cap.get(0).unwrap();
+    assert_eq!(&first[0], "## Title ![alt](https://link.com)");
+    assert_eq!(&first["level"], "##");
+    assert_eq!(&first["title"], "Title ![alt](https://link.com)");
 }
