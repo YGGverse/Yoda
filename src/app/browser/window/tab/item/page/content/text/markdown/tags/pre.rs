@@ -7,6 +7,8 @@ use gtk::{
 use regex::Regex;
 
 const REGEX_PRE: &str = r"`(?P<text>[^`]+)`";
+const TAG_FONT: &str = "monospace"; // @TODO
+const TAG_SCALE: f64 = 0.9;
 
 pub struct Pre(TextTag);
 
@@ -14,15 +16,17 @@ impl Pre {
     pub fn new() -> Self {
         Self(if adw::StyleManager::default().is_dark() {
             TextTag::builder()
-                .background_rgba(&RGBA::new(0.0, 0.0, 0.0, 1.))
-                .foreground("#ccc")
-                .family("monospace") // @TODO
+                .background_rgba(&RGBA::new(255., 255., 255., 0.05))
+                .family(TAG_FONT)
+                .foreground("#e8e8e8")
+                .scale(TAG_SCALE)
                 .wrap_mode(Word)
                 .build()
         } else {
             TextTag::builder()
-                .background_rgba(&RGBA::new(0.0, 0.0, 0.0, 0.06))
-                .family("monospace") // @TODO
+                .background_rgba(&RGBA::new(0., 0., 0., 0.06))
+                .family(TAG_FONT)
+                .scale(TAG_SCALE)
                 .wrap_mode(Word)
                 .build()
         })
