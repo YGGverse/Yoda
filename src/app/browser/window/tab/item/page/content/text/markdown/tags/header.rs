@@ -64,7 +64,9 @@ impl Header {
     }
 
     /// Apply title `Tag` to given `TextBuffer`
-    pub fn render(&self, buffer: &TextBuffer) {
+    pub fn render(&self, buffer: &TextBuffer) -> Option<String> {
+        let mut raw_title = None;
+
         let table = buffer.tag_table();
 
         assert!(table.add(&self.h1));
@@ -80,6 +82,12 @@ impl Header {
             .unwrap()
             .captures_iter(&full_content)
             .collect();
+
+        for cap in matches.iter() {
+            if raw_title.is_none() && !cap["title"].trim().is_empty() {
+                raw_title = Some(cap["title"].into())
+            }
+        }
 
         for cap in matches.into_iter().rev() {
             let full_match = cap.get(0).unwrap();
@@ -102,6 +110,8 @@ impl Header {
                 _ => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[]),
             }
         }
+
+        raw_title
     }
 }
 

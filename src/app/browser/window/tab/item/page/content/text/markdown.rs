@@ -39,9 +39,6 @@ impl Markdown {
         base: &Uri,
         markdown: &str,
     ) -> Result<Self, Error> {
-        // Init default values
-        let mut title = None;
-
         // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
 
@@ -110,7 +107,7 @@ impl Markdown {
         // Render markdown tags
         // * keep in order!
 
-        tags.render(&buffer, &base, &link_color.0, &mut links);
+        let title = tags.render(&buffer, &base, &link_color.0, &mut links);
 
         // Parse single-line markdown tags
         /*'l: for line in markdown.lines() {

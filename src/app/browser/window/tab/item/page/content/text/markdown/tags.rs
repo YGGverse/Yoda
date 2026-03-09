@@ -59,13 +59,15 @@ impl Tags {
         base: &Uri,
         link_color: &RGBA,
         links: &mut HashMap<TextTag, Uri>,
-    ) {
+    ) -> Option<String> {
         // * keep in order!
-        self.header.render(buffer);
+        let title = self.header.render(buffer); // @TODO strip raw tags
         self.quote.render(buffer);
 
         reference::render_images_links(&buffer, base, &link_color, links);
         reference::render_images(&buffer, base, &link_color, links);
         reference::render_links(&buffer, base, &link_color, links);
+
+        title
     }
 }
