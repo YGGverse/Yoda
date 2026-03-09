@@ -1,47 +1,35 @@
-mod ansi;
-pub mod error;
 mod gutter;
-mod icon;
-mod syntax;
-mod tag;
+mod tags;
 
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
-pub use error::Error;
 use gtk::{
-    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
-    UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, TextBuffer, TextTag, TextTagTable, TextView,
+    TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
     gio::{Cancellable, SimpleAction, SimpleActionGroup},
     glib::{Uri, uuid_string_random},
-    prelude::{PopoverExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
+    prelude::{PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
-use icon::Icon;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
-use syntax::Syntax;
-use tag::Tag;
+use tags::Tags;
 
-pub const NEW_LINE: &str = "\n";
-
-pub struct Gemini {
+pub struct Markdown {
     pub title: Option<String>,
     pub text_view: TextView,
 }
 
-impl Gemini {
+impl Markdown {
     // Constructors
 
     /// Build new `Self`
     pub fn build(
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
-        gemtext: &str,
-    ) -> Result<Self, Error> {
-        // Init default values
-        let mut title = None;
-
+        markdown: &str,
+    ) -> Self {
         // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
 
@@ -50,10 +38,7 @@ impl Gemini {
         let hover: Rc<Cell<Option<TextTag>>> = Rc::new(Cell::new(None));
 
         // Init code features
-        let mut code = None;
-
-        // Init quote icon feature
-        let mut is_line_after_quote = false;
+        //let mut code = None;
 
         // Init colors
         // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
@@ -62,17 +47,12 @@ impl Gemini {
             RGBA::new(0.208, 0.518, 0.894, 0.9),
         );
 
-        // Init syntect highlight features
-        let syntax = Syntax::new();
-
-        // Init icons
-        let icon = Icon::new();
-
         // Init tags
-        let tag = Tag::new();
+        let mut tags = Tags::new();
 
         // Init new text buffer
-        let buffer = TextBuffer::new(Some(&tag.text_tag_table));
+        let buffer = TextBuffer::new(Some(&TextTagTable::new()));
+        buffer.set_text(markdown);
 
         // Init main widget
         let text_view = {
@@ -93,196 +73,8 @@ impl Gemini {
         // Init gutter widget (the tooltip on URL tags hover)
         let gutter = Gutter::build(&text_view);
 
-        // Disable code format on at least one closing tag not found
-        // gemini://bbs.geminispace.org/s/Gemini/26031
-        let is_code_enabled = {
-            use ggemtext::line::code::{self};
-            let mut t: usize = 0;
-            for l in gemtext.lines() {
-                if l.starts_with(code::TAG) {
-                    t += 1;
-                }
-            }
-            t == 0 || t.is_multiple_of(2)
-        };
-
-        // Parse gemtext lines
-        for line in gemtext.lines() {
-            if is_code_enabled {
-                use ggemtext::line::Code;
-                match code {
-                    None => {
-                        // Open tag found
-                        if let Some(c) = Code::begin_from(line) {
-                            // Begin next lines collection into the code buffer
-                            code = Some(c);
-
-                            // Skip other actions for this line
-                            continue;
-                        }
-                    }
-                    Some(ref mut c) => {
-                        match c.continue_from(line) {
-                            Ok(()) => {
-                                // Close tag found:
-                                if c.is_completed {
-                                    // Is alt provided
-                                    let alt = match c.alt {
-                                        Some(ref alt) => {
-                                            // Insert alt value to the main buffer
-                                            buffer.insert_with_tags(
-                                                &mut buffer.end_iter(),
-                                                alt.as_str(),
-                                                &[&tag.title],
-                                            );
-
-                                            // Append new line after alt text
-                                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                                            // Return value as wanted also for syntax highlight detection
-                                            Some(alt)
-                                        }
-                                        None => None,
-                                    };
-
-                                    // Begin code block construction
-                                    // Try auto-detect code syntax for given `value` and `alt` @TODO optional
-                                    match syntax.highlight(&c.value, alt) {
-                                        Ok(highlight) => {
-                                            for (syntax_tag, entity) in highlight {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        }
-                                        Err(_) => {
-                                            // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                            for (syntax_tag, entity) in ansi::format(&c.value) {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        } // @TODO handle
-                                    }
-
-                                    // Reset
-                                    code = None;
-                                }
-
-                                // Skip other actions for this line
-                                continue;
-                            }
-                            Err(_) => todo!(),
-                        }
-                    }
-                }
-            }
-
-            // Is header
-            {
-                use ggemtext::line::{Header, header::Level};
-                if let Some(header) = Header::parse(line) {
-                    buffer.insert_with_tags(
-                        &mut buffer.end_iter(),
-                        &header.value,
-                        &[match header.level {
-                            Level::H1 => &tag.h1,
-                            Level::H2 => &tag.h2,
-                            Level::H3 => &tag.h3,
-                        }],
-                    );
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                    if title.is_none() {
-                        title = Some(header.value.clone());
-                    }
-                    continue;
-                }
-            }
-
-            // Is link
-            if let Some(link) = ggemtext::line::Link::parse(line) {
-                if let Some(uri) = link.uri(Some(base)) {
-                    let mut alt = Vec::with_capacity(2);
-
-                    if uri.scheme() != base.scheme() {
-                        alt.push("⇖".to_string());
-                    }
-
-                    alt.push(match link.alt {
-                        Some(alt) => alt,
-                        None => uri.to_string(),
-                    });
-
-                    let a = TextTag::builder()
-                        .foreground_rgba(&link_color.0)
-                        // .foreground_rgba(&adw::StyleManager::default().accent_color_rgba()) @TODO adw 1.6 / ubuntu 24.10+
-                        .sentence(true)
-                        .wrap_mode(WrapMode::Word)
-                        .build();
-
-                    if !tag.text_tag_table.add(&a) {
-                        panic!()
-                    }
-
-                    buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
-                    buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                    links.insert(a, uri);
-                }
-                continue;
-            }
-
-            // Is list
-
-            if let Some(value) = ggemtext::line::list::Gemtext::as_value(line) {
-                buffer.insert_with_tags(
-                    &mut buffer.end_iter(),
-                    &format!("• {value}"),
-                    &[&tag.list],
-                );
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                continue;
-            }
-
-            // Is quote
-
-            if let Some(quote) = ggemtext::line::quote::Gemtext::as_value(line) {
-                // Show quote indicator if last line is not quote (to prevent duplicates)
-                if !is_line_after_quote {
-                    // Show only if the icons resolved for default `Display`
-                    if let Some(ref icon) = icon {
-                        buffer.insert_paintable(&mut buffer.end_iter(), &icon.quote);
-                        buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                    }
-                }
-                buffer.insert_with_tags(&mut buffer.end_iter(), quote, &[&tag.quote]);
-                buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-                is_line_after_quote = true;
-                continue;
-            } else {
-                is_line_after_quote = false;
-            }
-
-            // Nothing match custom tags above,
-            // just append plain text covered in empty tag (to handle controller events properly)
-            buffer.insert_with_tags(&mut buffer.end_iter(), line, &[&tag.plain]);
-            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-        }
+        // Render markdown tags
+        let title = tags.render(&buffer, base, &link_color.0, &mut links);
 
         // Context menu
         let action_link_tab =
@@ -516,15 +308,7 @@ impl Gemini {
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
-        // Result
-        if is_code_enabled {
-            Ok(Self { text_view, title })
-        } else {
-            Err(Error::Markup(
-                "Invalid multiline markup! Gemtext format partially ignored.".to_string(),
-                Self { text_view, title },
-            ))
-        }
+        Self { text_view, title }
     }
 }
 

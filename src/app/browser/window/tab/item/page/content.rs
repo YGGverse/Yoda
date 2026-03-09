@@ -154,6 +154,14 @@ impl Content {
         }
     }
 
+    /// `text/markdown`
+    pub fn to_text_markdown(&self, base: &Uri, data: &str) -> Text {
+        self.clean();
+        let m = Text::markdown((&self.window_action, &self.item_action), base, data);
+        self.g_box.append(&m.scrolled_window);
+        m
+    }
+
     /// `text/plain`
     pub fn to_text_plain(&self, data: &str) -> Text {
         self.clean();

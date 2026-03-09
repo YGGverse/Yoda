@@ -135,8 +135,9 @@ The Gemini protocol was designed as a minimalistic, tracking-resistant alternati
 
 #### Text
   * [x] `text/gemini`
-  * [x] `text/plain`
+  * [x] `text/markdown`
   * [x] `text/nex`
+  * [x] `text/plain`
 
 #### Images
   * [x] `image/gif`

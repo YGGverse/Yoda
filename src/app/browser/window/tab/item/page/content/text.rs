@@ -1,4 +1,5 @@
 mod gemini;
+mod markdown;
 mod nex;
 mod plain;
 mod source;
@@ -7,6 +8,7 @@ use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
 use gtk::{ScrolledWindow, TextView, glib::Uri};
+use markdown::Markdown;
 use nex::Nex;
 use plain::Plain;
 use source::Source;
@@ -47,6 +49,21 @@ impl Text {
                         },
                     }),
                 )),
+            },
+        }
+    }
+
+    pub fn markdown(
+        actions: (&Rc<WindowAction>, &Rc<ItemAction>),
+        base: &Uri,
+        gemtext: &str,
+    ) -> Self {
+        let markdown = Markdown::build(actions, base, gemtext);
+        Self {
+            scrolled_window: reader(&markdown.text_view),
+            text_view: markdown.text_view,
+            meta: Meta {
+                title: markdown.title,
             },
         }
     }

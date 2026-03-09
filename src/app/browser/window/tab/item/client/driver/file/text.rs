@@ -2,6 +2,7 @@ use gtk::glib::Uri;
 
 pub enum Text {
     Gemini(Uri, String),
+    Markdown(Uri, String),
     Plain(Uri, String),
     Source(Uri, String),
 }
@@ -21,6 +22,14 @@ impl Text {
                     .borrow_mut()
                     .set_mime(Some("text/gemini".to_string()));
                 page.content.to_text_gemini(uri, data)
+            }),
+            Self::Markdown(uri, data) => (uri, {
+                page.navigation
+                    .request
+                    .info
+                    .borrow_mut()
+                    .set_mime(Some("text/markdown".to_string()));
+                page.content.to_text_markdown(uri, data)
             }),
             Self::Plain(uri, data) => (uri, page.content.to_text_plain(data)),
             Self::Source(uri, data) => (uri, page.content.to_text_source(data)),
