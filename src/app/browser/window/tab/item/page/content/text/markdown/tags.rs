@@ -1,3 +1,4 @@
+mod bold;
 mod header;
 mod list;
 mod quote;
@@ -6,6 +7,7 @@ mod title;
 
 use std::collections::HashMap;
 
+use bold::Bold;
 use gtk::{
     TextBuffer, TextTag, TextTagTable,
     gdk::RGBA,
@@ -20,6 +22,7 @@ use title::Title;
 pub struct Tags {
     pub text_tag_table: TextTagTable,
     // Tags
+    pub bold: Bold,
     pub header: Header,
     pub list: TextTag,
     pub quote: Quote,
@@ -47,6 +50,7 @@ impl Tags {
         Self {
             text_tag_table,
             // Tags
+            bold: Bold::new(),
             header: Header::new(),
             list,
             quote: Quote::new(),
@@ -65,10 +69,16 @@ impl Tags {
 
         self.quote.render(buffer);
 
+        self.bold.render(buffer);
+
         reference::render_images_links(&buffer, base, &link_color, links);
         reference::render_images(&buffer, base, &link_color, links);
         reference::render_links(&buffer, base, &link_color, links);
 
-        title.map(|ref s| reference::strip_tags(s)) // @TODO other tags
+        title.map(|mut s| {
+            s = reference::strip_tags(&s);
+            s = bold::strip_tags(&s);
+            s // @TODO other tags
+        })
     }
 }
