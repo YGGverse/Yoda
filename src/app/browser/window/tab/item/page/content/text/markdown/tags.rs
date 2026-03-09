@@ -1,13 +1,12 @@
 mod bold;
 mod code;
 mod header;
+mod list;
 mod pre;
 mod quote;
 mod reference;
 mod strike;
 mod underline;
-
-use std::collections::HashMap;
 
 use bold::Bold;
 use code::Code;
@@ -15,6 +14,7 @@ use gtk::{TextBuffer, TextTag, gdk::RGBA, glib::Uri};
 use header::Header;
 use pre::Pre;
 use quote::Quote;
+use std::collections::HashMap;
 use strike::Strike;
 use underline::Underline;
 
@@ -59,6 +59,8 @@ impl Tags {
 
         // Keep in order!
         let title = self.header.render(buffer);
+
+        list::render(buffer);
 
         self.quote.render(buffer);
 
