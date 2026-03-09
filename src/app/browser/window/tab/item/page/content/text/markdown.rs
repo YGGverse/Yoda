@@ -112,6 +112,7 @@ impl Markdown {
         // * keep in order!
 
         tag::header(&buffer, &tag);
+        tag::quote(&buffer, &tag);
 
         reference::image_link(&buffer, &tag, base, &link_color.0, &mut links);
         reference::image(&buffer, &tag, base, &link_color.0, &mut links);
