@@ -34,7 +34,7 @@ impl Markdown {
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
         markdown: &str,
-    ) -> Result<Self, Error> {
+    ) -> Self {
         // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
 
@@ -81,22 +81,7 @@ impl Markdown {
         // Init gutter widget (the tooltip on URL tags hover)
         let gutter = Gutter::build(&text_view);
 
-        // Disable code format on at least one closing tag not found
-        // gemini://bbs.geminispace.org/s/Gemini/26031
-        let is_code_enabled = {
-            use ggemtext::line::code::{self};
-            let mut t: usize = 0;
-            for l in markdown.lines() {
-                if l.starts_with(code::TAG) {
-                    t += 1;
-                }
-            }
-            t == 0 || t.is_multiple_of(2)
-        };
-
         // Render markdown tags
-        // * keep in order!
-
         let title = tags.render(&buffer, &base, &link_color.0, &mut links);
 
         // Parse single-line markdown tags
@@ -418,15 +403,7 @@ impl Markdown {
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
-        // Result
-        if is_code_enabled {
-            Ok(Self { text_view, title })
-        } else {
-            Err(Error::Markup(
-                "Invalid multiline markup! Markdown format partially ignored.".to_string(),
-                Self { text_view, title },
-            ))
-        }
+        Self { text_view, title }
     }
 }
 

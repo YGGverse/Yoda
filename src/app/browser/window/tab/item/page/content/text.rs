@@ -57,26 +57,13 @@ impl Text {
         actions: (&Rc<WindowAction>, &Rc<ItemAction>),
         base: &Uri,
         gemtext: &str,
-    ) -> Result<Self, (String, Option<Self>)> {
-        match Markdown::build(actions, base, gemtext) {
-            Ok(widget) => Ok(Self {
-                scrolled_window: reader(&widget.text_view),
-                text_view: widget.text_view,
-                meta: Meta {
-                    title: widget.title,
-                },
-            }),
-            Err(e) => match e {
-                markdown::Error::Markup(message, widget) => Err((
-                    message,
-                    Some(Self {
-                        scrolled_window: reader(&widget.text_view),
-                        text_view: widget.text_view,
-                        meta: Meta {
-                            title: widget.title,
-                        },
-                    }),
-                )),
+    ) -> Self {
+        let markdown = Markdown::build(actions, base, gemtext);
+        Self {
+            scrolled_window: reader(&markdown.text_view),
+            text_view: markdown.text_view,
+            meta: Meta {
+                title: markdown.title,
             },
         }
     }
