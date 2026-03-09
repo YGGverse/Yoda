@@ -118,7 +118,7 @@ fn test_regex() {
         .captures_iter("Some ``` alt text\ncode line 1\ncode line 2``` and ```\ncode line 3\ncode line 4``` with ![img](https://link.com)")
         .collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(alt(first.name("alt").map(|m| m.as_str())), Some("alt text"));
     assert_eq!(&first["data"], "code line 1\ncode line 2");
 

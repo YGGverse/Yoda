@@ -73,6 +73,6 @@ fn test_regex() {
         .captures_iter(r"Some **bold 1** and **bold 2** with ![img](https://link.com)")
         .collect();
 
-    assert_eq!(&cap.get(0).unwrap()["text"], "bold 1");
+    assert_eq!(&cap.first().unwrap()["text"], "bold 1");
     assert_eq!(&cap.get(1).unwrap()["text"], "bold 2");
 }

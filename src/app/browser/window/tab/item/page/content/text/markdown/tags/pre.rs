@@ -88,6 +88,6 @@ fn test_regex() {
         .captures_iter(r"Some `pre 1` and `pre 2` with ![img](https://link.com)")
         .collect();
 
-    assert_eq!(&cap.get(0).unwrap()["text"], "pre 1");
+    assert_eq!(&cap.first().unwrap()["text"], "pre 1");
     assert_eq!(&cap.get(1).unwrap()["text"], "pre 2");
 }

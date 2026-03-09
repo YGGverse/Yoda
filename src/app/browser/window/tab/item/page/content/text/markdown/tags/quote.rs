@@ -55,7 +55,7 @@ fn test_regex() {
         .captures_iter(r"> Some quote with ![img](https://link.com)")
         .collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(&first[0], "> Some quote with ![img](https://link.com)");
     assert_eq!(&first["text"], "Some quote with ![img](https://link.com)");
 }

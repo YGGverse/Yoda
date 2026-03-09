@@ -250,7 +250,7 @@ fn test_regex_link() {
         .captures_iter(r"[link1](https://link1.com) [link2](https://link2.com)")
         .collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(&first[0], "[link1](https://link1.com)");
     assert_eq!(&first["text"], "link1");
     assert_eq!(&first["url"], "https://link1.com");
@@ -270,7 +270,7 @@ fn test_regex_image_link() {
         r"[![image1](https://image1.com)](https://image2.com) [![image3](https://image3.com)](https://image4.com)"
     ).collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(
         &first[0],
         "[![image1](https://image1.com)](https://image2.com)"
@@ -296,7 +296,7 @@ fn test_regex_image() {
         .captures_iter(r"![image1](https://image1.com) ![image2](https://image2.com)")
         .collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(&first[0], "![image1](https://image1.com)");
     assert_eq!(&first["alt"], "image1");
     assert_eq!(&first["url"], "https://image1.com");

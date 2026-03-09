@@ -78,6 +78,6 @@ fn test_regex() {
         .captures_iter(r"Some ~~strike 1~~ and ~~strike 2~~ with ![img](https://link.com)")
         .collect();
 
-    assert_eq!(&cap.get(0).unwrap()["text"], "strike 1");
+    assert_eq!(&cap.first().unwrap()["text"], "strike 1");
     assert_eq!(&cap.get(1).unwrap()["text"], "strike 2");
 }

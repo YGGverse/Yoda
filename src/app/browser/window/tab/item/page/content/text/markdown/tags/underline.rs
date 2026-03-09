@@ -74,6 +74,6 @@ fn test_regex() {
         .captures_iter(r"Some _underline 1_ and _underline 2_ with ![img](https://link.com)")
         .collect();
 
-    assert_eq!(&cap.get(0).unwrap()["text"], "underline 1");
+    assert_eq!(&cap.first().unwrap()["text"], "underline 1");
     assert_eq!(&cap.get(1).unwrap()["text"], "underline 2");
 }

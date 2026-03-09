@@ -122,7 +122,7 @@ fn test_regex_title() {
         .captures_iter(r"## Header ![alt](https://link.com)")
         .collect();
 
-    let first = cap.get(0).unwrap();
+    let first = cap.first().unwrap();
     assert_eq!(&first[0], "## Header ![alt](https://link.com)");
     assert_eq!(&first["level"], "##");
     assert_eq!(&first["title"], "Header ![alt](https://link.com)");
