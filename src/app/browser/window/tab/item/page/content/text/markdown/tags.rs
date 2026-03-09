@@ -4,6 +4,7 @@ mod list;
 mod quote;
 mod reference;
 mod title;
+mod underline;
 
 use std::collections::HashMap;
 
@@ -18,6 +19,7 @@ use header::Header;
 use list::List;
 use quote::Quote;
 use title::Title;
+use underline::Underline;
 
 pub struct Tags {
     pub text_tag_table: TextTagTable,
@@ -27,6 +29,7 @@ pub struct Tags {
     pub list: TextTag,
     pub quote: Quote,
     pub title: TextTag,
+    pub underline: Underline,
 }
 
 impl Default for Tags {
@@ -55,6 +58,7 @@ impl Tags {
             list,
             quote: Quote::new(),
             title,
+            underline: Underline::new(),
         }
     }
     pub fn render(
@@ -70,6 +74,7 @@ impl Tags {
         self.quote.render(buffer);
 
         self.bold.render(buffer);
+        self.underline.render(buffer);
 
         reference::render_images_links(&buffer, base, &link_color, links);
         reference::render_images(&buffer, base, &link_color, links);
@@ -78,6 +83,7 @@ impl Tags {
         title.map(|mut s| {
             s = reference::strip_tags(&s);
             s = bold::strip_tags(&s);
+            s = underline::strip_tags(&s);
             s // @TODO other tags
         })
     }
