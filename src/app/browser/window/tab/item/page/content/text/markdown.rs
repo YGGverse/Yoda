@@ -6,7 +6,6 @@ mod tags;
 
 use super::{ItemAction, WindowAction};
 use crate::app::browser::window::action::Position;
-pub use error::Error;
 use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextTagTable, TextView,
     TextWindowType, UriLauncher, Window, WrapMode,
@@ -56,7 +55,7 @@ impl Markdown {
         let syntax = Syntax::new();
 
         // Init tags
-        let tags = Tags::new();
+        let mut tags = Tags::new();
 
         // Init new text buffer
         let buffer = TextBuffer::new(Some(&TextTagTable::new()));
