@@ -7,10 +7,10 @@ use gtk::{
 use regex::Regex;
 use std::collections::HashMap;
 
-const REGEX_LINK: &str = r"\[(?P<text>[^\]]+)\]\((?P<url>[^\)]+)\)";
-const REGEX_IMAGE: &str = r"!\[(?P<alt>[^\]]+)\]\((?P<url>[^\)]+)\)";
+const REGEX_LINK: &str = r"\[(?P<text>[^\]]*)\]\((?P<url>[^\)]+)\)";
+const REGEX_IMAGE: &str = r"!\[(?P<alt>[^\]]*)\]\((?P<url>[^\)]+)\)";
 const REGEX_IMAGE_LINK: &str =
-    r"\[(?P<is_img>!)\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
+    r"\[(?P<is_img>!)\[(?P<alt>[^\]]*)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
 
 struct Reference {
     uri: Uri,
