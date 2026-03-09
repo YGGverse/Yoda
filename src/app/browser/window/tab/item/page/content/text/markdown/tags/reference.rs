@@ -12,7 +12,7 @@ const REGEX_IMAGE: &str = r"!\[(?P<alt>[^\]]+)\]\((?P<url>[^\)]+)\)";
 const REGEX_IMAGE_LINK: &str =
     r"\[(?P<is_img>!)\[(?P<alt>[^\]]+)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
 
-pub struct Reference {
+struct Reference {
     uri: Uri,
     alt: String,
 }
