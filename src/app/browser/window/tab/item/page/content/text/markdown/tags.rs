@@ -61,13 +61,14 @@ impl Tags {
         links: &mut HashMap<TextTag, Uri>,
     ) -> Option<String> {
         // * keep in order!
-        let title = self.header.render(buffer); // @TODO strip raw tags
+        let title = self.header.render(buffer);
+
         self.quote.render(buffer);
 
         reference::render_images_links(&buffer, base, &link_color, links);
         reference::render_images(&buffer, base, &link_color, links);
         reference::render_links(&buffer, base, &link_color, links);
 
-        title
+        title.map(|ref s| reference::strip_tags(s)) // @TODO other tags
     }
 }

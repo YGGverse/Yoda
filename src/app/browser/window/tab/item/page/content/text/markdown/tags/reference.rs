@@ -221,11 +221,41 @@ pub fn render_links(
     }
 }
 
+pub fn strip_tags(value: &str) -> String {
+    let mut result = String::from(value);
+    for cap in Regex::new(REGEX_LINK)
+        .unwrap()
+        .captures_iter(&value)
+        .into_iter()
+    {
+        if let Some(m) = cap.get(0) {
+            result = result.replace(m.as_str(), &cap["text"]);
+        }
+    }
+    result
+}
+
+#[test]
+fn test_strip_tags() {
+    const VALUE: &str = r"Some text [link1](https://link1.com) [link2](https://link2.com)";
+    let mut result = String::from(VALUE);
+    for cap in Regex::new(REGEX_LINK)
+        .unwrap()
+        .captures_iter(VALUE)
+        .into_iter()
+    {
+        if let Some(m) = cap.get(0) {
+            result = result.replace(m.as_str(), &cap["text"]);
+        }
+    }
+    assert_eq!(result, "Some text link1 link2")
+}
+
 #[test]
 fn test_regex_link() {
     let cap: Vec<_> = Regex::new(REGEX_LINK)
         .unwrap()
-        .captures_iter(r#"[link1](https://link1.com) [link2](https://link2.com)"#)
+        .captures_iter(r"[link1](https://link1.com) [link2](https://link2.com)")
         .collect();
 
     let first = cap.get(0).unwrap();
@@ -245,7 +275,7 @@ fn test_regex_image_link() {
         REGEX_IMAGE_LINK,
     )
     .unwrap().captures_iter(
-        r#"[![image1](https://image1.com)](https://image2.com) [![image3](https://image3.com)](https://image4.com)"#
+        r"[![image1](https://image1.com)](https://image2.com) [![image3](https://image3.com)](https://image4.com)"
     ).collect();
 
     let first = cap.get(0).unwrap();
@@ -271,7 +301,7 @@ fn test_regex_image_link() {
 fn test_regex_image() {
     let cap: Vec<_> = Regex::new(REGEX_IMAGE)
         .unwrap()
-        .captures_iter(r#"![image1](https://image1.com) ![image2](https://image2.com)"#)
+        .captures_iter(r"![image1](https://image1.com) ![image2](https://image2.com)")
         .collect();
 
     let first = cap.get(0).unwrap();
