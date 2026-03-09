@@ -1,6 +1,5 @@
 mod header;
 mod list;
-mod plain;
 mod quote;
 mod reference;
 mod title;
@@ -15,9 +14,7 @@ use gtk::{
 };
 use header::Header;
 use list::List;
-use plain::Plain;
 use quote::Quote;
-use reference::Reference;
 use title::Title;
 
 pub struct Tags {
@@ -25,7 +22,6 @@ pub struct Tags {
     // Tags
     pub header: Header,
     pub list: TextTag,
-    pub plain: TextTag,
     pub quote: Quote,
     pub title: TextTag,
 }
@@ -42,20 +38,17 @@ impl Tags {
         // Init tag table
         let text_tag_table = TextTagTable::new();
 
-        // Init components
+        // Init shared tags members
         let list = TextTag::list();
-        let plain = TextTag::plain();
         let title = TextTag::title();
         text_tag_table.add(&title);
         text_tag_table.add(&list);
-        text_tag_table.add(&plain);
 
         Self {
             text_tag_table,
             // Tags
             header: Header::new(),
             list,
-            plain,
             quote: Quote::new(),
             title,
         }
