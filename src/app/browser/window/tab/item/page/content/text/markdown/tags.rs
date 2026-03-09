@@ -3,6 +3,7 @@ mod header;
 mod list;
 mod quote;
 mod reference;
+mod strike;
 mod title;
 mod underline;
 
@@ -18,6 +19,7 @@ use gtk::{
 use header::Header;
 use list::List;
 use quote::Quote;
+use strike::Strike;
 use title::Title;
 use underline::Underline;
 
@@ -28,6 +30,7 @@ pub struct Tags {
     pub header: Header,
     pub list: TextTag,
     pub quote: Quote,
+    pub strike: Strike,
     pub title: TextTag,
     pub underline: Underline,
 }
@@ -57,6 +60,7 @@ impl Tags {
             header: Header::new(),
             list,
             quote: Quote::new(),
+            strike: Strike::new(),
             title,
             underline: Underline::new(),
         }
@@ -74,6 +78,7 @@ impl Tags {
         self.quote.render(buffer);
 
         self.bold.render(buffer);
+        self.strike.render(buffer);
         self.underline.render(buffer);
 
         reference::render_images_links(&buffer, base, &link_color, links);
@@ -81,8 +86,9 @@ impl Tags {
         reference::render_links(&buffer, base, &link_color, links);
 
         title.map(|mut s| {
-            s = reference::strip_tags(&s);
             s = bold::strip_tags(&s);
+            s = reference::strip_tags(&s);
+            s = strike::strip_tags(&s);
             s = underline::strip_tags(&s);
             s // @TODO other tags
         })
