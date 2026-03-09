@@ -1,6 +1,7 @@
 mod bold;
 mod code;
 mod header;
+mod pre;
 mod quote;
 mod reference;
 mod strike;
@@ -12,6 +13,7 @@ use bold::Bold;
 use code::Code;
 use gtk::{TextBuffer, TextTag, gdk::RGBA, glib::Uri};
 use header::Header;
+use pre::Pre;
 use quote::Quote;
 use strike::Strike;
 use underline::Underline;
@@ -20,6 +22,7 @@ pub struct Tags {
     pub bold: Bold,
     pub code: Code,
     pub header: Header,
+    pub pre: Pre,
     pub quote: Quote,
     pub strike: Strike,
     pub underline: Underline,
@@ -38,6 +41,7 @@ impl Tags {
             bold: Bold::new(),
             code: Code::new(),
             header: Header::new(),
+            pre: Pre::new(),
             quote: Quote::new(),
             strike: Strike::new(),
             underline: Underline::new(),
@@ -59,6 +63,7 @@ impl Tags {
         self.quote.render(buffer);
 
         self.bold.render(buffer);
+        self.pre.render(buffer);
         self.strike.render(buffer);
         self.underline.render(buffer);
 
@@ -71,6 +76,7 @@ impl Tags {
         // Format document title string
         title.map(|mut s| {
             s = bold::strip_tags(&s);
+            s = pre::strip_tags(&s);
             s = reference::strip_tags(&s);
             s = strike::strip_tags(&s);
             s = underline::strip_tags(&s);
