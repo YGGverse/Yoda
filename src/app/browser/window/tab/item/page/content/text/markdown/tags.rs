@@ -10,7 +10,7 @@ mod underline;
 
 use bold::Bold;
 use code::Code;
-use gtk::{TextBuffer, TextTag, gdk::RGBA, glib::Uri};
+use gtk::{TextBuffer, TextSearchFlags, TextTag, gdk::RGBA, glib::Uri, prelude::TextBufferExt};
 use header::Header;
 use pre::Pre;
 use quote::Quote;
@@ -54,7 +54,8 @@ impl Tags {
         link_color: &RGBA,
         links: &mut HashMap<TextTag, Uri>,
     ) -> Option<String> {
-        // Collect all code blocks first, and replace them with tmp macro ID
+        // Collect all code blocks first,
+        // and temporarily replace them with placeholder ID
         self.code.collect(buffer);
 
         // Keep in order!
@@ -73,6 +74,16 @@ impl Tags {
         reference::render_images(buffer, base, link_color, links);
         reference::render_links(buffer, base, link_color, links);
 
+        // Cleanup unformatted escape chars
+        let mut cursor = buffer.start_iter();
+        while let Some((mut match_start, mut match_end)) =
+            cursor.forward_search("\\", TextSearchFlags::CASE_INSENSITIVE, None)
+        {
+            buffer.delete(&mut match_start, &mut match_end);
+            cursor = match_end;
+        }
+
+        // Render placeholders
         self.code.render(buffer);
 
         // Format document title string
