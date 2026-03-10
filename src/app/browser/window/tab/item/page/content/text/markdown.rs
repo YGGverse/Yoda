@@ -449,7 +449,7 @@ fn scroll_to_anchor(text_view: &TextView, fragment: GString) -> bool {
     let query = uri_unescape_string(&fragment, None::<&str>).unwrap_or(fragment);
     let result = try_scroll(text_view, &query); // exact match
     if !result {
-        return try_scroll(text_view, &query.replace("-", " ")); // unstable @TODO
+        return try_scroll(text_view, &query.replace(" ", "-")); // alt syntax
     }
     result
 }
