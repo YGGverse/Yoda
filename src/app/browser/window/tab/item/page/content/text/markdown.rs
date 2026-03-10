@@ -8,7 +8,7 @@ use gtk::{
     TextView, TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
     gio::{Cancellable, SimpleAction, SimpleActionGroup},
-    glib::{ControlFlow, Uri, idle_add_local, uri_unescape_string, uuid_string_random},
+    glib::{ControlFlow, GString, Uri, idle_add_local, uri_unescape_string, uuid_string_random},
     prelude::{PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
@@ -203,7 +203,11 @@ impl Markdown {
                     for tag in iter.tags() {
                         // Tag is link
                         if let Some(uri) = links.get(&tag) {
-                            return open_link_in_current_tab(&uri.to_string(), &item_action);
+                            return if let Some(fragment) = uri.fragment() {
+                                scroll_to_anchor(&text_view, fragment);
+                            } else {
+                                open_link_in_current_tab(&uri.to_string(), &item_action);
+                            };
                         }
                     }
                 }
@@ -308,29 +312,13 @@ impl Markdown {
             }
         }); // @TODO may be expensive for CPU, add timeout?
 
-        // Anchor auto-scroll behavior (@TODO navigate without page reload)
+        // Anchor auto-scroll behavior
         idle_add_local({
             let base = base.clone();
             let text_view = text_view.clone();
             move || {
                 if let Some(fragment) = base.fragment() {
-                    let query = uri_unescape_string(&fragment, None::<&str>)
-                        .unwrap_or(fragment)
-                        .replace("-", " ");
-                    let mut cursor = text_view.buffer().start_iter();
-                    while let Some((mut match_start, match_end)) =
-                        cursor.forward_search(&query, TextSearchFlags::CASE_INSENSITIVE, None)
-                    {
-                        if match_start
-                            .tags()
-                            .iter()
-                            .any(|t| t.name().is_some_and(|n| n.starts_with("h")))
-                        {
-                            text_view.scroll_to_iter(&mut match_start, 0.0, true, 0.0, 0.0);
-                            break;
-                        }
-                        cursor = match_end;
-                    }
+                    scroll_to_anchor(&text_view, fragment);
                 }
                 ControlFlow::Break
             }
@@ -338,6 +326,26 @@ impl Markdown {
 
         Self { text_view, title }
     }
+}
+
+fn scroll_to_anchor(text_view: &TextView, fragment: GString) -> bool {
+    let query = uri_unescape_string(&fragment, None::<&str>)
+        .unwrap_or(fragment)
+        .replace("-", " ");
+    let mut cursor = text_view.buffer().start_iter();
+    while let Some((mut match_start, match_end)) =
+        cursor.forward_search(&query, TextSearchFlags::CASE_INSENSITIVE, None)
+    {
+        if match_start
+            .tags()
+            .iter()
+            .any(|t| t.name().is_some_and(|n| n.starts_with("h")))
+        {
+            return text_view.scroll_to_iter(&mut match_start, 0.0, true, 0.0, 0.0);
+        }
+        cursor = match_end;
+    }
+    false
 }
 
 fn is_internal_link(request: &str) -> bool {
