@@ -7,21 +7,19 @@ use regex::Regex;
 const REGEX_LIST: &str =
     r"(?m)^(?P<level>[ \t]*)\*[ \t]+(?:(?P<state>\[[ xX]\])[ \t]+)?(?P<text>.*)";
 
-struct State {
-    pub is_checked: bool,
-    //tag: TextTag,
-}
+struct State(bool);
 
 impl State {
     fn parse(value: Option<&str>) -> Option<Self> {
         if let Some(state) = value
             && (state.starts_with("[ ]") || state.starts_with("[x]"))
         {
-            return Some(Self {
-                is_checked: state.starts_with("[x]"),
-            });
+            return Some(Self(state.starts_with("[x]")));
         }
         None
+    }
+    fn is_checked(&self) -> bool {
+        self.0
     }
 }
 
@@ -79,7 +77,7 @@ pub fn render(buffer: &TextBuffer) {
         if let Some(state) = item.state {
             buffer.insert_with_tags(
                 &mut start_iter,
-                if state.is_checked { "[x] " } else { "[ ] " },
+                if state.is_checked() { "[x] " } else { "[ ] " },
                 &[&state_tag],
             );
         }
@@ -134,13 +132,13 @@ fn test_regex() {
     {
         let item = item(&cap, 5);
         assert_eq!(item.level, 2);
-        assert!(item.state.is_some_and(|this| this.is_checked));
+        assert!(item.state.is_some_and(|this| this.is_checked()));
         assert_eq!(item.text, "list item 3.1");
     }
     {
         let item = item(&cap, 6);
         assert_eq!(item.level, 2);
-        assert!(item.state.is_some_and(|this| !this.is_checked));
+        assert!(item.state.is_some_and(|this| !this.is_checked()));
         assert_eq!(item.text, "list item 3.2");
     }
     {
