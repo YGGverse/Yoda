@@ -77,7 +77,7 @@ impl Tags {
         // Cleanup unformatted escape chars
         let mut cursor = buffer.start_iter();
         while let Some((mut match_start, mut match_end)) =
-            cursor.forward_search("\\", TextSearchFlags::CASE_INSENSITIVE, None)
+            cursor.forward_search(ESC, TextSearchFlags::CASE_INSENSITIVE, None)
         {
             buffer.delete(&mut match_start, &mut match_end);
             cursor = match_end;
@@ -93,7 +93,9 @@ impl Tags {
             s = reference::strip_tags(&s);
             s = strike::strip_tags(&s);
             s = underline::strip_tags(&s);
-            s // @TODO other tags
+            s.replace(ESC, "")
         })
     }
 }
+
+const ESC: &str = "\\";
