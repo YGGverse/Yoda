@@ -329,23 +329,28 @@ impl Markdown {
 }
 
 fn scroll_to_anchor(text_view: &TextView, fragment: GString) -> bool {
-    let query = uri_unescape_string(&fragment, None::<&str>)
-        .unwrap_or(fragment)
-        .replace("-", " ");
-    let mut cursor = text_view.buffer().start_iter();
-    while let Some((mut match_start, match_end)) =
-        cursor.forward_search(&query, TextSearchFlags::CASE_INSENSITIVE, None)
-    {
-        if match_start
-            .tags()
-            .iter()
-            .any(|t| t.name().is_some_and(|n| n.starts_with("h")))
+    fn try_scroll(text_view: &TextView, query: &str) -> bool {
+        let mut cursor = text_view.buffer().start_iter();
+        while let Some((mut match_start, match_end)) =
+            cursor.forward_search(query, TextSearchFlags::CASE_INSENSITIVE, None)
         {
-            return text_view.scroll_to_iter(&mut match_start, 0.0, true, 0.0, 0.0);
+            if match_start
+                .tags()
+                .iter()
+                .any(|t| t.name().is_some_and(|n| n.starts_with("h")))
+            {
+                return text_view.scroll_to_iter(&mut match_start, 0.0, true, 0.0, 0.0);
+            }
+            cursor = match_end;
         }
-        cursor = match_end;
+        false
     }
-    false
+    let query = uri_unescape_string(&fragment, None::<&str>).unwrap_or(fragment);
+    let result = try_scroll(text_view, &query); // exact match
+    if !result {
+        return try_scroll(text_view, &query.replace("-", " ")); // unstable @TODO
+    }
+    result
 }
 
 fn is_internal_link(request: &str) -> bool {
