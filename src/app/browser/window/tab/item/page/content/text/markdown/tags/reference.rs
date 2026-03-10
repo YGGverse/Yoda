@@ -129,6 +129,18 @@ pub fn render_images_links(
         let mut start_iter = buffer.iter_at_offset(start_char_offset);
         let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
+        if start_char_offset > 0
+            && buffer
+                .text(
+                    &buffer.iter_at_offset(start_char_offset - 1),
+                    &end_iter,
+                    false,
+                )
+                .contains("\\")
+        {
+            continue;
+        }
+
         buffer.delete(&mut start_iter, &mut end_iter);
 
         if let Some(this) = Reference::parse(
@@ -171,6 +183,18 @@ pub fn render_images(
         let mut start_iter = buffer.iter_at_offset(start_char_offset);
         let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
+        if start_char_offset > 0
+            && buffer
+                .text(
+                    &buffer.iter_at_offset(start_char_offset - 1),
+                    &end_iter,
+                    false,
+                )
+                .contains("\\")
+        {
+            continue;
+        }
+
         buffer.delete(&mut start_iter, &mut end_iter);
 
         if let Some(this) = Reference::parse(
@@ -209,6 +233,18 @@ pub fn render_links(
 
         let mut start_iter = buffer.iter_at_offset(start_char_offset);
         let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        if start_char_offset > 0
+            && buffer
+                .text(
+                    &buffer.iter_at_offset(start_char_offset - 1),
+                    &end_iter,
+                    false,
+                )
+                .contains("\\")
+        {
+            continue;
+        }
 
         buffer.delete(&mut start_iter, &mut end_iter);
 

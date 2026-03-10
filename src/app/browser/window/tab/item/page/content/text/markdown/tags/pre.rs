@@ -53,6 +53,18 @@ impl Pre {
             let mut start_iter = buffer.iter_at_offset(start_char_offset);
             let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
+            if start_char_offset > 0
+                && buffer
+                    .text(
+                        &buffer.iter_at_offset(start_char_offset - 1),
+                        &end_iter,
+                        false,
+                    )
+                    .contains("\\")
+            {
+                continue;
+            }
+
             buffer.delete(&mut start_iter, &mut end_iter);
             buffer.insert_with_tags(&mut start_iter, &cap["text"], &[&self.0])
         }
