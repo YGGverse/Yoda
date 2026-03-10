@@ -21,7 +21,7 @@ impl Text {
                     .info
                     .borrow_mut()
                     .set_mime(Some("text/gemini".to_string()));
-                page.content.to_text_gemini(uri, data)
+                page.content.to_text_gemini(&page.profile, uri, data)
             }),
             Self::Markdown(uri, data) => (uri, {
                 page.navigation
@@ -29,7 +29,7 @@ impl Text {
                     .info
                     .borrow_mut()
                     .set_mime(Some("text/markdown".to_string()));
-                page.content.to_text_markdown(uri, data)
+                page.content.to_text_markdown(&page.profile, uri, data)
             }),
             Self::Plain(uri, data) => (uri, page.content.to_text_plain(data)),
             Self::Source(uri, data) => (uri, page.content.to_text_source(data)),

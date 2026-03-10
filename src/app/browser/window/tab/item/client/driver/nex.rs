@@ -299,7 +299,7 @@ fn render(
                             } else if q.ends_with("/") {
                                 p.content.to_text_nex(&u, d)
                             } else if q.ends_with(".gmi") || q.ends_with(".gemini") {
-                                p.content.to_text_gemini(&u, d)
+                                p.content.to_text_gemini(&p.profile, &u, d)
                             } else {
                                 p.content.to_text_plain(d)
                             };

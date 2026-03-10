@@ -4,6 +4,8 @@ mod nex;
 mod plain;
 mod source;
 
+use crate::profile::Profile;
+
 use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
 use gemini::Gemini;
@@ -27,10 +29,11 @@ pub struct Text {
 impl Text {
     pub fn gemini(
         actions: (&Rc<WindowAction>, &Rc<ItemAction>),
+        profile: &Rc<Profile>,
         base: &Uri,
         gemtext: &str,
     ) -> Result<Self, (String, Option<Self>)> {
-        match Gemini::build(actions, base, gemtext) {
+        match Gemini::build(actions, profile, base, gemtext) {
             Ok(widget) => Ok(Self {
                 scrolled_window: reader(&widget.text_view),
                 text_view: widget.text_view,
@@ -55,10 +58,11 @@ impl Text {
 
     pub fn markdown(
         actions: (&Rc<WindowAction>, &Rc<ItemAction>),
+        profile: &Rc<Profile>,
         base: &Uri,
         gemtext: &str,
     ) -> Self {
-        let markdown = Markdown::build(actions, base, gemtext);
+        let markdown = Markdown::build(actions, profile, base, gemtext);
         Self {
             scrolled_window: reader(&markdown.text_view),
             text_view: markdown.text_view,

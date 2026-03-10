@@ -6,13 +6,13 @@ mod syntax;
 mod tag;
 
 use super::{ItemAction, WindowAction};
-use crate::app::browser::window::action::Position;
+use crate::{app::browser::window::action::Position, profile::Profile};
 pub use error::Error;
 use gtk::{
     EventControllerMotion, GestureClick, TextBuffer, TextTag, TextView, TextWindowType,
     UriLauncher, Window, WrapMode,
-    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, RGBA},
-    gio::{Cancellable, SimpleAction, SimpleActionGroup},
+    gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, Display, RGBA},
+    gio::{Cancellable, Menu, SimpleAction, SimpleActionGroup},
     glib::{Uri, uuid_string_random},
     prelude::{PopoverExt, TextBufferExt, TextBufferExtManual, TextTagExt, TextViewExt, WidgetExt},
 };
@@ -36,6 +36,7 @@ impl Gemini {
     /// Build new `Self`
     pub fn build(
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
+        profile: &Rc<Profile>,
         base: &Uri,
         gemtext: &str,
     ) -> Result<Self, Error> {
@@ -220,7 +221,7 @@ impl Gemini {
                     let mut alt = Vec::with_capacity(2);
 
                     if uri.scheme() != base.scheme() {
-                        alt.push("⇖".to_string());
+                        alt.push(LINK_EXTERNAL_INDICATOR.to_string());
                     }
 
                     alt.push(match link.alt {
@@ -235,9 +236,7 @@ impl Gemini {
                         .wrap_mode(WrapMode::Word)
                         .build();
 
-                    if !tag.text_tag_table.add(&a) {
-                        panic!()
-                    }
+                    assert!(tag.text_tag_table.add(&a));
 
                     buffer.insert_with_tags(&mut buffer.end_iter(), &alt.join(" "), &[&a]);
                     buffer.insert(&mut buffer.end_iter(), NEW_LINE);
@@ -296,13 +295,38 @@ impl Gemini {
                 )
             }
         });
-        let action_link_copy =
+        let action_link_copy_url =
             SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
-        action_link_copy.connect_activate(|this, _| {
-            gtk::gdk::Display::default()
+        action_link_copy_url.connect_activate(|this, _| {
+            Display::default()
                 .unwrap()
                 .clipboard()
                 .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_link_copy_text =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_copy_text.connect_activate(|this, _| {
+            Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_link_copy_text_selected =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_copy_text_selected.connect_activate(|this, _| {
+            Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_link_bookmark =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_link_bookmark.connect_activate({
+            let p = profile.clone();
+            move |this, _| {
+                let state = this.state().unwrap().get::<String>().unwrap();
+                p.bookmark.toggle(&state, None).unwrap();
+            }
         });
         let action_link_download =
             SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
@@ -338,14 +362,17 @@ impl Gemini {
             Some(&{
                 let g = SimpleActionGroup::new();
                 g.add_action(&action_link_tab);
-                g.add_action(&action_link_copy);
+                g.add_action(&action_link_copy_url);
+                g.add_action(&action_link_copy_text);
+                g.add_action(&action_link_copy_text_selected);
+                g.add_action(&action_link_bookmark);
                 g.add_action(&action_link_download);
                 g.add_action(&action_link_source);
                 g
             }),
         );
         let link_context = gtk::PopoverMenu::from_model(Some(&{
-            let m = gtk::gio::Menu::new();
+            let m = Menu::new();
             m.append(
                 Some("Open Link in New Tab"),
                 Some(&format!(
@@ -353,27 +380,56 @@ impl Gemini {
                     action_link_tab.name()
                 )),
             );
-            m.append(
-                Some("Copy Link"),
-                Some(&format!(
-                    "{link_context_group_id}.{}",
-                    action_link_copy.name()
-                )),
-            );
-            m.append(
-                Some("Download Link"),
-                Some(&format!(
-                    "{link_context_group_id}.{}",
-                    action_link_download.name()
-                )),
-            );
-            m.append(
-                Some("View Link as Source"),
-                Some(&format!(
-                    "{link_context_group_id}.{}",
-                    action_link_source.name()
-                )),
-            );
+            m.append_section(None, &{
+                let m_copy = Menu::new();
+                m_copy.append(
+                    Some("Copy Link URL"),
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_copy_url.name()
+                    )),
+                );
+                m_copy.append(
+                    Some("Copy Link Text"),
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_copy_text.name()
+                    )),
+                );
+                m_copy.append(
+                    Some("Copy Link Text Selected"),
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_copy_text_selected.name()
+                    )),
+                );
+                m_copy
+            });
+            m.append_section(None, &{
+                let m_other = Menu::new();
+                m_other.append(
+                    Some("Bookmark Link"), // @TODO highlight state
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_bookmark.name()
+                    )),
+                );
+                m_other.append(
+                    Some("Download Link"),
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_download.name()
+                    )),
+                );
+                m_other.append(
+                    Some("View Link as Source"),
+                    Some(&format!(
+                        "{link_context_group_id}.{}",
+                        action_link_source.name()
+                    )),
+                );
+                m_other
+            });
             m
         }));
         link_context.set_parent(&text_view);
@@ -435,18 +491,61 @@ impl Gemini {
                             let request_str = uri.to_str();
                             let request_var = request_str.to_variant();
 
+                            // Open in the new tab
                             action_link_tab.set_state(&request_var);
-                            action_link_copy.set_state(&request_var);
+                            action_link_copy_text.set_enabled(!request_str.is_empty());
 
+                            action_link_copy_url.set_state(&request_var);
+                            action_link_copy_text.set_enabled(!request_str.is_empty());
+
+                            {
+                                // Copy link text
+                                let mut start_iter = iter;
+                                let mut end_iter = iter;
+                                if !start_iter.starts_tag(Some(&tag)) {
+                                    start_iter.backward_to_tag_toggle(Some(&tag));
+                                }
+                                if !end_iter.ends_tag(Some(&tag)) {
+                                    end_iter.forward_to_tag_toggle(Some(&tag));
+                                }
+                                let tagged_text = text_view
+                                    .buffer()
+                                    .text(&start_iter, &end_iter, false)
+                                    .replace(LINK_EXTERNAL_INDICATOR, "")
+                                    .trim()
+                                    .to_string();
+
+                                action_link_copy_text.set_state(&tagged_text.to_variant());
+                                action_link_copy_text.set_enabled(!tagged_text.is_empty());
+                            }
+
+                            // Copy link text (if) selected
+                            if let Some((sel_start, sel_end)) = buffer.selection_bounds() {
+                                let selected_tag_text = buffer.text(&sel_start, &sel_end, false);
+                                action_link_copy_text_selected
+                                    .set_state(&selected_tag_text.to_variant());
+                                action_link_copy_text_selected
+                                    .set_enabled(!selected_tag_text.is_empty());
+                            } else {
+                                action_link_copy_text_selected.set_enabled(false);
+                            }
+
+                            // Bookmark
+                            action_link_bookmark.set_state(&request_var);
+                            action_link_bookmark.set_enabled(is_prefixable_link(&request_str));
+
+                            // Download (new tab)
                             action_link_download.set_state(&request_var);
                             action_link_download.set_enabled(is_prefixable_link(&request_str));
 
+                            // View as Source (new tab)
                             action_link_source.set_state(&request_var);
                             action_link_source.set_enabled(is_prefixable_link(&request_str));
 
+                            // Toggle
                             link_context
                                 .set_pointing_to(Some(&gtk::gdk::Rectangle::new(x, y, 1, 1)));
-                            link_context.popup();
+                            link_context.popup()
                         }
                     }
                 }
@@ -580,5 +679,6 @@ fn link_prefix(request: String, prefix: &str) -> String {
     format!("{prefix}{}", request.trim_start_matches(prefix))
 }
 
+const LINK_EXTERNAL_INDICATOR: &str = "⇖";
 const LINK_PREFIX_DOWNLOAD: &str = "download:";
 const LINK_PREFIX_SOURCE: &str = "source:";

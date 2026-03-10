@@ -7,6 +7,8 @@ use directory::Directory;
 use image::Image;
 use text::Text;
 
+use crate::profile::Profile;
+
 use super::{ItemAction, TabAction, WindowAction};
 use adw::StatusPage;
 use gtk::{
@@ -126,9 +128,14 @@ impl Content {
     }
 
     /// `text/gemini`
-    pub fn to_text_gemini(&self, base: &Uri, data: &str) -> Text {
+    pub fn to_text_gemini(&self, profile: &Rc<Profile>, base: &Uri, data: &str) -> Text {
         self.clean();
-        match Text::gemini((&self.window_action, &self.item_action), base, data) {
+        match Text::gemini(
+            (&self.window_action, &self.item_action),
+            profile,
+            base,
+            data,
+        ) {
             Ok(text) => {
                 self.g_box.append(&text.scrolled_window);
                 text
@@ -155,9 +162,14 @@ impl Content {
     }
 
     /// `text/markdown`
-    pub fn to_text_markdown(&self, base: &Uri, data: &str) -> Text {
+    pub fn to_text_markdown(&self, profile: &Rc<Profile>, base: &Uri, data: &str) -> Text {
         self.clean();
-        let m = Text::markdown((&self.window_action, &self.item_action), base, data);
+        let m = Text::markdown(
+            (&self.window_action, &self.item_action),
+            profile,
+            base,
+            data,
+        );
         self.g_box.append(&m.scrolled_window);
         m
     }
