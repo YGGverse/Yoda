@@ -40,8 +40,15 @@ impl Strike {
             let mut start_iter = buffer.iter_at_offset(start_char_offset);
             let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
+            let mut tags = start_iter.tags();
+            tags.push(self.0.clone());
+
             buffer.delete(&mut start_iter, &mut end_iter);
-            buffer.insert_with_tags(&mut start_iter, &cap["text"], &[&self.0])
+            buffer.insert_with_tags(
+                &mut start_iter,
+                &cap["text"],
+                &tags.iter().collect::<Vec<&TextTag>>(),
+            )
         }
     }
 }

@@ -95,7 +95,12 @@ impl Reference {
                 .build()
         };
         assert!(buffer.tag_table().add(&a));
-        buffer.insert_with_tags(position, &self.alt, &[&a]);
+
+        let mut tags = position.tags(); // @TODO seems does not work :)
+        tags.push(a.clone());
+
+        buffer.insert_with_tags(position, &self.alt, &tags.iter().collect::<Vec<&TextTag>>());
+
         links.insert(a, self.uri);
     }
 }
