@@ -17,9 +17,11 @@ pub struct Header {
 
 impl Header {
     pub fn new() -> Self {
+        // * important to give the tag name here as used in the fragment search
         Self {
             h1: TextTag::builder()
                 .foreground("#2190a4") // @TODO optional
+                .name("h1")
                 .scale(1.6)
                 .sentence(true)
                 .weight(500)
@@ -27,6 +29,7 @@ impl Header {
                 .build(),
             h2: TextTag::builder()
                 .foreground("#d56199") // @TODO optional
+                .name("h2")
                 .scale(1.4)
                 .sentence(true)
                 .weight(400)
@@ -34,6 +37,7 @@ impl Header {
                 .build(),
             h3: TextTag::builder()
                 .foreground("#c88800") // @TODO optional
+                .name("h3")
                 .scale(1.2)
                 .sentence(true)
                 .weight(400)
@@ -41,6 +45,7 @@ impl Header {
                 .build(),
             h4: TextTag::builder()
                 .foreground("#c88800") // @TODO optional
+                .name("h4")
                 .scale(1.1)
                 .sentence(true)
                 .weight(400)
@@ -48,6 +53,7 @@ impl Header {
                 .build(),
             h5: TextTag::builder()
                 .foreground("#c88800") // @TODO optional
+                .name("h5")
                 .scale(1.0)
                 .sentence(true)
                 .weight(400)
@@ -55,6 +61,7 @@ impl Header {
                 .build(),
             h6: TextTag::builder()
                 .foreground("#c88800") // @TODO optional
+                .name("h6")
                 .scale(1.0)
                 .sentence(true)
                 .weight(300)
