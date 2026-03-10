@@ -166,7 +166,7 @@ The Gemini protocol was designed as a minimalistic, tracking-resistant alternati
 * Glib `2.80+`
 * Gtk `4.14+`
 * GtkSourceView `5.14+`
-* libadwaita `1.5+` (Ubuntu 24.04+)
+* libadwaita `1.5+` (Ubuntu `24.04+`)
 * libspelling `0.1+`
 
 #### Debian
