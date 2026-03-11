@@ -7,6 +7,8 @@ use regex::Regex;
 
 const REGEX_BOLD: &str = r"\*\*(?P<text>[^*]+)\*\*";
 
+pub const ESCAPES: &[&str] = &["\\*"]; // same with list
+
 pub struct Bold(TextTag);
 
 impl Bold {

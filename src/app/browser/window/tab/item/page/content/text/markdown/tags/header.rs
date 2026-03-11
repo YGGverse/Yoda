@@ -8,6 +8,8 @@ use std::collections::HashMap;
 
 const REGEX_HEADER: &str = r"(?m)^(?P<level>#{1,6})\s+(?P<title>.*)$";
 
+pub const ESCAPES: &[&str] = &["\\#"];
+
 pub struct Header {
     h1: TextTag,
     h2: TextTag,

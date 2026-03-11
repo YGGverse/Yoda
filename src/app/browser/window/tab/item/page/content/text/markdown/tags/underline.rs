@@ -8,6 +8,8 @@ use regex::Regex;
 
 const REGEX_UNDERLINE: &str = r"\b_(?P<text>[^_]+)_\b";
 
+pub const ESCAPES: &[&str] = &["\\_"];
+
 pub struct Underline(TextTag);
 
 impl Underline {

@@ -8,6 +8,8 @@ use regex::Regex;
 
 const REGEX_QUOTE: &str = r"(?m)>\s*(?P<text>.*)$";
 
+pub const ESCAPES: &[&str] = &["\\>"];
+
 pub struct Quote(TextTag);
 
 impl Quote {

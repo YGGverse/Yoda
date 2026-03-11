@@ -7,6 +7,9 @@ use regex::Regex;
 const REGEX_LIST: &str =
     r"(?m)^(?P<level>[ \t]*)\*[ \t]+(?:(?P<state>\[[ xX]\])[ \t]+)?(?P<text>.*)";
 
+// same with bold and reference
+// pub const ESCAPES: &[&str] = &["\\*","\\[","\\]"];
+
 struct State(bool);
 
 impl State {

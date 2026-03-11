@@ -12,6 +12,9 @@ use syntax::Syntax;
 
 const REGEX_CODE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
 
+// same with pre
+// pub const ESCAPES: &[&str] = &["\\`"];
+
 struct Entry {
     alt: Option<String>,
     data: String,

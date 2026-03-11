@@ -81,12 +81,16 @@ impl Tags {
         reference::render_links(buffer, base, link_color, links);
 
         // Cleanup unformatted escape chars
-        let mut cursor = buffer.start_iter();
-        while let Some((mut match_start, mut match_end)) =
-            cursor.forward_search(ESC, TextSearchFlags::CASE_INSENSITIVE, None)
-        {
-            buffer.delete(&mut match_start, &mut match_end);
-            cursor = match_end;
+        for escapes in ESCAPES {
+            for escape in *escapes {
+                let mut cursor = buffer.start_iter();
+                while let Some((mut match_start, mut match_end)) =
+                    cursor.forward_search(escape, TextSearchFlags::CASE_INSENSITIVE, None)
+                {
+                    buffer.delete(&mut match_start, &mut match_end);
+                    cursor = match_end;
+                }
+            }
         }
 
         // Render placeholders
@@ -99,7 +103,12 @@ impl Tags {
             s = reference::strip_tags(&s);
             s = strike::strip_tags(&s);
             s = underline::strip_tags(&s);
-            s.replace(ESC, "")
+            for escapes in ESCAPES {
+                for escape in *escapes {
+                    s = s.replace(escape, "");
+                }
+            }
+            s
         })
     }
 }
@@ -109,4 +118,17 @@ pub fn format_header_fragment(value: &str) -> GString {
     Uri::escape_string(&value.to_lowercase().replace(" ", "-"), None, true)
 }
 
-const ESC: &str = "\\";
+const ESCAPES: &[&[&str]] = &[
+    &["\\\n"],
+    bold::ESCAPES,
+    // same with pre
+    // code::ESCAPES,
+    header::ESCAPES,
+    // same with bold and reference
+    // list::ESCAPES,
+    pre::ESCAPES,
+    quote::ESCAPES,
+    reference::ESCAPES,
+    strike::ESCAPES,
+    underline::ESCAPES,
+];
