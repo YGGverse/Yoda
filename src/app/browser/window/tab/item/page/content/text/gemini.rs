@@ -493,13 +493,14 @@ impl Gemini {
 
                             // Open in the new tab
                             action_link_tab.set_state(&request_var);
-                            action_link_copy_text.set_enabled(!request_str.is_empty());
+                            action_link_tab.set_enabled(!request_str.is_empty());
 
+                            // Copy link to the clipboard
                             action_link_copy_url.set_state(&request_var);
-                            action_link_copy_text.set_enabled(!request_str.is_empty());
+                            action_link_copy_url.set_enabled(!request_str.is_empty());
 
+                            // Copy link text
                             {
-                                // Copy link text
                                 let mut start_iter = iter;
                                 let mut end_iter = iter;
                                 if !start_iter.starts_tag(Some(&tag)) {
