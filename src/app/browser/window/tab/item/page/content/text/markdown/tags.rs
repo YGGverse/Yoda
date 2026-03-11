@@ -10,7 +10,12 @@ mod underline;
 
 use bold::Bold;
 use code::Code;
-use gtk::{TextBuffer, TextSearchFlags, TextTag, gdk::RGBA, glib::Uri, prelude::TextBufferExt};
+use gtk::{
+    TextBuffer, TextSearchFlags, TextTag,
+    gdk::RGBA,
+    glib::{GString, Uri},
+    prelude::TextBufferExt,
+};
 use header::Header;
 use pre::Pre;
 use quote::Quote;
@@ -97,6 +102,11 @@ impl Tags {
             s.replace(ESC, "")
         })
     }
+}
+
+/// Shared URL #fragment logic (for the Header tags ref)
+pub fn format_header_fragment(value: &str) -> GString {
+    Uri::escape_string(&value.to_lowercase().replace(" ", "-"), None, true)
 }
 
 const ESC: &str = "\\";

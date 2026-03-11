@@ -126,8 +126,8 @@ impl Header {
             }
 
             // Create unique phantom tag for each header
-            // * it is required for context menu relationships
-            let h = TextTag::builder().build();
+            // * for the #fragment references implementation
+            let h = TextTag::new(Some(&format!("h{}", gtk::glib::uuid_string_random())));
             assert!(table.add(&h));
 
             // Render header in text buffer
@@ -158,11 +158,7 @@ impl Header {
                                 base.port(),
                                 &base.path(),
                                 base.query().as_deref(),
-                                Some(&Uri::escape_string(
-                                    &cap["title"].to_lowercase().replace(" ", "-"),
-                                    None,
-                                    true
-                                )),
+                                Some(&super::format_header_fragment(&cap["title"])),
                             )
                         ),
                     )

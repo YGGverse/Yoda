@@ -4,11 +4,11 @@ mod tags;
 use super::{ItemAction, WindowAction};
 use crate::{app::browser::window::action::Position, profile::Profile};
 use gtk::{
-    EventControllerMotion, GestureClick, PopoverMenu, TextBuffer, TextSearchFlags, TextTag,
-    TextTagTable, TextView, TextWindowType, UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, PopoverMenu, TextBuffer, TextTag, TextTagTable, TextView,
+    TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, Display, RGBA},
     gio::{Cancellable, Menu, SimpleAction, SimpleActionGroup},
-    glib::{ControlFlow, GString, Uri, idle_add_local, uri_unescape_string, uuid_string_random},
+    glib::{ControlFlow, GString, Uri, idle_add_local, uuid_string_random},
     prelude::{PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
@@ -312,6 +312,7 @@ impl Markdown {
 
         // Init events
         primary_button_controller.connect_released({
+            let headers = headers.clone();
             let item_action = item_action.clone();
             let links = links.clone();
             let text_view = text_view.clone();
@@ -327,7 +328,7 @@ impl Markdown {
                         // Tag is link
                         if let Some(uri) = links.get(&tag) {
                             return if let Some(fragment) = uri.fragment() {
-                                scroll_to_anchor(&text_view, fragment);
+                                scroll_to_anchor(&text_view, &headers, fragment);
                             } else {
                                 open_link_in_current_tab(&uri.to_string(), &item_action);
                             };
@@ -338,10 +339,10 @@ impl Markdown {
         });
 
         secondary_button_controller.connect_pressed({
-            let links = links.clone();
             let headers = headers.clone();
-            let text_view = text_view.clone();
             let link_context = link_context.clone();
+            let links = links.clone();
+            let text_view = text_view.clone();
             move |_, _, window_x, window_y| {
                 let x = window_x as i32;
                 let y = window_y as i32;
@@ -518,7 +519,7 @@ impl Markdown {
             let text_view = text_view.clone();
             move || {
                 if let Some(fragment) = base.fragment() {
-                    scroll_to_anchor(&text_view, fragment);
+                    scroll_to_anchor(&text_view, &headers, fragment);
                 }
                 ControlFlow::Break
             }
@@ -528,29 +529,20 @@ impl Markdown {
     }
 }
 
-fn scroll_to_anchor(text_view: &TextView, fragment: GString) -> bool {
-    fn try_scroll(text_view: &TextView, query: &str) -> bool {
-        let mut cursor = text_view.buffer().start_iter();
-        while let Some((mut match_start, match_end)) =
-            cursor.forward_search(query, TextSearchFlags::CASE_INSENSITIVE, None)
-        {
-            if match_start
-                .tags()
-                .iter()
-                .any(|t| t.name().is_some_and(|n| n.starts_with("h")))
-            {
-                return text_view.scroll_to_iter(&mut match_start, 0.0, true, 0.0, 0.0);
-            }
-            cursor = match_end;
+fn scroll_to_anchor(
+    text_view: &TextView,
+    headers: &HashMap<TextTag, (String, Uri)>,
+    fragment: GString,
+) {
+    if let Some((tag, _)) = headers.iter().find(|(_, (_, uri))| {
+        uri.fragment()
+            .is_some_and(|f| fragment == tags::format_header_fragment(&f))
+    }) {
+        let mut iter = text_view.buffer().start_iter();
+        if iter.starts_tag(Some(tag)) || iter.forward_to_tag_toggle(Some(tag)) {
+            text_view.scroll_to_iter(&mut iter, 0.0, true, 0.0, 0.0);
         }
-        false
     }
-    let query = uri_unescape_string(&fragment, None::<&str>).unwrap_or(fragment);
-    let result = try_scroll(text_view, &query); // exact match
-    if !result {
-        return try_scroll(text_view, &query.replace(" ", "-")); // alt syntax
-    }
-    result
 }
 
 fn is_internal_link(request: &str) -> bool {
