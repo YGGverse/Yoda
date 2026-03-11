@@ -397,7 +397,7 @@ impl Gemini {
                     )),
                 );
                 m_copy.append(
-                    Some("Copy Link Text Selected"),
+                    Some("Copy Text Selected"),
                     Some(&format!(
                         "{link_context_group_id}.{}",
                         action_link_copy_text_selected.name()
@@ -490,6 +490,7 @@ impl Gemini {
                         if let Some(uri) = links.get(&tag) {
                             let request_str = uri.to_str();
                             let request_var = request_str.to_variant();
+                            let is_prefix_link = is_prefix_link(&request_str);
 
                             // Open in the new tab
                             action_link_tab.set_state(&request_var);
@@ -521,27 +522,28 @@ impl Gemini {
                             }
 
                             // Copy link text (if) selected
-                            if let Some((sel_start, sel_end)) = buffer.selection_bounds() {
-                                let selected_tag_text = buffer.text(&sel_start, &sel_end, false);
-                                action_link_copy_text_selected
-                                    .set_state(&selected_tag_text.to_variant());
-                                action_link_copy_text_selected
-                                    .set_enabled(!selected_tag_text.is_empty());
-                            } else {
-                                action_link_copy_text_selected.set_enabled(false);
-                            }
+                            action_link_copy_text_selected.set_enabled(
+                                if let Some((start, end)) = buffer.selection_bounds() {
+                                    let selected = buffer.text(&start, &end, false);
+                                    action_link_copy_text_selected
+                                        .set_state(&selected.to_variant());
+                                    !selected.is_empty()
+                                } else {
+                                    false
+                                },
+                            );
 
                             // Bookmark
                             action_link_bookmark.set_state(&request_var);
-                            action_link_bookmark.set_enabled(is_prefixable_link(&request_str));
+                            action_link_bookmark.set_enabled(is_prefix_link);
 
                             // Download (new tab)
                             action_link_download.set_state(&request_var);
-                            action_link_download.set_enabled(is_prefixable_link(&request_str));
+                            action_link_download.set_enabled(is_prefix_link);
 
                             // View as Source (new tab)
                             action_link_source.set_state(&request_var);
-                            action_link_source.set_enabled(is_prefixable_link(&request_str));
+                            action_link_source.set_enabled(is_prefix_link);
 
                             // Toggle
                             link_context
@@ -639,7 +641,7 @@ fn is_internal_link(request: &str) -> bool {
         || request.starts_with("source:")
 }
 
-fn is_prefixable_link(request: &str) -> bool {
+fn is_prefix_link(request: &str) -> bool {
     request.starts_with("gemini://")
         || request.starts_with("nex://")
         || request.starts_with("file://")
