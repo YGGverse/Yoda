@@ -358,7 +358,7 @@ fn handle(
                                                                     } else {
                                                                         match m.as_str() {
                                                                             "text/gemini" => page.content.to_text_gemini(&page.profile, &uri, data),
-                                                                            "text/markdown" => page.content.to_text_markdown(&page.profile, &uri, data),
+                                                                            "text/markdown" => page.content.to_text_markdown(&page, &uri, data),
                                                                             "text/plain" => page.content.to_text_plain(data),
                                                                             _ => panic!() // unexpected
                                                                         }

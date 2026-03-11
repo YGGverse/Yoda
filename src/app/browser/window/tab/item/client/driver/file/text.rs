@@ -8,7 +8,7 @@ pub enum Text {
 }
 
 impl Text {
-    pub fn handle(&self, page: &super::Page) {
+    pub fn handle(&self, page: &std::rc::Rc<super::Page>) {
         page.navigation
             .request
             .info
@@ -29,7 +29,7 @@ impl Text {
                     .info
                     .borrow_mut()
                     .set_mime(Some("text/markdown".to_string()));
-                page.content.to_text_markdown(&page.profile, uri, data)
+                page.content.to_text_markdown(page, uri, data)
             }),
             Self::Plain(uri, data) => (uri, page.content.to_text_plain(data)),
             Self::Source(uri, data) => (uri, page.content.to_text_source(data)),

@@ -2,14 +2,14 @@ mod gutter;
 mod tags;
 
 use super::{ItemAction, WindowAction};
-use crate::{app::browser::window::action::Position, profile::Profile};
+use crate::app::browser::window::{action::Position, tab::item::page::Page};
 use gtk::{
     EventControllerMotion, GestureClick, PopoverMenu, TextBuffer, TextTag, TextTagTable, TextView,
     TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, Display, RGBA},
     gio::{Cancellable, Menu, SimpleAction, SimpleActionGroup},
     glib::{ControlFlow, GString, Uri, idle_add_local, uuid_string_random},
-    prelude::{PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
+    prelude::{EditableExt, PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
@@ -27,7 +27,7 @@ impl Markdown {
     /// Build new `Self`
     pub fn build(
         (window_action, item_action): (&Rc<WindowAction>, &Rc<ItemAction>),
-        profile: &Rc<Profile>,
+        page: &Rc<Page>,
         base: &Uri,
         markdown: &str,
     ) -> Self {
@@ -180,7 +180,7 @@ impl Markdown {
         let action_link_bookmark =
             SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
         action_link_bookmark.connect_activate({
-            let p = profile.clone();
+            let p = page.profile.clone();
             move |this, _| {
                 let state = this.state().unwrap().get::<String>().unwrap();
                 p.bookmark.toggle(&state, None).unwrap();
@@ -315,6 +315,7 @@ impl Markdown {
             let headers = headers.clone();
             let item_action = item_action.clone();
             let links = links.clone();
+            let page = page.clone();
             let text_view = text_view.clone();
             move |_, _, window_x, window_y| {
                 // Detect tag match current coords hovered
@@ -328,7 +329,7 @@ impl Markdown {
                         // Tag is link
                         if let Some(uri) = links.get(&tag) {
                             return if let Some(fragment) = uri.fragment() {
-                                scroll_to_anchor(&text_view, &headers, fragment);
+                                scroll_to_anchor(&page, &text_view, &headers, fragment);
                             } else {
                                 open_link_in_current_tab(&uri.to_string(), &item_action);
                             };
@@ -516,10 +517,11 @@ impl Markdown {
         // Anchor auto-scroll behavior
         idle_add_local({
             let base = base.clone();
+            let page = page.clone();
             let text_view = text_view.clone();
             move || {
                 if let Some(fragment) = base.fragment() {
-                    scroll_to_anchor(&text_view, &headers, fragment);
+                    scroll_to_anchor(&page, &text_view, &headers, fragment);
                 }
                 ControlFlow::Break
             }
@@ -530,11 +532,12 @@ impl Markdown {
 }
 
 fn scroll_to_anchor(
+    page: &Rc<Page>,
     text_view: &TextView,
     headers: &HashMap<TextTag, (String, Uri)>,
     fragment: GString,
 ) {
-    if let Some((tag, _)) = headers.iter().find(|(_, (_, uri))| {
+    if let Some((tag, (_, uri))) = headers.iter().find(|(_, (_, uri))| {
         uri.fragment()
             .is_some_and(|f| fragment == tags::format_header_fragment(&f))
     }) {
@@ -542,6 +545,7 @@ fn scroll_to_anchor(
         if iter.starts_tag(Some(tag)) || iter.forward_to_tag_toggle(Some(tag)) {
             text_view.scroll_to_iter(&mut iter, 0.0, true, 0.0, 0.0);
         }
+        page.navigation.request.entry.set_text(&uri.to_string())
     }
 }
 

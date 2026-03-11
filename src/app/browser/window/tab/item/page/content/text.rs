@@ -4,7 +4,7 @@ mod nex;
 mod plain;
 mod source;
 
-use crate::profile::Profile;
+use crate::{app::browser::window::tab::item::page::Page, profile::Profile};
 
 use super::{ItemAction, WindowAction};
 use adw::ClampScrollable;
@@ -58,11 +58,11 @@ impl Text {
 
     pub fn markdown(
         actions: (&Rc<WindowAction>, &Rc<ItemAction>),
-        profile: &Rc<Profile>,
+        page: &Rc<Page>,
         base: &Uri,
         gemtext: &str,
     ) -> Self {
-        let markdown = Markdown::build(actions, profile, base, gemtext);
+        let markdown = Markdown::build(actions, page, base, gemtext);
         Self {
             scrolled_window: reader(&markdown.text_view),
             text_view: markdown.text_view,

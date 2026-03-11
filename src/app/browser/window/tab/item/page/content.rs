@@ -7,7 +7,7 @@ use directory::Directory;
 use image::Image;
 use text::Text;
 
-use crate::profile::Profile;
+use crate::{app::browser::window::tab::item::page::Page, profile::Profile};
 
 use super::{ItemAction, TabAction, WindowAction};
 use adw::StatusPage;
@@ -162,14 +162,9 @@ impl Content {
     }
 
     /// `text/markdown`
-    pub fn to_text_markdown(&self, profile: &Rc<Profile>, base: &Uri, data: &str) -> Text {
+    pub fn to_text_markdown(&self, page: &Rc<Page>, base: &Uri, data: &str) -> Text {
         self.clean();
-        let m = Text::markdown(
-            (&self.window_action, &self.item_action),
-            profile,
-            base,
-            data,
-        );
+        let m = Text::markdown((&self.window_action, &self.item_action), page, base, data);
         self.g_box.append(&m.scrolled_window);
         m
     }
