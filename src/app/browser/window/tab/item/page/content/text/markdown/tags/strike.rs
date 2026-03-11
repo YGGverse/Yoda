@@ -5,7 +5,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_STRIKE: &str = r"~~(?P<text>.+?)~~";
+const REGEX_STRIKE: &str = r"~~(?P<text>[^~]*)~~";
 
 pub struct Strike(TextTag);
 

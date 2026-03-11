@@ -5,7 +5,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_BOLD: &str = r"\*\*(?P<text>[^*]+)\*\*";
+const REGEX_BOLD: &str = r"\*\*(?P<text>[^\*]*)\*\*";
 
 pub struct Bold(TextTag);
 

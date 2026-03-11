@@ -112,19 +112,6 @@ impl Header {
             let mut start_iter = buffer.iter_at_offset(start_char_offset);
             let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
-            // Skip escaped entries
-            if start_char_offset > 0
-                && buffer
-                    .text(
-                        &buffer.iter_at_offset(start_char_offset - 1),
-                        &end_iter,
-                        false,
-                    )
-                    .contains("\\")
-            {
-                continue;
-            }
-
             // Create unique phantom tag for each header
             // * for the #fragment references implementation
             let h = TextTag::new(Some(&format!("h{}", gtk::glib::uuid_string_random())));

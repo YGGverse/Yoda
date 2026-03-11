@@ -42,18 +42,6 @@ impl Quote {
             let mut start_iter = buffer.iter_at_offset(start_char_offset);
             let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
-            if start_char_offset > 0
-                && buffer
-                    .text(
-                        &buffer.iter_at_offset(start_char_offset - 1),
-                        &end_iter,
-                        false,
-                    )
-                    .contains("\\")
-            {
-                continue;
-            }
-
             buffer.delete(&mut start_iter, &mut end_iter);
             buffer.insert_with_tags(&mut start_iter, &cap["text"], &[&self.0])
         }
@@ -63,7 +51,7 @@ impl Quote {
 #[test]
 fn test_regex() {
     let cap: Vec<_> = Regex::new(REGEX_QUOTE).unwrap().captures_iter(
-        "> Some quote 1 with ![img](https://link.com)\n> Some quote 2 with text\nplain text\n> Some quote 3"
+        "> Some quote 1 with ![img](https://link.com)\n> 2\\)Some quote 2 with text\nplain text\n> Some quote 3"
     ).collect();
     {
         let m = cap.first().unwrap();
@@ -71,7 +59,7 @@ fn test_regex() {
     }
     {
         let m = cap.get(1).unwrap();
-        assert_eq!(&m["text"], "Some quote 2 with text");
+        assert_eq!(&m["text"], "2\\)Some quote 2 with text");
     }
     {
         let m = cap.get(2).unwrap();

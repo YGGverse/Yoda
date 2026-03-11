@@ -6,7 +6,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_UNDERLINE: &str = r"\b_(?P<text>[^_]+)_\b";
+const REGEX_UNDERLINE: &str = r"\b_(?P<text>[^_]*)_\b";
 
 pub struct Underline(TextTag);
 

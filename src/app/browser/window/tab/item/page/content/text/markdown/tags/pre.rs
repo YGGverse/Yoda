@@ -6,7 +6,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_PRE: &str = r"`(?P<text>[^`]+)`";
+const REGEX_PRE: &str = r"`(?P<text>[^`]*)`";
 const TAG_FONT: &str = "monospace"; // @TODO
 const TAG_SCALE: f64 = 0.9;
 
