@@ -7,8 +7,6 @@ use regex::Regex;
 
 const REGEX_STRIKE: &str = r"~~(?P<text>.+?)~~";
 
-pub const ESCAPES: &[&str] = &["\\~"];
-
 pub struct Strike(TextTag);
 
 impl Strike {

@@ -10,8 +10,6 @@ const REGEX_PRE: &str = r"`(?P<text>[^`]+)`";
 const TAG_FONT: &str = "monospace"; // @TODO
 const TAG_SCALE: f64 = 0.9;
 
-pub const ESCAPES: &[&str] = &["\\`"]; // same with code
-
 pub struct Pre(TextTag);
 
 impl Pre {
