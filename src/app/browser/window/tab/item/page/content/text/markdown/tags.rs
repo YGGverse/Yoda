@@ -53,13 +53,14 @@ impl Tags {
         base: &Uri,
         link_color: &RGBA,
         links: &mut HashMap<TextTag, Uri>,
+        headers: &mut HashMap<TextTag, (String, Uri)>,
     ) -> Option<String> {
         // Collect all code blocks first,
         // and temporarily replace them with placeholder ID
         self.code.collect(buffer);
 
         // Keep in order!
-        let title = self.header.render(buffer);
+        let title = self.header.render(buffer, base, headers);
 
         list::render(buffer);
 

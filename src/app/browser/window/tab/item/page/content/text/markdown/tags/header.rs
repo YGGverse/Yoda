@@ -1,8 +1,10 @@
 use gtk::{
     TextBuffer, TextTag, WrapMode,
+    glib::Uri,
     prelude::{TextBufferExt, TextBufferExtManual},
 };
 use regex::Regex;
+use std::collections::HashMap;
 
 const REGEX_HEADER: &str = r"(?m)^(?P<level>#{1,6})\s+(?P<title>.*)$";
 
@@ -71,7 +73,12 @@ impl Header {
     }
 
     /// Apply title `Tag` to given `TextBuffer`
-    pub fn render(&self, buffer: &TextBuffer) -> Option<String> {
+    pub fn render(
+        &self,
+        buffer: &TextBuffer,
+        base: &Uri,
+        headers: &mut HashMap<TextTag, (String, Uri)>,
+    ) -> Option<String> {
         let mut raw_title = None;
 
         let table = buffer.tag_table();
@@ -105,6 +112,7 @@ impl Header {
             let mut start_iter = buffer.iter_at_offset(start_char_offset);
             let mut end_iter = buffer.iter_at_offset(end_char_offset);
 
+            // Skip escaped entries
             if start_char_offset > 0
                 && buffer
                     .text(
@@ -117,19 +125,50 @@ impl Header {
                 continue;
             }
 
+            // Create unique phantom tag for each header
+            // * it is required for context menu relationships
+            let h = TextTag::builder().build();
+            assert!(table.add(&h));
+
+            // Render header in text buffer
             buffer.delete(&mut start_iter, &mut end_iter);
 
             match cap["level"].chars().count() {
-                1 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h1]),
-                2 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h2]),
-                3 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h3]),
-                4 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h4]),
-                5 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h5]),
-                6 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&self.h6]),
-                _ => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[]),
+                1 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h1]),
+                2 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h2]),
+                3 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h3]),
+                4 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h4]),
+                5 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h5]),
+                6 => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h, &self.h6]),
+                _ => buffer.insert_with_tags(&mut start_iter, &cap["title"], &[&h]), // unexpected
             }
-        }
 
+            // Register fragment reference
+            assert!(
+                headers
+                    .insert(
+                        h,
+                        (
+                            cap["title"].into(),
+                            Uri::build(
+                                base.flags(),
+                                &base.scheme(),
+                                base.userinfo().as_deref(),
+                                base.host().as_deref(),
+                                base.port(),
+                                &base.path(),
+                                base.query().as_deref(),
+                                Some(&Uri::escape_string(
+                                    &cap["title"].to_lowercase().replace(" ", "-"),
+                                    None,
+                                    true
+                                )),
+                            )
+                        ),
+                    )
+                    .is_none()
+            )
+        }
         raw_title
     }
 }

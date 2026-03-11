@@ -4,8 +4,8 @@ mod tags;
 use super::{ItemAction, WindowAction};
 use crate::{app::browser::window::action::Position, profile::Profile};
 use gtk::{
-    EventControllerMotion, GestureClick, TextBuffer, TextSearchFlags, TextTag, TextTagTable,
-    TextView, TextWindowType, UriLauncher, Window, WrapMode,
+    EventControllerMotion, GestureClick, PopoverMenu, TextBuffer, TextSearchFlags, TextTag,
+    TextTagTable, TextView, TextWindowType, UriLauncher, Window, WrapMode,
     gdk::{BUTTON_MIDDLE, BUTTON_PRIMARY, BUTTON_SECONDARY, Display, RGBA},
     gio::{Cancellable, Menu, SimpleAction, SimpleActionGroup},
     glib::{ControlFlow, GString, Uri, idle_add_local, uri_unescape_string, uuid_string_random},
@@ -33,6 +33,7 @@ impl Markdown {
     ) -> Self {
         // Init HashMap storage (for event controllers)
         let mut links: HashMap<TextTag, Uri> = HashMap::new();
+        let mut headers: HashMap<TextTag, (String, Uri)> = HashMap::new();
 
         // Init hovered tag storage for `links`
         // * maybe less expensive than update entire HashMap by iter
@@ -75,9 +76,72 @@ impl Markdown {
         let gutter = Gutter::build(&text_view);
 
         // Render markdown tags
-        let title = tags.render(&buffer, base, &link_color.0, &mut links);
+        let title = tags.render(&buffer, base, &link_color.0, &mut links, &mut headers);
 
-        // Context menu
+        // Headers context menu (fragment capture)
+        let action_header_copy_url =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_header_copy_url.connect_activate(|this, _| {
+            Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_header_copy_text =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_header_copy_text.connect_activate(|this, _| {
+            Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let action_header_copy_text_selected =
+            SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
+        action_header_copy_text_selected.connect_activate(|this, _| {
+            Display::default()
+                .unwrap()
+                .clipboard()
+                .set_text(&this.state().unwrap().get::<String>().unwrap())
+        });
+        let header_context_group_id = uuid_string_random();
+        text_view.insert_action_group(
+            &header_context_group_id,
+            Some(&{
+                let g = SimpleActionGroup::new();
+                g.add_action(&action_header_copy_url);
+                g.add_action(&action_header_copy_text);
+                g.add_action(&action_header_copy_text_selected);
+                g
+            }),
+        );
+        let header_context = PopoverMenu::from_model(Some(&{
+            let m = Menu::new();
+            m.append(
+                Some("Copy Header Link"),
+                Some(&format!(
+                    "{header_context_group_id}.{}",
+                    action_header_copy_url.name()
+                )),
+            );
+            m.append(
+                Some("Copy Header Text"),
+                Some(&format!(
+                    "{header_context_group_id}.{}",
+                    action_header_copy_text.name()
+                )),
+            );
+            m.append(
+                Some("Copy Text Selected"),
+                Some(&format!(
+                    "{header_context_group_id}.{}",
+                    action_header_copy_text_selected.name()
+                )),
+            );
+            m
+        }));
+        header_context.set_parent(&text_view);
+
+        // Link context menu
         let action_link_tab =
             SimpleAction::new_stateful(&uuid_string_random(), None, &String::new().to_variant());
         action_link_tab.connect_activate({
@@ -165,7 +229,7 @@ impl Markdown {
                 g
             }),
         );
-        let link_context = gtk::PopoverMenu::from_model(Some(&{
+        let link_context = PopoverMenu::from_model(Some(&{
             let m = Menu::new();
             m.append(
                 Some("Open Link in New Tab"),
@@ -191,7 +255,7 @@ impl Markdown {
                     )),
                 );
                 m_copy.append(
-                    Some("Copy Link Text Selected"),
+                    Some("Copy Text Selected"),
                     Some(&format!(
                         "{link_context_group_id}.{}",
                         action_link_copy_text_selected.name()
@@ -244,6 +308,7 @@ impl Markdown {
 
         // Init shared reference container for HashTable collected
         let links = Rc::new(links);
+        let headers = Rc::new(headers);
 
         // Init events
         primary_button_controller.connect_released({
@@ -274,6 +339,7 @@ impl Markdown {
 
         secondary_button_controller.connect_pressed({
             let links = links.clone();
+            let headers = headers.clone();
             let text_view = text_view.clone();
             let link_context = link_context.clone();
             move |_, _, window_x, window_y| {
@@ -288,16 +354,18 @@ impl Markdown {
                         if let Some(uri) = links.get(&tag) {
                             let request_str = uri.to_str();
                             let request_var = request_str.to_variant();
+                            let is_prefix_link = is_prefix_link(&request_str);
 
                             // Open in the new tab
                             action_link_tab.set_state(&request_var);
-                            action_link_copy_text.set_enabled(!request_str.is_empty());
+                            action_link_tab.set_enabled(!request_str.is_empty());
 
+                            // Copy link to the clipboard
                             action_link_copy_url.set_state(&request_var);
-                            action_link_copy_text.set_enabled(!request_str.is_empty());
+                            action_link_copy_url.set_enabled(!request_str.is_empty());
 
+                            // Copy link text
                             {
-                                // Copy link text
                                 let mut start_iter = iter;
                                 let mut end_iter = iter;
                                 if !start_iter.starts_tag(Some(&tag)) {
@@ -318,32 +386,63 @@ impl Markdown {
                             }
 
                             // Copy link text (if) selected
-                            if let Some((sel_start, sel_end)) = buffer.selection_bounds() {
-                                let selected_tag_text = buffer.text(&sel_start, &sel_end, false);
-                                action_link_copy_text_selected
-                                    .set_state(&selected_tag_text.to_variant());
-                                action_link_copy_text_selected
-                                    .set_enabled(!selected_tag_text.is_empty());
-                            } else {
-                                action_link_copy_text_selected.set_enabled(false);
-                            }
+                            action_link_copy_text_selected.set_enabled(
+                                if let Some((start, end)) = buffer.selection_bounds() {
+                                    let selected = buffer.text(&start, &end, false);
+                                    action_link_copy_text_selected
+                                        .set_state(&selected.to_variant());
+                                    !selected.is_empty()
+                                } else {
+                                    false
+                                },
+                            );
 
                             // Bookmark
                             action_link_bookmark.set_state(&request_var);
-                            action_link_bookmark.set_enabled(is_prefixable_link(&request_str));
+                            action_link_bookmark.set_enabled(is_prefix_link);
 
                             // Download (new tab)
                             action_link_download.set_state(&request_var);
-                            action_link_download.set_enabled(is_prefixable_link(&request_str));
+                            action_link_download.set_enabled(is_prefix_link);
 
                             // View as Source (new tab)
                             action_link_source.set_state(&request_var);
-                            action_link_source.set_enabled(is_prefixable_link(&request_str));
+                            action_link_source.set_enabled(is_prefix_link);
 
                             // Toggle
                             link_context
                                 .set_pointing_to(Some(&gtk::gdk::Rectangle::new(x, y, 1, 1)));
                             link_context.popup()
+                        }
+                        // Tag is header
+                        if let Some((title, uri)) = headers.get(&tag) {
+                            let request_str = uri.to_str();
+                            let request_var = request_str.to_variant();
+
+                            // Copy link to the clipboard
+                            action_header_copy_url.set_state(&request_var);
+                            action_header_copy_url.set_enabled(!request_str.is_empty());
+
+                            // Copy header text
+                            action_header_copy_text.set_state(&title.to_variant());
+                            action_header_copy_text.set_enabled(!title.is_empty());
+
+                            // Copy header text (if) selected
+                            action_header_copy_text_selected.set_enabled(
+                                if let Some((start, end)) = buffer.selection_bounds() {
+                                    let selected = buffer.text(&start, &end, false);
+                                    action_header_copy_text_selected
+                                        .set_state(&selected.to_variant());
+                                    !selected.is_empty()
+                                } else {
+                                    false
+                                },
+                            );
+
+                            // Toggle
+                            header_context
+                                .set_pointing_to(Some(&gtk::gdk::Rectangle::new(x, y, 1, 1)));
+                            header_context.popup()
                         }
                     }
                 }
@@ -465,7 +564,7 @@ fn is_internal_link(request: &str) -> bool {
         || request.starts_with("source:")
 }
 
-fn is_prefixable_link(request: &str) -> bool {
+fn is_prefix_link(request: &str) -> bool {
     request.starts_with("gemini://")
         || request.starts_with("nex://")
         || request.starts_with("file://")
