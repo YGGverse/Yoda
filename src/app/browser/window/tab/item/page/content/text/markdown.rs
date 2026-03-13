@@ -14,6 +14,7 @@ use gtk::{
 use gutter::Gutter;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
+use strip_tags::*;
 use tags::Tags;
 
 pub struct Markdown {
@@ -39,9 +40,6 @@ impl Markdown {
         // * maybe less expensive than update entire HashMap by iter
         let hover: Rc<Cell<Option<TextTag>>> = Rc::new(Cell::new(None));
 
-        // Init code features
-        //let mut code = None;
-
         // Init colors
         // @TODO use accent colors in adw 1.6 / ubuntu 24.10+
         let link_color = (
@@ -54,7 +52,7 @@ impl Markdown {
 
         // Init new text buffer
         let buffer = TextBuffer::new(Some(&TextTagTable::new()));
-        buffer.set_text(markdown);
+        buffer.set_text(&strip_tags(markdown)); // @TODO extract `<img>` tags?
 
         // Init main widget
         let text_view = {
