@@ -56,7 +56,7 @@ impl Markdown {
         buffer.set_text(
             Regex::new(r"\n{3,}")
                 .unwrap()
-                .replace_all(&strip_tags(markdown), "\n")
+                .replace_all(&strip_tags(markdown), "\n\n")
                 .trim(),
         ); // @TODO extract `<img>` tags?
 
