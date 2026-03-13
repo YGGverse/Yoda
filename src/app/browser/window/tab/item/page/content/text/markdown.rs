@@ -12,6 +12,7 @@ use gtk::{
     prelude::{EditableExt, PopoverExt, TextBufferExt, TextTagExt, TextViewExt, WidgetExt},
 };
 use gutter::Gutter;
+use regex::Regex;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 use strip_tags::*;
@@ -52,7 +53,12 @@ impl Markdown {
 
         // Init new text buffer
         let buffer = TextBuffer::new(Some(&TextTagTable::new()));
-        buffer.set_text(&strip_tags(markdown)); // @TODO extract `<img>` tags?
+        buffer.set_text(
+            Regex::new(r"\n{3,}")
+                .unwrap()
+                .replace_all(&strip_tags(markdown), "\n")
+                .trim(),
+        ); // @TODO extract `<img>` tags?
 
         // Init main widget
         let text_view = {
