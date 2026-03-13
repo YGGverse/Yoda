@@ -1,6 +1,7 @@
 mod bold;
 mod code;
 mod header;
+mod hr;
 mod list;
 mod pre;
 mod quote;
@@ -11,10 +12,10 @@ mod underline;
 use bold::Bold;
 use code::Code;
 use gtk::{
-    TextBuffer, TextSearchFlags, TextTag,
+    TextSearchFlags, TextTag, TextView,
     gdk::RGBA,
     glib::{GString, Uri},
-    prelude::TextBufferExt,
+    prelude::{TextBufferExt, TextViewExt},
 };
 use header::Header;
 use pre::Pre;
@@ -54,31 +55,32 @@ impl Tags {
     }
     pub fn render(
         &mut self,
-        buffer: &TextBuffer,
+        text_view: &TextView,
         base: &Uri,
         link_color: &RGBA,
         links: &mut HashMap<TextTag, Uri>,
         headers: &mut HashMap<TextTag, (String, Uri)>,
     ) -> Option<String> {
+        let buffer = text_view.buffer();
+
         // Collect all code blocks first,
         // and temporarily replace them with placeholder ID
-        self.code.collect(buffer);
+        self.code.collect(&buffer);
 
         // Keep in order!
-        let title = self.header.render(buffer, base, headers);
+        let title = self.header.render(&buffer, base, headers);
 
-        list::render(buffer);
+        list::render(&buffer);
 
-        self.quote.render(buffer);
+        self.quote.render(&buffer);
 
-        self.bold.render(buffer);
-        self.pre.render(buffer);
-        self.strike.render(buffer);
-        self.underline.render(buffer);
+        self.bold.render(&buffer);
+        self.pre.render(&buffer);
+        self.strike.render(&buffer);
+        self.underline.render(&buffer);
 
-        reference::render_images_links(buffer, base, link_color, links);
-        reference::render_images(buffer, base, link_color, links);
-        reference::render_links(buffer, base, link_color, links);
+        reference::render(&buffer, base, link_color, links);
+        hr::render(text_view);
 
         // Cleanup unformatted escape chars
         for e in ESCAPE_ENTRIES {
@@ -94,11 +96,12 @@ impl Tags {
         }
 
         // Render placeholders
-        self.code.render(buffer);
+        self.code.render(&buffer);
 
         // Format document title string
         title.map(|mut s| {
             s = bold::strip_tags(&s);
+            s = hr::strip_tags(&s);
             s = pre::strip_tags(&s);
             s = reference::strip_tags(&s);
             s = strike::strip_tags(&s);
@@ -118,10 +121,13 @@ pub fn format_header_fragment(value: &str) -> GString {
 
 const ESCAPE_ENTRIES: &[&str] = &[
     "\\\n", "\\\\", "\\>", "\\`", "\\!", "\\[", "\\]", "\\(", "\\)", "\\*", "\\#", "\\~", "\\_",
+    "\\-",
 ];
 #[test]
 fn test_escape_entries() {
+    let mut set = std::collections::HashSet::new();
     for e in ESCAPE_ENTRIES {
-        assert_eq!(e.len(), 2)
+        assert_eq!(e.len(), 2);
+        assert!(set.insert(*e))
     }
 }

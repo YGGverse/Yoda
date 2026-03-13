@@ -76,7 +76,7 @@ impl Markdown {
         let gutter = Gutter::build(&text_view);
 
         // Render markdown tags
-        let title = tags.render(&buffer, base, &link_color.0, &mut links, &mut headers);
+        let title = tags.render(&text_view, base, &link_color.0, &mut links, &mut headers);
 
         // Headers context menu (fragment capture)
         let action_header_copy_url =

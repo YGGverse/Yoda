@@ -106,7 +106,7 @@ impl Reference {
 }
 
 /// Image links `[![]()]()`
-pub fn render_images_links(
+fn render_images_links(
     buffer: &TextBuffer,
     base: &Uri,
     link_color: &RGBA,
@@ -159,8 +159,20 @@ pub fn render_images_links(
         }
     }
 }
+
+pub fn render(
+    buffer: &TextBuffer,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    render_images_links(buffer, base, link_color, links);
+    render_images(buffer, base, link_color, links);
+    render_links(buffer, base, link_color, links)
+}
+
 /// Image tags `![]()`
-pub fn render_images(
+fn render_images(
     buffer: &TextBuffer,
     base: &Uri,
     link_color: &RGBA,
@@ -211,7 +223,7 @@ pub fn render_images(
     }
 }
 /// Links `[]()`
-pub fn render_links(
+fn render_links(
     buffer: &TextBuffer,
     base: &Uri,
     link_color: &RGBA,
