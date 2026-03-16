@@ -5,7 +5,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_BOLD: &str = r"\*\*(?P<text>[^\*]*)\*\*";
+const REGEX_BOLD: &str = r"(\*\*|__)(?P<text>[^\*_]*)(\*\*|__)";
 
 pub struct Bold(TextTag);
 
@@ -72,7 +72,7 @@ pub fn strip_tags(value: &str) -> String {
 
 #[test]
 fn test_strip_tags() {
-    const VALUE: &str = r"Some **bold 1** and **bold 2** with ![img](https://link.com)";
+    const VALUE: &str = "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_ with ![img](https://link.com)";
     let mut result = String::from(VALUE);
     for cap in Regex::new(REGEX_BOLD).unwrap().captures_iter(VALUE) {
         if let Some(m) = cap.get(0) {
@@ -81,7 +81,7 @@ fn test_strip_tags() {
     }
     assert_eq!(
         result,
-        "Some bold 1 and bold 2 with ![img](https://link.com)"
+        "Some bold 1 and bold 2 and bold 3 and *italic 1* and _italic 2_ with ![img](https://link.com)"
     )
 }
 
@@ -89,9 +89,15 @@ fn test_strip_tags() {
 fn test_regex() {
     let cap: Vec<_> = Regex::new(REGEX_BOLD)
         .unwrap()
-        .captures_iter(r"Some **bold 1** and **bold 2** with ![img](https://link.com)")
+        .captures_iter(
+            "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_ with ![img](https://link.com)"
+        )
         .collect();
 
-    assert_eq!(&cap.first().unwrap()["text"], "bold 1");
-    assert_eq!(&cap.get(1).unwrap()["text"], "bold 2");
+    assert_eq!(cap.len(), 3);
+
+    let mut c = cap.into_iter();
+    assert_eq!(&c.next().unwrap()["text"], "bold 1");
+    assert_eq!(&c.next().unwrap()["text"], "bold 2");
+    assert_eq!(&c.next().unwrap()["text"], "bold 3");
 }
