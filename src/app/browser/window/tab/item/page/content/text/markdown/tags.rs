@@ -2,6 +2,7 @@ mod bold;
 mod code;
 mod header;
 mod hr;
+mod italic;
 mod list;
 mod pre;
 mod quote;
@@ -18,6 +19,7 @@ use gtk::{
     prelude::{TextBufferExt, TextViewExt},
 };
 use header::Header;
+use italic::Italic;
 use pre::Pre;
 use quote::Quote;
 use std::collections::HashMap;
@@ -28,6 +30,7 @@ pub struct Tags {
     pub bold: Bold,
     pub code: Code,
     pub header: Header,
+    pub italic: Italic,
     pub pre: Pre,
     pub quote: Quote,
     pub strike: Strike,
@@ -47,6 +50,7 @@ impl Tags {
             bold: Bold::new(),
             code: Code::new(),
             header: Header::new(),
+            italic: Italic::new(),
             pre: Pre::new(),
             quote: Quote::new(),
             strike: Strike::new(),
@@ -75,6 +79,7 @@ impl Tags {
         self.quote.render(&buffer);
 
         self.bold.render(&buffer);
+        self.italic.render(&buffer);
         self.pre.render(&buffer);
         self.strike.render(&buffer);
         self.underline.render(&buffer);
@@ -102,6 +107,7 @@ impl Tags {
         title.map(|mut s| {
             s = bold::strip_tags(&s);
             s = hr::strip_tags(&s);
+            s = italic::strip_tags(&s);
             s = pre::strip_tags(&s);
             s = reference::strip_tags(&s);
             s = strike::strip_tags(&s);

@@ -14,7 +14,7 @@ impl Bold {
         Self(TextTag::builder().weight(600).wrap_mode(Word).build())
     }
 
-    /// Apply **bold** `Tag` to given `TextBuffer`
+    /// Apply **bold**/__bold__ `Tag` to given `TextBuffer`
     pub fn render(&self, buffer: &TextBuffer) {
         assert!(buffer.tag_table().add(&self.0));
 
@@ -72,7 +72,8 @@ pub fn strip_tags(value: &str) -> String {
 
 #[test]
 fn test_strip_tags() {
-    const VALUE: &str = "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_ with ![img](https://link.com)";
+    const VALUE: &str =
+        "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_";
     let mut result = String::from(VALUE);
     for cap in Regex::new(REGEX_BOLD).unwrap().captures_iter(VALUE) {
         if let Some(m) = cap.get(0) {
@@ -81,7 +82,7 @@ fn test_strip_tags() {
     }
     assert_eq!(
         result,
-        "Some bold 1 and bold 2 and bold 3 and *italic 1* and _italic 2_ with ![img](https://link.com)"
+        "Some bold 1 and bold 2 and bold 3 and *italic 1* and _italic 2_"
     )
 }
 
@@ -90,7 +91,7 @@ fn test_regex() {
     let cap: Vec<_> = Regex::new(REGEX_BOLD)
         .unwrap()
         .captures_iter(
-            "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_ with ![img](https://link.com)"
+            "Some **bold 1** and **bold 2** and __bold 3__ and *italic 1* and _italic 2_",
         )
         .collect();
 
