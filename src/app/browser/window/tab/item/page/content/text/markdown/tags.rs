@@ -101,7 +101,7 @@ impl Tags {
         }
 
         // Render placeholders
-        self.code.render(&buffer);
+        self.code.render(text_view);
 
         // Format document title string
         title.map(|mut s| {

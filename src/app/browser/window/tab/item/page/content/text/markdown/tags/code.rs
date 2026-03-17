@@ -2,9 +2,13 @@ mod ansi;
 mod syntax;
 
 use gtk::{
-    TextBuffer, TextSearchFlags, TextTag, WrapMode,
-    glib::{GString, uuid_string_random},
-    prelude::{TextBufferExt, TextBufferExtManual},
+    Align, Box, Button, Label, Orientation, PolicyType, ScrolledWindow, Separator, TextBuffer,
+    TextSearchFlags, TextTag, TextTagTable, TextView, WrapMode,
+    gdk::Display,
+    glib::{ControlFlow, GString, idle_add_local, uuid_string_random},
+    prelude::{
+        BoxExt, ButtonExt, DisplayExt, TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt,
+    },
 };
 use regex::Regex;
 use std::collections::HashMap;
@@ -73,10 +77,13 @@ impl Code {
         }
     }
 
-    /// Apply code `Tag` to given `TextBuffer` using `Self.index`
-    pub fn render(&mut self, buffer: &TextBuffer) {
+    /// Apply code `Tag` to given `TextView` using `Self.index`
+    pub fn render(&mut self, text_view: &TextView) {
+        let buffer = text_view.buffer();
         let syntax = Syntax::new();
+
         assert!(buffer.tag_table().add(&self.alt));
+
         for (k, v) in self.index.iter() {
             while let Some((mut m_start, mut m_end)) =
                 buffer
@@ -84,24 +91,124 @@ impl Code {
                     .forward_search(k, TextSearchFlags::VISIBLE_ONLY, None)
             {
                 buffer.delete(&mut m_start, &mut m_end);
-                if let Some(ref alt) = v.alt {
-                    buffer.insert_with_tags(&mut m_start, &format!("{alt}\n"), &[&self.alt])
-                }
-                match syntax.highlight(&v.data, v.alt.as_ref()) {
-                    Ok(highlight) => {
-                        for (syntax_tag, entity) in highlight {
-                            assert!(buffer.tag_table().add(&syntax_tag));
-                            buffer.insert_with_tags(&mut m_start, &entity, &[&syntax_tag])
-                        }
-                    }
-                    Err(_) => {
-                        // Try ANSI/SGR format (terminal emulation) @TODO optional
-                        for (syntax_tag, entity) in ansi::format(&v.data) {
-                            assert!(buffer.tag_table().add(&syntax_tag));
-                            buffer.insert_with_tags(&mut m_start, &entity, &[&syntax_tag])
-                        }
-                    }
-                }
+                text_view.add_child_at_anchor(
+                    &{
+                        const MARGIN: i32 = 16;
+                        let widget = Box::builder()
+                            .css_classes(["card"])
+                            .halign(Align::Fill)
+                            .hexpand(true)
+                            .margin_bottom(MARGIN / 2)
+                            .orientation(Orientation::Vertical)
+                            .build();
+                        widget.append(&{
+                            let header = Box::builder()
+                                .halign(Align::Fill)
+                                .hexpand(true)
+                                .orientation(Orientation::Horizontal)
+                                .build();
+                            if let Some(ref alt) = v.alt {
+                                header.append(
+                                    &Label::builder()
+                                        .halign(Align::Start)
+                                        .hexpand(true)
+                                        .label(alt)
+                                        .margin_bottom(MARGIN)
+                                        .margin_end(MARGIN)
+                                        .margin_start(MARGIN)
+                                        .margin_top(MARGIN)
+                                        .selectable(true)
+                                        .build(),
+                                );
+                            }
+                            header.append(&{
+                                let copy = Button::builder()
+                                    .css_classes(["circular", "flat"])
+                                    .halign(Align::End)
+                                    .icon_name("edit-copy-symbolic")
+                                    .margin_bottom(MARGIN / 2)
+                                    .margin_end(MARGIN / 2)
+                                    .margin_start(MARGIN / 2)
+                                    .margin_top(MARGIN / 2)
+                                    .tooltip_text("Copy")
+                                    .valign(Align::Center)
+                                    .build();
+                                copy.set_cursor_from_name(Some("pointer"));
+                                copy.connect_clicked({
+                                    let source = v.data.clone();
+                                    move |_| {
+                                        Display::default().unwrap().clipboard().set_text(&source)
+                                    }
+                                });
+                                copy
+                            });
+                            header
+                        });
+                        widget.append(
+                            &Separator::builder()
+                                .orientation(Orientation::Horizontal)
+                                .build(),
+                        );
+                        widget.append(&{
+                            ScrolledWindow::builder()
+                                .child(
+                                    &TextView::builder()
+                                        .buffer(&{
+                                            let b = TextBuffer::new(Some(&TextTagTable::new()));
+                                            let mut start = b.start_iter();
+                                            match syntax.highlight(&v.data, v.alt.as_ref()) {
+                                                Ok(highlight) => {
+                                                    for (syntax_tag, entity) in highlight {
+                                                        assert!(b.tag_table().add(&syntax_tag));
+                                                        b.insert_with_tags(
+                                                            &mut start,
+                                                            &entity,
+                                                            &[&syntax_tag],
+                                                        )
+                                                    }
+                                                }
+                                                Err(_) => {
+                                                    // Try ANSI/SGR format (terminal emulation) @TODO optional
+                                                    for (syntax_tag, entity) in
+                                                        ansi::format(&v.data)
+                                                    {
+                                                        assert!(b.tag_table().add(&syntax_tag));
+                                                        b.insert_with_tags(
+                                                            &mut start,
+                                                            &entity,
+                                                            &[&syntax_tag],
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            b
+                                        })
+                                        .css_classes(["code-block"])
+                                        .cursor_visible(false)
+                                        .editable(false)
+                                        .wrap_mode(WrapMode::None)
+                                        .build(),
+                                )
+                                .margin_end(MARGIN)
+                                .margin_start(MARGIN)
+                                .margin_top(MARGIN)
+                                .vscrollbar_policy(PolicyType::Never)
+                                .hscrollbar_policy(PolicyType::Automatic)
+                                .propagate_natural_height(true)
+                                .build()
+                        });
+                        idle_add_local({
+                            let widget = widget.clone();
+                            let text_view = text_view.clone();
+                            move || {
+                                widget.set_width_request(text_view.width() - 22);
+                                ControlFlow::Break
+                            }
+                        });
+                        widget
+                    },
+                    &buffer.create_child_anchor(&mut m_end),
+                );
             }
         }
     }
