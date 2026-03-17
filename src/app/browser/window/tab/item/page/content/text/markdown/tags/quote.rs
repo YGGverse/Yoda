@@ -6,7 +6,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_QUOTE: &str = r"(?m)>\s*(?P<text>.*)$";
+const REGEX_QUOTE: &str = r"(?m)^>(?:[ \t]*(?P<text>.*))?$";
 
 pub struct Quote(TextTag);
 
@@ -51,18 +51,16 @@ impl Quote {
 #[test]
 fn test_regex() {
     let cap: Vec<_> = Regex::new(REGEX_QUOTE).unwrap().captures_iter(
-        "> Some quote 1 with ![img](https://link.com)\n> 2\\)Some quote 2 with text\nplain text\n> Some quote 3"
+        "> Some quote 1 with ![img](https://link.com)\n>\n> 2\\)Some quote 2 with text\nplain text\n> Some quote 3"
     ).collect();
-    {
-        let m = cap.first().unwrap();
-        assert_eq!(&m["text"], "Some quote 1 with ![img](https://link.com)");
-    }
-    {
-        let m = cap.get(1).unwrap();
-        assert_eq!(&m["text"], "2\\)Some quote 2 with text");
-    }
-    {
-        let m = cap.get(2).unwrap();
-        assert_eq!(&m["text"], "Some quote 3");
-    }
+
+    let mut i = cap.into_iter();
+
+    assert_eq!(
+        &i.next().unwrap()["text"],
+        "Some quote 1 with ![img](https://link.com)"
+    );
+    assert!(&i.next().unwrap()["text"].is_empty());
+    assert_eq!(&i.next().unwrap()["text"], "2\\)Some quote 2 with text");
+    assert_eq!(&i.next().unwrap()["text"], "Some quote 3");
 }
