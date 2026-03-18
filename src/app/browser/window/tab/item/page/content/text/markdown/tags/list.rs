@@ -71,7 +71,7 @@ pub fn render(buffer: &TextBuffer) {
 
         buffer.insert_with_tags(
             &mut start_iter,
-            &format!("{}• ", " ".repeat(item.level)),
+            &format!("  {}• ", " ".repeat(item.level)),
             &[],
         );
         if let Some(state) = item.state {
