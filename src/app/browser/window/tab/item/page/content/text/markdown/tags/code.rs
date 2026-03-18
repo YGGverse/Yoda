@@ -69,7 +69,7 @@ impl Code {
                         id,
                         Entry {
                             alt: alt(cap["alt"].into()).map(|s| s.into()),
-                            data: cap["data"].into(),
+                            data: cap["data"].trim_end().into(),
                         },
                     )
                     .is_none()
@@ -200,6 +200,7 @@ impl Code {
                                         .wrap_mode(WrapMode::None)
                                         .build(),
                                 )
+                                .margin_bottom(MARGIN)
                                 .margin_end(MARGIN)
                                 .margin_start(MARGIN)
                                 .margin_top(MARGIN)
