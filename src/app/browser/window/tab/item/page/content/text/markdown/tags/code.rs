@@ -3,7 +3,7 @@ mod syntax;
 
 use gtk::{
     Align, Box, Button, Label, Orientation, PolicyType, ScrolledWindow, Separator, TextBuffer,
-    TextSearchFlags, TextTag, TextTagTable, TextView, WrapMode,
+    TextSearchFlags, TextTagTable, TextView, WrapMode,
     gdk::Display,
     glib::{ControlFlow, GString, idle_add_local, uuid_string_random},
     prelude::{
@@ -21,22 +21,11 @@ struct Entry {
     data: String,
 }
 
-pub struct Code {
-    index: HashMap<GString, Entry>,
-    alt: TextTag,
-}
+pub struct Code(HashMap<GString, Entry>);
 
 impl Code {
     pub fn new() -> Self {
-        Self {
-            index: HashMap::new(),
-            alt: TextTag::builder()
-                .pixels_above_lines(4)
-                .pixels_below_lines(8)
-                .weight(500)
-                .wrap_mode(WrapMode::None)
-                .build(),
-        }
+        Self(HashMap::new())
     }
 
     /// Collect all code blocks into `Self.index` (to prevent formatting)
@@ -64,7 +53,7 @@ impl Code {
 
             buffer.insert_with_tags(&mut start_iter, &id, &[]);
             assert!(
-                self.index
+                self.0
                     .insert(
                         id,
                         Entry {
@@ -82,10 +71,7 @@ impl Code {
         let buffer = text_view.buffer();
         let syntax = Syntax::new();
         let copied = Rc::new(Cell::new(None));
-
-        assert!(buffer.tag_table().add(&self.alt));
-
-        for (k, v) in self.index.iter() {
+        for (k, v) in self.0.iter() {
             while let Some((mut m_start, mut m_end)) =
                 buffer
                     .start_iter()
