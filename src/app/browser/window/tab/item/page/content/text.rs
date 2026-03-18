@@ -1,12 +1,12 @@
+mod common;
 mod gemini;
 mod markdown;
 mod nex;
 mod plain;
 mod source;
 
-use crate::{app::browser::window::tab::item::page::Page, profile::Profile};
-
 use super::{ItemAction, WindowAction};
+use crate::{app::browser::window::tab::item::page::Page, profile::Profile};
 use adw::ClampScrollable;
 use gemini::Gemini;
 use gtk::{ScrolledWindow, TextView, glib::Uri};

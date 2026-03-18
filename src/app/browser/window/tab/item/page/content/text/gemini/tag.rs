@@ -2,14 +2,12 @@ mod header;
 mod list;
 mod plain;
 mod quote;
-mod title;
 
 use gtk::{TextTag, TextTagTable};
 use header::Header;
 use list::List;
 use plain::Plain;
 use quote::Quote;
-use title::Title;
 
 pub struct Tag {
     pub text_tag_table: TextTagTable,
@@ -19,7 +17,6 @@ pub struct Tag {
     pub h3: TextTag,
     pub list: TextTag,
     pub quote: TextTag,
-    pub title: TextTag,
     pub plain: TextTag,
 }
 
@@ -38,7 +35,6 @@ impl Tag {
         let h3 = TextTag::h3();
         let list = TextTag::list();
         let quote = TextTag::quote();
-        let title = TextTag::title();
         let plain = TextTag::plain();
 
         // Init tag table
@@ -47,7 +43,6 @@ impl Tag {
         text_tag_table.add(&h1);
         text_tag_table.add(&h2);
         text_tag_table.add(&h3);
-        text_tag_table.add(&title);
         text_tag_table.add(&list);
         text_tag_table.add(&quote);
         text_tag_table.add(&plain);
@@ -60,7 +55,6 @@ impl Tag {
             h3,
             list,
             quote,
-            title,
             plain,
         }
     }

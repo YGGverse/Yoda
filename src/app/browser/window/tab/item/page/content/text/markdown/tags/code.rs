@@ -1,18 +1,10 @@
-mod ansi;
-mod syntax;
-
 use gtk::{
-    Align, Box, Button, Label, Orientation, PolicyType, ScrolledWindow, Separator, TextBuffer,
-    TextSearchFlags, TextTagTable, TextView, WrapMode,
-    gdk::Display,
-    glib::{ControlFlow, GString, idle_add_local, uuid_string_random},
-    prelude::{
-        BoxExt, ButtonExt, DisplayExt, TextBufferExt, TextBufferExtManual, TextViewExt, WidgetExt,
-    },
+    TextBuffer, TextSearchFlags, TextView,
+    glib::{GString, uuid_string_random},
+    prelude::{TextBufferExt, TextBufferExtManual, TextViewExt},
 };
 use regex::Regex;
-use std::{cell::Cell, collections::HashMap, rc::Rc};
-use syntax::Syntax;
+use std::collections::HashMap;
 
 const REGEX_CODE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
 
@@ -69,8 +61,6 @@ impl Code {
     /// Apply code `Tag` to given `TextView` using `Self.index`
     pub fn render(&mut self, text_view: &TextView) {
         let buffer = text_view.buffer();
-        let syntax = Syntax::new();
-        let copied = Rc::new(Cell::new(None));
         for (k, v) in self.0.iter() {
             while let Some((mut m_start, mut m_end)) =
                 buffer
@@ -79,134 +69,14 @@ impl Code {
             {
                 buffer.delete(&mut m_start, &mut m_end);
                 text_view.add_child_at_anchor(
-                    &{
-                        const MARGIN: i32 = 16;
-                        let widget = Box::builder()
-                            .css_classes(["card"])
-                            .halign(Align::Fill)
-                            .hexpand(true)
-                            .margin_bottom(MARGIN / 2)
-                            .orientation(Orientation::Vertical)
-                            .build();
-                        widget.append(&{
-                            let header = Box::builder()
-                                .halign(Align::Fill)
-                                .hexpand(true)
-                                .orientation(Orientation::Horizontal)
-                                .build();
-                            if let Some(ref alt) = v.alt {
-                                header.append(
-                                    &Label::builder()
-                                        .halign(Align::Start)
-                                        .hexpand(true)
-                                        .label(alt)
-                                        .margin_bottom(MARGIN)
-                                        .margin_end(MARGIN)
-                                        .margin_start(MARGIN)
-                                        .margin_top(MARGIN)
-                                        .selectable(true)
-                                        .build(),
-                                );
-                            }
-                            header.append(&{
-                                const TOGGLE_BUTTON_CLASS: &str = "dimmed";
-                                const TOGGLE_BUTTON_TOOLTIP: (&str, &str) = ("Copy", "Copied");
-                                let copy = Button::builder()
-                                    .css_classes(["circular", "flat", TOGGLE_BUTTON_CLASS])
-                                    .halign(Align::End)
-                                    .icon_name("edit-copy-symbolic")
-                                    .margin_bottom(MARGIN / 2)
-                                    .margin_end(MARGIN / 2)
-                                    .margin_start(MARGIN / 2)
-                                    .margin_top(MARGIN / 2)
-                                    .tooltip_text(TOGGLE_BUTTON_TOOLTIP.0)
-                                    .valign(Align::Center)
-                                    .build();
-                                copy.set_cursor_from_name(Some("pointer"));
-                                copy.connect_clicked({
-                                    let source = v.data.clone();
-                                    let copied = copied.clone();
-                                    move |this| {
-                                        if let Some(prev) = copied.replace(Some(this.clone())) {
-                                            prev.set_tooltip_text(Some(TOGGLE_BUTTON_TOOLTIP.0));
-                                            prev.add_css_class(TOGGLE_BUTTON_CLASS)
-                                        }
-                                        this.set_tooltip_text(Some(TOGGLE_BUTTON_TOOLTIP.1));
-                                        this.remove_css_class(TOGGLE_BUTTON_CLASS);
-
-                                        Display::default().unwrap().clipboard().set_text(&source)
-                                    }
-                                });
-                                copy
-                            });
-                            header
-                        });
-                        widget.append(
-                            &Separator::builder()
-                                .orientation(Orientation::Horizontal)
-                                .build(),
-                        );
-                        widget.append(&{
-                            ScrolledWindow::builder()
-                                .child(
-                                    &TextView::builder()
-                                        .buffer(&{
-                                            let b = TextBuffer::new(Some(&TextTagTable::new()));
-                                            let mut start = b.start_iter();
-                                            match syntax.highlight(&v.data, v.alt.as_ref()) {
-                                                Ok(highlight) => {
-                                                    for (syntax_tag, entity) in highlight {
-                                                        assert!(b.tag_table().add(&syntax_tag));
-                                                        b.insert_with_tags(
-                                                            &mut start,
-                                                            &entity,
-                                                            &[&syntax_tag],
-                                                        )
-                                                    }
-                                                }
-                                                Err(_) => {
-                                                    // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                                    for (syntax_tag, entity) in
-                                                        ansi::format(&v.data)
-                                                    {
-                                                        assert!(b.tag_table().add(&syntax_tag));
-                                                        b.insert_with_tags(
-                                                            &mut start,
-                                                            &entity,
-                                                            &[&syntax_tag],
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                            b
-                                        })
-                                        .css_classes(["code-block"])
-                                        .cursor_visible(false)
-                                        .editable(false)
-                                        .wrap_mode(WrapMode::None)
-                                        .build(),
-                                )
-                                .margin_bottom(MARGIN)
-                                .margin_end(MARGIN)
-                                .margin_start(MARGIN)
-                                .margin_top(MARGIN)
-                                .vscrollbar_policy(PolicyType::Never)
-                                .hscrollbar_policy(PolicyType::Automatic)
-                                .propagate_natural_height(true)
-                                .build()
-                        });
-                        idle_add_local({
-                            let widget = widget.clone();
-                            let text_view = text_view.clone();
-                            move || {
-                                widget.set_width_request(text_view.width() - 22);
-                                ControlFlow::Break
-                            }
-                        });
-                        widget
-                    },
+                    &super::super::super::common::Code::init(
+                        text_view,
+                        v.data.as_ref(),
+                        v.alt.as_ref(),
+                    )
+                    .widget,
                     &buffer.create_child_anchor(&mut m_end),
-                );
+                )
             }
         }
     }

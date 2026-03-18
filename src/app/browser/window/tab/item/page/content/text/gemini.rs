@@ -1,8 +1,6 @@
-mod ansi;
 pub mod error;
 mod gutter;
 mod icon;
-mod syntax;
 mod tag;
 
 use super::{ItemAction, WindowAction};
@@ -20,7 +18,6 @@ use gutter::Gutter;
 use icon::Icon;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
-use syntax::Syntax;
 use tag::Tag;
 
 pub const NEW_LINE: &str = "\n";
@@ -62,9 +59,6 @@ impl Gemini {
             RGBA::new(0.208, 0.518, 0.894, 1.0),
             RGBA::new(0.208, 0.518, 0.894, 0.9),
         );
-
-        // Init syntect highlight features
-        let syntax = Syntax::new();
 
         // Init icons
         let icon = Icon::new();
@@ -125,60 +119,17 @@ impl Gemini {
                     Some(ref mut c) => {
                         match c.continue_from(line) {
                             Ok(()) => {
-                                // Close tag found:
+                                // Closing tag found:
                                 if c.is_completed {
-                                    // Is alt provided
-                                    let alt = match c.alt {
-                                        Some(ref alt) => {
-                                            // Insert alt value to the main buffer
-                                            buffer.insert_with_tags(
-                                                &mut buffer.end_iter(),
-                                                alt.as_str(),
-                                                &[&tag.title],
-                                            );
-
-                                            // Append new line after alt text
-                                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                                            // Return value as wanted also for syntax highlight detection
-                                            Some(alt)
-                                        }
-                                        None => None,
-                                    };
-
-                                    // Begin code block construction
-                                    // Try auto-detect code syntax for given `value` and `alt` @TODO optional
-                                    match syntax.highlight(&c.value, alt) {
-                                        Ok(highlight) => {
-                                            for (syntax_tag, entity) in highlight {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        }
-                                        Err(_) => {
-                                            // Try ANSI/SGR format (terminal emulation) @TODO optional
-                                            for (syntax_tag, entity) in ansi::format(&c.value) {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
-                                                buffer.insert_with_tags(
-                                                    &mut buffer.end_iter(),
-                                                    &entity,
-                                                    &[&syntax_tag],
-                                                );
-                                            }
-                                        } // @TODO handle
-                                    }
+                                    text_view.add_child_at_anchor(
+                                        &super::common::Code::init(
+                                            &text_view,
+                                            c.value.trim_end(),
+                                            c.alt.as_ref(),
+                                        )
+                                        .widget,
+                                        &buffer.create_child_anchor(&mut buffer.end_iter()),
+                                    );
 
                                     // Reset
                                     code = None;
