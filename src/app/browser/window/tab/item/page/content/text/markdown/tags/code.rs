@@ -11,7 +11,7 @@ use gtk::{
     },
 };
 use regex::Regex;
-use std::collections::HashMap;
+use std::{cell::Cell, collections::HashMap, rc::Rc};
 use syntax::Syntax;
 
 const REGEX_CODE: &str = r"(?s)```[ \t]*(?P<alt>.*?)\n(?P<data>.*?)```";
@@ -81,6 +81,7 @@ impl Code {
     pub fn render(&mut self, text_view: &TextView) {
         let buffer = text_view.buffer();
         let syntax = Syntax::new();
+        let copied = Rc::new(Cell::new(None));
 
         assert!(buffer.tag_table().add(&self.alt));
 
@@ -122,21 +123,31 @@ impl Code {
                                 );
                             }
                             header.append(&{
+                                const TOGGLE_BUTTON_CLASS: &str = "dimmed";
+                                const TOGGLE_BUTTON_TOOLTIP: (&str, &str) = ("Copy", "Copied");
                                 let copy = Button::builder()
-                                    .css_classes(["circular", "flat"])
+                                    .css_classes(["circular", "flat", TOGGLE_BUTTON_CLASS])
                                     .halign(Align::End)
                                     .icon_name("edit-copy-symbolic")
                                     .margin_bottom(MARGIN / 2)
                                     .margin_end(MARGIN / 2)
                                     .margin_start(MARGIN / 2)
                                     .margin_top(MARGIN / 2)
-                                    .tooltip_text("Copy")
+                                    .tooltip_text(TOGGLE_BUTTON_TOOLTIP.0)
                                     .valign(Align::Center)
                                     .build();
                                 copy.set_cursor_from_name(Some("pointer"));
                                 copy.connect_clicked({
                                     let source = v.data.clone();
-                                    move |_| {
+                                    let copied = copied.clone();
+                                    move |this| {
+                                        if let Some(prev) = copied.replace(Some(this.clone())) {
+                                            prev.set_tooltip_text(Some(TOGGLE_BUTTON_TOOLTIP.0));
+                                            prev.add_css_class(TOGGLE_BUTTON_CLASS)
+                                        }
+                                        this.set_tooltip_text(Some(TOGGLE_BUTTON_TOOLTIP.1));
+                                        this.remove_css_class(TOGGLE_BUTTON_CLASS);
+
                                         Display::default().unwrap().clipboard().set_text(&source)
                                     }
                                 });
