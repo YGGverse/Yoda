@@ -151,11 +151,7 @@ impl Gemini {
                                     match syntax.highlight(&c.value, alt) {
                                         Ok(highlight) => {
                                             for (syntax_tag, entity) in highlight {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
+                                                assert!(tag.text_tag_table.add(&syntax_tag));
                                                 buffer.insert_with_tags(
                                                     &mut buffer.end_iter(),
                                                     &entity,
@@ -166,11 +162,7 @@ impl Gemini {
                                         Err(_) => {
                                             // Try ANSI/SGR format (terminal emulation) @TODO optional
                                             for (syntax_tag, entity) in ansi::format(&c.value) {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
+                                                assert!(tag.text_tag_table.add(&syntax_tag));
                                                 buffer.insert_with_tags(
                                                     &mut buffer.end_iter(),
                                                     &entity,
@@ -187,7 +179,7 @@ impl Gemini {
                                 // Skip other actions for this line
                                 continue;
                             }
-                            Err(_) => todo!(),
+                            Err(_) => panic!(),
                         }
                     }
                 }
