@@ -20,7 +20,7 @@ impl Tag {
         Self {
             text_tag: TextTag::builder()
                 .family("monospace") // @TODO
-                .left_margin(28)
+                //.left_margin(28)
                 .scale(0.81) // * the rounded `0.8` value crops text for some reason @TODO
                 .wrap_mode(WrapMode::None)
                 .build(),

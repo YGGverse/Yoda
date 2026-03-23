@@ -2,6 +2,7 @@ mod ansi;
 pub mod error;
 mod gutter;
 mod icon;
+mod separator;
 mod syntax;
 mod tag;
 
@@ -146,16 +147,17 @@ impl Gemini {
                                         None => None,
                                     };
 
+                                    text_view.add_child_at_anchor(
+                                        &separator::horizontal(&text_view),
+                                        &buffer.create_child_anchor(&mut buffer.end_iter()),
+                                    );
+
                                     // Begin code block construction
                                     // Try auto-detect code syntax for given `value` and `alt` @TODO optional
                                     match syntax.highlight(&c.value, alt) {
                                         Ok(highlight) => {
                                             for (syntax_tag, entity) in highlight {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
+                                                assert!(tag.text_tag_table.add(&syntax_tag));
                                                 buffer.insert_with_tags(
                                                     &mut buffer.end_iter(),
                                                     &entity,
@@ -166,11 +168,7 @@ impl Gemini {
                                         Err(_) => {
                                             // Try ANSI/SGR format (terminal emulation) @TODO optional
                                             for (syntax_tag, entity) in ansi::format(&c.value) {
-                                                // Register new tag
-                                                if !tag.text_tag_table.add(&syntax_tag) {
-                                                    todo!()
-                                                }
-                                                // Append tag to buffer
+                                                assert!(tag.text_tag_table.add(&syntax_tag));
                                                 buffer.insert_with_tags(
                                                     &mut buffer.end_iter(),
                                                     &entity,
@@ -180,6 +178,11 @@ impl Gemini {
                                         } // @TODO handle
                                     }
 
+                                    text_view.add_child_at_anchor(
+                                        &separator::horizontal(&text_view),
+                                        &buffer.create_child_anchor(&mut buffer.end_iter()),
+                                    );
+
                                     // Reset
                                     code = None;
                                 }
@@ -187,7 +190,7 @@ impl Gemini {
                                 // Skip other actions for this line
                                 continue;
                             }
-                            Err(_) => todo!(),
+                            Err(_) => panic!(),
                         }
                     }
                 }
