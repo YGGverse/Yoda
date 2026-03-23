@@ -131,27 +131,21 @@ impl Gemini {
                                     // Is alt provided
                                     let alt = match c.alt {
                                         Some(ref alt) => {
-                                            // Insert alt value to the main buffer
                                             buffer.insert_with_tags(
                                                 &mut buffer.end_iter(),
                                                 alt.as_str(),
                                                 &[&tag.title],
                                             );
-
-                                            // Append new line after alt text
                                             buffer.insert(&mut buffer.end_iter(), NEW_LINE);
-
-                                            // Return value as wanted also for syntax highlight detection
+                                            text_view.add_child_at_anchor(
+                                                &separator::horizontal(&text_view),
+                                                &buffer.create_child_anchor(&mut buffer.end_iter()),
+                                            );
+                                            buffer.insert(&mut buffer.end_iter(), NEW_LINE);
                                             Some(alt)
                                         }
                                         None => None,
                                     };
-
-                                    text_view.add_child_at_anchor(
-                                        &separator::horizontal(&text_view),
-                                        &buffer.create_child_anchor(&mut buffer.end_iter()),
-                                    );
-
                                     // Begin code block construction
                                     // Try auto-detect code syntax for given `value` and `alt` @TODO optional
                                     match syntax.highlight(&c.value, alt) {
@@ -177,11 +171,6 @@ impl Gemini {
                                             }
                                         } // @TODO handle
                                     }
-
-                                    text_view.add_child_at_anchor(
-                                        &separator::horizontal(&text_view),
-                                        &buffer.create_child_anchor(&mut buffer.end_iter()),
-                                    );
 
                                     // Reset
                                     code = None;
