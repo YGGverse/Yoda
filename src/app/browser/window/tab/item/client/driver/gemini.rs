@@ -327,7 +327,7 @@ fn handle(
                             },
                             _ => match success.mime() {
                                 Ok(mime) => match mime.as_str() {
-                                    "text/gemini" | "text/plain" => memory_input_stream::from_stream_async(
+                                    "text/gemini" | "text/plain" | "text/markdown" => memory_input_stream::from_stream_async(
                                         connection.stream(),
                                         Priority::DEFAULT,
                                         cancellable.clone(),
