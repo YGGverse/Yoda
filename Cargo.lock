@@ -23,7 +23,6 @@ dependencies = [
  "regex",
  "rusqlite",
  "sourceview5",
- "strip-tags",
  "syntect",
 ]
 
@@ -1351,12 +1350,6 @@ name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
-
-[[package]]
-name = "strip-tags"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecd2b127e68202f5f285a116f616d5d11735cca5e4befaea0347becd445b05b2"
 
 [[package]]
 name = "syn"

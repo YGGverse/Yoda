@@ -15,7 +15,6 @@ use gutter::Gutter;
 use regex::Regex;
 use sourceview::prelude::{ActionExt, ActionMapExt, DisplayExt, ToVariant};
 use std::{cell::Cell, collections::HashMap, rc::Rc};
-use strip_tags::*;
 use tags::Tags;
 
 pub struct Markdown {
@@ -56,7 +55,7 @@ impl Markdown {
         buffer.set_text(
             Regex::new(r"\n{3,}")
                 .unwrap()
-                .replace_all(&strip_tags(markdown), "\n\n")
+                .replace_all(markdown, "\n\n")
                 .trim(),
         ); // @TODO extract `<img>` tags?
 
