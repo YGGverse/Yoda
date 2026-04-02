@@ -60,7 +60,7 @@ impl Pre {
                         &end_iter,
                         false,
                     )
-                    .contains("\\")
+                    .starts_with("\\")
             {
                 continue;
             }

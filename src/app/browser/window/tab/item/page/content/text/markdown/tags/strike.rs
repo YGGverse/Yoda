@@ -47,7 +47,7 @@ impl Strike {
                         &end_iter,
                         false,
                     )
-                    .contains("\\")
+                    .starts_with("\\")
             {
                 continue;
             }

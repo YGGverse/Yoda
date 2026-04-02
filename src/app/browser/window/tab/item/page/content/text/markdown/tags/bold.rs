@@ -42,7 +42,7 @@ impl Bold {
                         &end_iter,
                         false,
                     )
-                    .contains("\\")
+                    .starts_with("\\")
             {
                 continue;
             }

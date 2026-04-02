@@ -47,7 +47,7 @@ pub fn render(text_view: &TextView) {
                     &end_iter,
                     false,
                 )
-                .contains("\\")
+                .starts_with("\\")
         {
             continue;
         }

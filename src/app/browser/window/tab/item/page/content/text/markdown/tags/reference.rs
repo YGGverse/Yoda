@@ -7,10 +7,10 @@ use gtk::{
 use regex::Regex;
 use std::collections::HashMap;
 
-const REGEX_LINK: &str = r"\[(?P<text>[^\]]*)\]\((?P<url>[^\)]+)\)";
-const REGEX_IMAGE: &str = r"!\[(?P<alt>[^\]]*)\]\((?P<url>[^\)]+)\)";
+const REGEX_LINK: &str = r"\[(?P<text>.*?)\]\((?P<url>[^\)]+)\)";
+const REGEX_IMAGE: &str = r"!\[(?P<alt>.*?)\]\((?P<url>[^\)]+)\)";
 const REGEX_IMAGE_LINK: &str =
-    r"\[(?P<is_img>!)\[(?P<alt>[^\]]*)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
+    r"\[(?P<is_img>!)\[(?P<alt>.*?)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
 
 struct Reference {
     uri: Uri,
@@ -136,7 +136,7 @@ fn render_images_links(
                     &end_iter,
                     false,
                 )
-                .contains("\\")
+                .starts_with("\\")
         {
             continue;
         }
@@ -202,7 +202,7 @@ fn render_images(
                     &end_iter,
                     false,
                 )
-                .contains("\\")
+                .starts_with("\\")
         {
             continue;
         }
@@ -253,7 +253,7 @@ fn render_links(
                     &end_iter,
                     false,
                 )
-                .contains("\\")
+                .starts_with("\\")
         {
             continue;
         }
@@ -300,7 +300,7 @@ fn test_strip_tags() {
 fn test_regex_link() {
     let cap: Vec<_> = Regex::new(REGEX_LINK)
         .unwrap()
-        .captures_iter(r"[link1](https://link1.com) [link2](https://link2.com)")
+        .captures_iter(r"[link1](https://link1.com) [link2 [square] (round)](https://link2.com)")
         .collect();
 
     let first = cap.first().unwrap();
@@ -309,8 +309,8 @@ fn test_regex_link() {
     assert_eq!(&first["url"], "https://link1.com");
 
     let second = cap.get(1).unwrap();
-    assert_eq!(&second[0], "[link2](https://link2.com)");
-    assert_eq!(&second["text"], "link2");
+    assert_eq!(&second[0], "[link2 [square] (round)](https://link2.com)");
+    assert_eq!(&second["text"], "link2 [square] (round)");
     assert_eq!(&second["url"], "https://link2.com");
 }
 

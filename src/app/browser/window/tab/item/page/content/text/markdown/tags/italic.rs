@@ -56,7 +56,7 @@ fn render(this: &Italic, buffer: &TextBuffer, regex: &str) {
                     &end_iter,
                     false,
                 )
-                .contains("\\")
+                .starts_with("\\")
         {
             continue;
         }
