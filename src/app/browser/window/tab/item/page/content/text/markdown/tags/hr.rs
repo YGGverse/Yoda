@@ -9,6 +9,7 @@ const REGEX_HR: &str = r"(?m)^(?P<hr>\\?[-]{3,})$";
 
 /// Apply --- `Tag` to given `TextBuffer`
 pub fn render(text_view: &TextView) {
+    const OFFSET: i32 = 18;
     let separator = Separator::builder()
         .orientation(Orientation::Horizontal)
         .build();
@@ -16,10 +17,15 @@ pub fn render(text_view: &TextView) {
         let text_view = text_view.clone();
         let separator = separator.clone();
         move || {
-            separator.set_width_request(text_view.width() - 18);
-            ControlFlow::Break
+            let w = text_view.width();
+            if w < OFFSET {
+                ControlFlow::Continue
+            } else {
+                separator.set_width_request(w - OFFSET);
+                ControlFlow::Break
+            }
         }
-    });
+    }); // @TODO something with the widgets init/activation priority..
 
     let buffer = text_view.buffer();
 
