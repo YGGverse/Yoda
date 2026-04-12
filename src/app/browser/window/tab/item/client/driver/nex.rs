@@ -300,6 +300,8 @@ fn render(
                                 p.content.to_text_nex(&u, d)
                             } else if q.ends_with(".gmi") || q.ends_with(".gemini") {
                                 p.content.to_text_gemini(&p.profile, &u, d)
+                            } else if q.ends_with(".md") || q.ends_with(".markdown") {
+                                p.content.to_text_markdown(&p, &u, d)
                             } else {
                                 p.content.to_text_plain(d)
                             };
@@ -317,10 +319,10 @@ fn render(
                     Err((_, e)) => failure(&p, &e.to_string()),
                 })
             }
-            Feature::Download => panic!(), // unexpected
+            Feature::Download => unreachable!(),
         }
     } else {
-        panic!() // unexpected
+        unreachable!()
     }
 }
 
@@ -406,12 +408,14 @@ fn is_image(q: &str) -> bool {
 }
 
 fn is_document(q: &str) -> bool {
-    q.ends_with(".txt")
-        || q.ends_with(".log")
-        || q.ends_with(".gmi")
+    !q.contains(".")
         || q.ends_with(".gemini")
+        || q.ends_with(".gmi")
+        || q.ends_with(".log")
+        || q.ends_with(".markdown")
+        || q.ends_with(".md")
+        || q.ends_with(".txt")
         || q.ends_with("/")
-        || !q.contains(".")
 }
 
 fn is_renderable(q: &str) -> bool {
