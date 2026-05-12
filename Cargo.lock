@@ -411,9 +411,9 @@ dependencies = [
 
 [[package]]
 name = "ggemtext"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2e21c4c0a529456406af98f1517730f4e68a48e0fd1bc0ad7f2931fa8f8bcb6"
+checksum = "82233a9d04d1befe1c0335d53f113389955ee49bacd705eb36d71f484d0015bc"
 dependencies = [
  "glib",
 ]
