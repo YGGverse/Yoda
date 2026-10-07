@@ -6,8 +6,8 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_ITALIC_1: &str = r"\*(?P<text>[^\*]*)\*";
-const REGEX_ITALIC_2: &str = r"\b_(?P<text>[^_]*)_\b";
+const REGEX_ITALIC_1: &str = r"\*(?P<text>[^\s\*](?:[^\n\*]*?[^\s\*])?|[^\s\*])\*";
+const REGEX_ITALIC_2: &str = r"_(?P<text>[^\s_](?:[^\n_]*?[^\s_])?|[^\s_])_";
 
 pub struct Italic(TextTag);
 
