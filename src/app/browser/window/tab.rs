@@ -286,7 +286,7 @@ impl Tab {
         for record in database::select(transaction, app_browser_window_id)? {
             database::delete(transaction, record.id)?;
             // Delegate clean action to childs
-            for (_, item) in self.index.borrow().iter() {
+            for item in self.index.borrow().values() {
                 item.clean(transaction, record.id)?
             }
         }
@@ -342,7 +342,7 @@ impl Tab {
 
     pub fn save(&self, transaction: &Transaction, app_browser_window_id: i64) -> Result<()> {
         let id = database::insert(transaction, app_browser_window_id)?;
-        for (_, item) in self.index.borrow().iter() {
+        for item in self.index.borrow().values() {
             item.save(transaction, id, self.tab_view.page_position(&item.tab_page))?;
         }
         Ok(())
