@@ -4,8 +4,7 @@ use gtk::{
 };
 use regex::Regex;
 
-const REGEX_LIST: &str =
-    r"(?m)^(?P<level>[ \t]*)\*[ \t]+(?:(?P<state>\[[ xX]\])[ \t]+)?(?P<text>.*)";
+const REGEX_LIST: &str = r"(?m)^(?P<level>[ \t]*)(?P<value>(\*|[\d\.]+\.))[ \t]+(?:(?P<state>\[[ xX]\])[ \t]+)?(?P<text>.*)";
 
 struct State(bool);
 
@@ -27,14 +26,16 @@ struct Item {
     pub level: usize,
     pub state: Option<State>,
     pub text: String,
+    pub value: String,
 }
 
 impl Item {
-    fn parse(level: &str, state: Option<&str>, text: String) -> Self {
+    fn parse(level: &str, value: String, state: Option<&str>, text: String) -> Self {
         Self {
             level: level.chars().count(),
             state: State::parse(state),
             text,
+            value,
         }
     }
 }
@@ -66,6 +67,7 @@ pub fn render(buffer: &TextBuffer) {
 
         let item = Item::parse(
             &cap["level"],
+            cap["value"].into(),
             cap.name("state").map(|m| m.as_str()),
             cap["text"].into(),
         );
@@ -86,7 +88,18 @@ pub fn render(buffer: &TextBuffer) {
 
         let item_start_offset = start_iter.offset();
 
-        buffer.insert_with_tags(&mut start_iter, "• ", &[]);
+        buffer.insert_with_tags(
+            &mut start_iter,
+            &format!(
+                "{} ",
+                if "*" == &item.value {
+                    "•"
+                } else {
+                    &item.value
+                }
+            ),
+            &[],
+        );
 
         if let Some(state) = item.state {
             buffer.insert_with_tags(
@@ -115,6 +128,7 @@ fn test_regex() {
         let c = cap.get(n).unwrap();
         Item::parse(
             &c["level"],
+            c["value"].into(),
             c.name("state").map(|m| m.as_str()),
             c["text"].into(),
         )
@@ -171,4 +185,5 @@ fn test_regex() {
         assert!(item.state.is_none());
         assert_eq!(item.text, "list item 4");
     }
+    // @TODO numbered test
 }
