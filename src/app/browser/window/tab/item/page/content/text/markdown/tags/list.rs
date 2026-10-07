@@ -42,7 +42,8 @@ impl Item {
 /// Apply * list item `Tag` to given `TextBuffer`
 pub fn render(buffer: &TextBuffer) {
     let state_tag = TextTag::builder().family("monospace").build();
-    assert!(buffer.tag_table().add(&state_tag));
+    let tag_table = buffer.tag_table();
+    assert!(tag_table.add(&state_tag));
 
     let (start, end) = buffer.bounds();
     let full_content = buffer.text(&start, &end, true).to_string();
@@ -69,19 +70,42 @@ pub fn render(buffer: &TextBuffer) {
             cap["text"].into(),
         );
 
-        buffer.insert_with_tags(
-            &mut start_iter,
-            &format!("{}• ", " ".repeat(item.level)),
-            &[],
-        );
+        let level_tag_name = format!("list-level-{}", item.level);
+        let level_tag = match tag_table.lookup(&level_tag_name) {
+            Some(tag) => tag,
+            None => {
+                let tag = TextTag::builder()
+                    .name(&level_tag_name)
+                    .left_margin(28 + (item.level as i32 * 6))
+                    .indent(-14)
+                    .build();
+                assert!(tag_table.add(&tag));
+                tag
+            }
+        };
+
+        let item_start_offset = start_iter.offset();
+
+        buffer.insert_with_tags(&mut start_iter, "• ", &[]);
+
         if let Some(state) = item.state {
             buffer.insert_with_tags(
                 &mut start_iter,
-                if state.is_checked() { "[x] " } else { "[ ] " },
+                if state.is_checked() {
+                    "\\[x\\] "
+                } else {
+                    "\\[ \\] "
+                },
                 &[&state_tag],
             );
         }
+
         buffer.insert_with_tags(&mut start_iter, &item.text, &[]);
+        buffer.apply_tag(
+            &level_tag,
+            &buffer.iter_at_offset(item_start_offset),
+            &start_iter,
+        );
     }
 }
 
