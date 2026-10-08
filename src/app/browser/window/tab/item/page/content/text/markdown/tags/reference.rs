@@ -11,6 +11,7 @@ const REGEX_LINK: &str = r"\[(?P<text>.*?)\]\((?P<url>[^\)]+)\)";
 const REGEX_IMAGE: &str = r"!\[(?P<alt>.*?)\]\((?P<url>[^\)]+)\)";
 const REGEX_IMAGE_LINK: &str =
     r"\[(?P<is_img>!)\[(?P<alt>.*?)\]\((?P<img_url>[^\)]+)\)\]\((?P<link_url>[^\)]+)\)";
+const REGEX_PLAIN: &str = r"(?i)(?P<url>[a-z0-9]+://[^\s)\\]+)";
 
 struct Reference {
     uri: Uri,
@@ -105,6 +106,18 @@ impl Reference {
     }
 }
 
+pub fn render(
+    buffer: &TextBuffer,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    render_images_links(buffer, base, link_color, links);
+    render_images(buffer, base, link_color, links);
+    render_links(buffer, base, link_color, links);
+    render_plain(buffer, base, link_color, links)
+}
+
 /// Image links `[![]()]()`
 fn render_images_links(
     buffer: &TextBuffer,
@@ -160,17 +173,6 @@ fn render_images_links(
     }
 }
 
-pub fn render(
-    buffer: &TextBuffer,
-    base: &Uri,
-    link_color: &RGBA,
-    links: &mut HashMap<TextTag, Uri>,
-) {
-    render_images_links(buffer, base, link_color, links);
-    render_images(buffer, base, link_color, links);
-    render_links(buffer, base, link_color, links)
-}
-
 /// Image tags `![]()`
 fn render_images(
     buffer: &TextBuffer,
@@ -222,6 +224,7 @@ fn render_images(
         }
     }
 }
+
 /// Links `[]()`
 fn render_links(
     buffer: &TextBuffer,
@@ -269,6 +272,50 @@ fn render_links(
             },
             base,
         ) {
+            this.into_buffer(buffer, &mut start_iter, link_color, false, links)
+        }
+    }
+}
+
+/// Plain scheme://*
+fn render_plain(
+    buffer: &TextBuffer,
+    base: &Uri,
+    link_color: &RGBA,
+    links: &mut HashMap<TextTag, Uri>,
+) {
+    let (start, end) = buffer.bounds();
+    let full_content = buffer.text(&start, &end, true).to_string();
+
+    let matches: Vec<_> = Regex::new(REGEX_PLAIN)
+        .unwrap()
+        .captures_iter(&full_content)
+        .collect();
+
+    for cap in matches.into_iter().rev() {
+        let full_match = cap.get(0).unwrap();
+
+        let start_char_offset = full_content[..full_match.start()].chars().count() as i32;
+        let end_char_offset = full_content[..full_match.end()].chars().count() as i32;
+
+        let mut start_iter = buffer.iter_at_offset(start_char_offset);
+        let mut end_iter = buffer.iter_at_offset(end_char_offset);
+
+        if start_char_offset > 0
+            && buffer
+                .text(
+                    &buffer.iter_at_offset(start_char_offset - 1),
+                    &end_iter,
+                    false,
+                )
+                .starts_with("\\")
+        {
+            continue;
+        }
+
+        buffer.delete(&mut start_iter, &mut end_iter);
+
+        if let Some(this) = Reference::parse(&cap["url"], None, base) {
             this.into_buffer(buffer, &mut start_iter, link_color, false, links)
         }
     }
@@ -358,4 +405,23 @@ fn test_regex_image() {
     assert_eq!(&second[0], "![image2](https://image2.com)");
     assert_eq!(&second["alt"], "image2");
     assert_eq!(&second["url"], "https://image2.com");
+}
+
+#[test]
+fn test_regex_plain() {
+    let cap: Vec<_> = Regex::new(REGEX_PLAIN)
+        .unwrap()
+        .captures_iter(
+            r"https://link1.com abc: def https://link2.com:80/index.php?k1=v1&k2=v2\n
+              abc def gemini://link3.com abc def ftp://user:pass@link4)\n
+              http://domain.i2p", // a-z0-9 TLD
+        )
+        .collect();
+
+    assert_eq!(cap.len(), 5);
+    assert_eq!(&cap[0]["url"], "https://link1.com");
+    assert_eq!(&cap[1]["url"], "https://link2.com:80/index.php?k1=v1&k2=v2");
+    assert_eq!(&cap[2]["url"], "gemini://link3.com");
+    assert_eq!(&cap[3]["url"], "ftp://user:pass@link4");
+    assert_eq!(&cap[4]["url"], "http://domain.i2p")
 }
